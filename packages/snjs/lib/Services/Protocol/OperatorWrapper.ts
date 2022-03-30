@@ -4,6 +4,7 @@ import {
   EncryptedParameters,
   ErroredDecryptingParameters,
   DecryptedParameters,
+  encryptedParametersFromPayload,
 } from '@standardnotes/payloads'
 import { SNItemsKey } from '@Lib/Models/ItemsKey/ItemsKey'
 import { isAsyncOperator } from './Functions'
@@ -36,11 +37,15 @@ export async function decryptPayload(
   operatorManager: OperatorManager,
 ): Promise<DecryptedParameters | ErroredDecryptingParameters> {
   const operator = operatorManager.operatorForVersion(payload.version)
+
   try {
     if (isAsyncOperator(operator)) {
-      return await operator.generateDecryptedParametersAsync(payload, key)
+      return await operator.generateDecryptedParametersAsync(
+        encryptedParametersFromPayload(payload),
+        key,
+      )
     } else {
-      return operator.generateDecryptedParametersSync(payload, key)
+      return operator.generateDecryptedParametersSync(encryptedParametersFromPayload(payload), key)
     }
   } catch (e) {
     console.error('Error decrypting payload', payload, e)

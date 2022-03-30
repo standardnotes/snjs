@@ -17,7 +17,7 @@ import { UuidGenerator } from '@standardnotes/utils'
  * changed, and overrides functions where behavior may differ.
  */
 export class SNProtocolOperator003 extends SNProtocolOperator002 {
-  get version(): string {
+  get version(): ProtocolVersion {
     return ProtocolVersion.V003
   }
 
@@ -66,7 +66,11 @@ export class SNProtocolOperator003 extends SNProtocolOperator002 {
       V003Algorithm.PbkdfOutputLength,
     )
 
-    const partitions = splitString(derivedKey!, 3)
+    if (!derivedKey) {
+      throw Error('Error deriving PBKDF2 key')
+    }
+
+    const partitions = splitString(derivedKey, 3)
     const key = SNRootKey.Create({
       serverPassword: partitions[0],
       masterKey: partitions[1],

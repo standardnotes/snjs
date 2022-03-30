@@ -16,6 +16,7 @@ import {
   DecryptedParameters,
   ErroredDecryptingParameters,
   mergePayloadWithEncryptionParameters,
+  encryptedParametersFromPayload,
 } from '@standardnotes/payloads'
 import { Uuids } from '@Lib/Models/Functions'
 import { ItemManager } from '@Lib/Services/Items/ItemManager'
@@ -261,7 +262,7 @@ export class SNProtocolService
 
     if (split.usesRootKey) {
       const categorized = categorizePayloads(split.usesRootKey.items)
-      const rootKeyEncrypted = await this.rootKeyEncryption.encryptPayloads(
+      const rootKeyEncrypted = await this.rootKeyEncryption.encryptSplitSingles(
         categorized.encryptables,
         split.usesRootKey.key,
       )
@@ -271,7 +272,7 @@ export class SNProtocolService
 
     if (split.usesItemsKey) {
       const categorized = categorizePayloads(split.usesItemsKey.items)
-      const itemsKeyEncrypted = await this.itemsEncryption.encryptPayloads(
+      const itemsKeyEncrypted = await this.itemsEncryption.encryptSplitSingles(
         categorized.encryptables,
         split.usesItemsKey.key,
       )
@@ -281,7 +282,7 @@ export class SNProtocolService
 
     if (split.usesRootKeyWithKeyLookup) {
       const categorized = categorizePayloads(split.usesRootKeyWithKeyLookup.items)
-      const rootKeyEncrypted = await this.rootKeyEncryption.encryptPayloadsWithKeyLookup(
+      const rootKeyEncrypted = await this.rootKeyEncryption.encryptSplitSinglesWithKeyLookup(
         categorized.encryptables,
       )
       extendArray(allEncryptedParams, rootKeyEncrypted)
@@ -290,7 +291,7 @@ export class SNProtocolService
 
     if (split.usesItemsKeyWithKeyLookup) {
       const categorized = categorizePayloads(split.usesItemsKeyWithKeyLookup.items)
-      const itemsKeyEncrypted = await this.itemsEncryption.encryptPayloadsWithKeyLookup(
+      const itemsKeyEncrypted = await this.itemsEncryption.encryptSplitSinglesWithKeyLookup(
         categorized.encryptables,
       )
       extendArray(allEncryptedParams, itemsKeyEncrypted)
@@ -345,6 +346,15 @@ export class SNProtocolService
       extendArray(allNondecryptablePayloads, categorized.nondecryptables)
     }
 
+    if (split.usesRootKeyWithKeyLookup) {
+      const categorized = categorizePayloads(split.usesRootKeyWithKeyLookup.items)
+      const rootKeyDecrypted = await this.rootKeyEncryption.decryptPayloadsWithKeyLookup(
+        categorized.decryptables,
+      )
+      extendArray(allDecryptedParams, rootKeyDecrypted)
+      extendArray(allNondecryptablePayloads, categorized.nondecryptables)
+    }
+
     if (split.usesItemsKey) {
       const categorized = categorizePayloads(split.usesItemsKey.items)
       const itemsKeyDecrypted = await this.itemsEncryption.decryptPayloads(
@@ -355,12 +365,22 @@ export class SNProtocolService
       extendArray(allNondecryptablePayloads, categorized.nondecryptables)
     }
 
-    const packagedDecrypted = allDecryptedParams.map((decryptedParams) =>
-      mergePayloadWithEncryptionParameters(
-        findPayloadInSplit(decryptedParams.uuid, split),
-        decryptedParams,
-      ),
-    )
+    if (split.usesItemsKeyWithKeyLookup) {
+      const categorized = categorizePayloads(split.usesItemsKeyWithKeyLookup.items)
+      const itemsKeyDecrypted = await this.itemsEncryption.decryptPayloadsWithKeyLookup(
+        categorized.decryptables,
+      )
+      extendArray(allDecryptedParams, itemsKeyDecrypted)
+      extendArray(allNondecryptablePayloads, categorized.nondecryptables)
+    }
+
+    const packagedDecrypted = allDecryptedParams.map((decryptedParams) => {
+      const original = findPayloadInSplit(decryptedParams.uuid, split)
+      return mergePayloadWithEncryptionParameters(original, {
+        ...decryptedParams,
+        errorDecryptingValueChanged: original.errorDecrypting !== decryptedParams.errorDecrypting,
+      })
+    })
 
     return allNondecryptablePayloads.concat(packagedDecrypted)
   }
@@ -594,7 +614,9 @@ export class SNProtocolService
       return undefined
     }
     const operator = this.operatorManager.operatorForVersion(version)
-    const authenticatedData = operator.getPayloadAuthenticatedData(payload)
+    const authenticatedData = operator.getPayloadAuthenticatedData(
+      encryptedParametersFromPayload(payload),
+    )
     return authenticatedData
   }
 

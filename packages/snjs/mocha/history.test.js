@@ -12,15 +12,15 @@ describe('history manager', () => {
     awaitAll: true,
   }
 
-  beforeEach(async function () {
+  beforeEach(function () {
     localStorage.clear()
   })
 
-  afterEach(async function () {
+  afterEach(function () {
     localStorage.clear()
   })
 
-  describe('session', async function () {
+  describe('session', function () {
     beforeEach(async function () {
       this.application = await Factory.createInitAppWithFakeCrypto()
       this.historyManager = this.application.historyManager
@@ -33,7 +33,7 @@ describe('history manager', () => {
       await Factory.safeDeinit(this.application)
     })
 
-    async function setTextAndSync(application, item, text) {
+    function setTextAndSync(application, item, text) {
       return application.mutator.changeAndSaveItem(
         item.uuid,
         (mutator) => {
@@ -90,7 +90,6 @@ describe('history manager', () => {
     it('first change should create revision with previous value', async function () {
       const identifier = this.application.identifier
       const item = await Factory.createSyncedNote(this.application)
-      await Factory.safeDeinit(this.application)
 
       /** Simulate loading new application session */
       const context = await Factory.createAppContext(identifier)
@@ -306,7 +305,7 @@ describe('history manager', () => {
     })
   })
 
-  describe('remote', async function () {
+  describe('remote', function () {
     beforeEach(async function () {
       this.application = await Factory.createInitAppWithFakeCrypto()
       this.historyManager = this.application.historyManager

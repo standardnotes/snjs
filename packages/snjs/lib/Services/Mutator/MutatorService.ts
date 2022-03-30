@@ -326,7 +326,7 @@ export class MutatorService extends AbstractService implements MutatorClientInte
         return { error: new ClientDisplayableError(Strings.Info.UnsupportedBackupFileVersion) }
       }
 
-      const userVersion = await this.protocolService.getUserVersion()
+      const userVersion = this.protocolService.getUserVersion()
       if (userVersion && compareVersions(version, userVersion) === 1) {
         /** File was made with a greater version than the user's account */
         return { error: new ClientDisplayableError(Strings.Info.BackupFileMoreRecentThanAccount) }

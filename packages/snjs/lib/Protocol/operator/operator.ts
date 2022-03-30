@@ -39,7 +39,7 @@ export interface OperatorCommon {
    * non-decrypted, ciphertext state.
    */
   getPayloadAuthenticatedData(
-    payload: PurePayload,
+    encrypted: EncryptedParameters,
   ): RootKeyEncryptedAuthenticatedData | ItemAuthenticatedData | LegacyAttachedData | undefined
 
   /**
@@ -75,7 +75,7 @@ export interface SynchronousOperator extends OperatorCommon {
   ): EncryptedParameters
 
   generateDecryptedParametersSync(
-    encryptedParameters: PurePayload,
+    encrypted: EncryptedParameters,
     key: SNItemsKey | SNRootKey,
   ): DecryptedParameters | ErroredDecryptingParameters
 }
@@ -94,7 +94,7 @@ export interface AsynchronousOperator extends OperatorCommon {
   ): Promise<EncryptedParameters>
 
   generateDecryptedParametersAsync(
-    encryptedParameters: PurePayload,
+    encrypted: EncryptedParameters,
     key: SNItemsKey | SNRootKey,
   ): Promise<DecryptedParameters | ErroredDecryptingParameters>
 }

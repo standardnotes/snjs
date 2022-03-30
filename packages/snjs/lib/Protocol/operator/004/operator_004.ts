@@ -5,7 +5,6 @@ import {
   LegacyAttachedData,
   RootKeyEncryptedAuthenticatedData,
   PurePayload,
-  PayloadFormat,
   FillItemContent,
   CreateMaxPayloadFromAnyObject,
   EncryptedParameters,
@@ -40,7 +39,7 @@ export class SNProtocolOperator004 implements SynchronousOperator {
     return 'XChaCha20-Poly1305'
   }
 
-  get version(): string {
+  get version(): ProtocolVersion {
     return ProtocolVersion.V004
   }
 
@@ -177,13 +176,9 @@ export class SNProtocolOperator004 implements SynchronousOperator {
   }
 
   public getPayloadAuthenticatedData(
-    payload: PurePayload,
+    encrypted: EncryptedParameters,
   ): RootKeyEncryptedAuthenticatedData | ItemAuthenticatedData | LegacyAttachedData | undefined {
-    if (payload.format !== PayloadFormat.EncryptedString) {
-      throw Error('Attempting to get embedded key params of already decrypted item')
-    }
-
-    const itemKeyComponents = this.deconstructEncryptedPayloadString(payload.enc_item_key!)
+    const itemKeyComponents = this.deconstructEncryptedPayloadString(encrypted.enc_item_key)
     const authenticatedData = itemKeyComponents.rawAuthenticatedData
     const result = this.stringToAuthenticatedData(authenticatedData)
     return result
@@ -254,19 +249,20 @@ export class SNProtocolOperator004 implements SynchronousOperator {
       items_key_id: key instanceof SNItemsKey ? key.uuid : undefined,
       content: encryptedContentString,
       enc_item_key: encryptedItemKey,
+      version: this.version,
     }
   }
 
   public generateDecryptedParametersSync(
-    payload: PurePayload,
+    encrypted: EncryptedParameters,
     key: SNItemsKey | SNRootKey,
   ): DecryptedParameters | ErroredDecryptingParameters {
-    const itemKeyComponents = this.deconstructEncryptedPayloadString(payload.enc_item_key!)
+    const itemKeyComponents = this.deconstructEncryptedPayloadString(encrypted.enc_item_key)
     const authenticatedData = this.stringToAuthenticatedData(
       itemKeyComponents.rawAuthenticatedData,
       {
-        u: payload.uuid,
-        v: payload.version,
+        u: encrypted.uuid,
+        v: encrypted.version,
       },
     )
 
@@ -279,16 +275,15 @@ export class SNProtocolOperator004 implements SynchronousOperator {
     )
 
     if (!itemKey) {
-      console.error('Error decrypting itemKey parameters', payload)
+      console.error('Error decrypting itemKey parameters', encrypted)
       return {
-        uuid: payload.uuid,
+        uuid: encrypted.uuid,
         errorDecrypting: true,
-        errorDecryptingValueChanged: !payload.errorDecrypting,
       }
     }
 
     /** Decrypt content payload. */
-    const contentComponents = this.deconstructEncryptedPayloadString(payload.contentString)
+    const contentComponents = this.deconstructEncryptedPayloadString(encrypted.content)
     const content = this.decryptString004(
       contentComponents.ciphertext,
       itemKey,
@@ -297,19 +292,17 @@ export class SNProtocolOperator004 implements SynchronousOperator {
     )
     if (!content) {
       return {
-        uuid: payload.uuid,
+        uuid: encrypted.uuid,
         errorDecrypting: true,
-        errorDecryptingValueChanged: !payload.errorDecrypting,
       }
     } else {
       return {
-        uuid: payload.uuid,
+        uuid: encrypted.uuid,
         content: JSON.parse(content),
         items_key_id: undefined,
         enc_item_key: undefined,
         auth_hash: undefined,
         errorDecrypting: false,
-        errorDecryptingValueChanged: payload.errorDecrypting === true,
         waitingForKey: false,
       }
     }

@@ -8,7 +8,6 @@ import {
   FillItemContent,
   PurePayload,
   CreateMaxPayloadFromAnyObject,
-  PayloadFormat,
   EncryptedParameters,
   DecryptedParameters,
   ErroredDecryptingParameters,
@@ -40,7 +39,7 @@ export class SNProtocolOperator001 implements AsynchronousOperator {
     return 'AES-256'
   }
 
-  get version(): string {
+  get version(): ProtocolVersion {
     return ProtocolVersion.V001
   }
 
@@ -74,8 +73,9 @@ export class SNProtocolOperator001 implements AsynchronousOperator {
     origination: KeyParamsOrigination,
   ): Promise<SNRootKey> {
     const pwCost = V001Algorithm.PbkdfMinCost as number
-    const pwNonce = await this.crypto.generateRandomKey(V001Algorithm.SaltSeedLength)
+    const pwNonce = this.crypto.generateRandomKey(V001Algorithm.SaltSeedLength)
     const pwSalt = await this.crypto.unsafeSha1(identifier + 'SN' + pwNonce)
+
     const keyParams = Create001KeyParams({
       email: identifier,
       pw_cost: pwCost,
@@ -85,12 +85,12 @@ export class SNProtocolOperator001 implements AsynchronousOperator {
       origination,
       created: `${Date.now()}`,
     })
+
     return this.deriveKey(password, keyParams)
   }
 
   public getPayloadAuthenticatedData(
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    _payload: PurePayload,
+    _encrypted: EncryptedParameters,
   ): RootKeyEncryptedAuthenticatedData | ItemAuthenticatedData | LegacyAttachedData | undefined {
     return undefined
   }
@@ -125,61 +125,62 @@ export class SNProtocolOperator001 implements AsynchronousOperator {
     const ciphertext = key.keyVersion + contentCiphertext
     const authHash = await this.crypto.hmac256(ciphertext, ak)
 
+    if (!authHash) {
+      throw Error('Error generating hmac256 authHash')
+    }
+
     return {
       uuid: payload.uuid,
       items_key_id: key instanceof SNItemsKey ? key.uuid : undefined,
       content: ciphertext,
-      enc_item_key: encItemKey!,
-      auth_hash: authHash!,
+      enc_item_key: encItemKey,
+      auth_hash: authHash,
+      version: this.version,
     }
   }
 
   public async generateDecryptedParametersAsync(
-    payload: PurePayload,
+    encrypted: EncryptedParameters,
     key: SNItemsKey | SNRootKey,
   ): Promise<DecryptedParameters | ErroredDecryptingParameters> {
-    if (!payload.enc_item_key) {
+    if (!encrypted.enc_item_key) {
       SNLog.error(Error('Missing item encryption key, skipping decryption.'))
       return {
-        uuid: payload.uuid,
+        uuid: encrypted.uuid,
         errorDecrypting: true,
-        errorDecryptingValueChanged: !payload.errorDecrypting,
       }
     }
 
-    let encryptedItemKey = payload.enc_item_key
+    let encryptedItemKey = encrypted.enc_item_key
     encryptedItemKey = this.version + encryptedItemKey
-    const itemKeyComponents = this.encryptionComponentsFromString(encryptedItemKey, key!.itemsKey)
+    const itemKeyComponents = this.encryptionComponentsFromString(encryptedItemKey, key.itemsKey)
 
     const itemKey = await this.decryptString(itemKeyComponents.ciphertext, itemKeyComponents.key)
     if (!itemKey) {
-      console.error('Error decrypting parameters', payload)
+      console.error('Error decrypting parameters', encrypted)
       return {
-        uuid: payload.uuid,
+        uuid: encrypted.uuid,
         errorDecrypting: true,
-        errorDecryptingValueChanged: !payload.errorDecrypting,
       }
     }
 
     const ek = firstHalfOfString(itemKey)
-    const itemParams = this.encryptionComponentsFromString(payload.contentString, ek)
+    const itemParams = this.encryptionComponentsFromString(encrypted.content, ek)
     const content = await this.decryptString(itemParams.ciphertext, itemParams.key)
 
     if (!content) {
       return {
-        uuid: payload.uuid,
+        uuid: encrypted.uuid,
         errorDecrypting: true,
-        errorDecryptingValueChanged: !payload.errorDecrypting,
       }
     } else {
       return {
-        uuid: payload.uuid,
+        uuid: encrypted.uuid,
         content: JSON.parse(content),
         items_key_id: undefined,
         enc_item_key: undefined,
         auth_hash: undefined,
         errorDecrypting: false,
-        errorDecryptingValueChanged: payload.errorDecrypting === true,
         waitingForKey: false,
       }
     }
@@ -201,13 +202,20 @@ export class SNProtocolOperator001 implements AsynchronousOperator {
       keyParams.content001.pw_cost,
       V001Algorithm.PbkdfOutputLength,
     )
-    const partitions = splitString(derivedKey!, 2)
-    const key = await SNRootKey.Create({
+
+    if (!derivedKey) {
+      throw Error('Error deriving PBKDF2 key')
+    }
+
+    const partitions = splitString(derivedKey, 2)
+
+    const key = SNRootKey.Create({
       serverPassword: partitions[0],
       masterKey: partitions[1],
       version: ProtocolVersion.V001,
       keyParams: keyParams.getPortableValue(),
     })
+
     return key
   }
 }

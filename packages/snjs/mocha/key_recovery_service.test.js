@@ -12,11 +12,11 @@ describe('key recovery service', function () {
     awaitAll: true,
   }
 
-  beforeEach(async function () {
+  beforeEach(function () {
     localStorage.clear()
   })
 
-  afterEach(async function () {
+  afterEach(function () {
     localStorage.clear()
   })
 
@@ -27,7 +27,7 @@ describe('key recovery service', function () {
     const unassociatedIdentifier = 'foorand'
 
     const application = context.application
-    const receiveChallenge = async (challenge) => {
+    const receiveChallenge = (challenge) => {
       /** Give unassociated password when prompted */
       application.submitValuesForChallenge(challenge, [
         new ChallengeValue(challenge.prompts[0], unassociatedPassword),
@@ -51,17 +51,22 @@ describe('key recovery service', function () {
     const randomItemsKey = await application.protocolService.operatorManager
       .defaultOperator()
       .createItemsKey()
-    const encrypted = await application.protocolService.rootKeyEncryption.encryptPayload(
-      randomItemsKey.payload,
+    const encrypted = await application.protocolService.encryptSplitSingle(
+      {
+        usesRootKey: {
+          items: [randomItemsKey.payload],
+          key: randomRootKey,
+        },
+      },
       EncryptionIntent.Sync,
-      randomRootKey,
     )
 
     /** Attempt decryption and insert into rotation in errored state  */
-    const decrypted = await application.protocolService.rootKeyEncryption.decryptPayload(
-      encrypted,
-      application.protocolService.getRootKey(),
-    )
+    const decrypted = await application.protocolService.decryptSplitSingle({
+      usesRootKeyWithKeyLookup: {
+        items: [encrypted],
+      },
+    })
     /** Expect to be errored */
     expect(decrypted.errorDecrypting).to.equal(true)
 
@@ -86,7 +91,7 @@ describe('key recovery service', function () {
 
     const context = await Factory.createAppContextWithFakeCrypto(namespace)
     const application = context.application
-    const receiveChallenge = async (challenge) => {
+    const receiveChallenge = (challenge) => {
       totalPromptCount++
       /** Give unassociated password when prompted */
       application.submitValuesForChallenge(challenge, [
@@ -114,17 +119,22 @@ describe('key recovery service', function () {
     const randomItemsKey2 = await application.protocolService.operatorManager
       .defaultOperator()
       .createItemsKey()
-    const encrypted = await application.protocolService.rootKeyEncryption.encryptPayloads(
-      [randomItemsKey.payload, randomItemsKey2.payload],
+    const encrypted = await application.protocolService.encryptSplit(
+      {
+        usesRootKey: {
+          items: [randomItemsKey.payload, randomItemsKey2.payload],
+          key: randomRootKey,
+        },
+      },
       EncryptionIntent.Sync,
-      randomRootKey,
     )
 
     /** Attempt decryption and insert into rotation in errored state  */
-    const decrypted = await application.protocolService.rootKeyEncryption.decryptPayloads(
-      encrypted,
-      application.protocolService.getRootKey(),
-    )
+    const decrypted = await application.protocolService.decryptSplit({
+      usesRootKeyWithKeyLookup: {
+        items: encrypted,
+      },
+    })
 
     await application.payloadManager.emitPayloads(decrypted, PayloadSource.Constructor)
 
@@ -151,7 +161,7 @@ describe('key recovery service', function () {
     const newPassword = `${Math.random()}`
     const contextA = await Factory.createAppContextWithFakeCrypto(namespace)
     const appA = contextA.application
-    const receiveChallenge = async (challenge) => {
+    const receiveChallenge = (challenge) => {
       const responses = []
       for (const prompt of challenge.prompts) {
         if (prompt.validation === ChallengeValidation.AccountPassword) {
@@ -165,7 +175,7 @@ describe('key recovery service', function () {
           responses.push(new ChallengeValue(prompt, newPassword))
         } else {
           console.error(
-            `Unhandled custom challenge in Factory.createAppContextWithFakeCrypto`,
+            'Unhandled custom challenge in Factory.createAppContextWithFakeCrypto',
             challenge,
             prompt,
           )
@@ -227,8 +237,8 @@ describe('key recovery service', function () {
     expect(appA.syncService.isOutOfSync()).to.equal(false)
     expect(appB.syncService.isOutOfSync()).to.equal(false)
 
-    contextA.deinit()
-    contextB.deinit()
+    await contextA.deinit()
+    await contextB.deinit()
   }).timeout(80000)
 
   it.skip('when items key associated with item is errored, item should be marked waiting for key', async function () {
@@ -236,7 +246,7 @@ describe('key recovery service', function () {
     const newPassword = `${Math.random()}`
     const contextA = await Factory.createAppContextWithFakeCrypto(namespace)
     const appA = contextA.application
-    const receiveChallenge = async (challenge) => {
+    const receiveChallenge = (challenge) => {
       const prompt = challenge.prompts[0]
       /** Give newPassword when prompted */
       appA.submitValuesForChallenge(challenge, [new ChallengeValue(prompt, newPassword)])
@@ -254,6 +264,7 @@ describe('key recovery service', function () {
 
     /** Create simultaneous appB signed into same account */
     const appB = await Factory.createApplicationWithFakeCrypto('another-namespace')
+    // eslint-disable-next-line @typescript-eslint/no-empty-function
     await appB.prepareForLaunch({ receiveChallenge: () => {} })
     await appB.launch(true)
     await Factory.loginToApplication({
@@ -275,6 +286,7 @@ describe('key recovery service', function () {
     await Factory.safeDeinit(appB)
 
     const recreatedAppA = await Factory.createApplicationWithFakeCrypto(namespace)
+    // eslint-disable-next-line @typescript-eslint/no-empty-function
     await recreatedAppA.prepareForLaunch({ receiveChallenge: () => {} })
     await recreatedAppA.launch(true)
 
@@ -292,7 +304,7 @@ describe('key recovery service', function () {
     const unassociatedPassword = 'randfoo'
     const context = await Factory.createAppContextWithFakeCrypto('some-namespace')
     const application = context.application
-    const receiveChallenge = async (challenge) => {
+    const receiveChallenge = (challenge) => {
       /** This is the sign in prompt, return proper value */
       application.submitValuesForChallenge(challenge, [
         new ChallengeValue(
@@ -331,10 +343,14 @@ describe('key recovery service', function () {
     const correctItemsKey = await application.protocolService.operatorManager
       .defaultOperator()
       .createItemsKey()
-    const encrypted = await application.protocolService.rootKeyEncryption.encryptPayload(
-      correctItemsKey.payload,
+    const encrypted = await application.protocolService.encryptSplitSingle(
+      {
+        usesRootKey: {
+          items: [correctItemsKey.payload],
+          key: randomRootKey,
+        },
+      },
       EncryptionIntent.Sync,
-      randomRootKey,
     )
     await application.payloadManager.emitPayload(
       CopyPayload(encrypted, {
@@ -359,7 +375,7 @@ describe('key recovery service', function () {
           it should be temporarily ignored and recovered separately`, async function () {
     const context = await Factory.createAppContextWithFakeCrypto(Factory.randomString())
     const application = context.application
-    const receiveChallenge = async (challenge) => {
+    const receiveChallenge = (challenge) => {
       application.submitValuesForChallenge(challenge, [
         new ChallengeValue(challenge.prompts[0], context.password),
       ])
@@ -374,11 +390,14 @@ describe('key recovery service', function () {
     })
 
     /** Create and emit errored encrypted items key payload */
-    const itemsKey = await application.protocolService.itemsEncryption.getDefaultItemsKey()
-    const encrypted = await application.protocolService.rootKeyEncryption.encryptPayload(
-      itemsKey.payload,
+    const itemsKey = await application.protocolService.getSureDefaultItemsKey()
+    const encrypted = await application.protocolService.encryptSplitSingle(
+      {
+        usesRootKeyWithKeyLookup: {
+          items: [itemsKey.payload],
+        },
+      },
       EncryptionIntent.Sync,
-      application.protocolService.getRootKey(),
     )
     const newUpdated = new Date()
     await application.payloadManager.emitPayload(
@@ -432,11 +451,14 @@ describe('key recovery service', function () {
     })
 
     /** Create and emit errored encrypted items key payload */
-    const itemsKey = await application.protocolService.itemsEncryption.getDefaultItemsKey()
-    const encrypted = await application.protocolService.rootKeyEncryption.encryptPayload(
-      itemsKey.payload,
+    const itemsKey = await application.protocolService.getSureDefaultItemsKey()
+    const encrypted = await application.protocolService.encryptSplitSingle(
+      {
+        usesRootKeyWithKeyLookup: {
+          items: [itemsKey.payload],
+        },
+      },
       EncryptionIntent.Sync,
-      application.protocolService.getRootKey(),
     )
 
     await application.payloadManager.emitPayload(
@@ -456,7 +478,7 @@ describe('key recovery service', function () {
     /** Recreate application, and expect key recovery wizard to complete */
     const recreatedApp = await Factory.createApplicationWithFakeCrypto(namespace)
     let didReceivePasswordPrompt = false
-    const receiveChallenge = async (challenge) => {
+    const receiveChallenge = (challenge) => {
       didReceivePasswordPrompt = true
       recreatedApp.submitValuesForChallenge(challenge, [
         new ChallengeValue(challenge.prompts[0], context.password),
@@ -488,7 +510,7 @@ describe('key recovery service', function () {
 
     const context = await Factory.createAppContextWithFakeCrypto(namespace)
     const application = context.application
-    const receiveChallenge = async (challenge) => {
+    const receiveChallenge = (challenge) => {
       /** Give unassociated password when prompted */
       application.submitValuesForChallenge(challenge, [
         new ChallengeValue(challenge.prompts[0], unassociatedPassword),
@@ -514,17 +536,22 @@ describe('key recovery service', function () {
     const randomItemsKey = await application.protocolService.operatorManager
       .operatorForVersion(ProtocolVersion.V003)
       .createItemsKey()
-    const encrypted = await application.protocolService.rootKeyEncryption.encryptPayload(
-      randomItemsKey.payload,
+    const encrypted = await application.protocolService.encryptSplitSingle(
+      {
+        usesRootKey: {
+          items: [randomItemsKey.payload],
+          key: randomRootKey,
+        },
+      },
       EncryptionIntent.Sync,
-      randomRootKey,
     )
 
     /** Attempt decryption and insert into rotation in errored state  */
-    const decrypted = await application.protocolService.rootKeyEncryption.decryptPayload(
-      encrypted,
-      application.protocolService.getRootKey(),
-    )
+    const decrypted = await application.protocolService.decryptSplitSingle({
+      usesRootKeyWithKeyLookup: {
+        items: [encrypted],
+      },
+    })
     /** Expect to be errored */
     expect(decrypted.errorDecrypting).to.equal(true)
 
@@ -543,10 +570,10 @@ describe('key recovery service', function () {
 
   it('when replacing root key, new root key should be set before items key are re-saved to disk', async function () {
     const namespace = Factory.randomString()
-    const newPassword = `new-password`
+    const newPassword = 'new-password'
     const contextA = await Factory.createAppContextWithFakeCrypto(namespace)
     const appA = contextA.application
-    const receiveChallenge = async (challenge) => {
+    const receiveChallenge = (challenge) => {
       const responses = []
       for (const prompt of challenge.prompts) {
         if (prompt.validation === ChallengeValidation.AccountPassword) {
@@ -560,7 +587,7 @@ describe('key recovery service', function () {
           responses.push(new ChallengeValue(prompt, newPassword))
         } else {
           console.error(
-            `Unhandled custom challenge in Factory.createAppContextWithFakeCrypto`,
+            'Unhandled custom challenge in Factory.createAppContextWithFakeCrypto',
             challenge,
             prompt,
           )
@@ -593,12 +620,15 @@ describe('key recovery service', function () {
     expect(result.error).to.not.be.ok
     await appB.sync.sync()
 
-    const newDefaultKey = appB.protocolService.itemsEncryption.getDefaultItemsKey()
+    const newDefaultKey = appB.protocolService.getSureDefaultItemsKey()
 
-    const encrypted = await appB.protocolService.rootKeyEncryption.encryptPayload(
-      newDefaultKey.payload,
+    const encrypted = await appB.protocolService.encryptSplitSingle(
+      {
+        usesRootKeyWithKeyLookup: {
+          items: [newDefaultKey.payload],
+        },
+      },
       EncryptionIntent.Sync,
-      appB.protocolService.getRootKey(),
     )
 
     /** Insert foreign items key into appA, which shouldn't be able to decrypt it yet */
@@ -631,7 +661,7 @@ describe('key recovery service', function () {
 
     expect(storedParams).to.eql(correctParams)
 
-    contextA.deinit()
-    contextB.deinit()
+    await contextA.deinit()
+    await contextB.deinit()
   }).timeout(80000)
 })

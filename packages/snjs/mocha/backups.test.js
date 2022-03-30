@@ -5,11 +5,11 @@ chai.use(chaiAsPromised)
 const expect = chai.expect
 
 describe('backups', function () {
-  before(async function () {
+  before(function () {
     localStorage.clear()
   })
 
-  after(async function () {
+  after(function () {
     localStorage.clear()
   })
 
@@ -151,8 +151,12 @@ describe('backups', function () {
   it('downloading backup if item is error decrypting should succeed', async function () {
     await Factory.createSyncedNote(this.application)
     const note = await Factory.createSyncedNote(this.application)
-    const encrypted = await this.application.protocolService.itemsEncryption.encryptPayload(
-      note.payload,
+    const encrypted = await this.application.protocolService.encryptSplitSingle(
+      {
+        usesItemsKeyWithKeyLookup: {
+          items: [note.payload],
+        },
+      },
       EncryptionIntent.FileEncrypted,
     )
     const errored = CopyPayload(encrypted, {

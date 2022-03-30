@@ -47,11 +47,14 @@ describe('payload encryption', function () {
       errorDecrypting: false,
     })
 
-    const encryptedPayload =
-      await this.application.protocolService.itemsEncryption.encryptPayload(
-        notePayload,
-        EncryptionIntent.Sync,
-      )
+    const encryptedPayload = await this.application.protocolService.encryptSplitSingle(
+      {
+        usesItemsKeyWithKeyLookup: {
+          items: [notePayload],
+        },
+      },
+      EncryptionIntent.Sync,
+    )
 
     expect(encryptedPayload.dirty).to.not.be.ok
     expect(encryptedPayload.errorDecrypting).to.not.be.ok
@@ -60,7 +63,7 @@ describe('payload encryption', function () {
     expect(encryptedPayload.lastSyncBegan).to.not.be.ok
   })
 
-  it('creating payload with override properties', async function () {
+  it('creating payload with override properties', function () {
     const payload = Factory.createNotePayload()
     const uuid = payload.uuid
     const changedUuid = 'foo'
@@ -72,7 +75,7 @@ describe('payload encryption', function () {
     expect(changedPayload.uuid).to.equal(changedUuid)
   })
 
-  it('creating payload with deep override properties', async function () {
+  it('creating payload with deep override properties', function () {
     const payload = Factory.createNotePayload()
     const text = payload.content.text
     const changedText = `${Math.random()}`
@@ -99,7 +102,7 @@ describe('payload encryption', function () {
     expect(mutated.content.text).to.not.be.ok
   })
 
-  it('copying payload with override should copy empty arrays', async function () {
+  it('copying payload with override should copy empty arrays', function () {
     const pair = Factory.createRelatedNoteTagPairPayload()
     const tagPayload = pair[1]
     expect(tagPayload.content.references.length).to.equal(1)
@@ -115,11 +118,14 @@ describe('payload encryption', function () {
 
   it('returns valid encrypted params for syncing', async function () {
     const payload = Factory.createNotePayload()
-    const encryptedPayload =
-      await this.application.protocolService.itemsEncryption.encryptPayload(
-        payload,
-        EncryptionIntent.Sync,
-      )
+    const encryptedPayload = await this.application.protocolService.encryptSplitSingle(
+      {
+        usesItemsKeyWithKeyLookup: {
+          items: [payload],
+        },
+      },
+      EncryptionIntent.Sync,
+    )
     expect(encryptedPayload.enc_item_key).to.be.ok
     expect(encryptedPayload.uuid).to.be.ok
     expect(encryptedPayload.auth_hash).to.not.be.ok
@@ -130,30 +136,17 @@ describe('payload encryption', function () {
     })
   }).timeout(5000)
 
-  it('returns unencrypted params with no keys', async function () {
-    const payload = Factory.createNotePayload()
-    const encodedPayload = await this.application.protocolService.itemsEncryption.encryptPayload(
-      payload,
-      EncryptionIntent.FileDecrypted,
-    )
-
-    expect(encodedPayload.enc_item_key).to.not.be.ok
-    expect(encodedPayload.auth_hash).to.not.be.ok
-    expect(encodedPayload.uuid).to.be.ok
-    expect(encodedPayload.content_type).to.be.ok
-    expect(encodedPayload.created_at).to.be.ok
-    /** File decrypted will result in bare object */
-    expect(encodedPayload.content.title).to.equal(payload.content.title)
-  })
-
   it('returns additional fields for local storage', async function () {
     const payload = Factory.createNotePayload()
 
-    const encryptedPayload =
-      await this.application.protocolService.itemsEncryption.encryptPayload(
-        payload,
-        EncryptionIntent.LocalStorageEncrypted,
-      )
+    const encryptedPayload = await this.application.protocolService.encryptSplitSingle(
+      {
+        usesItemsKeyWithKeyLookup: {
+          items: [payload],
+        },
+      },
+      EncryptionIntent.LocalStorageEncrypted,
+    )
 
     expect(encryptedPayload.enc_item_key).to.be.ok
     expect(encryptedPayload.auth_hash).to.not.be.ok
@@ -170,11 +163,14 @@ describe('payload encryption', function () {
 
   it('omits deleted for export file', async function () {
     const payload = Factory.createNotePayload()
-    const encryptedPayload =
-      await this.application.protocolService.itemsEncryption.encryptPayload(
-        payload,
-        EncryptionIntent.FileEncrypted,
-      )
+    const encryptedPayload = await this.application.protocolService.encryptSplitSingle(
+      {
+        usesItemsKeyWithKeyLookup: {
+          items: [payload],
+        },
+      },
+      EncryptionIntent.FileEncrypted,
+    )
     expect(encryptedPayload.enc_item_key).to.be.ok
     expect(encryptedPayload.uuid).to.be.ok
     expect(encryptedPayload.content_type).to.be.ok
@@ -191,11 +187,14 @@ describe('payload encryption', function () {
       enc_item_key: 'foo',
       errorDecrypting: true,
     })
-    const encryptedPayload =
-      await this.application.protocolService.itemsEncryption.encryptPayload(
-        mutatedPayload,
-        EncryptionIntent.Sync,
-      )
+    const encryptedPayload = await this.application.protocolService.encryptSplitSingle(
+      {
+        usesItemsKeyWithKeyLookup: {
+          items: [mutatedPayload],
+        },
+      },
+      EncryptionIntent.Sync,
+    )
     expect(encryptedPayload.content).to.eql(payload.content)
     expect(encryptedPayload.enc_item_key).to.be.ok
     expect(encryptedPayload.uuid).to.be.ok

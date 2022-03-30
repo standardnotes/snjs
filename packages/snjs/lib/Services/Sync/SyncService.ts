@@ -271,7 +271,7 @@ export class SNSyncService
     this.opStatus.setDatabaseLoadStatus(0, 0, true)
   }
 
-  private async setLastSyncToken(token: string) {
+  private setLastSyncToken(token: string) {
     this.syncToken = token
     return this.storageService.setValue(StorageKey.LastSyncToken, token)
   }

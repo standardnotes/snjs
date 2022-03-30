@@ -71,6 +71,7 @@ export class RootKeyEncryptionService extends AbstractService<RootKeyServiceEven
     const accountKeyParams = await this.recomputeAccountKeyParams()
     const hasWrapper = await this.hasRootKeyWrapper()
     const hasRootKey = wrappedRootKey != undefined || accountKeyParams != undefined
+
     if (hasWrapper && hasRootKey) {
       this.keyMode = KeyMode.RootKeyPlusWrapper
     } else if (hasWrapper && !hasRootKey) {
@@ -292,7 +293,7 @@ export class RootKeyEncryptionService extends AbstractService<RootKeyServiceEven
       content: this.getSureRootKey().persistableValueWhenWrapping(),
     })
 
-    const wrappedKey = await this.encryptPayload(payload, wrappingKey)
+    const wrappedKey = await this.encryptSplitSingle(payload, wrappingKey)
     const wrappedKeyPayload = mergePayloadWithEncryptionParameters(payload, wrappedKey)
 
     await this.storageService.setValue(
@@ -473,28 +474,31 @@ export class RootKeyEncryptionService extends AbstractService<RootKeyServiceEven
     return this.itemManager.itemsKeys()
   }
 
-  public async encryptPayloadWithKeyLookup(payload: PurePayload): Promise<EncryptedParameters> {
+  public async encryptSplitSingleWithKeyLookup(payload: PurePayload): Promise<EncryptedParameters> {
     const key = this.getRootKey()
 
     if (key == undefined) {
       throw Error('Attempting root key encryption with no root key')
     }
 
-    return this.encryptPayload(payload, key)
+    return this.encryptSplitSingle(payload, key)
   }
 
-  public async encryptPayloadsWithKeyLookup(
+  public async encryptSplitSinglesWithKeyLookup(
     payloads: PurePayload[],
   ): Promise<EncryptedParameters[]> {
-    return Promise.all(payloads.map((payload) => this.encryptPayloadWithKeyLookup(payload)))
+    return Promise.all(payloads.map((payload) => this.encryptSplitSingleWithKeyLookup(payload)))
   }
 
-  public async encryptPayload(payload: PurePayload, key: SNRootKey): Promise<EncryptedParameters> {
+  public async encryptSplitSingle(
+    payload: PurePayload,
+    key: SNRootKey,
+  ): Promise<EncryptedParameters> {
     return OperatorWrapper.encryptPayload(payload, key, this.operatorManager)
   }
 
-  public async encryptPayloads(payloads: PurePayload[], key: SNRootKey) {
-    return Promise.all(payloads.map((payload) => this.encryptPayload(payload, key)))
+  public async encryptSplitSingles(payloads: PurePayload[], key: SNRootKey) {
+    return Promise.all(payloads.map((payload) => this.encryptSplitSingle(payload, key)))
   }
 
   public async decryptPayloadWithKeyLookup(

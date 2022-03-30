@@ -63,7 +63,6 @@ describe('2020-01-15 web migration', () => {
     })
     const encryptionParams = await operator003.generateEncryptedParametersAsync(
       storagePayload,
-      PayloadFormat.EncryptedString,
       passcodeKey,
     )
     const persistPayload = CreateMaxPayloadFromAnyObject(storagePayload, encryptionParams)
@@ -76,7 +75,6 @@ describe('2020-01-15 web migration', () => {
     const notePayload = Factory.createNotePayload()
     const noteEncryptionParams = await operator003.generateEncryptedParametersAsync(
       notePayload,
-      PayloadFormat.EncryptedString,
       accountKey,
     )
     const noteEncryptedPayload = CreateMaxPayloadFromAnyObject(notePayload, noteEncryptionParams)
@@ -96,7 +94,7 @@ describe('2020-01-15 web migration', () => {
 
     await application.launch(true)
     expect(application.sessionManager.online()).to.equal(true)
-    expect(application.protocolService.keyMode).to.equal(KeyMode.RootKeyPlusWrapper)
+    expect(application.protocolService.rootKeyEncryption.keyMode).to.equal(KeyMode.RootKeyPlusWrapper)
     /** Should be decrypted */
     const storageMode = application.storageService.domainKeyForMode(StorageValueModes.Default)
     const valueStore = application.storageService.values[storageMode]
@@ -122,7 +120,7 @@ describe('2020-01-15 web migration', () => {
     /** Application should not retain server password from legacy versions */
     expect(rootKey.serverPassword).to.not.be.ok
     expect(rootKey.keyVersion).to.equal(ProtocolVersion.V003)
-    expect(application.protocolService.keyMode).to.equal(KeyMode.RootKeyPlusWrapper)
+    expect(application.protocolService.rootKeyEncryption.keyMode).to.equal(KeyMode.RootKeyPlusWrapper)
 
     /** Expect note is decrypted */
     expect(application.itemManager.notes.length).to.equal(1)
@@ -176,7 +174,6 @@ describe('2020-01-15 web migration', () => {
     })
     const encryptionParams = await operator003.generateEncryptedParametersAsync(
       storagePayload,
-      PayloadFormat.EncryptedString,
       passcodeKey,
     )
     const persistPayload = CreateMaxPayloadFromAnyObject(storagePayload, encryptionParams)
@@ -189,7 +186,6 @@ describe('2020-01-15 web migration', () => {
     const notePayload = Factory.createNotePayload()
     const noteEncryptionParams = await operator003.generateEncryptedParametersAsync(
       notePayload,
-      PayloadFormat.EncryptedString,
       passcodeKey,
     )
     const noteEncryptedPayload = CreateMaxPayloadFromAnyObject(notePayload, noteEncryptionParams)
@@ -206,7 +202,7 @@ describe('2020-01-15 web migration', () => {
       },
     })
     await application.launch(true)
-    expect(application.protocolService.keyMode).to.equal(KeyMode.WrapperOnly)
+    expect(application.protocolService.rootKeyEncryption.keyMode).to.equal(KeyMode.WrapperOnly)
     /** Should be decrypted */
     const storageMode = application.storageService.domainKeyForMode(StorageValueModes.Default)
     const valueStore = application.storageService.values[storageMode]
@@ -226,7 +222,7 @@ describe('2020-01-15 web migration', () => {
     /** Root key is in memory with passcode only, so server password can be defined */
     expect(rootKey.serverPassword).to.be.ok
     expect(rootKey.keyVersion).to.equal(ProtocolVersion.V003)
-    expect(application.protocolService.keyMode).to.equal(KeyMode.WrapperOnly)
+    expect(application.protocolService.rootKeyEncryption.keyMode).to.equal(KeyMode.WrapperOnly)
 
     /** Expect note is decrypted */
     expect(application.itemManager.notes.length).to.equal(1)
@@ -276,7 +272,6 @@ describe('2020-01-15 web migration', () => {
     const notePayload = Factory.createNotePayload()
     const noteEncryptionParams = await operator003.generateEncryptedParametersAsync(
       notePayload,
-      PayloadFormat.EncryptedString,
       accountKey,
     )
     const noteEncryptedPayload = CreateMaxPayloadFromAnyObject(notePayload, noteEncryptionParams)
@@ -315,7 +310,7 @@ describe('2020-01-15 web migration', () => {
     })
     await application.launch(true)
     expect(application.sessionManager.online()).to.equal(true)
-    expect(application.protocolService.keyMode).to.equal(KeyMode.RootKeyOnly)
+    expect(application.protocolService.rootKeyEncryption.keyMode).to.equal(KeyMode.RootKeyOnly)
     /** Should be decrypted */
     const storageMode = application.storageService.domainKeyForMode(StorageValueModes.Default)
     const valueStore = application.storageService.values[storageMode]
@@ -343,7 +338,7 @@ describe('2020-01-15 web migration', () => {
     expect(rootKey.dataAuthenticationKey).to.equal(accountKey.dataAuthenticationKey)
     expect(rootKey.serverPassword).to.not.be.ok
     expect(rootKey.keyVersion).to.equal(ProtocolVersion.V003)
-    expect(application.protocolService.keyMode).to.equal(KeyMode.RootKeyOnly)
+    expect(application.protocolService.rootKeyEncryption.keyMode).to.equal(KeyMode.RootKeyOnly)
 
     /** Expect note is decrypted */
     expect(application.itemManager.notes.length).to.equal(1)
@@ -369,7 +364,6 @@ describe('2020-01-15 web migration', () => {
     const application = await Factory.createAppWithRandNamespace()
     /** Create legacy migrations value so that base migration detects old app */
     await application.deviceInterface.setRawStorageValue('migrations', JSON.stringify(['anything']))
-    const operator003 = new SNProtocolOperator003(new FakeWebCrypto())
     /** Create arbitrary storage values and make sure they're migrated */
     const storage = {
       foo: 'bar',
@@ -382,25 +376,20 @@ describe('2020-01-15 web migration', () => {
 
     /** Create item and store it in db */
     const notePayload = Factory.createNotePayload()
-    const noteParams = await operator003.generateEncryptedParametersAsync(
-      notePayload,
-      PayloadFormat.DecryptedBareObject,
-    )
-    const noteProcessedPayload = CreateMaxPayloadFromAnyObject(notePayload, noteParams)
     await application.deviceInterface.saveRawDatabasePayload(
-      noteProcessedPayload,
+      notePayload.ejected(),
       application.identifier,
     )
 
     /** Run migration */
     await application.prepareForLaunch({
-      receiveChallenge: (challenge) => {
+      receiveChallenge: (_challenge) => {
         return null
       },
     })
     await application.launch(true)
 
-    expect(application.protocolService.keyMode).to.equal(KeyMode.RootKeyNone)
+    expect(application.protocolService.rootKeyEncryption.keyMode).to.equal(KeyMode.RootKeyNone)
 
     /** Should be decrypted */
     const storageMode = application.storageService.domainKeyForMode(StorageValueModes.Default)
@@ -408,7 +397,7 @@ describe('2020-01-15 web migration', () => {
     expect(valueStore.content_type).to.not.be.ok
     const rootKey = await application.protocolService.getRootKey()
     expect(rootKey).to.not.be.ok
-    expect(application.protocolService.keyMode).to.equal(KeyMode.RootKeyNone)
+    expect(application.protocolService.rootKeyEncryption.keyMode).to.equal(KeyMode.RootKeyNone)
 
     expect(await application.deviceInterface.getRawStorageValue('migrations')).to.not.be.ok
 
@@ -458,7 +447,6 @@ describe('2020-01-15 web migration', () => {
     const notePayload = Factory.createNotePayload()
     const noteEncryptionParams = await operator001.generateEncryptedParametersAsync(
       notePayload,
-      PayloadFormat.EncryptedString,
       accountKey,
     )
     const noteEncryptedPayload = CreateMaxPayloadFromAnyObject(notePayload, noteEncryptionParams)
@@ -494,7 +482,7 @@ describe('2020-01-15 web migration', () => {
     await application.launch(true)
     expect(application.sessionManager.online()).to.equal(true)
     expect(application.sessionManager.getUser()).to.be.ok
-    expect(application.protocolService.keyMode).to.equal(KeyMode.RootKeyOnly)
+    expect(application.protocolService.rootKeyEncryption.keyMode).to.equal(KeyMode.RootKeyOnly)
     /** Should be decrypted */
     const storageMode = application.storageService.domainKeyForMode(StorageValueModes.Default)
     const valueStore = application.storageService.values[storageMode]
@@ -525,7 +513,7 @@ describe('2020-01-15 web migration', () => {
     expect(rootKey.dataAuthenticationKey).to.equal(accountKey.dataAuthenticationKey)
     expect(rootKey.serverPassword).to.not.be.ok
     expect(rootKey.keyVersion).to.equal(ProtocolVersion.V001)
-    expect(application.protocolService.keyMode).to.equal(KeyMode.RootKeyOnly)
+    expect(application.protocolService.rootKeyEncryption.keyMode).to.equal(KeyMode.RootKeyOnly)
 
     /** Expect note is decrypted */
     expect(application.itemManager.notes.length).to.equal(1)
@@ -594,7 +582,6 @@ describe('2020-01-15 web migration', () => {
     })
     const encryptionParams = await operator002.generateEncryptedParametersAsync(
       storagePayload,
-      PayloadFormat.EncryptedString,
       passcodeKey,
     )
     const persistPayload = CreateMaxPayloadFromAnyObject(storagePayload, encryptionParams)
@@ -607,7 +594,6 @@ describe('2020-01-15 web migration', () => {
     const notePayload = Factory.createNotePayload()
     const noteEncryptionParams = await operator002.generateEncryptedParametersAsync(
       notePayload,
-      PayloadFormat.EncryptedString,
       accountKey,
     )
     const noteEncryptedPayload = CreateMaxPayloadFromAnyObject(notePayload, noteEncryptionParams)
@@ -627,7 +613,7 @@ describe('2020-01-15 web migration', () => {
     await application.launch(true)
     expect(application.sessionManager.online()).to.equal(true)
     expect(application.sessionManager.getUser()).to.be.ok
-    expect(application.protocolService.keyMode).to.equal(KeyMode.RootKeyPlusWrapper)
+    expect(application.protocolService.rootKeyEncryption.keyMode).to.equal(KeyMode.RootKeyPlusWrapper)
     /** Should be decrypted */
     const storageMode = application.storageService.domainKeyForMode(StorageValueModes.Default)
     const valueStore = application.storageService.values[storageMode]

@@ -42,7 +42,9 @@ describe('online conflict handling', function () {
   })
 
   afterEach(async function () {
-    await Factory.safeDeinit(this.application)
+    if (!this.application.dealloced) {
+      await Factory.safeDeinit(this.application)
+    }
     localStorage.clear()
   })
 
@@ -557,10 +559,10 @@ describe('online conflict handling', function () {
       /** First modify the item without saving so that
        * our local contents digress from the server's */
       await this.application.itemManager.changeItem(note.uuid, (mutator) => {
-        mutator.text = `1`
+        mutator.text = '1'
       })
       await this.application.itemManager.changeItem(note.uuid, (mutator) => {
-        mutator.text = `2`
+        mutator.text = '2'
         mutator.updated_at_timestamp = Factory.dateToMicroseconds(yesterday)
       })
       // We expect all the notes to be duplicated.

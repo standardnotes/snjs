@@ -23,10 +23,10 @@ describe('upgrading', () => {
       }
       return values
     }
-    this.receiveChallenge = async (challenge) => {
-      this.receiveChallengeWithApp(this.application, challenge)
+    this.receiveChallenge = (challenge) => {
+      void this.receiveChallengeWithApp(this.application, challenge)
     }
-    this.receiveChallengeWithApp = async (application, challenge) => {
+    this.receiveChallengeWithApp = (application, challenge) => {
       application.addChallengeObserver(challenge, {
         onInvalidValue: (value) => {
           const values = promptValueReply([value.prompt])
@@ -88,9 +88,10 @@ describe('upgrading', () => {
       version: oldVersion,
     })
 
-    expect((await this.application.protocolService.getRootKeyWrapperKeyParams()).version).to.equal(
-      oldVersion,
-    )
+    expect(
+      (await this.application.protocolService.rootKeyEncryption.getRootKeyWrapperKeyParams())
+        .version,
+    ).to.equal(oldVersion)
     expect((await this.application.protocolService.getRootKeyParams()).version).to.equal(oldVersion)
     expect((await this.application.protocolService.getRootKey()).keyVersion).to.equal(oldVersion)
 
@@ -100,13 +101,15 @@ describe('upgrading', () => {
     const result = await this.application.upgradeProtocolVersion()
     expect(result).to.deep.equal({ success: true })
 
-    const wrappedRootKey = await this.application.protocolService.getWrappedRootKey()
+    const wrappedRootKey =
+      await this.application.protocolService.rootKeyEncryption.getWrappedRootKey()
     const payload = CreateMaxPayloadFromAnyObject(wrappedRootKey)
     expect(payload.version).to.equal(newVersion)
 
-    expect((await this.application.protocolService.getRootKeyWrapperKeyParams()).version).to.equal(
-      newVersion,
-    )
+    expect(
+      (await this.application.protocolService.rootKeyEncryption.getRootKeyWrapperKeyParams())
+        .version,
+    ).to.equal(newVersion)
     expect((await this.application.protocolService.getRootKeyParams()).version).to.equal(newVersion)
     expect((await this.application.protocolService.getRootKey()).keyVersion).to.equal(newVersion)
 
@@ -140,7 +143,6 @@ describe('upgrading', () => {
     })
 
     const identifier = this.application.identifier
-    await Factory.safeDeinit(this.application)
 
     /** Recreate the app once */
     const appFirst = Factory.createApplicationWithFakeCrypto(identifier)
@@ -169,7 +171,7 @@ describe('upgrading', () => {
 
   it('protocol version should be upgraded on password change', async function () {
     /** Delete default items key that is created on launch */
-    const itemsKey = await this.application.protocolService.itemsEncryption.getDefaultItemsKey()
+    const itemsKey = await this.application.protocolService.getSureDefaultItemsKey()
     await this.application.itemManager.setItemToBeDeleted(itemsKey.uuid)
     expect(this.application.itemManager.itemsKeys().length).to.equal(0)
 
@@ -206,7 +208,7 @@ describe('upgrading', () => {
     )
     expect((await this.application.protocolService.getRootKey()).keyVersion).to.equal(latestVersion)
 
-    const defaultItemsKey = await this.application.protocolService.itemsEncryption.getDefaultItemsKey()
+    const defaultItemsKey = await this.application.protocolService.getSureDefaultItemsKey()
     expect(defaultItemsKey.keyVersion).to.equal(latestVersion)
 
     /** After change, note should now be encrypted with latest protocol version */
@@ -244,7 +246,7 @@ describe('upgrading', () => {
       })
     })
 
-    afterEach(async function () {
+    afterEach(function () {
       sinon.restore()
     })
 
@@ -254,45 +256,49 @@ describe('upgrading', () => {
         receiveChallenge: this.receiveChallenge,
       })
       expect(
-        (await this.application.protocolService.getRootKeyWrapperKeyParams()).version,
+        (await this.application.protocolService.rootKeyEncryption.getRootKeyWrapperKeyParams())
+          .version,
       ).to.equal(oldVersion)
       const errors = await this.application.upgradeProtocolVersion()
       expect(errors).to.not.be.empty
 
       /** Ensure we're still on 003 */
       expect(
-        (await this.application.protocolService.getRootKeyWrapperKeyParams()).version,
+        (await this.application.protocolService.rootKeyEncryption.getRootKeyWrapperKeyParams())
+          .version,
       ).to.equal(oldVersion)
       expect((await this.application.protocolService.getRootKeyParams()).version).to.equal(
         oldVersion,
       )
       expect((await this.application.protocolService.getRootKey()).keyVersion).to.equal(oldVersion)
-      expect((await this.application.protocolService.itemsEncryption.getDefaultItemsKey()).keyVersion).to.equal(
+      expect((await this.application.protocolService.getSureDefaultItemsKey()).keyVersion).to.equal(
         oldVersion,
       )
     })
 
     it('rolls back the local protocol upgrade if the server responds with an error', async function () {
-      sinon.replace(this.application.sessionManager, 'changeCredentials', async () => [Error()])
+      sinon.replace(this.application.sessionManager, 'changeCredentials', () => [Error()])
 
       this.application.setLaunchCallback({
         receiveChallenge: this.receiveChallenge,
       })
       expect(
-        (await this.application.protocolService.getRootKeyWrapperKeyParams()).version,
+        (await this.application.protocolService.rootKeyEncryption.getRootKeyWrapperKeyParams())
+          .version,
       ).to.equal(oldVersion)
       const errors = await this.application.upgradeProtocolVersion()
       expect(errors).to.not.be.empty
 
       /** Ensure we're still on 003 */
       expect(
-        (await this.application.protocolService.getRootKeyWrapperKeyParams()).version,
+        (await this.application.protocolService.rootKeyEncryption.getRootKeyWrapperKeyParams())
+          .version,
       ).to.equal(oldVersion)
       expect((await this.application.protocolService.getRootKeyParams()).version).to.equal(
         oldVersion,
       )
       expect((await this.application.protocolService.getRootKey()).keyVersion).to.equal(oldVersion)
-      expect((await this.application.protocolService.itemsEncryption.getDefaultItemsKey()).keyVersion).to.equal(
+      expect((await this.application.protocolService.getSureDefaultItemsKey()).keyVersion).to.equal(
         oldVersion,
       )
     })

@@ -1,4 +1,4 @@
-import { ItemInterface, PurePayload } from '@standardnotes/payloads'
+import { ItemInterface, PurePayload, sureFindPayload } from '@standardnotes/payloads'
 import { SNRootKey } from '@Lib/Protocol/root_key'
 import { SNItemsKey } from '@Lib/Models'
 import { ItemContentTypeUsesRootKeyEncryption } from '@standardnotes/applications'
@@ -77,7 +77,7 @@ export function splitItemsByEncryptionType<T extends ItemOrPayload>(
 
 export function findPayloadInSplit<T extends ItemOrPayload>(
   uuid: string,
-  split: EncryptionSplit<T>,
+  split: EncryptionSplitWithKey<T>,
 ): T {
   const inUsesItemsKey = split.usesItemsKey?.items.find((item) => item.uuid === uuid)
   if (inUsesItemsKey) {
@@ -87,6 +87,20 @@ export function findPayloadInSplit<T extends ItemOrPayload>(
   const inUsesRootKey = split.usesRootKey?.items.find((item) => item.uuid === uuid)
   if (inUsesRootKey) {
     return inUsesRootKey
+  }
+
+  const inUsesItemsKeyWithKeyLookup = split.usesItemsKeyWithKeyLookup?.items.find(
+    (item) => item.uuid === uuid,
+  )
+  if (inUsesItemsKeyWithKeyLookup) {
+    return inUsesItemsKeyWithKeyLookup
+  }
+
+  const inUsesRootKeyWithKeyLookup = split.usesRootKeyWithKeyLookup?.items.find(
+    (item) => item.uuid === uuid,
+  )
+  if (inUsesRootKeyWithKeyLookup) {
+    return inUsesRootKeyWithKeyLookup
   }
 
   throw Error('Cannot find payload in split')

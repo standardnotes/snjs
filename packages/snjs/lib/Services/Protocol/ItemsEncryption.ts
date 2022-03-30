@@ -124,17 +124,20 @@ export class ItemsEncryptionService extends AbstractService {
     return defaultKey
   }
 
-  public async encryptPayloadWithKeyLookup(payload: PurePayload): Promise<EncryptedParameters> {
+  public async encryptSplitSingleWithKeyLookup(payload: PurePayload): Promise<EncryptedParameters> {
     const key = this.keyToUseForItemEncryption()
 
     if (key instanceof StandardException) {
       throw Error(key.message)
     }
 
-    return this.encryptPayload(payload, key)
+    return this.encryptSplitSingle(payload, key)
   }
 
-  public async encryptPayload(payload: PurePayload, key: SNItemsKey): Promise<EncryptedParameters> {
+  public async encryptSplitSingle(
+    payload: PurePayload,
+    key: SNItemsKey,
+  ): Promise<EncryptedParameters> {
     if (payload.format !== PayloadFormat.DecryptedBareObject) {
       throw Error('Attempting to encrypt already encrypted payload.')
     }
@@ -151,17 +154,17 @@ export class ItemsEncryptionService extends AbstractService {
     return OperatorWrapper.encryptPayload(payload, key, this.operatorManager)
   }
 
-  public async encryptPayloads(
+  public async encryptSplitSingles(
     payloads: PurePayload[],
     key: SNItemsKey,
   ): Promise<EncryptedParameters[]> {
-    return Promise.all(payloads.map((payload) => this.encryptPayload(payload, key)))
+    return Promise.all(payloads.map((payload) => this.encryptSplitSingle(payload, key)))
   }
 
-  public async encryptPayloadsWithKeyLookup(
+  public async encryptSplitSinglesWithKeyLookup(
     payloads: PurePayload[],
   ): Promise<EncryptedParameters[]> {
-    return Promise.all(payloads.map((payload) => this.encryptPayloadWithKeyLookup(payload)))
+    return Promise.all(payloads.map((payload) => this.encryptSplitSingleWithKeyLookup(payload)))
   }
 
   public async decryptPayloadWithKeyLookup(

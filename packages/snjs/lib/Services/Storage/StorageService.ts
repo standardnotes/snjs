@@ -11,7 +11,7 @@ import {
 } from '@standardnotes/payloads'
 import { SNRootKey } from '@Lib/Protocol/root_key'
 import { ContentType } from '@standardnotes/common'
-import { Copy, isNullOrUndefined, UuidGenerator } from '@standardnotes/utils'
+import { Copy, extendArray, isNullOrUndefined, UuidGenerator } from '@standardnotes/utils'
 import {
   AbstractService,
   DeviceInterface,
@@ -74,6 +74,7 @@ export class SNStorageService extends AbstractService {
   private persistencePolicy!: StoragePersistencePolicies
   private encryptionPolicy!: StorageEncryptionPolicy
   private needsPersist = false
+  private currentPersistPromise?: Promise<StorageValuesObject>
 
   private values!: StorageValuesObject
 
@@ -116,6 +117,7 @@ export class SNStorageService extends AbstractService {
 
   public async setPersistencePolicy(persistencePolicy: StoragePersistencePolicies) {
     this.persistencePolicy = persistencePolicy
+
     if (this.persistencePolicy === StoragePersistencePolicies.Ephemeral) {
       await this.deviceInterface.removeAllRawStorageValues()
       await this.clearAllPayloads()
@@ -218,24 +220,42 @@ export class SNStorageService extends AbstractService {
       this.needsPersist = true
       return
     }
+
     if (this.persistencePolicy === StoragePersistencePolicies.Ephemeral) {
       return
     }
+
+    await this.currentPersistPromise
+
     this.needsPersist = false
     const values = await this.immediatelyPersistValuesToDisk()
     /** Save the persisted value so we have access to it in memory (for unit tests afawk) */
     this.values[ValueModesKeys.Wrapped] = values[ValueModesKeys.Wrapped]
   }
 
+  public async awaitPersist(): Promise<void> {
+    await this.currentPersistPromise
+  }
+
   private async immediatelyPersistValuesToDisk(): Promise<StorageValuesObject> {
-    return this.executeCriticalFunction(async () => {
+    this.currentPersistPromise = this.executeCriticalFunction(async () => {
       const values = await this.generatePersistableValues()
+
+      const persistencePolicySuddenlyChanged =
+        this.persistencePolicy === StoragePersistencePolicies.Ephemeral
+      if (persistencePolicySuddenlyChanged) {
+        return values
+      }
+
       await this.deviceInterface?.setRawStorageValue(
         this.getPersistenceKey(),
         JSON.stringify(values),
       )
+
       return values
     })
+
+    return this.currentPersistPromise
   }
 
   /**
@@ -261,9 +281,10 @@ export class SNStorageService extends AbstractService {
         },
       }
 
-      const encryptedPayload = (
-        await this.encryptionProvider.encryptSplit(split, EncryptionIntent.LocalStorageEncrypted)
-      )[0]
+      const encryptedPayload = await this.encryptionProvider.encryptSplitSingle(
+        split,
+        EncryptionIntent.LocalStorageEncrypted,
+      )
 
       rawContent[ValueModesKeys.Wrapped] = encryptedPayload.ejected()
     } else {
@@ -278,14 +299,30 @@ export class SNStorageService extends AbstractService {
   }
 
   public setValue(key: string, value: unknown, mode = StorageValueModes.Default): void {
+    this.setValueWithNoPersist(key, value, mode)
+    void this.persistValuesToDisk()
+  }
+
+  public async setValueAndAwaitPersist(
+    key: string,
+    value: unknown,
+    mode = StorageValueModes.Default,
+  ): Promise<void> {
+    this.setValueWithNoPersist(key, value, mode)
+    await this.persistValuesToDisk()
+  }
+
+  private setValueWithNoPersist(
+    key: string,
+    value: unknown,
+    mode = StorageValueModes.Default,
+  ): void {
     if (!this.values) {
       throw Error(`Attempting to set storage key ${key} before loading local storage.`)
     }
 
     const domainKey = this.domainKeyForMode(mode)
     this.values[domainKey][key] = value
-
-    void this.persistValuesToDisk()
   }
 
   public getValue<T>(key: string, mode = StorageValueModes.Default, defaultValue?: T): T {
@@ -377,42 +414,58 @@ export class SNStorageService extends AbstractService {
       return
     }
 
-    const encrypted = this.encryptionPolicy === StorageEncryptionPolicy.Default
-
     const categorizePayloads = (payloads: PurePayload[]) => {
-      const encryptables: PurePayload[] = []
+      const encrypted = this.encryptionPolicy === StorageEncryptionPolicy.Default
+
+      const plausiblyEncryptable: PurePayload[] = []
       const discardables: PurePayload[] = []
+      const unencryptables: PurePayload[] = []
 
       for (const payload of payloads) {
         if (payload.discardable) {
           discardables.push(payload)
         } else {
-          encryptables.push(payload)
+          plausiblyEncryptable.push(payload)
         }
       }
 
-      return { encryptables, discardables }
+      const encryptables: PurePayload[] = []
+      if (encrypted) {
+        const split = splitItemsByEncryptionType(plausiblyEncryptable)
+        if (split.usesItemsKey) {
+          extendArray(encryptables, split.usesItemsKey.items)
+        }
+        if (split.usesRootKey) {
+          if (!this.encryptionProvider.hasRootKeyEncryptionSource()) {
+            extendArray(unencryptables, split.usesRootKey.items)
+          } else {
+            extendArray(encryptables, split.usesRootKey.items)
+          }
+        }
+      } else {
+        extendArray(unencryptables, plausiblyEncryptable)
+      }
+
+      return { encryptables, unencryptables, discardables }
     }
 
-    const categorized = categorizePayloads(decryptedPayloads)
-    await this.deletePayloads(categorized.discardables)
+    const { encryptables, unencryptables, discardables } = categorizePayloads(decryptedPayloads)
+    await this.deletePayloads(discardables)
 
-    let savePayloads: PurePayload[]
+    const split = splitItemsByEncryptionType(encryptables)
+    const keyLookupSplit = createKeyLookupSplitFromSplit(split)
+    const encryptedPayloads = await this.encryptionProvider.encryptSplit(
+      keyLookupSplit,
+      EncryptionIntent.LocalStorageEncrypted,
+    )
 
-    if (encrypted) {
-      const split = splitItemsByEncryptionType(categorized.encryptables)
-      const keyLookupSplit = createKeyLookupSplitFromSplit(split)
-      savePayloads = await this.encryptionProvider.encryptSplit(
-        keyLookupSplit,
-        EncryptionIntent.LocalStorageEncrypted,
-      )
-    } else {
-      savePayloads = categorized.encryptables.map((payload) =>
-        CreateIntentPayloadFromObject(payload, EncryptionIntent.LocalStorageDecrypted),
-      )
-    }
+    const nonEncryptedPayloads = unencryptables.map((payload) =>
+      CreateIntentPayloadFromObject(payload, EncryptionIntent.LocalStorageDecrypted),
+    )
 
-    const ejected = savePayloads.map((payload) => payload.ejected())
+    const ejected = encryptedPayloads
+      .concat(nonEncryptedPayloads)
+      .map((payload) => payload.ejected())
     return this.executeCriticalFunction(async () => {
       return this.deviceInterface?.saveRawDatabasePayloads(ejected, this.identifier)
     })

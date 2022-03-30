@@ -240,7 +240,7 @@ export async function initializeApplication(application) {
   await application.launch(true)
 }
 
-export async function registerUserToApplication({
+export function registerUserToApplication({
   application,
   email,
   password,
@@ -294,7 +294,7 @@ export async function registerOldUser({ application, email, password, version })
     mode: SyncMode.DownloadFirst,
     ...syncOptions,
   })
-  await application.protocolService.itemsEncryption.decryptErroredItems()
+  await application.protocolService.decryptErroredItems()
 }
 
 export function createStorageItemPayload(contentType) {
@@ -607,7 +607,7 @@ export async function createTags(
   return result
 }
 
-export async function pinNote(application, note) {
+export function pinNote(application, note) {
   return application.mutator.changeItem(note.uuid, (mutator) => {
     mutator.pinned = true
   })

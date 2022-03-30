@@ -68,7 +68,6 @@ describe('2020-01-15 mobile migration', () => {
       })
       const encryptedKeyParams = await operator003.generateEncryptedParametersAsync(
         keyPayload,
-        PayloadFormat.EncryptedString,
         passcodeKey,
       )
       const wrappedKey = CreateMaxPayloadFromAnyObject(keyPayload, encryptedKeyParams)
@@ -90,7 +89,6 @@ describe('2020-01-15 mobile migration', () => {
       const notePayload = Factory.createNotePayload()
       const noteEncryptionParams = await operator003.generateEncryptedParametersAsync(
         notePayload,
-        PayloadFormat.EncryptedString,
         accountKey,
       )
       const noteEncryptedPayload = CreateMaxPayloadFromAnyObject(notePayload, noteEncryptionParams)
@@ -135,7 +133,7 @@ describe('2020-01-15 mobile migration', () => {
       })
       await application.launch(true)
 
-      expect(application.protocolService.keyMode).to.equal(KeyMode.RootKeyPlusWrapper)
+      expect(application.protocolService.rootKeyEncryption.keyMode).to.equal(KeyMode.RootKeyPlusWrapper)
 
       /** Should be decrypted */
       const storageMode = application.storageService.domainKeyForMode(StorageValueModes.Default)
@@ -152,7 +150,7 @@ describe('2020-01-15 mobile migration', () => {
       expect(rootKey.dataAuthenticationKey).to.equal(accountKey.dataAuthenticationKey)
       expect(rootKey.serverPassword).to.not.be.ok
       expect(rootKey.keyVersion).to.equal(ProtocolVersion.V003)
-      expect(application.protocolService.keyMode).to.equal(KeyMode.RootKeyPlusWrapper)
+      expect(application.protocolService.rootKeyEncryption.keyMode).to.equal(KeyMode.RootKeyPlusWrapper)
 
       const keychainValue = await application.deviceInterface.getNamespacedKeychainValue(
         application.identifier,
@@ -253,7 +251,6 @@ describe('2020-01-15 mobile migration', () => {
     const notePayload = Factory.createNotePayload()
     const noteEncryptionParams = await operator003.generateEncryptedParametersAsync(
       notePayload,
-      PayloadFormat.EncryptedString,
       passcodeKey,
     )
     const noteEncryptedPayload = CreateMaxPayloadFromAnyObject(notePayload, noteEncryptionParams)
@@ -305,7 +302,7 @@ describe('2020-01-15 mobile migration', () => {
     await application.prepareForLaunch({
       receiveChallenge: receiveChallenge,
     })
-    expect(application.protocolService.keyMode).to.equal(KeyMode.WrapperOnly)
+    expect(application.protocolService.rootKeyEncryption.keyMode).to.equal(KeyMode.WrapperOnly)
     await application.launch(true)
     /** Should be decrypted */
     const storageMode = application.storageService.domainKeyForMode(StorageValueModes.Default)
@@ -318,7 +315,7 @@ describe('2020-01-15 mobile migration', () => {
     /** Root key is in memory with passcode only, so server password can be defined */
     expect(rootKey.serverPassword).to.be.ok
     expect(rootKey.keyVersion).to.equal(ProtocolVersion.V003)
-    expect(application.protocolService.keyMode).to.equal(KeyMode.WrapperOnly)
+    expect(application.protocolService.rootKeyEncryption.keyMode).to.equal(KeyMode.WrapperOnly)
 
     const keychainValue = await application.deviceInterface.getNamespacedKeychainValue(
       application.identifier,
@@ -400,7 +397,6 @@ describe('2020-01-15 mobile migration', () => {
     const notePayload = Factory.createNotePayload()
     const noteEncryptionParams = await operator003.generateEncryptedParametersAsync(
       notePayload,
-      PayloadFormat.EncryptedString,
       passcodeKey,
     )
     const noteEncryptedPayload = CreateMaxPayloadFromAnyObject(notePayload, noteEncryptionParams)
@@ -452,7 +448,7 @@ describe('2020-01-15 mobile migration', () => {
     await application.prepareForLaunch({
       receiveChallenge: receiveChallenge,
     })
-    expect(application.protocolService.keyMode).to.equal(KeyMode.WrapperOnly)
+    expect(application.protocolService.rootKeyEncryption.keyMode).to.equal(KeyMode.WrapperOnly)
     await application.launch(true)
 
     const retrievedNote = application.itemManager.notes[0]
@@ -501,7 +497,6 @@ describe('2020-01-15 mobile migration', () => {
     const notePayload = Factory.createNotePayload()
     const noteEncryptionParams = await operator003.generateEncryptedParametersAsync(
       notePayload,
-      PayloadFormat.EncryptedString,
       accountKey,
     )
     const noteEncryptedPayload = CreateMaxPayloadFromAnyObject(notePayload, noteEncryptionParams)
@@ -552,7 +547,7 @@ describe('2020-01-15 mobile migration', () => {
     })
     await application.launch(true)
 
-    expect(application.protocolService.keyMode).to.equal(KeyMode.RootKeyOnly)
+    expect(application.protocolService.rootKeyEncryption.keyMode).to.equal(KeyMode.RootKeyOnly)
     /** Should be decrypted */
     const storageMode = application.storageService.domainKeyForMode(StorageValueModes.Default)
     const valueStore = application.storageService.values[storageMode]
@@ -562,7 +557,7 @@ describe('2020-01-15 mobile migration', () => {
     expect(rootKey.dataAuthenticationKey).to.equal(accountKey.dataAuthenticationKey)
     expect(rootKey.serverPassword).to.not.be.ok
     expect(rootKey.keyVersion).to.equal(ProtocolVersion.V003)
-    expect(application.protocolService.keyMode).to.equal(KeyMode.RootKeyOnly)
+    expect(application.protocolService.rootKeyEncryption.keyMode).to.equal(KeyMode.RootKeyOnly)
 
     const keyParams = await application.storageService.getValue(
       StorageKey.RootKeyParams,
@@ -643,7 +638,6 @@ describe('2020-01-15 mobile migration', () => {
     const notePayload = Factory.createNotePayload()
     const noteEncryptionParams = await operator003.generateEncryptedParametersAsync(
       notePayload,
-      PayloadFormat.EncryptedString,
       accountKey,
     )
     const noteEncryptedPayload = CreateMaxPayloadFromAnyObject(notePayload, noteEncryptionParams)
@@ -687,7 +681,7 @@ describe('2020-01-15 mobile migration', () => {
     /** Recovery migration is non-blocking, so let's block for it */
     await Factory.sleep(1.0)
 
-    expect(application.protocolService.keyMode).to.equal(KeyMode.RootKeyOnly)
+    expect(application.protocolService.rootKeyEncryption.keyMode).to.equal(KeyMode.RootKeyOnly)
     /** Should be decrypted */
     const storageMode = application.storageService.domainKeyForMode(StorageValueModes.Default)
     const valueStore = application.storageService.values[storageMode]
@@ -697,7 +691,7 @@ describe('2020-01-15 mobile migration', () => {
     expect(rootKey.masterKey).to.equal(accountKey.masterKey)
     expect(rootKey.dataAuthenticationKey).to.equal(accountKey.dataAuthenticationKey)
     expect(rootKey.keyVersion).to.equal(ProtocolVersion.V003)
-    expect(application.protocolService.keyMode).to.equal(KeyMode.RootKeyOnly)
+    expect(application.protocolService.rootKeyEncryption.keyMode).to.equal(KeyMode.RootKeyOnly)
 
     /** Expect note is decrypted */
     expect(application.itemManager.notes.length).to.equal(1)
@@ -740,7 +734,6 @@ describe('2020-01-15 mobile migration', () => {
     const notePayload = Factory.createNotePayload()
     const noteEncryptionParams = await operator002.generateEncryptedParametersAsync(
       notePayload,
-      PayloadFormat.EncryptedString,
       accountKey,
     )
     const noteEncryptedPayload = CreateMaxPayloadFromAnyObject(notePayload, noteEncryptionParams)
@@ -820,7 +813,6 @@ describe('2020-01-15 mobile migration', () => {
     const notePayload = Factory.createNotePayload()
     const noteEncryptionParams = await operator001.generateEncryptedParametersAsync(
       notePayload,
-      PayloadFormat.EncryptedString,
       accountKey,
     )
     const noteEncryptedPayload = CreateMaxPayloadFromAnyObject(notePayload, noteEncryptionParams)
@@ -935,7 +927,6 @@ describe('2020-01-15 mobile migration', () => {
     const application = await Factory.createAppWithRandNamespace(Environment.Mobile, Platform.Ios)
     /** Create legacy migrations value so that base migration detects old app */
     await application.deviceInterface.setRawStorageValue('migrations', JSON.stringify(['anything']))
-    const operator003 = new SNProtocolOperator003(new FakeWebCrypto())
     const biometricPrefs = {
       enabled: true,
       timing: 'immediately',
@@ -948,13 +939,8 @@ describe('2020-01-15 mobile migration', () => {
     await application.deviceInterface.setRawStorageValue(NonwrappedStorageKey.MobileFirstRun, false)
     /** Create encrypted item and store it in db */
     const notePayload = Factory.createNotePayload()
-    const noteParams = await operator003.generateEncryptedParametersAsync(
-      notePayload,
-      PayloadFormat.DecryptedBareObject,
-    )
-    const noteProcessedPayload = CreateMaxPayloadFromAnyObject(notePayload, noteParams)
     await application.deviceInterface.saveRawDatabasePayload(
-      noteProcessedPayload,
+      notePayload.ejected(),
       application.identifier,
     )
     /** setup options */
@@ -1001,7 +987,7 @@ describe('2020-01-15 mobile migration', () => {
     })
     await application.launch(true)
 
-    expect(application.protocolService.keyMode).to.equal(KeyMode.RootKeyNone)
+    expect(application.protocolService.rootKeyEncryption.keyMode).to.equal(KeyMode.RootKeyNone)
     /** Should be decrypted */
     const storageMode = application.storageService.domainKeyForMode(StorageValueModes.Default)
     const valueStore = application.storageService.values[storageMode]
@@ -1009,7 +995,7 @@ describe('2020-01-15 mobile migration', () => {
 
     const rootKey = await application.protocolService.getRootKey()
     expect(rootKey).to.not.be.ok
-    expect(application.protocolService.keyMode).to.equal(KeyMode.RootKeyNone)
+    expect(application.protocolService.rootKeyEncryption.keyMode).to.equal(KeyMode.RootKeyNone)
 
     /** Expect note is decrypted */
     expect(application.itemManager.notes.length).to.equal(1)
@@ -1096,7 +1082,6 @@ describe('2020-01-15 mobile migration', () => {
       })
       const encryptedKeyParams = await operator003.generateEncryptedParametersAsync(
         keyPayload,
-        PayloadFormat.EncryptedString,
         passcodeKey,
       )
       const wrappedKey = CreateMaxPayloadFromAnyObject(keyPayload, encryptedKeyParams)
@@ -1121,7 +1106,6 @@ describe('2020-01-15 mobile migration', () => {
       const notePayload = Factory.createNotePayload()
       const noteEncryptionParams = await operator003.generateEncryptedParametersAsync(
         notePayload,
-        PayloadFormat.EncryptedString,
         accountKey,
       )
       const noteEncryptedPayload = CreateMaxPayloadFromAnyObject(notePayload, noteEncryptionParams)
@@ -1166,7 +1150,7 @@ describe('2020-01-15 mobile migration', () => {
       })
       await application.launch(true)
 
-      expect(application.protocolService.keyMode).to.equal(KeyMode.RootKeyPlusWrapper)
+      expect(application.protocolService.rootKeyEncryption.keyMode).to.equal(KeyMode.RootKeyPlusWrapper)
 
       /** Should be decrypted */
       const storageMode = application.storageService.domainKeyForMode(StorageValueModes.Default)
@@ -1183,7 +1167,7 @@ describe('2020-01-15 mobile migration', () => {
       expect(rootKey.dataAuthenticationKey).to.equal(accountKey.dataAuthenticationKey)
       expect(rootKey.serverPassword).to.not.be.ok
       expect(rootKey.keyVersion).to.equal(ProtocolVersion.V003)
-      expect(application.protocolService.keyMode).to.equal(KeyMode.RootKeyPlusWrapper)
+      expect(application.protocolService.rootKeyEncryption.keyMode).to.equal(KeyMode.RootKeyPlusWrapper)
 
       const keychainValue = await application.deviceInterface.getNamespacedKeychainValue(
         application.identifier,

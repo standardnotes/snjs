@@ -785,7 +785,7 @@ describe('importing', function () {
               (prompt) =>
                 new ChallengeValue(
                   prompt,
-                  prompt.validation === ChallengeValidation.AccountPassword
+                  prompt.validation !== ChallengeValidation.ProtectionSessionDuration
                     ? password
                     : UnprotectedAccessSecondsDuration.OneMinute,
                 ),
@@ -821,7 +821,8 @@ describe('importing', function () {
         version: '003',
       },
     }
-    const result = await application.mutator.importData(backupFile, true)
+
+    const result = await application.mutator.importData(backupFile, false)
     expect(result.errorCount).to.equal(0)
     await Factory.safeDeinit(application)
   })

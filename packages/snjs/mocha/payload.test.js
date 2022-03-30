@@ -91,7 +91,7 @@ describe('payload', () => {
           content_type: ContentType.Note,
           content: '000:somebase64string',
         }),
-      'Corrupt payload',
+      'Unrecognized protocol version 000',
     )
   })
 
@@ -178,10 +178,10 @@ describe('payload', () => {
 
   it('Encryption params with override of select fields should only merge provided fields', function () {
     const payload = this.createBarePayload()
-    const override = CreateEncryptionParameters({
+    const override = {
       waitingForKey: true,
       errorDecrypting: true,
-    })
+    }
     const intentPayload = CreateIntentPayloadFromObject(
       payload,
       EncryptionIntent.LocalStorageEncrypted,

@@ -15,6 +15,11 @@ import { PayloadOverride } from './PayloadOverride'
 import { PayloadSource } from './PayloadSource'
 import { RawPayload } from './RawPayload'
 import { PayloadFormat } from './PayloadFormat'
+import {
+  DecryptedParameters,
+  EncryptedParameters,
+  ErroredDecryptingParameters,
+} from '../Encryption/EncryptedParameters'
 
 /**
  * Return the payloads that result if you alternated the uuid for the payload.
@@ -424,4 +429,22 @@ export function isRemotePayloadAllowed(payload: PurePayload): boolean {
 
 export function sureFindPayload(uuid: Uuid, payloads: PurePayload[]): PurePayload {
   return payloads.find((payload) => payload.uuid === uuid) as PurePayload
+}
+
+export function mergePayloadWithEncryptionParameters(
+  payload: PurePayload,
+  parameters: EncryptedParameters | DecryptedParameters | ErroredDecryptingParameters,
+): PurePayload {
+  return CopyPayload(payload, parameters)
+}
+
+export function encryptedParametersFromPayload(payload: PurePayload): EncryptedParameters {
+  return {
+    uuid: payload.uuid,
+    content: payload.contentString,
+    items_key_id: payload.items_key_id,
+    enc_item_key: payload.enc_item_key as string,
+    version: payload.version,
+    auth_hash: payload.auth_hash,
+  }
 }

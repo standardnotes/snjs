@@ -1,12 +1,12 @@
-import { CopyPayload } from '../Payload/Functions'
+import { ProtocolVersion } from '@standardnotes/common'
 import { PayloadContent } from '../Payload/PayloadContent'
-import { PurePayload } from '../Payload/PurePayload'
 
 export type EncryptedParameters = {
   uuid: string
   content: string
   items_key_id?: string | undefined
   enc_item_key: string
+  version: ProtocolVersion
 
   /** @deprecated */
   auth_hash?: string
@@ -34,11 +34,4 @@ export type ErroredDecryptingParameters = {
   errorDecrypting: true
   waitingForKey?: boolean
   errorDecryptingValueChanged?: boolean
-}
-
-export function mergePayloadWithEncryptionParameters(
-  payload: PurePayload,
-  parameters: EncryptedParameters | DecryptedParameters | ErroredDecryptingParameters,
-): PurePayload {
-  return CopyPayload(payload, parameters)
 }

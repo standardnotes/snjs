@@ -3,7 +3,11 @@ import { BackupFile, BackupFileType } from './BackupFile'
 import { ClientDisplayableError } from '@Lib/Application/ClientError'
 import { CreateAnyKeyParams } from '@Lib/Protocol/key_params'
 import { extendArray } from '@standardnotes/utils'
-import { leftVersionGreaterThanOrEqualToRight, compareVersions } from '@standardnotes/applications'
+import {
+  leftVersionGreaterThanOrEqualToRight,
+  compareVersions,
+  ContentTypeUsesRootKeyEncryption,
+} from '@standardnotes/applications'
 import { SNItemsKey, CreateItemFromPayload } from '@Lib/Models'
 import { SNProtocolService } from './ProtocolService'
 import { SNRootKey, SNRootKeyParams } from '@Lib/Protocol/index'
@@ -137,7 +141,7 @@ async function decryptWithItemsKeys(
   const decryptedPayloads: PurePayload[] = []
 
   for (const encryptedPayload of payloads) {
-    if (encryptedPayload.content_type === ContentType.ItemsKey) {
+    if (ContentTypeUsesRootKeyEncryption(encryptedPayload.content_type)) {
       continue
     }
 
@@ -151,6 +155,12 @@ async function decryptWithItemsKeys(
       )
 
       if (!key) {
+        decryptedPayloads.push(
+          CreateMaxPayloadFromAnyObject(encryptedPayload, {
+            errorDecrypting: true,
+            errorDecryptingValueChanged: !encryptedPayload.errorDecrypting,
+          }),
+        )
         continue
       }
 
@@ -209,7 +219,7 @@ async function decryptEncrypted(
 
   const decryptedPayloads = await decryptWithItemsKeys(
     payloads,
-    decryptedItemsKeysPayloads.map((p) => CreateItemFromPayload(p) as SNItemsKey),
+    decryptedItemsKeysPayloads.map((p) => CreateItemFromPayload(p)),
     protocolService,
     keyParams,
     rootKey,

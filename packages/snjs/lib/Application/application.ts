@@ -185,21 +185,30 @@ export class SNApplication implements Services.ListedClientInterface {
    */
   async prepareForLaunch(callback: LaunchCallback): Promise<void> {
     await this.options.crypto.initialize()
+
     this.setLaunchCallback(callback)
+
     const databaseResult = await this.deviceInterface
       .openDatabase(this.identifier)
       .catch((error) => {
         void this.notifyEvent(ApplicationEvent.LocalDatabaseReadError, error)
         return undefined
       })
+
     this.createdNewDatabase = databaseResult?.isNewDatabase || false
+
     await this.migrationService.initialize()
+
     await this.notifyEvent(ApplicationEvent.MigrationsLoaded)
     await this.handleStage(Applications.ApplicationStage.PreparingForLaunch_0)
+
     await this.storageService.initializeFromDisk()
     await this.notifyEvent(ApplicationEvent.StorageReady)
+
     await this.protocolService.initialize()
+
     await this.handleStage(Applications.ApplicationStage.ReadyForLaunch_05)
+
     this.started = true
     await this.notifyEvent(ApplicationEvent.Started)
   }
@@ -217,6 +226,7 @@ export class SNApplication implements Services.ListedClientInterface {
    */
   public async launch(awaitDatabaseLoad = false): Promise<void> {
     this.launched = false
+
     const launchChallenge = this.getLaunchChallenge()
     if (launchChallenge) {
       const response = await this.challengeService.promptForChallengeResponse(launchChallenge)
@@ -225,6 +235,7 @@ export class SNApplication implements Services.ListedClientInterface {
       }
       await this.handleLaunchChallengeResponse(response)
     }
+
     if (this.storageService.isStorageWrapped()) {
       try {
         await this.storageService.decryptStorage()
@@ -236,12 +247,15 @@ export class SNApplication implements Services.ListedClientInterface {
       }
     }
     await this.handleStage(Applications.ApplicationStage.StorageDecrypted_09)
-    await this.apiService.loadHost()
-    await this.webSocketsService.loadWebSocketUrl()
+
+    this.apiService.loadHost()
+    this.webSocketsService.loadWebSocketUrl()
     await this.sessionManager.initializeFromDisk()
+
     void this.historyManager.initializeFromDisk()
     this.settingsService.initializeFromDisk()
-    await this.featuresService.initializeFromDisk()
+
+    this.featuresService.initializeFromDisk()
 
     this.launched = true
     await this.notifyEvent(ApplicationEvent.Launched)
@@ -591,11 +605,7 @@ export class SNApplication implements Services.ListedClientInterface {
     return this.storageService.isEphemeralSession()
   }
 
-  public async setValue(
-    key: string,
-    value: unknown,
-    mode?: Services.StorageValueModes,
-  ): Promise<void> {
+  public setValue(key: string, value: unknown, mode?: Services.StorageValueModes): void {
     return this.storageService.setValue(key, value, mode)
   }
 
@@ -855,7 +865,7 @@ export class SNApplication implements Services.ListedClientInterface {
   public async setStorageEncryptionPolicy(
     encryptionPolicy: Services.StorageEncryptionPolicy,
   ): Promise<void> {
-    await this.storageService.setEncryptionPolicy(encryptionPolicy)
+    this.storageService.setEncryptionPolicy(encryptionPolicy)
     return this.protocolService.repersistAllItems()
   }
 
