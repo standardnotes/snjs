@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.36.0](https://github.com/standardnotes/snjs/compare/@standardnotes/features@1.35.6...@standardnotes/features@1.36.0) (2022-03-30)
+
+
+### Features
+
+* files-beta role ([#678](https://github.com/standardnotes/snjs/issues/678)) ([f1ae62f](https://github.com/standardnotes/snjs/commit/f1ae62ff05e361dc551f1a0d047feabd129d0f76))
+
+
+
+
+
 ## [1.35.6](https://github.com/standardnotes/snjs/compare/@standardnotes/features@1.35.5...@standardnotes/features@1.35.6) (2022-03-23)
 
 **Note:** Version bump only for package @standardnotes/features
