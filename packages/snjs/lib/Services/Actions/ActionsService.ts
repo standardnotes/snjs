@@ -1,3 +1,4 @@
+import { EncryptionService, SNRootKey } from '@standardnotes/encryption'
 import {
   Challenge,
   ChallengeValidation,
@@ -6,23 +7,23 @@ import {
   ChallengePrompt,
 } from '../Challenge'
 import { ListedService } from '../Listed/ListedService'
-import { CreateItemFromPayload } from '@Lib/Models/Generator'
 import { ActionResponse, HttpResponse } from '@standardnotes/responses'
 import { ContentType } from '@standardnotes/common'
 import { EncryptionIntent } from '@standardnotes/applications'
 import { ItemManager } from '@Lib/Services/Items/ItemManager'
 import { PurePayload, CreateMaxPayloadFromAnyObject } from '@standardnotes/payloads'
-import { SNRootKey } from '@Lib/Protocol/root_key'
 import {
   SNActionsExtension,
   Action,
   ActionAccessType,
-} from '../../Models/ActionsExtension/ActionsExtension'
-import { ActionsExtensionMutator } from '../../Models/ActionsExtension/ActionsExtensionMutator'
-import { SNItem } from '@Lib/Models/Item/Item'
-import { MutationType } from '@Lib/Models/Item/MutationType'
+  ActionsExtensionMutator,
+  SNItem,
+  MutationType,
+  CreateItemFromPayload,
+} from '@standardnotes/models'
+
 import { SNSyncService } from '../Sync/SyncService'
-import { SNProtocolService } from '../Protocol/ProtocolService'
+
 import { PayloadManager } from '../Payloads/PayloadManager'
 import { SNHttpService } from '../Api/HttpService'
 import { SNAlertService } from '../Alert/AlertService'
@@ -56,7 +57,7 @@ export class SNActionsService extends AbstractService {
     public deviceInterface: DeviceInterface,
     private httpService: SNHttpService,
     private payloadManager: PayloadManager,
-    private protocolService: SNProtocolService,
+    private protocolService: EncryptionService,
     private syncService: SNSyncService,
     private challengeService: ChallengeService,
     private listedService: ListedService,
@@ -179,7 +180,7 @@ export class SNActionsService extends AbstractService {
 
   private async payloadByDecryptingResponse(
     response: ActionResponse,
-    key?: SNRootKey,
+    rootKey?: SNRootKey,
     triedPasswords: string[] = [],
   ): Promise<PurePayload | undefined> {
     const payload = CreateMaxPayloadFromAnyObject(response.item)
@@ -189,16 +190,36 @@ export class SNActionsService extends AbstractService {
       return
     }
 
-    const decryptedPayload = await this.protocolService.payloadByDecryptingPayload(payload, key)
+    let decryptedPayload = await this.protocolService.decryptSplitSingle({
+      usesItemsKeyWithKeyLookup: {
+        items: [payload],
+      },
+    })
+
     if (!decryptedPayload.errorDecrypting) {
       return decryptedPayload
     }
 
+    if (rootKey) {
+      decryptedPayload = await this.protocolService.decryptSplitSingle({
+        usesRootKey: {
+          items: [payload],
+          key: rootKey,
+        },
+      })
+      if (!decryptedPayload.errorDecrypting) {
+        return decryptedPayload
+      }
+    }
+
     for (const itemsKey of this.itemManager.itemsKeys()) {
-      const decryptedPayload = await this.protocolService.payloadByDecryptingPayload(
-        payload,
-        itemsKey,
-      )
+      const decryptedPayload = await this.protocolService.decryptSplitSingle({
+        usesItemsKey: {
+          items: [payload],
+          key: itemsKey,
+        },
+      })
+
       if (!decryptedPayload.errorDecrypting) {
         return decryptedPayload
       }
@@ -230,11 +251,7 @@ export class SNActionsService extends AbstractService {
       if (!key) {
         continue
       }
-      const nestedResponse: any = await this.payloadByDecryptingResponse(
-        response,
-        key,
-        triedPasswords,
-      )
+      const nestedResponse = await this.payloadByDecryptingResponse(response, key, triedPasswords)
       if (nestedResponse) {
         return nestedResponse
       }
@@ -251,7 +268,7 @@ export class SNActionsService extends AbstractService {
     }
 
     this.previousPasswords.push(password)
-    return this.payloadByDecryptingResponse(response, key)
+    return this.payloadByDecryptingResponse(response, rootKey)
   }
 
   private async promptForLegacyPassword(): Promise<string | undefined> {
@@ -293,11 +310,17 @@ export class SNActionsService extends AbstractService {
   }
 
   private async outgoingPayloadForItem(item: SNItem, decrypted = false) {
-    const intent = decrypted ? EncryptionIntent.FileDecrypted : EncryptionIntent.FileEncrypted
-    const encrypted = await this.protocolService.payloadByEncryptingPayload(
-      item.payloadRepresentation(),
-      intent,
+    if (decrypted) {
+      return item.payload.ejected()
+    }
+
+    const encrypted = await this.protocolService.encryptSplitSingle(
+      {
+        usesItemsKeyWithKeyLookup: { items: [item.payload] },
+      },
+      EncryptionIntent.FileEncrypted,
     )
+
     return encrypted.ejected()
   }
 }

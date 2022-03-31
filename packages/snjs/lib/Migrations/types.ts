@@ -3,13 +3,13 @@ import { ApplicationIdentifier } from '@standardnotes/applications'
 import { ItemManager } from '@Lib/Services/Items/ItemManager'
 import { Environment } from '../Application/platforms'
 import { SNStorageService } from '@Lib/Services/Storage/StorageService'
-import { SNProtocolService } from '../Services/Protocol/ProtocolService'
+import { EncryptionService } from '@standardnotes/encryption'
 import { DeviceInterface, InternalEventBusInterface } from '@standardnotes/services'
 import { ChallengeService, SNSingletonManager, SNFeaturesService } from '@Lib/Services'
 
 /** Services that the migration service needs to function */
 export type MigrationServices = {
-  protocolService: SNProtocolService
+  protocolService: EncryptionService
   deviceInterface: DeviceInterface
   storageService: SNStorageService
   challengeService: ChallengeService
@@ -20,5 +20,5 @@ export type MigrationServices = {
   environment: Environment
   /** The application identifier */
   identifier: ApplicationIdentifier
-  internalEventBus: InternalEventBusInterface,
+  internalEventBus: InternalEventBusInterface
 }

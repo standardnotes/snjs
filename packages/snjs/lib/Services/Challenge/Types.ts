@@ -1,4 +1,4 @@
-import { SNRootKey } from '@Lib/Protocol'
+import { SNRootKey } from '@standardnotes/encryption'
 
 export type ChallengeRawValue = number | string | boolean
 

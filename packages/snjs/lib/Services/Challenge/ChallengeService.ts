@@ -1,3 +1,4 @@
+import { EncryptionService } from '@standardnotes/encryption'
 import {
   Challenge,
   ChallengeArtifacts,
@@ -8,7 +9,6 @@ import {
   ChallengeValidation,
   ChallengeValue,
 } from '.'
-import { SNProtocolService } from '../Protocol/ProtocolService'
 import { SNStorageService } from '../Storage/StorageService'
 import { removeFromArray } from '@standardnotes/utils'
 import { isValidProtectionSessionLength } from '../Protection/ProtectionService'
@@ -34,12 +34,12 @@ export type ChallengeObserver = {
  */
 export class ChallengeService extends AbstractService {
   private challengeOperations: Record<string, ChallengeOperation> = {}
-  public sendChallenge?: (challenge: Challenge) => void
+  public sendChallenge!: (challenge: Challenge) => void
   private challengeObservers: Record<string, ChallengeObserver[]> = {}
 
   constructor(
     private storageService: SNStorageService,
-    private protocolService: SNProtocolService,
+    private protocolService: EncryptionService,
     protected internalEventBus: InternalEventBusInterface,
   ) {
     super(internalEventBus)
@@ -49,7 +49,7 @@ export class ChallengeService extends AbstractService {
   public deinit() {
     ;(this.storageService as unknown) = undefined
     ;(this.protocolService as unknown) = undefined
-    this.sendChallenge = undefined
+    ;(this.sendChallenge as unknown) = undefined
     ;(this.challengeOperations as unknown) = undefined
     ;(this.challengeObservers as unknown) = undefined
     super.deinit()
@@ -62,7 +62,7 @@ export class ChallengeService extends AbstractService {
   public promptForChallengeResponse(challenge: Challenge): Promise<ChallengeResponse | undefined> {
     return new Promise<ChallengeResponse | undefined>((resolve) => {
       this.createOrGetChallengeOperation(challenge, resolve)
-      this.sendChallenge!(challenge)
+      this.sendChallenge(challenge)
     })
   }
 
@@ -119,7 +119,7 @@ export class ChallengeService extends AbstractService {
   }
 
   public isPasscodeLocked() {
-    return this.protocolService.rootKeyNeedsUnwrapping()
+    return this.protocolService.isPasscodeLocked()
   }
 
   public addChallengeObserver(challenge: Challenge, observer: ChallengeObserver) {

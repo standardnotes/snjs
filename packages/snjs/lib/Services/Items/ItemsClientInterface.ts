@@ -1,5 +1,3 @@
-import { SmartView } from './../../Models/SmartView/SmartView'
-import { NotesDisplayCriteria } from '@Lib/Protocol/collection/notes_display_criteria'
 import {
   CollectionSort,
   CollectionSortDirection,
@@ -8,9 +6,16 @@ import {
   PurePayload,
 } from '@standardnotes/payloads'
 import { AnyRecord, ContentType } from '@standardnotes/common'
-import { SNNote, SNFile, SNTag, SNItem } from '@Lib/Models'
+import {
+  SNNote,
+  SNFile,
+  SNTag,
+  SNItem,
+  SmartView,
+  TagNoteCountChangeObserver,
+  NotesDisplayCriteria,
+} from '@standardnotes/models'
 import { UuidString } from '@Lib/Types'
-import { TagNoteCountChangeObserver } from '@Lib/Protocol/collection/tag_notes_index'
 
 export interface ItemsClientInterface {
   associateFileWithNote(file: SNFile, note: SNNote): Promise<SNFile>
@@ -38,7 +43,7 @@ export interface ItemsClientInterface {
 
   setNotesDisplayCriteria(criteria: NotesDisplayCriteria): void
 
-  getDisplayableItems<T extends SNItem>(contentType: ContentType): T[]
+  getDisplayableItems<T extends ItemInterface>(contentType: ContentType): T[]
 
   getItems<T extends SNItem>(
     contentType: ContentType | ContentType[],

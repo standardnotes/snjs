@@ -79,7 +79,12 @@ describe('001 protocol operations', () => {
         'sVuHmG0XAp1PRDE8r8XqFXijjP8Pqdwal9YFRrXK4hKLt1yyq8MwQU+1Z95Tz/b7ajYdidwFE0iDwd8Iu8281VtJsQ4yhh2tJiAzBy6newyHfhA5nH93yZ3iXRJaG87bgNQE9lsXzTV/OHAvqMuQtw/QVSWI3Qy1Pyu1Tn72q7FPKKhRRkzEEZ+Ax0BA1fHg',
       uuid: '54001a6f-7c22-4b34-8316-fadf9b1fc255',
     })
-    const decrypted = await application.protocolService.payloadByDecryptingPayload(payload, key)
+    const decrypted = await application.protocolService.decryptSplitSingle({
+      usesRootKey: {
+        items: [payload],
+        key: key,
+      },
+    })
     expect(decrypted.errorDecrypting).to.not.be.ok
     expect(decrypted.content.text).to.equal('Decryptable Sentence')
   })
@@ -104,7 +109,6 @@ describe('001 protocol operations', () => {
     const key = await protocol001.createItemsKey()
     const params = await protocol001.generateEncryptedParametersAsync(
       payload,
-      PayloadFormat.EncryptedString,
       key,
     )
     expect(params.content).to.be.ok
@@ -118,10 +122,8 @@ describe('001 protocol operations', () => {
     const key = await protocol001.createItemsKey()
     const params = await protocol001.generateEncryptedParametersAsync(
       payload,
-      PayloadFormat.EncryptedString,
       key,
     )
-
     const decrypted = await protocol001.generateDecryptedParametersAsync(params, key)
     expect(decrypted.content).to.eql(payload.content)
   })
@@ -131,7 +133,6 @@ describe('001 protocol operations', () => {
     const key = await protocol001.createItemsKey()
     const params = await protocol001.generateEncryptedParametersAsync(
       payload,
-      PayloadFormat.EncryptedString,
       key,
     )
     const modified = CreateMaxPayloadFromAnyObject(params, {

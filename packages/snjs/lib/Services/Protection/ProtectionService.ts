@@ -6,13 +6,17 @@ import {
   ChallengeService,
 } from '@Lib/Services/Challenge'
 import { SNLog } from '@Lib/log'
-import { SNFile, SNNote } from '@Lib/Models'
-import { SNProtocolService } from '../Protocol/ProtocolService'
-import { SNStorageService, StorageValueModes } from '@Lib/Services/Storage/StorageService'
-import { StorageKey } from '@Lib/Services/Storage/storage_keys'
+import { SNFile, SNNote } from '@standardnotes/models'
+import { EncryptionService } from '@standardnotes/encryption'
+import { SNStorageService } from '@Lib/Services/Storage/StorageService'
+import { StorageKey } from '@standardnotes/services'
 import { isNullOrUndefined } from '@standardnotes/utils'
 import { ApplicationStage } from '@standardnotes/applications'
-import { AbstractService, InternalEventBusInterface } from '@standardnotes/services'
+import {
+  AbstractService,
+  InternalEventBusInterface,
+  StorageValueModes,
+} from '@standardnotes/services'
 import { ProtectionsClientInterface } from './ClientInterface'
 
 export enum ProtectionEvent {
@@ -66,7 +70,7 @@ export class SNProtectionService
   private sessionExpiryTimeout = -1
 
   constructor(
-    private protocolService: SNProtocolService,
+    private protocolService: EncryptionService,
     private challengeService: ChallengeService,
     private storageService: SNStorageService,
     protected internalEventBus: InternalEventBusInterface,
@@ -312,7 +316,7 @@ export class SNProtectionService
   }
 
   public getSessionExpiryDate(): Date {
-    const expiresAt = this.storageService.getValue(StorageKey.ProtectionExpirey)
+    const expiresAt = this.storageService.getValue<number>(StorageKey.ProtectionExpirey)
     if (expiresAt) {
       return new Date(expiresAt)
     } else {

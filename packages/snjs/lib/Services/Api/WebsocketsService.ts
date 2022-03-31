@@ -1,7 +1,6 @@
 import { UserRolesChangedEvent } from '@standardnotes/domain-events'
-import { StorageKey } from '@Lib/Services/Storage/storage_keys'
 import { SNStorageService } from '../Storage/StorageService'
-import { AbstractService, InternalEventBusInterface } from '@standardnotes/services'
+import { AbstractService, InternalEventBusInterface, StorageKey } from '@standardnotes/services'
 
 export enum WebSocketsServiceEvent {
   UserRoleMessageReceived = 'WebSocketMessageReceived',
@@ -21,13 +20,13 @@ export class SNWebSocketsService extends AbstractService<
     super(internalEventBus)
   }
 
-  public async setWebSocketUrl(url: string | undefined): Promise<void> {
+  public setWebSocketUrl(url: string | undefined): void {
     this.webSocketUrl = url
-    await this.storageService.setValue(StorageKey.WebSocketUrl, url)
+    this.storageService.setValue(StorageKey.WebSocketUrl, url)
   }
 
-  public async loadWebSocketUrl(): Promise<void> {
-    const storedValue = await this.storageService.getValue(StorageKey.WebSocketUrl)
+  public loadWebSocketUrl(): void {
+    const storedValue = this.storageService.getValue<string | undefined>(StorageKey.WebSocketUrl)
     this.webSocketUrl =
       storedValue ||
       this.webSocketUrl ||

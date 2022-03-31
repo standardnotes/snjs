@@ -11,8 +11,6 @@ module.exports = {
     alias: {
       '@Lib': path.resolve(__dirname, 'lib'),
       '@Services': path.resolve(__dirname, 'lib/services'),
-      '@Models': path.resolve(__dirname, 'lib/models'),
-      '@Protocol': path.resolve(__dirname, 'lib/protocol'),
       '@Payloads': path.resolve(__dirname, 'lib/protocol/payloads'),
     },
   },

@@ -1,5 +1,5 @@
 import { ChallengeReason } from '@Lib/Services/Challenge/Types'
-import { SNFile } from '@Lib/Models'
+import { SNFile } from '@standardnotes/models'
 
 export interface ProtectionsClientInterface {
   authorizeProtectedActionForFiles(

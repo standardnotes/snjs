@@ -2,7 +2,8 @@ import * as Applications from '@standardnotes/applications'
 import * as Challenges from '../Services/Challenge'
 import * as Common from '@standardnotes/common'
 import * as ExternalServices from '@standardnotes/services'
-import * as Models from '../Models'
+import * as Encryption from '@standardnotes/encryption'
+import * as Models from '@standardnotes/models'
 import * as Payloads from '@standardnotes/payloads'
 import * as Responses from '@standardnotes/responses'
 import * as Services from '../Services'
@@ -10,7 +11,6 @@ import * as Utils from '@standardnotes/utils'
 import * as Options from './options'
 import * as Settings from '@standardnotes/settings'
 import { Subscription } from '@standardnotes/auth'
-import { ClientDisplayableError } from '@Lib/Application/ClientError'
 import { UuidString, DeinitSource, ApplicationEventPayload } from '../Types'
 import { ApplicationEvent, applicationEventForSyncEvent } from '@Lib/Application/events'
 import { Environment, Platform } from './platforms'
@@ -44,7 +44,7 @@ export class SNApplication implements Services.ListedClientInterface {
   private migrationService!: Services.SNMigrationService
   private httpService!: Services.SNHttpService
   private payloadManager!: Services.PayloadManager
-  public protocolService!: Services.SNProtocolService
+  public protocolService!: Encryption.EncryptionService
   private storageService!: Services.SNStorageService
   private apiService!: Services.SNApiService
   private sessionManager!: Services.SNSessionManager
@@ -184,21 +184,30 @@ export class SNApplication implements Services.ListedClientInterface {
    */
   async prepareForLaunch(callback: LaunchCallback): Promise<void> {
     await this.options.crypto.initialize()
+
     this.setLaunchCallback(callback)
+
     const databaseResult = await this.deviceInterface
       .openDatabase(this.identifier)
       .catch((error) => {
         void this.notifyEvent(ApplicationEvent.LocalDatabaseReadError, error)
         return undefined
       })
+
     this.createdNewDatabase = databaseResult?.isNewDatabase || false
+
     await this.migrationService.initialize()
+
     await this.notifyEvent(ApplicationEvent.MigrationsLoaded)
     await this.handleStage(Applications.ApplicationStage.PreparingForLaunch_0)
+
     await this.storageService.initializeFromDisk()
     await this.notifyEvent(ApplicationEvent.StorageReady)
+
     await this.protocolService.initialize()
+
     await this.handleStage(Applications.ApplicationStage.ReadyForLaunch_05)
+
     this.started = true
     await this.notifyEvent(ApplicationEvent.Started)
   }
@@ -216,6 +225,7 @@ export class SNApplication implements Services.ListedClientInterface {
    */
   public async launch(awaitDatabaseLoad = false): Promise<void> {
     this.launched = false
+
     const launchChallenge = this.getLaunchChallenge()
     if (launchChallenge) {
       const response = await this.challengeService.promptForChallengeResponse(launchChallenge)
@@ -224,6 +234,7 @@ export class SNApplication implements Services.ListedClientInterface {
       }
       await this.handleLaunchChallengeResponse(response)
     }
+
     if (this.storageService.isStorageWrapped()) {
       try {
         await this.storageService.decryptStorage()
@@ -235,12 +246,15 @@ export class SNApplication implements Services.ListedClientInterface {
       }
     }
     await this.handleStage(Applications.ApplicationStage.StorageDecrypted_09)
-    await this.apiService.loadHost()
-    await this.webSocketsService.loadWebSocketUrl()
+
+    this.apiService.loadHost()
+    this.webSocketsService.loadWebSocketUrl()
     await this.sessionManager.initializeFromDisk()
+
     void this.historyManager.initializeFromDisk()
     this.settingsService.initializeFromDisk()
-    await this.featuresService.initializeFromDisk()
+
+    this.featuresService.initializeFromDisk()
 
     this.launched = true
     await this.notifyEvent(ApplicationEvent.Launched)
@@ -380,20 +394,20 @@ export class SNApplication implements Services.ListedClientInterface {
     return this.sessionManager.revokeAllOtherSessions()
   }
 
-  public async userCanManageSessions(): Promise<boolean> {
-    const userVersion = await this.getUserVersion()
+  public userCanManageSessions(): boolean {
+    const userVersion = this.getUserVersion()
     if (Utils.isNullOrUndefined(userVersion)) {
       return false
     }
     return Applications.compareVersions(userVersion, Common.ProtocolVersion.V004) >= 0
   }
 
-  public async getUserSubscription(): Promise<Subscription | ClientDisplayableError> {
+  public async getUserSubscription(): Promise<Subscription | Responses.ClientDisplayableError> {
     return this.sessionManager.getSubscription()
   }
 
   public async getAvailableSubscriptions(): Promise<
-    Responses.AvailableSubscriptions | ClientDisplayableError
+    Responses.AvailableSubscriptions | Responses.ClientDisplayableError
   > {
     return this.sessionManager.getAvailableSubscriptions()
   }
@@ -453,18 +467,18 @@ export class SNApplication implements Services.ListedClientInterface {
     return this.protocolService.getPasswordCreatedDate()
   }
 
-  public async getProtocolEncryptionDisplayName(): Promise<string | undefined> {
+  public getProtocolEncryptionDisplayName(): Promise<string | undefined> {
     return this.protocolService.getEncryptionDisplayName()
   }
 
-  public getUserVersion(): Promise<Common.ProtocolVersion | undefined> {
+  public getUserVersion(): Common.ProtocolVersion | undefined {
     return this.protocolService.getUserVersion()
   }
 
   /**
    * Returns true if there is an upgrade available for the account or passcode
    */
-  public async protocolUpgradeAvailable(): Promise<boolean> {
+  public protocolUpgradeAvailable(): Promise<boolean> {
     return this.protocolService.upgradeAvailable()
   }
 
@@ -568,41 +582,37 @@ export class SNApplication implements Services.ListedClientInterface {
     return this.listedService.getListedAccountInfo(account, inContextOfItem)
   }
 
-  /**
-   * Creates a JSON-stringifiable backup object of all items.
-   */
-  public async createBackupFile(
-    intent: Applications.EncryptionIntent,
-    authorizeEncrypted = false,
-  ): Promise<Services.BackupFile | undefined> {
-    const encrypted = intent === Applications.EncryptionIntent.FileEncrypted
-    const decrypted = intent === Applications.EncryptionIntent.FileDecrypted
-    const authorize = (encrypted && authorizeEncrypted) || decrypted
-
-    if (authorize && !(await this.protectionService.authorizeBackupCreation(encrypted))) {
+  public async createEncryptedBackupFile(
+    requireAuthorization = false,
+  ): Promise<Encryption.BackupFile | undefined> {
+    if (requireAuthorization && !(await this.protectionService.authorizeBackupCreation(true))) {
       return
     }
 
-    return this.protocolService.createBackupFile(intent)
+    return this.protocolService.createEncryptedBackupFile()
+  }
+
+  public async createDecryptedBackupFile(): Promise<Encryption.BackupFile | undefined> {
+    if (!(await this.protectionService.authorizeBackupCreation(false))) {
+      return
+    }
+
+    return this.protocolService.createDecryptedBackupFile()
   }
 
   public isEphemeralSession(): boolean {
     return this.storageService.isEphemeralSession()
   }
 
-  public async setValue(
-    key: string,
-    value: unknown,
-    mode?: Services.StorageValueModes,
-  ): Promise<void> {
+  public setValue(key: string, value: unknown, mode?: ExternalServices.StorageValueModes): void {
     return this.storageService.setValue(key, value, mode)
   }
 
-  public getValue(key: string, mode?: Services.StorageValueModes): unknown {
+  public getValue(key: string, mode?: ExternalServices.StorageValueModes): unknown {
     return this.storageService.getValue(key, mode)
   }
 
-  public async removeValue(key: string, mode?: Services.StorageValueModes): Promise<void> {
+  public async removeValue(key: string, mode?: ExternalServices.StorageValueModes): Promise<void> {
     return this.storageService.removeValue(key, mode)
   }
 
@@ -680,14 +690,18 @@ export class SNApplication implements Services.ListedClientInterface {
     for (const uninstallObserver of this.serviceObservers) {
       uninstallObserver()
     }
+
     for (const uninstallSubscriber of this.managedSubscribers) {
       uninstallSubscriber()
     }
+
     for (const service of this.services) {
       service.deinit()
     }
 
+    this.options.crypto.deinit()
     ;(this.options as unknown) = undefined
+
     this.createdNewDatabase = false
     this.services.length = 0
     this.serviceObservers.length = 0
@@ -843,19 +857,21 @@ export class SNApplication implements Services.ListedClientInterface {
     return this.userService.changePasscode(newPasscode, origination)
   }
 
-  public getStorageEncryptionPolicy(): Services.StorageEncryptionPolicies {
+  public getStorageEncryptionPolicy(): ExternalServices.StorageEncryptionPolicy {
     return this.storageService.getStorageEncryptionPolicy()
   }
 
-  public async setStorageEncryptionPolicy(
-    encryptionPolicy: Services.StorageEncryptionPolicies,
+  public setStorageEncryptionPolicy(
+    encryptionPolicy: ExternalServices.StorageEncryptionPolicy,
   ): Promise<void> {
-    await this.storageService.setEncryptionPolicy(encryptionPolicy)
+    this.storageService.setEncryptionPolicy(encryptionPolicy)
     return this.protocolService.repersistAllItems()
   }
 
   public enableEphemeralPersistencePolicy(): Promise<void> {
-    return this.storageService.setPersistencePolicy(Services.StoragePersistencePolicies.Ephemeral)
+    return this.storageService.setPersistencePolicy(
+      ExternalServices.StoragePersistencePolicies.Ephemeral,
+    )
   }
 
   public hasPendingMigrations(): Promise<boolean> {
@@ -876,9 +892,11 @@ export class SNApplication implements Services.ListedClientInterface {
    */
   public changeDeviceInterface(deviceInterface: ExternalServices.DeviceInterface): void {
     this.deviceInterface = deviceInterface
+
     for (const service of this.services) {
-      if (service.deviceInterface) {
-        service.deviceInterface = deviceInterface
+      if ('deviceInterface' in service) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        ;(service as any)['deviceInterface'] = deviceInterface
       }
     }
   }
@@ -929,15 +947,7 @@ export class SNApplication implements Services.ListedClientInterface {
     this.createItemManager()
     this.createStorageManager()
     this.createProtocolService()
-    const encryptionDelegate = {
-      payloadByEncryptingPayload: this.protocolService.payloadByEncryptingPayload.bind(
-        this.protocolService,
-      ),
-      payloadByDecryptingPayload: this.protocolService.payloadByDecryptingPayload.bind(
-        this.protocolService,
-      ),
-    }
-    this.storageService.encryptionDelegate = encryptionDelegate
+    this.storageService.provideEncryptionProvider(this.protocolService)
     this.createChallengeService()
     this.createHttpManager()
     this.createApiService()
@@ -1206,7 +1216,6 @@ export class SNApplication implements Services.ListedClientInterface {
   private createStorageManager() {
     this.storageService = new Services.SNStorageService(
       this.deviceInterface,
-      this.alertService,
       this.identifier,
       this.environment,
       this.internalEventBus,
@@ -1215,7 +1224,7 @@ export class SNApplication implements Services.ListedClientInterface {
   }
 
   private createProtocolService() {
-    this.protocolService = new Services.SNProtocolService(
+    this.protocolService = new Encryption.EncryptionService(
       this.itemManager,
       this.payloadManager,
       this.deviceInterface,
@@ -1224,9 +1233,13 @@ export class SNApplication implements Services.ListedClientInterface {
       this.options.crypto,
       this.internalEventBus,
     )
-    this.protocolService.onKeyStatusChange(async () => {
-      await this.notifyEvent(ApplicationEvent.KeyStatusChanged)
-    })
+    this.serviceObservers.push(
+      this.protocolService.addEventObserver(async (event) => {
+        if (event === Encryption.EncryptionServiceEvent.RootKeyStatusChanged) {
+          await this.notifyEvent(ApplicationEvent.KeyStatusChanged)
+        }
+      }),
+    )
     this.services.push(this.protocolService)
   }
 

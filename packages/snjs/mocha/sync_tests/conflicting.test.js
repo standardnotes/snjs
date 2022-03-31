@@ -42,7 +42,9 @@ describe('online conflict handling', function () {
   })
 
   afterEach(async function () {
-    await Factory.safeDeinit(this.application)
+    if (!this.application.dealloced) {
+      await Factory.safeDeinit(this.application)
+    }
     localStorage.clear()
   })
 
@@ -557,10 +559,10 @@ describe('online conflict handling', function () {
       /** First modify the item without saving so that
        * our local contents digress from the server's */
       await this.application.itemManager.changeItem(note.uuid, (mutator) => {
-        mutator.text = `1`
+        mutator.text = '1'
       })
       await this.application.itemManager.changeItem(note.uuid, (mutator) => {
-        mutator.text = `2`
+        mutator.text = '2'
         mutator.updated_at_timestamp = Factory.dateToMicroseconds(yesterday)
       })
       // We expect all the notes to be duplicated.
@@ -809,12 +811,12 @@ describe('online conflict handling', function () {
     await newApp.syncService.sync(syncOptions)
     expect(newApp.itemManager.invalidItems.length).to.equal(0)
     await Factory.safeDeinit(newApp)
-  }).timeout(60000)
+  }).timeout(80000)
 
   it('importing data belonging to another account should not result in duplication', async function () {
     /** Create primary account and export data */
     await Factory.createSyncedNoteWithTag(this.application)
-    let backupFile = await this.application.createBackupFile(EncryptionIntent.FileEncrypted)
+    let backupFile = await this.application.createEncryptedBackupFile()
     /** Sort matters, and is the cause of the original issue, where tag comes before the note */
     backupFile.items = [
       backupFile.items.find((i) => i.content_type === ContentType.ItemsKey),
@@ -849,7 +851,7 @@ describe('online conflict handling', function () {
     await this.application.mutator.changeAndSaveItem(tag.uuid, (mutator) => {
       mutator.addItemAsRelationship(note2)
     })
-    let backupFile = await this.application.createBackupFile(EncryptionIntent.FileEncrypted)
+    let backupFile = await this.application.createEncryptedBackupFile()
     backupFile.items = [
       backupFile.items.find((i) => i.content_type === ContentType.ItemsKey),
       backupFile.items.filter((i) => i.content_type === ContentType.Note)[0],

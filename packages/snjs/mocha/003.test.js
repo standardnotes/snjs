@@ -125,7 +125,6 @@ describe('003 protocol operations', () => {
     const key = await protocol003.createItemsKey()
     const params = await protocol003.generateEncryptedParametersAsync(
       payload,
-      PayloadFormat.EncryptedString,
       key,
     )
     expect(params.content).to.be.ok
@@ -138,7 +137,6 @@ describe('003 protocol operations', () => {
     const key = await protocol003.createItemsKey()
     const params = await protocol003.generateEncryptedParametersAsync(
       payload,
-      PayloadFormat.EncryptedString,
       key,
     )
     const decrypted = await protocol003.generateDecryptedParametersAsync(params, key)

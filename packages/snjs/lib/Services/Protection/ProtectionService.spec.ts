@@ -1,10 +1,10 @@
 import { ChallengeService, ChallengeReason } from '../Challenge'
-import { SNProtocolService } from '../Protocol/ProtocolService'
+import { EncryptionService } from '@standardnotes/encryption'
 import { SNStorageService } from '../Storage/StorageService'
 import { SNProtectionService } from './ProtectionService'
 import { InternalEventBus, InternalEventBusInterface } from '@standardnotes/services'
 import { UuidGenerator } from '@standardnotes/utils'
-import { SNFile } from '@Lib/Models'
+import { SNFile } from '@standardnotes/models'
 import { ContentType } from '@standardnotes/common'
 import { FillItemContent, CreateMaxPayloadFromAnyObject } from '@standardnotes/payloads'
 
@@ -13,7 +13,7 @@ const setupRandomUuid = () => {
 }
 
 describe('protectionService', () => {
-  let protocolService: SNProtocolService
+  let protocolService: EncryptionService
   let challengeService: ChallengeService
   let storageService: SNStorageService
   let internalEventBus: InternalEventBusInterface
@@ -52,7 +52,7 @@ describe('protectionService', () => {
     storageService = {} as jest.Mocked<SNStorageService>
     storageService.getValue = jest.fn()
 
-    protocolService = {} as jest.Mocked<SNProtocolService>
+    protocolService = {} as jest.Mocked<EncryptionService>
     protocolService.hasAccount = jest.fn().mockReturnValue(true)
     protocolService.hasPasscode = jest.fn().mockReturnValue(false)
   })

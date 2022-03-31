@@ -1,12 +1,11 @@
-import { ClientDisplayableError } from '@Lib/Application/ClientError'
-import { SNItem } from '@Lib/Models/Item/Item'
+import { ClientDisplayableError } from '@standardnotes/responses'
+import { SNItem, SNFeatureRepo, FeatureRepoContent } from '@standardnotes/models'
 import { ApplicationStage } from '@standardnotes/applications'
 import { LEGACY_PROD_EXT_ORIGIN, PROD_OFFLINE_FEATURES_URL } from '../../hosts'
-import { SNFeatureRepo, FeatureRepoContent } from '../../Models/FeatureRepo/FeatureRepo'
 import { SNSyncService } from '../Sync/SyncService'
 import { AccountEvent, UserService } from '../User/UserService'
 import { UserRolesChangedEvent } from '@standardnotes/domain-events'
-import { StorageKey } from '@Lib/Services/Storage/storage_keys'
+import { StorageKey } from '@standardnotes/services'
 import { SNStorageService } from '../Storage/StorageService'
 import { ApiServiceEvent, MetaReceivedData, SNApiService } from '../Api/ApiService'
 import { UuidString } from '@Lib/Types/UuidString'
@@ -23,7 +22,7 @@ import {
 import { ContentType, RoleName } from '@standardnotes/common'
 import { ItemManager } from '../Items/ItemManager'
 import { UserFeaturesResponse } from '@standardnotes/responses'
-import { SNComponent, SNTheme } from '@Lib/Models'
+import { SNComponent, SNTheme } from '@standardnotes/models'
 import { SNWebSocketsService, WebSocketsServiceEvent } from '../Api/WebsocketsService'
 import { FillItemContent, PayloadContent, PayloadSource } from '@standardnotes/payloads'
 import { SNSettingsService } from '../Settings'
@@ -349,12 +348,12 @@ export class SNFeaturesService
     }
   }
 
-  public async initializeFromDisk(): Promise<void> {
-    this.roles = await this.storageService.getValue(StorageKey.UserRoles, undefined, [])
+  public initializeFromDisk(): void {
+    this.roles = this.storageService.getValue<RoleName[]>(StorageKey.UserRoles, undefined, [])
 
-    this.features = await this.storageService.getValue(StorageKey.UserFeatures, undefined, [])
+    this.features = this.storageService.getValue(StorageKey.UserFeatures, undefined, [])
 
-    this.enabledExperimentalFeatures = await this.storageService.getValue(
+    this.enabledExperimentalFeatures = this.storageService.getValue(
       StorageKey.ExperimentalFeatures,
       undefined,
       [],
@@ -363,10 +362,12 @@ export class SNFeaturesService
 
   public async updateRolesAndFetchFeatures(userUuid: UuidString, roles: RoleName[]): Promise<void> {
     const userRolesChanged = this.haveRolesChanged(roles)
+
     if (userRolesChanged || this.needsInitialFeaturesUpdate) {
       this.needsInitialFeaturesUpdate = false
       await this.setRoles(roles)
       const featuresResponse = await this.apiService.getUserFeatures(userUuid)
+
       if (!featuresResponse.error && featuresResponse.data && !this.deinited) {
         const features = (featuresResponse as UserFeaturesResponse).data.features
         await this.didDownloadFeatures(features)

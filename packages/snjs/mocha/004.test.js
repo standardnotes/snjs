@@ -80,7 +80,7 @@ describe('004 protocol operations', function () {
     const text = 'hello world'
     const rawKey = _key.masterKey
     const nonce = await application.protocolService.crypto.generateRandomKey(192)
-    const operator = application.protocolService.operatorForVersion(ProtocolVersion.V004)
+    const operator = application.protocolService.operatorManager.operatorForVersion(ProtocolVersion.V004)
     const authenticatedData = { foo: 'bar' }
     const encString = await operator.encryptString004(text, rawKey, nonce, authenticatedData)
     const decString = await operator.decryptString004(
@@ -96,7 +96,7 @@ describe('004 protocol operations', function () {
     const text = 'hello world'
     const rawKey = _key.masterKey
     const nonce = await application.protocolService.crypto.generateRandomKey(192)
-    const operator = application.protocolService.operatorForVersion(ProtocolVersion.V004)
+    const operator = application.protocolService.operatorManager.operatorForVersion(ProtocolVersion.V004)
     const aad = { foo: 'bar' }
     const nonmatchingAad = { foo: 'rab' }
     const encString = await operator.encryptString004(text, rawKey, nonce, aad)
@@ -114,7 +114,6 @@ describe('004 protocol operations', function () {
     const key = await protocol004.createItemsKey()
     const params = await protocol004.generateEncryptedParametersSync(
       payload,
-      PayloadFormat.EncryptedString,
       key,
     )
     const decrypted = await protocol004.generateDecryptedParametersSync(params, key)
@@ -127,11 +126,10 @@ describe('004 protocol operations', function () {
     const key = await protocol004.createItemsKey()
     const params = await protocol004.generateEncryptedParametersSync(
       payload,
-      PayloadFormat.EncryptedString,
       key,
     )
-    const modifiedParams = CopyPayload(params, { uuid: 'foo' })
-    const result = await protocol004.generateDecryptedParametersSync(modifiedParams, key)
+    params.uuid = 'foo'
+    const result = await protocol004.generateDecryptedParametersSync(params, key)
     expect(result.errorDecrypting).to.equal(true)
   })
 })

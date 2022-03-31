@@ -87,7 +87,7 @@ describe('storage manager', function () {
     })
     const key = 'foo'
     const value = 'bar'
-    await this.application.storageService.setValue(key, value)
+    await this.application.storageService.setValueAndAwaitPersist(key, value)
     expect(Object.keys(localStorage).length).to.equal(0)
     const retrievedValue = await this.application.storageService.getValue(key)
     expect(retrievedValue).to.equal(value)
@@ -106,14 +106,14 @@ describe('storage manager', function () {
   })
 
   it('storage with no account and no passcode should not be encrypted', async function () {
-    await this.application.setValue('foo', 'bar')
+    await this.application.storageService.setValueAndAwaitPersist('foo', 'bar')
     const wrappedValue = this.application.storageService.values[ValueModesKeys.Wrapped]
     const payload = CreateMaxPayloadFromAnyObject(wrappedValue)
     expect(payload.format).to.equal(PayloadFormat.DecryptedBareObject)
   })
 
   it('storage aftering adding passcode should be encrypted', async function () {
-    await this.application.setValue('foo', 'bar')
+    await this.application.storageService.setValueAndAwaitPersist('foo', 'bar')
     await this.application.addPasscode('123')
     const wrappedValue = this.application.storageService.values[ValueModesKeys.Wrapped]
     const payload = CreateMaxPayloadFromAnyObject(wrappedValue)
@@ -123,9 +123,9 @@ describe('storage manager', function () {
   it('storage after adding passcode then removing passcode should not be encrypted', async function () {
     const passcode = '123'
     Factory.handlePasswordChallenges(this.application, passcode)
-    await this.application.setValue('foo', 'bar')
+    await this.application.storageService.setValueAndAwaitPersist('foo', 'bar')
     await this.application.addPasscode(passcode)
-    await this.application.setValue('bar', 'foo')
+    await this.application.storageService.setValueAndAwaitPersist('bar', 'foo')
     await this.application.removePasscode()
     const wrappedValue = this.application.storageService.values[ValueModesKeys.Wrapped]
     const payload = CreateMaxPayloadFromAnyObject(wrappedValue)
@@ -149,7 +149,7 @@ describe('storage manager', function () {
         this.application.identifier,
       ),
     ).to.be.ok
-    await this.application.setValue('foo', 'bar')
+    await this.application.storageService.setValueAndAwaitPersist('foo', 'bar')
     Factory.handlePasswordChallenges(this.application, this.password)
     await this.application.addPasscode(passcode)
     expect(
@@ -157,7 +157,7 @@ describe('storage manager', function () {
         this.application.identifier,
       ),
     ).to.not.be.ok
-    await this.application.setValue('bar', 'foo')
+    await this.application.storageService.setValueAndAwaitPersist('bar', 'foo')
     Factory.handlePasswordChallenges(this.application, passcode)
     await this.application.removePasscode()
     expect(
@@ -172,7 +172,7 @@ describe('storage manager', function () {
   })
 
   it('adding account should encrypt storage with account keys', async function () {
-    await this.application.setValue('foo', 'bar')
+    await this.application.storageService.setValueAndAwaitPersist('foo', 'bar')
     await Factory.registerUserToApplication({
       application: this.application,
       email: this.email,
@@ -184,7 +184,7 @@ describe('storage manager', function () {
   })
 
   it('signing out of account should decrypt storage', async function () {
-    await this.application.setValue('foo', 'bar')
+    await this.application.storageService.setValueAndAwaitPersist('foo', 'bar')
     await Factory.registerUserToApplication({
       application: this.application,
       email: this.email,
@@ -192,7 +192,7 @@ describe('storage manager', function () {
       ephemeral: true,
     })
     this.application = await Factory.signOutApplicationAndReturnNew(this.application)
-    await this.application.setValue('bar', 'foo')
+    await this.application.storageService.setValueAndAwaitPersist('bar', 'foo')
     const wrappedValue = this.application.storageService.values[ValueModesKeys.Wrapped]
     const payload = CreateMaxPayloadFromAnyObject(wrappedValue)
     expect(payload.format).to.equal(PayloadFormat.DecryptedBareObject)
@@ -200,7 +200,7 @@ describe('storage manager', function () {
 
   it('adding account then passcode should encrypt storage with account keys', async function () {
     /** Should encrypt storage with account keys and encrypt account keys with passcode */
-    await this.application.setValue('foo', 'bar')
+    await this.application.storageService.setValueAndAwaitPersist('foo', 'bar')
     await Factory.registerUserToApplication({
       application: this.application,
       email: this.email,
@@ -209,26 +209,30 @@ describe('storage manager', function () {
     })
 
     /** Should not be wrapped root key yet */
-    expect(await this.application.protocolService.getWrappedRootKey()).to.not.be.ok
+    expect(await this.application.protocolService.rootKeyEncryption.getWrappedRootKey()).to.not.be
+      .ok
 
     const passcode = '123'
     Factory.handlePasswordChallenges(this.application, this.password)
     await this.application.addPasscode(passcode)
-    await this.application.setValue('bar', 'foo')
+    await this.application.storageService.setValueAndAwaitPersist('bar', 'foo')
 
     /** Root key should now be wrapped */
-    expect(await this.application.protocolService.getWrappedRootKey()).to.be.ok
+    expect(await this.application.protocolService.rootKeyEncryption.getWrappedRootKey()).to.be.ok
 
     const accountKey = await this.application.protocolService.getRootKey()
     expect(await this.application.storageService.canDecryptWithKey(accountKey)).to.equal(true)
     const passcodeKey = await this.application.protocolService.computeWrappingKey(passcode)
-    const wrappedRootKey = await this.application.protocolService.getWrappedRootKey()
+    const wrappedRootKey =
+      await this.application.protocolService.rootKeyEncryption.getWrappedRootKey()
     /** Expect that we can decrypt wrapped root key with passcode key */
     const payload = CreateMaxPayloadFromAnyObject(wrappedRootKey)
-    const decrypted = await this.application.protocolService.payloadByDecryptingPayload(
-      payload,
-      passcodeKey,
-    )
+    const decrypted = await this.application.protocolService.decryptSplitSingle({
+      usesRootKey: {
+        items: [payload],
+        key: passcodeKey,
+      },
+    })
     expect(decrypted.errorDecrypting).to.equal(false)
     expect(decrypted.format).to.equal(PayloadFormat.DecryptedBareObject)
   })
@@ -241,7 +245,7 @@ describe('storage manager', function () {
       ephemeral: false,
     })
 
-    await this.application.setStorageEncryptionPolicy(StorageEncryptionPolicies.Disabled)
+    await this.application.setStorageEncryptionPolicy(StorageEncryptionPolicy.Disabled)
 
     const payloads = await this.application.storageService.getAllRawPayloads()
     const payload = payloads[0]
@@ -249,10 +253,9 @@ describe('storage manager', function () {
     expect(payload.content.references).to.be.ok
 
     const identifier = this.application.identifier
-    await Factory.safeDeinit(this.application)
 
     const app = await Factory.createAndInitializeApplication(identifier, Environment.Mobile)
-    expect(app.storageService.encryptionPolicy).to.equal(StorageEncryptionPolicies.Disabled)
+    expect(app.storageService.encryptionPolicy).to.equal(StorageEncryptionPolicy.Disabled)
   })
 
   it('stored payloads should not contain metadata fields', async function () {

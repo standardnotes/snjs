@@ -1,6 +1,6 @@
 import { ContentType } from '@standardnotes/common'
 import { ItemManager } from '@Lib/Services/Items/ItemManager'
-import { SNItem, SingletonStrategy } from '@Lib/Models/Item/Item'
+import { SNItem, SingletonStrategy, Uuids } from '@standardnotes/models'
 import {
   arrayByRemovingFromIndex,
   extendArray,
@@ -13,7 +13,6 @@ import {
   PredicateInterface,
 } from '@standardnotes/payloads'
 import { SNSyncService } from '../Sync/SyncService'
-import { Uuids } from '@Lib/Models/Functions'
 import { AbstractService, InternalEventBusInterface, SyncEvent } from '@standardnotes/services'
 
 /**
@@ -218,7 +217,7 @@ export class SNSingletonManager extends AbstractService {
       dirtiedDate: new Date(),
     })
     const item = await this.itemManager.emitItemFromPayload(dirtyPayload)
-    this.syncService.sync()
+    void this.syncService.sync()
     return item as T
   }
 }

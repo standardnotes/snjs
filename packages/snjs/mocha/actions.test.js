@@ -120,8 +120,12 @@ describe('actions service', () => {
       },
     })
 
-    const encryptedPayload = await this.application.protocolService.payloadByEncryptingPayload(
-      payload,
+    const encryptedPayload = await this.application.protocolService.encryptSplitSingle(
+      {
+        usesItemsKeyWithKeyLookup: {
+          items: [payload],
+        },
+      },
       EncryptionIntent.Sync,
     )
 

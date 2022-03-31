@@ -6,27 +6,29 @@ node_modules
 coverage
 
 # List individually so that packages/components/all/org./dist is included
+packages/analytics/dist
+packages/applications/dist
 packages/auth/dist
 packages/common/dist
 packages/components/dist
 packages/config/dist
 packages/domain-events-infra/dist
 packages/domain-events/dist
+packages/encryption/dist
 packages/features/dist
+packages/filepicker/dist
+packages/filepicker/example/dist
+packages/models/dist
+packages/payloads/dist
+packages/responses/dist
+packages/services/dist
 packages/settings/dist
-packages/snjs/dist
-packages/time/dist
 packages/sncrypto-common/dist
 packages/sncrypto-node/dist
 packages/sncrypto-web/dist
-packages/filepicker/dist
-packages/filepicker/example/dist
+packages/snjs/dist
+packages/time/dist
 packages/utils/dist
-packages/services/dist
-packages/payloads/dist
-packages/applications/dist
-packages/responses/dist
-packages/analytics/dist
 
 yarn-error.log
 package-lock.json

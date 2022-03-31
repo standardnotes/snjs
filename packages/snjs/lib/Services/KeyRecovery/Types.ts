@@ -1,7 +1,7 @@
+import { SNRootKey, SNRootKeyParams } from '@standardnotes/encryption'
+import { SNItemsKey } from '@standardnotes/models'
 import { RawPayload } from '@standardnotes/payloads'
 import { UuidString } from '@Lib/Types'
-import { SNItemsKey } from '@Lib/Models'
-import { SNRootKey, SNRootKeyParams } from '@Lib/Protocol'
 
 export type UndecryptableItemsStorage = Record<UuidString, RawPayload>
 

@@ -44,7 +44,7 @@ describe('basic auth', () => {
     expect(await this.application.protocolService.getRootKey()).to.be.ok
     this.application = await Factory.signOutApplicationAndReturnNew(this.application)
     expect(await this.application.protocolService.getRootKey()).to.not.be.ok
-    expect(this.application.protocolService.keyMode).to.equal(KeyMode.RootKeyNone)
+    expect(this.application.protocolService.rootKeyEncryption.keyMode).to.equal(KeyMode.RootKeyNone)
     const rawPayloads = await this.application.storageService.getAllRawPayloads()
     expect(rawPayloads.length).to.equal(BASE_ITEM_COUNT)
   })
@@ -311,7 +311,7 @@ describe('basic auth', () => {
     let outOfSync = true
     let didCompletePostDownloadFirstSync = false
     let didCompleteDownloadFirstSync = false
-    this.application.syncService.addEventObserver(async (eventName, data) => {
+    this.application.syncService.addEventObserver((eventName) => {
       if (eventName === SyncEvent.DownloadFirstSyncCompleted) {
         didCompleteDownloadFirstSync = true
       }
@@ -496,7 +496,7 @@ describe('basic auth', () => {
     expect(performSignIn.callCount).to.equal(1)
   })
 
-  describe('add passcode', async function () {
+  describe('add passcode', function () {
     it('should set passcode successfully', async function () {
       const passcode = 'passcode'
       const result = await this.application.addPasscode(passcode)
@@ -510,7 +510,7 @@ describe('basic auth', () => {
     })
   })
 
-  describe('change passcode', async function () {
+  describe('change passcode', function () {
     it('should change passcode successfully', async function () {
       const passcode = 'passcode'
       const newPasscode = 'newPasscode'
@@ -530,7 +530,7 @@ describe('basic auth', () => {
     }).timeout(Factory.TenSecondTimeout)
   })
 
-  describe.skip('account deletion', async function () {
+  describe.skip('account deletion', function () {
     it('should delete account', async function () {
       await Factory.registerUserToApplication({
         application: this.application,
@@ -539,7 +539,7 @@ describe('basic auth', () => {
       })
 
       Factory.handlePasswordChallenges(this.application, this.password)
-      const response = await this.application.user.deleteAccount()
+      const _response = await this.application.user.deleteAccount()
     }).timeout(Factory.TenSecondTimeout)
 
     it('should prompt for account password when deleting account', async function () {
@@ -551,7 +551,7 @@ describe('basic auth', () => {
 
       Factory.handlePasswordChallenges(this.application, this.password)
 
-      const response = await this.application.deleteAccount()
+      const _response = await this.application.deleteAccount()
 
       sinon.spy(snApp.challengeService, 'sendChallenge')
       const spyCall = snApp.challengeService.sendChallenge.getCall(0)
@@ -570,7 +570,7 @@ describe('basic auth', () => {
 
       Factory.handlePasswordChallenges(this.application, this.password)
 
-      const response = await this.application.deleteAccount()
+      const _response = await this.application.deleteAccount()
 
       expect(application.hasAccount()).to.be.false
     }).timeout(Factory.TenSecondTimeout)

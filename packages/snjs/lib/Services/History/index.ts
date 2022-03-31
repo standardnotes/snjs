@@ -1,5 +1,1 @@
 export * from './HistoryManager'
-export * from './HistoryMap'
-export * from './Entries/NoteHistoryEntry'
-export * from './Entries/HistoryEntry'
-export * from './Entries/Generator'

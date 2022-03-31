@@ -1,19 +1,10 @@
-import { SNFile } from '../../Models/File/File'
-import { ItemManager, SNItem } from '@Lib/index'
-import { SNNote, NoteMutator } from '@Lib/Models'
-import { SmartView, SystemViewId } from '@Lib/Models/SmartView/SmartView'
-import { SNTag } from '@Lib/Models/Tag/Tag'
-import { TagMutator } from '@Lib/Models/Tag/TagMutator'
-import {
-  FillItemContent,
-  CreateMaxPayloadFromAnyObject,
-  predicateFromJson,
-} from '@standardnotes/payloads'
-import { UuidGenerator } from '@standardnotes/utils'
 import { ContentType } from '@standardnotes/common'
-import { NotesDisplayCriteria } from '../../Protocol/collection/notes_display_criteria'
-import { PayloadManager } from '../Payloads/PayloadManager'
 import { InternalEventBusInterface } from '@standardnotes/services'
+import { ItemManager } from './ItemManager'
+import { PayloadManager } from '../Payloads/PayloadManager'
+import { UuidGenerator } from '@standardnotes/utils'
+import * as Models from '@standardnotes/models'
+import * as Payloads from '@standardnotes/payloads'
 
 const setupRandomUuid = () => {
   UuidGenerator.SetGenerator(() => String(Math.random()))
@@ -23,19 +14,19 @@ const VIEW_NOT_PINNED = '!["Not Pinned", "pinned", "=", false]'
 const VIEW_LAST_DAY = '!["Last Day", "updated_at", ">", "1.days.ago"]'
 const VIEW_LONG = '!["Long", "text.length", ">", 500]'
 
-const NotPinnedPredicate = predicateFromJson<SNTag>({
+const NotPinnedPredicate = Payloads.predicateFromJson<Models.SNTag>({
   keypath: 'pinned',
   operator: '=',
   value: false,
 })
 
-const LastDayPredicate = predicateFromJson<SNTag>({
+const LastDayPredicate = Payloads.predicateFromJson<Models.SNTag>({
   keypath: 'updated_at',
   operator: '>',
   value: '1.days.ago',
 })
 
-const LongTextPredicate = predicateFromJson<SNTag>({
+const LongTextPredicate = Payloads.predicateFromJson<Models.SNTag>({
   keypath: 'text.length' as never,
   operator: '>',
   value: 500,
@@ -44,7 +35,7 @@ const LongTextPredicate = predicateFromJson<SNTag>({
 describe('itemManager', () => {
   let payloadManager: PayloadManager
   let itemManager: ItemManager
-  let items: SNItem[]
+  let items: Models.SNItem[]
   let internalEventBus: InternalEventBusInterface
 
   const createService = () => {
@@ -59,11 +50,11 @@ describe('itemManager', () => {
 
     payloadManager = new PayloadManager(internalEventBus)
 
-    items = [] as jest.Mocked<SNItem[]>
+    items = [] as jest.Mocked<Models.SNItem[]>
     itemManager = {} as jest.Mocked<ItemManager>
     itemManager.getItems = jest.fn().mockReturnValue(items)
     itemManager.createItem = jest.fn()
-    itemManager.changeComponent = jest.fn().mockReturnValue({} as jest.Mocked<SNItem>)
+    itemManager.changeComponent = jest.fn().mockReturnValue({} as jest.Mocked<Models.SNItem>)
     itemManager.setItemsToBeDeleted = jest.fn()
     itemManager.addObserver = jest.fn()
     itemManager.changeItem = jest.fn()
@@ -71,11 +62,11 @@ describe('itemManager', () => {
   })
 
   const createTag = (title: string) => {
-    return new SNTag(
-      CreateMaxPayloadFromAnyObject({
+    return new Models.SNTag(
+      Payloads.CreateMaxPayloadFromAnyObject({
         uuid: String(Math.random()),
         content_type: ContentType.Tag,
-        content: FillItemContent({
+        content: Payloads.FillItemContent({
           title: title,
         }),
       }),
@@ -83,11 +74,11 @@ describe('itemManager', () => {
   }
 
   const createNote = (title: string) => {
-    return new SNNote(
-      CreateMaxPayloadFromAnyObject({
+    return new Models.SNNote(
+      Payloads.CreateMaxPayloadFromAnyObject({
         uuid: String(Math.random()),
         content_type: ContentType.Note,
-        content: FillItemContent({
+        content: Payloads.FillItemContent({
           title: title,
         }),
       }),
@@ -95,11 +86,11 @@ describe('itemManager', () => {
   }
 
   const createFile = (name: string) => {
-    return new SNFile(
-      CreateMaxPayloadFromAnyObject({
+    return new Models.SNFile(
+      Payloads.CreateMaxPayloadFromAnyObject({
         uuid: String(Math.random()),
         content_type: ContentType.File,
-        content: FillItemContent({
+        content: Payloads.FillItemContent({
           name: name,
         }),
       }),
@@ -114,7 +105,7 @@ describe('itemManager', () => {
       await itemManager.insertItems([tag, note])
       await itemManager.addTagToNote(note, tag, false)
 
-      const criteria = NotesDisplayCriteria.Create({
+      const criteria = Models.NotesDisplayCriteria.Create({
         tags: [tag],
       })
       itemManager.setNotesDisplayCriteria(criteria)
@@ -132,7 +123,7 @@ describe('itemManager', () => {
       await itemManager.insertItems([parent, child])
       await itemManager.setTagParent(parent, child)
 
-      const changedChild = itemManager.findItem(child.uuid) as SNTag
+      const changedChild = itemManager.findItem(child.uuid) as Models.SNTag
       expect(changedChild.parentId).toBe(parent.uuid)
     })
 
@@ -304,7 +295,7 @@ describe('itemManager', () => {
       await itemManager.addTagToNote(parentNote, parentTag, false)
       await itemManager.addTagToNote(childNote, childTag, false)
 
-      const criteria = NotesDisplayCriteria.Create({
+      const criteria = Models.NotesDisplayCriteria.Create({
         tags: [parentTag],
       })
       itemManager.setNotesDisplayCriteria(criteria)
@@ -387,7 +378,9 @@ describe('itemManager', () => {
 
       const [systemTag1, ...restOfSystemViews] = itemManager
         .getSmartViews()
-        .filter((view) => Object.values(SystemViewId).includes(view.uuid as SystemViewId))
+        .filter((view) =>
+          Object.values(Models.SystemViewId).includes(view.uuid as Models.SystemViewId),
+        )
 
       const isSystemTemplate = itemManager.isTemplateItem(systemTag1)
       expect(isSystemTemplate).toEqual(false)
@@ -482,14 +475,14 @@ describe('itemManager', () => {
       expect(itemManager.countableNotesForTag(tag1)).toBe(2)
       expect(itemManager.allCountableNotesCount()).toBe(2)
 
-      await itemManager.changeItem<NoteMutator>(note1.uuid, (m) => {
+      await itemManager.changeItem<Models.NoteMutator>(note1.uuid, (m) => {
         m.archived = true
       })
 
       expect(itemManager.allCountableNotesCount()).toBe(1)
       expect(itemManager.countableNotesForTag(tag1)).toBe(1)
 
-      await itemManager.changeItem<NoteMutator>(note1.uuid, (m) => {
+      await itemManager.changeItem<Models.NoteMutator>(note1.uuid, (m) => {
         m.archived = false
       })
 
@@ -578,15 +571,15 @@ describe('itemManager', () => {
 
     const tag = await itemManager.createSmartView('Not Pinned', NotPinnedPredicate)
 
-    await itemManager.changeItem<TagMutator>(tag.uuid, (m) => {
+    await itemManager.changeItem<Models.TagMutator>(tag.uuid, (m) => {
       m.title = 'New Title'
     })
 
-    const view = itemManager.findItem(tag.uuid) as SmartView
+    const view = itemManager.findItem(tag.uuid) as Models.SmartView
     const views = itemManager.getSmartViews()
 
     expect(view.title).toEqual('New Title')
-    expect(views.some((tag: SmartView) => tag.title === 'New Title')).toEqual(true)
+    expect(views.some((tag: Models.SmartView) => tag.title === 'New Title')).toEqual(true)
   })
 
   it('lets me find a smart view', async () => {
@@ -595,7 +588,7 @@ describe('itemManager', () => {
 
     const tag = await itemManager.createSmartView('Not Pinned', NotPinnedPredicate)
 
-    const view = itemManager.findItem(tag.uuid) as SmartView
+    const view = itemManager.findItem(tag.uuid) as Models.SmartView
 
     expect(view).toBeDefined()
   })

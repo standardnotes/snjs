@@ -7,21 +7,23 @@ const expect = chai.expect
 describe('protections', function () {
   this.timeout(Factory.TenSecondTimeout)
 
-  beforeEach(async function () {
+  let application
+
+  beforeEach(function () {
     localStorage.clear()
   })
 
   afterEach(async function () {
-    await Factory.safeDeinit(this.application)
+    await Factory.safeDeinit(application)
     localStorage.clear()
   })
 
   it('prompts for password when accessing protected note', async function () {
     let challengePrompts = 0
 
-    this.application = await Factory.createApplicationWithFakeCrypto(Factory.randomString())
+    application = await Factory.createApplicationWithFakeCrypto(Factory.randomString())
     const password = UuidGenerator.GenerateUuid()
-    await this.application.prepareForLaunch({
+    await application.prepareForLaunch({
       receiveChallenge: (challenge) => {
         challengePrompts += 1
         expect(
@@ -39,27 +41,27 @@ describe('protections', function () {
             ),
         )
 
-        this.application.submitValuesForChallenge(challenge, values)
+        application.submitValuesForChallenge(challenge, values)
       },
     })
-    await this.application.launch(true)
+    await application.launch(true)
     await Factory.registerUserToApplication({
-      application: this.application,
+      application: application,
       email: UuidGenerator.GenerateUuid(),
       password,
     })
 
-    let note = await Factory.createMappedNote(this.application)
-    note = await this.application.mutator.protectNote(note)
+    let note = await Factory.createMappedNote(application)
+    note = await application.mutator.protectNote(note)
 
-    expect(await this.application.authorizeNoteAccess(note)).to.be.true
+    expect(await application.authorizeNoteAccess(note)).to.be.true
     expect(challengePrompts).to.equal(1)
   })
 
   it('sets `note.protected` to true', async function () {
-    this.application = await Factory.createInitAppWithFakeCrypto()
-    let note = await Factory.createMappedNote(this.application)
-    note = await this.application.mutator.protectNote(note)
+    application = await Factory.createInitAppWithFakeCrypto()
+    let note = await Factory.createMappedNote(application)
+    note = await application.mutator.protectNote(note)
     expect(note.protected).to.be.true
   })
 
@@ -67,8 +69,8 @@ describe('protections', function () {
     const passcode = 'passcode'
     let challengePrompts = 0
 
-    this.application = await Factory.createApplicationWithFakeCrypto(Factory.randomString())
-    await this.application.prepareForLaunch({
+    application = await Factory.createApplicationWithFakeCrypto(Factory.randomString())
+    await application.prepareForLaunch({
       receiveChallenge: (challenge) => {
         challengePrompts += 1
         expect(
@@ -86,16 +88,16 @@ describe('protections', function () {
             ),
         )
 
-        this.application.submitValuesForChallenge(challenge, values)
+        application.submitValuesForChallenge(challenge, values)
       },
     })
-    await this.application.launch(true)
+    await application.launch(true)
 
-    await this.application.addPasscode(passcode)
-    let note = await Factory.createMappedNote(this.application)
-    note = await this.application.mutator.protectNote(note)
+    await application.addPasscode(passcode)
+    let note = await Factory.createMappedNote(application)
+    note = await application.mutator.protectNote(note)
 
-    expect(await this.application.authorizeNoteAccess(note)).to.be.true
+    expect(await application.authorizeNoteAccess(note)).to.be.true
     expect(challengePrompts).to.equal(1)
   })
 
@@ -103,8 +105,8 @@ describe('protections', function () {
     const passcode = 'passcode'
     let challengePrompts = 0
 
-    this.application = await Factory.createApplicationWithFakeCrypto(Factory.randomString())
-    await this.application.prepareForLaunch({
+    application = await Factory.createApplicationWithFakeCrypto(Factory.randomString())
+    await application.prepareForLaunch({
       receiveChallenge: (challenge) => {
         challengePrompts += 1
         expect(
@@ -122,16 +124,16 @@ describe('protections', function () {
             ),
         )
 
-        this.application.submitValuesForChallenge(challenge, values)
+        application.submitValuesForChallenge(challenge, values)
       },
     })
-    await this.application.launch(true)
+    await application.launch(true)
 
-    await this.application.addPasscode(passcode)
-    let note = await Factory.createMappedNote(this.application)
+    await application.addPasscode(passcode)
+    let note = await Factory.createMappedNote(application)
     const uuid = note.uuid
-    note = await this.application.mutator.protectNote(note)
-    note = await this.application.mutator.unprotectNote(note)
+    note = await application.mutator.protectNote(note)
+    note = await application.mutator.unprotectNote(note)
     expect(note.uuid).to.equal(uuid)
     expect(note.protected).to.equal(false)
     expect(challengePrompts).to.equal(1)
@@ -141,19 +143,19 @@ describe('protections', function () {
     const passcode = 'passcode'
     let challengePrompts = 0
 
-    this.application = await Factory.createApplicationWithFakeCrypto(Factory.randomString())
-    await this.application.prepareForLaunch({
+    application = await Factory.createApplicationWithFakeCrypto(Factory.randomString())
+    await application.prepareForLaunch({
       receiveChallenge: (challenge) => {
         challengePrompts++
-        this.application.cancelChallenge(challenge)
+        application.cancelChallenge(challenge)
       },
     })
-    await this.application.launch(true)
+    await application.launch(true)
 
-    await this.application.addPasscode(passcode)
-    let note = await Factory.createMappedNote(this.application)
-    note = await this.application.mutator.protectNote(note)
-    const result = await this.application.mutator.unprotectNote(note)
+    await application.addPasscode(passcode)
+    let note = await Factory.createMappedNote(application)
+    note = await application.mutator.protectNote(note)
+    const result = await application.mutator.unprotectNote(note)
     expect(result).to.be.undefined
     expect(challengePrompts).to.equal(1)
   })
@@ -162,8 +164,8 @@ describe('protections', function () {
     const passcode = 'passcode'
 
     let challengePrompts = 0
-    this.application = await Factory.createApplicationWithFakeCrypto(Factory.randomString())
-    await this.application.prepareForLaunch({
+    application = await Factory.createApplicationWithFakeCrypto(Factory.randomString())
+    await application.prepareForLaunch({
       receiveChallenge: (challenge) => {
         challengePrompts += 1
         expect(
@@ -181,25 +183,26 @@ describe('protections', function () {
             ),
         )
 
-        this.application.submitValuesForChallenge(challenge, values)
+        application.submitValuesForChallenge(challenge, values)
       },
     })
-    await this.application.launch(true)
+    await application.launch(true)
 
-    await this.application.addPasscode(passcode)
-    let note = await Factory.createMappedNote(this.application)
-    note = await this.application.mutator.protectNote(note)
+    await application.addPasscode(passcode)
+    let note = await Factory.createMappedNote(application)
+    note = await application.mutator.protectNote(note)
 
-    expect(await this.application.authorizeNoteAccess(note)).to.be.true
-    expect(await this.application.authorizeNoteAccess(note)).to.be.true
+    expect(await application.authorizeNoteAccess(note)).to.be.true
+    expect(await application.authorizeNoteAccess(note)).to.be.true
     expect(challengePrompts).to.equal(1)
   })
 
   it('prompts for password when adding a passcode', async function () {
-    const application = Factory.createApplicationWithFakeCrypto(Factory.randomString())
+    application = Factory.createApplicationWithFakeCrypto(Factory.randomString())
     const password = UuidGenerator.GenerateUuid()
     const passcode = 'passcode'
     let didPromptForPassword = false
+
     await application.prepareForLaunch({
       receiveChallenge: (challenge) => {
         let values
@@ -223,6 +226,7 @@ describe('protections', function () {
         application.submitValuesForChallenge(challenge, values)
       },
     })
+
     await application.launch(true)
     await Factory.registerUserToApplication({
       application: application,
@@ -232,23 +236,22 @@ describe('protections', function () {
 
     await application.addPasscode(passcode)
     expect(didPromptForPassword).to.equal(true)
-    await Factory.safeDeinit(application)
   })
 
   it('authorizes note access when no password or passcode are set', async function () {
-    this.application = await Factory.createInitAppWithFakeCrypto()
+    application = await Factory.createInitAppWithFakeCrypto()
 
-    let note = await Factory.createMappedNote(this.application)
-    note = await this.application.mutator.protectNote(note)
+    let note = await Factory.createMappedNote(application)
+    note = await application.mutator.protectNote(note)
 
-    expect(await this.application.authorizeNoteAccess(note)).to.be.true
+    expect(await application.authorizeNoteAccess(note)).to.be.true
   })
 
   it('authorizes autolock interval change', async function () {
     const passcode = 'passcode'
 
-    this.application = await Factory.createApplicationWithFakeCrypto(Factory.randomString())
-    await this.application.prepareForLaunch({
+    application = await Factory.createApplicationWithFakeCrypto(Factory.randomString())
+    await application.prepareForLaunch({
       receiveChallenge: (challenge) => {
         expect(
           challenge.prompts.find(
@@ -265,21 +268,21 @@ describe('protections', function () {
             ),
         )
 
-        this.application.submitValuesForChallenge(challenge, values)
+        application.submitValuesForChallenge(challenge, values)
       },
     })
-    await this.application.launch(true)
+    await application.launch(true)
 
-    await this.application.addPasscode(passcode)
+    await application.addPasscode(passcode)
 
-    expect(await this.application.authorizeAutolockIntervalChange()).to.be.true
+    expect(await application.authorizeAutolockIntervalChange()).to.be.true
   })
 
   it('authorizes batch manager access', async function () {
     const passcode = 'passcode'
 
-    this.application = await Factory.createApplicationWithFakeCrypto(Factory.randomString())
-    await this.application.prepareForLaunch({
+    application = await Factory.createApplicationWithFakeCrypto(Factory.randomString())
+    await application.prepareForLaunch({
       receiveChallenge: (challenge) => {
         expect(
           challenge.prompts.find(
@@ -296,140 +299,138 @@ describe('protections', function () {
             ),
         )
 
-        this.application.submitValuesForChallenge(challenge, values)
+        application.submitValuesForChallenge(challenge, values)
       },
     })
-    await this.application.launch(true)
+    await application.launch(true)
 
-    await this.application.addPasscode(passcode)
+    await application.addPasscode(passcode)
 
-    expect(await this.application.authorizeAutolockIntervalChange()).to.be.true
+    expect(await application.authorizeAutolockIntervalChange()).to.be.true
   })
 
   it('handles session length', async function () {
-    this.application = await Factory.createInitAppWithFakeCrypto()
-    await this.application.protectionService.setSessionLength(300)
-    const length = await this.application.protectionService.getLastSessionLength()
+    application = await Factory.createInitAppWithFakeCrypto()
+    await application.protectionService.setSessionLength(300)
+    const length = await application.protectionService.getLastSessionLength()
     expect(length).to.equal(300)
-    const expirey = await this.application.getProtectionSessionExpiryDate()
+    const expirey = await application.getProtectionSessionExpiryDate()
     expect(expirey).to.be.ok
   })
 
   it('handles session length', async function () {
-    this.application = await Factory.createInitAppWithFakeCrypto()
-    await this.application.protectionService.setSessionLength(
-      UnprotectedAccessSecondsDuration.OneMinute,
-    )
-    const length = await this.application.protectionService.getLastSessionLength()
+    application = await Factory.createInitAppWithFakeCrypto()
+    await application.protectionService.setSessionLength(UnprotectedAccessSecondsDuration.OneMinute)
+    const length = await application.protectionService.getLastSessionLength()
     expect(length).to.equal(UnprotectedAccessSecondsDuration.OneMinute)
-    const expirey = await this.application.getProtectionSessionExpiryDate()
+    const expirey = await application.getProtectionSessionExpiryDate()
     expect(expirey).to.be.ok
   })
 
-  describe('hasProtectionSources', async function () {
+  describe('hasProtectionSources', function () {
     it('no account, no passcode, no biometrics', async function () {
-      this.application = await Factory.createInitAppWithFakeCrypto()
-      expect(this.application.hasProtectionSources()).to.be.false
+      application = await Factory.createInitAppWithFakeCrypto()
+      expect(application.hasProtectionSources()).to.be.false
     })
 
     it('no account, no passcode, biometrics', async function () {
-      this.application = await Factory.createInitAppWithFakeCrypto()
-      await this.application.enableBiometrics()
-      expect(this.application.hasProtectionSources()).to.be.true
+      application = await Factory.createInitAppWithFakeCrypto()
+      await application.enableBiometrics()
+      expect(application.hasProtectionSources()).to.be.true
     })
 
     it('no account, passcode, no biometrics', async function () {
-      this.application = await Factory.createInitAppWithFakeCrypto()
-      await this.application.addPasscode('passcode')
-      expect(this.application.hasProtectionSources()).to.be.true
+      application = await Factory.createInitAppWithFakeCrypto()
+      await application.addPasscode('passcode')
+      expect(application.hasProtectionSources()).to.be.true
     })
 
     it('no account, passcode, biometrics', async function () {
-      this.application = await Factory.createInitAppWithFakeCrypto()
-      await this.application.addPasscode('passcode')
-      await this.application.enableBiometrics()
-      expect(this.application.hasProtectionSources()).to.be.true
+      application = await Factory.createInitAppWithFakeCrypto()
+      await application.addPasscode('passcode')
+      await application.enableBiometrics()
+      expect(application.hasProtectionSources()).to.be.true
     })
 
     it('account, no passcode, no biometrics', async function () {
-      this.application = await Factory.createInitAppWithFakeCrypto()
+      application = await Factory.createInitAppWithFakeCrypto()
       await Factory.registerUserToApplication({
-        application: this.application,
+        application: application,
         email: UuidGenerator.GenerateUuid(),
         password: UuidGenerator.GenerateUuid(),
       })
-      expect(this.application.hasProtectionSources()).to.be.true
+      expect(application.hasProtectionSources()).to.be.true
     })
 
     it('account, no passcode, biometrics', async function () {
-      this.application = await Factory.createInitAppWithFakeCrypto()
+      application = await Factory.createInitAppWithFakeCrypto()
       await Factory.registerUserToApplication({
-        application: this.application,
+        application: application,
         email: UuidGenerator.GenerateUuid(),
         password: UuidGenerator.GenerateUuid(),
       })
-      await this.application.enableBiometrics()
-      expect(this.application.hasProtectionSources()).to.be.true
+      await application.enableBiometrics()
+      expect(application.hasProtectionSources()).to.be.true
     })
 
     it('account, passcode, no biometrics', async function () {
-      this.application = await Factory.createInitAppWithFakeCrypto()
+      application = await Factory.createInitAppWithFakeCrypto()
       const password = UuidGenerator.GenerateUuid()
       await Factory.registerUserToApplication({
-        application: this.application,
+        application: application,
         email: UuidGenerator.GenerateUuid(),
         password,
       })
-      Factory.handlePasswordChallenges(this.application, password)
-      await this.application.addPasscode('passcode')
-      expect(this.application.hasProtectionSources()).to.be.true
+      Factory.handlePasswordChallenges(application, password)
+      await application.addPasscode('passcode')
+      expect(application.hasProtectionSources()).to.be.true
     })
 
     it('account, passcode, biometrics', async function () {
-      this.application = await Factory.createInitAppWithFakeCrypto()
+      application = await Factory.createInitAppWithFakeCrypto()
       const password = UuidGenerator.GenerateUuid()
       await Factory.registerUserToApplication({
-        application: this.application,
+        application: application,
         email: UuidGenerator.GenerateUuid(),
         password,
       })
-      Factory.handlePasswordChallenges(this.application, password)
-      await this.application.addPasscode('passcode')
-      await this.application.enableBiometrics()
-      expect(this.application.hasProtectionSources()).to.be.true
+      Factory.handlePasswordChallenges(application, password)
+      await application.addPasscode('passcode')
+      await application.enableBiometrics()
+      expect(application.hasProtectionSources()).to.be.true
     })
   })
 
-  describe('hasUnprotectedAccessSession', async function () {
+  describe('hasUnprotectedAccessSession', function () {
     it('should return false when session length has not been set', async function () {
       this.foo = 'tar'
-      this.application = await Factory.createInitAppWithFakeCrypto()
-      await this.application.addPasscode('passcode')
-      expect(this.application.hasUnprotectedAccessSession()).to.be.false
+      application = await Factory.createInitAppWithFakeCrypto()
+      await application.addPasscode('passcode')
+      expect(application.hasUnprotectedAccessSession()).to.be.false
     })
 
     it('should return true when session length has been set', async function () {
-      this.application = await Factory.createInitAppWithFakeCrypto()
-      await this.application.addPasscode('passcode')
-      await this.application.protectionService.setSessionLength(
+      application = await Factory.createInitAppWithFakeCrypto()
+      await application.addPasscode('passcode')
+      await application.protectionService.setSessionLength(
         UnprotectedAccessSecondsDuration.OneMinute,
       )
-      expect(this.application.hasUnprotectedAccessSession()).to.be.true
+      expect(application.hasUnprotectedAccessSession()).to.be.true
     })
 
     it('should return true when there are no protection sources', async function () {
-      this.application = await Factory.createInitAppWithFakeCrypto()
-      expect(this.application.hasUnprotectedAccessSession()).to.be.true
+      application = await Factory.createInitAppWithFakeCrypto()
+      expect(application.hasUnprotectedAccessSession()).to.be.true
     })
   })
 
-  describe('authorizeProtectedActionForNotes', async function () {
+  describe('authorizeProtectedActionForNotes', function () {
     it('prompts for password once with the right challenge reason when one or more notes are protected', async function () {
       let challengePrompts = 0
-      this.application = await Factory.createApplicationWithFakeCrypto(Factory.randomString())
+      application = await Factory.createApplicationWithFakeCrypto(Factory.randomString())
       const password = UuidGenerator.GenerateUuid()
 
-      await this.application.prepareForLaunch({
+      await application.prepareForLaunch({
         receiveChallenge: (challenge) => {
           challengePrompts += 1
           expect(
@@ -447,24 +448,24 @@ describe('protections', function () {
                   : UnprotectedAccessSecondsDuration.OneMinute,
               ),
           )
-          this.application.submitValuesForChallenge(challenge, values)
+          application.submitValuesForChallenge(challenge, values)
         },
       })
-      await this.application.launch(true)
+      await application.launch(true)
       await Factory.registerUserToApplication({
-        application: this.application,
+        application: application,
         email: UuidGenerator.GenerateUuid(),
         password,
       })
 
       const NOTE_COUNT = 3
-      let notes = await Factory.createManyMappedNotes(this.application, NOTE_COUNT)
+      let notes = await Factory.createManyMappedNotes(application, NOTE_COUNT)
 
-      notes[0] = await this.application.mutator.protectNote(notes[0])
-      notes[1] = await this.application.mutator.protectNote(notes[1])
+      notes[0] = await application.mutator.protectNote(notes[0])
+      notes[1] = await application.mutator.protectNote(notes[1])
 
       expect(
-        await this.application.authorizeProtectedActionForNotes(
+        await application.authorizeProtectedActionForNotes(
           notes,
           ChallengeReason.SelectProtectedNote,
         ),
@@ -474,10 +475,10 @@ describe('protections', function () {
 
     it('prompts for passcode once with the right challenge reason when one or more notes are protected', async function () {
       let challengePrompts = 0
-      this.application = await Factory.createApplicationWithFakeCrypto(Factory.randomString())
+      application = await Factory.createApplicationWithFakeCrypto(Factory.randomString())
       const passcode = 'passcode'
 
-      await this.application.prepareForLaunch({
+      await application.prepareForLaunch({
         receiveChallenge: (challenge) => {
           challengePrompts += 1
           expect(
@@ -496,19 +497,19 @@ describe('protections', function () {
               ),
           )
 
-          this.application.submitValuesForChallenge(challenge, values)
+          application.submitValuesForChallenge(challenge, values)
         },
       })
-      await this.application.launch(true)
-      await this.application.addPasscode(passcode)
+      await application.launch(true)
+      await application.addPasscode(passcode)
 
       const NOTE_COUNT = 3
-      let notes = await Factory.createManyMappedNotes(this.application, NOTE_COUNT)
-      notes[0] = await this.application.mutator.protectNote(notes[0])
-      notes[1] = await this.application.mutator.protectNote(notes[1])
+      let notes = await Factory.createManyMappedNotes(application, NOTE_COUNT)
+      notes[0] = await application.mutator.protectNote(notes[0])
+      notes[1] = await application.mutator.protectNote(notes[1])
 
       expect(
-        await this.application.authorizeProtectedActionForNotes(
+        await application.authorizeProtectedActionForNotes(
           notes,
           ChallengeReason.SelectProtectedNote,
         ),
@@ -520,23 +521,23 @@ describe('protections', function () {
       const passcode = 'passcode'
       let challengePrompts = 0
 
-      this.application = await Factory.createApplicationWithFakeCrypto(Factory.randomString())
-      await this.application.prepareForLaunch({
+      application = await Factory.createApplicationWithFakeCrypto(Factory.randomString())
+      await application.prepareForLaunch({
         receiveChallenge: (challenge) => {
           challengePrompts++
-          this.application.cancelChallenge(challenge)
+          application.cancelChallenge(challenge)
         },
       })
-      await this.application.launch(true)
-      await this.application.addPasscode(passcode)
+      await application.launch(true)
+      await application.addPasscode(passcode)
 
       const NOTE_COUNT = 3
-      let notes = await Factory.createManyMappedNotes(this.application, NOTE_COUNT)
-      notes[0] = await this.application.mutator.protectNote(notes[0])
-      notes[1] = await this.application.mutator.protectNote(notes[1])
+      let notes = await Factory.createManyMappedNotes(application, NOTE_COUNT)
+      notes[0] = await application.mutator.protectNote(notes[0])
+      notes[1] = await application.mutator.protectNote(notes[1])
 
       expect(
-        await this.application.authorizeProtectedActionForNotes(
+        await application.authorizeProtectedActionForNotes(
           notes,
           ChallengeReason.SelectProtectedNote,
         ),
@@ -545,19 +546,19 @@ describe('protections', function () {
     })
   })
 
-  describe('protectNotes', async function () {
+  describe('protectNotes', function () {
     it('protects all notes', async function () {
-      this.application = await Factory.createApplicationWithFakeCrypto(Factory.randomString())
-      await this.application.prepareForLaunch({
+      application = await Factory.createApplicationWithFakeCrypto(Factory.randomString())
+      await application.prepareForLaunch({
         receiveChallenge: (challenge) => {
-          this.application.cancelChallenge(challenge)
+          application.cancelChallenge(challenge)
         },
       })
-      await this.application.launch(true)
+      await application.launch(true)
 
       const NOTE_COUNT = 3
-      let notes = await Factory.createManyMappedNotes(this.application, NOTE_COUNT)
-      notes = await this.application.mutator.protectNotes(notes)
+      let notes = await Factory.createManyMappedNotes(application, NOTE_COUNT)
+      notes = await application.mutator.protectNotes(notes)
 
       for (const note of notes) {
         expect(note.protected).to.be.true
@@ -565,13 +566,13 @@ describe('protections', function () {
     })
   })
 
-  describe('unprotect notes', async function () {
+  describe('unprotect notes', function () {
     it('prompts for password and unprotects all notes if challenge is succesful', async function () {
       let challengePrompts = 0
-      this.application = await Factory.createApplicationWithFakeCrypto(Factory.randomString())
+      application = await Factory.createApplicationWithFakeCrypto(Factory.randomString())
       const passcode = 'passcode'
 
-      await this.application.prepareForLaunch({
+      await application.prepareForLaunch({
         receiveChallenge: (challenge) => {
           challengePrompts += 1
           expect(
@@ -590,16 +591,16 @@ describe('protections', function () {
               ),
           )
 
-          this.application.submitValuesForChallenge(challenge, values)
+          application.submitValuesForChallenge(challenge, values)
         },
       })
-      await this.application.launch(true)
-      await this.application.addPasscode(passcode)
+      await application.launch(true)
+      await application.addPasscode(passcode)
 
       const NOTE_COUNT = 3
-      let notes = await Factory.createManyMappedNotes(this.application, NOTE_COUNT)
-      notes = await this.application.mutator.protectNotes(notes)
-      notes = await this.application.mutator.unprotectNotes(notes)
+      let notes = await Factory.createManyMappedNotes(application, NOTE_COUNT)
+      notes = await application.mutator.protectNotes(notes)
+      notes = await application.mutator.unprotectNotes(notes)
 
       for (const note of notes) {
         expect(note.protected).to.be.false
@@ -609,10 +610,10 @@ describe('protections', function () {
 
     it('prompts for passcode and unprotects all notes if challenge is succesful', async function () {
       let challengePrompts = 0
-      this.application = await Factory.createApplicationWithFakeCrypto(Factory.randomString())
+      application = await Factory.createApplicationWithFakeCrypto(Factory.randomString())
       const passcode = 'passcode'
 
-      await this.application.prepareForLaunch({
+      await application.prepareForLaunch({
         receiveChallenge: (challenge) => {
           challengePrompts += 1
           expect(
@@ -631,16 +632,16 @@ describe('protections', function () {
               ),
           )
 
-          this.application.submitValuesForChallenge(challenge, values)
+          application.submitValuesForChallenge(challenge, values)
         },
       })
-      await this.application.launch(true)
-      await this.application.addPasscode(passcode)
+      await application.launch(true)
+      await application.addPasscode(passcode)
 
       const NOTE_COUNT = 3
-      let notes = await Factory.createManyMappedNotes(this.application, NOTE_COUNT)
-      notes = await this.application.mutator.protectNotes(notes)
-      notes = await this.application.mutator.unprotectNotes(notes)
+      let notes = await Factory.createManyMappedNotes(application, NOTE_COUNT)
+      notes = await application.mutator.protectNotes(notes)
+      notes = await application.mutator.unprotectNotes(notes)
 
       for (const note of notes) {
         expect(note.protected).to.be.false
@@ -652,20 +653,20 @@ describe('protections', function () {
       const passcode = 'passcode'
       let challengePrompts = 0
 
-      this.application = await Factory.createApplicationWithFakeCrypto(Factory.randomString())
-      await this.application.prepareForLaunch({
+      application = await Factory.createApplicationWithFakeCrypto(Factory.randomString())
+      await application.prepareForLaunch({
         receiveChallenge: (challenge) => {
           challengePrompts++
-          this.application.cancelChallenge(challenge)
+          application.cancelChallenge(challenge)
         },
       })
-      await this.application.launch(true)
-      await this.application.addPasscode(passcode)
+      await application.launch(true)
+      await application.addPasscode(passcode)
 
       const NOTE_COUNT = 3
-      let notes = await Factory.createManyMappedNotes(this.application, NOTE_COUNT)
-      notes = await this.application.mutator.protectNotes(notes)
-      notes = await this.application.mutator.unprotectNotes(notes)
+      let notes = await Factory.createManyMappedNotes(application, NOTE_COUNT)
+      notes = await application.mutator.protectNotes(notes)
+      notes = await application.mutator.unprotectNotes(notes)
 
       for (const note of notes) {
         expect(note.protected).to.be(true)

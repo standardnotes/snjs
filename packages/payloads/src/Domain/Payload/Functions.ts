@@ -6,7 +6,6 @@ import { remove } from 'lodash'
 
 import { PurePayload } from '../Payload/PurePayload'
 import { ImmutablePayloadCollection } from '../Collection/ImmutablePayloadCollection'
-import { RawEncryptionParameters } from '../Encryption/RawEncryptionParameters'
 import { ContentReference } from '../Reference/ContentReference'
 
 import { PayloadContent } from './PayloadContent'
@@ -16,6 +15,11 @@ import { PayloadOverride } from './PayloadOverride'
 import { PayloadSource } from './PayloadSource'
 import { RawPayload } from './RawPayload'
 import { PayloadFormat } from './PayloadFormat'
+import {
+  DecryptedParameters,
+  EncryptedParameters,
+  ErroredDecryptingParameters,
+} from '../Encryption/EncryptedParameters'
 
 /**
  * Return the payloads that result if you alternated the uuid for the payload.
@@ -25,7 +29,7 @@ import { PayloadFormat } from './PayloadFormat'
  */
 export async function PayloadsByAlternatingUuid(
   payload: PayloadInterface,
-  baseCollection: ImmutablePayloadCollection
+  baseCollection: ImmutablePayloadCollection,
 ): Promise<PayloadInterface[]> {
   const results: PayloadInterface[] = []
   /**
@@ -33,7 +37,7 @@ export async function PayloadsByAlternatingUuid(
    * then delete item with old uuid from db (cannot modify uuids in our IndexedDB setup)
    */
   const copy = CopyPayload(payload, {
-    uuid: await UuidGenerator.GenerateUuid(),
+    uuid: UuidGenerator.GenerateUuid(),
     dirty: true,
     dirtiedDate: new Date(),
     lastSyncBegan: null,
@@ -50,7 +54,7 @@ export async function PayloadsByAlternatingUuid(
     payload,
     baseCollection,
     [copy],
-    [payload.uuid]
+    [payload.uuid],
   )
   extendArray(results, updatedReferencing)
 
@@ -58,11 +62,9 @@ export async function PayloadsByAlternatingUuid(
     /**
      * Update any payloads who are still encrypted and whose items_key_id point to this uuid
      */
-    const matchingPayloads = baseCollection
-      .all()
-      .filter((p) => p.items_key_id === payload.uuid)
+    const matchingPayloads = baseCollection.all().filter((p) => p.items_key_id === payload.uuid)
     const adjustedPayloads = matchingPayloads.map((a) =>
-      CopyPayload(a, { items_key_id: copy.uuid })
+      CopyPayload(a, { items_key_id: copy.uuid }),
     )
     if (adjustedPayloads.length > 0) {
       extendArray(results, adjustedPayloads)
@@ -85,11 +87,9 @@ export function PayloadsByUpdatingReferencingPayloadReferences(
   payload: PayloadInterface,
   baseCollection: ImmutablePayloadCollection,
   add: PayloadInterface[] = [],
-  removeIds: Uuid[] = []
+  removeIds: Uuid[] = [],
 ): PayloadInterface[] {
-  const referencingPayloads = baseCollection.elementsReferencingElement(
-    payload
-  )
+  const referencingPayloads = baseCollection.elementsReferencingElement(payload)
   const results = []
   for (const referencingPayload of referencingPayloads) {
     const references = referencingPayload.contentObject.references.slice()
@@ -140,10 +140,7 @@ export function payloadFieldsForSource(source: PayloadSource): PayloadField[] {
     return ComponentCreatedPayloadFields.slice()
   }
 
-  if (
-    source === PayloadSource.LocalRetrieved ||
-    source === PayloadSource.LocalChanged
-  ) {
+  if (source === PayloadSource.LocalRetrieved || source === PayloadSource.LocalChanged) {
     return StoragePayloadFields.slice()
   }
 
@@ -155,10 +152,7 @@ export function payloadFieldsForSource(source: PayloadSource): PayloadField[] {
   ) {
     return ServerPayloadFields.slice()
   }
-  if (
-    source === PayloadSource.LocalSaved ||
-    source === PayloadSource.RemoteSaved
-  ) {
+  if (source === PayloadSource.LocalSaved || source === PayloadSource.RemoteSaved) {
     return ServerSavedPayloadFields.slice()
   } else {
     throw `No payload fields found for source ${source}`
@@ -166,16 +160,11 @@ export function payloadFieldsForSource(source: PayloadSource): PayloadField[] {
 }
 
 function payloadFieldsForIntent(intent: EncryptionIntent) {
-  if (
-    intent === EncryptionIntent.FileEncrypted ||
-    intent === EncryptionIntent.FileDecrypted ||
-    intent === EncryptionIntent.FilePreferEncrypted
-  ) {
+  if (intent === EncryptionIntent.FileEncrypted || intent === EncryptionIntent.FileDecrypted) {
     return FilePayloadFields.slice()
   }
 
   if (
-    intent === EncryptionIntent.LocalStoragePreferEncrypted ||
     intent === EncryptionIntent.LocalStorageDecrypted ||
     intent === EncryptionIntent.LocalStorageEncrypted
   ) {
@@ -189,52 +178,32 @@ function payloadFieldsForIntent(intent: EncryptionIntent) {
   }
 }
 
-export function CopyEncryptionParameters(
-  raw: RawEncryptionParameters,
-  override?: RawEncryptionParameters
-): PayloadInterface {
-  return CreatePayload(
-    raw,
-    EncryptionParametersFields.slice(),
-    undefined,
-    override
-  )
-}
-
-export function CreateEncryptionParameters(
-  raw: RawEncryptionParameters,
-  source?: PayloadSource
-): PayloadInterface {
-  const fields = Object.keys(raw) as PayloadField[]
-  return CreatePayload(raw, fields, source)
-}
-
 function CreatePayload(
   object: any,
   fields: PayloadField[],
   source?: PayloadSource,
-  override?: PayloadOverride
+  override?: PayloadOverride,
 ): PayloadInterface {
   const rawPayload = pickByCopy(object, fields)
+
   const overrideFields =
     override instanceof PurePayload
       ? override.fields.slice()
       : (Object.keys(override || []) as PayloadField[])
+
   for (const field of overrideFields) {
-    const value = override![field]
+    const value = override?.[field] as unknown
     rawPayload[field] = value ? Copy(value) : value
   }
+
   const newFields = uniqueArray(fields.concat(overrideFields))
-  return new PurePayload(
-    rawPayload,
-    newFields,
-    source || PayloadSource.Constructor
-  )
+
+  return new PurePayload(rawPayload, newFields, source || PayloadSource.Constructor)
 }
 
 export function CopyPayload(
   payload: PayloadInterface,
-  override?: PayloadOverride
+  override?: PayloadOverride,
 ): PayloadInterface {
   return CreatePayload(payload, payload.fields, payload.source, override)
 }
@@ -242,7 +211,7 @@ export function CopyPayload(
 export function CreateSourcedPayloadFromObject(
   object: RawPayload,
   source: PayloadSource,
-  override?: PayloadOverride
+  override?: PayloadOverride,
 ): PayloadInterface {
   const payloadFields = payloadFieldsForSource(source)
   return CreatePayload(object, payloadFields, source, override)
@@ -251,15 +220,10 @@ export function CreateSourcedPayloadFromObject(
 export function CreateIntentPayloadFromObject(
   object: RawPayload,
   intent: EncryptionIntent,
-  override?: PayloadOverride
+  override?: PayloadOverride,
 ): PayloadInterface {
   const payloadFields = payloadFieldsForIntent(intent)
-  return CreatePayload(
-    object,
-    payloadFields,
-    PayloadSource.Constructor,
-    override
-  )
+  return CreatePayload(object, payloadFields, PayloadSource.Constructor, override)
 }
 
 /**
@@ -272,7 +236,7 @@ export function PayloadByMerging(
   payload: PayloadInterface,
   mergeWith: PayloadInterface,
   fields?: PayloadField[],
-  override?: PayloadOverride
+  override?: PayloadOverride,
 ): PayloadInterface {
   const resultOverride: PayloadOverride = {}
   const useFields = fields || mergeWith.fields
@@ -291,7 +255,7 @@ export function PayloadByMerging(
 export function CreateMaxPayloadFromAnyObject(
   object: RawPayload,
   override?: PayloadOverride,
-  source?: PayloadSource
+  source?: PayloadSource,
 ): PayloadInterface {
   return CreatePayload(object, MaxPayloadFields.slice(), source, override)
 }
@@ -318,17 +282,6 @@ const MaxPayloadFields = Object.freeze([
   PayloadField.LastSyncBegan,
   PayloadField.LastSyncEnd,
   PayloadField.DuplicateOf,
-])
-
-const EncryptionParametersFields = Object.freeze([
-  PayloadField.Uuid,
-  PayloadField.ItemsKeyId,
-  PayloadField.EncItemKey,
-  PayloadField.Content,
-  PayloadField.Legacy003AuthHash,
-  PayloadField.ErrorDecrypting,
-  PayloadField.ErrorDecryptingChanged,
-  PayloadField.WaitingForKey,
 ])
 
 const FilePayloadFields = Object.freeze([
@@ -429,9 +382,7 @@ const RemoteHistoryPayloadFields = Object.freeze(ServerPayloadFields.slice())
  * require a UI refresh
  */
 export function isPayloadSourceInternalChange(source: PayloadSource): boolean {
-  return [PayloadSource.RemoteSaved, PayloadSource.PreSyncSave].includes(
-    source
-  )
+  return [PayloadSource.RemoteSaved, PayloadSource.PreSyncSave].includes(source)
 }
 
 export function isPayloadSourceRetrieved(source: PayloadSource): boolean {
@@ -457,9 +408,7 @@ export function FillItemContent(content: Record<string, any>): PayloadContent {
     content.appData[DefaultAppDomain] = {}
   }
   if (!content.appData[DefaultAppDomain][AppDataField.UserModifiedDate]) {
-    content.appData[DefaultAppDomain][
-      AppDataField.UserModifiedDate
-    ] = `${new Date()}`
+    content.appData[DefaultAppDomain][AppDataField.UserModifiedDate] = `${new Date()}`
   }
   return content as PayloadContent
 }
@@ -476,4 +425,26 @@ export function isRemotePayloadAllowed(payload: PurePayload): boolean {
   const acceptableFormats = [PayloadFormat.EncryptedString, PayloadFormat.MetadataOnly]
 
   return acceptableFormats.includes(payload.format)
+}
+
+export function sureFindPayload(uuid: Uuid, payloads: PurePayload[]): PurePayload {
+  return payloads.find((payload) => payload.uuid === uuid) as PurePayload
+}
+
+export function mergePayloadWithEncryptionParameters(
+  payload: PurePayload,
+  parameters: EncryptedParameters | DecryptedParameters | ErroredDecryptingParameters,
+): PurePayload {
+  return CopyPayload(payload, parameters)
+}
+
+export function encryptedParametersFromPayload(payload: PurePayload): EncryptedParameters {
+  return {
+    uuid: payload.uuid,
+    content: payload.contentString,
+    items_key_id: payload.items_key_id,
+    enc_item_key: payload.enc_item_key as string,
+    version: payload.version,
+    auth_hash: payload.auth_hash,
+  }
 }

@@ -1,30 +1,27 @@
-import { IntegrityPayload, ItemManagerInterface, RawPayload } from '@standardnotes/payloads'
+import { IntegrityPayload, RawPayload } from '@standardnotes/payloads'
+import { ItemManagerInterface } from '../Item/ItemManagerInterface'
 import { SyncEvent } from '../Event/SyncEvent'
 
 import { InternalEventBusInterface } from '../Internal/InternalEventBusInterface'
-import { ItemApiInterface } from '../Item/ItemApiInterface'
+import { ItemsServerInterface } from '../Item/ItemsServerInterface'
 import { SyncSource } from '../Sync/SyncSource'
 import { IntegrityApiInterface } from './IntegrityApiInterface'
 import { IntegrityService } from './IntegrityService'
 
 describe('IntegrityService', () => {
   let integrityApi: IntegrityApiInterface
-  let itemApi: ItemApiInterface
+  let itemApi: ItemsServerInterface
   let itemManager: ItemManagerInterface
   let internalEventBus: InternalEventBusInterface
 
-  const createService = () => new IntegrityService(
-    integrityApi,
-    itemApi,
-    itemManager,
-    internalEventBus
-  )
+  const createService = () =>
+    new IntegrityService(integrityApi, itemApi, itemManager, internalEventBus)
 
   beforeEach(() => {
     integrityApi = {} as jest.Mocked<IntegrityApiInterface>
     integrityApi.checkIntegrity = jest.fn()
 
-    itemApi = {} as jest.Mocked<ItemApiInterface>
+    itemApi = {} as jest.Mocked<ItemsServerInterface>
     itemApi.getSingleItem = jest.fn()
 
     itemManager = {} as jest.Mocked<ItemManagerInterface>
@@ -37,9 +34,7 @@ describe('IntegrityService', () => {
   it('should check integrity of payloads and publish mismatches', async () => {
     integrityApi.checkIntegrity = jest.fn().mockReturnValue({
       data: {
-        mismatches: [
-          { uuid: '1-2-3', updated_at_timestamp: 234 } as IntegrityPayload,
-        ],
+        mismatches: [{ uuid: '1-2-3', updated_at_timestamp: 234 } as IntegrityPayload],
       },
     })
     itemApi.getSingleItem = jest.fn().mockReturnValue({
@@ -64,14 +59,15 @@ describe('IntegrityService', () => {
         payload: {
           rawPayloads: [
             {
-              content: 'foobar', uuid: '1-2-3',
+              content: 'foobar',
+              uuid: '1-2-3',
             },
           ],
           source: 5,
         },
         type: 'IntegrityCheckCompleted',
       },
-      'SEQUENCE'
+      'SEQUENCE',
     )
   })
 
@@ -98,7 +94,7 @@ describe('IntegrityService', () => {
         },
         type: 'IntegrityCheckCompleted',
       },
-      'SEQUENCE'
+      'SEQUENCE',
     )
   })
 
@@ -121,9 +117,7 @@ describe('IntegrityService', () => {
   it('should publish empty mismatches if fetching items fails', async () => {
     integrityApi.checkIntegrity = jest.fn().mockReturnValue({
       data: {
-        mismatches: [
-          { uuid: '1-2-3', updated_at_timestamp: 234 } as IntegrityPayload,
-        ],
+        mismatches: [{ uuid: '1-2-3', updated_at_timestamp: 234 } as IntegrityPayload],
       },
     })
     itemApi.getSingleItem = jest.fn().mockReturnValue({
@@ -146,7 +140,7 @@ describe('IntegrityService', () => {
         },
         type: 'IntegrityCheckCompleted',
       },
-      'SEQUENCE'
+      'SEQUENCE',
     )
   })
 

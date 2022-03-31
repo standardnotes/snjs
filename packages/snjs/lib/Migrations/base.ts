@@ -1,3 +1,4 @@
+import { AnyKeyParamsContent } from '@standardnotes/common'
 import { SNLog } from '@Lib/log'
 import { CreateMaxPayloadFromAnyObject } from '@standardnotes/payloads'
 import {
@@ -9,7 +10,7 @@ import {
 import { KeychainRecoveryStrings, SessionStrings } from '../Services/Api/Messages'
 import { PreviousSnjsVersion1_0_0, PreviousSnjsVersion2_0_0, SnjsVersion } from '../version'
 import { Migration } from '@Lib/Migrations/migration'
-import { RawStorageKey, namespacedKey } from '@Lib/Services/Storage/storage_keys'
+import { RawStorageKey, namespacedKey } from '@standardnotes/services'
 import { ApplicationStage, ContentTypeUsesRootKeyEncryption } from '@standardnotes/applications'
 import { isNullOrUndefined } from '@standardnotes/utils'
 import { CreateReader } from './readers/functions'
@@ -172,6 +173,7 @@ export class BaseMigration extends Migration {
   private async repairMissingKeychain() {
     const version = (await this.getStoredVersion())!
     const rawAccountParams = await this.reader!.getAccountKeyParams()
+
     /** Challenge for account password */
     const challenge = new Challenge(
       [
@@ -192,33 +194,41 @@ export class BaseMigration extends Migration {
         onNonvalidatedSubmit: async (challengeResponse) => {
           const password = challengeResponse.values[0].value as string
           const accountParams = this.services.protocolService.createKeyParams(
-            rawAccountParams as any,
+            rawAccountParams as AnyKeyParamsContent,
           )
           const rootKey = await this.services.protocolService.computeRootKey(
             password,
             accountParams,
           )
+
           /** Choose an item to decrypt */
-          const allItems = (await this.services.deviceInterface.getAllRawDatabasePayloads(
+          const allItems = await this.services.deviceInterface.getAllRawDatabasePayloads(
             this.services.identifier,
-          )) as any[]
+          )
+
           let itemToDecrypt = allItems.find((item) => {
             const payload = CreateMaxPayloadFromAnyObject(item)
             return ContentTypeUsesRootKeyEncryption(payload.content_type)
           })
+
           if (!itemToDecrypt) {
             /** If no root key encrypted item, just choose any item */
             itemToDecrypt = allItems[0]
           }
+
           if (!itemToDecrypt) {
             throw SNLog.error(
               Error('Attempting keychain recovery validation but no items present.'),
             )
           }
-          const decryptedItem = await this.services.protocolService.payloadByDecryptingPayload(
-            CreateMaxPayloadFromAnyObject(itemToDecrypt),
-            rootKey,
-          )
+
+          const decryptedItem = await this.services.protocolService.decryptSplitSingle({
+            usesRootKey: {
+              items: [CreateMaxPayloadFromAnyObject(itemToDecrypt)],
+              key: rootKey,
+            },
+          })
+
           if (decryptedItem.errorDecrypting) {
             /** Wrong password, try again */
             this.services.challengeService.setValidationStatusForChallenge(

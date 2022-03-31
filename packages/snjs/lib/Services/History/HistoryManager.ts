@@ -1,41 +1,20 @@
-import {
-  CopyPayload,
-  RawPayload,
-  SurePayload,
-  CreateMaxPayloadFromAnyObject,
-  CreateSourcedPayloadFromObject,
-  PayloadSource,
-  PayloadFormat,
-  isRemotePayloadAllowed,
-} from '@standardnotes/payloads'
-import {
-  AbstractService,
-  DeviceInterface,
-  InternalEventBusInterface,
-} from '@standardnotes/services'
-import { HistoryEntry } from '@Lib/Services/History/Entries/HistoryEntry'
-import { CreateHistoryEntryForPayload } from '@Lib/Services/History/Entries/Generator'
-import { UuidString } from '../../Types/UuidString'
-import {
-  MinimalHttpResponse,
-  RevisionListEntry,
-  RevisionListResponse,
-  SingleRevisionResponse,
-} from '@standardnotes/responses'
-import { SNStorageService } from '@Lib/Services/Storage/StorageService'
-import { ItemManager } from '@Lib/Services/Items/ItemManager'
-import { SNItem } from '@Lib/Models/Item/Item'
 import { ContentType } from '@standardnotes/common'
-import { StorageKey } from '@Lib/Services/Storage/storage_keys'
+import { EncryptionService } from '@standardnotes/encryption'
 import { isNullOrUndefined, removeFromArray } from '@standardnotes/utils'
+import { ItemManager } from '@Lib/Services/Items/ItemManager'
 import { SNApiService } from '@Lib/Services/Api/ApiService'
-import { SNProtocolService } from '@Lib/Services/Protocol/ProtocolService'
-import { HistoryMap, historyMapFunctions } from './HistoryMap'
+import { SNStorageService } from '@Lib/Services/Storage/StorageService'
+import { StorageKey } from '@standardnotes/services'
+import { UuidString } from '../../Types/UuidString'
+import * as Models from '@standardnotes/models'
+import * as Payloads from '@standardnotes/payloads'
+import * as Responses from '@standardnotes/responses'
+import * as Services from '@standardnotes/services'
 
 const PersistTimeout = 2000
 
 type PersistableHistoryEntry = {
-  payload: RawPayload
+  payload: Payloads.RawPayload
 }
 
 type PersistableHistory = Record<UuidString, PersistableHistoryEntry[]>
@@ -58,7 +37,7 @@ const LargeEntryDeltaThreshold = 25
  * 2. Remote server history. Entries are automatically added by the server and must be
  *    retrieved per item via an API call.
  */
-export class SNHistoryManager extends AbstractService {
+export class SNHistoryManager extends Services.AbstractService {
   private persistable = false
   public autoOptimize = false
   private removeChangeObserver: () => void
@@ -73,8 +52,8 @@ export class SNHistoryManager extends AbstractService {
    * as an item propagating through the different PayloadSource
    * lifecycles (created, local saved, presyncsave, etc)
    */
-  private historyStaging: Partial<Record<UuidString, HistoryEntry>> = {}
-  private history: HistoryMap = {}
+  private historyStaging: Partial<Record<UuidString, Models.HistoryEntry>> = {}
+  private history: Models.HistoryMap = {}
   /** The content types for which to record history */
   public readonly historyTypes: ContentType[] = [ContentType.Note]
 
@@ -84,9 +63,9 @@ export class SNHistoryManager extends AbstractService {
     private itemManager: ItemManager,
     private storageService: SNStorageService,
     private apiService: SNApiService,
-    private protocolService: SNProtocolService,
-    public deviceInterface: DeviceInterface,
-    protected internalEventBus: InternalEventBusInterface,
+    private protocolService: EncryptionService,
+    public deviceInterface: Services.DeviceInterface,
+    protected internalEventBus: Services.InternalEventBusInterface,
   ) {
     super(internalEventBus)
     this.removeChangeObserver = this.itemManager.addObserver(
@@ -113,15 +92,15 @@ export class SNHistoryManager extends AbstractService {
   async initializeFromDisk(): Promise<void> {
     this.persistable = await this.storageService.getValue(StorageKey.SessionHistoryPersistable)
     this.history = await this.getPersistedHistory()
-    this.autoOptimize = await this.storageService.getValue(
+    this.autoOptimize = this.storageService.getValue(
       StorageKey.SessionHistoryOptimize,
       undefined,
       true,
     )
   }
 
-  private async getPersistedHistory(): Promise<Record<UuidString, HistoryEntry[]>> {
-    const historyMap: Record<UuidString, HistoryEntry[]> = {}
+  private async getPersistedHistory(): Promise<Record<UuidString, Models.HistoryEntry[]>> {
+    const historyMap: Record<UuidString, Models.HistoryEntry[]> = {}
     const rawHistory: PersistableHistory = await this.storageService.getValue(
       StorageKey.SessionHistoryRevisions,
     )
@@ -130,14 +109,14 @@ export class SNHistoryManager extends AbstractService {
     }
     for (const [uuid, historyDescending] of Object.entries(rawHistory)) {
       const historyAscending = historyDescending.slice().reverse()
-      const entries: HistoryEntry[] = []
+      const entries: Models.HistoryEntry[] = []
       for (const rawEntry of historyAscending) {
-        const payload = CreateSourcedPayloadFromObject(
+        const payload = Payloads.CreateSourcedPayloadFromObject(
           rawEntry.payload,
-          PayloadSource.SessionHistory,
-        ) as SurePayload
-        const previousEntry = historyMapFunctions.getNewestRevision(entries)
-        const entry = CreateHistoryEntryForPayload(payload, previousEntry)
+          Payloads.PayloadSource.SessionHistory,
+        ) as Payloads.SurePayload
+        const previousEntry = Models.historyMapFunctions.getNewestRevision(entries)
+        const entry = Models.CreateHistoryEntryForPayload(payload, previousEntry)
         entries.unshift(entry)
       }
       historyMap[uuid] = entries
@@ -145,23 +124,23 @@ export class SNHistoryManager extends AbstractService {
     return historyMap
   }
 
-  private recordNewHistoryForItems(items: SNItem[]) {
+  private recordNewHistoryForItems(items: Models.SNItem[]) {
     let needsPersist = false
     for (const item of items) {
       if (!this.historyTypes.includes(item.content_type)) {
         continue
       }
       const payload = item.payload
-      if (item.deleted || payload.format !== PayloadFormat.DecryptedBareObject) {
+      if (item.deleted || payload.format !== Payloads.PayloadFormat.DecryptedBareObject) {
         continue
       }
       const itemHistory = this.history[item.uuid] || []
-      const latestEntry = historyMapFunctions.getNewestRevision(itemHistory)
-      const historyPayload = CreateSourcedPayloadFromObject(
+      const latestEntry = Models.historyMapFunctions.getNewestRevision(itemHistory)
+      const historyPayload = Payloads.CreateSourcedPayloadFromObject(
         item,
-        PayloadSource.SessionHistory,
-      ) as SurePayload
-      const currentValueEntry = CreateHistoryEntryForPayload(historyPayload, latestEntry)
+        Payloads.PayloadSource.SessionHistory,
+      ) as Payloads.SurePayload
+      const currentValueEntry = Models.CreateHistoryEntryForPayload(historyPayload, latestEntry)
       if (currentValueEntry.isDiscardable()) {
         continue
       }
@@ -238,31 +217,32 @@ export class SNHistoryManager extends AbstractService {
     this.itemRevisionThreshold = threshold
   }
 
-  sessionHistoryForItem(item: SNItem): HistoryEntry[] {
+  sessionHistoryForItem(item: Models.SNItem): Models.HistoryEntry[] {
     return this.history[item.uuid] || []
   }
 
   /** For local session history */
-  clearHistoryForItem(item: SNItem): void {
+  clearHistoryForItem(item: Models.SNItem): void {
     delete this.history[item.uuid]
     this.saveToDisk()
   }
 
   /** For local session history */
-  async clearAllHistory(): Promise<void> {
+  clearAllHistory(): Promise<void> {
     this.history = {}
     return this.storageService.removeValue(StorageKey.SessionHistoryRevisions)
   }
 
   /** For local session history */
-  async toggleDiskSaving(): Promise<void> {
+  toggleDiskSaving(): void {
     this.persistable = !this.persistable
+
     if (this.persistable) {
       this.storageService.setValue(StorageKey.SessionHistoryPersistable, true)
       this.saveToDisk()
     } else {
       this.storageService.setValue(StorageKey.SessionHistoryPersistable, false)
-      return this.storageService.removeValue(StorageKey.SessionHistoryRevisions)
+      this.storageService.removeValue(StorageKey.SessionHistoryRevisions)
     }
   }
 
@@ -276,7 +256,7 @@ export class SNHistoryManager extends AbstractService {
     }
   }
 
-  getHistoryMapCopy(): HistoryMap {
+  getHistoryMapCopy(): Models.HistoryMap {
     const copy = Object.assign({}, this.history)
     for (const [key, value] of Object.entries(copy)) {
       copy[key] = value.slice()
@@ -289,12 +269,14 @@ export class SNHistoryManager extends AbstractService {
    * include the item's content. Instead, each revision's content must be fetched
    * individually upon selection via `fetchRemoteRevision`.
    */
-  async remoteHistoryForItem(item: SNItem): Promise<RevisionListEntry[] | undefined> {
+  async remoteHistoryForItem(
+    item: Models.SNItem,
+  ): Promise<Responses.RevisionListEntry[] | undefined> {
     const response = await this.apiService.getItemRevisions(item.uuid)
     if (response.error || isNullOrUndefined(response.data)) {
       return undefined
     }
-    return (response as RevisionListResponse).data
+    return (response as Responses.RevisionListResponse).data
   }
 
   /**
@@ -303,15 +285,17 @@ export class SNHistoryManager extends AbstractService {
    */
   async fetchRemoteRevision(
     itemUuid: UuidString,
-    entry: RevisionListEntry,
-  ): Promise<HistoryEntry | undefined> {
+    entry: Responses.RevisionListEntry,
+  ): Promise<Models.HistoryEntry | undefined> {
     const revisionResponse = await this.apiService.getRevision(entry, itemUuid)
     if (revisionResponse.error || isNullOrUndefined(revisionResponse.data)) {
       return undefined
     }
-    const revision = (revisionResponse as SingleRevisionResponse).data
+    const revision = (revisionResponse as Responses.SingleRevisionResponse).data
 
-    const serverPayload = CreateMaxPayloadFromAnyObject(revision as unknown as RawPayload)
+    const serverPayload = Payloads.CreateMaxPayloadFromAnyObject(
+      revision as unknown as Payloads.RawPayload,
+    )
     /**
      * When an item is duplicated, its revisions also carry over to the newly created item.
      * However since the new item has a different UUID than the source item, we must decrypt
@@ -322,27 +306,35 @@ export class SNHistoryManager extends AbstractService {
       serverPayload,
     )
     const sourceItemUuid = embeddedParams?.u
-    const payload = CopyPayload(CreateMaxPayloadFromAnyObject(revision as unknown as RawPayload), {
-      uuid: sourceItemUuid || revision.item_uuid,
-    })
+    const payload = Payloads.CopyPayload(
+      Payloads.CreateMaxPayloadFromAnyObject(revision as unknown as Payloads.RawPayload),
+      {
+        uuid: sourceItemUuid || revision.item_uuid,
+      },
+    )
 
-    if (!isRemotePayloadAllowed(payload)) {
+    if (!Payloads.isRemotePayloadAllowed(payload)) {
       console.error('Remote payload is disallowed', payload)
       return undefined
     }
 
-    const encryptedPayload = CreateSourcedPayloadFromObject(payload, PayloadSource.RemoteHistory)
-    const decryptedPayload = await this.protocolService.payloadByDecryptingPayload(encryptedPayload)
+    const encryptedPayload = Payloads.CreateSourcedPayloadFromObject(
+      payload,
+      Payloads.PayloadSource.RemoteHistory,
+    )
+    const decryptedPayload = await this.protocolService.decryptSplitSingle({
+      usesItemsKeyWithKeyLookup: { items: [encryptedPayload] },
+    })
     if (decryptedPayload.errorDecrypting) {
       return undefined
     }
-    return new HistoryEntry(decryptedPayload as SurePayload)
+    return new Models.HistoryEntry(decryptedPayload as Payloads.SurePayload)
   }
 
   async deleteRemoteRevision(
     itemUuid: UuidString,
-    entry: RevisionListEntry,
-  ): Promise<MinimalHttpResponse> {
+    entry: Responses.RevisionListEntry,
+  ): Promise<Responses.MinimalHttpResponse> {
     const response = await this.apiService.deleteRevision(itemUuid, entry)
     return response
   }
@@ -367,11 +359,11 @@ export class SNHistoryManager extends AbstractService {
       return
     }
 
-    const isEntrySignificant = (entry: HistoryEntry) => {
+    const isEntrySignificant = (entry: Models.HistoryEntry) => {
       return entry.deltaSize() > LargeEntryDeltaThreshold
     }
-    const keepEntries: HistoryEntry[] = []
-    const processEntry = (entry: HistoryEntry, index: number, keep: boolean) => {
+    const keepEntries: Models.HistoryEntry[] = []
+    const processEntry = (entry: Models.HistoryEntry, index: number, keep: boolean) => {
       /**
        * Entries may be processed retrospectively, meaning it can be
        * decided to be deleted, then an upcoming processing can change that.

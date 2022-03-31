@@ -1,44 +1,41 @@
 import { ConflictType, RawSyncResponse } from '@standardnotes/responses'
-import {
-  ApiEndpointParam,
-  PurePayload,
-  PayloadSource,
-  CreateSourcedPayloadFromObject,
-  RawPayload,
-} from '@standardnotes/payloads'
+import * as Payloads from '@standardnotes/payloads'
 import { deepFreeze, isNullOrUndefined } from '@standardnotes/utils'
 
 export class SyncResponse {
   public readonly rawResponse: RawSyncResponse
-  public readonly savedPayloads: PurePayload[]
-  public readonly retrievedPayloads: PurePayload[]
-  public readonly uuidConflictPayloads: PurePayload[]
-  public readonly dataConflictPayloads: PurePayload[]
-  public readonly rejectedPayloads: PurePayload[]
-  public readonly deletedPayloads: PurePayload[]
+  public readonly savedPayloads: Payloads.PurePayload[]
+  public readonly retrievedPayloads: Payloads.PurePayload[]
+  public readonly uuidConflictPayloads: Payloads.PurePayload[]
+  public readonly dataConflictPayloads: Payloads.PurePayload[]
+  public readonly rejectedPayloads: Payloads.PurePayload[]
+  public readonly deletedPayloads: Payloads.PurePayload[]
 
   constructor(rawResponse: RawSyncResponse) {
     this.rawResponse = rawResponse
     this.savedPayloads = this.filterRawItemArray(rawResponse.data?.saved_items).map((rawItem) => {
-      return CreateSourcedPayloadFromObject(rawItem, PayloadSource.RemoteSaved)
+      return Payloads.CreateSourcedPayloadFromObject(rawItem, Payloads.PayloadSource.RemoteSaved)
     })
     this.retrievedPayloads = this.filterRawItemArray(rawResponse.data?.retrieved_items).map(
       (rawItem) => {
-        return CreateSourcedPayloadFromObject(rawItem, PayloadSource.RemoteRetrieved)
+        return Payloads.CreateSourcedPayloadFromObject(
+          rawItem,
+          Payloads.PayloadSource.RemoteRetrieved,
+        )
       },
     )
     this.dataConflictPayloads = this.filterRawItemArray(this.rawDataConflictItems).map(
       (rawItem) => {
-        return CreateSourcedPayloadFromObject(rawItem, PayloadSource.ConflictData)
+        return Payloads.CreateSourcedPayloadFromObject(rawItem, Payloads.PayloadSource.ConflictData)
       },
     )
     this.uuidConflictPayloads = this.filterRawItemArray(this.rawUuidConflictItems).map(
       (rawItem) => {
-        return CreateSourcedPayloadFromObject(rawItem, PayloadSource.ConflictUuid)
+        return Payloads.CreateSourcedPayloadFromObject(rawItem, Payloads.PayloadSource.ConflictUuid)
       },
     )
     this.rejectedPayloads = this.filterRawItemArray(this.rawRejectedPayloads).map((rawItem) => {
-      return CreateSourcedPayloadFromObject(rawItem, PayloadSource.RemoteRejected)
+      return Payloads.CreateSourcedPayloadFromObject(rawItem, Payloads.PayloadSource.RemoteRejected)
     })
     /**
      * Items may be deleted from a combination of sources, such as from RemoteSaved,
@@ -53,7 +50,7 @@ export class SyncResponse {
   /**
    * Filter out and exclude any items that do not have a uuid. These are useless to us.
    */
-  private filterRawItemArray(rawItems: RawPayload[] = []) {
+  private filterRawItemArray(rawItems: Payloads.RawPayload[] = []) {
     return rawItems.filter((rawItem) => {
       if (!rawItem.uuid) {
         return false
@@ -75,11 +72,11 @@ export class SyncResponse {
   }
 
   public get lastSyncToken() {
-    return this.rawResponse.data?.[ApiEndpointParam.LastSyncToken]
+    return this.rawResponse.data?.[Payloads.ApiEndpointParam.LastSyncToken]
   }
 
   public get paginationToken() {
-    return this.rawResponse.data?.[ApiEndpointParam.PaginationToken]
+    return this.rawResponse.data?.[Payloads.ApiEndpointParam.PaginationToken]
   }
 
   public get numberOfItemsInvolved() {

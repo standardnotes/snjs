@@ -2,19 +2,22 @@ import { AllowedBatchStreaming } from './types'
 import { SNPreferencesService } from '../Preferences/PreferencesService'
 import { FindNativeFeature } from '@standardnotes/features'
 import { SNFeaturesService } from '@Lib/Services/Features/FeaturesService'
-import { ComponentMutator } from '@Lib/Models/Component/ComponentMutator'
-import { displayStringForContentType } from '@Lib/Models/Functions'
+
 import { ContentType, Runtime } from '@standardnotes/common'
 import { PayloadSource } from '@standardnotes/payloads'
 import { ItemManager } from '@Lib/Services/Items/ItemManager'
-import { SNNote } from '@Lib/Models/Note/Note'
-import { SNTheme } from '@Lib/Models/Theme/Theme'
-import { SNItem } from '@Lib/Models/Item/Item'
+import {
+  SNItem,
+  SNNote,
+  SNTheme,
+  SNComponent,
+  ComponentMutator,
+  displayStringForContentType,
+} from '@standardnotes/models'
 import { SNAlertService } from '@Lib/Services/Alert/AlertService'
 import { SNSyncService } from '@Lib/Services/Sync/SyncService'
 import find from 'lodash/find'
 import uniq from 'lodash/uniq'
-import { SNComponent } from '@Lib/Models/Component/Component'
 import { ComponentArea, ComponentAction, ComponentPermission } from '@standardnotes/features'
 import { Copy, concatArrays, filterFromArray, removeFromArray, sleep } from '@standardnotes/utils'
 import { Environment, Platform } from '@Lib/Application/platforms'

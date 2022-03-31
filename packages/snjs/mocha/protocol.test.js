@@ -94,7 +94,11 @@ describe('protocol', function () {
 
   it('decrypting already decrypted payload should return same payload', async function () {
     const payload = Factory.createNotePayload()
-    const result = await this.application.protocolService.payloadByDecryptingPayload(payload)
+    const result = await this.application.protocolService.decryptSplitSingle({
+      usesItemsKeyWithKeyLookup: {
+        items: [payload],
+      },
+    })
     expect(payload).to.equal(result)
     expect(result.errorDecrypting).to.not.be.ok
   })
@@ -102,8 +106,12 @@ describe('protocol', function () {
   it('ejected payload should not have meta fields', async function () {
     await this.application.addPasscode('123')
     const payload = Factory.createNotePayload()
-    const result = await this.application.protocolService.payloadByEncryptingPayload(
-      payload,
+    const result = await this.application.protocolService.encryptSplitSingle(
+      {
+        usesItemsKeyWithKeyLookup: {
+          items: [payload],
+        },
+      },
       EncryptionIntent.Sync,
     )
     const ejected = result.ejected()
@@ -115,8 +123,12 @@ describe('protocol', function () {
 
   it('encrypted payload for server should include duplicate_of field', async function () {
     const payload = Factory.createNotePayload('Test')
-    const encryptedPayload = await this.application.protocolService.payloadByEncryptingPayload(
-      payload,
+    const encryptedPayload = await this.application.protocolService.encryptSplitSingle(
+      {
+        usesItemsKeyWithKeyLookup: {
+          items: [payload],
+        },
+      },
       EncryptionIntent.Sync,
     )
     expect(encryptedPayload).to.be.ok
@@ -125,8 +137,12 @@ describe('protocol', function () {
 
   it('ejected payload for server should include duplicate_of field', async function () {
     const payload = Factory.createNotePayload('Test')
-    const encryptedPayload = await this.application.protocolService.payloadByEncryptingPayload(
-      payload,
+    const encryptedPayload = await this.application.protocolService.encryptSplitSingle(
+      {
+        usesItemsKeyWithKeyLookup: {
+          items: [payload],
+        },
+      },
       EncryptionIntent.Sync,
     )
     const ejected = encryptedPayload.ejected()
@@ -136,8 +152,12 @@ describe('protocol', function () {
 
   it('encrypted payload for storage should include duplicate_of field', async function () {
     const payload = Factory.createNotePayload('Test')
-    const encryptedPayload = await this.application.protocolService.payloadByEncryptingPayload(
-      payload,
+    const encryptedPayload = await this.application.protocolService.encryptSplitSingle(
+      {
+        usesItemsKeyWithKeyLookup: {
+          items: [payload],
+        },
+      },
       EncryptionIntent.LocalStorageEncrypted,
     )
     expect(encryptedPayload).to.be.ok
@@ -146,8 +166,12 @@ describe('protocol', function () {
 
   it('ejected payload for storage should include duplicate_of field', async function () {
     const payload = Factory.createNotePayload('Test')
-    const encryptedPayload = await this.application.protocolService.payloadByEncryptingPayload(
-      payload,
+    const encryptedPayload = await this.application.protocolService.encryptSplitSingle(
+      {
+        usesItemsKeyWithKeyLookup: {
+          items: [payload],
+        },
+      },
       EncryptionIntent.LocalStorageEncrypted,
     )
     const ejected = encryptedPayload.ejected()
@@ -157,8 +181,12 @@ describe('protocol', function () {
 
   it('encrypted payload for file should include duplicate_of field', async function () {
     const payload = Factory.createNotePayload('Test')
-    const encryptedPayload = await this.application.protocolService.payloadByEncryptingPayload(
-      payload,
+    const encryptedPayload = await this.application.protocolService.encryptSplitSingle(
+      {
+        usesItemsKeyWithKeyLookup: {
+          items: [payload],
+        },
+      },
       EncryptionIntent.FileEncrypted,
     )
     expect(encryptedPayload).to.be.ok
@@ -167,8 +195,12 @@ describe('protocol', function () {
 
   it('ejected payload for file should include duplicate_of field', async function () {
     const payload = Factory.createNotePayload('Test')
-    const encryptedPayload = await this.application.protocolService.payloadByEncryptingPayload(
-      payload,
+    const encryptedPayload = await this.application.protocolService.encryptSplitSingle(
+      {
+        usesItemsKeyWithKeyLookup: {
+          items: [payload],
+        },
+      },
       EncryptionIntent.FileEncrypted,
     )
     const ejected = encryptedPayload.ejected()

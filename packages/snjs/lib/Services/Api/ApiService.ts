@@ -7,7 +7,8 @@ import {
   AbstractService,
   InternalEventBusInterface,
   IntegrityApiInterface,
-  ItemApiInterface,
+  ItemsServerInterface,
+  StorageKey,
 } from '@standardnotes/services'
 import {
   ApiEndpointParam,
@@ -16,9 +17,7 @@ import {
   PurePayload,
 } from '@standardnotes/payloads'
 import * as Responses from '@standardnotes/responses'
-
 import { API_MESSAGE_FAILED_OFFLINE_ACTIVATION } from '@Lib/Services/Api/Messages'
-import { ClientDisplayableError } from '@Lib/Application/ClientError'
 import { EncryptedFileInterface } from '../Files/types'
 import { HttpParams, HttpRequest, HttpVerb, SNHttpService } from './HttpService'
 import { FilesServerInterface } from '../Files/FilesServerInterface'
@@ -26,16 +25,17 @@ import { isUrlFirstParty, TRUSTED_FEATURE_HOSTS } from '@Lib/hosts'
 import { Paths } from './Paths'
 import { Session } from '../Session/Sessions/Session'
 import { TokenSession } from '../Session/Sessions/TokenSession'
-import { SNFeatureRepo } from '../../Models/FeatureRepo/FeatureRepo'
-import { SNRootKeyParams } from '../../Protocol/key_params'
 import { SNStorageService } from '../Storage/StorageService'
-import { StorageKey } from '@Lib/Services/Storage/storage_keys'
+
 import { UserServerInterface } from '../User/UserServerInterface'
 import { UuidString } from '../../Types/UuidString'
 import * as messages from '@Lib/Services/Api/Messages'
 import merge from 'lodash/merge'
 import { SettingsServerInterface } from '../Settings/SettingsServerInterface'
 import { Strings } from '@Lib/Strings'
+import { SNRootKeyParams } from '@standardnotes/encryption'
+import { SNFeatureRepo } from '@standardnotes/models'
+import { ClientDisplayableError } from '@standardnotes/responses'
 
 /** Legacy api version field to be specified in params when calling v0 APIs. */
 const V0_API_VERSION = '20200115'
@@ -56,7 +56,7 @@ export class SNApiService
   implements
     FilesServerInterface,
     IntegrityApiInterface,
-    ItemApiInterface,
+    ItemsServerInterface,
     UserServerInterface,
     SettingsServerInterface
 {
@@ -103,16 +103,16 @@ export class SNApiService
     this.invalidSessionObserver = observer
   }
 
-  public async loadHost(): Promise<void> {
-    const storedValue = await this.storageService.getValue(StorageKey.ServerHost)
+  public loadHost(): void {
+    const storedValue = this.storageService.getValue<string | undefined>(StorageKey.ServerHost)
     this.host =
       storedValue ||
       this.host ||
-      (
+      ((
         window as {
           _default_sync_server?: string
         }
-      )._default_sync_server
+      )._default_sync_server as string)
   }
 
   public async setHost(host: string): Promise<void> {

@@ -1,4 +1,4 @@
-import { RawStorageKey } from '@Lib/Services/Storage/storage_keys'
+import { RawStorageKey } from '@standardnotes/services'
 import { removeFromArray } from '@standardnotes/utils'
 import { UuidString, DeinitSource } from '../Types'
 import { SNApplication } from './application'

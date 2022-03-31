@@ -12,15 +12,15 @@ describe('history manager', () => {
     awaitAll: true,
   }
 
-  beforeEach(async function () {
+  beforeEach(function () {
     localStorage.clear()
   })
 
-  afterEach(async function () {
+  afterEach(function () {
     localStorage.clear()
   })
 
-  describe('session', async function () {
+  describe('session', function () {
     beforeEach(async function () {
       this.application = await Factory.createInitAppWithFakeCrypto()
       this.historyManager = this.application.historyManager
@@ -33,7 +33,7 @@ describe('history manager', () => {
       await Factory.safeDeinit(this.application)
     })
 
-    async function setTextAndSync(application, item, text) {
+    function setTextAndSync(application, item, text) {
       return application.mutator.changeAndSaveItem(
         item.uuid,
         (mutator) => {
@@ -49,7 +49,7 @@ describe('history manager', () => {
       return string.substring(0, string.length - amount)
     }
 
-    it('create basic history entries', async function () {
+    it('create basic history entries 1', async function () {
       const item = await Factory.createSyncedNote(this.application)
       expect(this.historyManager.sessionHistoryForItem(item).length).to.equal(0)
 
@@ -90,7 +90,6 @@ describe('history manager', () => {
     it('first change should create revision with previous value', async function () {
       const identifier = this.application.identifier
       const item = await Factory.createSyncedNote(this.application)
-      await Factory.safeDeinit(this.application)
 
       /** Simulate loading new application session */
       const context = await Factory.createAppContext(identifier)
@@ -306,7 +305,7 @@ describe('history manager', () => {
     })
   })
 
-  describe('remote', async function () {
+  describe('remote', function () {
     beforeEach(async function () {
       this.application = await Factory.createInitAppWithFakeCrypto()
       this.historyManager = this.application.historyManager
@@ -335,7 +334,7 @@ describe('history manager', () => {
       expect(itemHistory).to.be.undefined
     })
 
-    it('create basic history entries', async function () {
+    it('create basic history entries 2', async function () {
       const item = await Factory.createSyncedNote(this.application)
       let itemHistory = await this.historyManager.remoteHistoryForItem(item)
 

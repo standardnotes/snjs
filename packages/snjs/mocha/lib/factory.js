@@ -126,6 +126,12 @@ export function disableIntegrityAutoHeal(application) {
 }
 
 export async function safeDeinit(application) {
+  if (application.dealloced) {
+    console.warn(
+      'Attempting to deinit already deinited application. Check the test case to find where you are double deiniting.',
+    )
+    return
+  }
   /** Limit waiting to 1s */
   await Promise.race([sleep(1), application.syncService?.awaitCurrentSyncs()])
   await application.prepareForDeinit()
@@ -240,7 +246,7 @@ export async function initializeApplication(application) {
   await application.launch(true)
 }
 
-export async function registerUserToApplication({
+export function registerUserToApplication({
   application,
   email,
   password,
@@ -254,7 +260,7 @@ export async function registerUserToApplication({
 
 export async function setOldVersionPasscode({ application, passcode, version }) {
   const identifier = await application.protocolService.crypto.generateUUID()
-  const operator = application.protocolService.operatorForVersion(version)
+  const operator = application.protocolService.operatorManager.operatorForVersion(version)
   const key = await operator.createRootKey(
     identifier,
     passcode,
@@ -272,7 +278,7 @@ export async function setOldVersionPasscode({ application, passcode, version }) 
 export async function registerOldUser({ application, email, password, version }) {
   if (!email) email = generateUuid()
   if (!password) password = generateUuid()
-  const operator = application.protocolService.operatorForVersion(version)
+  const operator = application.protocolService.operatorManager.operatorForVersion(version)
   const accountKey = await operator.createRootKey(
     email,
     password,
@@ -607,7 +613,7 @@ export async function createTags(
   return result
 }
 
-export async function pinNote(application, note) {
+export function pinNote(application, note) {
   return application.mutator.changeItem(note.uuid, (mutator) => {
     mutator.pinned = true
   })

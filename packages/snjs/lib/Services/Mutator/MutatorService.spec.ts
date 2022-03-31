@@ -1,3 +1,5 @@
+import { SNNote } from '@standardnotes/models'
+import { EncryptionService } from '@standardnotes/encryption'
 import { ContentType } from '@standardnotes/common'
 import { FillItemContent, CreateMaxPayloadFromAnyObject } from '@standardnotes/payloads'
 import { InternalEventBusInterface } from '@standardnotes/services'
@@ -8,10 +10,8 @@ import {
   SNComponentManager,
   SNProtectionService,
   ItemManager,
-  SNProtocolService,
   SNSyncService,
 } from '../'
-import { SNNote } from '@Lib/Models'
 import { UuidGenerator } from '@standardnotes/utils'
 
 const setupRandomUuid = () => {
@@ -24,7 +24,7 @@ describe('mutator service', () => {
   let itemManager: ItemManager
   let syncService: SNSyncService
   let protectionService: SNProtectionService
-  let protocolService: SNProtocolService
+  let protocolService: EncryptionService
   let challengeService: ChallengeService
   let componentManager: SNComponentManager
 

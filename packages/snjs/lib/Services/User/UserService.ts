@@ -1,34 +1,20 @@
-import { Strings } from '../../Strings/index'
+import { Challenge, ChallengeValidation, ChallengeReason, ChallengePrompt } from '../Challenge'
+import { ChallengeService } from '../Challenge/ChallengeService'
+import { EncryptionService, SNRootKey, SNRootKeyParams } from '@standardnotes/encryption'
+import { HttpResponse, SignInResponse, User } from '@standardnotes/responses'
+import { ItemManager } from '@Lib/Services/Items/ItemManager'
+import { KeyParamsOrigination } from '@standardnotes/common'
+import { SNAlertService } from '@Lib/Services/Alert/AlertService'
 import { SNApiService } from './../Api/ApiService'
 import { SNProtectionService } from '../Protection/ProtectionService'
-import { Challenge, ChallengeValidation, ChallengeReason, ChallengePrompt } from '../Challenge'
-import { KeyParamsOrigination } from '@standardnotes/common'
-import { UuidGenerator } from '@standardnotes/utils'
-import { SNRootKey } from '@Lib/Protocol/root_key'
-import { SNAlertService } from '@Lib/Services/Alert/AlertService'
-import { SNRootKeyParams } from '../../Protocol/key_params'
-import {
-  CredentialsChangeStrings,
-  INVALID_PASSWORD,
-  InsufficientPasswordMessage,
-  ChallengeStrings,
-  DO_NOT_CLOSE_APPLICATION,
-  UPGRADING_ENCRYPTION,
-  SETTING_PASSCODE,
-  REMOVING_PASSCODE,
-  CHANGING_PASSCODE,
-  ProtocolUpgradeStrings,
-} from '../Api/Messages'
-import { HttpResponse, SignInResponse, User } from '@standardnotes/responses'
-import { SNProtocolService } from '@Lib/Services/Protocol/ProtocolService'
-import { ItemManager } from '@Lib/Services/Items/ItemManager'
-import { SNStorageService, StoragePersistencePolicies } from '@Lib/Services/Storage/StorageService'
-import { SNSyncService } from '../Sync/SyncService'
 import { SNSessionManager, MINIMUM_PASSWORD_LENGTH } from '../Session/SessionManager'
-import { ChallengeService } from '../Challenge/ChallengeService'
-import { SNItemsKey } from '@Lib/Models'
-import { AbstractService, InternalEventBusInterface } from '@standardnotes/services'
+import { SNStorageService } from '@Lib/Services/Storage/StorageService'
+import { SNSyncService } from '../Sync/SyncService'
+import { Strings } from '../../Strings/index'
 import { UserClientInterface } from './UserClientInterface'
+import { UuidGenerator } from '@standardnotes/utils'
+import * as Messages from '../Api/Messages'
+import * as Services from '@standardnotes/services'
 
 const MINIMUM_PASSCODE_LENGTH = 1
 
@@ -40,7 +26,10 @@ export enum AccountEvent {
   SignedOut = 'SignedOut',
 }
 
-export class UserService extends AbstractService<AccountEvent> implements UserClientInterface {
+export class UserService
+  extends Services.AbstractService<AccountEvent>
+  implements UserClientInterface
+{
   private signingIn = false
   private registering = false
 
@@ -49,12 +38,12 @@ export class UserService extends AbstractService<AccountEvent> implements UserCl
     private syncService: SNSyncService,
     private storageService: SNStorageService,
     private itemManager: ItemManager,
-    private protocolService: SNProtocolService,
+    private protocolService: EncryptionService,
     private alertService: SNAlertService,
     private challengeService: ChallengeService,
     private protectionService: SNProtectionService,
     private apiService: SNApiService,
-    protected internalEventBus: InternalEventBusInterface,
+    protected internalEventBus: Services.InternalEventBusInterface,
   ) {
     super(internalEventBus)
   }
@@ -95,7 +84,9 @@ export class UserService extends AbstractService<AccountEvent> implements UserCl
       if (!result.response.error) {
         this.syncService.resetSyncState()
         await this.storageService.setPersistencePolicy(
-          ephemeral ? StoragePersistencePolicies.Ephemeral : StoragePersistencePolicies.Default,
+          ephemeral
+            ? Services.StoragePersistencePolicies.Ephemeral
+            : Services.StoragePersistencePolicies.Default,
         )
         if (mergeLocal) {
           await this.syncService.markAllItemsAsNeedingSync()
@@ -142,7 +133,9 @@ export class UserService extends AbstractService<AccountEvent> implements UserCl
       if (!result.response.error) {
         this.syncService.resetSyncState()
         await this.storageService.setPersistencePolicy(
-          ephemeral ? StoragePersistencePolicies.Ephemeral : StoragePersistencePolicies.Default,
+          ephemeral
+            ? Services.StoragePersistencePolicies.Ephemeral
+            : Services.StoragePersistencePolicies.Default,
         )
         if (mergeLocal) {
           await this.syncService.markAllItemsAsNeedingSync()
@@ -186,7 +179,7 @@ export class UserService extends AbstractService<AccountEvent> implements UserCl
     ) {
       return {
         error: true,
-        message: INVALID_PASSWORD,
+        message: Messages.INVALID_PASSWORD,
       }
     }
 
@@ -295,7 +288,7 @@ export class UserService extends AbstractService<AccountEvent> implements UserCl
         new ChallengePrompt(
           ChallengeValidation.LocalPasscode,
           undefined,
-          ChallengeStrings.LocalPasscodePlaceholder,
+          Messages.ChallengeStrings.LocalPasscodePlaceholder,
         ),
       )
     }
@@ -304,7 +297,7 @@ export class UserService extends AbstractService<AccountEvent> implements UserCl
         new ChallengePrompt(
           ChallengeValidation.AccountPassword,
           undefined,
-          ChallengeStrings.AccountPasswordPlaceholder,
+          Messages.ChallengeStrings.AccountPasswordPlaceholder,
         ),
       )
     }
@@ -314,8 +307,8 @@ export class UserService extends AbstractService<AccountEvent> implements UserCl
       return { canceled: true }
     }
     const dismissBlockingDialog = await this.alertService.blockingDialog(
-      DO_NOT_CLOSE_APPLICATION,
-      UPGRADING_ENCRYPTION,
+      Messages.DO_NOT_CLOSE_APPLICATION,
+      Messages.UPGRADING_ENCRYPTION,
     )
     try {
       let passcode: string | undefined
@@ -364,8 +357,8 @@ export class UserService extends AbstractService<AccountEvent> implements UserCl
     }
 
     const dismissBlockingDialog = await this.alertService.blockingDialog(
-      DO_NOT_CLOSE_APPLICATION,
-      SETTING_PASSCODE,
+      Messages.DO_NOT_CLOSE_APPLICATION,
+      Messages.SETTING_PASSCODE,
     )
     try {
       await this.setPasscodeWithoutWarning(passcode, KeyParamsOrigination.PasscodeCreate)
@@ -381,8 +374,8 @@ export class UserService extends AbstractService<AccountEvent> implements UserCl
     }
 
     const dismissBlockingDialog = await this.alertService.blockingDialog(
-      DO_NOT_CLOSE_APPLICATION,
-      REMOVING_PASSCODE,
+      Messages.DO_NOT_CLOSE_APPLICATION,
+      Messages.REMOVING_PASSCODE,
     )
     try {
       await this.removePasscodeWithoutWarning()
@@ -407,10 +400,10 @@ export class UserService extends AbstractService<AccountEvent> implements UserCl
     }
 
     const dismissBlockingDialog = await this.alertService.blockingDialog(
-      DO_NOT_CLOSE_APPLICATION,
+      Messages.DO_NOT_CLOSE_APPLICATION,
       origination === KeyParamsOrigination.ProtocolUpgrade
-        ? ProtocolUpgradeStrings.UpgradingPasscode
-        : CHANGING_PASSCODE,
+        ? Messages.ProtocolUpgradeStrings.UpgradingPasscode
+        : Messages.CHANGING_PASSCODE,
     )
     try {
       await this.removePasscodeWithoutWarning()
@@ -430,7 +423,7 @@ export class UserService extends AbstractService<AccountEvent> implements UserCl
   }
 
   private async removePasscodeWithoutWarning() {
-    await this.protocolService.removeRootKeyWrapper()
+    await this.protocolService.removePasscode()
     await this.rewriteItemsKeys()
   }
 
@@ -472,24 +465,28 @@ export class UserService extends AbstractService<AccountEvent> implements UserCl
     const { wrappingKey, canceled } = await this.challengeService.getWrappingKeyIfApplicable(
       parameters.passcode,
     )
+
     if (canceled) {
-      return { error: Error(CredentialsChangeStrings.PasscodeRequired) }
+      return { error: Error(Messages.CredentialsChangeStrings.PasscodeRequired) }
     }
+
     if (parameters.newPassword !== undefined && parameters.validateNewPasswordStrength) {
       if (parameters.newPassword.length < MINIMUM_PASSWORD_LENGTH) {
         return {
-          error: Error(InsufficientPasswordMessage(MINIMUM_PASSWORD_LENGTH)),
+          error: Error(Messages.InsufficientPasswordMessage(MINIMUM_PASSWORD_LENGTH)),
         }
       }
     }
+
     const accountPasswordValidation = await this.protocolService.validateAccountPassword(
       parameters.currentPassword,
     )
     if (!accountPasswordValidation.valid) {
       return {
-        error: Error(INVALID_PASSWORD),
+        error: Error(Messages.INVALID_PASSWORD),
       }
     }
+
     const user = this.sessionManager.getUser() as User
     const currentEmail = user.email
     const rootKeys = await this.recomputeRootKeysForCredentialChange({
@@ -501,6 +498,7 @@ export class UserService extends AbstractService<AccountEvent> implements UserCl
     })
 
     this.lockSyncing()
+
     /** Now, change the credentials on the server. Roll back on failure */
     const result = await this.sessionManager.changeCredentials({
       currentServerPassword: rootKeys.currentRootKey.serverPassword as string,
@@ -508,13 +506,17 @@ export class UserService extends AbstractService<AccountEvent> implements UserCl
       wrappingKey,
       newEmail: parameters.newEmail,
     })
+
     this.unlockSyncing()
+
     if (!result.response.error) {
       const rollback = await this.protocolService.createNewItemsKeyWithRollback()
       await this.protocolService.reencryptItemsKeys()
       await this.syncService.sync({ awaitAll: true })
-      const defaultItemsKey = this.protocolService.getDefaultItemsKey() as SNItemsKey
+
+      const defaultItemsKey = this.protocolService.getSureDefaultItemsKey()
       const itemsKeyWasSynced = !defaultItemsKey.neverSynced
+
       if (!itemsKeyWasSynced) {
         await this.sessionManager.changeCredentials({
           currentServerPassword: rootKeys.newRootKey.serverPassword as string,
@@ -525,7 +527,7 @@ export class UserService extends AbstractService<AccountEvent> implements UserCl
         await rollback()
         await this.syncService.sync({ awaitAll: true })
 
-        return { error: Error(CredentialsChangeStrings.Failed) }
+        return { error: Error(Messages.CredentialsChangeStrings.Failed) }
       }
     }
 

@@ -356,7 +356,7 @@ describe('importing', function () {
       Factory.createMappedTag(application),
     ])
 
-    const backupData = await application.createBackupFile(EncryptionIntent.FileEncrypted)
+    const backupData = await application.createEncryptedBackupFile()
 
     await application.sync.sync({ awaitAll: true })
 
@@ -386,7 +386,7 @@ describe('importing', function () {
       Factory.createMappedTag(application),
     ])
 
-    const backupData = await application.createBackupFile(EncryptionIntent.FileEncrypted)
+    const backupData = await application.createEncryptedBackupFile()
 
     await Factory.safeDeinit(application)
     application = await Factory.createInitAppWithFakeCrypto()
@@ -413,7 +413,7 @@ describe('importing', function () {
       Factory.createMappedTag(application),
     ])
 
-    const backupData = await application.createBackupFile(EncryptionIntent.FileEncrypted)
+    const backupData = await application.createEncryptedBackupFile()
 
     await Factory.safeDeinit(application)
     application = await Factory.createInitAppWithFakeCrypto()
@@ -442,7 +442,7 @@ describe('importing', function () {
       text: 'On protocol version 003.',
     })
 
-    const backupData = await application.createBackupFile(EncryptionIntent.FileEncrypted)
+    const backupData = await application.createEncryptedBackupFile()
 
     await Factory.safeDeinit(application)
     application = await Factory.createInitAppWithFakeCrypto()
@@ -523,7 +523,7 @@ describe('importing', function () {
       text: 'On protocol version 004.',
     })
 
-    const backupData = await application.createBackupFile(EncryptionIntent.FileEncrypted)
+    const backupData = await application.createEncryptedBackupFile()
 
     await Factory.safeDeinit(application)
     application = await Factory.createInitAppWithFakeCrypto()
@@ -553,7 +553,7 @@ describe('importing', function () {
       text: 'On protocol version 004.',
     })
 
-    const backupData = await application.createBackupFile(EncryptionIntent.FileEncrypted)
+    const backupData = await application.createEncryptedBackupFile()
 
     await Factory.safeDeinit(application)
     application = await Factory.createInitAppWithFakeCrypto()
@@ -590,7 +590,7 @@ describe('importing', function () {
       text: 'On protocol version 003.',
     })
 
-    const backupData = await application.createBackupFile(EncryptionIntent.FileEncrypted)
+    const backupData = await application.createEncryptedBackupFile()
 
     await Factory.safeDeinit(application)
     application = await Factory.createInitAppWithFakeCrypto()
@@ -626,7 +626,7 @@ describe('importing', function () {
       text: 'On protocol version 004.',
     })
 
-    const backupData = await application.createBackupFile(EncryptionIntent.FileEncrypted)
+    const backupData = await application.createEncryptedBackupFile()
 
     await Factory.safeDeinit(application)
     application = await Factory.createInitAppWithFakeCrypto()
@@ -659,7 +659,7 @@ describe('importing', function () {
       text: 'On protocol version 004.',
     })
 
-    const backupData = await application.createBackupFile(EncryptionIntent.FileEncrypted)
+    const backupData = await application.createEncryptedBackupFile()
     delete backupData.keyParams
 
     await Factory.safeDeinit(application)
@@ -684,7 +684,7 @@ describe('importing', function () {
       text: 'On protocol version 004.',
     })
 
-    const backupData = await application.createBackupFile(EncryptionIntent.FileEncrypted)
+    const backupData = await application.createEncryptedBackupFile()
     backupData.items = backupData.items.filter(
       (payload) => payload.content_type !== ContentType.ItemsKey,
     )
@@ -785,7 +785,7 @@ describe('importing', function () {
               (prompt) =>
                 new ChallengeValue(
                   prompt,
-                  prompt.validation === ChallengeValidation.AccountPassword
+                  prompt.validation !== ChallengeValidation.ProtectionSessionDuration
                     ? password
                     : UnprotectedAccessSecondsDuration.OneMinute,
                 ),
@@ -821,7 +821,8 @@ describe('importing', function () {
         version: '003',
       },
     }
-    const result = await application.mutator.importData(backupFile, true)
+
+    const result = await application.mutator.importData(backupFile, false)
     expect(result.errorCount).to.equal(0)
     await Factory.safeDeinit(application)
   })
@@ -840,7 +841,7 @@ describe('importing', function () {
 
     await application.sync.sync()
 
-    const backupData = await application.createBackupFile(EncryptionIntent.FileEncrypted)
+    const backupData = await application.createEncryptedBackupFile()
 
     await Factory.safeDeinit(application)
     application = await Factory.createInitAppWithFakeCrypto()

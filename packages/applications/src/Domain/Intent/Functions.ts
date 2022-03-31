@@ -15,26 +15,27 @@ export function ContentTypeUsesRootKeyEncryption(contentType: ContentType): bool
   )
 }
 
+export function ItemContentTypeUsesRootKeyEncryption(contentType: ContentType): boolean {
+  return contentType === ContentType.ItemsKey
+}
+
 export function isLocalStorageIntent(intent: EncryptionIntent): boolean {
   return (
     intent === EncryptionIntent.LocalStorageEncrypted ||
-    intent === EncryptionIntent.LocalStorageDecrypted ||
-    intent === EncryptionIntent.LocalStoragePreferEncrypted
+    intent === EncryptionIntent.LocalStorageDecrypted
   )
 }
 
 export function isFileIntent(intent: EncryptionIntent): boolean {
   return (
     intent === EncryptionIntent.FileEncrypted ||
-    intent === EncryptionIntent.FileDecrypted ||
-    intent === EncryptionIntent.FilePreferEncrypted
+    intent === EncryptionIntent.FileDecrypted
   )
 }
 
 export function isDecryptedIntent(intent: EncryptionIntent): boolean {
   return (
-    intent === EncryptionIntent.LocalStorageDecrypted ||
-    intent === EncryptionIntent.FileDecrypted
+    intent === EncryptionIntent.LocalStorageDecrypted || intent === EncryptionIntent.FileDecrypted
   )
 }
 
