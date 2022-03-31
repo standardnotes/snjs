@@ -1,3 +1,10 @@
+import { SNItemsKey, CreateItemFromPayload } from '@standardnotes/models'
+import {
+  SNRootKeyParams,
+  EncryptionService,
+  SNRootKey,
+  KeyParamsFromApiResponse,
+} from '@standardnotes/encryption'
 import { UserService } from '../User/UserService'
 import {
   PurePayload,
@@ -6,11 +13,9 @@ import {
   PayloadSource,
 } from '@standardnotes/payloads'
 import { SNSyncService } from '../Sync/SyncService'
-import { CreateItemFromPayload } from '@Lib/Models/Generator'
-import { StorageKey } from '@Lib/Services/Storage/storage_keys'
+import { StorageKey } from '@standardnotes/services'
 import { KeyRecoveryStrings } from '../Api/Messages'
-import { SNStorageService, StorageValueModes } from '../Storage/StorageService'
-import { SNRootKeyParams } from '../../Protocol/key_params'
+import { SNStorageService } from '../Storage/StorageService'
 import { PayloadManager } from '../Payloads/PayloadManager'
 import {
   Challenge,
@@ -20,17 +25,19 @@ import {
   ChallengeService,
 } from '../Challenge'
 import { SNAlertService } from '../Alert/AlertService'
-import { SNRootKey } from '@Lib/Protocol/root_key'
-import { SNProtocolService } from '@Lib/Services/Protocol/ProtocolService'
+
 import { SNApiService } from '@Lib/Services/Api/ApiService'
-import { SNItemsKey } from '../../Models/ItemsKey/ItemsKey'
+
 import { ContentType } from '@standardnotes/common'
 import { ApplicationStage, leftVersionGreaterThanOrEqualToRight } from '@standardnotes/applications'
 import { ItemManager } from '../Items/ItemManager'
 import { dateSorted, isNullOrUndefined, removeFromArray } from '@standardnotes/utils'
-import { KeyParamsFromApiResponse } from '@Lib/Protocol/key_params'
 import { KeyParamsResponse } from '@standardnotes/responses'
-import { AbstractService, InternalEventBusInterface } from '@standardnotes/services'
+import {
+  AbstractService,
+  InternalEventBusInterface,
+  StorageValueModes,
+} from '@standardnotes/services'
 import {
   UndecryptableItemsStorage,
   DecryptionCallback,
@@ -82,7 +89,7 @@ export class SNKeyRecoveryService extends AbstractService {
     private itemManager: ItemManager,
     private payloadManager: PayloadManager,
     private apiService: SNApiService,
-    private protocolService: SNProtocolService,
+    private protocolService: EncryptionService,
     private challengeService: ChallengeService,
     private alertService: SNAlertService,
     private storageService: SNStorageService,

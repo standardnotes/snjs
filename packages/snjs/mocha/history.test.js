@@ -49,7 +49,7 @@ describe('history manager', () => {
       return string.substring(0, string.length - amount)
     }
 
-    it('create basic history entries', async function () {
+    it('create basic history entries 1', async function () {
       const item = await Factory.createSyncedNote(this.application)
       expect(this.historyManager.sessionHistoryForItem(item).length).to.equal(0)
 
@@ -334,7 +334,7 @@ describe('history manager', () => {
       expect(itemHistory).to.be.undefined
     })
 
-    it('create basic history entries', async function () {
+    it('create basic history entries 2', async function () {
       const item = await Factory.createSyncedNote(this.application)
       let itemHistory = await this.historyManager.remoteHistoryForItem(item)
 

@@ -1,4 +1,4 @@
-import { ClientDisplayableError } from '@Lib/Application/ClientError'
+import { ClientDisplayableError } from '@standardnotes/responses'
 import { Base64String } from '@standardnotes/sncrypto-common'
 
 export interface SessionsClientInterface {

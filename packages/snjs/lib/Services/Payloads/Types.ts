@@ -1,10 +1,10 @@
 import { ContentType } from '@standardnotes/common'
 import { PurePayload, PayloadSource } from '@standardnotes/payloads'
-import { ChangeObserverCallback } from '../Items/ChangeObserverCallback'
+import { ItemManagerChangeObserverCallback } from '@standardnotes/services'
 
 export type PayloadsChangeObserver = {
   types: ContentType[]
-  callback: ChangeObserverCallback<PurePayload>
+  callback: ItemManagerChangeObserverCallback<PurePayload>
   priority: number
 }
 

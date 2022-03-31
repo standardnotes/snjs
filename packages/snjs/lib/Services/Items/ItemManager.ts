@@ -1,32 +1,17 @@
-import { TagsToFoldersMigrationApplicator } from '../../Migrations/applicators/tags_to_folders'
-
-import * as Payloads from '@standardnotes/payloads'
-import * as Models from '@standardnotes/models'
-import { ItemCollectionNotesView } from '@Lib/Protocol/collection/item_collection_notes_view'
-import { NotesDisplayCriteria } from '@Lib/Protocol/collection/notes_display_criteria'
-import { isString, naturalSort, removeFromArray, UuidGenerator } from '@standardnotes/utils'
-import { PayloadsByDuplicating } from '@standardnotes/models'
 import { AnyRecord, ContentType } from '@standardnotes/common'
-import {
-  TagNoteCountChangeObserver,
-  TagNotesIndex,
-} from '../../Protocol/collection/tag_notes_index'
-import { UuidString } from '../../Types/UuidString'
-import { PayloadManager } from '../Payloads/PayloadManager'
-import {
-  AbstractService,
-  InternalEventBusInterface,
-  ItemManagerInterface,
-  ItemManagerChangeObserverCallback,
-} from '@standardnotes/services'
-import { BuildSmartViews } from '@Lib/Protocol/collection/smart_view_builder'
+import { isString, naturalSort, removeFromArray, UuidGenerator } from '@standardnotes/utils'
 import { ItemsClientInterface } from './ItemsClientInterface'
-import { ItemInterface } from '@standardnotes/payloads'
+import { PayloadManager } from '../Payloads/PayloadManager'
+import { TagsToFoldersMigrationApplicator } from '../../Migrations/applicators/tags_to_folders'
 import { TransactionalMutation } from './TransactionalMutation'
+import { UuidString } from '../../Types/UuidString'
+import * as Models from '@standardnotes/models'
+import * as Payloads from '@standardnotes/payloads'
+import * as Services from '@standardnotes/services'
 
 type ItemsChangeObserver = {
   contentType: ContentType[]
-  callback: ItemManagerChangeObserverCallback<Models.SNItem>
+  callback: Services.ItemManagerChangeObserverCallback<Models.SNItem>
 }
 
 /**
@@ -40,23 +25,23 @@ type ItemsChangeObserver = {
  * and then  we'll propagate them to our listeners.
  */
 export class ItemManager
-  extends AbstractService
-  implements ItemManagerInterface, ItemsClientInterface
+  extends Services.AbstractService
+  implements Services.ItemManagerInterface, ItemsClientInterface
 {
   private unsubChangeObserver: () => void
   private observers: ItemsChangeObserver[] = []
   private collection!: Payloads.ItemCollection
-  private notesView!: ItemCollectionNotesView
+  private notesView!: Models.ItemCollectionNotesView
   private systemSmartViews: Models.SmartView[]
-  private tagNotesIndex!: TagNotesIndex
+  private tagNotesIndex!: Models.TagNotesIndex
 
   constructor(
     private payloadManager: PayloadManager,
-    protected internalEventBus: InternalEventBusInterface,
+    protected internalEventBus: Services.InternalEventBusInterface,
   ) {
     super(internalEventBus)
     this.payloadManager = payloadManager
-    this.systemSmartViews = this.rebuildSystemSmartViews(NotesDisplayCriteria.Create({}))
+    this.systemSmartViews = this.rebuildSystemSmartViews(Models.NotesDisplayCriteria.Create({}))
     this.createCollection()
     this.unsubChangeObserver = this.payloadManager.addObserver(
       ContentType.Any,
@@ -64,8 +49,8 @@ export class ItemManager
     )
   }
 
-  private rebuildSystemSmartViews(criteria: NotesDisplayCriteria): Models.SmartView[] {
-    this.systemSmartViews = BuildSmartViews(criteria)
+  private rebuildSystemSmartViews(criteria: Models.NotesDisplayCriteria): Models.SmartView[] {
+    this.systemSmartViews = Models.BuildSmartViews(criteria)
     return this.systemSmartViews
   }
 
@@ -85,14 +70,14 @@ export class ItemManager
     )
     this.collection.setDisplayOptions(ContentType.Theme, Payloads.CollectionSort.Title, 'asc')
     this.collection.setDisplayOptions(ContentType.SmartView, Payloads.CollectionSort.Title, 'dsc')
-    this.notesView = new ItemCollectionNotesView(this.collection)
-    this.tagNotesIndex = new TagNotesIndex(this.collection, this.tagNotesIndex?.observers)
+    this.notesView = new Models.ItemCollectionNotesView(this.collection)
+    this.tagNotesIndex = new Models.TagNotesIndex(this.collection, this.tagNotesIndex?.observers)
   }
 
   /**
    * Returns all items.
    */
-  allItems(): ItemInterface[] {
+  allItems(): Payloads.ItemInterface[] {
     return this.items
   }
 
@@ -115,19 +100,19 @@ export class ItemManager
     contentType: ContentType,
     sortBy?: Payloads.CollectionSort,
     direction?: Payloads.CollectionSortDirection,
-    filter?: (element: ItemInterface) => boolean,
+    filter?: (element: Payloads.ItemInterface) => boolean,
   ): void {
     if (contentType === ContentType.Note) {
       console.warn(
         'Called setDisplayOptions with ContentType.Note. ' +
-          'setNotesDisplayCriteria should be used instead.',
+          'setModels.NotesDisplayCriteria should be used instead.',
       )
     }
     this.collection.setDisplayOptions(contentType, sortBy, direction, filter)
   }
 
-  public setNotesDisplayCriteria(criteria: NotesDisplayCriteria): void {
-    const override: Partial<NotesDisplayCriteria> = {}
+  public setNotesDisplayCriteria(criteria: Models.NotesDisplayCriteria): void {
+    const override: Partial<Models.NotesDisplayCriteria> = {}
     if (criteria.views.find((view) => view.uuid === Models.SystemViewId.AllNotes)) {
       if (criteria.includeArchived == undefined) {
         override.includeArchived = false
@@ -147,14 +132,14 @@ export class ItemManager
       }
     }
 
-    this.rebuildSystemSmartViews(NotesDisplayCriteria.Copy(criteria, override))
+    this.rebuildSystemSmartViews(Models.NotesDisplayCriteria.Copy(criteria, override))
 
     const updatedViews = criteria.views.map((tag) => {
       const matchingSystemTag = this.systemSmartViews.find((view) => view.uuid === tag.uuid)
       return matchingSystemTag || tag
     })
 
-    const updatedCriteria = NotesDisplayCriteria.Copy(criteria, {
+    const updatedCriteria = Models.NotesDisplayCriteria.Copy(criteria, {
       views: updatedViews,
       ...override,
     })
@@ -268,7 +253,7 @@ export class ItemManager
     return components.concat(themes)
   }
 
-  public addNoteCountChangeObserver(observer: TagNoteCountChangeObserver): () => void {
+  public addNoteCountChangeObserver(observer: Models.TagNoteCountChangeObserver): () => void {
     return this.tagNotesIndex.addCountChangeObserver(observer)
   }
 
@@ -293,7 +278,7 @@ export class ItemManager
 
   public addObserver(
     contentType: ContentType | ContentType[],
-    callback: ItemManagerChangeObserverCallback<Models.SNItem>,
+    callback: Services.ItemManagerChangeObserverCallback<Models.SNItem>,
   ): () => void {
     if (!Array.isArray(contentType)) {
       contentType = [contentType]
@@ -645,7 +630,7 @@ export class ItemManager
   public async setItemsDirty(
     uuids: UuidString[],
     isUserModified = false,
-  ): Promise<ItemInterface[]> {
+  ): Promise<Payloads.ItemInterface[]> {
     if (!isString(uuids[0])) {
       throw Error('Must use uuid when setting item dirty')
     }
@@ -679,7 +664,7 @@ export class ItemManager
   ) {
     const item = this.findSureItem(uuid)
     const payload = Payloads.CreateMaxPayloadFromAnyObject(item)
-    const resultingPayloads = await PayloadsByDuplicating(
+    const resultingPayloads = await Models.PayloadsByDuplicating(
       payload,
       this.payloadManager.getMasterCollection(),
       isConflict,

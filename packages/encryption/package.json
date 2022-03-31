@@ -39,6 +39,7 @@
   "dependencies": {
     "@standardnotes/payloads": "^1.4.20",
     "@standardnotes/models": "^1.0.0",
-    "@standardnotes/responses": "1.4.1"
+    "@standardnotes/responses": "1.4.1",
+    "@standardnotes/services": "1.6.12"
   }
 }

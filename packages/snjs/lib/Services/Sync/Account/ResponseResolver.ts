@@ -1,14 +1,6 @@
-import {
-  PurePayload,
-  PayloadSource,
-  ImmutablePayloadCollection,
-  ImmutablePayloadCollectionSet,
-  CopyPayload,
-  filterDisallowedRemotePayloads,
-} from '@standardnotes/payloads'
+import { HistoryMap, DeltaClassForSource } from '@standardnotes/models'
+import * as Payloads from '@standardnotes/payloads'
 import { SyncResponse } from '@Lib/Services/Sync/Response'
-import { DeltaClassForSource } from '@Lib/Protocol/payloads/deltas/generator'
-import { HistoryMap } from '@Lib/Services/History/HistoryMap'
 
 /**
  * Given a remote sync response, the resolver applies the incoming changes on top
@@ -17,30 +9,33 @@ import { HistoryMap } from '@Lib/Services/History/HistoryMap'
  * offers the 'recommended' new global state given a sync response and a current base state.
  */
 export class SyncResponseResolver {
-  private relatedCollectionSet: ImmutablePayloadCollectionSet
+  private relatedCollectionSet: Payloads.ImmutablePayloadCollectionSet
 
   constructor(
     private response: SyncResponse,
-    decryptedResponsePayloads: PurePayload[],
-    private baseCollection: ImmutablePayloadCollection,
-    payloadsSavedOrSaving: PurePayload[],
+    decryptedResponsePayloads: Payloads.PurePayload[],
+    private baseCollection: Payloads.ImmutablePayloadCollection,
+    payloadsSavedOrSaving: Payloads.PurePayload[],
     private historyMap: HistoryMap,
   ) {
-    this.relatedCollectionSet = new ImmutablePayloadCollectionSet([
-      ImmutablePayloadCollection.WithPayloads(
+    this.relatedCollectionSet = new Payloads.ImmutablePayloadCollectionSet([
+      Payloads.ImmutablePayloadCollection.WithPayloads(
         decryptedResponsePayloads,
-        PayloadSource.DecryptedTransient,
+        Payloads.PayloadSource.DecryptedTransient,
       ),
-      ImmutablePayloadCollection.WithPayloads(payloadsSavedOrSaving, PayloadSource.SavedOrSaving),
+      Payloads.ImmutablePayloadCollection.WithPayloads(
+        payloadsSavedOrSaving,
+        Payloads.PayloadSource.SavedOrSaving,
+      ),
     ])
   }
 
-  public async collectionsByProcessingResponse(): Promise<ImmutablePayloadCollection[]> {
+  public async collectionsByProcessingResponse(): Promise<Payloads.ImmutablePayloadCollection[]> {
     const collections = []
 
     const collectionRetrieved = await this.collectionByProcessingPayloads(
       this.response.retrievedPayloads,
-      PayloadSource.RemoteRetrieved,
+      Payloads.PayloadSource.RemoteRetrieved,
     )
     if (collectionRetrieved.all().length > 0) {
       collections.push(collectionRetrieved)
@@ -48,7 +43,7 @@ export class SyncResponseResolver {
 
     const collectionSaved = await this.collectionByProcessingPayloads(
       this.response.savedPayloads,
-      PayloadSource.RemoteSaved,
+      Payloads.PayloadSource.RemoteSaved,
     )
     if (collectionSaved.all().length > 0) {
       collections.push(collectionSaved)
@@ -57,7 +52,7 @@ export class SyncResponseResolver {
     if (this.response.uuidConflictPayloads.length > 0) {
       const collectionUuidConflicts = await this.collectionByProcessingPayloads(
         this.response.uuidConflictPayloads,
-        PayloadSource.ConflictUuid,
+        Payloads.PayloadSource.ConflictUuid,
       )
       if (collectionUuidConflicts.all().length > 0) {
         collections.push(collectionUuidConflicts)
@@ -67,7 +62,7 @@ export class SyncResponseResolver {
     if (this.response.dataConflictPayloads.length > 0) {
       const collectionDataConflicts = await this.collectionByProcessingPayloads(
         this.response.dataConflictPayloads,
-        PayloadSource.ConflictData,
+        Payloads.PayloadSource.ConflictData,
       )
       if (collectionDataConflicts.all().length > 0) {
         collections.push(collectionDataConflicts)
@@ -77,7 +72,7 @@ export class SyncResponseResolver {
     if (this.response.rejectedPayloads.length > 0) {
       const collectionRejected = await this.collectionByProcessingPayloads(
         this.response.rejectedPayloads,
-        PayloadSource.RemoteRejected,
+        Payloads.PayloadSource.RemoteRejected,
       )
       if (collectionRejected.all().length > 0) {
         collections.push(collectionRejected)
@@ -88,11 +83,11 @@ export class SyncResponseResolver {
   }
 
   private async collectionByProcessingPayloads(
-    payloads: PurePayload[],
-    source: PayloadSource,
-  ): Promise<ImmutablePayloadCollection> {
-    const collection = ImmutablePayloadCollection.WithPayloads(
-      filterDisallowedRemotePayloads(payloads),
+    payloads: Payloads.PurePayload[],
+    source: Payloads.PayloadSource,
+  ): Promise<Payloads.ImmutablePayloadCollection> {
+    const collection = Payloads.ImmutablePayloadCollection.WithPayloads(
+      Payloads.filterDisallowedRemotePayloads(payloads),
       source,
     )
     const deltaClass = DeltaClassForSource(source)!
@@ -106,16 +101,16 @@ export class SyncResponseResolver {
     const resultCollection = await delta.resultingCollection()
     const updatedDirtyPayloads = resultCollection.all().map((payload) => {
       const stillDirty = this.finalDirtyStateForPayload(payload)
-      return CopyPayload(payload, {
+      return Payloads.CopyPayload(payload, {
         dirty: stillDirty,
         dirtiedDate: stillDirty ? new Date() : undefined,
       })
     })
-    return ImmutablePayloadCollection.WithPayloads(updatedDirtyPayloads, source)
+    return Payloads.ImmutablePayloadCollection.WithPayloads(updatedDirtyPayloads, source)
   }
 
-  private finalDirtyStateForPayload(payload: PurePayload): boolean | undefined {
-    const current = this.baseCollection.find(payload.uuid!)
+  private finalDirtyStateForPayload(payload: Payloads.PurePayload): boolean | undefined {
+    const current = this.baseCollection.find(payload.uuid)
     /**
      * `current` can be null in the case of new
      * items that haven't yet been mapped

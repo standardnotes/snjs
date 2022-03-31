@@ -1,6 +1,6 @@
 import { EncryptAndUploadFileOperation } from './Operations/EncryptAndUpload'
-import { SNFile, FileMetadata } from '../../Models/File/File'
-import { ClientDisplayableError } from '@Lib/Application/ClientError'
+import { SNFile, FileMetadata } from '@standardnotes/models'
+import { ClientDisplayableError } from '@standardnotes/responses'
 
 export interface FilesClientInterface {
   beginNewFileUpload(): Promise<EncryptAndUploadFileOperation | ClientDisplayableError>

@@ -7,7 +7,7 @@ import { MigrationServices } from '../../Migrations/types'
 import { Migration } from '@Lib/Migrations/migration'
 import * as migrationImports from '@Lib/Migrations'
 import { BaseMigration } from '@Lib/Migrations/base'
-import { RawStorageKey, namespacedKey } from '@Lib/Services/Storage/storage_keys'
+import { RawStorageKey, namespacedKey } from '@standardnotes/services'
 import { lastElement } from '@standardnotes/utils'
 import { AbstractService } from '@standardnotes/services'
 

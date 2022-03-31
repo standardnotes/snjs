@@ -16,8 +16,6 @@
     "paths": {
       "@Lib/*": ["*"],
       "@Services/*": ["Services/*"],
-      "@Models/*": ["Models/*"],
-      "@Protocol/*": ["Protocol/*"],
       "@Payloads/*": ["Protocol/payloads/*"]
     }
   },

@@ -1,44 +1,22 @@
-import { SNItemsKey, CreateItemFromPayload } from '@standardnotes/models'
-import {
-  lastElement,
-  splitString,
-  firstHalfOfString,
-  secondHalfOfString,
-} from '@standardnotes/utils'
-import {
-  ItemAuthenticatedData,
-  LegacyAttachedData,
-  RootKeyEncryptedAuthenticatedData,
-  CreateMaxPayloadFromAnyObject,
-  PurePayload,
-  FillItemContent,
-  EncryptedParameters,
-  DecryptedParameters,
-  ErroredDecryptingParameters,
-} from '@standardnotes/payloads'
+import { Create002KeyParams } from '../../RootKey/KeyParams'
 import { ItemsKeyContent } from '../Operator'
-
-import { Create002KeyParams } from '../../KeyParams'
-import { V002Algorithm } from '../../Algorithm'
+import { SNItemsKey, CreateItemFromPayload } from '@standardnotes/models'
 import { SNProtocolOperator001 } from '../001/Operator001'
-
-import { SNRootKey } from '../../RootKey'
-import {
-  ContentType,
-  AnyKeyParamsContent,
-  KeyParamsOrigination,
-  ProtocolVersion,
-} from '@standardnotes/common'
+import { SNRootKey } from '../../RootKey/RootKey'
+import { SNRootKeyParams } from '../../RootKey/RootKeyParams'
 import { UuidGenerator } from '@standardnotes/utils'
-import { SNRootKeyParams } from '../../RootKeyParams'
+import { V002Algorithm } from '../../Algorithm'
+import * as Common from '@standardnotes/common'
+import * as Payloads from '@standardnotes/payloads'
+import * as Utils from '@standardnotes/utils'
 
 /**
  * @deprecated
  * A legacy operator no longer used to generate new accounts.
  */
 export class SNProtocolOperator002 extends SNProtocolOperator001 {
-  get version(): ProtocolVersion {
-    return ProtocolVersion.V002
+  get version(): Common.ProtocolVersion {
+    return Common.ProtocolVersion.V002
   }
 
   protected generateNewItemsKeyContent(): ItemsKeyContent {
@@ -48,7 +26,7 @@ export class SNProtocolOperator002 extends SNProtocolOperator001 {
     const response: ItemsKeyContent = {
       itemsKey: itemsKey,
       dataAuthenticationKey: authKey,
-      version: ProtocolVersion.V002,
+      version: Common.ProtocolVersion.V002,
     }
     return response
   }
@@ -59,10 +37,10 @@ export class SNProtocolOperator002 extends SNProtocolOperator001 {
    */
   public createItemsKey(): SNItemsKey {
     const content = this.generateNewItemsKeyContent()
-    const payload = CreateMaxPayloadFromAnyObject({
+    const payload = Payloads.CreateMaxPayloadFromAnyObject({
       uuid: UuidGenerator.GenerateUuid(),
-      content_type: ContentType.ItemsKey,
-      content: FillItemContent(content),
+      content_type: Common.ContentType.ItemsKey,
+      content: Payloads.FillItemContent(content),
     })
     return CreateItemFromPayload(payload) as SNItemsKey
   }
@@ -70,9 +48,9 @@ export class SNProtocolOperator002 extends SNProtocolOperator001 {
   public async createRootKey(
     identifier: string,
     password: string,
-    origination: KeyParamsOrigination,
+    origination: Common.KeyParamsOrigination,
   ): Promise<SNRootKey> {
-    const pwCost = lastElement(V002Algorithm.PbkdfCostsUsed) as number
+    const pwCost = Utils.lastElement(V002Algorithm.PbkdfCostsUsed) as number
     const pwNonce = this.crypto.generateRandomKey(V002Algorithm.SaltSeedLength)
     const pwSalt = await this.crypto.unsafeSha1(identifier + ':' + pwNonce)
 
@@ -81,7 +59,7 @@ export class SNProtocolOperator002 extends SNProtocolOperator001 {
       pw_nonce: pwNonce,
       pw_cost: pwCost,
       pw_salt: pwSalt,
-      version: ProtocolVersion.V002,
+      version: Common.ProtocolVersion.V002,
       origination,
       created: `${Date.now()}`,
     })
@@ -114,7 +92,7 @@ export class SNProtocolOperator002 extends SNProtocolOperator001 {
     encryptionKey: string,
     authKey: string,
     uuid: string,
-    version: ProtocolVersion,
+    version: Common.ProtocolVersion,
     keyParams?: SNRootKeyParams,
   ) {
     const iv = this.crypto.generateRandomKey(V002Algorithm.EncryptionIvLength)
@@ -159,8 +137,12 @@ export class SNProtocolOperator002 extends SNProtocolOperator001 {
   }
 
   public getPayloadAuthenticatedData(
-    encrypted: EncryptedParameters,
-  ): RootKeyEncryptedAuthenticatedData | ItemAuthenticatedData | LegacyAttachedData | undefined {
+    encrypted: Payloads.EncryptedParameters,
+  ):
+    | Payloads.RootKeyEncryptedAuthenticatedData
+    | Payloads.ItemAuthenticatedData
+    | Payloads.LegacyAttachedData
+    | undefined {
     const itemKeyComponents = this.encryptionComponentsFromString002(encrypted.enc_item_key)
     const authenticatedData = itemKeyComponents.keyParams
 
@@ -169,16 +151,16 @@ export class SNProtocolOperator002 extends SNProtocolOperator001 {
     }
 
     const decoded = JSON.parse(this.crypto.base64Decode(authenticatedData))
-    const data: LegacyAttachedData = {
-      ...(decoded as AnyKeyParamsContent),
+    const data: Payloads.LegacyAttachedData = {
+      ...(decoded as Common.AnyKeyParamsContent),
     }
     return data
   }
 
   public async generateEncryptedParametersAsync(
-    payload: PurePayload,
+    payload: Payloads.PurePayload,
     key: SNItemsKey | SNRootKey,
-  ): Promise<EncryptedParameters> {
+  ): Promise<Payloads.EncryptedParameters> {
     /**
      * Generate new item key that is double the key size.
      * Will be split to create encryption key and authentication key.
@@ -193,8 +175,8 @@ export class SNProtocolOperator002 extends SNProtocolOperator001 {
       key instanceof SNRootKey ? (key as SNRootKey).keyParams : undefined,
     )
 
-    const ek = firstHalfOfString(itemKey)
-    const ak = secondHalfOfString(itemKey)
+    const ek = Utils.firstHalfOfString(itemKey)
+    const ak = Utils.secondHalfOfString(itemKey)
     const ciphertext = await this.encryptTextParams(
       JSON.stringify(payload.content),
       ek,
@@ -214,9 +196,9 @@ export class SNProtocolOperator002 extends SNProtocolOperator001 {
   }
 
   public async generateDecryptedParametersAsync(
-    encrypted: EncryptedParameters,
+    encrypted: Payloads.EncryptedParameters,
     key: SNItemsKey | SNRootKey,
-  ): Promise<DecryptedParameters | ErroredDecryptingParameters> {
+  ): Promise<Payloads.DecryptedParameters | Payloads.ErroredDecryptingParameters> {
     if (!encrypted.enc_item_key) {
       console.error(Error('Missing item encryption key, skipping decryption.'))
       return {
@@ -248,8 +230,8 @@ export class SNProtocolOperator002 extends SNProtocolOperator001 {
       }
     }
 
-    const ek = firstHalfOfString(itemKey)
-    const ak = secondHalfOfString(itemKey)
+    const ek = Utils.firstHalfOfString(itemKey)
+    const ak = Utils.secondHalfOfString(itemKey)
     const itemParams = this.encryptionComponentsFromString002(encrypted.content, ek, ak)
     const content = await this.decryptTextParams(
       itemParams.ciphertextToAuth,
@@ -296,12 +278,12 @@ export class SNProtocolOperator002 extends SNProtocolOperator001 {
       throw Error('Error deriving PBKDF2 key')
     }
 
-    const partitions = splitString(derivedKey, 3)
+    const partitions = Utils.splitString(derivedKey, 3)
     const key = SNRootKey.Create({
       serverPassword: partitions[0],
       masterKey: partitions[1],
       dataAuthenticationKey: partitions[2],
-      version: ProtocolVersion.V002,
+      version: Common.ProtocolVersion.V002,
       keyParams: keyParams.getPortableValue(),
     })
     return key

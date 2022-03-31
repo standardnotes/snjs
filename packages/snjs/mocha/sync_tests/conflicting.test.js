@@ -811,7 +811,7 @@ describe('online conflict handling', function () {
     await newApp.syncService.sync(syncOptions)
     expect(newApp.itemManager.invalidItems.length).to.equal(0)
     await Factory.safeDeinit(newApp)
-  }).timeout(60000)
+  }).timeout(80000)
 
   it('importing data belonging to another account should not result in duplication', async function () {
     /** Create primary account and export data */

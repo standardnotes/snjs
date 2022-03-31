@@ -1,14 +1,6 @@
-import {
-  ItemAuthenticatedData,
-  LegacyAttachedData,
-  RootKeyEncryptedAuthenticatedData,
-  PurePayload,
-  EncryptedParameters,
-  DecryptedParameters,
-  ErroredDecryptingParameters,
-} from '@standardnotes/payloads'
-import { SNRootKey } from '../RootKey'
-import { SNRootKeyParams } from '../RootKeyParams'
+import * as Payloads from '@standardnotes/payloads'
+import { SNRootKey } from '../RootKey/RootKey'
+import { SNRootKeyParams } from '../RootKey/RootKeyParams'
 import { KeyParamsOrigination, ProtocolVersion } from '@standardnotes/common'
 import { SNItemsKey } from '@standardnotes/models'
 
@@ -39,8 +31,12 @@ export interface OperatorCommon {
    * non-decrypted, ciphertext state.
    */
   getPayloadAuthenticatedData(
-    encrypted: EncryptedParameters,
-  ): RootKeyEncryptedAuthenticatedData | ItemAuthenticatedData | LegacyAttachedData | undefined
+    encrypted: Payloads.EncryptedParameters,
+  ):
+    | Payloads.RootKeyEncryptedAuthenticatedData
+    | Payloads.ItemAuthenticatedData
+    | Payloads.LegacyAttachedData
+    | undefined
 
   /**
    * Computes a root key given a password and previous keyParams
@@ -70,14 +66,14 @@ export interface SynchronousOperator extends OperatorCommon {
    * items keys), or an ItemsKey (if encrypted regular items)
    */
   generateEncryptedParametersSync(
-    payload: PurePayload,
+    payload: Payloads.PurePayload,
     key: SNItemsKey | SNRootKey,
-  ): EncryptedParameters
+  ): Payloads.EncryptedParameters
 
   generateDecryptedParametersSync(
-    encrypted: EncryptedParameters,
+    encrypted: Payloads.EncryptedParameters,
     key: SNItemsKey | SNRootKey,
-  ): DecryptedParameters | ErroredDecryptingParameters
+  ): Payloads.DecryptedParameters | Payloads.ErroredDecryptingParameters
 }
 
 export interface AsynchronousOperator extends OperatorCommon {
@@ -89,12 +85,12 @@ export interface AsynchronousOperator extends OperatorCommon {
    * items keys), or an ItemsKey (if encrypted regular items)
    */
   generateEncryptedParametersAsync(
-    payload: PurePayload,
+    payload: Payloads.PurePayload,
     key: SNItemsKey | SNRootKey,
-  ): Promise<EncryptedParameters>
+  ): Promise<Payloads.EncryptedParameters>
 
   generateDecryptedParametersAsync(
-    encrypted: EncryptedParameters,
+    encrypted: Payloads.EncryptedParameters,
     key: SNItemsKey | SNRootKey,
-  ): Promise<DecryptedParameters | ErroredDecryptingParameters>
+  ): Promise<Payloads.DecryptedParameters | Payloads.ErroredDecryptingParameters>
 }

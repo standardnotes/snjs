@@ -1,14 +1,14 @@
 import { splitString } from '@standardnotes/utils'
 import { SNItemsKey, CreateItemFromPayload } from '@standardnotes/models'
 import { ItemsKeyContent } from '../Operator'
-import { SNRootKey } from '../../RootKey'
+import { SNRootKey } from '../../RootKey/RootKey'
 import { V003Algorithm } from '../../Algorithm'
-import { Create003KeyParams } from '../../KeyParams'
+import { Create003KeyParams } from '../../RootKey/KeyParams'
 import { SNProtocolOperator002 } from '../002/Operator002'
 import { CreateMaxPayloadFromAnyObject, FillItemContent } from '@standardnotes/payloads'
 import { ContentType, KeyParamsOrigination, ProtocolVersion } from '@standardnotes/common'
 import { UuidGenerator } from '@standardnotes/utils'
-import { SNRootKeyParams } from '../../RootKeyParams'
+import { SNRootKeyParams } from '../../RootKey/RootKeyParams'
 
 /**
  * @legacy

@@ -1,8 +1,8 @@
-import * as Models from '@Lib/Models';
-import { UuidString } from '../../Types/UuidString';
+import * as Models from '@standardnotes/models'
+import { UuidString } from '../../Types/UuidString'
 
 export type TransactionalMutation = {
-  itemUuid: UuidString;
-  mutate: (mutator: Models.ItemMutator) => void;
-  mutationType?: Models.MutationType;
-};
+  itemUuid: UuidString
+  mutate: (mutator: Models.ItemMutator) => void
+  mutationType?: Models.MutationType
+}

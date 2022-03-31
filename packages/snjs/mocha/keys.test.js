@@ -15,7 +15,9 @@ describe('keys', function () {
   })
 
   afterEach(async function () {
-    await Factory.safeDeinit(this.application)
+    if (!this.application.dealloced) {
+      await Factory.safeDeinit(this.application)
+    }
     this.application = null
     localStorage.clear()
   })

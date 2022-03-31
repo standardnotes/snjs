@@ -1,6 +1,6 @@
 import { Base64String } from '@standardnotes/sncrypto-common'
 import { Subscription } from '@standardnotes/auth'
-import { ClientDisplayableError } from '@Lib/Application/ClientError'
+import { ClientDisplayableError } from '@standardnotes/responses'
 import {
   ProtocolVersion,
   AnyKeyParamsContent,
@@ -29,14 +29,13 @@ import {
   AvailableSubscriptions,
   GetAvailableSubscriptionsResponse,
 } from '@standardnotes/responses'
-import { SNProtocolService } from '../Protocol/ProtocolService'
+import { EncryptionService } from '@standardnotes/encryption'
 import { SNApiService } from '../Api/ApiService'
 import { SNStorageService } from '../Storage/StorageService'
-import { SNRootKey } from '@Lib/Protocol/root_key'
-import { KeyParamsFromApiResponse, SNRootKeyParams } from '../../Protocol/key_params'
+import { KeyParamsFromApiResponse, SNRootKeyParams, SNRootKey } from '@standardnotes/encryption'
 import { isNullOrUndefined } from '@standardnotes/utils'
 import { SNAlertService } from '@Lib/Services/Alert/AlertService'
-import { StorageKey } from '@Lib/Services/Storage/storage_keys'
+import { StorageKey } from '@standardnotes/services'
 import * as messages from '../Api/Messages'
 import { PromptTitles, RegisterStrings, SessionStrings, SignInStrings } from '../Api/Messages'
 import { UuidString } from '@Lib/Types/UuidString'
@@ -85,7 +84,7 @@ export class SNSessionManager
     private storageService: SNStorageService,
     private apiService: SNApiService,
     private alertService: SNAlertService,
-    private protocolService: SNProtocolService,
+    private protocolService: EncryptionService,
     private challengeService: ChallengeService,
     private webSocketsService: SNWebSocketsService,
     protected internalEventBus: InternalEventBusInterface,
@@ -636,7 +635,7 @@ export class SNSessionManager
       accessExpiration: session.accessExpiration,
       refreshExpiration: session.refreshExpiration,
       readonlyAccess: true,
-      masterKey: this.protocolService.getRootKey()?.masterKey,
+      masterKey: this.protocolService.getRootKey()?.masterKey as string,
       keyParams: keyParams.content,
       user: this.getSureUser(),
       host: this.apiService.getHost(),

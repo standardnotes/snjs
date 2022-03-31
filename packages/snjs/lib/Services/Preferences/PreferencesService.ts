@@ -1,7 +1,5 @@
-import { SNUserPrefs } from '@Lib/Models'
+import { SNUserPrefs, PrefKey, PrefValue, UserPrefsMutator } from '@standardnotes/models'
 import { ContentType } from '@standardnotes/common'
-import { PrefKey, PrefValue } from '@Lib/Models/UserPrefs/UserPrefs'
-import { UserPrefsMutator } from '@Lib/Models/UserPrefs/UserPrefsMutator'
 import { ItemManager } from '../Items/ItemManager'
 import { SNSingletonManager } from '../Singleton/SingletonManager'
 import { SNSyncService } from '../Sync/SyncService'

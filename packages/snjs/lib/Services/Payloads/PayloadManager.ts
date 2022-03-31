@@ -1,22 +1,9 @@
-import { removeFromArray } from '@standardnotes/utils'
-import {
-  PayloadByMerging,
-  PayloadSource,
-  PurePayload,
-  MutableCollection,
-  ImmutablePayloadCollection,
-} from '@standardnotes/payloads'
-import { DeltaFileImport } from '../../Protocol/payloads/deltas/file_import'
-import { ContentType } from '@standardnotes/common'
-import { Uuids } from '@Lib/Models/Functions'
-import { UuidString } from '../../Types/UuidString'
-import {
-  AbstractService,
-  InternalEventBusInterface,
-  PayloadManagerInterface,
-} from '@standardnotes/services'
-import { ChangeObserverCallback } from '../Items/ChangeObserverCallback'
+import { ContentType, Uuid } from '@standardnotes/common'
 import { PayloadsChangeObserver, QueueElement, OverwriteProtectedTypes } from './Types'
+import { removeFromArray } from '@standardnotes/utils'
+import { Uuids, DeltaFileImport } from '@standardnotes/models'
+import * as Payloads from '@standardnotes/payloads'
+import * as Services from '@standardnotes/services'
 
 /**
  * The payload manager is responsible for keeping state regarding what items exist in the
@@ -28,14 +15,17 @@ import { PayloadsChangeObserver, QueueElement, OverwriteProtectedTypes } from '.
  * It exposes methods that allow consumers to listen to mapping events. This is how
  * applications 'stream' items to display in the interface.
  */
-export class PayloadManager extends AbstractService implements PayloadManagerInterface {
+export class PayloadManager
+  extends Services.AbstractService
+  implements Services.PayloadManagerInterface
+{
   private changeObservers: PayloadsChangeObserver[] = []
-  public collection: MutableCollection<PurePayload>
+  public collection: Payloads.MutableCollection<Payloads.PurePayload>
   private emitQueue: QueueElement[] = []
 
-  constructor(protected internalEventBus: InternalEventBusInterface) {
+  constructor(protected internalEventBus: Services.InternalEventBusInterface) {
     super(internalEventBus)
-    this.collection = new MutableCollection()
+    this.collection = new Payloads.MutableCollection()
   }
 
   /**
@@ -44,7 +34,7 @@ export class PayloadManager extends AbstractService implements PayloadManagerInt
    * as needed to make decisions, like about duplication or uuid alteration.
    */
   public getMasterCollection() {
-    return ImmutablePayloadCollection.FromCollection(this.collection)
+    return Payloads.ImmutablePayloadCollection.FromCollection(this.collection)
   }
 
   public deinit() {
@@ -54,10 +44,10 @@ export class PayloadManager extends AbstractService implements PayloadManagerInt
   }
 
   public resetState() {
-    this.collection = new MutableCollection()
+    this.collection = new Payloads.MutableCollection()
   }
 
-  public find(uuids: UuidString[]) {
+  public find(uuids: Uuid[]) {
     return this.collection.findAll(uuids)
   }
 
@@ -65,7 +55,7 @@ export class PayloadManager extends AbstractService implements PayloadManagerInt
    * One of many mapping helpers available.
    * This function maps a collection of payloads.
    */
-  public async emitCollection(collection: ImmutablePayloadCollection, sourceKey?: string) {
+  public async emitCollection(collection: Payloads.ImmutablePayloadCollection, sourceKey?: string) {
     return this.emitPayloads(collection.all(), collection.source!, sourceKey)
   }
 
@@ -76,10 +66,10 @@ export class PayloadManager extends AbstractService implements PayloadManagerInt
    * saved to storage by the caller
    */
   public async emitPayload(
-    payload: PurePayload,
-    source: PayloadSource,
+    payload: Payloads.PurePayload,
+    source: Payloads.PayloadSource,
     sourceKey?: string,
-  ): Promise<PurePayload[]> {
+  ): Promise<Payloads.PurePayload[]> {
     return this.emitPayloads([payload], source, sourceKey)
   }
 
@@ -90,10 +80,10 @@ export class PayloadManager extends AbstractService implements PayloadManagerInt
    * saved to storage by the caller
    */
   public async emitPayloads(
-    payloads: PurePayload[],
-    source: PayloadSource,
+    payloads: Payloads.PurePayload[],
+    source: Payloads.PayloadSource,
     sourceKey?: string,
-  ): Promise<PurePayload[]> {
+  ): Promise<Payloads.PurePayload[]> {
     if (payloads.length === 0) {
       console.warn('Attempting to emit 0 payloads.')
     }
@@ -122,11 +112,11 @@ export class PayloadManager extends AbstractService implements PayloadManagerInt
     }
   }
 
-  private mergePayloadsOntoMaster(payloads: PurePayload[]) {
-    const changed: PurePayload[] = []
-    const inserted: PurePayload[] = []
-    const discarded: PurePayload[] = []
-    const ignored: PurePayload[] = []
+  private mergePayloadsOntoMaster(payloads: Payloads.PurePayload[]) {
+    const changed: Payloads.PurePayload[] = []
+    const inserted: Payloads.PurePayload[] = []
+    const discarded: Payloads.PurePayload[] = []
+    const ignored: Payloads.PurePayload[] = []
 
     for (const payload of payloads) {
       if (!payload.uuid || !payload.content_type) {
@@ -146,7 +136,7 @@ export class PayloadManager extends AbstractService implements PayloadManagerInt
         continue
       }
 
-      const newPayload = masterPayload ? PayloadByMerging(masterPayload, payload) : payload
+      const newPayload = masterPayload ? Payloads.PayloadByMerging(masterPayload, payload) : payload
       if (newPayload.discardable) {
         /** The item has been deleted and synced,
          * and can thus be removed from our local record */
@@ -172,7 +162,7 @@ export class PayloadManager extends AbstractService implements PayloadManagerInt
    */
   public addObserver(
     types: ContentType | ContentType[],
-    callback: ChangeObserverCallback<PurePayload>,
+    callback: Services.ItemManagerChangeObserverCallback<Payloads.PurePayload>,
     priority = 1,
   ) {
     if (!Array.isArray(types)) {
@@ -194,18 +184,18 @@ export class PayloadManager extends AbstractService implements PayloadManagerInt
    * explicitely understand what they are doing (want to propagate model state without mapping)
    */
   public notifyChangeObservers(
-    changed: PurePayload[],
-    inserted: PurePayload[],
-    discarded: PurePayload[],
-    ignored: PurePayload[],
-    source: PayloadSource,
+    changed: Payloads.PurePayload[],
+    inserted: Payloads.PurePayload[],
+    discarded: Payloads.PurePayload[],
+    ignored: Payloads.PurePayload[],
+    source: Payloads.PayloadSource,
     sourceKey?: string,
   ) {
     /** Slice the observers array as sort modifies in-place */
     const observers = this.changeObservers.slice().sort((a, b) => {
       return a.priority < b.priority ? -1 : 1
     })
-    const filter = (payloads: PurePayload[], types: ContentType[]) => {
+    const filter = (payloads: Payloads.PurePayload[], types: ContentType[]) => {
       return types.includes(ContentType.Any)
         ? payloads.slice()
         : payloads.slice().filter((payload) => {
@@ -229,10 +219,10 @@ export class PayloadManager extends AbstractService implements PayloadManagerInt
    * and marks the items as dirty.
    * @returns Resulting items
    */
-  public async importPayloads(payloads: PurePayload[]) {
+  public async importPayloads(payloads: Payloads.PurePayload[]) {
     const delta = new DeltaFileImport(
       this.getMasterCollection(),
-      ImmutablePayloadCollection.WithPayloads(payloads, PayloadSource.FileImport),
+      Payloads.ImmutablePayloadCollection.WithPayloads(payloads, Payloads.PayloadSource.FileImport),
       undefined,
     )
     const collection = await delta.resultingCollection()
@@ -240,7 +230,7 @@ export class PayloadManager extends AbstractService implements PayloadManagerInt
     return Uuids(collection.payloads)
   }
 
-  public removePayloadLocally(payload: PurePayload) {
+  public removePayloadLocally(payload: Payloads.PurePayload) {
     this.collection.discard(payload)
   }
 }

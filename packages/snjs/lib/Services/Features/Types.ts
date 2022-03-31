@@ -1,4 +1,4 @@
-import { ClientDisplayableError } from '@Lib/Application/ClientError'
+import { ClientDisplayableError } from '@standardnotes/responses'
 
 export type SetOfflineFeaturesFunctionResponse = ClientDisplayableError | undefined
 

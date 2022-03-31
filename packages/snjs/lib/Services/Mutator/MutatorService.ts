@@ -1,6 +1,6 @@
 import { AbstractService, InternalEventBusInterface } from '@standardnotes/services'
-import { BackupFile, SNProtocolService } from '../Protocol'
-import { ClientDisplayableError } from '@Lib/Application/ClientError'
+import { BackupFile, EncryptionService } from '@standardnotes/encryption'
+import { ClientDisplayableError } from '@standardnotes/responses'
 import { compareVersions } from '@standardnotes/applications'
 import { ContentType, ProtocolVersion } from '@standardnotes/common'
 import { ItemManager, TransactionalMutation } from '../Items'
@@ -12,7 +12,7 @@ import { SNSyncService, SyncOptions } from '../Sync'
 import { Strings } from '../../Strings'
 import { TagsToFoldersMigrationApplicator } from '@Lib/Migrations/applicators/tags_to_folders'
 import { UuidString } from '@Lib/Types/UuidString'
-import * as Models from '../../Models'
+import * as Models from '@standardnotes/models'
 import * as Payloads from '@standardnotes/payloads'
 import * as Utils from '@standardnotes/utils'
 import {
@@ -28,7 +28,7 @@ export class MutatorService extends AbstractService implements MutatorClientInte
     private itemManager: ItemManager,
     private syncService: SNSyncService,
     private protectionService: SNProtectionService,
-    private protocolService: SNProtocolService,
+    private protocolService: EncryptionService,
     private payloadManager: PayloadManager,
     private challengeService: ChallengeService,
     private componentManager: SNComponentManager,
