@@ -1,5 +1,5 @@
 import { SNSessionManager } from '../Services/Session/SessionManager'
-import { ApplicationIdentifier } from '@standardnotes/applications'
+import { ApplicationIdentifier } from '@standardnotes/common'
 import { ItemManager } from '@Lib/Services/Items/ItemManager'
 import { Environment } from '../Application/platforms'
 import { SNStorageService } from '@Lib/Services/Storage/StorageService'

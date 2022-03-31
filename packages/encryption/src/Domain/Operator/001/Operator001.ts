@@ -1,8 +1,12 @@
-import { ContentType, KeyParamsOrigination, ProtocolVersion } from '@standardnotes/common'
+import {
+  ContentType,
+  KeyParamsOrigination,
+  ProtocolVersion,
+  ProtocolVersionLength,
+} from '@standardnotes/common'
 import { Create001KeyParams } from '../../RootKey/KeyParams'
 import { firstHalfOfString, secondHalfOfString, splitString } from '@standardnotes/utils'
 import { ItemsKeyContent, AsynchronousOperator } from '../Operator'
-import { ProtocolVersionLength } from '@standardnotes/applications'
 import { SNItemsKey, CreateItemFromPayload } from '@standardnotes/models'
 import { SNPureCrypto } from '@standardnotes/sncrypto-common'
 import { SNRootKey } from '../../RootKey/RootKey'
@@ -10,6 +14,14 @@ import { SNRootKeyParams } from '../../RootKey/RootKeyParams'
 import { UuidGenerator } from '@standardnotes/utils'
 import { V001Algorithm } from '../../Algorithm'
 import * as Payloads from '@standardnotes/payloads'
+import {
+  DecryptedParameters,
+  EncryptedParameters,
+  ErroredDecryptingParameters,
+} from '../../Encryption/EncryptedParameters'
+import { RootKeyEncryptedAuthenticatedData } from '../../Encryption/RootKeyEncryptedAuthenticatedData'
+import { ItemAuthenticatedData } from '../../Encryption/ItemAuthenticatedData'
+import { LegacyAttachedData } from '../../Encryption/LegacyAttachedData'
 
 const NO_IV = '00000000000000000000000000000000'
 
@@ -79,12 +91,8 @@ export class SNProtocolOperator001 implements AsynchronousOperator {
   }
 
   public getPayloadAuthenticatedData(
-    _encrypted: Payloads.EncryptedParameters,
-  ):
-    | Payloads.RootKeyEncryptedAuthenticatedData
-    | Payloads.ItemAuthenticatedData
-    | Payloads.LegacyAttachedData
-    | undefined {
+    _encrypted: EncryptedParameters,
+  ): RootKeyEncryptedAuthenticatedData | ItemAuthenticatedData | LegacyAttachedData | undefined {
     return undefined
   }
 
@@ -103,7 +111,7 @@ export class SNProtocolOperator001 implements AsynchronousOperator {
   public async generateEncryptedParametersAsync(
     payload: Payloads.PurePayload,
     key: SNItemsKey | SNRootKey,
-  ): Promise<Payloads.EncryptedParameters> {
+  ): Promise<EncryptedParameters> {
     /**
      * Generate new item key that is double the key size.
      * Will be split to create encryption key and authentication key.
@@ -133,9 +141,9 @@ export class SNProtocolOperator001 implements AsynchronousOperator {
   }
 
   public async generateDecryptedParametersAsync(
-    encrypted: Payloads.EncryptedParameters,
+    encrypted: EncryptedParameters,
     key: SNItemsKey | SNRootKey,
-  ): Promise<Payloads.DecryptedParameters | Payloads.ErroredDecryptingParameters> {
+  ): Promise<DecryptedParameters | ErroredDecryptingParameters> {
     if (!encrypted.enc_item_key) {
       console.error(Error('Missing item encryption key, skipping decryption.'))
       return {

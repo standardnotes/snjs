@@ -1,11 +1,12 @@
-import { AnyKeyParamsContent, ContentType, ProtocolVersion } from '@standardnotes/common'
-import { BackupFile, BackupFileType } from './BackupFile'
-import { extendArray } from '@standardnotes/utils'
 import {
+  AnyKeyParamsContent,
+  ContentType,
+  ProtocolVersion,
   leftVersionGreaterThanOrEqualToRight,
   compareVersions,
-  ContentTypeUsesRootKeyEncryption,
-} from '@standardnotes/applications'
+} from '@standardnotes/common'
+import { BackupFile, BackupFileType } from './BackupFile'
+import { extendArray } from '@standardnotes/utils'
 import { EncryptionService } from '../Service/Encryption/EncryptionService'
 import {
   PayloadSource,
@@ -19,6 +20,7 @@ import { CreateAnyKeyParams } from '../RootKey/KeyParams'
 import { CreateItemFromPayload, SNItemsKey } from '@standardnotes/models'
 import { SNRootKeyParams } from '../RootKey/RootKeyParams'
 import { SNRootKey } from '../RootKey/RootKey'
+import { ContentTypeUsesRootKeyEncryption } from '../Intent/Functions'
 
 export async function decryptBackupFile(
   file: BackupFile,

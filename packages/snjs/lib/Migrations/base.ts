@@ -10,11 +10,11 @@ import {
 import { KeychainRecoveryStrings, SessionStrings } from '../Services/Api/Messages'
 import { PreviousSnjsVersion1_0_0, PreviousSnjsVersion2_0_0, SnjsVersion } from '../version'
 import { Migration } from '@Lib/Migrations/migration'
-import { RawStorageKey, namespacedKey } from '@standardnotes/services'
-import { ApplicationStage, ContentTypeUsesRootKeyEncryption } from '@standardnotes/applications'
+import { RawStorageKey, namespacedKey, ApplicationStage } from '@standardnotes/services'
 import { isNullOrUndefined } from '@standardnotes/utils'
 import { CreateReader } from './readers/functions'
 import { StorageReader } from './readers/reader'
+import { ContentTypeUsesRootKeyEncryption } from '@standardnotes/encryption'
 
 /** A key that was briefly present in Snjs version 2.0.0 but removed in 2.0.1 */
 const LastMigrationTimeStampKey2_0_0 = 'last_migration_timestamp'

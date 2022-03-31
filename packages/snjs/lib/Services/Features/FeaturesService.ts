@@ -1,6 +1,6 @@
 import { ClientDisplayableError } from '@standardnotes/responses'
 import { SNItem, SNFeatureRepo, FeatureRepoContent } from '@standardnotes/models'
-import { ApplicationStage } from '@standardnotes/applications'
+import { ApplicationStage } from '@standardnotes/services'
 import { LEGACY_PROD_EXT_ORIGIN, PROD_OFFLINE_FEATURES_URL } from '../../hosts'
 import { SNSyncService } from '../Sync/SyncService'
 import { AccountEvent, UserService } from '../User/UserService'

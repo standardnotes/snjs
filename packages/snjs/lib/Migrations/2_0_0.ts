@@ -1,4 +1,3 @@
-import { ApplicationStage, EncryptionIntent } from '@standardnotes/applications'
 import { ContentType } from '@standardnotes/common'
 import { CreateItemFromPayload, RootKeyContent, SNItemsKey } from '@standardnotes/models'
 import { JwtSession } from '../Services/Session/Sessions/JwtSession'
@@ -6,7 +5,7 @@ import { Migration } from '@Lib/Migrations/migration'
 import { MigrationServices } from './types'
 import { PreviousSnjsVersion2_0_0 } from '../version'
 import { ProtocolVersion } from '@standardnotes/common'
-import { SNRootKey } from '@standardnotes/encryption'
+import { SNRootKey, EncryptionIntent } from '@standardnotes/encryption'
 import { SNStorageService } from '../Services/Storage/StorageService'
 import { StorageReader1_0_0 } from './readers/reader_1_0_0'
 import * as Payloads from '@standardnotes/payloads'
@@ -49,14 +48,14 @@ export class Migration2_0_0 extends Migration {
   }
 
   protected registerStageHandlers() {
-    this.registerStageHandler(ApplicationStage.PreparingForLaunch_0, async () => {
+    this.registerStageHandler(Services.ApplicationStage.PreparingForLaunch_0, async () => {
       if (isEnvironmentWebOrDesktop(this.services.environment)) {
         await this.migrateStorageStructureForWebDesktop()
       } else if (isEnvironmentMobile(this.services.environment)) {
         await this.migrateStorageStructureForMobile()
       }
     })
-    this.registerStageHandler(ApplicationStage.StorageDecrypted_09, async () => {
+    this.registerStageHandler(Services.ApplicationStage.StorageDecrypted_09, async () => {
       await this.migrateArbitraryRawStorageToManagedStorageAllPlatforms()
       if (isEnvironmentMobile(this.services.environment)) {
         await this.migrateMobilePreferences()
@@ -64,7 +63,7 @@ export class Migration2_0_0 extends Migration {
       await this.migrateSessionStorage()
       await this.deleteLegacyStorageValues()
     })
-    this.registerStageHandler(ApplicationStage.LoadingDatabase_11, async () => {
+    this.registerStageHandler(Services.ApplicationStage.LoadingDatabase_11, async () => {
       await this.createDefaultItemsKeyForAllPlatforms()
       this.markDone()
     })

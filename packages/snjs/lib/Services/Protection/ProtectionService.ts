@@ -11,7 +11,7 @@ import { EncryptionService } from '@standardnotes/encryption'
 import { SNStorageService } from '@Lib/Services/Storage/StorageService'
 import { StorageKey } from '@standardnotes/services'
 import { isNullOrUndefined } from '@standardnotes/utils'
-import { ApplicationStage } from '@standardnotes/applications'
+import { ApplicationStage } from '@standardnotes/services'
 import {
   AbstractService,
   InternalEventBusInterface,

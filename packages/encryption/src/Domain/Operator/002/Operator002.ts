@@ -9,6 +9,14 @@ import { V002Algorithm } from '../../Algorithm'
 import * as Common from '@standardnotes/common'
 import * as Payloads from '@standardnotes/payloads'
 import * as Utils from '@standardnotes/utils'
+import {
+  DecryptedParameters,
+  EncryptedParameters,
+  ErroredDecryptingParameters,
+} from '../../Encryption/EncryptedParameters'
+import { RootKeyEncryptedAuthenticatedData } from '../../Encryption/RootKeyEncryptedAuthenticatedData'
+import { ItemAuthenticatedData } from '../../Encryption/ItemAuthenticatedData'
+import { LegacyAttachedData } from '../../Encryption/LegacyAttachedData'
 
 /**
  * @deprecated
@@ -137,12 +145,8 @@ export class SNProtocolOperator002 extends SNProtocolOperator001 {
   }
 
   public getPayloadAuthenticatedData(
-    encrypted: Payloads.EncryptedParameters,
-  ):
-    | Payloads.RootKeyEncryptedAuthenticatedData
-    | Payloads.ItemAuthenticatedData
-    | Payloads.LegacyAttachedData
-    | undefined {
+    encrypted: EncryptedParameters,
+  ): RootKeyEncryptedAuthenticatedData | ItemAuthenticatedData | LegacyAttachedData | undefined {
     const itemKeyComponents = this.encryptionComponentsFromString002(encrypted.enc_item_key)
     const authenticatedData = itemKeyComponents.keyParams
 
@@ -151,7 +155,7 @@ export class SNProtocolOperator002 extends SNProtocolOperator001 {
     }
 
     const decoded = JSON.parse(this.crypto.base64Decode(authenticatedData))
-    const data: Payloads.LegacyAttachedData = {
+    const data: LegacyAttachedData = {
       ...(decoded as Common.AnyKeyParamsContent),
     }
     return data
@@ -160,7 +164,7 @@ export class SNProtocolOperator002 extends SNProtocolOperator001 {
   public async generateEncryptedParametersAsync(
     payload: Payloads.PurePayload,
     key: SNItemsKey | SNRootKey,
-  ): Promise<Payloads.EncryptedParameters> {
+  ): Promise<EncryptedParameters> {
     /**
      * Generate new item key that is double the key size.
      * Will be split to create encryption key and authentication key.
@@ -196,9 +200,9 @@ export class SNProtocolOperator002 extends SNProtocolOperator001 {
   }
 
   public async generateDecryptedParametersAsync(
-    encrypted: Payloads.EncryptedParameters,
+    encrypted: EncryptedParameters,
     key: SNItemsKey | SNRootKey,
-  ): Promise<Payloads.DecryptedParameters | Payloads.ErroredDecryptingParameters> {
+  ): Promise<DecryptedParameters | ErroredDecryptingParameters> {
     if (!encrypted.enc_item_key) {
       console.error(Error('Missing item encryption key, skipping decryption.'))
       return {

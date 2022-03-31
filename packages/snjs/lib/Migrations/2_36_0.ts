@@ -1,6 +1,6 @@
 import { Migration } from '@Lib/Migrations/migration'
 import { ContentType } from '@standardnotes/common'
-import { ApplicationStage } from '@standardnotes/applications'
+import { ApplicationStage } from '@standardnotes/services'
 
 export class Migration2_36_0 extends Migration {
   static version(): string {

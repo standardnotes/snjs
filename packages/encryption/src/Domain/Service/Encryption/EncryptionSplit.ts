@@ -1,7 +1,7 @@
 import { ItemInterface, PurePayload } from '@standardnotes/payloads'
-import { ItemContentTypeUsesRootKeyEncryption } from '@standardnotes/applications'
 import { SNItemsKey } from '@standardnotes/models'
 import { SNRootKey } from '../../RootKey/RootKey'
+import { ItemContentTypeUsesRootKeyEncryption } from '../../Intent/Functions'
 
 type ItemOrPayload = ItemInterface | PurePayload
 

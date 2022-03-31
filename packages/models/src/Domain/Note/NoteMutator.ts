@@ -1,4 +1,4 @@
-import { AppDataField } from '@standardnotes/applications'
+import { AppDataField } from '@standardnotes/payloads'
 import { ItemMutator } from '../Item/ItemMutator'
 import { NoteContent } from './Note'
 

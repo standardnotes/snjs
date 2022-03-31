@@ -1,6 +1,6 @@
 import * as readerClasses from '@Lib/Migrations/readers'
 import { compareSemVersions, isRightVersionGreaterThanLeft } from '@Lib/version'
-import { ApplicationIdentifier } from '@standardnotes/applications'
+import { ApplicationIdentifier } from '@standardnotes/common'
 import { Environment } from '@Lib/Application/platforms'
 import { DeviceInterface } from '@standardnotes/services'
 import { StorageReader } from './reader'

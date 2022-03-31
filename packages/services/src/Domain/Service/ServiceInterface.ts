@@ -1,4 +1,4 @@
-import { ApplicationStage } from '@standardnotes/applications'
+import { ApplicationStage } from '../Application/ApplicationStage'
 import { EventObserver } from '../Event/EventObserver'
 
 export interface ServiceInterface<E, D> {

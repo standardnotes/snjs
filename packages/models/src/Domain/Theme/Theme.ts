@@ -1,4 +1,4 @@
-import { AppDataField } from '@standardnotes/applications'
+import { AppDataField } from '@standardnotes/payloads'
 import { ComponentArea } from '@standardnotes/features'
 import { ConflictStrategy } from '@standardnotes/payloads'
 import { HistoryEntry } from '../History/HistoryEntry'

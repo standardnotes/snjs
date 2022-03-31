@@ -1,4 +1,3 @@
-import * as Applications from '@standardnotes/applications'
 import * as Challenges from '../Services/Challenge'
 import * as Common from '@standardnotes/common'
 import * as ExternalServices from '@standardnotes/services'
@@ -6,7 +5,7 @@ import * as Encryption from '@standardnotes/encryption'
 import * as Models from '@standardnotes/models'
 import * as Payloads from '@standardnotes/payloads'
 import * as Responses from '@standardnotes/responses'
-import * as Services from '../Services'
+import * as InternalServices from '../Services'
 import * as Utils from '@standardnotes/utils'
 import * as Options from './options'
 import * as Settings from '@standardnotes/settings'
@@ -31,7 +30,7 @@ type ItemStream = (items: Models.SNItem[], source: Payloads.PayloadSource) => vo
 type ObserverRemover = () => void
 
 /** The main entrypoint of an application. */
-export class SNApplication implements Services.ListedClientInterface {
+export class SNApplication implements InternalServices.ListedClientInterface {
   private onDeinit?: (app: SNApplication, source: DeinitSource) => void
 
   /**
@@ -41,31 +40,31 @@ export class SNApplication implements Services.ListedClientInterface {
    */
   public readonly ephemeralIdentifier = Utils.nonSecureRandomIdentifier()
 
-  private migrationService!: Services.SNMigrationService
-  private httpService!: Services.SNHttpService
-  private payloadManager!: Services.PayloadManager
+  private migrationService!: InternalServices.SNMigrationService
+  private httpService!: InternalServices.SNHttpService
+  private payloadManager!: InternalServices.PayloadManager
   public protocolService!: Encryption.EncryptionService
-  private storageService!: Services.SNStorageService
-  private apiService!: Services.SNApiService
-  private sessionManager!: Services.SNSessionManager
-  private syncService!: Services.SNSyncService
-  private challengeService!: Services.ChallengeService
-  public singletonManager!: Services.SNSingletonManager
-  public componentManager!: Services.SNComponentManager
-  public protectionService!: Services.SNProtectionService
-  public actionsManager!: Services.SNActionsService
-  public historyManager!: Services.SNHistoryManager
-  private itemManager!: Services.ItemManager
-  private keyRecoveryService!: Services.SNKeyRecoveryService
-  private preferencesService!: Services.SNPreferencesService
-  private featuresService!: Services.SNFeaturesService
-  private userService!: Services.UserService
-  private webSocketsService!: Services.SNWebSocketsService
-  private settingsService!: Services.SNSettingsService
-  private mfaService!: Services.SNMfaService
-  private listedService!: Services.ListedService
-  private fileService!: Services.SNFileService
-  private mutatorService!: Services.MutatorService
+  private storageService!: InternalServices.SNStorageService
+  private apiService!: InternalServices.SNApiService
+  private sessionManager!: InternalServices.SNSessionManager
+  private syncService!: InternalServices.SNSyncService
+  private challengeService!: InternalServices.ChallengeService
+  public singletonManager!: InternalServices.SNSingletonManager
+  public componentManager!: InternalServices.SNComponentManager
+  public protectionService!: InternalServices.SNProtectionService
+  public actionsManager!: InternalServices.SNActionsService
+  public historyManager!: InternalServices.SNHistoryManager
+  private itemManager!: InternalServices.ItemManager
+  private keyRecoveryService!: InternalServices.SNKeyRecoveryService
+  private preferencesService!: InternalServices.SNPreferencesService
+  private featuresService!: InternalServices.SNFeaturesService
+  private userService!: InternalServices.UserService
+  private webSocketsService!: InternalServices.SNWebSocketsService
+  private settingsService!: InternalServices.SNSettingsService
+  private mfaService!: InternalServices.SNMfaService
+  private listedService!: InternalServices.ListedService
+  private fileService!: InternalServices.SNFileService
+  private mutatorService!: InternalServices.MutatorService
   private integrityService!: ExternalServices.IntegrityService
 
   private internalEventBus!: ExternalServices.InternalEventBusInterface
@@ -92,8 +91,8 @@ export class SNApplication implements Services.ListedClientInterface {
   public readonly environment: Environment
   public readonly platform: Platform
   public deviceInterface: ExternalServices.DeviceInterface
-  public alertService: Services.SNAlertService
-  public readonly identifier: Applications.ApplicationIdentifier
+  public alertService: InternalServices.SNAlertService
+  public readonly identifier: Common.ApplicationIdentifier
   public readonly options: Options.FullyResolvedApplicationOptions
 
   constructor(options: Options.ApplicationOptions) {
@@ -138,44 +137,44 @@ export class SNApplication implements Services.ListedClientInterface {
     this.defineInternalEventHandlers()
   }
 
-  public get files(): Services.FilesClientInterface {
+  public get files(): InternalServices.FilesClientInterface {
     return this.fileService
   }
 
-  public get features(): Services.FeaturesClientInterface {
+  public get features(): InternalServices.FeaturesClientInterface {
     return this.featuresService
   }
 
-  public get items(): Services.ItemsClientInterface {
+  public get items(): InternalServices.ItemsClientInterface {
     return this.itemManager
   }
 
-  public get protections(): Services.ProtectionsClientInterface {
+  public get protections(): InternalServices.ProtectionsClientInterface {
     return this.protectionService
   }
 
-  public get sync(): Services.SyncClientInterface {
+  public get sync(): InternalServices.SyncClientInterface {
     return this.syncService
   }
 
-  public get user(): Services.UserClientInterface {
+  public get user(): InternalServices.UserClientInterface {
     return this.userService
   }
 
-  public get settings(): Services.SNSettingsService {
+  public get settings(): InternalServices.SNSettingsService {
     return this.settingsService
   }
 
-  public get mutator(): Services.MutatorClientInterface {
+  public get mutator(): InternalServices.MutatorClientInterface {
     return this.mutatorService
   }
 
-  public get sessions(): Services.SessionsClientInterface {
+  public get sessions(): InternalServices.SessionsClientInterface {
     return this.sessionManager
   }
 
   public vaultToEmail(name: string, userphrase: string): Promise<string | undefined> {
-    return Applications.vaultToEmail(this.options.crypto, name, userphrase)
+    return Encryption.vaultToEmail(this.options.crypto, name, userphrase)
   }
 
   /**
@@ -199,14 +198,14 @@ export class SNApplication implements Services.ListedClientInterface {
     await this.migrationService.initialize()
 
     await this.notifyEvent(ApplicationEvent.MigrationsLoaded)
-    await this.handleStage(Applications.ApplicationStage.PreparingForLaunch_0)
+    await this.handleStage(ExternalServices.ApplicationStage.PreparingForLaunch_0)
 
     await this.storageService.initializeFromDisk()
     await this.notifyEvent(ApplicationEvent.StorageReady)
 
     await this.protocolService.initialize()
 
-    await this.handleStage(Applications.ApplicationStage.ReadyForLaunch_05)
+    await this.handleStage(ExternalServices.ApplicationStage.ReadyForLaunch_05)
 
     this.started = true
     await this.notifyEvent(ApplicationEvent.Started)
@@ -240,12 +239,12 @@ export class SNApplication implements Services.ListedClientInterface {
         await this.storageService.decryptStorage()
       } catch (_error) {
         void this.alertService.alert(
-          Services.ErrorAlertStrings.StorageDecryptErrorBody,
-          Services.ErrorAlertStrings.StorageDecryptErrorTitle,
+          InternalServices.ErrorAlertStrings.StorageDecryptErrorBody,
+          InternalServices.ErrorAlertStrings.StorageDecryptErrorTitle,
         )
       }
     }
-    await this.handleStage(Applications.ApplicationStage.StorageDecrypted_09)
+    await this.handleStage(ExternalServices.ApplicationStage.StorageDecrypted_09)
 
     this.apiService.loadHost()
     this.webSocketsService.loadWebSocketUrl()
@@ -258,10 +257,10 @@ export class SNApplication implements Services.ListedClientInterface {
 
     this.launched = true
     await this.notifyEvent(ApplicationEvent.Launched)
-    await this.handleStage(Applications.ApplicationStage.Launched_10)
+    await this.handleStage(ExternalServices.ApplicationStage.Launched_10)
 
     const databasePayloads = await this.syncService.getDatabasePayloads()
-    await this.handleStage(Applications.ApplicationStage.LoadingDatabase_11)
+    await this.handleStage(ExternalServices.ApplicationStage.LoadingDatabase_11)
 
     if (this.createdNewDatabase) {
       await this.syncService.onNewDatabaseCreated()
@@ -275,10 +274,10 @@ export class SNApplication implements Services.ListedClientInterface {
       if (this.dealloced) {
         throw 'Application has been destroyed.'
       }
-      await this.handleStage(Applications.ApplicationStage.LoadedDatabase_12)
+      await this.handleStage(ExternalServices.ApplicationStage.LoadedDatabase_12)
       this.beginAutoSyncTimer()
       await this.syncService.sync({
-        mode: Services.SyncMode.DownloadFirst,
+        mode: InternalServices.SyncMode.DownloadFirst,
         source: ExternalServices.SyncSource.External,
       })
     })
@@ -319,7 +318,7 @@ export class SNApplication implements Services.ListedClientInterface {
     }, DEFAULT_AUTO_SYNC_INTERVAL)
   }
 
-  private async handleStage(stage: Applications.ApplicationStage) {
+  private async handleStage(stage: ExternalServices.ApplicationStage) {
     for (const service of this.services) {
       await service.handleApplicationStage(stage)
     }
@@ -376,7 +375,7 @@ export class SNApplication implements Services.ListedClientInterface {
   }
 
   public getSessions(): Promise<
-    (Responses.HttpResponse & { data: Services.RemoteSession[] }) | Responses.HttpResponse
+    (Responses.HttpResponse & { data: InternalServices.RemoteSession[] }) | Responses.HttpResponse
   > {
     return this.sessionManager.getSessionsList()
   }
@@ -399,7 +398,7 @@ export class SNApplication implements Services.ListedClientInterface {
     if (Utils.isNullOrUndefined(userVersion)) {
       return false
     }
-    return Applications.compareVersions(userVersion, Common.ProtocolVersion.V004) >= 0
+    return Common.compareVersions(userVersion, Common.ProtocolVersion.V004) >= 0
   }
 
   public async getUserSubscription(): Promise<Subscription | Responses.ClientDisplayableError> {
@@ -499,12 +498,12 @@ export class SNApplication implements Services.ListedClientInterface {
     const result = await this.userService.performProtocolUpgrade()
     if (result.success) {
       if (this.hasAccount()) {
-        void this.alertService.alert(Services.ProtocolUpgradeStrings.SuccessAccount)
+        void this.alertService.alert(InternalServices.ProtocolUpgradeStrings.SuccessAccount)
       } else {
-        void this.alertService.alert(Services.ProtocolUpgradeStrings.SuccessPasscodeOnly)
+        void this.alertService.alert(InternalServices.ProtocolUpgradeStrings.SuccessPasscodeOnly)
       }
     } else if (result.error) {
-      void this.alertService.alert(Services.ProtocolUpgradeStrings.Fail)
+      void this.alertService.alert(InternalServices.ProtocolUpgradeStrings.Fail)
     }
     return result
   }
@@ -543,7 +542,7 @@ export class SNApplication implements Services.ListedClientInterface {
 
   public async authorizeProtectedActionForNotes(
     notes: Models.SNNote[],
-    challengeReason: Services.ChallengeReason,
+    challengeReason: InternalServices.ChallengeReason,
   ): Promise<Models.SNNote[]> {
     return await this.protectionService.authorizeProtectedActionForNotes(notes, challengeReason)
   }
@@ -658,7 +657,7 @@ export class SNApplication implements Services.ListedClientInterface {
 
   public addChallengeObserver(
     challenge: Challenges.Challenge,
-    observer: Services.ChallengeObserver,
+    observer: InternalServices.ChallengeObserver,
   ): () => void {
     return this.challengeService.addChallengeObserver(challenge, observer)
   }
@@ -724,7 +723,7 @@ export class SNApplication implements Services.ListedClientInterface {
     password: string,
     ephemeral = false,
     mergeLocal = true,
-  ): Promise<Services.AccountServiceResponse> {
+  ): Promise<InternalServices.AccountServiceResponse> {
     return this.userService.register(email, password, ephemeral, mergeLocal)
   }
 
@@ -748,7 +747,7 @@ export class SNApplication implements Services.ListedClientInterface {
     currentPassword: string,
     passcode?: string,
     origination = Common.KeyParamsOrigination.EmailChange,
-  ): Promise<Services.CredentialsChangeFunctionResponse> {
+  ): Promise<InternalServices.CredentialsChangeFunctionResponse> {
     return this.userService.changeCredentials({
       currentPassword,
       newEmail,
@@ -764,7 +763,7 @@ export class SNApplication implements Services.ListedClientInterface {
     passcode?: string,
     origination = Common.KeyParamsOrigination.PasswordChange,
     validateNewPasswordStrength = true,
-  ): Promise<Services.CredentialsChangeFunctionResponse> {
+  ): Promise<InternalServices.CredentialsChangeFunctionResponse> {
     return this.userService.changeCredentials({
       currentPassword,
       newPassword,
@@ -786,7 +785,7 @@ export class SNApplication implements Services.ListedClientInterface {
     /** Keep a reference to the soon-to-be-cleared alertService */
     const alertService = this.alertService
     await this.user.signOut(true)
-    void alertService.alert(Services.SessionStrings.CurrentSessionRevoked)
+    void alertService.alert(InternalServices.SessionStrings.CurrentSessionRevoked)
   }
 
   public async validateAccountPassword(password: string): Promise<boolean> {
@@ -824,9 +823,9 @@ export class SNApplication implements Services.ListedClientInterface {
     return this.protocolService.hasPasscode()
   }
 
-  async isLocked(): Promise<boolean> {
+  isLocked(): Promise<boolean> {
     if (!this.started) {
-      return true
+      return Promise.resolve(true)
     }
     return this.challengeService.isPasscodeLocked()
   }
@@ -1011,7 +1010,7 @@ export class SNApplication implements Services.ListedClientInterface {
   private defineInternalEventHandlers(): void {
     this.internalEventBus.addEventHandler(
       this.featuresService,
-      Services.ApiServiceEvent.MetaReceived,
+      InternalServices.ApiServiceEvent.MetaReceived,
     )
     this.internalEventBus.addEventHandler(
       this.integrityService,
@@ -1028,7 +1027,7 @@ export class SNApplication implements Services.ListedClientInterface {
   }
 
   private createListedService(): void {
-    this.listedService = new Services.ListedService(
+    this.listedService = new InternalServices.ListedService(
       this.apiService,
       this.itemManager,
       this.settingsService,
@@ -1039,7 +1038,7 @@ export class SNApplication implements Services.ListedClientInterface {
   }
 
   private createFileService() {
-    this.fileService = new Services.SNFileService(
+    this.fileService = new InternalServices.SNFileService(
       this.apiService,
       this.itemManager,
       this.syncService,
@@ -1063,7 +1062,7 @@ export class SNApplication implements Services.ListedClientInterface {
   }
 
   private createFeaturesService() {
-    this.featuresService = new Services.SNFeaturesService(
+    this.featuresService = new InternalServices.SNFeaturesService(
       this.storageService,
       this.apiService,
       this.itemManager,
@@ -1079,11 +1078,11 @@ export class SNApplication implements Services.ListedClientInterface {
     this.serviceObservers.push(
       this.featuresService.addEventObserver((event) => {
         switch (event) {
-          case Services.FeaturesEvent.UserRolesChanged: {
+          case InternalServices.FeaturesEvent.UserRolesChanged: {
             void this.notifyEvent(ApplicationEvent.UserRolesChanged)
             break
           }
-          case Services.FeaturesEvent.FeaturesUpdated: {
+          case InternalServices.FeaturesEvent.FeaturesUpdated: {
             void this.notifyEvent(ApplicationEvent.FeaturesUpdated)
             break
           }
@@ -1097,7 +1096,7 @@ export class SNApplication implements Services.ListedClientInterface {
   }
 
   private createWebSocketsService() {
-    this.webSocketsService = new Services.SNWebSocketsService(
+    this.webSocketsService = new InternalServices.SNWebSocketsService(
       this.storageService,
       this.options.webSocketUrl,
       this.internalEventBus,
@@ -1106,7 +1105,7 @@ export class SNApplication implements Services.ListedClientInterface {
   }
 
   private createMigrationService() {
-    this.migrationService = new Services.SNMigrationService({
+    this.migrationService = new InternalServices.SNMigrationService({
       protocolService: this.protocolService,
       deviceInterface: this.deviceInterface,
       storageService: this.storageService,
@@ -1123,7 +1122,7 @@ export class SNApplication implements Services.ListedClientInterface {
   }
 
   private createUserService(): void {
-    this.userService = new Services.UserService(
+    this.userService = new InternalServices.UserService(
       this.sessionManager,
       this.syncService,
       this.storageService,
@@ -1138,11 +1137,11 @@ export class SNApplication implements Services.ListedClientInterface {
     this.serviceObservers.push(
       this.userService.addEventObserver(async (event) => {
         switch (event) {
-          case Services.AccountEvent.SignedInOrRegistered: {
+          case InternalServices.AccountEvent.SignedInOrRegistered: {
             void this.notifyEvent(ApplicationEvent.SignedIn)
             break
           }
-          case Services.AccountEvent.SignedOut: {
+          case InternalServices.AccountEvent.SignedOut: {
             await this.notifyEvent(ApplicationEvent.SignedOut)
             await this.prepareForDeinit()
             this.deinit(DeinitSource.SignOut)
@@ -1158,7 +1157,7 @@ export class SNApplication implements Services.ListedClientInterface {
   }
 
   private createApiService() {
-    this.apiService = new Services.SNApiService(
+    this.apiService = new InternalServices.SNApiService(
       this.httpService,
       this.storageService,
       this.options.defaultHost,
@@ -1168,13 +1167,13 @@ export class SNApplication implements Services.ListedClientInterface {
   }
 
   private createItemManager() {
-    this.itemManager = new Services.ItemManager(this.payloadManager, this.internalEventBus)
+    this.itemManager = new InternalServices.ItemManager(this.payloadManager, this.internalEventBus)
     this.services.push(this.itemManager)
   }
 
   private createComponentManager() {
-    const MaybeSwappedComponentManager = this.getClass<typeof Services.SNComponentManager>(
-      Services.SNComponentManager,
+    const MaybeSwappedComponentManager = this.getClass<typeof InternalServices.SNComponentManager>(
+      InternalServices.SNComponentManager,
     )
     this.componentManager = new MaybeSwappedComponentManager(
       this.itemManager,
@@ -1191,7 +1190,7 @@ export class SNApplication implements Services.ListedClientInterface {
   }
 
   private createHttpManager() {
-    this.httpService = new Services.SNHttpService(
+    this.httpService = new InternalServices.SNHttpService(
       this.environment,
       this.options.appVersion,
       this.internalEventBus,
@@ -1200,12 +1199,12 @@ export class SNApplication implements Services.ListedClientInterface {
   }
 
   private createPayloadManager() {
-    this.payloadManager = new Services.PayloadManager(this.internalEventBus)
+    this.payloadManager = new InternalServices.PayloadManager(this.internalEventBus)
     this.services.push(this.payloadManager)
   }
 
   private createSingletonManager() {
-    this.singletonManager = new Services.SNSingletonManager(
+    this.singletonManager = new InternalServices.SNSingletonManager(
       this.itemManager,
       this.syncService,
       this.internalEventBus,
@@ -1214,7 +1213,7 @@ export class SNApplication implements Services.ListedClientInterface {
   }
 
   private createStorageManager() {
-    this.storageService = new Services.SNStorageService(
+    this.storageService = new InternalServices.SNStorageService(
       this.deviceInterface,
       this.identifier,
       this.environment,
@@ -1244,7 +1243,7 @@ export class SNApplication implements Services.ListedClientInterface {
   }
 
   private createKeyRecoveryService() {
-    this.keyRecoveryService = new Services.SNKeyRecoveryService(
+    this.keyRecoveryService = new InternalServices.SNKeyRecoveryService(
       this.itemManager,
       this.payloadManager,
       this.apiService,
@@ -1260,7 +1259,7 @@ export class SNApplication implements Services.ListedClientInterface {
   }
 
   private createSessionManager() {
-    this.sessionManager = new Services.SNSessionManager(
+    this.sessionManager = new InternalServices.SNSessionManager(
       this.storageService,
       this.apiService,
       this.alertService,
@@ -1272,7 +1271,7 @@ export class SNApplication implements Services.ListedClientInterface {
     this.serviceObservers.push(
       this.sessionManager.addEventObserver(async (event) => {
         switch (event) {
-          case Services.SessionEvent.Restored: {
+          case InternalServices.SessionEvent.Restored: {
             void (async () => {
               await this.sync.sync()
               if (this.protocolService.needsNewRootKeyBasedItemsKey()) {
@@ -1283,7 +1282,7 @@ export class SNApplication implements Services.ListedClientInterface {
             })()
             break
           }
-          case Services.SessionEvent.Revoked: {
+          case InternalServices.SessionEvent.Revoked: {
             await this.handleRevokedSession()
             break
           }
@@ -1297,7 +1296,7 @@ export class SNApplication implements Services.ListedClientInterface {
   }
 
   private createSyncManager() {
-    this.syncService = new Services.SNSyncService(
+    this.syncService = new InternalServices.SNSyncService(
       this.itemManager,
       this.sessionManager,
       this.protocolService,
@@ -1317,7 +1316,7 @@ export class SNApplication implements Services.ListedClientInterface {
         if (appEvent === ApplicationEvent.CompletedFullSync) {
           if (!this.handledFullSyncStage) {
             this.handledFullSyncStage = true
-            await this.handleStage(Applications.ApplicationStage.FullSyncCompleted_13)
+            await this.handleStage(ExternalServices.ApplicationStage.FullSyncCompleted_13)
           }
         }
       }
@@ -1329,7 +1328,7 @@ export class SNApplication implements Services.ListedClientInterface {
   }
 
   private createChallengeService() {
-    this.challengeService = new Services.ChallengeService(
+    this.challengeService = new InternalServices.ChallengeService(
       this.storageService,
       this.protocolService,
       this.internalEventBus,
@@ -1338,7 +1337,7 @@ export class SNApplication implements Services.ListedClientInterface {
   }
 
   private createProtectionService() {
-    this.protectionService = new Services.SNProtectionService(
+    this.protectionService = new InternalServices.SNProtectionService(
       this.protocolService,
       this.challengeService,
       this.storageService,
@@ -1346,9 +1345,9 @@ export class SNApplication implements Services.ListedClientInterface {
     )
     this.serviceObservers.push(
       this.protectionService.addEventObserver((event) => {
-        if (event === Services.ProtectionEvent.UnprotectedSessionBegan) {
+        if (event === InternalServices.ProtectionEvent.UnprotectedSessionBegan) {
           void this.notifyEvent(ApplicationEvent.UnprotectedSessionBegan)
-        } else if (event === Services.ProtectionEvent.UnprotectedSessionExpired) {
+        } else if (event === InternalServices.ProtectionEvent.UnprotectedSessionExpired) {
           void this.notifyEvent(ApplicationEvent.UnprotectedSessionExpired)
         }
       }),
@@ -1357,7 +1356,7 @@ export class SNApplication implements Services.ListedClientInterface {
   }
 
   private createHistoryManager() {
-    this.historyManager = new Services.SNHistoryManager(
+    this.historyManager = new InternalServices.SNHistoryManager(
       this.itemManager,
       this.storageService,
       this.apiService,
@@ -1369,7 +1368,7 @@ export class SNApplication implements Services.ListedClientInterface {
   }
 
   private createActionsManager() {
-    this.actionsManager = new Services.SNActionsService(
+    this.actionsManager = new InternalServices.SNActionsService(
       this.itemManager,
       this.alertService,
       this.deviceInterface,
@@ -1385,7 +1384,7 @@ export class SNApplication implements Services.ListedClientInterface {
   }
 
   private createPreferencesService() {
-    this.preferencesService = new Services.SNPreferencesService(
+    this.preferencesService = new InternalServices.SNPreferencesService(
       this.singletonManager,
       this.itemManager,
       this.syncService,
@@ -1400,7 +1399,7 @@ export class SNApplication implements Services.ListedClientInterface {
   }
 
   private createSettingsService() {
-    this.settingsService = new Services.SNSettingsService(
+    this.settingsService = new InternalServices.SNSettingsService(
       this.sessionManager,
       this.apiService,
       this.internalEventBus,
@@ -1409,7 +1408,7 @@ export class SNApplication implements Services.ListedClientInterface {
   }
 
   private createMfaService() {
-    this.mfaService = new Services.SNMfaService(
+    this.mfaService = new InternalServices.SNMfaService(
       this.settingsService,
       this.options.crypto,
       this.featuresService,
@@ -1419,7 +1418,7 @@ export class SNApplication implements Services.ListedClientInterface {
   }
 
   private createMutationService() {
-    this.mutatorService = new Services.MutatorService(
+    this.mutatorService = new InternalServices.MutatorService(
       this.itemManager,
       this.syncService,
       this.protectionService,

@@ -2,7 +2,7 @@ import { CompoundPredicate, Predicate } from '@standardnotes/payloads'
 import { SNComponent } from '@standardnotes/models'
 import { Migration } from '@Lib/Migrations/migration'
 import { ContentType } from '@standardnotes/common'
-import { ApplicationStage } from '@standardnotes/applications'
+import { ApplicationStage } from '@standardnotes/services'
 
 export class Migration2_7_0 extends Migration {
   static version(): string {

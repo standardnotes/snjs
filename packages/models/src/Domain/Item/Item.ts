@@ -1,5 +1,4 @@
 import { ContentType, ProtocolVersion, Uuid } from '@standardnotes/common'
-import { AppDataField, DefaultAppDomain } from '@standardnotes/applications'
 import {
   ItemInterface,
   PayloadFormat,
@@ -10,6 +9,8 @@ import {
   PayloadSource,
   PredicateInterface,
   ConflictStrategy,
+  AppDataField,
+  DefaultAppDomain,
 } from '@standardnotes/payloads'
 import { HistoryEntry } from '../History/HistoryEntry'
 import { dateToLocalizedString, deepFreeze } from '@standardnotes/utils'

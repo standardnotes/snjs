@@ -6,6 +6,12 @@ import { StandardException } from '../../StandardException'
 import * as OperatorWrapper from '../../Operator/OperatorWrapper'
 import * as Payloads from '@standardnotes/payloads'
 import * as Services from '@standardnotes/services'
+import {
+  DecryptedParameters,
+  EncryptedParameters,
+  ErroredDecryptingParameters,
+} from '../../Encryption/EncryptedParameters'
+import { mergePayloadWithEncryptionParameters } from '../../Intent/Functions'
 
 export class ItemsEncryptionService extends Services.AbstractService {
   private removeItemsObserver!: () => void
@@ -114,7 +120,7 @@ export class ItemsEncryptionService extends Services.AbstractService {
 
   public async encryptSplitSingleWithKeyLookup(
     payload: Payloads.PurePayload,
-  ): Promise<Payloads.EncryptedParameters> {
+  ): Promise<EncryptedParameters> {
     const key = this.keyToUseForItemEncryption()
 
     if (key instanceof StandardException) {
@@ -127,7 +133,7 @@ export class ItemsEncryptionService extends Services.AbstractService {
   public async encryptSplitSingle(
     payload: Payloads.PurePayload,
     key: SNItemsKey,
-  ): Promise<Payloads.EncryptedParameters> {
+  ): Promise<EncryptedParameters> {
     if (payload.format !== Payloads.PayloadFormat.DecryptedBareObject) {
       throw Error('Attempting to encrypt already encrypted payload.')
     }
@@ -147,19 +153,19 @@ export class ItemsEncryptionService extends Services.AbstractService {
   public async encryptSplitSingles(
     payloads: Payloads.PurePayload[],
     key: SNItemsKey,
-  ): Promise<Payloads.EncryptedParameters[]> {
+  ): Promise<EncryptedParameters[]> {
     return Promise.all(payloads.map((payload) => this.encryptSplitSingle(payload, key)))
   }
 
   public async encryptSplitSinglesWithKeyLookup(
     payloads: Payloads.PurePayload[],
-  ): Promise<Payloads.EncryptedParameters[]> {
+  ): Promise<EncryptedParameters[]> {
     return Promise.all(payloads.map((payload) => this.encryptSplitSingleWithKeyLookup(payload)))
   }
 
   public async decryptPayloadWithKeyLookup(
     payload: Payloads.PurePayload,
-  ): Promise<Payloads.DecryptedParameters | Payloads.ErroredDecryptingParameters> {
+  ): Promise<DecryptedParameters | ErroredDecryptingParameters> {
     const key = this.keyToUseForDecryptionOfPayload(payload)
 
     if (key instanceof StandardException) {
@@ -176,7 +182,7 @@ export class ItemsEncryptionService extends Services.AbstractService {
   public async decryptPayload(
     payload: Payloads.PurePayload,
     key: SNItemsKey,
-  ): Promise<Payloads.DecryptedParameters | Payloads.ErroredDecryptingParameters> {
+  ): Promise<DecryptedParameters | ErroredDecryptingParameters> {
     if (!payload.content) {
       return {
         uuid: payload.uuid,
@@ -197,14 +203,14 @@ export class ItemsEncryptionService extends Services.AbstractService {
 
   public async decryptPayloadsWithKeyLookup(
     payloads: Payloads.PurePayload[],
-  ): Promise<(Payloads.DecryptedParameters | Payloads.ErroredDecryptingParameters)[]> {
+  ): Promise<(DecryptedParameters | ErroredDecryptingParameters)[]> {
     return Promise.all(payloads.map((payload) => this.decryptPayloadWithKeyLookup(payload)))
   }
 
   public async decryptPayloads(
     payloads: Payloads.PurePayload[],
     key: SNItemsKey,
-  ): Promise<(Payloads.DecryptedParameters | Payloads.ErroredDecryptingParameters)[]> {
+  ): Promise<(DecryptedParameters | ErroredDecryptingParameters)[]> {
     return Promise.all(payloads.map((payload) => this.decryptPayload(payload, key)))
   }
 
@@ -223,7 +229,7 @@ export class ItemsEncryptionService extends Services.AbstractService {
     const decryptedParams = await this.decryptPayloadsWithKeyLookup(payloads)
     const decryptedPayloads = decryptedParams.map((decryptedParam) => {
       const originalPayload = Payloads.sureFindPayload(decryptedParam.uuid, payloads)
-      return Payloads.mergePayloadWithEncryptionParameters(originalPayload, decryptedParam)
+      return mergePayloadWithEncryptionParameters(originalPayload, decryptedParam)
     })
 
     await this.payloadManager.emitPayloads(decryptedPayloads, Payloads.PayloadSource.LocalChanged)

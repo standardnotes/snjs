@@ -1,4 +1,4 @@
-import { EncryptionService, SNRootKey } from '@standardnotes/encryption'
+import { EncryptionService, SNRootKey, EncryptionIntent } from '@standardnotes/encryption'
 import {
   Challenge,
   ChallengeValidation,
@@ -9,7 +9,6 @@ import {
 import { ListedService } from '../Listed/ListedService'
 import { ActionResponse, HttpResponse } from '@standardnotes/responses'
 import { ContentType } from '@standardnotes/common'
-import { EncryptionIntent } from '@standardnotes/applications'
 import { ItemManager } from '@Lib/Services/Items/ItemManager'
 import { PurePayload, CreateMaxPayloadFromAnyObject } from '@standardnotes/payloads'
 import {
@@ -21,13 +20,10 @@ import {
   MutationType,
   CreateItemFromPayload,
 } from '@standardnotes/models'
-
 import { SNSyncService } from '../Sync/SyncService'
-
 import { PayloadManager } from '../Payloads/PayloadManager'
 import { SNHttpService } from '../Api/HttpService'
 import { SNAlertService } from '../Alert/AlertService'
-
 import {
   AbstractService,
   DeviceInterface,

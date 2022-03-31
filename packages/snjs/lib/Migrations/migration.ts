@@ -5,7 +5,7 @@ import {
   ChallengePrompt,
 } from '../Services/Challenge'
 import { MigrationServices } from './types'
-import { ApplicationStage } from '@standardnotes/applications'
+import { ApplicationStage } from '@standardnotes/services'
 
 type StageHandler = () => Promise<void>
 
