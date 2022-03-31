@@ -1,6 +1,6 @@
 {
   "name": "@standardnotes/payloads",
-  "version": "1.4.21",
+  "version": "1.4.22",
   "engines": {
     "node": ">=14.0.0 <17.0.0"
   },
@@ -37,7 +37,7 @@
   "dependencies": {
     "@standardnotes/applications": "^1.2.7",
     "@standardnotes/common": "^1.18.0",
-    "@standardnotes/features": "^1.36.0",
+    "@standardnotes/features": "^1.36.1",
     "@standardnotes/utils": "^1.4.4"
   }
 }
