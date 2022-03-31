@@ -11,14 +11,17 @@ import {
   ConflictStrategy,
   AppDataField,
   DefaultAppDomain,
+  PayloadContent,
 } from '@standardnotes/payloads'
 import { HistoryEntry } from '../History/HistoryEntry'
 import { dateToLocalizedString, deepFreeze } from '@standardnotes/utils'
 import { PrefKey } from '../UserPrefs/UserPrefs'
 import { ItemContentsDiffer, ItemContentsEqual } from './ItemMutator'
 
-export interface ItemContent {
-  references?: ContentReference[]
+export interface ItemContent extends PayloadContent {
+  protected: boolean
+  trashed: boolean
+  appData: Record<string, unknown>
 }
 
 export enum SingletonStrategy {
@@ -28,20 +31,20 @@ export enum SingletonStrategy {
 /**
  * The most abstract item that any syncable item needs to extend from.
  */
-export class SNItem implements ItemInterface {
-  public readonly payload: PurePayload
+export class SNItem<C extends ItemContent = ItemContent> implements ItemInterface {
+  public readonly payload: PurePayload<C>
   public readonly conflictOf?: Uuid
   public readonly duplicateOf?: Uuid
   public readonly createdAtString?: string
   public readonly updatedAtString?: string
-  public readonly protected = false
-  public readonly trashed = false
+  public readonly protected: boolean
+  public readonly trashed: boolean
   public readonly pinned = false
   public readonly archived = false
   public readonly locked = false
   public readonly userModifiedDate: Date
 
-  constructor(payload: PurePayload) {
+  constructor(payload: PurePayload<C>) {
     if (!payload.uuid || !payload.content_type) {
       throw Error('Cannot create item without both uuid and content_type')
     }

@@ -1,7 +1,8 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
+import { ProtocolVersion, Uuid } from '@standardnotes/common'
 import { ContentReference } from '../Reference/ContentReference'
 
 export type PayloadContent = {
-  [key: string]: any
   references: ContentReference[]
+  version: ProtocolVersion
+  conflict_of?: Uuid
 }

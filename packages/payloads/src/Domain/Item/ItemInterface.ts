@@ -12,11 +12,11 @@ export interface ItemInterface {
   readonly duplicateOf?: Uuid
   readonly createdAtString?: string
   readonly updatedAtString?: string
-  readonly protected: false
-  readonly trashed: false
-  readonly pinned: false
-  readonly archived: false
-  readonly locked: false
+  readonly protected: boolean
+  readonly trashed: boolean
+  readonly pinned: boolean
+  readonly archived: boolean
+  readonly locked: boolean
   readonly userModifiedDate: Date
   uuid: Uuid
   content: string | PayloadContent | undefined

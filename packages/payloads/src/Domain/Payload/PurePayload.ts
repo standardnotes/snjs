@@ -32,7 +32,7 @@ import { RawPayload } from './RawPayload'
  * Payloads also have a content format. Formats can either be
  * EncryptedString or DecryptedBareObject.
  */
-export class PurePayload implements PayloadInterface {
+export class PurePayload<C extends PayloadContent = PayloadContent> implements PayloadInterface {
   /** When constructed, the payload takes in an array of fields that the input raw payload
    * contains. These fields allow consumers to determine whether a given payload has an actual
    * undefined value for payload.content, for example, or whether the payload was constructed
@@ -41,7 +41,7 @@ export class PurePayload implements PayloadInterface {
   readonly source: PayloadSource
   readonly uuid: string
   readonly content_type: ContentType
-  readonly content?: PayloadContent | string
+  readonly content?: C | string
   readonly deleted?: boolean
   readonly items_key_id?: string
   readonly enc_item_key?: string
@@ -69,19 +69,9 @@ export class PurePayload implements PayloadInterface {
   readonly duplicate_of?: string
 
   constructor(rawPayload: RawPayload, fields: PayloadField[], source: PayloadSource) {
-    if (fields) {
-      this.fields = fields
-    } else {
-      this.fields = Object.keys(rawPayload) as PayloadField[]
-    }
-
-    if (source) {
-      this.source = source
-    } else {
-      this.source = PayloadSource.Constructor
-    }
+    this.fields = fields || (Object.keys(rawPayload) as PayloadField[])
+    this.source = source != undefined ? source : PayloadSource.Constructor
     this.uuid = rawPayload.uuid
-
     if (!this.uuid && this.fields.includes(PayloadField.Uuid)) {
       throw Error(
         `uuid is null, yet this payloads fields indicate it shouldnt be. Content type: ${rawPayload.content_type}`,
@@ -92,7 +82,7 @@ export class PurePayload implements PayloadInterface {
 
     if (rawPayload.content) {
       if (isObject(rawPayload.content)) {
-        this.content = FillItemContent(rawPayload.content as PayloadContent)
+        this.content = FillItemContent(rawPayload.content) as C
       } else {
         this.content = rawPayload.content
       }
@@ -128,7 +118,7 @@ export class PurePayload implements PayloadInterface {
     if (isString(this.content)) {
       this.version = protocolVersionFromEncryptedString(this.content as string)
     } else if (this.content) {
-      this.version = (this.content as PayloadContent).version
+      this.version = this.content.version
     } else {
       this.version = ProtocolVersion.V001
     }
@@ -178,11 +168,11 @@ export class PurePayload implements PayloadInterface {
     return result
   }
 
-  get safeContent(): PayloadContent {
+  get safeContent(): C {
     if (this.format === PayloadFormat.DecryptedBareObject) {
-      return this.content as PayloadContent
+      return this.content as C
     } else {
-      return {} as PayloadContent
+      return {} as C
     }
   }
 
@@ -205,11 +195,11 @@ export class PurePayload implements PayloadInterface {
     return result
   }
 
-  get contentObject(): PayloadContent {
+  get contentObject(): C {
     if (this.format !== PayloadFormat.DecryptedBareObject) {
       throw Error('Attempting to access non-object content as object')
     }
-    return this.content as PayloadContent
+    return this.content as C
   }
 
   get contentString(): string {

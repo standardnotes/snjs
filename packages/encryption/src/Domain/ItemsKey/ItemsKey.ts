@@ -1,6 +1,12 @@
-import { ConflictStrategy } from '@standardnotes/payloads'
+import { ConflictStrategy, PayloadContent, PurePayload } from '@standardnotes/payloads'
 import { ProtocolVersion } from '@standardnotes/common'
 import { HistoryEntry, SNItem, ItemsKeyInterface } from '@standardnotes/models'
+
+interface ItemsKeyContent extends PayloadContent {
+  keyVersion: ProtocolVersion
+  isDefault: boolean | undefined
+  itemsKey: string
+}
 
 export function isItemsKey(x: unknown): x is ItemsKeyInterface {
   return x instanceof SNItemsKey
@@ -9,7 +15,12 @@ export function isItemsKey(x: unknown): x is ItemsKeyInterface {
 /**
  * A key used to encrypt other items. Items keys are synced and persisted.
  */
-export class SNItemsKey extends SNItem implements ItemsKeyInterface {
+export class SNItemsKey extends SNItem<ItemsKeyContent> implements ItemsKeyInterface {
+  constructor(payload: PurePayload<ItemsKeyContent>) {
+    super(payload)
+    this.keyVersion = payload.safeContent.keyVersion
+  }
+
   /** Do not duplicate items keys. Always keep original */
   strategyWhenConflictingWithItem(item: SNItem, previousRevision?: HistoryEntry): ConflictStrategy {
     if (this.errorDecrypting) {
@@ -20,7 +31,7 @@ export class SNItemsKey extends SNItem implements ItemsKeyInterface {
   }
 
   get keyVersion(): ProtocolVersion {
-    return this.payload.safeContent.version
+    return this.payload.safeContent.versdion
   }
 
   get isDefault(): boolean | undefined {
