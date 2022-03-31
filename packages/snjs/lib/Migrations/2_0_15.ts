@@ -1,5 +1,5 @@
 import { ApplicationStage } from '@standardnotes/services'
-import { Migration } from '@Lib/Migrations/migration'
+import { Migration } from '@Lib/Migrations/Migration'
 
 export class Migration2_0_15 extends Migration {
   static version(): string {

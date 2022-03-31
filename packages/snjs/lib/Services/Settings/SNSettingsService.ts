@@ -7,7 +7,7 @@ import {
   SettingName,
   SensitiveSettingName,
 } from '@standardnotes/settings'
-import { ExtensionsServerURL } from '@Lib/hosts'
+import { ExtensionsServerURL } from '@Lib/Hosts'
 import { AbstractService, InternalEventBusInterface } from '@standardnotes/services'
 import { SettingsClientInterface } from './SettingsClientInterface'
 

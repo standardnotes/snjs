@@ -20,7 +20,7 @@ import find from 'lodash/find'
 import uniq from 'lodash/uniq'
 import { ComponentArea, ComponentAction, ComponentPermission } from '@standardnotes/features'
 import { Copy, concatArrays, filterFromArray, removeFromArray, sleep } from '@standardnotes/utils'
-import { Environment, Platform } from '@Lib/Application/platforms'
+import { Environment, Platform } from '@Lib/Application/Platforms'
 import { UuidString } from '@Lib/Types/UuidString'
 import {
   PermissionDialog,

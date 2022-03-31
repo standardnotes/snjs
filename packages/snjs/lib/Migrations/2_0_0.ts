@@ -1,18 +1,18 @@
 import { ContentType } from '@standardnotes/common'
 import { CreateItemFromPayload, RootKeyContent, SNItemsKey } from '@standardnotes/models'
 import { JwtSession } from '../Services/Session/Sessions/JwtSession'
-import { Migration } from '@Lib/Migrations/migration'
-import { MigrationServices } from './types'
-import { PreviousSnjsVersion2_0_0 } from '../version'
+import { Migration } from '@Lib/Migrations/Migration'
+import { MigrationServices } from './MigrationServices'
+import { PreviousSnjsVersion2_0_0 } from '../Version'
 import { ProtocolVersion } from '@standardnotes/common'
 import { SNRootKey, EncryptionIntent } from '@standardnotes/encryption'
 import { SNStorageService } from '../Services/Storage/StorageService'
-import { StorageReader1_0_0 } from './readers/reader_1_0_0'
+import { StorageReader1_0_0 } from './Readers/Reader1_0_0'
 import * as Payloads from '@standardnotes/payloads'
 import * as Services from '@standardnotes/services'
 import * as Utils from '@standardnotes/utils'
 
-import { isEnvironmentMobile, isEnvironmentWebOrDesktop } from '@Lib/Application/platforms'
+import { isEnvironmentMobile, isEnvironmentWebOrDesktop } from '@Lib/Application/Platforms'
 
 type LegacyMobileKeychainStructure =
   | {

@@ -22,7 +22,7 @@ import {
   environmentToString,
   Platform,
   platformToString,
-} from '@Lib/Application/platforms'
+} from '@Lib/Application/Platforms'
 import {
   PayloadContent,
   RawPayload,

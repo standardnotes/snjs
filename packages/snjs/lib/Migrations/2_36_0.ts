@@ -1,4 +1,4 @@
-import { Migration } from '@Lib/Migrations/migration'
+import { Migration } from '@Lib/Migrations/Migration'
 import { ContentType } from '@standardnotes/common'
 import { ApplicationStage } from '@standardnotes/services'
 

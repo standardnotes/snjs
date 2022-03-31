@@ -5,7 +5,7 @@ import {
   ChallengePrompt,
   ChallengeService,
 } from '@Lib/Services/Challenge'
-import { SNLog } from '@Lib/log'
+import { SNLog } from '@Lib/Log'
 import { SNFile, SNNote } from '@standardnotes/models'
 import { EncryptionService } from '@standardnotes/encryption'
 import { SNStorageService } from '@Lib/Services/Storage/StorageService'
