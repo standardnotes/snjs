@@ -1,7 +1,7 @@
 import { PayloadFormat } from '@standardnotes/payloads'
-import { EncryptionIntent } from '@standardnotes/applications'
 import { SNRootKey } from '../RootKey/RootKey'
 import { SNItemsKey } from '@standardnotes/models'
+import { EncryptionIntent } from '../Intent/EncryptionIntent'
 
 /**
  * Given a key and intent, returns the proper PayloadFormat,

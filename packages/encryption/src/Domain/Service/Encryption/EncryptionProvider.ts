@@ -1,5 +1,5 @@
-import { EncryptedEncryptionIntent } from '@standardnotes/applications'
 import { PurePayload } from '@standardnotes/payloads'
+import { EncryptedEncryptionIntent } from '../../Intent/EncryptionIntent'
 import { EncryptionSplitWithKey } from './EncryptionSplit'
 
 export interface EncryptionProvider {

@@ -21,7 +21,7 @@ import { API_MESSAGE_FAILED_OFFLINE_ACTIVATION } from '@Lib/Services/Api/Message
 import { EncryptedFileInterface } from '../Files/types'
 import { HttpParams, HttpRequest, HttpVerb, SNHttpService } from './HttpService'
 import { FilesServerInterface } from '../Files/FilesServerInterface'
-import { isUrlFirstParty, TRUSTED_FEATURE_HOSTS } from '@Lib/hosts'
+import { isUrlFirstParty, TRUSTED_FEATURE_HOSTS } from '@Lib/Hosts'
 import { Paths } from './Paths'
 import { Session } from '../Session/Sessions/Session'
 import { TokenSession } from '../Session/Sessions/TokenSession'

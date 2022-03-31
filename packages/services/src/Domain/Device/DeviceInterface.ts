@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { RawPayload } from '@standardnotes/payloads'
-import { ApplicationIdentifier } from '@standardnotes/applications'
+import { ApplicationIdentifier } from '@standardnotes/common'
 
 export interface DeviceInterface {
   interval: any

@@ -13,7 +13,7 @@ import { DesktopManagerInterface } from '@Lib/Services/ComponentManager/types'
 import { FeatureIdentifier } from '@standardnotes/features'
 import { ContentType } from '@standardnotes/common'
 import { SNItem, SNComponent } from '@standardnotes/models'
-import { Environment, Platform } from '@Lib/Application/platforms'
+import { Environment, Platform } from '@Lib/Application/Platforms'
 import { Runtime } from '@standardnotes/common'
 import { SNAlertService } from '@Lib/Services/Alert/AlertService'
 

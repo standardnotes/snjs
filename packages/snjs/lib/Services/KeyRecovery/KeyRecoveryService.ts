@@ -25,11 +25,8 @@ import {
   ChallengeService,
 } from '../Challenge'
 import { SNAlertService } from '../Alert/AlertService'
-
 import { SNApiService } from '@Lib/Services/Api/ApiService'
-
-import { ContentType } from '@standardnotes/common'
-import { ApplicationStage, leftVersionGreaterThanOrEqualToRight } from '@standardnotes/applications'
+import { ContentType, leftVersionGreaterThanOrEqualToRight } from '@standardnotes/common'
 import { ItemManager } from '../Items/ItemManager'
 import { dateSorted, isNullOrUndefined, removeFromArray } from '@standardnotes/utils'
 import { KeyParamsResponse } from '@standardnotes/responses'
@@ -37,6 +34,7 @@ import {
   AbstractService,
   InternalEventBusInterface,
   StorageValueModes,
+  ApplicationStage,
 } from '@standardnotes/services'
 import {
   UndecryptableItemsStorage,

@@ -11,13 +11,18 @@ import { SNPureCrypto } from '@standardnotes/sncrypto-common'
 import { SNRootKey } from '../../RootKey/RootKey'
 import { SNRootKeyParams } from '../../RootKey/RootKeyParams'
 import { V001Algorithm, V002Algorithm } from '../../Algorithm'
-import * as Applications from '@standardnotes/applications'
 import * as Common from '@standardnotes/common'
 import * as EncryptionSplit from './EncryptionSplit'
 import * as Payloads from '@standardnotes/payloads'
 import * as RootKeyEncryption from '../RootKey/RootKeyEncryption'
 import * as Services from '@standardnotes/services'
 import * as Utils from '@standardnotes/utils'
+import { EncryptedEncryptionIntent, EncryptionIntent } from '../../Intent/EncryptionIntent'
+import { DecryptedParameters, EncryptedParameters, ErroredDecryptingParameters } from '../../Encryption/EncryptedParameters'
+import { CreateIntentPayloadFromObject, encryptedParametersFromPayload, mergePayloadWithEncryptionParameters } from '../../Intent/Functions'
+import { RootKeyEncryptedAuthenticatedData } from '../../Encryption/RootKeyEncryptedAuthenticatedData'
+import { ItemAuthenticatedData } from '../../Encryption/ItemAuthenticatedData'
+import { LegacyAttachedData } from '../../Encryption/LegacyAttachedData'
 
 export enum EncryptionServiceEvent {
   RootKeyStatusChanged = 'RootKeyStatusChanged',
@@ -64,7 +69,7 @@ export class EncryptionService
     private payloadManager: Services.PayloadManagerInterface,
     public deviceInterface: Services.DeviceInterface,
     private storageService: Services.StorageServiceInterface,
-    private identifier: Applications.ApplicationIdentifier,
+    private identifier: Common.ApplicationIdentifier,
     public crypto: SNPureCrypto,
     protected internalEventBus: Services.InternalEventBusInterface,
   ) {
@@ -191,16 +196,16 @@ export class EncryptionService
 
   public async encryptSplitSingle(
     split: EncryptionSplit.EncryptionSplitWithKey<Payloads.PurePayload>,
-    intent: Applications.EncryptedEncryptionIntent,
+    intent: EncryptedEncryptionIntent,
   ): Promise<Payloads.PurePayload> {
     return (await this.encryptSplit(split, intent))[0]
   }
 
   public async encryptSplit(
     split: EncryptionSplit.EncryptionSplitWithKey<Payloads.PurePayload>,
-    intent: Applications.EncryptedEncryptionIntent,
+    intent: EncryptedEncryptionIntent,
   ): Promise<Payloads.PurePayload[]> {
-    const allEncryptedParams: Payloads.EncryptedParameters[] = []
+    const allEncryptedParams: EncryptedParameters[] = []
     const allNonencryptablePayloads: Payloads.PurePayload[] = []
 
     const categorizePayloads = (payloads: Payloads.PurePayload[]) => {
@@ -257,7 +262,7 @@ export class EncryptionService
     }
 
     const packagedEncrypted = allEncryptedParams.map((encryptedParams) =>
-      Payloads.CreateIntentPayloadFromObject(
+      CreateIntentPayloadFromObject(
         EncryptionSplit.findPayloadInSplit(encryptedParams.uuid, split),
         intent,
         encryptedParams,
@@ -277,8 +282,8 @@ export class EncryptionService
     split: EncryptionSplit.EncryptionSplitWithKey<Payloads.PurePayload>,
   ): Promise<Payloads.PurePayload[]> {
     const allDecryptedParams: (
-      | Payloads.DecryptedParameters
-      | Payloads.ErroredDecryptingParameters
+      | DecryptedParameters
+      | ErroredDecryptingParameters
     )[] = []
     const allNondecryptablePayloads: Payloads.PurePayload[] = []
 
@@ -339,7 +344,7 @@ export class EncryptionService
 
     const packagedDecrypted = allDecryptedParams.map((decryptedParams) => {
       const original = EncryptionSplit.findPayloadInSplit(decryptedParams.uuid, split)
-      return Payloads.mergePayloadWithEncryptionParameters(original, {
+      return mergePayloadWithEncryptionParameters(original, {
         ...decryptedParams,
         errorDecryptingValueChanged: original.errorDecrypting !== decryptedParams.errorDecrypting,
       })
@@ -377,7 +382,7 @@ export class EncryptionService
      *
      * Versions 004 and above are always supported.
      */
-    if (Applications.compareVersions(keyParams.version, Common.ProtocolVersion.V004) >= 0) {
+    if (Common.compareVersions(keyParams.version, Common.ProtocolVersion.V004) >= 0) {
       /* keyParams.version >= 004 */
       return true
     } else {
@@ -402,7 +407,7 @@ export class EncryptionService
    */
   public isVersionNewerThanLibraryVersion(version: Common.ProtocolVersion) {
     const libraryVersion = Common.ProtocolVersionLatest
-    return Applications.compareVersions(version, libraryVersion) === 1
+    return Common.compareVersions(version, libraryVersion) === 1
   }
 
   /**
@@ -411,7 +416,7 @@ export class EncryptionService
    * overwhelmingly under-reporting the cost.
    */
   public costMinimumForVersion(version: Common.ProtocolVersion) {
-    if (Applications.compareVersions(version, Common.ProtocolVersion.V003) >= 0) {
+    if (Common.compareVersions(version, Common.ProtocolVersion.V003) >= 0) {
       throw 'Cost minimums only apply to versions <= 002'
     }
     if (version === Common.ProtocolVersion.V001) {
@@ -464,10 +469,7 @@ export class EncryptionService
     const payloads = this.itemManager.allItems().map((item) => item.payload)
     const split = EncryptionSplit.splitItemsByEncryptionType(payloads)
     const keyLookupSplit = EncryptionSplit.createKeyLookupSplitFromSplit(split)
-    const result = await this.encryptSplit(
-      keyLookupSplit,
-      Applications.EncryptionIntent.FileEncrypted,
-    )
+    const result = await this.encryptSplit(keyLookupSplit, EncryptionIntent.FileEncrypted)
     const ejected = result.map((payload) => payload.ejected())
 
     const data: BackupFile = {
@@ -580,9 +582,9 @@ export class EncryptionService
   public getEmbeddedPayloadAuthenticatedData(
     payload: Payloads.PurePayload,
   ):
-    | Payloads.RootKeyEncryptedAuthenticatedData
-    | Payloads.ItemAuthenticatedData
-    | Payloads.LegacyAttachedData
+    | RootKeyEncryptedAuthenticatedData
+    | ItemAuthenticatedData
+    | LegacyAttachedData
     | undefined {
     const version = payload.version
     if (!version) {
@@ -590,7 +592,7 @@ export class EncryptionService
     }
     const operator = this.operatorManager.operatorForVersion(version)
     const authenticatedData = operator.getPayloadAuthenticatedData(
-      Payloads.encryptedParametersFromPayload(payload),
+      encryptedParametersFromPayload(payload),
     )
     return authenticatedData
   }
@@ -605,11 +607,11 @@ export class EncryptionService
     if (!authenticatedData) {
       return undefined
     }
-    if (Applications.isVersionLessThanOrEqualTo(key.version, Common.ProtocolVersion.V003)) {
-      const rawKeyParams = authenticatedData as Payloads.LegacyAttachedData
+    if (Common.isVersionLessThanOrEqualTo(key.version, Common.ProtocolVersion.V003)) {
+      const rawKeyParams = authenticatedData as LegacyAttachedData
       return this.createKeyParams(rawKeyParams)
     } else {
-      const rawKeyParams = (authenticatedData as Payloads.RootKeyEncryptedAuthenticatedData).kp
+      const rawKeyParams = (authenticatedData as RootKeyEncryptedAuthenticatedData).kp
       return this.createKeyParams(rawKeyParams)
     }
   }
@@ -628,10 +630,7 @@ export class EncryptionService
       return false
     }
 
-    if (
-      Applications.compareVersions(rootKey.keyVersion, Common.ProtocolVersionLastNonrootItemsKey) >
-      0
-    ) {
+    if (Common.compareVersions(rootKey.keyVersion, Common.ProtocolVersionLastNonrootItemsKey) > 0) {
       /** Is >= 004, not needed */
       return false
     }

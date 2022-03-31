@@ -1,13 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { AppDataField, DefaultAppDomain, EncryptionIntent } from '@standardnotes/applications'
 import { ContentType, Uuid } from '@standardnotes/common'
 import { Copy, extendArray, pickByCopy, uniqueArray, UuidGenerator } from '@standardnotes/utils'
 import { remove } from 'lodash'
-
 import { PurePayload } from '../Payload/PurePayload'
 import { ImmutablePayloadCollection } from '../Collection/ImmutablePayloadCollection'
 import { ContentReference } from '../Reference/ContentReference'
-
 import { PayloadContent } from './PayloadContent'
 import { PayloadField } from './PayloadField'
 import { PayloadInterface } from './PayloadInterface'
@@ -15,11 +12,8 @@ import { PayloadOverride } from './PayloadOverride'
 import { PayloadSource } from './PayloadSource'
 import { RawPayload } from './RawPayload'
 import { PayloadFormat } from './PayloadFormat'
-import {
-  DecryptedParameters,
-  EncryptedParameters,
-  ErroredDecryptingParameters,
-} from '../Encryption/EncryptedParameters'
+import { DefaultAppDomain } from '../Domain/DefaultAppDomain'
+import { AppDataField } from '../Data/AppDataField'
 
 /**
  * Return the payloads that result if you alternated the uuid for the payload.
@@ -158,27 +152,7 @@ export function payloadFieldsForSource(source: PayloadSource): PayloadField[] {
     throw `No payload fields found for source ${source}`
   }
 }
-
-function payloadFieldsForIntent(intent: EncryptionIntent) {
-  if (intent === EncryptionIntent.FileEncrypted || intent === EncryptionIntent.FileDecrypted) {
-    return FilePayloadFields.slice()
-  }
-
-  if (
-    intent === EncryptionIntent.LocalStorageDecrypted ||
-    intent === EncryptionIntent.LocalStorageEncrypted
-  ) {
-    return StoragePayloadFields.slice()
-  }
-
-  if (intent === EncryptionIntent.Sync) {
-    return ServerPayloadFields.slice()
-  } else {
-    throw `No payload fields found for intent ${intent}`
-  }
-}
-
-function CreatePayload(
+export function CreatePayload(
   object: any,
   fields: PayloadField[],
   source?: PayloadSource,
@@ -217,15 +191,6 @@ export function CreateSourcedPayloadFromObject(
   return CreatePayload(object, payloadFields, source, override)
 }
 
-export function CreateIntentPayloadFromObject(
-  object: RawPayload,
-  intent: EncryptionIntent,
-  override?: PayloadOverride,
-): PayloadInterface {
-  const payloadFields = payloadFieldsForIntent(intent)
-  return CreatePayload(object, payloadFields, PayloadSource.Constructor, override)
-}
-
 /**
  * Makes a new payload by starting with input payload, then overriding values of all
  * keys of mergeWith.fields. If wanting to merge only specific fields, pass an array of
@@ -261,7 +226,7 @@ export function CreateMaxPayloadFromAnyObject(
 }
 
 /** The MaxItemPayload represents a payload with all possible fields */
-const MaxPayloadFields = Object.freeze([
+export const MaxPayloadFields = Object.freeze([
   PayloadField.Uuid,
   PayloadField.ContentType,
   PayloadField.ItemsKeyId,
@@ -284,7 +249,7 @@ const MaxPayloadFields = Object.freeze([
   PayloadField.DuplicateOf,
 ])
 
-const FilePayloadFields = Object.freeze([
+export const FilePayloadFields = Object.freeze([
   PayloadField.Uuid,
   PayloadField.ContentType,
   PayloadField.ItemsKeyId,
@@ -298,7 +263,7 @@ const FilePayloadFields = Object.freeze([
   PayloadField.DuplicateOf,
 ])
 
-const StoragePayloadFields = Object.freeze([
+export const StoragePayloadFields = Object.freeze([
   PayloadField.Uuid,
   PayloadField.ContentType,
   PayloadField.ItemsKeyId,
@@ -318,7 +283,7 @@ const StoragePayloadFields = Object.freeze([
   PayloadField.DuplicateOf,
 ])
 
-const ServerPayloadFields = Object.freeze([
+export const ServerPayloadFields = Object.freeze([
   PayloadField.Uuid,
   PayloadField.ContentType,
   PayloadField.ItemsKeyId,
@@ -333,7 +298,7 @@ const ServerPayloadFields = Object.freeze([
   PayloadField.DuplicateOf,
 ])
 
-const SessionHistoryPayloadFields = Object.freeze([
+export const SessionHistoryPayloadFields = Object.freeze([
   PayloadField.Uuid,
   PayloadField.ContentType,
   PayloadField.Content,
@@ -342,7 +307,7 @@ const SessionHistoryPayloadFields = Object.freeze([
 
 /** Represents a payload with permissible fields for when a
  * payload is retrieved from a component for saving */
-const ComponentRetrievedPayloadFields = Object.freeze([
+export const ComponentRetrievedPayloadFields = Object.freeze([
   PayloadField.Uuid,
   PayloadField.Content,
   PayloadField.ContentType,
@@ -351,7 +316,7 @@ const ComponentRetrievedPayloadFields = Object.freeze([
 
 /** Represents a payload with permissible fields for when a
  * component wants to create a new item */
-const ComponentCreatedPayloadFields = Object.freeze([
+export const ComponentCreatedPayloadFields = Object.freeze([
   PayloadField.Uuid,
   PayloadField.Content,
   PayloadField.ContentType,
@@ -364,7 +329,7 @@ const ComponentCreatedPayloadFields = Object.freeze([
  * updated_at value the server returns for the item, and basically
  * nothing else.
  */
-const ServerSavedPayloadFields = Object.freeze([
+export const ServerSavedPayloadFields = Object.freeze([
   PayloadField.Uuid,
   PayloadField.ContentType,
   PayloadField.ServerUpdatedAt,
@@ -375,7 +340,7 @@ const ServerSavedPayloadFields = Object.freeze([
   PayloadField.LastSyncEnd,
 ])
 
-const RemoteHistoryPayloadFields = Object.freeze(ServerPayloadFields.slice())
+export const RemoteHistoryPayloadFields = Object.freeze(ServerPayloadFields.slice())
 
 /**
  * Whether the changed payload represents only an internal change that shouldn't
@@ -429,22 +394,4 @@ export function isRemotePayloadAllowed(payload: PurePayload): boolean {
 
 export function sureFindPayload(uuid: Uuid, payloads: PurePayload[]): PurePayload {
   return payloads.find((payload) => payload.uuid === uuid) as PurePayload
-}
-
-export function mergePayloadWithEncryptionParameters(
-  payload: PurePayload,
-  parameters: EncryptedParameters | DecryptedParameters | ErroredDecryptingParameters,
-): PurePayload {
-  return CopyPayload(payload, parameters)
-}
-
-export function encryptedParametersFromPayload(payload: PurePayload): EncryptedParameters {
-  return {
-    uuid: payload.uuid,
-    content: payload.contentString,
-    items_key_id: payload.items_key_id,
-    enc_item_key: payload.enc_item_key as string,
-    version: payload.version,
-    auth_hash: payload.auth_hash,
-  }
 }

@@ -1,8 +1,7 @@
 import { isValidUrl } from '@standardnotes/utils'
-import { Predicate, PurePayload, ConflictStrategy } from '@standardnotes/payloads'
+import { Predicate, PurePayload, ConflictStrategy, AppDataField } from '@standardnotes/payloads'
 import { SNItem } from '../Item/Item'
 import { ContentType, Uuid } from '@standardnotes/common'
-import { AppDataField } from '@standardnotes/applications'
 import { HistoryEntry } from '../History/HistoryEntry'
 import {
   FeatureIdentifier,

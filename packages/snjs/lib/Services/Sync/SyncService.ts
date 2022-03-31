@@ -1,14 +1,13 @@
 import { AccountSyncOperation } from '@Lib/Services/Sync/Account/Operation'
-import { ApplicationSyncOptions } from '../../Application/options'
+import { ApplicationSyncOptions } from '../../Application/Options'
 import { ContentType } from '@standardnotes/common'
-import { EncryptionIntent } from '@standardnotes/applications'
 import { isNullOrUndefined, removeFromIndex, sleep, subtractFromArray } from '@standardnotes/utils'
 import { ItemManager } from '@Lib/Services/Items/ItemManager'
 import { OfflineSyncOperation } from '@Lib/Services/Sync/Offline/Operation'
 import { PayloadManager } from '../Payloads/PayloadManager'
 import { SNApiService } from '../Api/ApiService'
 import { SNHistoryManager } from '../History/HistoryManager'
-import { SNLog } from '@Lib/log'
+import { SNLog } from '@Lib/Log'
 import { SNSessionManager } from '../Session/SessionManager'
 import { SNStorageService } from '../Storage/StorageService'
 import { SortPayloadsByRecentAndContentPriority } from '@Lib/Services/Sync/Utils'
@@ -367,7 +366,7 @@ export class SNSyncService
   ): Promise<Payloads.PurePayload[]> {
     const split = Encryption.splitItemsByEncryptionType(payloads)
     const keyLookupSplit = Encryption.createKeyLookupSplitFromSplit(split)
-    return this.protocolService.encryptSplit(keyLookupSplit, EncryptionIntent.Sync)
+    return this.protocolService.encryptSplit(keyLookupSplit, Encryption.EncryptionIntent.Sync)
   }
 
   public async downloadFirstSync(

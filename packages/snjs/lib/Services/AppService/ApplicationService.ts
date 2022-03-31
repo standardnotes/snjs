@@ -1,6 +1,6 @@
-import { ApplicationEvent } from '@Lib/Application/events'
+import { ApplicationEvent } from '@Lib/Application/Event'
 import { AbstractService, InternalEventBusInterface } from '@standardnotes/services'
-import { SNApplication } from '../../Application/application'
+import { SNApplication } from '../../Application/Application'
 
 export class ApplicationService extends AbstractService {
   private unsubApp: any

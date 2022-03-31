@@ -1,8 +1,13 @@
 import { isNullOrUndefined } from '@standardnotes/utils'
 import { ContentType } from '@standardnotes/common'
-import { AppDataField } from '@standardnotes/applications'
 import { SNItem } from '../Item/Item'
-import { ItemInterface, PayloadContent, PayloadFormat, PurePayload } from '@standardnotes/payloads'
+import {
+  ItemInterface,
+  PayloadContent,
+  PayloadFormat,
+  PurePayload,
+  AppDataField,
+} from '@standardnotes/payloads'
 
 export interface NoteContent extends PayloadContent {
   title: string

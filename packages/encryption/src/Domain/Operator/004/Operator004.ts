@@ -1,5 +1,4 @@
 import { ContentType, KeyParamsOrigination, ProtocolVersion } from '@standardnotes/common'
-import { ContentTypeUsesRootKeyEncryption } from '@standardnotes/applications'
 import { Create004KeyParams } from '../../RootKey/KeyParams'
 import { ItemsKeyContent, SynchronousOperator } from '../Operator'
 import { SNItemsKey, CreateItemFromPayload } from '@standardnotes/models'
@@ -9,6 +8,15 @@ import { SNRootKeyParams } from '../../RootKey/RootKeyParams'
 import { V004Algorithm } from '../../Algorithm'
 import * as Payloads from '@standardnotes/payloads'
 import * as Utils from '@standardnotes/utils'
+import { ContentTypeUsesRootKeyEncryption } from '../../Intent/Functions'
+import {
+  DecryptedParameters,
+  EncryptedParameters,
+  ErroredDecryptingParameters,
+} from '../../Encryption/EncryptedParameters'
+import { RootKeyEncryptedAuthenticatedData } from '../../Encryption/RootKeyEncryptedAuthenticatedData'
+import { ItemAuthenticatedData } from '../../Encryption/ItemAuthenticatedData'
+import { LegacyAttachedData } from '../../Encryption/LegacyAttachedData'
 
 const PARTITION_CHARACTER = ':'
 
@@ -106,7 +114,7 @@ export class SNProtocolOperator004 implements SynchronousOperator {
     plaintext: string,
     rawKey: string,
     nonce: string,
-    authenticatedData: Payloads.ItemAuthenticatedData,
+    authenticatedData: ItemAuthenticatedData,
   ) {
     if (!nonce) {
       throw 'encryptString null nonce'
@@ -145,7 +153,7 @@ export class SNProtocolOperator004 implements SynchronousOperator {
   private generateEncryptedProtocolString(
     plaintext: string,
     rawKey: string,
-    authenticatedData: Payloads.ItemAuthenticatedData,
+    authenticatedData: ItemAuthenticatedData,
   ) {
     const nonce = this.crypto.generateRandomKey(V004Algorithm.EncryptionNonceLength)
     const version = ProtocolVersion.V004
@@ -160,12 +168,8 @@ export class SNProtocolOperator004 implements SynchronousOperator {
   }
 
   public getPayloadAuthenticatedData(
-    encrypted: Payloads.EncryptedParameters,
-  ):
-    | Payloads.RootKeyEncryptedAuthenticatedData
-    | Payloads.ItemAuthenticatedData
-    | Payloads.LegacyAttachedData
-    | undefined {
+    encrypted: EncryptedParameters,
+  ): RootKeyEncryptedAuthenticatedData | ItemAuthenticatedData | LegacyAttachedData | undefined {
     const itemKeyComponents = this.deconstructEncryptedPayloadString(encrypted.enc_item_key)
     const authenticatedData = itemKeyComponents.rawAuthenticatedData
     const result = this.stringToAuthenticatedData(authenticatedData)
@@ -180,8 +184,8 @@ export class SNProtocolOperator004 implements SynchronousOperator {
   private generateAuthenticatedDataForPayload(
     payload: Payloads.PurePayload,
     key: SNItemsKey | SNRootKey,
-  ): Payloads.ItemAuthenticatedData | Payloads.RootKeyEncryptedAuthenticatedData {
-    const baseData: Payloads.ItemAuthenticatedData = {
+  ): ItemAuthenticatedData | RootKeyEncryptedAuthenticatedData {
+    const baseData: ItemAuthenticatedData = {
       u: payload.uuid,
       v: ProtocolVersion.V004,
     }
@@ -198,7 +202,7 @@ export class SNProtocolOperator004 implements SynchronousOperator {
     }
   }
 
-  private authenticatedDataToString(attachedData: Payloads.ItemAuthenticatedData) {
+  private authenticatedDataToString(attachedData: ItemAuthenticatedData) {
     return this.crypto.base64Encode(
       JSON.stringify(Utils.sortedCopy(Utils.omitUndefinedCopy(attachedData))),
     )
@@ -206,8 +210,8 @@ export class SNProtocolOperator004 implements SynchronousOperator {
 
   private stringToAuthenticatedData(
     rawAuthenticatedData: string,
-    override?: Partial<Payloads.ItemAuthenticatedData>,
-  ): Payloads.RootKeyEncryptedAuthenticatedData | Payloads.ItemAuthenticatedData {
+    override?: Partial<ItemAuthenticatedData>,
+  ): RootKeyEncryptedAuthenticatedData | ItemAuthenticatedData {
     const base = JSON.parse(this.crypto.base64Decode(rawAuthenticatedData))
     return Utils.sortedCopy({
       ...base,
@@ -218,7 +222,7 @@ export class SNProtocolOperator004 implements SynchronousOperator {
   public generateEncryptedParametersSync(
     payload: Payloads.PurePayload,
     key: SNItemsKey | SNRootKey,
-  ): Payloads.EncryptedParameters {
+  ): EncryptedParameters {
     const itemKey = this.crypto.generateRandomKey(V004Algorithm.EncryptionKeyLength)
     /** Encrypt content with item_key */
     const contentPlaintext = JSON.stringify(payload.content)
@@ -244,9 +248,9 @@ export class SNProtocolOperator004 implements SynchronousOperator {
   }
 
   public generateDecryptedParametersSync(
-    encrypted: Payloads.EncryptedParameters,
+    encrypted: EncryptedParameters,
     key: SNItemsKey | SNRootKey,
-  ): Payloads.DecryptedParameters | Payloads.ErroredDecryptingParameters {
+  ): DecryptedParameters | ErroredDecryptingParameters {
     const itemKeyComponents = this.deconstructEncryptedPayloadString(encrypted.enc_item_key)
     const authenticatedData = this.stringToAuthenticatedData(
       itemKeyComponents.rawAuthenticatedData,

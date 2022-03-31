@@ -20,7 +20,6 @@ USER $USERNAME
 COPY --chown=$UID:$GID package.json yarn.lock /var/www/
 
 COPY --chown=$UID:$GID packages/analytics/package.json /var/www/packages/analytics/package.json
-COPY --chown=$UID:$GID packages/applications/package.json /var/www/packages/applications/package.json
 COPY --chown=$UID:$GID packages/auth/package.json /var/www/packages/auth/package.json
 COPY --chown=$UID:$GID packages/common/package.json /var/www/packages/common/package.json
 COPY --chown=$UID:$GID packages/components/package.json /var/www/packages/components/package.json

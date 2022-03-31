@@ -1,7 +1,7 @@
 import { addIfUnique, removeFromArray } from '@standardnotes/utils'
 import { ItemMutator } from '../Item/ItemMutator'
 import { Uuid } from '@standardnotes/common'
-import { AppDataField } from '@standardnotes/applications'
+import { AppDataField } from '@standardnotes/payloads'
 import { ComponentPermission, ComponentContent } from '@standardnotes/features'
 
 export class ComponentMutator extends ItemMutator {

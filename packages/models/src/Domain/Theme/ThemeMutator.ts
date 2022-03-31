@@ -1,4 +1,4 @@
-import { AppDataField } from '@standardnotes/applications'
+import { AppDataField } from '@standardnotes/payloads'
 import { ItemMutator } from '../Item/ItemMutator'
 
 export class ThemeMutator extends ItemMutator {

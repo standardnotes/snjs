@@ -1,8 +1,7 @@
-import { ApplicationStage, EncryptionIntent } from '@standardnotes/applications'
 import { ContentType } from '@standardnotes/common'
 import { Copy, extendArray, isNullOrUndefined, UuidGenerator } from '@standardnotes/utils'
-import { Environment } from '@Lib/Application/platforms'
-import { SNLog } from '../../log'
+import { Environment } from '@Lib/Application/Platforms'
+import { SNLog } from '../../Log'
 import { SNRootKey } from '@standardnotes/encryption'
 import * as Encryption from '@standardnotes/encryption'
 import * as Payloads from '@standardnotes/payloads'
@@ -53,14 +52,14 @@ export class SNStorageService
     super.deinit()
   }
 
-  async handleApplicationStage(stage: ApplicationStage) {
+  async handleApplicationStage(stage: Services.ApplicationStage) {
     await super.handleApplicationStage(stage)
-    if (stage === ApplicationStage.Launched_10) {
+    if (stage === Services.ApplicationStage.Launched_10) {
       this.storagePersistable = true
       if (this.needsPersist) {
         void this.persistValuesToDisk()
       }
-    } else if (stage === ApplicationStage.StorageDecrypted_09) {
+    } else if (stage === Services.ApplicationStage.StorageDecrypted_09) {
       const persistedPolicy = await this.getValue(Services.StorageKey.StorageEncryptionPolicy)
       if (persistedPolicy) {
         void this.setEncryptionPolicy(persistedPolicy as Services.StorageEncryptionPolicy, false)
@@ -236,14 +235,14 @@ export class SNStorageService
 
       const encryptedPayload = await this.encryptionProvider.encryptSplitSingle(
         split,
-        EncryptionIntent.LocalStorageEncrypted,
+        Encryption.EncryptionIntent.LocalStorageEncrypted,
       )
 
       rawContent[Services.ValueModesKeys.Wrapped] = encryptedPayload.ejected()
     } else {
-      const packagedPayload = Payloads.CreateIntentPayloadFromObject(
+      const packagedPayload = Encryption.CreateIntentPayloadFromObject(
         payload,
-        EncryptionIntent.LocalStorageDecrypted,
+        Encryption.EncryptionIntent.LocalStorageDecrypted,
       )
       rawContent[Services.ValueModesKeys.Wrapped] = packagedPayload.ejected()
     }
@@ -409,11 +408,14 @@ export class SNStorageService
     const keyLookupSplit = Encryption.createKeyLookupSplitFromSplit(split)
     const encryptedPayloads = await this.encryptionProvider.encryptSplit(
       keyLookupSplit,
-      EncryptionIntent.LocalStorageEncrypted,
+      Encryption.EncryptionIntent.LocalStorageEncrypted,
     )
 
     const nonEncryptedPayloads = unencryptables.map((payload) =>
-      Payloads.CreateIntentPayloadFromObject(payload, EncryptionIntent.LocalStorageDecrypted),
+      Encryption.CreateIntentPayloadFromObject(
+        payload,
+        Encryption.EncryptionIntent.LocalStorageDecrypted,
+      ),
     )
 
     const ejected = encryptedPayloads

@@ -3,12 +3,18 @@ import { OperatorManager } from './OperatorManager'
 import { SNItemsKey } from '@standardnotes/models'
 import { SNRootKey } from '../RootKey/RootKey'
 import * as Payloads from '@standardnotes/payloads'
+import {
+  DecryptedParameters,
+  EncryptedParameters,
+  ErroredDecryptingParameters,
+} from '../Encryption/EncryptedParameters'
+import { encryptedParametersFromPayload } from '../Intent/Functions'
 
 export async function encryptPayload(
   payload: Payloads.PurePayload,
   key: SNItemsKey | SNRootKey,
   operatorManager: OperatorManager,
-): Promise<Payloads.EncryptedParameters> {
+): Promise<EncryptedParameters> {
   const operator = operatorManager.operatorForVersion(key.keyVersion)
   let encryptionParameters
 
@@ -29,20 +35,17 @@ export async function decryptPayload(
   payload: Payloads.PurePayload,
   key: SNItemsKey | SNRootKey,
   operatorManager: OperatorManager,
-): Promise<Payloads.DecryptedParameters | Payloads.ErroredDecryptingParameters> {
+): Promise<DecryptedParameters | ErroredDecryptingParameters> {
   const operator = operatorManager.operatorForVersion(payload.version)
 
   try {
     if (isAsyncOperator(operator)) {
       return await operator.generateDecryptedParametersAsync(
-        Payloads.encryptedParametersFromPayload(payload),
+        encryptedParametersFromPayload(payload),
         key,
       )
     } else {
-      return operator.generateDecryptedParametersSync(
-        Payloads.encryptedParametersFromPayload(payload),
-        key,
-      )
+      return operator.generateDecryptedParametersSync(encryptedParametersFromPayload(payload), key)
     }
   } catch (e) {
     console.error('Error decrypting payload', payload, e)

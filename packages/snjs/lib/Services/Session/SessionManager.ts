@@ -6,8 +6,8 @@ import {
   AnyKeyParamsContent,
   KeyParamsOrigination,
   isProtocolVersionExpired,
+  leftVersionGreaterThanOrEqualToRight,
 } from '@standardnotes/common'
-import { leftVersionGreaterThanOrEqualToRight } from '@standardnotes/applications'
 import {
   ChallengeKeyboardType,
   ChallengeValidation,

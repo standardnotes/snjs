@@ -25,7 +25,6 @@
     "test:unit": "jest spec --coverage"
   },
   "dependencies": {
-    "@standardnotes/applications": "^1.3.0",
     "@standardnotes/common": "^1.19.0",
     "@standardnotes/models": "^1.1.0",
     "@standardnotes/responses": "^1.5.0",

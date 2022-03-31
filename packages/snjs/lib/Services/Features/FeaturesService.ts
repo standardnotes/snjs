@@ -1,7 +1,7 @@
 import { ClientDisplayableError } from '@standardnotes/responses'
 import { SNItem, SNFeatureRepo, FeatureRepoContent } from '@standardnotes/models'
-import { ApplicationStage } from '@standardnotes/applications'
-import { LEGACY_PROD_EXT_ORIGIN, PROD_OFFLINE_FEATURES_URL } from '../../hosts'
+import { ApplicationStage } from '@standardnotes/services'
+import { LEGACY_PROD_EXT_ORIGIN, PROD_OFFLINE_FEATURES_URL } from '../../Hosts'
 import { SNSyncService } from '../Sync/SyncService'
 import { AccountEvent, UserService } from '../User/UserService'
 import { UserRolesChangedEvent } from '@standardnotes/domain-events'
@@ -37,7 +37,7 @@ import {
 } from '@Lib/Services/Api/Messages'
 import { SNPureCrypto } from '@standardnotes/sncrypto-common'
 import { ButtonType, SNAlertService } from '@Lib/Services/Alert/AlertService'
-import { TRUSTED_CUSTOM_EXTENSIONS_HOSTS, TRUSTED_FEATURE_HOSTS } from '@Lib/hosts'
+import { TRUSTED_CUSTOM_EXTENSIONS_HOSTS, TRUSTED_FEATURE_HOSTS } from '@Lib/Hosts'
 import { Copy, lastElement } from '@standardnotes/utils'
 import { FeaturesClientInterface } from './ClientInterface'
 import {

@@ -7,7 +7,6 @@ coverage
 
 # List individually so that packages/components/all/org./dist is included
 packages/analytics/dist
-packages/applications/dist
 packages/auth/dist
 packages/common/dist
 packages/components/dist

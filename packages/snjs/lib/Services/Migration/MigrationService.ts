@@ -1,15 +1,15 @@
-import { compareSemVersions } from '@Lib/version'
-import { SNLog } from '@Lib/log'
-import { SnjsVersion, isRightVersionGreaterThanLeft } from '../../version'
-import { ApplicationEvent } from '../../Application/events'
-import { ApplicationStage } from '@standardnotes/applications'
-import { MigrationServices } from '../../Migrations/types'
-import { Migration } from '@Lib/Migrations/migration'
-import * as migrationImports from '@Lib/Migrations'
-import { BaseMigration } from '@Lib/Migrations/base'
-import { RawStorageKey, namespacedKey } from '@standardnotes/services'
-import { lastElement } from '@standardnotes/utils'
 import { AbstractService } from '@standardnotes/services'
+import { ApplicationEvent } from '../../Application/Event'
+import { ApplicationStage } from '@standardnotes/services'
+import { BaseMigration } from '@Lib/Migrations/Base'
+import { compareSemVersions } from '@Lib/Version'
+import { lastElement } from '@standardnotes/utils'
+import { Migration } from '@Lib/Migrations/Migration'
+import { MigrationServices } from '../../Migrations/MigrationServices'
+import { RawStorageKey, namespacedKey } from '@standardnotes/services'
+import { SnjsVersion, isRightVersionGreaterThanLeft } from '../../Version'
+import { SNLog } from '@Lib/Log'
+import * as MigrationVersions from '@Lib/Migrations/Versions'
 
 /**
  * The migration service orchestrates the execution of multi-stage migrations.
@@ -23,9 +23,7 @@ export class SNMigrationService extends AbstractService {
   private activeMigrations?: Migration[]
   private baseMigration!: BaseMigration
 
-  constructor(
-    private services: MigrationServices,
-  ) {
+  constructor(private services: MigrationServices) {
     super(services.internalEventBus)
   }
 
@@ -106,9 +104,9 @@ export class SNMigrationService extends AbstractService {
 
   private static async getRequiredMigrations(storedVersion: string) {
     const resultingClasses = []
-    const migrationClasses = Object.keys(migrationImports)
+    const migrationClasses = Object.keys(MigrationVersions)
       .map((key) => {
-        return (migrationImports as any)[key]
+        return (MigrationVersions as any)[key]
       })
       .sort((a, b) => {
         return compareSemVersions(a.version(), b.version())

@@ -5,13 +5,13 @@ import {
   ChallengePrompt,
   ChallengeService,
 } from '@Lib/Services/Challenge'
-import { SNLog } from '@Lib/log'
+import { SNLog } from '@Lib/Log'
 import { SNFile, SNNote } from '@standardnotes/models'
 import { EncryptionService } from '@standardnotes/encryption'
 import { SNStorageService } from '@Lib/Services/Storage/StorageService'
 import { StorageKey } from '@standardnotes/services'
 import { isNullOrUndefined } from '@standardnotes/utils'
-import { ApplicationStage } from '@standardnotes/applications'
+import { ApplicationStage } from '@standardnotes/services'
 import {
   AbstractService,
   InternalEventBusInterface,
