@@ -126,6 +126,12 @@ export function disableIntegrityAutoHeal(application) {
 }
 
 export async function safeDeinit(application) {
+  if (application.dealloced) {
+    console.warn(
+      'Attempting to deinit already deinited application. Check the test case to find where you are double deiniting.',
+    )
+    return
+  }
   /** Limit waiting to 1s */
   await Promise.race([sleep(1), application.syncService?.awaitCurrentSyncs()])
   await application.prepareForDeinit()
