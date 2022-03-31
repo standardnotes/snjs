@@ -1,6 +1,6 @@
 {
   "name": "@standardnotes/auth",
-  "version": "3.18.1",
+  "version": "3.18.2",
   "engines": {
     "node": ">=14.0.0 <17.0.0"
   },
@@ -25,11 +25,11 @@
     "test:unit": "jest spec --coverage"
   },
   "dependencies": {
-    "@standardnotes/common": "^1.18.0",
+    "@standardnotes/common": "^1.19.0",
     "jsonwebtoken": "^8.5.1"
   },
   "devDependencies": {
-    "@standardnotes/config": "^2.2.2",
+    "@standardnotes/config": "^2.3.0",
     "@types/jest": "^27.4.1",
     "@types/jsonwebtoken": "^8.5.8",
     "jest": "^27.5.1",

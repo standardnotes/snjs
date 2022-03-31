@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.3.0](https://github.com/standardnotes/snjs/compare/@standardnotes/applications@1.2.7...@standardnotes/applications@1.3.0) (2022-03-31)
+
+
+### Features
+
+* encryption and models packages ([#679](https://github.com/standardnotes/snjs/issues/679)) ([5e03d48](https://github.com/standardnotes/snjs/commit/5e03d48aba7e3dd266117201139ab869b1f70cc9))
+
+
+
+
+
 ## [1.2.7](https://github.com/standardnotes/snjs/compare/@standardnotes/applications@1.2.6...@standardnotes/applications@1.2.7) (2022-03-30)
 
 **Note:** Version bump only for package @standardnotes/applications
