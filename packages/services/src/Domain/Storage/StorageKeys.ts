@@ -46,11 +46,7 @@ export enum NonwrappedStorageKey {
 }
 
 export function namespacedKey(namespace: string, key: string) {
-  if (namespace) {
-    return `${namespace}-${key}`
-  } else {
-    return key
-  }
+  return `${namespace}-${key}`
 }
 
 export const LegacyKeys1_0_0 = {
