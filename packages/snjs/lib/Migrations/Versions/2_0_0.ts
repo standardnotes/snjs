@@ -1,5 +1,5 @@
 import { ContentType } from '@standardnotes/common'
-import { CreateItemFromPayload, RootKeyContent, SNItemsKey } from '@standardnotes/models'
+import { CreateItemFromPayload, ItemsKeyInterface, RootKeyContent } from '@standardnotes/models'
 import { JwtSession } from '../../Services/Session/Sessions/JwtSession'
 import { Migration } from '@Lib/Migrations/Migration'
 import { MigrationServices } from '../MigrationServices'
@@ -653,8 +653,9 @@ export class Migration2_0_0 extends Migration {
     let currentToken = this.services.storageService.getValue<string | undefined>(
       LEGACY_SESSION_TOKEN_KEY,
     )
-    const user =
-      this.services.storageService.getValue<{ jwt: string; server: string }>(USER_OBJECT_KEY)
+    const user = this.services.storageService.getValue<{ jwt: string; server: string }>(
+      USER_OBJECT_KEY,
+    )
 
     if (!currentToken) {
       /** Try the user object */
@@ -691,7 +692,7 @@ export class Migration2_0_0 extends Migration {
 
   /**
    * All platforms
-   * Create new default SNItemsKey from root key.
+   * Create new default items key from root key.
    * Otherwise, when data is loaded, we won't be able to decrypt it
    * without existence of an item key. This will mean that if this migration
    * is run on two different platforms for the same user, they will create
@@ -716,7 +717,7 @@ export class Migration2_0_0 extends Migration {
         dirty: true,
         dirtiedDate: new Date(),
       })
-      const itemsKey = CreateItemFromPayload(payload) as SNItemsKey
+      const itemsKey = CreateItemFromPayload<ItemsKeyInterface>(payload)
       await this.services.itemManager.emitItemFromPayload(
         itemsKey.payloadRepresentation(),
         Payloads.PayloadSource.LocalChanged,

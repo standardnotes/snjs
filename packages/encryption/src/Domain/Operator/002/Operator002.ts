@@ -1,6 +1,6 @@
 import { Create002KeyParams } from '../../RootKey/KeyParams'
 import { ItemsKeyContent } from '../Operator'
-import { SNItemsKey, CreateItemFromPayload } from '@standardnotes/models'
+import { CreateItemFromPayload, ItemsKeyInterface } from '@standardnotes/models'
 import { SNProtocolOperator001 } from '../001/Operator001'
 import { SNRootKey } from '../../RootKey/RootKey'
 import { SNRootKeyParams } from '../../RootKey/RootKeyParams'
@@ -17,6 +17,7 @@ import {
 import { RootKeyEncryptedAuthenticatedData } from '../../Encryption/RootKeyEncryptedAuthenticatedData'
 import { ItemAuthenticatedData } from '../../Encryption/ItemAuthenticatedData'
 import { LegacyAttachedData } from '../../Encryption/LegacyAttachedData'
+import { isItemsKey } from '../../ItemsKey'
 
 /**
  * @deprecated
@@ -40,17 +41,17 @@ export class SNProtocolOperator002 extends SNProtocolOperator001 {
   }
 
   /**
-   * Creates a new random SNItemsKey to use for item encryption.
+   * Creates a new random items key to use for item encryption.
    * The consumer must save/sync this item.
    */
-  public createItemsKey(): SNItemsKey {
+  public createItemsKey(): ItemsKeyInterface {
     const content = this.generateNewItemsKeyContent()
     const payload = Payloads.CreateMaxPayloadFromAnyObject({
       uuid: UuidGenerator.GenerateUuid(),
       content_type: Common.ContentType.ItemsKey,
       content: Payloads.FillItemContent(content),
     })
-    return CreateItemFromPayload(payload) as SNItemsKey
+    return CreateItemFromPayload(payload) as ItemsKeyInterface
   }
 
   public async createRootKey(
@@ -163,7 +164,7 @@ export class SNProtocolOperator002 extends SNProtocolOperator001 {
 
   public async generateEncryptedParametersAsync(
     payload: Payloads.PurePayload,
-    key: SNItemsKey | SNRootKey,
+    key: ItemsKeyInterface | SNRootKey,
   ): Promise<EncryptedParameters> {
     /**
      * Generate new item key that is double the key size.
@@ -192,7 +193,7 @@ export class SNProtocolOperator002 extends SNProtocolOperator001 {
 
     return {
       uuid: payload.uuid,
-      items_key_id: key instanceof SNItemsKey ? key.uuid : undefined,
+      items_key_id: isItemsKey(key) ? key.uuid : undefined,
       content: ciphertext,
       enc_item_key: encItemKey,
       version: this.version,
@@ -201,7 +202,7 @@ export class SNProtocolOperator002 extends SNProtocolOperator001 {
 
   public async generateDecryptedParametersAsync(
     encrypted: EncryptedParameters,
-    key: SNItemsKey | SNRootKey,
+    key: ItemsKeyInterface | SNRootKey,
   ): Promise<DecryptedParameters | ErroredDecryptingParameters> {
     if (!encrypted.enc_item_key) {
       console.error(Error('Missing item encryption key, skipping decryption.'))

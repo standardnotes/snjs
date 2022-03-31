@@ -1,44 +1,6 @@
-import { PayloadFormat } from '@standardnotes/payloads'
-import { SNRootKey } from '../RootKey/RootKey'
-import { SNItemsKey } from '@standardnotes/models'
-import { EncryptionIntent } from '../Intent/EncryptionIntent'
+import { ItemsKeyInterface } from '@standardnotes/models'
 
-/**
- * Given a key and intent, returns the proper PayloadFormat,
- * or throws an exception if unsupported configuration of parameters.
- */
-export function payloadContentFormatForIntent(
-  intent: EncryptionIntent,
-  key?: SNRootKey | SNItemsKey,
-) {
-  if (!key) {
-    /** Decrypted */
-    if (
-      intent === EncryptionIntent.LocalStorageDecrypted ||
-      intent === EncryptionIntent.FileDecrypted
-    ) {
-      return PayloadFormat.DecryptedBareObject
-    } else {
-      throw 'Unhandled decrypted case in protocolService.payloadContentFormatForIntent.'
-    }
-  } else {
-    /** Encrypted */
-    if (
-      intent === EncryptionIntent.Sync ||
-      intent === EncryptionIntent.FileEncrypted ||
-      intent === EncryptionIntent.LocalStorageEncrypted
-    ) {
-      return PayloadFormat.EncryptedString
-    } else {
-      throw 'Unhandled encrypted case in protocolService.payloadContentFormatForIntent.'
-    }
-  }
-}
-
-/**
- * @returns The SNItemsKey object to use to encrypt new or updated items.
- */
-export function findDefaultItemsKey(itemsKeys: SNItemsKey[]): SNItemsKey | undefined {
+export function findDefaultItemsKey(itemsKeys: ItemsKeyInterface[]): ItemsKeyInterface | undefined {
   if (itemsKeys.length === 1) {
     return itemsKeys[0]
   }

@@ -649,14 +649,14 @@ describe('key recovery service', function () {
       (payload) => payload.uuid === newDefaultKey.uuid,
     )
     const storedParams = await appA.protocolService.getKeyEmbeddedKeyParams(
-      new SNItemsKey(CreateMaxPayloadFromAnyObject(stored)),
+      CreateItemFromPayload(stored),
     )
 
     const correctStored = (
       await appB.deviceInterface.getAllRawDatabasePayloads(appB.identifier)
     ).find((payload) => payload.uuid === newDefaultKey.uuid)
     const correctParams = await appB.protocolService.getKeyEmbeddedKeyParams(
-      new SNItemsKey(CreateMaxPayloadFromAnyObject(correctStored)),
+      CreateItemFromPayload(correctStored),
     )
 
     expect(storedParams).to.eql(correctParams)

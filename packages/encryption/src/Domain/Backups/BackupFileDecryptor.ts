@@ -17,10 +17,11 @@ import {
 } from '@standardnotes/payloads'
 import { ClientDisplayableError } from '@standardnotes/responses'
 import { CreateAnyKeyParams } from '../RootKey/KeyParams'
-import { CreateItemFromPayload, SNItemsKey } from '@standardnotes/models'
+import { CreateItemFromPayload, ItemsKeyInterface } from '@standardnotes/models'
 import { SNRootKeyParams } from '../RootKey/RootKeyParams'
 import { SNRootKey } from '../RootKey/RootKey'
 import { ContentTypeUsesRootKeyEncryption } from '../Intent/Functions'
+import { isItemsKey } from '../ItemsKey'
 
 export async function decryptBackupFile(
   file: BackupFile,
@@ -85,18 +86,18 @@ async function decryptEncryptedWithNonEncryptedItemsKey(
     .filter((payload) => {
       return payload.content_type === ContentType.ItemsKey
     })
-    .map((p) => CreateItemFromPayload<SNItemsKey>(p))
+    .map((p) => CreateItemFromPayload<ItemsKeyInterface>(p))
   return decryptWithItemsKeys(payloads, itemsKeys, protocolService)
 }
 
 function findKeyToUseForPayload(
   payload: PurePayload,
-  availableKeys: SNItemsKey[],
+  availableKeys: ItemsKeyInterface[],
   protocolService: EncryptionService,
   keyParams?: SNRootKeyParams,
   fallbackRootKey?: SNRootKey,
-): SNItemsKey | SNRootKey | undefined {
-  let itemsKey: SNItemsKey | SNRootKey | undefined
+): ItemsKeyInterface | SNRootKey | undefined {
+  let itemsKey: ItemsKeyInterface | SNRootKey | undefined
 
   if (payload.items_key_id) {
     itemsKey = protocolService.itemsKeyForPayload(payload)
@@ -136,7 +137,7 @@ function findKeyToUseForPayload(
 
 async function decryptWithItemsKeys(
   payloads: PurePayload[],
-  itemsKeys: SNItemsKey[],
+  itemsKeys: ItemsKeyInterface[],
   protocolService: EncryptionService,
   keyParams?: SNRootKeyParams,
   fallbackRootKey?: SNRootKey,
@@ -167,7 +168,7 @@ async function decryptWithItemsKeys(
         continue
       }
 
-      if (key instanceof SNItemsKey) {
+      if (isItemsKey(key)) {
         const decryptedPayload = await protocolService.decryptSplitSingle({
           usesItemsKey: {
             items: [encryptedPayload],

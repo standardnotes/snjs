@@ -1,5 +1,5 @@
 import { splitString } from '@standardnotes/utils'
-import { SNItemsKey, CreateItemFromPayload } from '@standardnotes/models'
+import { CreateItemFromPayload, ItemsKeyInterface } from '@standardnotes/models'
 import { ItemsKeyContent } from '../Operator'
 import { SNRootKey } from '../../RootKey/RootKey'
 import { V003Algorithm } from '../../Algorithm'
@@ -34,17 +34,17 @@ export class SNProtocolOperator003 extends SNProtocolOperator002 {
   }
 
   /**
-   * Creates a new random SNItemsKey to use for item encryption.
+   * Creates a new random items key to use for item encryption.
    * The consumer must save/sync this item.
    */
-  public createItemsKey(): SNItemsKey {
+  public createItemsKey(): ItemsKeyInterface {
     const content = this.generateNewItemsKeyContent()
     const payload = CreateMaxPayloadFromAnyObject({
       uuid: UuidGenerator.GenerateUuid(),
       content_type: ContentType.ItemsKey,
       content: FillItemContent(content),
     })
-    return CreateItemFromPayload(payload) as SNItemsKey
+    return CreateItemFromPayload(payload)
   }
 
   public async computeRootKey(password: string, keyParams: SNRootKeyParams): Promise<SNRootKey> {

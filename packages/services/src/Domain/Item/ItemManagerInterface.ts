@@ -1,10 +1,10 @@
 import { ContentType, Uuid } from '@standardnotes/common'
 import {
   SNItem,
-  SNItemsKey,
-  ItemsKeyMutator,
   MutationType,
   ItemMutator,
+  ItemsKeyInterface,
+  ItemsKeyMutatorInterface,
 } from '@standardnotes/models'
 import {
   ItemInterface,
@@ -63,7 +63,7 @@ export interface ItemManagerInterface extends AbstractService {
   /**
    * Returns all non-deleted items keys
    */
-  itemsKeys(): SNItemsKey[]
+  itemsKeys(): ItemsKeyInterface[]
 
   /**
    * Returns all items that have not been able to decrypt.
@@ -85,9 +85,9 @@ export interface ItemManagerInterface extends AbstractService {
 
   changeItemsKey(
     uuid: Uuid,
-    mutate: (mutator: ItemsKeyMutator) => void,
+    mutate: (mutator: ItemsKeyMutatorInterface) => void,
     mutationType?: MutationType,
     payloadSource?: PayloadSource,
     payloadSourceKey?: string,
-  ): Promise<SNItemsKey>
+  ): Promise<ItemsKeyInterface>
 }
