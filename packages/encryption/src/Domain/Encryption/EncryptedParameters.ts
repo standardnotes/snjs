@@ -1,5 +1,5 @@
 import { ProtocolVersion } from '@standardnotes/common'
-import { PayloadContent } from '@standardnotes/payloads/src/Domain/Payload/PayloadContent'
+import { PayloadContent } from '@standardnotes/payloads'
 
 export type EncryptedParameters = {
   uuid: string
