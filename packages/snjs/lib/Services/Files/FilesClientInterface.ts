@@ -25,4 +25,6 @@ export interface FilesClientInterface {
   deleteFile(file: SNFile): Promise<ClientDisplayableError | undefined>
 
   minimumChunkSize(): number
+
+  isFileTypePreviewable(fileType: string): boolean
 }

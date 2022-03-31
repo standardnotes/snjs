@@ -158,4 +158,13 @@ export class SNFileService extends AbstractService implements FilesClientInterfa
     await this.itemManager.setItemToBeDeleted(file.uuid)
     await this.syncService.sync()
   }
+
+  public isFileTypePreviewable(fileType: string): boolean {
+    const isImage = fileType.startsWith('image/');
+    const isVideo = fileType.startsWith('video/');
+    const isAudio = fileType.startsWith('audio/');
+    const isPdf = fileType === 'application/pdf';
+
+    return isImage || isVideo || isAudio || isPdf;
+  }
 }
