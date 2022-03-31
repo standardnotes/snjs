@@ -1,6 +1,6 @@
 import { isNullOrUndefined } from '@standardnotes/utils'
 import { RawStorageKey, StorageKey, namespacedKey, ValueModesKeys } from '@standardnotes/services'
-import { StorageReader } from './reader'
+import { StorageReader } from '../Reader'
 import { PreviousSnjsVersion2_0_0 } from '@Lib/Version'
 
 export class StorageReader2_0_0 extends StorageReader {

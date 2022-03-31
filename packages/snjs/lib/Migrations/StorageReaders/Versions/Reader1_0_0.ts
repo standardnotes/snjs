@@ -1,8 +1,8 @@
 import { isNullOrUndefined } from '@standardnotes/utils'
 import { isEnvironmentMobile } from '@Lib/Application/Platforms'
-import { PreviousSnjsVersion1_0_0 } from '../../Version'
+import { PreviousSnjsVersion1_0_0 } from '../../../Version'
 import { LegacyKeys1_0_0 } from '@standardnotes/services'
-import { StorageReader } from './reader'
+import { StorageReader } from '../Reader'
 
 export class StorageReader1_0_0 extends StorageReader {
   static version() {

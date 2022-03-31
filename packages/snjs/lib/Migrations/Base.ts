@@ -12,8 +12,8 @@ import { PreviousSnjsVersion1_0_0, PreviousSnjsVersion2_0_0, SnjsVersion } from 
 import { Migration } from '@Lib/Migrations/Migration'
 import { RawStorageKey, namespacedKey, ApplicationStage } from '@standardnotes/services'
 import { isNullOrUndefined } from '@standardnotes/utils'
-import { CreateReader } from './Readers/Functions'
-import { StorageReader } from './Readers/reader'
+import { CreateReader } from './StorageReaders/Functions'
+import { StorageReader } from './StorageReaders/Reader'
 import { ContentTypeUsesRootKeyEncryption } from '@standardnotes/encryption'
 
 /** A key that was briefly present in Snjs version 2.0.0 but removed in 2.0.1 */

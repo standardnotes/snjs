@@ -18,7 +18,7 @@ export abstract class Migration {
   }
 
   public static version(): string {
-    throw 'Must override'
+    throw 'Must override migration version'
   }
 
   protected abstract registerStageHandlers(): void

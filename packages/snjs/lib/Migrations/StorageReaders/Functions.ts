@@ -1,13 +1,13 @@
-import * as readerClasses from '@Lib/Migrations/Readers'
-import { compareSemVersions, isRightVersionGreaterThanLeft } from '@Lib/Version'
 import { ApplicationIdentifier } from '@standardnotes/common'
-import { Environment } from '@Lib/Application/Platforms'
+import { compareSemVersions, isRightVersionGreaterThanLeft } from '@Lib/Version'
 import { DeviceInterface } from '@standardnotes/services'
-import { StorageReader } from './reader'
+import { Environment } from '@Lib/Application/Platforms'
+import { StorageReader } from './Reader'
+import * as ReaderClasses from './Versions'
 
 function ReaderClassForVersion(version: string): any {
   /** Sort readers by newest first */
-  const allReaders = Object.values(readerClasses).sort((a, b) => {
+  const allReaders = Object.values(ReaderClasses).sort((a, b) => {
     return compareSemVersions(a.version(), b.version()) * -1
   })
   for (const reader of allReaders) {
