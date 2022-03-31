@@ -1,4 +1,4 @@
-import { ContentType, ProtocolVersion, ProtocolVersionLatest } from '@standardnotes/common'
+import { ContentType, ProtocolVersion } from '@standardnotes/common'
 import { findDefaultItemsKey } from '../Functions'
 import { OperatorManager } from '../../Operator/OperatorManager'
 import { SNItemsKey } from '@standardnotes/models'
@@ -87,28 +87,13 @@ export class ItemsEncryptionService extends Services.AbstractService {
     return result
   }
 
-  private keyToUseForDecryptionOfPayload(
-    payload: Payloads.PurePayload,
-  ): SNItemsKey | StandardException {
+  private keyToUseForDecryptionOfPayload(payload: Payloads.PurePayload): SNItemsKey | undefined {
     if (payload.items_key_id) {
       const itemsKey = this.itemsKeyForPayload(payload)
-      if (!itemsKey) {
-        return new StandardException('Cannot find items key to use for decryption')
-      }
       return itemsKey
     }
 
-    const payloadVersion = payload.version
-    if (payloadVersion === ProtocolVersionLatest) {
-      return new StandardException(
-        'No associated key found for item encrypted with latest protocol version.',
-      )
-    }
-
-    const defaultKey = this.defaultItemsKeyForItemVersion(payloadVersion)
-    if (!defaultKey) {
-      return new StandardException('Cannot find key to use for decryption of payload')
-    }
+    const defaultKey = this.defaultItemsKeyForItemVersion(payload.version)
     return defaultKey
   }
 
@@ -162,7 +147,7 @@ export class ItemsEncryptionService extends Services.AbstractService {
   ): Promise<Payloads.DecryptedParameters | Payloads.ErroredDecryptingParameters> {
     const key = this.keyToUseForDecryptionOfPayload(payload)
 
-    if (key instanceof StandardException) {
+    if (key == undefined) {
       return {
         uuid: payload.uuid,
         errorDecrypting: true,
