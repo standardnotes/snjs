@@ -2744,10 +2744,10 @@
   resolved "https://registry.yarnpkg.com/@standardnotes/futura-theme/-/futura-theme-1.2.6.tgz#284561bf76010dd968be430e0f60d9b9a84f4a28"
   integrity sha512-VfPf2D2zWz6mEQOAZTBGKuX3DLlJ9mK+P4k9dzTgLXYhnFsthnzOKjjUcDREjKDcnbhG6GLeg7dRgO4AxugUuw==
 
-"@standardnotes/markdown-visual@1.0.5":
-  version "1.0.5"
-  resolved "https://registry.yarnpkg.com/@standardnotes/markdown-visual/-/markdown-visual-1.0.5.tgz#6f7f060c1cbadb58c69d15a22bf96d9a1260597d"
-  integrity sha512-4WJKlfwGkG85h7qM5dxQX7+nVN2Jd8sh6voBFNcEVS6WkD7y7YZy1o6clfyIQD8h19HdDh4K050oJ87gsSFeag==
+"@standardnotes/markdown-visual@1.0.6":
+  version "1.0.6"
+  resolved "https://registry.yarnpkg.com/@standardnotes/markdown-visual/-/markdown-visual-1.0.6.tgz#79fba6d838f56bf563bee9ef8d0e2b89de4a48d8"
+  integrity sha512-5Gp+6yUvdUv8N3gF3gutBTdClgPmKLzwWZWhB0/IpPjaxdgm/k0I++kkMwTy+3Iz/9aGgLqbpNNepstAEt845Q==
 
 "@standardnotes/midnight-theme@1.2.6":
   version "1.2.6"
