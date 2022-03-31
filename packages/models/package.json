@@ -35,6 +35,6 @@
     "preset": "../../node_modules/@standardnotes/config/src/jest.json"
   },
   "dependencies": {
-    "@standardnotes/payloads": "^1.4.20"
+    "@standardnotes/payloads": "^1.4.22"
   }
 }

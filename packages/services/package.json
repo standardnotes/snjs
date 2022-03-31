@@ -32,7 +32,7 @@
     "@standardnotes/models": "^1.0.0"
   },
   "peerDependencies": {
-    "@standardnotes/payloads": "^1.4.20"
+    "@standardnotes/payloads": "^1.4.22"
   },
   "devDependencies": {
     "@standardnotes/config": "^2.2.2",
