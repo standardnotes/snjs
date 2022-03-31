@@ -1,39 +1,22 @@
-import { StandardException } from '../../StandardException'
-import { OperatorManager } from '../../Operator/OperatorManager'
-import {
-  PurePayload,
-  CreateMaxPayloadFromAnyObject,
-  PayloadFormat,
-  PayloadSource,
-  EncryptedParameters,
-  DecryptedParameters,
-  ErroredDecryptingParameters,
-  mergePayloadWithEncryptionParameters,
-  sureFindPayload,
-} from '@standardnotes/payloads'
-import { SNItemsKey } from '@standardnotes/models'
-
 import { ContentType, ProtocolVersion, ProtocolVersionLatest } from '@standardnotes/common'
-import {
-  AbstractService,
-  InternalEventBusInterface,
-  ItemManagerInterface,
-  StorageServiceInterface,
-  PayloadManagerInterface,
-} from '@standardnotes/services'
 import { findDefaultItemsKey } from '../Functions'
+import { OperatorManager } from '../../Operator/OperatorManager'
+import { SNItemsKey } from '@standardnotes/models'
+import { StandardException } from '../../StandardException'
 import * as OperatorWrapper from '../../Operator/OperatorWrapper'
+import * as Payloads from '@standardnotes/payloads'
+import * as Services from '@standardnotes/services'
 
-export class ItemsEncryptionService extends AbstractService {
+export class ItemsEncryptionService extends Services.AbstractService {
   private removeItemsObserver!: () => void
   public userVersion?: ProtocolVersion
 
   constructor(
-    private itemManager: ItemManagerInterface,
-    private payloadManager: PayloadManagerInterface,
-    private storageService: StorageServiceInterface,
+    private itemManager: Services.ItemManagerInterface,
+    private payloadManager: Services.PayloadManagerInterface,
+    private storageService: Services.StorageServiceInterface,
     private operatorManager: OperatorManager,
-    protected internalEventBus: InternalEventBusInterface,
+    protected internalEventBus: Services.InternalEventBusInterface,
   ) {
     super(internalEventBus)
 
@@ -63,7 +46,7 @@ export class ItemsEncryptionService extends AbstractService {
    */
   async repersistAllItems() {
     const items = this.itemManager.allItems()
-    const payloads = items.map((item) => CreateMaxPayloadFromAnyObject(item))
+    const payloads = items.map((item) => Payloads.CreateMaxPayloadFromAnyObject(item))
     return this.storageService.savePayloads(payloads)
   }
 
@@ -71,7 +54,7 @@ export class ItemsEncryptionService extends AbstractService {
     return this.itemManager.itemsKeys()
   }
 
-  public itemsKeyForPayload(payload: PurePayload): SNItemsKey | undefined {
+  public itemsKeyForPayload(payload: Payloads.PurePayload): SNItemsKey | undefined {
     return this.getItemsKeys().find(
       (key) => key.uuid === payload.items_key_id || key.duplicateOf === payload.items_key_id,
     )
@@ -104,7 +87,9 @@ export class ItemsEncryptionService extends AbstractService {
     return result
   }
 
-  private keyToUseForDecryptionOfPayload(payload: PurePayload): SNItemsKey | StandardException {
+  private keyToUseForDecryptionOfPayload(
+    payload: Payloads.PurePayload,
+  ): SNItemsKey | StandardException {
     if (payload.items_key_id) {
       const itemsKey = this.itemsKeyForPayload(payload)
       if (!itemsKey) {
@@ -127,7 +112,9 @@ export class ItemsEncryptionService extends AbstractService {
     return defaultKey
   }
 
-  public async encryptSplitSingleWithKeyLookup(payload: PurePayload): Promise<EncryptedParameters> {
+  public async encryptSplitSingleWithKeyLookup(
+    payload: Payloads.PurePayload,
+  ): Promise<Payloads.EncryptedParameters> {
     const key = this.keyToUseForItemEncryption()
 
     if (key instanceof StandardException) {
@@ -138,10 +125,10 @@ export class ItemsEncryptionService extends AbstractService {
   }
 
   public async encryptSplitSingle(
-    payload: PurePayload,
+    payload: Payloads.PurePayload,
     key: SNItemsKey,
-  ): Promise<EncryptedParameters> {
-    if (payload.format !== PayloadFormat.DecryptedBareObject) {
+  ): Promise<Payloads.EncryptedParameters> {
+    if (payload.format !== Payloads.PayloadFormat.DecryptedBareObject) {
       throw Error('Attempting to encrypt already encrypted payload.')
     }
     if (!payload.content) {
@@ -158,21 +145,21 @@ export class ItemsEncryptionService extends AbstractService {
   }
 
   public async encryptSplitSingles(
-    payloads: PurePayload[],
+    payloads: Payloads.PurePayload[],
     key: SNItemsKey,
-  ): Promise<EncryptedParameters[]> {
+  ): Promise<Payloads.EncryptedParameters[]> {
     return Promise.all(payloads.map((payload) => this.encryptSplitSingle(payload, key)))
   }
 
   public async encryptSplitSinglesWithKeyLookup(
-    payloads: PurePayload[],
-  ): Promise<EncryptedParameters[]> {
+    payloads: Payloads.PurePayload[],
+  ): Promise<Payloads.EncryptedParameters[]> {
     return Promise.all(payloads.map((payload) => this.encryptSplitSingleWithKeyLookup(payload)))
   }
 
   public async decryptPayloadWithKeyLookup(
-    payload: PurePayload,
-  ): Promise<DecryptedParameters | ErroredDecryptingParameters> {
+    payload: Payloads.PurePayload,
+  ): Promise<Payloads.DecryptedParameters | Payloads.ErroredDecryptingParameters> {
     const key = this.keyToUseForDecryptionOfPayload(payload)
 
     if (key instanceof StandardException) {
@@ -187,9 +174,9 @@ export class ItemsEncryptionService extends AbstractService {
   }
 
   public async decryptPayload(
-    payload: PurePayload,
+    payload: Payloads.PurePayload,
     key: SNItemsKey,
-  ): Promise<DecryptedParameters | ErroredDecryptingParameters> {
+  ): Promise<Payloads.DecryptedParameters | Payloads.ErroredDecryptingParameters> {
     if (!payload.content) {
       return {
         uuid: payload.uuid,
@@ -209,15 +196,15 @@ export class ItemsEncryptionService extends AbstractService {
   }
 
   public async decryptPayloadsWithKeyLookup(
-    payloads: PurePayload[],
-  ): Promise<(DecryptedParameters | ErroredDecryptingParameters)[]> {
+    payloads: Payloads.PurePayload[],
+  ): Promise<(Payloads.DecryptedParameters | Payloads.ErroredDecryptingParameters)[]> {
     return Promise.all(payloads.map((payload) => this.decryptPayloadWithKeyLookup(payload)))
   }
 
   public async decryptPayloads(
-    payloads: PurePayload[],
+    payloads: Payloads.PurePayload[],
     key: SNItemsKey,
-  ): Promise<(DecryptedParameters | ErroredDecryptingParameters)[]> {
+  ): Promise<(Payloads.DecryptedParameters | Payloads.ErroredDecryptingParameters)[]> {
     return Promise.all(payloads.map((payload) => this.decryptPayload(payload, key)))
   }
 
@@ -235,11 +222,11 @@ export class ItemsEncryptionService extends AbstractService {
 
     const decryptedParams = await this.decryptPayloadsWithKeyLookup(payloads)
     const decryptedPayloads = decryptedParams.map((decryptedParam) => {
-      const originalPayload = sureFindPayload(decryptedParam.uuid, payloads)
-      return mergePayloadWithEncryptionParameters(originalPayload, decryptedParam)
+      const originalPayload = Payloads.sureFindPayload(decryptedParam.uuid, payloads)
+      return Payloads.mergePayloadWithEncryptionParameters(originalPayload, decryptedParam)
     })
 
-    await this.payloadManager.emitPayloads(decryptedPayloads, PayloadSource.LocalChanged)
+    await this.payloadManager.emitPayloads(decryptedPayloads, Payloads.PayloadSource.LocalChanged)
   }
 
   /**
