@@ -3,6 +3,49 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.92.10](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.92.9...@standardnotes/snjs@2.92.10) (2022-03-31)
+
+**Note:** Version bump only for package @standardnotes/snjs
+
+
+
+
+
+## [2.92.9](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.92.8...@standardnotes/snjs@2.92.9) (2022-03-30)
+
+**Note:** Version bump only for package @standardnotes/snjs
+
+
+
+
+
+## [2.92.8](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.92.7...@standardnotes/snjs@2.92.8) (2022-03-29)
+
+
+### Bug Fixes
+
+* spellcheck toggle ([#677](https://github.com/standardnotes/snjs/issues/677)) ([e6fd4c8](https://github.com/standardnotes/snjs/commit/e6fd4c8b339391b92996d926403b4484f961638a))
+
+
+
+
+
+## [2.92.7](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.92.6...@standardnotes/snjs@2.92.7) (2022-03-29)
+
+**Note:** Version bump only for package @standardnotes/snjs
+
+
+
+
+
+## [2.92.6](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.92.5...@standardnotes/snjs@2.92.6) (2022-03-29)
+
+**Note:** Version bump only for package @standardnotes/snjs
+
+
+
+
+
 ## [2.92.5](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.92.4...@standardnotes/snjs@2.92.5) (2022-03-28)
 
 

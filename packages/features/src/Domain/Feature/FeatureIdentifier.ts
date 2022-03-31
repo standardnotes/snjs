@@ -9,6 +9,7 @@ export enum FeatureIdentifier {
   DailyGDriveBackup = 'org.standardnotes.daily-gdrive-backup',
   DailyOneDriveBackup = 'org.standardnotes.daily-onedrive-backup',
   DynamicTheme = 'org.standardnotes.theme-dynamic',
+  FilesBeta = 'org.standardnotes.files-beta',
   Files = 'org.standardnotes.files',
   Files25GB = 'org.standardnotes.files-25-gb',
   Files5GB = 'org.standardnotes.files-5-gb',

@@ -1,6 +1,6 @@
 {
   "name": "@standardnotes/payloads",
-  "version": "1.4.20",
+  "version": "1.4.22",
   "engines": {
     "node": ">=14.0.0 <17.0.0"
   },
@@ -35,9 +35,9 @@
     "preset": "../../node_modules/@standardnotes/config/src/jest.json"
   },
   "dependencies": {
-    "@standardnotes/applications": "^1.2.6",
-    "@standardnotes/common": "^1.17.0",
-    "@standardnotes/features": "^1.35.6",
-    "@standardnotes/utils": "^1.4.3"
+    "@standardnotes/applications": "^1.2.7",
+    "@standardnotes/common": "^1.18.0",
+    "@standardnotes/features": "^1.36.1",
+    "@standardnotes/utils": "^1.4.4"
   }
 }

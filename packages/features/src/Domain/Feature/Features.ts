@@ -414,7 +414,7 @@ function experimentalFeatures(): FeatureDescription[] {
   const markdownVisual: EditorFeatureDescription = FillEditorComponentDefaults({
     name: 'Markdown Visual (Beta)',
     identifier: FeatureIdentifier.MarkdownVisualEditor,
-    version: '1.0.5',
+    version: '1.0.6',
     note_type: NoteType.Markdown,
     file_type: 'md',
     permission_name: PermissionName.MarkdownVisualEditor,
@@ -503,6 +503,12 @@ function clientFeatures(): ClientFeatureDescription[] {
       name: 'Encrypted files (coming soon)',
       identifier: FeatureIdentifier.Files,
       permission_name: PermissionName.Files,
+      description: '',
+    },
+    {
+      name: 'Encrypted files beta',
+      identifier: FeatureIdentifier.FilesBeta,
+      permission_name: PermissionName.FilesBeta,
       description: '',
     },
     {

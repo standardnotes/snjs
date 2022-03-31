@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.18.0](https://github.com/standardnotes/snjs/compare/@standardnotes/common@1.17.0...@standardnotes/common@1.18.0) (2022-03-30)
+
+
+### Features
+
+* files-beta role ([#678](https://github.com/standardnotes/snjs/issues/678)) ([f1ae62f](https://github.com/standardnotes/snjs/commit/f1ae62ff05e361dc551f1a0d047feabd129d0f76))
+
+
+
+
+
 # [1.17.0](https://github.com/standardnotes/snjs/compare/@standardnotes/common@1.16.2...@standardnotes/common@1.17.0) (2022-03-22)
 
 
