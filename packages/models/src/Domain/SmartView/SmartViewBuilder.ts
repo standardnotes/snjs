@@ -1,14 +1,12 @@
+import { SNNote } from './../Note/Note'
 import { SmartViewContent } from './SmartView'
 import { NoteWithTags } from '../Note/NoteWithTags'
 import { ContentType } from '@standardnotes/common'
-import {
-  CompoundPredicate,
-  CreateMaxPayloadFromAnyObject,
-  FillItemContent,
-  Predicate,
-} from '@standardnotes/payloads'
 import { NotesDisplayCriteria } from '../Note/NotesDisplayCriteria'
 import { SmartView, SystemViewId } from '.'
+import { CreateMaxPayloadFromAnyObject, FillItemContent } from '../Payload/Functions'
+import { Predicate } from '../Predicate/Predicate'
+import { CompoundPredicate } from '../Predicate/CompoundPredicate'
 
 export function BuildSmartViews(criteria: NotesDisplayCriteria): SmartView[] {
   const notes = new SmartView(
@@ -59,7 +57,7 @@ export function BuildSmartViews(criteria: NotesDisplayCriteria): SmartView[] {
 }
 
 function allNotesPredicate(criteria: NotesDisplayCriteria) {
-  const subPredicates = [new Predicate('content_type', '=', ContentType.Note)]
+  const subPredicates: Predicate<SNNote>[] = [new Predicate('content_type', '=', ContentType.Note)]
 
   if (criteria.includeTrashed === false) {
     subPredicates.push(new Predicate('trashed', '=', false))
@@ -79,7 +77,7 @@ function allNotesPredicate(criteria: NotesDisplayCriteria) {
 }
 
 function archivedNotesPredicate(criteria: NotesDisplayCriteria) {
-  const subPredicates = [
+  const subPredicates: Predicate<SNNote>[] = [
     new Predicate('archived', '=', true),
     new Predicate('content_type', '=', ContentType.Note),
   ]
@@ -98,7 +96,7 @@ function archivedNotesPredicate(criteria: NotesDisplayCriteria) {
 }
 
 function trashedNotesPredicate(criteria: NotesDisplayCriteria) {
-  const subPredicates = [
+  const subPredicates: Predicate<SNNote>[] = [
     new Predicate('trashed', '=', true),
     new Predicate('content_type', '=', ContentType.Note),
   ]

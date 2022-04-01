@@ -1,8 +1,8 @@
 import { ItemsKeyInterface } from '@standardnotes/models'
-import * as Payloads from '@standardnotes/payloads'
+import * as Models from '@standardnotes/models'
 import { SNRootKey } from '../RootKey/RootKey'
 import { SNRootKeyParams } from '../RootKey/RootKeyParams'
-import { KeyParamsOrigination, ProtocolVersion } from '@standardnotes/common'
+import { KeyParamsOrigination } from '@standardnotes/common'
 import {
   DecryptedParameters,
   EncryptedParameters,
@@ -11,12 +11,6 @@ import {
 import { RootKeyEncryptedAuthenticatedData } from '../Encryption/RootKeyEncryptedAuthenticatedData'
 import { ItemAuthenticatedData } from '../Encryption/ItemAuthenticatedData'
 import { LegacyAttachedData } from '../Encryption/LegacyAttachedData'
-
-export type ItemsKeyContent = {
-  itemsKey: string
-  dataAuthenticationKey?: string
-  version: ProtocolVersion
-}
 
 /**w
  * An operator is responsible for performing crypto operations, such as generating keys
@@ -70,14 +64,14 @@ export interface SynchronousOperator extends OperatorCommon {
    * items keys), or an ItemsKey (if encrypted regular items)
    */
   generateEncryptedParametersSync(
-    payload: Payloads.PurePayload,
+    payload: Models.PayloadInterface,
     key: ItemsKeyInterface | SNRootKey,
   ): EncryptedParameters
 
-  generateDecryptedParametersSync(
+  generateDecryptedParametersSync<C extends Models.ItemContent = Models.ItemContent>(
     encrypted: EncryptedParameters,
     key: ItemsKeyInterface | SNRootKey,
-  ): DecryptedParameters | ErroredDecryptingParameters
+  ): DecryptedParameters<C> | ErroredDecryptingParameters
 }
 
 export interface AsynchronousOperator extends OperatorCommon {
@@ -89,12 +83,12 @@ export interface AsynchronousOperator extends OperatorCommon {
    * items keys), or an ItemsKey (if encrypted regular items)
    */
   generateEncryptedParametersAsync(
-    payload: Payloads.PurePayload,
+    payload: Models.PayloadInterface,
     key: ItemsKeyInterface | SNRootKey,
   ): Promise<EncryptedParameters>
 
-  generateDecryptedParametersAsync(
+  generateDecryptedParametersAsync<C extends Models.ItemContent = Models.ItemContent>(
     encrypted: EncryptedParameters,
     key: ItemsKeyInterface | SNRootKey,
-  ): Promise<DecryptedParameters | ErroredDecryptingParameters>
+  ): Promise<DecryptedParameters<C> | ErroredDecryptingParameters>
 }

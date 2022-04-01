@@ -6,14 +6,13 @@ import { findDefaultItemsKey } from '../Functions'
 import { ItemsEncryptionService } from '../Items/ItemsEncryption'
 import { KeyMode } from '../RootKey/KeyMode'
 import { OperatorManager } from '../../Operator/OperatorManager'
-import { ItemsKeyInterface, Uuids } from '@standardnotes/models'
 import { SNPureCrypto } from '@standardnotes/sncrypto-common'
 import { SNRootKey } from '../../RootKey/RootKey'
 import { SNRootKeyParams } from '../../RootKey/RootKeyParams'
 import { V001Algorithm, V002Algorithm } from '../../Algorithm'
 import * as Common from '@standardnotes/common'
 import * as EncryptionSplit from './EncryptionSplit'
-import * as Payloads from '@standardnotes/payloads'
+import * as Models from '@standardnotes/models'
 import * as RootKeyEncryption from '../RootKey/RootKeyEncryption'
 import * as Services from '@standardnotes/services'
 import * as Utils from '@standardnotes/utils'
@@ -171,8 +170,8 @@ export class EncryptionService
     return accountUpgradeAvailable || passcodeUpgradeAvailable
   }
 
-  public getSureDefaultItemsKey(): ItemsKeyInterface {
-    return this.itemsEncryption.getDefaultItemsKey() as ItemsKeyInterface
+  public getSureDefaultItemsKey(): Models.ItemsKeyInterface {
+    return this.itemsEncryption.getDefaultItemsKey() as Models.ItemsKeyInterface
   }
 
   async repersistAllItems(): Promise<void> {
@@ -191,34 +190,36 @@ export class EncryptionService
     await this.itemsEncryption.decryptErroredItems()
   }
 
-  public itemsKeyForPayload(payload: Payloads.PurePayload): ItemsKeyInterface | undefined {
+  public itemsKeyForPayload(
+    payload: Models.PayloadInterface,
+  ): Models.ItemsKeyInterface | undefined {
     return this.itemsEncryption.itemsKeyForPayload(payload)
   }
 
   public defaultItemsKeyForItemVersion(
     version: Common.ProtocolVersion,
-    fromKeys?: ItemsKeyInterface[],
-  ): ItemsKeyInterface | undefined {
+    fromKeys?: Models.ItemsKeyInterface[],
+  ): Models.ItemsKeyInterface | undefined {
     return this.itemsEncryption.defaultItemsKeyForItemVersion(version, fromKeys)
   }
 
   public async encryptSplitSingle(
-    split: EncryptionSplit.EncryptionSplitWithKey<Payloads.PurePayload>,
+    split: EncryptionSplit.EncryptionSplitWithKey<Models.PayloadInterface>,
     intent: EncryptedEncryptionIntent,
-  ): Promise<Payloads.PurePayload> {
+  ): Promise<Models.PayloadInterface> {
     return (await this.encryptSplit(split, intent))[0]
   }
 
   public async encryptSplit(
-    split: EncryptionSplit.EncryptionSplitWithKey<Payloads.PurePayload>,
+    split: EncryptionSplit.EncryptionSplitWithKey<Models.PayloadInterface>,
     intent: EncryptedEncryptionIntent,
-  ): Promise<Payloads.PurePayload[]> {
+  ): Promise<Models.PayloadInterface[]> {
     const allEncryptedParams: EncryptedParameters[] = []
-    const allNonencryptablePayloads: Payloads.PurePayload[] = []
+    const allNonencryptablePayloads: Models.PayloadInterface[] = []
 
-    const categorizePayloads = (payloads: Payloads.PurePayload[]) => {
-      const encryptables: Payloads.PurePayload[] = []
-      const nonencryptables: Payloads.PurePayload[] = []
+    const categorizePayloads = (payloads: Models.PayloadInterface[]) => {
+      const encryptables: Models.PayloadInterface[] = []
+      const nonencryptables: Models.PayloadInterface[] = []
 
       for (const payload of payloads) {
         if (payload.errorDecrypting || payload.deleted) {
@@ -280,25 +281,25 @@ export class EncryptionService
     return allNonencryptablePayloads.concat(packagedEncrypted)
   }
 
-  public async decryptSplitSingle(
-    split: EncryptionSplit.EncryptionSplitWithKey<Payloads.PurePayload>,
-  ): Promise<Payloads.PurePayload> {
+  public async decryptSplitSingle<C extends Models.ItemContent = Models.ItemContent>(
+    split: EncryptionSplit.EncryptionSplitWithKey<Models.PayloadInterface<C>>,
+  ): Promise<Models.PayloadInterface<C>> {
     return (await this.decryptSplit(split))[0]
   }
 
-  public async decryptSplit(
-    split: EncryptionSplit.EncryptionSplitWithKey<Payloads.PurePayload>,
-  ): Promise<Payloads.PurePayload[]> {
-    const allDecryptedParams: (DecryptedParameters | ErroredDecryptingParameters)[] = []
-    const allNondecryptablePayloads: Payloads.PurePayload[] = []
+  public async decryptSplit<C extends Models.ItemContent = Models.ItemContent>(
+    split: EncryptionSplit.EncryptionSplitWithKey<Models.PayloadInterface<C>>,
+  ): Promise<Models.PayloadInterface<C>[]> {
+    const allDecryptedParams: (DecryptedParameters<C> | ErroredDecryptingParameters)[] = []
+    const allNondecryptablePayloads: Models.PayloadInterface<C>[] = []
 
-    const categorizePayloads = (payloads: Payloads.PurePayload[]) => {
-      const decryptables: Payloads.PurePayload[] = []
-      const nondecryptables: Payloads.PurePayload[] = []
+    const categorizePayloads = (payloads: Models.PayloadInterface[]) => {
+      const decryptables: Models.PayloadInterface[] = []
+      const nondecryptables: Models.PayloadInterface[] = []
 
       for (const payload of payloads) {
         const isDeletedPendingSync = payload.deleted === true && payload.content === undefined
-        const alreadyDecrypted = payload.format === Payloads.PayloadFormat.DecryptedBareObject
+        const alreadyDecrypted = payload.format === Models.PayloadFormat.DecryptedBareObject
         if (isDeletedPendingSync || alreadyDecrypted) {
           nondecryptables.push(payload)
         } else {
@@ -585,7 +586,7 @@ export class EncryptionService
 
   /** Returns the key params attached to this key's encrypted payload */
   public getEmbeddedPayloadAuthenticatedData(
-    payload: Payloads.PurePayload,
+    payload: Models.PayloadInterface,
   ): RootKeyEncryptedAuthenticatedData | ItemAuthenticatedData | LegacyAttachedData | undefined {
     const version = payload.version
     if (!version) {
@@ -599,9 +600,9 @@ export class EncryptionService
   }
 
   /** Returns the key params attached to this key's encrypted payload */
-  public getKeyEmbeddedKeyParams(key: ItemsKeyInterface): SNRootKeyParams | undefined {
+  public getKeyEmbeddedKeyParams(key: Models.ItemsKeyInterface): SNRootKeyParams | undefined {
     /** We can only look up key params for keys that are encrypted (as strings) */
-    if (key.payload.format === Payloads.PayloadFormat.DecryptedBareObject) {
+    if (key.payload.format === Models.PayloadFormat.DecryptedBareObject) {
       return undefined
     }
     const authenticatedData = this.getEmbeddedPayloadAuthenticatedData(key.payload)
@@ -650,7 +651,7 @@ export class EncryptionService
     return defaultItemsKey.itemsKey !== rootKey.itemsKey
   }
 
-  public async createNewDefaultItemsKey(): Promise<ItemsKeyInterface> {
+  public async createNewDefaultItemsKey(): Promise<Models.ItemsKeyInterface> {
     return this.rootKeyEncryption.createNewDefaultItemsKey()
   }
 
@@ -700,7 +701,7 @@ export class EncryptionService
     const hasSyncedItemsKey = !Utils.isNullOrUndefined(defaultSyncedKey)
     if (hasSyncedItemsKey) {
       /** Delete all never synced keys */
-      await this.itemManager.setItemsToBeDeleted(Uuids(neverSyncedKeys))
+      await this.itemManager.setItemsToBeDeleted(Models.Uuids(neverSyncedKeys))
     } else {
       /**
        * No previous synced items key.
@@ -716,7 +717,7 @@ export class EncryptionService
           return itemsKey.keyVersion !== rootKeyParams.version
         })
         if (toDelete.length > 0) {
-          await this.itemManager.setItemsToBeDeleted(Uuids(toDelete))
+          await this.itemManager.setItemsToBeDeleted(Models.Uuids(toDelete))
         }
 
         if (this.itemsEncryption.getItemsKeys().length === 0) {
@@ -762,7 +763,7 @@ export class EncryptionService
       .getItemsKeys()
       .filter((key) => key.neverSynced && !key.dirty && !key.deleted)
     if (unsyncedKeys.length > 0) {
-      void this.itemManager.setItemsDirty(Uuids(unsyncedKeys))
+      void this.itemManager.setItemsDirty(Models.Uuids(unsyncedKeys))
     }
   }
 }

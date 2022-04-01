@@ -1,5 +1,5 @@
 import { HistoryMap, DeltaClassForSource } from '@standardnotes/models'
-import * as Payloads from '@standardnotes/payloads'
+import * as Payloads from '@standardnotes/models'
 import { SyncResponse } from '@Lib/Services/Sync/Response'
 
 /**

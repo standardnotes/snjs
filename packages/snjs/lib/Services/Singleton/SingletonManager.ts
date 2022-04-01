@@ -9,9 +9,9 @@ import {
 } from '@standardnotes/utils'
 import {
   CreateMaxPayloadFromAnyObject,
-  PayloadContent,
+  ItemContent,
   PredicateInterface,
-} from '@standardnotes/payloads'
+} from '@standardnotes/models'
 import { SNSyncService } from '../Sync/SyncService'
 import { AbstractService, InternalEventBusInterface, SyncEvent } from '@standardnotes/services'
 
@@ -166,7 +166,7 @@ export class SNSingletonManager extends AbstractService {
   public async findOrCreateSingleton<T extends SNItem = SNItem>(
     predicate: PredicateInterface<T>,
     createContentType: ContentType,
-    createContent: PayloadContent,
+    createContent: ItemContent,
   ): Promise<T> {
     const existingSingleton = this.findSingleton<T>(createContentType, predicate)
     if (!isNullOrUndefined(existingSingleton)) {

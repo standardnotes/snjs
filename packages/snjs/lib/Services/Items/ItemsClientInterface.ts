@@ -4,7 +4,7 @@ import {
   ItemInterface,
   PredicateInterface,
   PurePayload,
-} from '@standardnotes/payloads'
+} from '@standardnotes/models'
 import { AnyRecord, ContentType } from '@standardnotes/common'
 import {
   SNNote,

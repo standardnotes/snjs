@@ -12,7 +12,6 @@ import { Strings } from '../../Strings'
 import { TagsToFoldersMigrationApplicator } from '@Lib/Migrations/Applicators/TagsToFolders'
 import { UuidString } from '@Lib/Types/UuidString'
 import * as Models from '@standardnotes/models'
-import * as Payloads from '@standardnotes/payloads'
 import * as Utils from '@standardnotes/utils'
 import {
   Challenge,
@@ -36,12 +35,12 @@ export class MutatorService extends AbstractService implements MutatorClientInte
     super(internalEventBus)
   }
 
-  public async savePayload(payload: Payloads.PurePayload): Promise<void> {
-    const dirtied = Payloads.CopyPayload(payload, {
+  public async savePayload(payload: Models.PurePayload): Promise<void> {
+    const dirtied = Models.CopyPayload(payload, {
       dirty: true,
       dirtiedDate: new Date(),
     })
-    await this.payloadManager.emitPayload(dirtied, Payloads.PayloadSource.LocalChanged)
+    await this.payloadManager.emitPayload(dirtied, Models.PayloadSource.LocalChanged)
     await this.syncService.sync()
   }
 
@@ -67,7 +66,7 @@ export class MutatorService extends AbstractService implements MutatorClientInte
     uuid: UuidString,
     mutate: (mutator: M) => void,
     updateTimestamps = true,
-    payloadSource?: Payloads.PayloadSource,
+    payloadSource?: Models.PayloadSource,
     syncOptions?: SyncOptions,
   ): Promise<Models.SNItem | undefined> {
     if (!Utils.isString(uuid)) {
@@ -89,7 +88,7 @@ export class MutatorService extends AbstractService implements MutatorClientInte
     uuids: UuidString[],
     mutate: (mutator: M) => void,
     updateTimestamps = true,
-    payloadSource?: Payloads.PayloadSource,
+    payloadSource?: Models.PayloadSource,
     syncOptions?: SyncOptions,
   ): Promise<void> {
     await this.itemManager.changeItems(
@@ -137,7 +136,7 @@ export class MutatorService extends AbstractService implements MutatorClientInte
 
   public async runTransactionalMutations(
     transactions: TransactionalMutation[],
-    payloadSource = Payloads.PayloadSource.LocalChanged,
+    payloadSource = Models.PayloadSource.LocalChanged,
     payloadSourceKey?: string,
   ): Promise<(Models.SNItem | undefined)[]> {
     return this.itemManager.runTransactionalMutations(transactions, payloadSource, payloadSourceKey)
@@ -145,7 +144,7 @@ export class MutatorService extends AbstractService implements MutatorClientInte
 
   public async runTransactionalMutation(
     transaction: TransactionalMutation,
-    payloadSource = Payloads.PayloadSource.LocalChanged,
+    payloadSource = Models.PayloadSource.LocalChanged,
     payloadSourceKey?: string,
   ): Promise<Models.SNItem | undefined> {
     return this.itemManager.runTransactionalMutation(transaction, payloadSource, payloadSourceKey)
@@ -217,24 +216,24 @@ export class MutatorService extends AbstractService implements MutatorClientInte
 
   public async mergeItem(
     item: Models.SNItem,
-    source: Payloads.PayloadSource,
+    source: Models.PayloadSource,
   ): Promise<Models.SNItem> {
     return this.itemManager.emitItemFromPayload(item.payloadRepresentation(), source)
   }
 
-  public async createManagedItem(
+  public async createManagedItem<C extends Models.ItemContent = Models.ItemContent>(
     contentType: ContentType,
-    content: Payloads.PayloadContent,
+    content: Models.ItemContent,
     needsSync = false,
-    override?: Payloads.PayloadOverride,
-  ): Promise<Models.SNItem> {
+    override?: Partial<Models.PayloadInterface<C>>,
+  ): Promise<Models.ItemInterface<C>> {
     return this.itemManager.createItem(contentType, content, needsSync, override)
   }
 
-  public async createTemplateItem(
-    contentType: ContentType,
-    content?: Payloads.PayloadContent,
-  ): Promise<Models.SNItem> {
+  createTemplateItem<
+    C extends Models.ItemContent = Models.ItemContent,
+    I extends Models.ItemInterface = Models.ItemInterface,
+  >(contentType: ContentType, content?: C): I {
     return this.itemManager.createTemplateItem(contentType, content)
   }
 
@@ -261,7 +260,7 @@ export class MutatorService extends AbstractService implements MutatorClientInte
 
   public duplicateItem<T extends Models.SNItem>(
     item: T,
-    additionalContent?: Partial<Payloads.PayloadContent>,
+    additionalContent?: Partial<Models.ItemContent>,
   ): Promise<T> {
     const duplicate = this.itemManager.duplicateItem<T>(item.uuid, false, additionalContent)
     void this.syncService.sync()
@@ -372,17 +371,18 @@ export class MutatorService extends AbstractService implements MutatorClientInte
 
     const validPayloads = decryptedPayloadsOrError
       .filter((payload) => {
-        return !payload.errorDecrypting && payload.format !== Payloads.PayloadFormat.EncryptedString
+        return !payload.errorDecrypting && payload.format !== Models.PayloadFormat.EncryptedString
       })
       .map((payload) => {
         /* Don't want to activate any components during import process in
          * case of exceptions breaking up the import proccess */
-        if (payload.content_type === ContentType.Component && payload.safeContent.active) {
-          return Payloads.CopyPayload(payload, {
-            content: {
-              ...payload.safeContent,
-              active: false,
-            },
+        if (
+          payload.content_type === ContentType.Component &&
+          (payload.safeContent as Models.ComponentContent).active
+        ) {
+          const typedContent = payload as Models.PayloadInterface<Models.ComponentContent>
+          return Models.CopyPayloadWithContentOverride(typedContent, {
+            active: false,
           })
         } else {
           return payload

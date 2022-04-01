@@ -1,13 +1,11 @@
 import { Create002KeyParams } from '../../RootKey/KeyParams'
-import { ItemsKeyContent } from '../Operator'
-import { CreateItemFromPayload, ItemsKeyInterface } from '@standardnotes/models'
 import { SNProtocolOperator001 } from '../001/Operator001'
 import { SNRootKey } from '../../RootKey/RootKey'
 import { SNRootKeyParams } from '../../RootKey/RootKeyParams'
 import { UuidGenerator } from '@standardnotes/utils'
 import { V002Algorithm } from '../../Algorithm'
 import * as Common from '@standardnotes/common'
-import * as Payloads from '@standardnotes/payloads'
+import * as Models from '@standardnotes/models'
 import * as Utils from '@standardnotes/utils'
 import {
   DecryptedParameters,
@@ -18,6 +16,8 @@ import { RootKeyEncryptedAuthenticatedData } from '../../Encryption/RootKeyEncry
 import { ItemAuthenticatedData } from '../../Encryption/ItemAuthenticatedData'
 import { LegacyAttachedData } from '../../Encryption/LegacyAttachedData'
 import { isItemsKey } from '../../ItemsKey'
+import { CreateNewRootKey } from '../../RootKey/Functions'
+import { ItemContent } from '@standardnotes/models'
 
 /**
  * @deprecated
@@ -28,15 +28,15 @@ export class SNProtocolOperator002 extends SNProtocolOperator001 {
     return Common.ProtocolVersion.V002
   }
 
-  protected generateNewItemsKeyContent(): ItemsKeyContent {
+  protected generateNewItemsKeyContent(): Models.ItemsKeyContent {
     const keyLength = V002Algorithm.EncryptionKeyLength
     const itemsKey = this.crypto.generateRandomKey(keyLength)
     const authKey = this.crypto.generateRandomKey(keyLength)
-    const response: ItemsKeyContent = {
+    const response = Models.FillItemContent<Models.ItemsKeyContent>({
       itemsKey: itemsKey,
       dataAuthenticationKey: authKey,
       version: Common.ProtocolVersion.V002,
-    }
+    })
     return response
   }
 
@@ -44,14 +44,13 @@ export class SNProtocolOperator002 extends SNProtocolOperator001 {
    * Creates a new random items key to use for item encryption.
    * The consumer must save/sync this item.
    */
-  public createItemsKey(): ItemsKeyInterface {
-    const content = this.generateNewItemsKeyContent()
-    const payload = Payloads.CreateMaxPayloadFromAnyObject({
+  public createItemsKey(): Models.ItemsKeyInterface {
+    const payload = Models.CreateMaxPayloadFromAnyObject({
       uuid: UuidGenerator.GenerateUuid(),
       content_type: Common.ContentType.ItemsKey,
-      content: Payloads.FillItemContent(content),
+      content: this.generateNewItemsKeyContent(),
     })
-    return CreateItemFromPayload(payload) as ItemsKeyInterface
+    return Models.CreateItemFromPayload(payload)
   }
 
   public async createRootKey(
@@ -163,8 +162,8 @@ export class SNProtocolOperator002 extends SNProtocolOperator001 {
   }
 
   public async generateEncryptedParametersAsync(
-    payload: Payloads.PurePayload,
-    key: ItemsKeyInterface | SNRootKey,
+    payload: Models.PayloadInterface,
+    key: Models.ItemsKeyInterface | SNRootKey,
   ): Promise<EncryptedParameters> {
     /**
      * Generate new item key that is double the key size.
@@ -200,10 +199,10 @@ export class SNProtocolOperator002 extends SNProtocolOperator001 {
     }
   }
 
-  public async generateDecryptedParametersAsync(
+  public async generateDecryptedParametersAsync<C extends ItemContent = ItemContent>(
     encrypted: EncryptedParameters,
-    key: ItemsKeyInterface | SNRootKey,
-  ): Promise<DecryptedParameters | ErroredDecryptingParameters> {
+    key: Models.ItemsKeyInterface | SNRootKey,
+  ): Promise<DecryptedParameters<C> | ErroredDecryptingParameters> {
     if (!encrypted.enc_item_key) {
       console.error(Error('Missing item encryption key, skipping decryption.'))
       return {
@@ -284,14 +283,14 @@ export class SNProtocolOperator002 extends SNProtocolOperator001 {
     }
 
     const partitions = Utils.splitString(derivedKey, 3)
-    const key = SNRootKey.Create({
+
+    return CreateNewRootKey({
       serverPassword: partitions[0],
       masterKey: partitions[1],
       dataAuthenticationKey: partitions[2],
       version: Common.ProtocolVersion.V002,
       keyParams: keyParams.getPortableValue(),
     })
-    return key
   }
 
   private encryptionComponentsFromString002(

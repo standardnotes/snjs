@@ -1,14 +1,4 @@
-import {
-  PayloadInterface,
-  ImmutablePayloadCollection,
-  PurePayload,
-  AffectorFunction,
-  CopyPayload,
-  PayloadsByUpdatingReferencingPayloadReferences,
-  PayloadOverride,
-  PayloadContent,
-} from '@standardnotes/payloads'
-
+import { PayloadInterface } from './Payload/PayloadInterface'
 import { CreateItemFromPayload } from './Generator'
 import { ContentType } from '@standardnotes/common'
 import { UuidGenerator, extendArray } from '@standardnotes/utils'
@@ -16,10 +6,13 @@ import { SNComponent } from './Component/Component'
 import { ComponentMutator } from './Component/ComponentMutator'
 import { ComponentArea } from '@standardnotes/features'
 import { MutationType } from './Item/MutationType'
+import { CopyPayload, PayloadsByUpdatingReferencingPayloadReferences } from './Payload/Functions'
+import { PurePayload } from './Payload/PurePayload'
+import { ImmutablePayloadCollection } from './Collection/ImmutablePayloadCollection'
+import { AffectorFunction } from './Payload/AffectorFunction'
+import { ItemContent } from './Item/ItemContent'
+import { Writeable } from './Writeable'
 
-/**
- * Returns an array of uuids for the given items or payloads
- */
 export function Uuids(items: { uuid: string }[]): string[] {
   return items.map((item) => {
     return item.uuid
@@ -74,31 +67,35 @@ const AffectorMapping = {
  * Copies payload and assigns it a new uuid.
  * @returns An array of payloads that have changed as a result of copying.
  */
-export async function PayloadsByDuplicating(
-  payload: PayloadInterface,
+export async function PayloadsByDuplicating<C extends ItemContent = ItemContent>(
+  payload: PayloadInterface<C>,
   baseCollection: ImmutablePayloadCollection,
   isConflict: boolean,
-  additionalContent?: Partial<PayloadContent>,
-): Promise<PayloadInterface[]> {
+  additionalContent?: Partial<C>,
+): Promise<PayloadInterface<C>[]> {
   if (payload.errorDecrypting) {
     throw Error('Attempting to duplicate errored payload')
   }
-  const results = []
-  const override: PayloadOverride = {
-    uuid: await UuidGenerator.GenerateUuid(),
+
+  const results: PayloadInterface<C>[] = []
+  const override: Writeable<Partial<PayloadInterface<C>>> = {
+    uuid: UuidGenerator.GenerateUuid(),
     dirty: true,
     dirtiedDate: new Date(),
-    lastSyncBegan: null,
-    lastSyncEnd: null,
+    lastSyncBegan: undefined,
+    lastSyncEnd: undefined,
     duplicate_of: payload.uuid,
   }
+
   override.content = {
     ...payload.safeContent,
     ...additionalContent,
   }
+
   if (isConflict) {
     override.content.conflict_of = payload.uuid
   }
+
   const copy = CopyPayload(payload, override)
 
   results.push(copy)

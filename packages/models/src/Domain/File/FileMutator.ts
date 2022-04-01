@@ -1,20 +1,17 @@
 import { ContentType } from '@standardnotes/common'
 import { SNNote } from '../Note/Note'
 import { ItemMutator } from '../Item/ItemMutator'
-import { ContenteReferenceType, FileToNoteReference } from '@standardnotes/payloads'
-import { ExtendedFileContent } from './File'
+import { FileContent } from './File'
+import { FileToNoteReference } from '../Reference/FileToNoteReference'
+import { ContenteReferenceType } from '../Reference/ContenteReferenceType'
 
-export class FileMutator extends ItemMutator {
-  get typedContent(): Partial<ExtendedFileContent> {
-    return this.content as Partial<ExtendedFileContent>
-  }
-
+export class FileMutator extends ItemMutator<FileContent> {
   set name(newName: string) {
-    this.typedContent.name = newName
+    this.sureContent.name = newName
   }
 
   set encryptionHeader(encryptionHeader: string) {
-    this.typedContent.encryptionHeader = encryptionHeader
+    this.sureContent.encryptionHeader = encryptionHeader
   }
 
   public associateWithNote(note: SNNote): void {
@@ -24,13 +21,13 @@ export class FileMutator extends ItemMutator {
       uuid: note.uuid,
     }
 
-    const references = this.typedContent.references || []
+    const references = this.sureContent.references || []
     references.push(reference)
-    this.typedContent.references = references
+    this.sureContent.references = references
   }
 
   public disassociateWithNote(note: SNNote): void {
     const references = this.item.references.filter((ref) => ref.uuid !== note.uuid)
-    this.typedContent.references = references
+    this.sureContent.references = references
   }
 }

@@ -1,6 +1,6 @@
 import { SNRootKey, SNRootKeyParams } from '@standardnotes/encryption'
 import { ItemsKeyInterface } from '@standardnotes/models'
-import { RawPayload } from '@standardnotes/payloads'
+import { RawPayload } from '@standardnotes/models'
 import { UuidString } from '@Lib/Types'
 
 export type UndecryptableItemsStorage = Record<UuidString, RawPayload>

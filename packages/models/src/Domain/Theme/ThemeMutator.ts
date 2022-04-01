@@ -1,8 +1,9 @@
-import { AppDataField } from '@standardnotes/payloads'
+import { AppDataField } from '../Item/AppDataField'
+import { ComponentContent } from '../Component/ComponentContent'
 import { ItemMutator } from '../Item/ItemMutator'
 
-export class ThemeMutator extends ItemMutator {
-  setMobileRules(rules: any) {
+export class ThemeMutator extends ItemMutator<ComponentContent> {
+  setMobileRules(rules: unknown) {
     this.setAppDataItem(AppDataField.MobileRules, rules)
   }
 
@@ -11,7 +12,7 @@ export class ThemeMutator extends ItemMutator {
   }
 
   set local_url(local_url: string) {
-    this.content!.local_url = local_url
+    this.sureContent.local_url = local_url
   }
 
   /**

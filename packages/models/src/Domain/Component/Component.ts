@@ -1,5 +1,6 @@
+import { PayloadInterface } from './../Payload/PayloadInterface'
+import { ComponentContent, ComponentInterface } from './ComponentContent'
 import { isValidUrl } from '@standardnotes/utils'
-import { Predicate, PurePayload, ConflictStrategy, AppDataField } from '@standardnotes/payloads'
 import { SNItem } from '../Item/Item'
 import { ContentType, Uuid } from '@standardnotes/common'
 import { HistoryEntry } from '../History/HistoryEntry'
@@ -10,21 +11,24 @@ import {
   ComponentFlag,
   FeatureDescription,
   ComponentPermission,
-  ComponentContent,
 } from '@standardnotes/features'
+import { ConflictStrategy } from '../Payload/ConflictStrategy'
+import { Predicate } from '../Predicate/Predicate'
+import { AppDataField } from '../Item/AppDataField'
+import { ItemContent } from '../Item/ItemContent'
 
 /**
  * Components are mostly iframe based extensions that communicate with the SN parent
  * via the postMessage API. However, a theme can also be a component, which is activated
  * only by its url.
  */
-export class SNComponent extends SNItem implements ComponentContent {
+export class SNComponent extends SNItem<ComponentContent> implements ComponentInterface {
   public readonly componentData: Record<string, any>
   /** Items that have requested a component to be disabled in its context */
   public readonly disassociatedItemIds: string[]
   /** Items that have requested a component to be enabled in its context */
   public readonly associatedItemIds: string[]
-  public readonly local_url: string
+  public readonly local_url?: string
   public readonly hosted_url?: string
   public readonly offlineOnly: boolean
   public readonly name: string
@@ -37,31 +41,31 @@ export class SNComponent extends SNItem implements ComponentContent {
   public readonly legacy_url?: string
   public readonly isMobileDefault: boolean
 
-  constructor(payload: PurePayload) {
+  constructor(payload: PayloadInterface<ComponentContent>) {
     super(payload)
     /** Custom data that a component can store in itself */
     this.componentData = this.payload.safeContent.componentData || {}
 
-    if (isValidUrl(this.payload.safeContent.hosted_url)) {
-      this.hosted_url = this.payload.safeContent.hosted_url
-    } else if (isValidUrl(this.payload.safeContent.url)) {
-      this.hosted_url = this.payload.safeContent.url
-    } else if (isValidUrl(this.payload.safeContent.legacy_url)) {
-      this.hosted_url = this.payload.safeContent.legacy_url
+    if (payload.safeContent.hosted_url && isValidUrl(payload.safeContent.hosted_url)) {
+      this.hosted_url = payload.safeContent.hosted_url
+    } else if (payload.safeContent.url && isValidUrl(payload.safeContent.url)) {
+      this.hosted_url = payload.safeContent.url
+    } else if (payload.safeContent.legacy_url && isValidUrl(payload.safeContent.legacy_url)) {
+      this.hosted_url = payload.safeContent.legacy_url
     }
-    this.local_url = this.payload.safeContent.local_url
+    this.local_url = payload.safeContent.local_url
 
-    this.valid_until = new Date(this.payload.safeContent.valid_until || 0)
-    this.offlineOnly = this.payload.safeContent.offlineOnly
-    this.name = this.payload.safeContent.name
-    this.area = this.payload.safeContent.area
-    this.package_info = this.payload.safeContent.package_info || {}
-    this.permissions = this.payload.safeContent.permissions || []
-    this.active = this.payload.safeContent.active
-    this.autoupdateDisabled = this.payload.safeContent.autoupdateDisabled
-    this.disassociatedItemIds = this.payload.safeContent.disassociatedItemIds || []
-    this.associatedItemIds = this.payload.safeContent.associatedItemIds || []
-    this.isMobileDefault = this.payload.safeContent.isMobileDefault
+    this.valid_until = new Date(payload.safeContent.valid_until || 0)
+    this.offlineOnly = payload.safeContent.offlineOnly
+    this.name = payload.safeContent.name
+    this.area = payload.safeContent.area
+    this.package_info = payload.safeContent.package_info || {}
+    this.permissions = payload.safeContent.permissions || []
+    this.active = payload.safeContent.active
+    this.autoupdateDisabled = payload.safeContent.autoupdateDisabled
+    this.disassociatedItemIds = payload.safeContent.disassociatedItemIds || []
+    this.associatedItemIds = payload.safeContent.associatedItemIds || []
+    this.isMobileDefault = payload.safeContent.isMobileDefault
     /**
      * @legacy
      * We don't want to set this.url directly, as we'd like to phase it out.
@@ -69,9 +73,7 @@ export class SNComponent extends SNItem implements ComponentContent {
      * need to set this if content.hosted_url is blank, otherwise,
      * hosted_url is the url replacement.
      */
-    this.legacy_url = !this.payload.safeContent.hosted_url
-      ? this.payload.safeContent.url
-      : undefined
+    this.legacy_url = !payload.safeContent.hosted_url ? payload.safeContent.url : undefined
   }
 
   /** Do not duplicate components under most circumstances. Always keep original */
@@ -89,9 +91,9 @@ export class SNComponent extends SNItem implements ComponentContent {
     return true
   }
 
-  public singletonPredicate<T extends SNItem>(): Predicate<T> {
+  public singletonPredicate(): Predicate<SNComponent> {
     const uniqueIdentifierPredicate = new Predicate<SNComponent>('identifier', '=', this.identifier)
-    return uniqueIdentifierPredicate as unknown as Predicate<T>
+    return uniqueIdentifierPredicate
   }
 
   public isEditor(): boolean {
@@ -110,10 +112,6 @@ export class SNComponent extends SNItem implements ComponentContent {
     return this.getAppDomainValue(AppDataField.LastSize)
   }
 
-  public acceptsThemes(): boolean {
-    return this.payload.safeContent.package_info?.acceptsThemes
-  }
-
   /**
    * The key used to look up data that this component may have saved to an item.
    * This data will be stored on the item using this key.
@@ -130,10 +128,15 @@ export class SNComponent extends SNItem implements ComponentContent {
     return (this.hosted_url || this.legacy_url) != undefined
   }
 
-  public contentKeysToIgnoreWhenCheckingEquality(): string[] {
-    return ['active', 'disassociatedItemIds', 'associatedItemIds'].concat(
-      super.contentKeysToIgnoreWhenCheckingEquality(),
-    )
+  public contentKeysToIgnoreWhenCheckingEquality(): (keyof ItemContent)[] {
+    const componentKeys: (keyof ComponentContent)[] = [
+      'active',
+      'disassociatedItemIds',
+      'associatedItemIds',
+    ]
+
+    const superKeys = super.contentKeysToIgnoreWhenCheckingEquality()
+    return [...componentKeys, ...superKeys] as (keyof ItemContent)[]
   }
 
   /**

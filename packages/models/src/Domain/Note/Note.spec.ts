@@ -1,15 +1,15 @@
-import { SNNote } from './Note'
-import { FillItemContent, CreateMaxPayloadFromAnyObject } from '@standardnotes/payloads'
+import { NoteContent, SNNote } from './Note'
 import { ContentType } from '@standardnotes/common'
+import { CreateMaxPayloadFromAnyObject, FillItemContent } from '../Payload/Functions'
 
 const randUuid = () => String(Math.random())
 
-const create = (payload?: Record<string, unknown>): SNNote =>
+const create = (payload?: Partial<NoteContent>): SNNote =>
   new SNNote(
     CreateMaxPayloadFromAnyObject({
       uuid: randUuid(),
       content_type: ContentType.Note,
-      content: FillItemContent({ ...payload }),
+      content: FillItemContent({ ...payload } as NoteContent),
     }),
   )
 
@@ -17,10 +17,10 @@ describe('SNNote Tests', () => {
   it('should safely type required fields of Note when creating from PayloadContent', () => {
     const note = create({
       title: 'Expected string',
-      text: ['unexpected array'],
+      text: ['unexpected array'] as never,
       preview_plain: 'Expected preview',
-      preview_html: {},
-      hidePreview: 'string',
+      preview_html: {} as never,
+      hidePreview: 'string' as never,
     })
 
     expect([
@@ -34,7 +34,7 @@ describe('SNNote Tests', () => {
 
   it('should preserve falsy values when casting from PayloadContent', () => {
     const note = create({
-      preview_plain: null,
+      preview_plain: null as never,
       preview_html: undefined,
     })
 

@@ -1,10 +1,8 @@
-import {
-  CopyPayload,
-  PayloadSource,
-  ImmutablePayloadCollection,
-  PurePayload,
-} from '@standardnotes/payloads'
 import { extendArray } from '@standardnotes/utils'
+import { ImmutablePayloadCollection } from '../Collection/ImmutablePayloadCollection'
+import { CopyPayload } from '../Payload/Functions'
+import { PayloadSource } from '../Payload/PayloadSource'
+import { PurePayload } from '../Payload/PurePayload'
 import { ConflictDelta } from './Conflict'
 import { PayloadsDelta } from './Delta'
 
@@ -52,7 +50,7 @@ export class DeltaFileImport extends PayloadsDelta {
      * If not found in current results, use the base value.
      */
     if (!current) {
-      current = this.findBasePayload(payload.uuid!)
+      current = this.findBasePayload(payload.uuid)
     }
     /**
      * If the current doesn't exist, we're creating a new item from payload.

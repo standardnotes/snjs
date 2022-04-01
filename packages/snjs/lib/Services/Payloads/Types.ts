@@ -1,5 +1,5 @@
 import { ContentType } from '@standardnotes/common'
-import { PurePayload, PayloadSource } from '@standardnotes/payloads'
+import { PurePayload, PayloadSource } from '@standardnotes/models'
 import { ItemManagerChangeObserverCallback } from '@standardnotes/services'
 
 export type PayloadsChangeObserver = {

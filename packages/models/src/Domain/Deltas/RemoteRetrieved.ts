@@ -1,5 +1,7 @@
-import { PayloadSource, ImmutablePayloadCollection, PurePayload } from '@standardnotes/payloads'
 import { extendArray } from '@standardnotes/utils'
+import { ImmutablePayloadCollection } from '../Collection/ImmutablePayloadCollection'
+import { PayloadSource } from '../Payload/PayloadSource'
+import { PurePayload } from '../Payload/PurePayload'
 import { ConflictDelta } from './Conflict'
 import { PayloadsDelta } from './Delta'
 

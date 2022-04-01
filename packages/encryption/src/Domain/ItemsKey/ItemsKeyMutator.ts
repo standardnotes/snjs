@@ -1,7 +1,10 @@
-import { ItemMutator, ItemsKeyMutatorInterface } from '@standardnotes/models'
+import { ItemMutator, ItemsKeyMutatorInterface, ItemsKeyContent } from '@standardnotes/models'
 
-export class ItemsKeyMutator extends ItemMutator implements ItemsKeyMutatorInterface {
+export class ItemsKeyMutator
+  extends ItemMutator<ItemsKeyContent>
+  implements ItemsKeyMutatorInterface
+{
   set isDefault(isDefault: boolean) {
-    this.content!.isDefault = isDefault
+    this.sureContent.isDefault = isDefault
   }
 }

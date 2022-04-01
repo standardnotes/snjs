@@ -1,4 +1,4 @@
-import { CompoundPredicate, Predicate } from '@standardnotes/payloads'
+import { CompoundPredicate, Predicate } from '@standardnotes/models'
 import { SNComponent } from '@standardnotes/models'
 import { Migration } from '@Lib/Migrations/Migration'
 import { ContentType } from '@standardnotes/common'

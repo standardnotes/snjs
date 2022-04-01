@@ -1,12 +1,5 @@
-import { ProtocolVersion, AnyKeyParamsContent } from '@standardnotes/common'
-
-export type RootKeyContent = {
-  version: ProtocolVersion
-  masterKey: string
-  serverPassword?: string
-  dataAuthenticationKey?: string
-  keyParams: AnyKeyParamsContent
-}
+import { ProtocolVersion } from '@standardnotes/common'
+import { RootKeyContent } from './RootKeyContent'
 
 export interface RootKeyInterface {
   get keyVersion(): ProtocolVersion

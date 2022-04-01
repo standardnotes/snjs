@@ -1,5 +1,4 @@
 import { ContentType } from '@standardnotes/common'
-import { ItemDelta, SNIndex, ItemCollection } from '@standardnotes/payloads'
 import { SNNote } from '../Note'
 import { isSystemView, SmartView } from '../SmartView'
 import { SNTag } from '../Tag'
@@ -8,6 +7,9 @@ import {
   NotesDisplayCriteria,
   notesMatchingCriteria,
 } from '../Note/NotesDisplayCriteria'
+import { SNIndex } from '../Index/SNIndex'
+import { ItemCollection } from './ItemCollection'
+import { ItemDelta } from '../Index/ItemDelta'
 
 /**
  * A view into ItemCollection that allows filtering by tag and smart view.

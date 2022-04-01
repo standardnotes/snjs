@@ -1,4 +1,4 @@
-import { RawPayload } from '@standardnotes/payloads'
+import { RawPayload } from '@standardnotes/models'
 import { MinimalHttpResponse } from '../Http/MinimalHttpResponses'
 
 export type GetSingleItemResponse = MinimalHttpResponse & {

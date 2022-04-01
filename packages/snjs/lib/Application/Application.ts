@@ -3,7 +3,6 @@ import * as Common from '@standardnotes/common'
 import * as ExternalServices from '@standardnotes/services'
 import * as Encryption from '@standardnotes/encryption'
 import * as Models from '@standardnotes/models'
-import * as Payloads from '@standardnotes/payloads'
 import * as Responses from '@standardnotes/responses'
 import * as InternalServices from '../Services'
 import * as Utils from '@standardnotes/utils'
@@ -26,7 +25,7 @@ type ApplicationObserver = {
   singleEvent?: ApplicationEvent
   callback: ApplicationEventCallback
 }
-type ItemStream = (items: Models.SNItem[], source: Payloads.PayloadSource) => void
+type ItemStream = (items: Models.SNItem[], source: Models.PayloadSource) => void
 type ObserverRemover = () => void
 
 /** The main entrypoint of an application. */
@@ -430,7 +429,7 @@ export class SNApplication implements InternalServices.ListedClientInterface {
     /** Push current values now */
     const matches = this.itemManager.getItems(contentType)
     if (matches.length > 0) {
-      stream(matches, Payloads.PayloadSource.InitialObserverRegistrationPush)
+      stream(matches, Models.PayloadSource.InitialObserverRegistrationPush)
     }
     this.streamRemovers.push(observer)
     return () => {

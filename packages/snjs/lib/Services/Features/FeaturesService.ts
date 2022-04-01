@@ -1,70 +1,51 @@
-import { ClientDisplayableError } from '@standardnotes/responses'
-import { SNItem, SNFeatureRepo, FeatureRepoContent } from '@standardnotes/models'
-import { ApplicationStage } from '@standardnotes/services'
-import { LEGACY_PROD_EXT_ORIGIN, PROD_OFFLINE_FEATURES_URL } from '../../Hosts'
-import { SNSyncService } from '../Sync/SyncService'
 import { AccountEvent, UserService } from '../User/UserService'
-import { UserRolesChangedEvent } from '@standardnotes/domain-events'
-import { StorageKey } from '@standardnotes/services'
-import { SNStorageService } from '../Storage/StorageService'
 import { ApiServiceEvent, MetaReceivedData, SNApiService } from '../Api/ApiService'
-import { UuidString } from '@Lib/Types/UuidString'
-import {
-  FeatureDescription,
-  ThirdPartyFeatureDescription,
-  FeatureIdentifier,
-  GetFeatures,
-  FindNativeFeature,
-  DeprecatedFeatures,
-  ComponentContent,
-  ExperimentalFeatures,
-} from '@standardnotes/features'
-import { ContentType, RoleName } from '@standardnotes/common'
-import { ItemManager } from '../Items/ItemManager'
-import { UserFeaturesResponse } from '@standardnotes/responses'
-import { SNComponent, SNTheme } from '@standardnotes/models'
-import { SNWebSocketsService, WebSocketsServiceEvent } from '../Api/WebsocketsService'
-import { FillItemContent, PayloadContent, PayloadSource } from '@standardnotes/payloads'
-import { SNSettingsService } from '../Settings'
-import { SettingName } from '@standardnotes/settings'
+import { ApplicationStage } from '@standardnotes/services'
 import { arraysEqual, convertTimestampToMilliseconds, removeFromArray } from '@standardnotes/utils'
-import { SNSessionManager } from '@Lib/Services/Session/SessionManager'
-import {
-  API_MESSAGE_FAILED_DOWNLOADING_EXTENSION,
-  API_MESSAGE_FAILED_OFFLINE_ACTIVATION,
-  API_MESSAGE_UNTRUSTED_EXTENSIONS_WARNING,
-  INVALID_EXTENSION_URL,
-} from '@Lib/Services/Api/Messages'
-import { SNPureCrypto } from '@standardnotes/sncrypto-common'
 import { ButtonType, SNAlertService } from '@Lib/Services/Alert/AlertService'
-import { TRUSTED_CUSTOM_EXTENSIONS_HOSTS, TRUSTED_FEATURE_HOSTS } from '@Lib/Hosts'
+import { ClientDisplayableError } from '@standardnotes/responses'
+import { ContentType, RoleName } from '@standardnotes/common'
 import { Copy, lastElement } from '@standardnotes/utils'
 import { FeaturesClientInterface } from './ClientInterface'
+import { FillItemContent, PayloadSource } from '@standardnotes/models'
+import { ItemManager } from '../Items/ItemManager'
+import { LEGACY_PROD_EXT_ORIGIN, PROD_OFFLINE_FEATURES_URL } from '../../Hosts'
+import { SettingName } from '@standardnotes/settings'
+import { SNComponent, SNTheme } from '@standardnotes/models'
+import { SNPureCrypto } from '@standardnotes/sncrypto-common'
+import { SNSessionManager } from '@Lib/Services/Session/SessionManager'
+import { SNSettingsService } from '../Settings'
+import { SNStorageService } from '../Storage/StorageService'
+import { SNSyncService } from '../Sync/SyncService'
+import { SNWebSocketsService, WebSocketsServiceEvent } from '../Api/WebsocketsService'
+import { StorageKey } from '@standardnotes/services'
+import { TRUSTED_CUSTOM_EXTENSIONS_HOSTS, TRUSTED_FEATURE_HOSTS } from '@Lib/Hosts'
+import { UserFeaturesResponse } from '@standardnotes/responses'
+import { UserRolesChangedEvent } from '@standardnotes/domain-events'
+import { UuidString } from '@Lib/Types/UuidString'
+import * as FeaturesImports from '@standardnotes/features'
+import * as Messages from '@Lib/Services/Api/Messages'
+import * as Models from '@standardnotes/models'
+import * as Services from '@standardnotes/services'
 import {
   FeaturesEvent,
   FeatureStatus,
   OfflineSubscriptionEntitlements,
   SetOfflineFeaturesFunctionResponse,
 } from './Types'
-import {
-  AbstractService,
-  InternalEventBusInterface,
-  InternalEventHandlerInterface,
-  InternalEventInterface,
-} from '@standardnotes/services'
 
 type GetOfflineSubscriptionDetailsResponse =
   | OfflineSubscriptionEntitlements
   | ClientDisplayableError
 
 export class SNFeaturesService
-  extends AbstractService<FeaturesEvent>
-  implements FeaturesClientInterface, InternalEventHandlerInterface
+  extends Services.AbstractService<FeaturesEvent>
+  implements FeaturesClientInterface, Services.InternalEventHandlerInterface
 {
   private deinited = false
   private roles: RoleName[] = []
-  private features: FeatureDescription[] = []
-  private enabledExperimentalFeatures: FeatureIdentifier[] = []
+  private features: FeaturesImports.FeatureDescription[] = []
+  private enabledExperimentalFeatures: FeaturesImports.FeatureIdentifier[] = []
   private removeWebSocketsServiceObserver: () => void
   private removefeatureReposObserver: () => void
   private removeSignInObserver: () => void
@@ -82,7 +63,7 @@ export class SNFeaturesService
     private alertService: SNAlertService,
     private sessionManager: SNSessionManager,
     private crypto: SNPureCrypto,
-    protected internalEventBus: InternalEventBusInterface,
+    protected internalEventBus: Services.InternalEventBusInterface,
   ) {
     super(internalEventBus)
 
@@ -107,7 +88,9 @@ export class SNFeaturesService
           PayloadSource.FileImport,
         ]
         if (source && sources.includes(source)) {
-          const items = [...changed, ...inserted].filter((item) => !item.deleted) as SNFeatureRepo[]
+          const items = [...changed, ...inserted].filter(
+            (item) => !item.deleted,
+          ) as Models.SNFeatureRepo[]
           if (this.sessionManager.isSignedIntoFirstPartyServer()) {
             await this.migrateFeatureRepoToUserSetting(items)
           } else {
@@ -119,7 +102,9 @@ export class SNFeaturesService
 
     this.removeSignInObserver = this.userService.addEventObserver((eventName: AccountEvent) => {
       if (eventName === AccountEvent.SignedInOrRegistered) {
-        const featureRepos = this.itemManager.getItems(ContentType.ExtensionRepo) as SNFeatureRepo[]
+        const featureRepos = this.itemManager.getItems(
+          ContentType.ExtensionRepo,
+        ) as Models.SNFeatureRepo[]
         if (!this.apiService.isThirdPartyHostUsed()) {
           void this.migrateFeatureRepoToUserSetting(featureRepos)
         }
@@ -127,7 +112,7 @@ export class SNFeaturesService
     })
   }
 
-  async handleEvent(event: InternalEventInterface): Promise<void> {
+  async handleEvent(event: Services.InternalEventInterface): Promise<void> {
     if (event.type === ApiServiceEvent.MetaReceived) {
       if (!this.syncService) {
         this.log(
@@ -167,7 +152,7 @@ export class SNFeaturesService
     }
   }
 
-  public enableExperimentalFeature(identifier: FeatureIdentifier): void {
+  public enableExperimentalFeature(identifier: FeaturesImports.FeatureIdentifier): void {
     const feature = this.getUserFeature(identifier)
     if (!feature) {
       throw Error('Attempting to enable a feature user does not have access to.')
@@ -184,7 +169,7 @@ export class SNFeaturesService
     void this.notifyEvent(FeaturesEvent.FeaturesUpdated)
   }
 
-  public disableExperimentalFeature(identifier: FeatureIdentifier): void {
+  public disableExperimentalFeature(identifier: FeaturesImports.FeatureIdentifier): void {
     const feature = this.getUserFeature(identifier)
     if (!feature) {
       throw Error('Attempting to disable a feature user does not have access to.')
@@ -210,7 +195,7 @@ export class SNFeaturesService
     void this.notifyEvent(FeaturesEvent.FeaturesUpdated)
   }
 
-  public toggleExperimentalFeature(identifier: FeatureIdentifier): void {
+  public toggleExperimentalFeature(identifier: FeaturesImports.FeatureIdentifier): void {
     if (this.isExperimentalFeatureEnabled(identifier)) {
       this.disableExperimentalFeature(identifier)
     } else {
@@ -218,19 +203,19 @@ export class SNFeaturesService
     }
   }
 
-  public getExperimentalFeatures(): FeatureIdentifier[] {
-    return ExperimentalFeatures
+  public getExperimentalFeatures(): FeaturesImports.FeatureIdentifier[] {
+    return FeaturesImports.ExperimentalFeatures
   }
 
-  public isExperimentalFeature(featureId: FeatureIdentifier): boolean {
+  public isExperimentalFeature(featureId: FeaturesImports.FeatureIdentifier): boolean {
     return this.getExperimentalFeatures().includes(featureId)
   }
 
-  public getEnabledExperimentalFeatures(): FeatureIdentifier[] {
+  public getEnabledExperimentalFeatures(): FeaturesImports.FeatureIdentifier[] {
     return this.enabledExperimentalFeatures
   }
 
-  public isExperimentalFeatureEnabled(featureId: FeatureIdentifier): boolean {
+  public isExperimentalFeatureEnabled(featureId: FeaturesImports.FeatureIdentifier): boolean {
     return this.enabledExperimentalFeatures.includes(featureId)
   }
 
@@ -250,18 +235,18 @@ export class SNFeaturesService
           offlineFeaturesUrl: result.featuresUrl,
           offlineKey: result.extensionKey,
           migratedToOfflineEntitlements: true,
-        } as FeatureRepoContent),
+        } as Models.FeatureRepoContent),
         true,
-      )) as SNFeatureRepo
+      )) as Models.SNFeatureRepo
       void this.syncService.sync()
       return this.downloadOfflineFeatures(offlineRepo)
     } catch (err) {
-      return new ClientDisplayableError(API_MESSAGE_FAILED_OFFLINE_ACTIVATION)
+      return new ClientDisplayableError(Messages.API_MESSAGE_FAILED_OFFLINE_ACTIVATION)
     }
   }
 
-  private getOfflineRepo(): SNFeatureRepo | undefined {
-    const repos = this.itemManager.getItems(ContentType.ExtensionRepo) as SNFeatureRepo[]
+  private getOfflineRepo(): Models.SNFeatureRepo | undefined {
+    const repos = this.itemManager.getItems(ContentType.ExtensionRepo) as Models.SNFeatureRepo[]
     return repos.filter((repo) => repo.migratedToOfflineEntitlements)[0]
   }
 
@@ -288,12 +273,12 @@ export class SNFeaturesService
         extensionKey,
       }
     } catch (error) {
-      return new ClientDisplayableError(API_MESSAGE_FAILED_OFFLINE_ACTIVATION)
+      return new ClientDisplayableError(Messages.API_MESSAGE_FAILED_OFFLINE_ACTIVATION)
     }
   }
 
   private async downloadOfflineFeatures(
-    repo: SNFeatureRepo,
+    repo: Models.SNFeatureRepo,
   ): Promise<SetOfflineFeaturesFunctionResponse | ClientDisplayableError> {
     const result = await this.apiService.downloadOfflineFeaturesFromRepo(repo)
     if (result instanceof ClientDisplayableError) {
@@ -302,7 +287,9 @@ export class SNFeaturesService
     await this.didDownloadFeatures(result.features)
   }
 
-  public async migrateFeatureRepoToUserSetting(featureRepos: SNFeatureRepo[] = []): Promise<void> {
+  public async migrateFeatureRepoToUserSetting(
+    featureRepos: Models.SNFeatureRepo[] = [],
+  ): Promise<void> {
     for (const item of featureRepos) {
       if (item.migratedToUserSetting) {
         continue
@@ -322,7 +309,7 @@ export class SNFeaturesService
   }
 
   public async migrateFeatureRepoToOfflineEntitlements(
-    featureRepos: SNFeatureRepo[] = [],
+    featureRepos: Models.SNFeatureRepo[] = [],
   ): Promise<void> {
     for (const item of featureRepos) {
       if (item.migratedToOfflineEntitlements) {
@@ -383,9 +370,9 @@ export class SNFeaturesService
     await this.storageService.setValue(StorageKey.UserRoles, this.roles)
   }
 
-  public async didDownloadFeatures(features: FeatureDescription[]): Promise<void> {
+  public async didDownloadFeatures(features: FeaturesImports.FeatureDescription[]): Promise<void> {
     features = features
-      .filter((feature) => !!FindNativeFeature(feature.identifier))
+      .filter((feature) => !!FeaturesImports.FindNativeFeature(feature.identifier))
       .map((feature) => this.mapRemoteNativeFeatureToStaticFeature(feature))
 
     this.features = features
@@ -397,28 +384,30 @@ export class SNFeaturesService
   }
 
   public isThirdPartyFeature(identifier: string): boolean {
-    const isNativeFeature = !!FindNativeFeature(identifier as FeatureIdentifier)
+    const isNativeFeature = !!FeaturesImports.FindNativeFeature(
+      identifier as FeaturesImports.FeatureIdentifier,
+    )
     return !isNativeFeature
   }
 
   private mapRemoteNativeFeatureToStaticFeature(
-    remoteFeature: FeatureDescription,
-  ): FeatureDescription {
-    const remoteFields: (keyof FeatureDescription)[] = [
+    remoteFeature: FeaturesImports.FeatureDescription,
+  ): FeaturesImports.FeatureDescription {
+    const remoteFields: (keyof FeaturesImports.FeatureDescription)[] = [
       'expires_at',
       'role_name',
       'no_expire',
       'permission_name',
     ]
 
-    const nativeFeature = FindNativeFeature(remoteFeature.identifier)
+    const nativeFeature = FeaturesImports.FindNativeFeature(remoteFeature.identifier)
     if (!nativeFeature) {
       throw Error(
         `Attempting to map remote native to unfound static feature ${remoteFeature.identifier}`,
       )
     }
 
-    const nativeFeatureCopy = Copy(nativeFeature) as FeatureDescription
+    const nativeFeatureCopy = Copy(nativeFeature) as FeaturesImports.FeatureDescription
 
     for (const field of remoteFields) {
       nativeFeatureCopy[field] = remoteFeature[field] as never
@@ -430,7 +419,9 @@ export class SNFeaturesService
     return nativeFeatureCopy
   }
 
-  public getUserFeature(featureId: FeatureIdentifier): FeatureDescription | undefined {
+  public getUserFeature(
+    featureId: FeaturesImports.FeatureIdentifier,
+  ): FeaturesImports.FeatureDescription | undefined {
     return this.features.find((feature) => feature.identifier === featureId)
   }
 
@@ -460,11 +451,11 @@ export class SNFeaturesService
     return indexOfRoleToCheck <= highestUserRoleIndex
   }
 
-  public isFeatureDeprecated(featureId: FeatureIdentifier): boolean {
-    return DeprecatedFeatures.includes(featureId)
+  public isFeatureDeprecated(featureId: FeaturesImports.FeatureIdentifier): boolean {
+    return FeaturesImports.DeprecatedFeatures.includes(featureId)
   }
 
-  public getFeatureStatus(featureId: FeatureIdentifier): FeatureStatus {
+  public getFeatureStatus(featureId: FeaturesImports.FeatureIdentifier): FeatureStatus {
     const isDeprecated = this.isFeatureDeprecated(featureId)
     if (isDeprecated) {
       if (this.hasPaidOnlineOrOfflineSubscription()) {
@@ -474,7 +465,7 @@ export class SNFeaturesService
       }
     }
 
-    const isThirdParty = FindNativeFeature(featureId) == undefined
+    const isThirdParty = FeaturesImports.FindNativeFeature(featureId) == undefined
     if (isThirdParty) {
       const component = this.itemManager.components.find(
         (candidate) => candidate.identifier === featureId,
@@ -525,8 +516,10 @@ export class SNFeaturesService
     )
   }
 
-  private componentContentForNativeFeatureDescription(feature: FeatureDescription): PayloadContent {
-    const componentContent: Partial<ComponentContent> = {
+  private componentContentForNativeFeatureDescription(
+    feature: FeaturesImports.FeatureDescription,
+  ): Models.ItemContent {
+    const componentContent: Partial<Models.ComponentContent> = {
       area: feature.area,
       name: feature.name,
       package_info: feature,
@@ -535,8 +528,13 @@ export class SNFeaturesService
     return FillItemContent(componentContent)
   }
 
-  private async mapRemoteNativeFeaturesToItems(features: FeatureDescription[]): Promise<void> {
-    const currentItems = this.itemManager.getItems([ContentType.Component, ContentType.Theme])
+  private async mapRemoteNativeFeaturesToItems(
+    features: FeaturesImports.FeatureDescription[],
+  ): Promise<void> {
+    const currentItems = this.itemManager.getItems<SNComponent>([
+      ContentType.Component,
+      ContentType.Theme,
+    ])
     const itemsToDeleteUuids: UuidString[] = []
     let hasChanges = false
     for (const feature of features) {
@@ -553,8 +551,8 @@ export class SNFeaturesService
   }
 
   private async mapNativeFeatureToItem(
-    feature: FeatureDescription,
-    currentItems: SNItem[],
+    feature: FeaturesImports.FeatureDescription,
+    currentItems: SNComponent[],
     itemsToDeleteUuids: UuidString[],
   ): Promise<boolean> {
     if (!feature.content_type) {
@@ -630,7 +628,7 @@ export class SNFeaturesService
       const { host } = new URL(url)
       if (!trustedCustomExtensionsUrls.includes(host)) {
         const didConfirm = await this.alertService.confirm(
-          API_MESSAGE_UNTRUSTED_EXTENSIONS_WARNING,
+          Messages.API_MESSAGE_UNTRUSTED_EXTENSIONS_WARNING,
           'Install extension from an untrusted source?',
           'Proceed to install',
           ButtonType.Danger,
@@ -643,31 +641,31 @@ export class SNFeaturesService
         return this.performDownloadExternalFeature(url)
       }
     } catch (err) {
-      void this.alertService.alert(INVALID_EXTENSION_URL)
+      void this.alertService.alert(Messages.INVALID_EXTENSION_URL)
     }
   }
 
   private async performDownloadExternalFeature(url: string): Promise<SNComponent | undefined> {
     const response = await this.apiService.downloadFeatureUrl(url)
     if (response.error) {
-      await this.alertService.alert(API_MESSAGE_FAILED_DOWNLOADING_EXTENSION)
+      await this.alertService.alert(Messages.API_MESSAGE_FAILED_DOWNLOADING_EXTENSION)
       return undefined
     }
-    const rawFeature = response.data as ThirdPartyFeatureDescription
+    const rawFeature = response.data as FeaturesImports.ThirdPartyFeatureDescription
     if (!rawFeature.content_type) {
       return
     }
 
-    const nativeFeature = FindNativeFeature(rawFeature.identifier)
+    const nativeFeature = FeaturesImports.FindNativeFeature(rawFeature.identifier)
     if (nativeFeature) {
-      await this.alertService.alert(API_MESSAGE_FAILED_DOWNLOADING_EXTENSION)
+      await this.alertService.alert(Messages.API_MESSAGE_FAILED_DOWNLOADING_EXTENSION)
       return
     }
 
     if (rawFeature.url) {
-      for (const nativeFeature of GetFeatures()) {
+      for (const nativeFeature of FeaturesImports.GetFeatures()) {
         if (rawFeature.url.includes(nativeFeature.identifier)) {
-          await this.alertService.alert(API_MESSAGE_FAILED_DOWNLOADING_EXTENSION)
+          await this.alertService.alert(Messages.API_MESSAGE_FAILED_DOWNLOADING_EXTENSION)
           return
         }
       }
@@ -679,7 +677,7 @@ export class SNFeaturesService
       package_info: rawFeature,
       valid_until: new Date(rawFeature.expires_at || 0),
       hosted_url: rawFeature.url,
-    } as Partial<ComponentContent>)
+    } as Partial<Models.ComponentContent>)
     const component = (await this.itemManager.createTemplateItem(
       rawFeature.content_type,
       content,

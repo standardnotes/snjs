@@ -4,13 +4,18 @@ import { ContentType } from '@standardnotes/common'
 import { DownloadAndDecryptFileOperation } from './Operations/DownloadAndDecrypt'
 import { DecryptedFileInterface } from './types'
 import { EncryptAndUploadFileOperation } from './Operations/EncryptAndUpload'
-import { SNFile, FileProtocolV1Constants, FileContent, FileMetadata } from '@standardnotes/models'
+import {
+  SNFile,
+  FileProtocolV1Constants,
+  FileMetadata,
+  FileContentSpecialized,
+  FillItemContentSpecialized,
+} from '@standardnotes/models'
 import { SNPureCrypto } from '@standardnotes/sncrypto-common'
 import { SNAlertService } from '../Alert/AlertService'
 import { SNSyncService } from '../Sync/SyncService'
 import { ItemManager } from '@Lib/Services/Items/ItemManager'
 import { UuidGenerator } from '@standardnotes/utils'
-import { FillItemContent } from '@standardnotes/payloads'
 import { AbstractService, InternalEventBusInterface } from '@standardnotes/services'
 import { FilesClientInterface } from './FilesClientInterface'
 
@@ -94,7 +99,7 @@ export class SNFileService extends AbstractService implements FilesClientInterfa
       return new ClientDisplayableError('Could not close upload session')
     }
 
-    const fileContent: FileContent = {
+    const fileContent: FileContentSpecialized = {
       chunkSizes: operation.chunkSizes,
       encryptionHeader: operation.getEncryptionHeader(),
       key: operation.getKey(),
@@ -106,7 +111,7 @@ export class SNFileService extends AbstractService implements FilesClientInterfa
 
     const file = await this.itemManager.createItem<SNFile>(
       ContentType.File,
-      FillItemContent(fileContent),
+      FillItemContentSpecialized(fileContent),
       true,
     )
 

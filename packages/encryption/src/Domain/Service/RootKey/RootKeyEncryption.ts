@@ -1,3 +1,4 @@
+import { RootKeyInKeychain } from './../../RootKey/Types'
 import { CreateAnyKeyParams } from '../../RootKey/KeyParams'
 import { findDefaultItemsKey } from '../Functions'
 import { KeyMode } from './KeyMode'
@@ -8,7 +9,6 @@ import { UuidGenerator } from '@standardnotes/utils'
 import * as Common from '@standardnotes/common'
 import * as Models from '@standardnotes/models'
 import * as OperatorWrapper from '../../Operator/OperatorWrapper'
-import * as Payloads from '@standardnotes/payloads'
 import * as Services from '@standardnotes/services'
 import { mergePayloadWithEncryptionParameters } from '../../Intent/Functions'
 import {
@@ -17,7 +17,8 @@ import {
   ErroredDecryptingParameters,
 } from '../../Encryption/EncryptedParameters'
 import { ItemsKeyMutator } from '../../ItemsKey'
-import { ItemsKeyInterface } from '@standardnotes/models'
+import { CreateNewRootKey } from '../../RootKey/Functions'
+import { FillItemContent, ItemsKeyContent, ItemsKeyContentSpecialized } from '@standardnotes/models'
 
 export enum RootKeyServiceEvent {
   RootKeyStatusChanged = 'RootKeyStatusChanged',
@@ -131,15 +132,20 @@ export class RootKeyEncryptionService extends Services.AbstractService<RootKeySe
   }
 
   private async getRootKeyFromKeychain() {
-    const rawKey = await this.deviceInterface.getNamespacedKeychainValue(this.identifier)
+    const rawKey = (await this.deviceInterface.getNamespacedKeychainValue(this.identifier)) as
+      | RootKeyInKeychain
+      | undefined
+
     if (rawKey == undefined) {
       return undefined
     }
-    const rootKey = SNRootKey.Create({
+
+    const keyParams = await this.getSureRootKeyParams()
+
+    return CreateNewRootKey({
       ...rawKey,
-      keyParams: await this.getRootKeyParams(),
+      keyParams: keyParams.getPortableValue(),
     })
-    return rootKey
   }
 
   private async saveRootKeyToKeychain() {
@@ -173,7 +179,7 @@ export class RootKeyEncryptionService extends Services.AbstractService<RootKeySe
     return this.getRootKeyWrapperKeyParams() as Promise<SNRootKeyParams>
   }
 
-  public async getRootKeyParams() {
+  public async getRootKeyParams(): Promise<SNRootKeyParams | undefined> {
     if (this.keyMode === KeyMode.WrapperOnly) {
       return this.getRootKeyWrapperKeyParams()
     } else if (
@@ -186,6 +192,10 @@ export class RootKeyEncryptionService extends Services.AbstractService<RootKeySe
     } else {
       throw `Unhandled key mode for getRootKeyParams ${this.keyMode}`
     }
+  }
+
+  public async getSureRootKeyParams(): Promise<SNRootKeyParams> {
+    return this.getRootKeyParams() as Promise<SNRootKeyParams>
   }
 
   public async computeRootKey(password: string, keyParams: SNRootKeyParams) {
@@ -236,7 +246,7 @@ export class RootKeyEncryptionService extends Services.AbstractService<RootKeySe
    * wrapped root key.
    */
   public async validateWrappingKey(wrappingKey: SNRootKey) {
-    const wrappedRootKey = (await this.getWrappedRootKey()) as Payloads.RawPayload
+    const wrappedRootKey = (await this.getWrappedRootKey()) as Models.RawPayload
 
     /** If wrapper only, storage is encrypted directly with wrappingKey */
     if (this.keyMode === KeyMode.WrapperOnly) {
@@ -250,7 +260,7 @@ export class RootKeyEncryptionService extends Services.AbstractService<RootKeySe
        * account keys are encrypted with wrappingKey. Here we validate
        * by attempting to decrypt account keys.
        */
-      const wrappedKeyPayload = Payloads.CreateMaxPayloadFromAnyObject(wrappedRootKey)
+      const wrappedKeyPayload = Models.CreateMaxPayloadFromAnyObject(wrappedRootKey)
       const decrypted = await this.decryptPayload(wrappedKeyPayload, wrappingKey)
       return !decrypted.errorDecrypting
     } else {
@@ -277,8 +287,8 @@ export class RootKeyEncryptionService extends Services.AbstractService<RootKeySe
    * then persists the wrapped value to disk.
    */
   private async wrapAndPersistRootKey(wrappingKey: SNRootKey) {
-    const payload = Payloads.CreateMaxPayloadFromAnyObject(this.getSureRootKey(), {
-      content: this.getSureRootKey().persistableValueWhenWrapping(),
+    const payload = Models.CreateMaxPayloadFromAnyObject(this.getSureRootKey(), {
+      content: FillItemContent(this.getSureRootKey().persistableValueWhenWrapping()),
     })
 
     const wrappedKey = await this.encryptSplitSingle(payload, wrappingKey)
@@ -301,20 +311,15 @@ export class RootKeyEncryptionService extends Services.AbstractService<RootKeySe
       throw 'Invalid key mode condition for unwrapping.'
     }
 
-    const wrappedKey = (await this.getWrappedRootKey()) as Payloads.RawPayload
-    const payload = Payloads.CreateMaxPayloadFromAnyObject(wrappedKey)
+    const wrappedKey = (await this.getWrappedRootKey()) as Models.RawPayload<Models.RootKeyContent>
+    const payload = Models.CreateMaxPayloadFromAnyObject(wrappedKey)
     const decrypted = await this.decryptPayload(payload, wrappingKey)
 
     if (decrypted.errorDecrypting) {
       throw Error('Unable to decrypt root key with provided wrapping key.')
     } else {
       const decryptedPayload = mergePayloadWithEncryptionParameters(payload, decrypted)
-      this.setRootKeyInstance(
-        SNRootKey.Create(
-          decryptedPayload.contentObject as unknown as Models.RootKeyContent,
-          decryptedPayload.uuid,
-        ),
-      )
+      this.setRootKeyInstance(new SNRootKey(decryptedPayload))
       await this.handleKeyStatusChange()
     }
   }
@@ -475,7 +480,7 @@ export class RootKeyEncryptionService extends Services.AbstractService<RootKeySe
   }
 
   public async encryptSplitSingleWithKeyLookup(
-    payload: Payloads.PurePayload,
+    payload: Models.PurePayload,
   ): Promise<EncryptedParameters> {
     const key = this.getRootKey()
 
@@ -487,24 +492,24 @@ export class RootKeyEncryptionService extends Services.AbstractService<RootKeySe
   }
 
   public async encryptSplitSinglesWithKeyLookup(
-    payloads: Payloads.PurePayload[],
+    payloads: Models.PurePayload[],
   ): Promise<EncryptedParameters[]> {
     return Promise.all(payloads.map((payload) => this.encryptSplitSingleWithKeyLookup(payload)))
   }
 
   public async encryptSplitSingle(
-    payload: Payloads.PurePayload,
+    payload: Models.PurePayload,
     key: SNRootKey,
   ): Promise<EncryptedParameters> {
     return OperatorWrapper.encryptPayload(payload, key, this.operatorManager)
   }
 
-  public async encryptSplitSingles(payloads: Payloads.PurePayload[], key: SNRootKey) {
+  public async encryptSplitSingles(payloads: Models.PurePayload[], key: SNRootKey) {
     return Promise.all(payloads.map((payload) => this.encryptSplitSingle(payload, key)))
   }
 
   public async decryptPayloadWithKeyLookup(
-    payload: Payloads.PurePayload,
+    payload: Models.PurePayload,
   ): Promise<DecryptedParameters | ErroredDecryptingParameters> {
     const key = this.getRootKey()
 
@@ -519,21 +524,21 @@ export class RootKeyEncryptionService extends Services.AbstractService<RootKeySe
     return this.decryptPayload(payload, key)
   }
 
-  public async decryptPayload(
-    payload: Payloads.PurePayload,
+  public async decryptPayload<C extends Models.ItemContent = Models.ItemContent>(
+    payload: Models.PayloadInterface<C>,
     key: SNRootKey,
-  ): Promise<DecryptedParameters | ErroredDecryptingParameters> {
+  ): Promise<DecryptedParameters<C> | ErroredDecryptingParameters> {
     return OperatorWrapper.decryptPayload(payload, key, this.operatorManager)
   }
 
   public async decryptPayloadsWithKeyLookup(
-    payloads: Payloads.PurePayload[],
+    payloads: Models.PurePayload[],
   ): Promise<(DecryptedParameters | ErroredDecryptingParameters)[]> {
     return Promise.all(payloads.map((payload) => this.decryptPayloadWithKeyLookup(payload)))
   }
 
   public async decryptPayloads(
-    payloads: Payloads.PurePayload[],
+    payloads: Models.PurePayload[],
     key: SNRootKey,
   ): Promise<(DecryptedParameters | ErroredDecryptingParameters)[]> {
     return Promise.all(payloads.map((payload) => this.decryptPayload(payload, key)))
@@ -560,23 +565,23 @@ export class RootKeyEncryptionService extends Services.AbstractService<RootKeySe
    * Consumer must call sync. If the protocol version <= 003, only one items key should be created,
    * and its .itemsKey value should be equal to the root key masterKey value.
    */
-  public async createNewDefaultItemsKey(): Promise<ItemsKeyInterface> {
-    const rootKey = this.rootKey as SNRootKey
+  public async createNewDefaultItemsKey(): Promise<Models.ItemsKeyInterface> {
+    const rootKey = this.getSureRootKey()
     const operatorVersion = rootKey ? rootKey.keyVersion : Common.ProtocolVersionLatest
-    let itemTemplate: ItemsKeyInterface
+    let itemTemplate: Models.ItemsKeyInterface
 
     if (Common.compareVersions(operatorVersion, Common.ProtocolVersionLastNonrootItemsKey) <= 0) {
       /** Create root key based items key */
-      const payload = Payloads.CreateMaxPayloadFromAnyObject({
+      const payload = Models.CreateMaxPayloadFromAnyObject<ItemsKeyContent>({
         uuid: UuidGenerator.GenerateUuid(),
         content_type: Common.ContentType.ItemsKey,
-        content: Payloads.FillItemContent({
+        content: Models.FillItemContentSpecialized<ItemsKeyContentSpecialized, ItemsKeyContent>({
           itemsKey: rootKey.masterKey,
           dataAuthenticationKey: rootKey.dataAuthenticationKey,
           version: operatorVersion,
         }),
       })
-      itemTemplate = Models.CreateItemFromPayload(payload) as ItemsKeyInterface
+      itemTemplate = Models.CreateItemFromPayload(payload) as Models.ItemsKeyInterface
     } else {
       /** Create independent items key */
       itemTemplate = this.operatorManager.operatorForVersion(operatorVersion).createItemsKey()
@@ -593,7 +598,7 @@ export class RootKeyEncryptionService extends Services.AbstractService<RootKeySe
       })
     }
 
-    const itemsKey = (await this.itemManager.insertItem(itemTemplate)) as ItemsKeyInterface
+    const itemsKey = (await this.itemManager.insertItem(itemTemplate)) as Models.ItemsKeyInterface
     await this.itemManager.changeItemsKey(itemsKey.uuid, (mutator) => {
       mutator.isDefault = true
     })

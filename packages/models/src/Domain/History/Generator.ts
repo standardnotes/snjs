@@ -1,10 +1,12 @@
-import { PayloadField, SurePayload } from '@standardnotes/payloads'
 import { ContentType } from '@standardnotes/common'
+import { NoteContent } from '../Note'
+import { PayloadField } from '../Payload/PayloadField'
+import { SurePayload } from '../Payload/SurePayload'
 import { HistoryEntry } from './HistoryEntry'
 import { NoteHistoryEntry } from './NoteHistoryEntry'
 
 export function CreateHistoryEntryForPayload(
-  payload: SurePayload,
+  payload: SurePayload<NoteContent>,
   previousEntry?: HistoryEntry,
 ): HistoryEntry {
   const type = payload[PayloadField.ContentType] as ContentType

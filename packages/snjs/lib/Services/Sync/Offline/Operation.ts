@@ -1,4 +1,4 @@
-import { PurePayload, CreateSourcedPayloadFromObject, PayloadSource } from '@standardnotes/payloads'
+import { PurePayload, CreateSourcedPayloadFromObject, PayloadSource } from '@standardnotes/models'
 import { ResponseSignalReceiver, SyncSignal } from '@Lib/Services/Sync/Signals'
 import { SyncResponse } from '@Lib/Services/Sync/Response'
 import { Copy } from '@standardnotes/utils'

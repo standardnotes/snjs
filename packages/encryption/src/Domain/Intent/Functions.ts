@@ -3,14 +3,13 @@ import {
   CopyPayload,
   CreatePayload,
   FilePayloadFields,
+  ItemContent,
   PayloadInterface,
-  PayloadOverride,
   PayloadSource,
-  PurePayload,
   RawPayload,
   ServerPayloadFields,
   StoragePayloadFields,
-} from '@standardnotes/payloads'
+} from '@standardnotes/models'
 import {
   DecryptedParameters,
   EncryptedParameters,
@@ -77,23 +76,26 @@ function payloadFieldsForIntent(intent: EncryptionIntent) {
   }
 }
 
-export function CreateIntentPayloadFromObject(
-  object: RawPayload,
+export function CreateIntentPayloadFromObject<C extends ItemContent = ItemContent>(
+  object: RawPayload<C>,
   intent: EncryptionIntent,
-  override?: PayloadOverride,
+  override?: Partial<PayloadInterface<C>>,
 ): PayloadInterface {
   const payloadFields = payloadFieldsForIntent(intent)
   return CreatePayload(object, payloadFields, PayloadSource.Constructor, override)
 }
 
-export function mergePayloadWithEncryptionParameters(
-  payload: PurePayload,
-  parameters: EncryptedParameters | DecryptedParameters | ErroredDecryptingParameters,
-): PurePayload {
-  return CopyPayload(payload, parameters)
+export function mergePayloadWithEncryptionParameters<C extends ItemContent = ItemContent>(
+  payload: PayloadInterface<C>,
+  parameters: EncryptedParameters | DecryptedParameters<C> | ErroredDecryptingParameters,
+): PayloadInterface<C> {
+  const override: Partial<PayloadInterface<C>> = {
+    ...parameters,
+  }
+  return CopyPayload(payload, override)
 }
 
-export function encryptedParametersFromPayload(payload: PurePayload): EncryptedParameters {
+export function encryptedParametersFromPayload(payload: PayloadInterface): EncryptedParameters {
   return {
     uuid: payload.uuid,
     content: payload.contentString,

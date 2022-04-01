@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { ApiEndpointParam, RawPayload } from '@standardnotes/payloads'
+import { RawPayload } from '@standardnotes/models'
+import { ApiEndpointParam } from './ApiEndpointParam'
 import { ConflictParams } from './ConflictParams'
 
 export type RawSyncData = {

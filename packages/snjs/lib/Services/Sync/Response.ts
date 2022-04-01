@@ -1,5 +1,5 @@
-import { ConflictType, RawSyncResponse } from '@standardnotes/responses'
-import * as Payloads from '@standardnotes/payloads'
+import { ApiEndpointParam, ConflictType, RawSyncResponse } from '@standardnotes/responses'
+import * as Payloads from '@standardnotes/models'
 import { deepFreeze, isNullOrUndefined } from '@standardnotes/utils'
 
 export class SyncResponse {
@@ -72,11 +72,11 @@ export class SyncResponse {
   }
 
   public get lastSyncToken() {
-    return this.rawResponse.data?.[Payloads.ApiEndpointParam.LastSyncToken]
+    return this.rawResponse.data?.[ApiEndpointParam.LastSyncToken]
   }
 
   public get paginationToken() {
-    return this.rawResponse.data?.[Payloads.ApiEndpointParam.PaginationToken]
+    return this.rawResponse.data?.[ApiEndpointParam.PaginationToken]
   }
 
   public get numberOfItemsInvolved() {

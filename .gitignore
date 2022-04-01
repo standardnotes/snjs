@@ -18,7 +18,6 @@ packages/features/dist
 packages/filepicker/dist
 packages/filepicker/example/dist
 packages/models/dist
-packages/payloads/dist
 packages/responses/dist
 packages/services/dist
 packages/settings/dist

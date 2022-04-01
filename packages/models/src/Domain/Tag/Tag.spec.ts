@@ -1,14 +1,11 @@
-import { SNTag } from './Tag'
-import {
-  ContentReference,
-  CreateMaxPayloadFromAnyObject,
-  FillItemContent,
-} from '@standardnotes/payloads'
+import { SNTag, TagContent } from './Tag'
 import { ContentType } from '@standardnotes/common'
+import { CreateMaxPayloadFromAnyObject, FillItemContent } from '../Payload/Functions'
+import { ContentReference } from '../Reference/ContentReference'
 
 const randUuid = () => String(Math.random())
 
-const create = (title: string, references?: ContentReference[]): SNTag => {
+const create = (title: string, references: ContentReference[] = []): SNTag => {
   const tag = new SNTag(
     CreateMaxPayloadFromAnyObject({
       uuid: randUuid(),
@@ -16,7 +13,7 @@ const create = (title: string, references?: ContentReference[]): SNTag => {
       content: FillItemContent({
         title,
         references,
-      }),
+      } as TagContent),
     }),
   )
 

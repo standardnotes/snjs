@@ -12,7 +12,7 @@ import {
   IntegrityPayload,
   PayloadSource,
   PurePayload,
-} from '@standardnotes/payloads'
+} from '@standardnotes/models'
 import { AbstractService } from '../Service/AbstractService'
 
 export type ItemManagerChangeObserverCallback<T extends SNItem | PurePayload> = (

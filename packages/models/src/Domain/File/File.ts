@@ -1,22 +1,10 @@
 import { SNItem } from '../Item/Item'
-import { PayloadContent, PurePayload } from '@standardnotes/payloads'
+import { ItemContent } from '../Item/ItemContent'
+import { PayloadInterface } from '../Payload/PayloadInterface'
+import { FileMetadata } from './FileMetadata'
+import { FileProtocolV1 } from './FileProtocolV1'
 
-export enum FileProtocolV1Constants {
-  KeySize = 256,
-}
-
-interface FileProtocolV1 {
-  readonly encryptionHeader: string
-  readonly key: string
-  readonly remoteIdentifier: string
-}
-
-export interface FileMetadata {
-  name: string
-  mimeType: string
-}
-
-export interface FileContent extends FileMetadata {
+export interface FileContentSpecialized extends FileMetadata {
   remoteIdentifier: string
   name: string
   key: string
@@ -26,9 +14,12 @@ export interface FileContent extends FileMetadata {
   mimeType: string
 }
 
-export type ExtendedFileContent = FileContent & PayloadContent
+export type FileContent = FileContentSpecialized & ItemContent
 
-export class SNFile extends SNItem implements ExtendedFileContent, FileProtocolV1, FileMetadata {
+export class SNFile
+  extends SNItem<FileContent>
+  implements FileContentSpecialized, FileProtocolV1, FileMetadata
+{
   public readonly remoteIdentifier: string
   public readonly name: string
   public readonly key: string
@@ -37,7 +28,7 @@ export class SNFile extends SNItem implements ExtendedFileContent, FileProtocolV
   public readonly chunkSizes: number[]
   public readonly mimeType: string
 
-  constructor(payload: PurePayload) {
+  constructor(payload: PayloadInterface<FileContent>) {
     super(payload)
     this.remoteIdentifier = this.typedContent.remoteIdentifier
     this.name = this.typedContent.name
@@ -48,7 +39,7 @@ export class SNFile extends SNItem implements ExtendedFileContent, FileProtocolV
     this.mimeType = this.typedContent.mimeType
   }
 
-  private get typedContent(): FileContent {
-    return this.safeContent as unknown as FileContent
+  private get typedContent(): FileContentSpecialized {
+    return this.safeContent as unknown as FileContentSpecialized
   }
 }

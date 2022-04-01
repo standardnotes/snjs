@@ -1,4 +1,4 @@
-import { PayloadSource, PurePayload } from '@standardnotes/payloads'
+import { PayloadSource, PurePayload } from '@standardnotes/models'
 
 export interface PayloadManagerInterface {
   emitPayloads(

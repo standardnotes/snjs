@@ -1,11 +1,9 @@
-import {
-  PayloadSource,
-  ImmutablePayloadCollection,
-  PayloadsByAlternatingUuid,
-  PurePayload,
-} from '@standardnotes/payloads'
 import { extendArray, filterFromArray } from '@standardnotes/utils'
+import { ImmutablePayloadCollection } from '../Collection/ImmutablePayloadCollection'
 import { Uuids } from '../Functions'
+import { PayloadsByAlternatingUuid } from '../Payload/Functions'
+import { PayloadSource } from '../Payload/PayloadSource'
+import { PurePayload } from '../Payload/PurePayload'
 import { ConflictDelta } from './Conflict'
 import { PayloadsDelta } from './Delta'
 

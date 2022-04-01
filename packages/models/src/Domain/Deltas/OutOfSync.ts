@@ -1,6 +1,7 @@
-import { PayloadSource, ImmutablePayloadCollection } from '@standardnotes/payloads'
 import { extendArray } from '@standardnotes/utils'
+import { ImmutablePayloadCollection } from '../Collection/ImmutablePayloadCollection'
 import { PayloadContentsEqual, PayloadsByDuplicating } from '../Functions'
+import { PayloadSource } from '../Payload/PayloadSource'
 import { PayloadsDelta } from './Delta'
 
 export class DeltaOutOfSync extends PayloadsDelta {

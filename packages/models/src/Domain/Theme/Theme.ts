@@ -1,15 +1,15 @@
-import { AppDataField } from '@standardnotes/payloads'
 import { ComponentArea } from '@standardnotes/features'
-import { ConflictStrategy } from '@standardnotes/payloads'
 import { HistoryEntry } from '../History/HistoryEntry'
 import { SNComponent } from '../Component/Component'
 import { SNItem } from '../Item/Item'
+import { ConflictStrategy } from '../Payload/ConflictStrategy'
+import { AppDataField } from '../Item/AppDataField'
 
 export class SNTheme extends SNComponent {
   public area: ComponentArea = ComponentArea.Themes
 
   isLayerable(): boolean {
-    return this.package_info && this.package_info.layerable!
+    return (this.package_info && this.package_info.layerable) || false
   }
 
   /** Do not duplicate under most circumstances. Always keep original */

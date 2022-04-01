@@ -1,4 +1,4 @@
-import { IntegrityPayload } from '@standardnotes/payloads'
+import { IntegrityPayload } from '@standardnotes/models'
 import { CheckIntegrityResponse } from '@standardnotes/responses'
 
 export interface IntegrityApiInterface {

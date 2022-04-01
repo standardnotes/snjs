@@ -1,47 +1,38 @@
 import { ContentType, ProtocolVersion, Uuid } from '@standardnotes/common'
-import {
-  ItemInterface,
-  PayloadFormat,
-  ContentReference,
-  CopyPayload,
-  PayloadOverride,
-  PurePayload,
-  PayloadSource,
-  PredicateInterface,
-  ConflictStrategy,
-  AppDataField,
-  DefaultAppDomain,
-} from '@standardnotes/payloads'
 import { HistoryEntry } from '../History/HistoryEntry'
 import { dateToLocalizedString, deepFreeze } from '@standardnotes/utils'
-import { PrefKey } from '../UserPrefs/UserPrefs'
-import { ItemContentsDiffer, ItemContentsEqual } from './ItemMutator'
-
-export interface ItemContent {
-  references?: ContentReference[]
-}
-
-export enum SingletonStrategy {
-  KeepEarliest = 1,
-}
+import { PrefKey } from '../UserPrefs/PrefKey'
+import { ItemContentsDiffer, ItemContentsEqual } from './Functions'
+import { ItemInterface } from './ItemInterface'
+import { ItemContent } from './ItemContent'
+import { PayloadFormat } from '../Payload/PayloadFormat'
+import { AppDataField } from './AppDataField'
+import { ComponentDataDomain, DefaultAppDomain } from './DefaultAppDomain'
+import { ContentReference } from '../Reference/ContentReference'
+import { PayloadSource } from '../Payload/PayloadSource'
+import { ConflictStrategy } from '../Payload/ConflictStrategy'
+import { PredicateInterface } from '../Predicate/Interface'
+import { CopyPayload } from '../Payload/Functions'
+import { SingletonStrategy } from './SingletonStrategy'
+import { PayloadInterface } from '../Payload/PayloadInterface'
 
 /**
  * The most abstract item that any syncable item needs to extend from.
  */
-export class SNItem implements ItemInterface {
-  public readonly payload: PurePayload
+export class SNItem<C extends ItemContent = ItemContent> implements ItemInterface<C> {
+  public readonly payload: PayloadInterface<C>
   public readonly conflictOf?: Uuid
   public readonly duplicateOf?: Uuid
   public readonly createdAtString?: string
   public readonly updatedAtString?: string
-  public readonly protected = false
-  public readonly trashed = false
-  public readonly pinned = false
-  public readonly archived = false
-  public readonly locked = false
+  public readonly protected: boolean = false
+  public readonly trashed: boolean = false
+  public readonly pinned: boolean = false
+  public readonly archived: boolean = false
+  public readonly locked: boolean = false
   public readonly userModifiedDate: Date
 
-  constructor(payload: PurePayload) {
+  constructor(payload: PayloadInterface<C>) {
     if (!payload.uuid || !payload.content_type) {
       throw Error('Cannot create item without both uuid and content_type')
     }
@@ -59,14 +50,14 @@ export class SNItem implements ItemInterface {
 
     if (payload.format === PayloadFormat.DecryptedBareObject) {
       this.userModifiedDate = new Date(
-        this.getAppDomainValue(AppDataField.UserModifiedDate) || this.serverUpdatedAt,
+        this.getAppDomainValueWithDefault(AppDataField.UserModifiedDate, this.serverUpdatedAt || 0),
       )
       this.updatedAtString = dateToLocalizedString(this.userModifiedDate)
-      this.protected = this.payload.safeContent.protected
-      this.trashed = this.payload.safeContent.trashed
-      this.pinned = this.getAppDomainValue(AppDataField.Pinned)
-      this.archived = this.getAppDomainValue(AppDataField.Archived)
-      this.locked = this.getAppDomainValue(AppDataField.Locked)
+      this.protected = this.payload.safeContent.protected || false
+      this.trashed = this.payload.safeContent.trashed || false
+      this.pinned = this.getAppDomainValueWithDefault(AppDataField.Pinned, false)
+      this.archived = this.getAppDomainValueWithDefault(AppDataField.Archived, false)
+      this.locked = this.getAppDomainValueWithDefault(AppDataField.Locked, false)
     } else {
       this.userModifiedDate = this.serverUpdatedAt || new Date()
     }
@@ -179,11 +170,11 @@ export class SNItem implements ItemInterface {
     return this.payload.duplicate_of
   }
 
-  public payloadRepresentation(override?: PayloadOverride) {
+  public payloadRepresentation(override?: Partial<PayloadInterface<C>>) {
     return CopyPayload(this.payload, override)
   }
 
-  public hasRelationshipWithItem(item: SNItem): boolean {
+  public hasRelationshipWithItem(item: ItemInterface): boolean {
     const target = this.references?.find((r) => {
       return r.uuid === item.uuid
     })
@@ -204,7 +195,9 @@ export class SNItem implements ItemInterface {
    * Currently appData['org.standardnotes.sn'] returns an object of type AppData.
    * And appData['org.standardnotes.sn.components] returns an object of type ComponentData
    */
-  public getDomainData(domain: string): undefined | Record<string, any> {
+  public getDomainData(
+    domain: typeof ComponentDataDomain | typeof DefaultAppDomain,
+  ): undefined | Record<string, unknown> {
     const domainData = this.payload.safeContent.appData
     if (!domainData) {
       return undefined
@@ -213,9 +206,17 @@ export class SNItem implements ItemInterface {
     return data
   }
 
-  public getAppDomainValue(key: AppDataField | PrefKey) {
-    const appData = this.getDomainData(SNItem.DefaultAppDomain())
-    return appData![key]
+  public getAppDomainValue<T>(key: AppDataField | PrefKey): T | undefined {
+    const appData = this.getDomainData(DefaultAppDomain)
+    return appData?.[key] as T
+  }
+
+  public getAppDomainValueWithDefault<T, D extends T>(
+    key: AppDataField | PrefKey,
+    defaultValue: D,
+  ): T {
+    const appData = this.getDomainData(DefaultAppDomain)
+    return (appData?.[key] as T) || defaultValue
   }
 
   /**
@@ -224,12 +225,14 @@ export class SNItem implements ItemInterface {
    * if one component has active = true and another component has active = false,
    * it would be needless to duplicate them, so instead we ignore that value.
    */
-  public contentKeysToIgnoreWhenCheckingEquality() {
+  public contentKeysToIgnoreWhenCheckingEquality<
+    C extends ItemContent = ItemContent,
+  >(): (keyof C)[] {
     return ['conflict_of']
   }
 
   /** Same as `contentKeysToIgnoreWhenCheckingEquality`, but keys inside appData[Item.AppDomain] */
-  public appDataContentKeysToIgnoreWhenCheckingEquality() {
+  public appDataContentKeysToIgnoreWhenCheckingEquality(): AppDataField[] {
     return [AppDataField.UserModifiedDate]
   }
 
@@ -251,7 +254,7 @@ export class SNItem implements ItemInterface {
   }
 
   /** The predicate by which singleton items should be unique */
-  public singletonPredicate<T extends SNItem>(): PredicateInterface<T> {
+  public singletonPredicate<T extends ItemInterface>(): PredicateInterface<T> {
     throw 'Must override SNItem.singletonPredicate'
   }
 
@@ -280,18 +283,21 @@ export class SNItem implements ItemInterface {
    * Left returns to our current item, and Right refers to the incoming item.
    */
   public strategyWhenConflictingWithItem(
-    item: SNItem,
+    item: ItemInterface,
     previousRevision?: HistoryEntry,
   ): ConflictStrategy {
     if (this.errorDecrypting) {
       return ConflictStrategy.KeepLeftDuplicateRight
     }
+
     if (this.isSingleton) {
       return ConflictStrategy.KeepLeft
     }
+
     if (this.deleted) {
       return ConflictStrategy.KeepRight
     }
+
     if (item.deleted) {
       if (this.payload.source === PayloadSource.FileImport) {
         /** Imported items take precedence */
@@ -299,10 +305,12 @@ export class SNItem implements ItemInterface {
       }
       return ConflictStrategy.KeepRight
     }
+
     const contentDiffers = ItemContentsDiffer(this, item)
     if (!contentDiffers) {
       return ConflictStrategy.KeepRight
     }
+
     const itemsAreDifferentExcludingRefs = ItemContentsDiffer(this, item, ['references'])
     if (itemsAreDifferentExcludingRefs) {
       if (previousRevision) {

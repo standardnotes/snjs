@@ -1,9 +1,7 @@
+import { ImmutablePayloadCollection } from '../Collection/ImmutablePayloadCollection'
+import { ImmutablePayloadCollectionSet } from '../Collection/ImmutablePayloadCollectionSet'
 import { HistoryMap } from '../History/HistoryMap'
-import {
-  PayloadSource,
-  ImmutablePayloadCollectionSet,
-  ImmutablePayloadCollection,
-} from '@standardnotes/payloads'
+import { PayloadSource } from '../Payload/PayloadSource'
 /**
  * A payload delta is a class that defines instructions that process an incoming collection
  * of payloads, applies some set of operations on those payloads wrt to the current base state,

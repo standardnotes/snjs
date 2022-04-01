@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { ApplicationIdentifier } from '@standardnotes/common'
-import { RawPayload } from '@standardnotes/payloads'
+import { RawPayload } from '@standardnotes/models'
 import { getGlobalScope, isNullOrUndefined } from '@standardnotes/utils'
 import { DeviceInterface } from './DeviceInterface'
 

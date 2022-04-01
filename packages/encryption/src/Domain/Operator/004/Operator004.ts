@@ -1,12 +1,18 @@
 import { ContentType, KeyParamsOrigination, ProtocolVersion } from '@standardnotes/common'
 import { Create004KeyParams } from '../../RootKey/KeyParams'
-import { ItemsKeyContent, SynchronousOperator } from '../Operator'
-import { CreateItemFromPayload, ItemsKeyInterface } from '@standardnotes/models'
+import { SynchronousOperator } from '../Operator'
+import {
+  CreateItemFromPayload,
+  FillItemContent,
+  ItemContent,
+  ItemsKeyContent,
+  ItemsKeyInterface,
+} from '@standardnotes/models'
 import { SNPureCrypto } from '@standardnotes/sncrypto-common'
 import { SNRootKey } from '../../RootKey/RootKey'
 import { SNRootKeyParams } from '../../RootKey/RootKeyParams'
 import { V004Algorithm } from '../../Algorithm'
-import * as Payloads from '@standardnotes/payloads'
+import * as Models from '@standardnotes/models'
 import * as Utils from '@standardnotes/utils'
 import { ContentTypeUsesRootKeyEncryption } from '../../Intent/Functions'
 import {
@@ -18,6 +24,7 @@ import { RootKeyEncryptedAuthenticatedData } from '../../Encryption/RootKeyEncry
 import { ItemAuthenticatedData } from '../../Encryption/ItemAuthenticatedData'
 import { LegacyAttachedData } from '../../Encryption/LegacyAttachedData'
 import { isItemsKey } from '../../ItemsKey'
+import { CreateNewRootKey } from '../../RootKey/Functions'
 
 const PARTITION_CHARACTER = ':'
 
@@ -38,10 +45,10 @@ export class SNProtocolOperator004 implements SynchronousOperator {
 
   private generateNewItemsKeyContent() {
     const itemsKey = this.crypto.generateRandomKey(V004Algorithm.EncryptionKeyLength)
-    const response: ItemsKeyContent = {
+    const response = FillItemContent<ItemsKeyContent>({
       itemsKey: itemsKey,
       version: ProtocolVersion.V004,
-    }
+    })
     return response
   }
 
@@ -50,11 +57,10 @@ export class SNProtocolOperator004 implements SynchronousOperator {
    * The consumer must save/sync this item.
    */
   public createItemsKey(): ItemsKeyInterface {
-    const content = this.generateNewItemsKeyContent()
-    const payload = Payloads.CreateMaxPayloadFromAnyObject({
+    const payload = Models.CreateMaxPayloadFromAnyObject({
       uuid: Utils.UuidGenerator.GenerateUuid(),
       content_type: ContentType.ItemsKey,
-      content: Payloads.FillItemContent(content),
+      content: this.generateNewItemsKeyContent(),
     })
     return CreateItemFromPayload(payload)
   }
@@ -183,7 +189,7 @@ export class SNProtocolOperator004 implements SynchronousOperator {
    * decrypt data by regenerating the key based on the attached key params.
    */
   private generateAuthenticatedDataForPayload(
-    payload: Payloads.PurePayload,
+    payload: Models.PayloadInterface,
     key: ItemsKeyInterface | SNRootKey,
   ): ItemAuthenticatedData | RootKeyEncryptedAuthenticatedData {
     const baseData: ItemAuthenticatedData = {
@@ -221,7 +227,7 @@ export class SNProtocolOperator004 implements SynchronousOperator {
   }
 
   public generateEncryptedParametersSync(
-    payload: Payloads.PurePayload,
+    payload: Models.PayloadInterface,
     key: ItemsKeyInterface | SNRootKey,
   ): EncryptedParameters {
     const itemKey = this.crypto.generateRandomKey(V004Algorithm.EncryptionKeyLength)
@@ -248,10 +254,10 @@ export class SNProtocolOperator004 implements SynchronousOperator {
     }
   }
 
-  public generateDecryptedParametersSync(
+  public generateDecryptedParametersSync<C extends ItemContent = ItemContent>(
     encrypted: EncryptedParameters,
     key: ItemsKeyInterface | SNRootKey,
-  ): DecryptedParameters | ErroredDecryptingParameters {
+  ): DecryptedParameters<C> | ErroredDecryptingParameters {
     const itemKeyComponents = this.deconstructEncryptedPayloadString(encrypted.enc_item_key)
     const authenticatedData = this.stringToAuthenticatedData(
       itemKeyComponents.rawAuthenticatedData,
@@ -328,7 +334,8 @@ export class SNProtocolOperator004 implements SynchronousOperator {
     const partitions = Utils.splitString(derivedKey, 2)
     const masterKey = partitions[0]
     const serverPassword = partitions[1]
-    return SNRootKey.Create({
+
+    return CreateNewRootKey({
       masterKey,
       serverPassword,
       version: ProtocolVersion.V004,
