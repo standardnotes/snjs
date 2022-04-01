@@ -1,6 +1,8 @@
-import { predicateFromJson, PredicateInterface, PredicateJsonForm } from '@standardnotes/payloads'
+import { PayloadInterface } from './../Payload/PayloadInterface'
 import { SNItem } from '../Item/Item'
-import { PurePayload } from '@standardnotes/payloads'
+import { PredicateInterface, PredicateJsonForm } from '../Predicate/Interface'
+import { predicateFromJson } from '../Predicate/Generators'
+import { ItemContent } from '../Item/ItemInterface'
 
 export const SMART_TAG_DSL_PREFIX = '!['
 
@@ -11,7 +13,7 @@ export enum SystemViewId {
   UntaggedNotes = 'untagged-notes',
 }
 
-export interface SmartViewContent {
+export interface SmartViewContent extends ItemContent {
   title: string
   predicate: PredicateJsonForm
 }
@@ -28,7 +30,7 @@ export class SmartView extends SNItem {
   public readonly predicate!: PredicateInterface<SNItem>
   public readonly title: string
 
-  constructor(payload: PurePayload) {
+  constructor(payload: PayloadInterface<SmartViewContent>) {
     super(payload)
     try {
       this.predicate = this.typedContent.predicate && predicateFromJson(this.typedContent.predicate)

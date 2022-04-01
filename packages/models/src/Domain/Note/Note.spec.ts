@@ -1,6 +1,6 @@
 import { SNNote } from './Note'
-import { FillItemContent, CreateMaxPayloadFromAnyObject } from '@standardnotes/payloads'
 import { ContentType } from '@standardnotes/common'
+import { CreateMaxPayloadFromAnyObject, FillItemContent } from '../Payload/Functions'
 
 const randUuid = () => String(Math.random())
 

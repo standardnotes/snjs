@@ -38,9 +38,6 @@ export const AllowedBatchContentTypes = Object.freeze([
   ContentType.FilesafeIntegration,
 ])
 
-/* This domain will be used to save context item client data */
-export const ComponentDataDomain = 'org.standardnotes.sn.components'
-
 export type StreamObserver = {
   identifier: string
   componentUuid: UuidString

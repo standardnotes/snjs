@@ -2,9 +2,8 @@
 import { extendArray, isString, UuidMap } from '@standardnotes/utils'
 import { ContentType, Uuid } from '@standardnotes/common'
 import { remove } from 'lodash'
-
-import { PayloadInterface } from '../Payload/PayloadInterface'
 import { ItemInterface } from '../Item/ItemInterface'
+import { PayloadInterface } from '../Payload/PayloadInterface'
 import { IntegrityPayload } from '../Payload/IntegrityPayload'
 
 export class MutableCollection<T extends PayloadInterface | ItemInterface> {
@@ -39,7 +38,7 @@ export class MutableCollection<T extends PayloadInterface | ItemInterface> {
     mapCopy?: Partial<Record<Uuid, T>>,
     typedMapCopy?: Partial<Record<ContentType, T[]>>,
     referenceMapCopy?: UuidMap,
-    conflictMapCopy?: UuidMap
+    conflictMapCopy?: UuidMap,
   ) {
     if (copy) {
       this.map = mapCopy!
@@ -155,7 +154,7 @@ export class MutableCollection<T extends PayloadInterface | ItemInterface> {
         }
         this.referenceMap.setAllRelationships(
           element.uuid!,
-          element.references.map((r) => r.uuid)
+          element.references.map((r) => r.uuid),
         )
       }
     }

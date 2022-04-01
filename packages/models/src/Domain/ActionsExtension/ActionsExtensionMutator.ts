@@ -1,20 +1,21 @@
 import { ItemMutator } from '../Item/ItemMutator'
-import { Action } from './ActionsExtension'
+import { ActionExtensionContent } from './ActionsExtension'
+import { Action } from './Types'
 
-export class ActionsExtensionMutator extends ItemMutator {
+export class ActionsExtensionMutator extends ItemMutator<ActionExtensionContent> {
   set description(description: string) {
-    this.content!.description = description
+    this.sureContent.description = description
   }
 
   set supported_types(supported_types: string[]) {
-    this.content!.supported_types = supported_types
+    this.sureContent.supported_types = supported_types
   }
 
   set actions(actions: Action[]) {
-    this.content!.actions = actions
+    this.sureContent.actions = actions
   }
 
   set deprecation(deprecation: string | undefined) {
-    this.content!.deprecation = deprecation
+    this.sureContent.deprecation = deprecation
   }
 }

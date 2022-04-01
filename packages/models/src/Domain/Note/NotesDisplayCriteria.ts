@@ -1,11 +1,13 @@
-import { CollectionSortDirection, CollectionSort, ItemCollection } from '@standardnotes/payloads'
 import { ContentType } from '@standardnotes/common'
 import { NoteWithTags } from './NoteWithTags'
-import { CompoundPredicate } from '@standardnotes/payloads'
 import { SNItem } from '../Item'
 import { SNTag } from '../Tag'
 import { SNNote } from '.'
 import { SmartView } from '../SmartView'
+import { CollectionSort } from '../Collection/CollectionSort'
+import { CollectionSortDirection } from '../Collection/CollectionSortDirection'
+import { ItemCollection } from '../Collection/ItemCollection'
+import { CompoundPredicate } from '../Predicate/CompoundPredicate'
 
 export type SearchQuery = {
   query: string
@@ -52,7 +54,7 @@ export class NotesDisplayCriteria {
 
       filters.push((note) => {
         if (compoundPredicate.keypathIncludesString('tags')) {
-          const noteWithTags = new NoteWithTags(
+          const noteWithTags = NoteWithTags.Create(
             note.payload,
             collection.elementsReferencingElement(note, ContentType.Tag) as SNTag[],
           )

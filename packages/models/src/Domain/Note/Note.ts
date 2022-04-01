@@ -1,15 +1,12 @@
 import { isNullOrUndefined } from '@standardnotes/utils'
 import { ContentType } from '@standardnotes/common'
 import { SNItem } from '../Item/Item'
-import {
-  ItemInterface,
-  PayloadContent,
-  PayloadFormat,
-  PurePayload,
-  AppDataField,
-} from '@standardnotes/payloads'
+import { ItemContent, ItemInterface } from '../Item/ItemInterface'
+import { PayloadInterface } from '../Payload/PayloadInterface'
+import { PayloadFormat } from '../Payload/PayloadFormat'
+import { AppDataField } from '../Item/AppDataField'
 
-export interface NoteContent extends PayloadContent {
+export interface NoteInterface {
   title: string
   text: string
   mobilePrefersPlainEditor?: boolean
@@ -19,20 +16,22 @@ export interface NoteContent extends PayloadContent {
   spellcheck?: boolean
 }
 
+export type NoteContent = NoteInterface & ItemContent
+
 export const isNote = (x: ItemInterface): x is SNNote => x.content_type === ContentType.Note
 
 /** A note item */
-export class SNNote extends SNItem implements NoteContent {
+export class SNNote extends SNItem<NoteContent> implements NoteInterface {
   public readonly title: string
   public readonly text: string
   public readonly mobilePrefersPlainEditor?: boolean
   public readonly hidePreview: boolean = false
   public readonly preview_plain: string
   public readonly preview_html: string
-  public readonly prefersPlainEditor!: boolean
+  public readonly prefersPlainEditor: boolean
   public readonly spellcheck?: boolean
 
-  constructor(payload: PurePayload) {
+  constructor(payload: PayloadInterface<NoteContent>) {
     super(payload)
 
     this.title = String(this.payload.safeContent.title || '')
@@ -43,7 +42,10 @@ export class SNNote extends SNItem implements NoteContent {
     this.spellcheck = this.payload.safeContent.spellcheck
 
     if (payload.format === PayloadFormat.DecryptedBareObject) {
-      this.prefersPlainEditor = this.getAppDomainValue(AppDataField.PrefersPlainEditor)
+      this.prefersPlainEditor = this.getAppDomainValueWithDefault(
+        AppDataField.PrefersPlainEditor,
+        false,
+      )
     }
 
     if (!isNullOrUndefined(this.payload.safeContent.mobilePrefersPlainEditor)) {

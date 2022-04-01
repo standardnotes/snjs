@@ -1,6 +1,3 @@
-import { ItemInterface } from './../Item/ItemInterface'
-export type StringKey<T extends ItemInterface> = keyof T & string
-
 /**
  * Predicate date strings are of form "x.days.ago" or "x.hours.ago"
  */

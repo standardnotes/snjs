@@ -1,19 +1,19 @@
-import { ItemInterface } from './../Item/ItemInterface'
 import {
+  PredicateTarget,
   PredicateInterface,
   PredicateJsonForm,
   PredicateOperator,
   PrimitiveOperand,
+  StringKey,
   SureValue,
 } from './Interface'
 import { valueMatchesTargetValue } from './Operator'
-import { StringKey } from './Utils'
 
 /**
  * A local-only construct that defines a built query that
  * can be used to dynamically search items.
  */
-export class Predicate<T extends ItemInterface> implements PredicateInterface<T> {
+export class Predicate<T extends PredicateTarget> implements PredicateInterface<T> {
   constructor(
     public readonly keypath: StringKey<T>,
     public readonly operator: PredicateOperator,
@@ -28,7 +28,7 @@ export class Predicate<T extends ItemInterface> implements PredicateInterface<T>
     return (this.keypath as string).includes(verb)
   }
 
-  matchesItem<T extends ItemInterface>(item: T): boolean {
+  matchesItem<T extends PredicateTarget>(item: T): boolean {
     const keyPathComponents = this.keypath.split('.') as StringKey<T>[]
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any

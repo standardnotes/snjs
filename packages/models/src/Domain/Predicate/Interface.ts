@@ -39,3 +39,7 @@ export const SureValueNonObjectTypesAsStrings = ['number', 'string', 'boolean']
 export type FalseyValue = false | '' | null | undefined
 
 export type PrimitiveOperand = SureValue | FalseyValue
+
+export type PredicateTarget = unknown
+
+export type StringKey<T = unknown> = keyof T & string

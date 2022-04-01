@@ -1,7 +1,11 @@
-import { ItemInterface } from './../Item/ItemInterface'
-import { PredicateCompoundOperator, PredicateInterface, PredicateJsonForm } from './Interface'
+import {
+  PredicateTarget,
+  PredicateCompoundOperator,
+  PredicateInterface,
+  PredicateJsonForm,
+} from './Interface'
 
-export class CompoundPredicate<T extends ItemInterface> implements PredicateInterface<T> {
+export class CompoundPredicate<T extends PredicateTarget> implements PredicateInterface<T> {
   constructor(
     public readonly operator: PredicateCompoundOperator,
     public readonly predicates: PredicateInterface<T>[],

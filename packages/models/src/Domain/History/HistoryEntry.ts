@@ -1,29 +1,32 @@
 import { SNItem } from '../Item/Item'
 import { isNullOrUndefined } from '@standardnotes/utils'
-import { CopyPayload, SurePayload } from '@standardnotes/payloads'
 import { CreateItemFromPayload } from '../Generator'
+import { SurePayload } from '../Payload/SurePayload'
+import { CopyPayload } from '../Payload/Functions'
+import { NoteContent } from '../Note'
 
 export class HistoryEntry {
-  public readonly payload: SurePayload
+  public readonly payload: SurePayload<NoteContent>
   public readonly previousEntry?: HistoryEntry
-  protected readonly defaultContentKeyToDiffOn = 'text'
+  protected readonly defaultContentKeyToDiffOn: keyof NoteContent = 'text'
   protected readonly textCharDiffLength: number
   protected readonly hasPreviousEntry: boolean
 
-  constructor(payload: SurePayload, previousEntry?: HistoryEntry) {
-    this.payload = CopyPayload(payload) as SurePayload
+  constructor(payload: SurePayload<NoteContent>, previousEntry?: HistoryEntry) {
+    this.payload = CopyPayload(payload) as SurePayload<NoteContent>
     this.previousEntry = previousEntry
     this.hasPreviousEntry = !isNullOrUndefined(previousEntry)
     /** We'll try to compute the delta based on an assumed
      * content property of `text`, if it exists. */
-    const propertyValue = this.payload.content[this.defaultContentKeyToDiffOn]
+    const propertyValue = this.payload.content[this.defaultContentKeyToDiffOn] as string | undefined
+
     if (propertyValue) {
       if (previousEntry) {
-        this.textCharDiffLength =
-          propertyValue.length -
-          previousEntry.payload.content[this.defaultContentKeyToDiffOn].length
+        const previousValue =
+          (previousEntry.payload.content[this.defaultContentKeyToDiffOn] as string)?.length || 0
+        this.textCharDiffLength = propertyValue.length - previousValue
       } else {
-        this.textCharDiffLength = this.payload.content[this.defaultContentKeyToDiffOn].length
+        this.textCharDiffLength = propertyValue.length
       }
     } else {
       this.textCharDiffLength = 0

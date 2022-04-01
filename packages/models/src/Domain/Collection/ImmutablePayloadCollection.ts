@@ -1,5 +1,6 @@
 import { ContentType, Uuid } from '@standardnotes/common'
 import { UuidMap } from '@standardnotes/utils'
+import { PayloadInterface } from '../Payload/PayloadInterface'
 import { PayloadSource } from '../Payload/PayloadSource'
 import { PurePayload } from '../Payload/PurePayload'
 import { MutableCollection } from './MutableCollection'
@@ -7,12 +8,15 @@ import { MutableCollection } from './MutableCollection'
 /**
  * A collection of payloads coming from a single source.
  */
-export class ImmutablePayloadCollection extends MutableCollection<PurePayload> {
+export class ImmutablePayloadCollection extends MutableCollection<PayloadInterface> {
   public source?: PayloadSource
 
   /** We don't use a constructor for this because we don't want the constructor to have
    * side-effects, such as calling collection.set(). */
-  static WithPayloads(payloads: PurePayload[] = [], source?: PayloadSource): ImmutablePayloadCollection {
+  static WithPayloads(
+    payloads: PurePayload[] = [],
+    source?: PayloadSource,
+  ): ImmutablePayloadCollection {
     const collection = new ImmutablePayloadCollection()
     collection.source = source
     if (payloads.length > 0) {
@@ -25,18 +29,14 @@ export class ImmutablePayloadCollection extends MutableCollection<PurePayload> {
   static FromCollection(collection: MutableCollection<PurePayload>): ImmutablePayloadCollection {
     const mapCopy = Object.freeze(Object.assign({}, collection.map))
     const typedMapCopy = Object.freeze(Object.assign({}, collection.typedMap))
-    const referenceMapCopy = Object.freeze(
-      collection.referenceMap.makeCopy()
-    ) as UuidMap
-    const conflictMapCopy = Object.freeze(
-      collection.conflictMap.makeCopy()
-    ) as UuidMap
+    const referenceMapCopy = Object.freeze(collection.referenceMap.makeCopy()) as UuidMap
+    const conflictMapCopy = Object.freeze(collection.conflictMap.makeCopy()) as UuidMap
     const result = new ImmutablePayloadCollection(
       true,
       mapCopy as Partial<Record<Uuid, PurePayload>>,
       typedMapCopy as Partial<Record<ContentType, PurePayload[]>>,
       referenceMapCopy,
-      conflictMapCopy
+      conflictMapCopy,
     )
     Object.freeze(result)
     return result
@@ -52,7 +52,7 @@ export class ImmutablePayloadCollection extends MutableCollection<PurePayload> {
       mapCopy as Partial<Record<Uuid, PurePayload>>,
       typedMapCopy as Partial<Record<ContentType, PurePayload[]>>,
       referenceMapCopy,
-      conflictMapCopy
+      conflictMapCopy,
     )
     return result
   }

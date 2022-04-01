@@ -1,5 +1,5 @@
 import { ProtocolVersion } from '@standardnotes/common'
-import { ItemInterface } from '@standardnotes/payloads'
+import { ItemInterface } from '../Item/ItemInterface'
 
 export interface ItemsKeyInterface extends ItemInterface {
   get keyVersion(): ProtocolVersion

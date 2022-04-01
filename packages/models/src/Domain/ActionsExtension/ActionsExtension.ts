@@ -1,38 +1,28 @@
 import { FeatureDescription, ThirdPartyFeatureDescription } from '@standardnotes/features'
 import { HistoryEntry } from '../History/HistoryEntry'
-import { PurePayload, ConflictStrategy } from '@standardnotes/payloads'
 import { SNItem } from '../Item'
+import { ItemContent } from '../Item/ItemInterface'
+import { ConflictStrategy } from '../Payload/ConflictStrategy'
+import { PayloadInterface } from '../Payload/PayloadInterface'
+import { Action } from './Types'
 
-export enum ActionAccessType {
-  Encrypted = 'encrypted',
-  Decrypted = 'decrypted',
-}
-
-export enum ActionVerb {
-  Get = 'get',
-  Render = 'render',
-  Show = 'show',
-  Post = 'post',
-  Nested = 'nested',
-}
-
-export type Action = {
-  label: string
-  desc: string
-  running?: boolean
-  error?: boolean
-  lastExecuted?: Date
-  context?: string
-  verb: ActionVerb
+export interface ActionExtensionInterface {
+  actions: Action[]
+  deprecation?: string
+  description: string
+  hosted_url?: string
+  name: string
+  package_info: FeatureDescription
+  supported_types: string[]
   url: string
-  access_type: ActionAccessType
-  subactions?: Action[]
 }
+
+export type ActionExtensionContent = ActionExtensionInterface & ItemContent
 
 /**
  * Related to the SNActionsService and the local Action model.
  */
-export class SNActionsExtension extends SNItem {
+export class SNActionsExtension extends SNItem<ActionExtensionContent> {
   public readonly actions: Action[] = []
   public readonly description: string
   public readonly url: string
@@ -41,7 +31,7 @@ export class SNActionsExtension extends SNItem {
   public readonly name: string
   public readonly package_info: FeatureDescription
 
-  constructor(payload: PurePayload) {
+  constructor(payload: PayloadInterface<ActionExtensionContent>) {
     super(payload)
     this.name = payload.safeContent.name || ''
     this.description = payload.safeContent.description || ''

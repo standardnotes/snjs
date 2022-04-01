@@ -12,8 +12,8 @@ import { PayloadOverride } from './PayloadOverride'
 import { PayloadSource } from './PayloadSource'
 import { RawPayload } from './RawPayload'
 import { PayloadFormat } from './PayloadFormat'
-import { DefaultAppDomain } from '../Domain/DefaultAppDomain'
-import { AppDataField } from '../Data/AppDataField'
+import { DefaultAppDomain } from '../Item/DefaultAppDomain'
+import { AppDataField } from '../Item/AppDataField'
 
 /**
  * Return the payloads that result if you alternated the uuid for the payload.
@@ -152,12 +152,12 @@ export function payloadFieldsForSource(source: PayloadSource): PayloadField[] {
     throw `No payload fields found for source ${source}`
   }
 }
-export function CreatePayload(
+export function CreatePayload<C extends PayloadContent = PayloadContent>(
   object: any,
   fields: PayloadField[],
   source?: PayloadSource,
   override?: PayloadOverride,
-): PayloadInterface {
+): PayloadInterface<C> {
   const rawPayload = pickByCopy(object, fields)
 
   const overrideFields =
@@ -175,10 +175,10 @@ export function CreatePayload(
   return new PurePayload(rawPayload, newFields, source || PayloadSource.Constructor)
 }
 
-export function CopyPayload(
-  payload: PayloadInterface,
+export function CopyPayload<C extends PayloadContent = PayloadContent>(
+  payload: PayloadInterface<C>,
   override?: PayloadOverride,
-): PayloadInterface {
+): PayloadInterface<C> {
   return CreatePayload(payload, payload.fields, payload.source, override)
 }
 
@@ -217,11 +217,11 @@ export function PayloadByMerging(
   return CopyPayload(payload, resultOverride)
 }
 
-export function CreateMaxPayloadFromAnyObject(
+export function CreateMaxPayloadFromAnyObject<C extends PayloadContent = PayloadContent>(
   object: RawPayload,
   override?: PayloadOverride,
   source?: PayloadSource,
-): PayloadInterface {
+): PayloadInterface<C> {
   return CreatePayload(object, MaxPayloadFields.slice(), source, override)
 }
 

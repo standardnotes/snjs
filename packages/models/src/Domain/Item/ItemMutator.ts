@@ -1,16 +1,14 @@
-import { Copy, omitInPlace, sortedCopy } from '@standardnotes/utils'
+import { Copy } from '@standardnotes/utils'
 import { MutationType } from './MutationType'
-import {
-  PayloadContent,
-  CopyPayload,
-  PurePayload,
-  PayloadByMerging,
-  AppDataField,
-  DefaultAppDomain,
-} from '@standardnotes/payloads'
-import { PrefKey } from '../UserPrefs/UserPrefs'
+import { PrefKey } from '../UserPrefs/PrefKey'
 import { SNItem } from './Item'
 import { Uuid } from '@standardnotes/common'
+import { ItemContent } from './ItemInterface'
+import { PurePayload } from '../Payload/PurePayload'
+import { CopyPayload, PayloadByMerging } from '../Payload/Functions'
+import { PayloadContent } from '../Payload/PayloadContent'
+import { AppDataField } from './AppDataField'
+import { DefaultAppDomain, DomainDataValueType, ItemDomainKey } from './DefaultAppDomain'
 
 /**
  * An item mutator takes in an item, and an operation, and returns the resulting payload.
@@ -18,20 +16,28 @@ import { Uuid } from '@standardnotes/common'
  * All changes to the payload must occur by copying the payload and reassigning its value.
  */
 
-export class ItemMutator {
-  public readonly item: SNItem
+export class ItemMutator<C extends ItemContent = ItemContent> {
+  public readonly item: SNItem<C>
   protected readonly type: MutationType
   protected payload: PurePayload
-  protected content?: PayloadContent
+  protected content?: C
 
-  constructor(item: SNItem, type: MutationType) {
+  constructor(item: SNItem<C>, type: MutationType) {
     this.item = item
     this.type = type
     this.payload = item.payload
+
     if (this.payload.content) {
       /** this.content needs to be mutable, so we make a copy */
       this.content = Copy(this.payload.content)
     }
+  }
+
+  public get sureContent(): C {
+    if (!this.content) {
+      throw Error('Attempting to access non-existant mutator content')
+    }
+    return this.content
   }
 
   public getUuid() {
@@ -48,6 +54,7 @@ export class ItemMutator {
         content: this.content,
       })
     }
+
     if (!this.payload.deleted) {
       if (this.type === MutationType.UpdateUserTimestamps) {
         this.userModifiedDate = new Date()
@@ -58,11 +65,13 @@ export class ItemMutator {
         }
       }
     }
+
     const result = CopyPayload(this.payload, {
       content: this.content,
       dirty: true,
       dirtiedDate: new Date(),
     })
+
     return result
   }
 
@@ -121,15 +130,15 @@ export class ItemMutator {
   }
 
   public set conflictOf(conflictOf: Uuid | undefined) {
-    this.content!.conflict_of = conflictOf
+    this.sureContent.conflict_of = conflictOf
   }
 
   public set protected(isProtected: boolean) {
-    this.content!.protected = isProtected
+    this.sureContent.protected = isProtected
   }
 
   public set trashed(trashed: boolean) {
-    this.content!.trashed = trashed
+    this.sureContent.trashed = trashed
   }
 
   public set pinned(pinned: boolean) {
@@ -147,106 +156,65 @@ export class ItemMutator {
   /**
    * Overwrites the entirety of this domain's data with the data arg.
    */
-  public setDomainData(data: any, domain: string): void {
+  public setDomainData(data: DomainDataValueType, domain: ItemDomainKey): void {
     if (this.payload.errorDecrypting) {
       return
     }
-    if (!this.content!.appData) {
-      this.content!.appData = {}
+
+    if (!this.sureContent.appData) {
+      this.sureContent.appData = {
+        [DefaultAppDomain]: {},
+      }
     }
-    this.content!.appData[domain] = data
+
+    this.sureContent.appData[domain] = data
   }
 
   /**
    * First gets the domain data for the input domain.
    * Then sets data[key] = value
    */
-  public setDomainDataKey(key: string, value: any, domain: string): void {
+  public setDomainDataKey(
+    key: keyof DomainDataValueType,
+    value: unknown,
+    domain: ItemDomainKey,
+  ): void {
     if (this.payload.errorDecrypting) {
       return
     }
-    if (!this.content!.appData) {
-      this.content!.appData = {}
+
+    if (!this.sureContent.appData) {
+      this.sureContent.appData = {
+        [DefaultAppDomain]: {},
+      }
     }
-    const globalData = this.content!.appData
-    if (!globalData[domain]) {
-      globalData[domain] = {}
+
+    if (!this.sureContent.appData[domain]) {
+      this.sureContent.appData[domain] = {}
     }
-    const domainData = globalData[domain]
+
+    const domainData = this.sureContent.appData[domain] as DomainDataValueType
     domainData[key] = value
   }
 
-  public setAppDataItem(key: AppDataField | PrefKey, value: any) {
-    this.setDomainDataKey(key, value, SNItem.DefaultAppDomain())
+  public setAppDataItem(key: AppDataField | PrefKey, value: unknown) {
+    this.setDomainDataKey(key, value, DefaultAppDomain)
   }
 
   public addItemAsRelationship(item: SNItem) {
-    const references = this.content!.references || []
+    const references = this.sureContent.references || []
     if (!references.find((r) => r.uuid === item.uuid)) {
       references.push({
         uuid: item.uuid,
-        content_type: item.content_type!,
+        content_type: item.content_type,
       })
     }
-    this.content!.references = references
+    this.sureContent.references = references
   }
 
   public removeItemAsRelationship(item: SNItem) {
-    let references = this.content!.references || []
+    let references = this.sureContent.references || []
     references = references.filter((r) => r.uuid !== item.uuid)
-    this.content!.references = references
+    this.sureContent.references = references
   }
-}
-export function ItemContentsDiffer(item1: SNItem, item2: SNItem, excludeContentKeys?: string[]) {
-  if (!excludeContentKeys) {
-    excludeContentKeys = []
-  }
-  return !ItemContentsEqual(
-    item1.content as PayloadContent,
-    item2.content as PayloadContent,
-    item1.contentKeysToIgnoreWhenCheckingEquality().concat(excludeContentKeys),
-    item1.appDataContentKeysToIgnoreWhenCheckingEquality(),
-  )
-}
-export function ItemContentsEqual(
-  leftContent: PayloadContent,
-  rightContent: PayloadContent,
-  keysToIgnore: string[],
-  appDataKeysToIgnore: string[],
-) {
-  /* Create copies of objects before running omit as not to modify source values directly. */
-  leftContent = sortedCopy(leftContent)
-  if (leftContent.appData) {
-    const domainData = leftContent.appData[DefaultAppDomain]
-    omitInPlace(domainData, appDataKeysToIgnore)
-    /**
-     * We don't want to disqualify comparison if one object contains an empty domain object
-     * and the other doesn't contain a domain object. This can happen if you create an item
-     * without setting dirty, which means it won't be initialized with a client_updated_at
-     */
-    if (domainData) {
-      if (Object.keys(domainData).length === 0) {
-        delete leftContent.appData
-      }
-    } else {
-      delete leftContent.appData
-    }
-  }
-  omitInPlace(leftContent, keysToIgnore)
-
-  rightContent = sortedCopy(rightContent)
-  if (rightContent.appData) {
-    const domainData = rightContent.appData[DefaultAppDomain]
-    omitInPlace(domainData, appDataKeysToIgnore)
-    if (domainData) {
-      if (Object.keys(domainData).length === 0) {
-        delete rightContent.appData
-      }
-    } else {
-      delete rightContent.appData
-    }
-  }
-  omitInPlace(rightContent, keysToIgnore)
-
-  return JSON.stringify(leftContent) === JSON.stringify(rightContent)
 }

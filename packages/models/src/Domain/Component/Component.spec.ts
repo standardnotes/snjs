@@ -1,5 +1,5 @@
-import { FillItemContent, CreateMaxPayloadFromAnyObject } from '@standardnotes/payloads'
 import { ContentType } from '@standardnotes/common'
+import { CreateMaxPayloadFromAnyObject, FillItemContent } from '../Payload/Functions'
 import { SNComponent } from './Component'
 
 describe('component model', () => {

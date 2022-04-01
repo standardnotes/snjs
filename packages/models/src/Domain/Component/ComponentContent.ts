@@ -1,17 +1,23 @@
+import { FeatureDescription, ComponentArea, ComponentPermission } from '@standardnotes/features'
 import { Uuid } from '@standardnotes/common'
-import { FeatureDescription } from '../Feature/FeatureDescription'
-import { ComponentArea } from './ComponentArea'
-import { ComponentPermission } from './ComponentPermission'
+import { ItemContent } from '../Item/ItemInterface'
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
-export interface ComponentContent {
+export interface ComponentInterface {
   componentData: Record<string, any>
+
   /** Items that have requested a component to be disabled in its context */
   disassociatedItemIds: string[]
+
   /** Items that have requested a component to be enabled in its context */
   associatedItemIds: string[]
-  local_url: string | null
+
+  local_url?: string
   hosted_url?: string
+
+  /** @deprecated */
+  url?: string
+
   offlineOnly: boolean
   name: string
   autoupdateDisabled: boolean
@@ -25,3 +31,5 @@ export interface ComponentContent {
   isDeprecated: boolean
   isExplicitlyEnabledForItem(uuid: Uuid): boolean
 }
+
+export type ComponentContent = ComponentInterface & ItemContent

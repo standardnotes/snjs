@@ -32,7 +32,7 @@ import { RawPayload } from './RawPayload'
  * Payloads also have a content format. Formats can either be
  * EncryptedString or DecryptedBareObject.
  */
-export class PurePayload<C extends PayloadContent = PayloadContent> implements PayloadInterface {
+export class PurePayload<C extends PayloadContent = PayloadContent> implements PayloadInterface<C> {
   /** When constructed, the payload takes in an array of fields that the input raw payload
    * contains. These fields allow consumers to determine whether a given payload has an actual
    * undefined value for payload.content, for example, or whether the payload was constructed

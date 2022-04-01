@@ -1,11 +1,19 @@
-import { PurePayload } from '@standardnotes/payloads'
-import { SNNote } from '.'
+import { PayloadInterface } from '../Payload/PayloadInterface'
 import { SNTag } from '../Tag'
+import { NoteContent, SNNote } from './Note'
+
+interface NoteWithTagsContent extends NoteContent {
+  tags: SNTag[]
+}
 
 export class NoteWithTags extends SNNote {
-  constructor(payload: PurePayload, public readonly tags?: SNTag[]) {
+  constructor(payload: PayloadInterface<NoteWithTagsContent>, public readonly tags?: SNTag[]) {
     super(payload)
     this.tags = tags || payload.safeContent.tags
+  }
+
+  static Create(payload: PayloadInterface<NoteContent>, tags?: SNTag[]) {
+    return new NoteWithTags(payload as PayloadInterface<NoteWithTagsContent>, tags)
   }
 
   get tagsCount(): number {

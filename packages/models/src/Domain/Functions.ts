@@ -1,14 +1,4 @@
-import {
-  PayloadInterface,
-  ImmutablePayloadCollection,
-  PurePayload,
-  AffectorFunction,
-  CopyPayload,
-  PayloadsByUpdatingReferencingPayloadReferences,
-  PayloadOverride,
-  PayloadContent,
-} from '@standardnotes/payloads'
-
+import { PayloadInterface } from './Payload/PayloadInterface'
 import { CreateItemFromPayload } from './Generator'
 import { ContentType } from '@standardnotes/common'
 import { UuidGenerator, extendArray } from '@standardnotes/utils'
@@ -16,6 +6,12 @@ import { SNComponent } from './Component/Component'
 import { ComponentMutator } from './Component/ComponentMutator'
 import { ComponentArea } from '@standardnotes/features'
 import { MutationType } from './Item/MutationType'
+import { CopyPayload, PayloadsByUpdatingReferencingPayloadReferences } from './Payload/Functions'
+import { PurePayload } from './Payload/PurePayload'
+import { PayloadOverride } from './Payload/PayloadOverride'
+import { ImmutablePayloadCollection } from './Collection/ImmutablePayloadCollection'
+import { PayloadContent } from './Payload/PayloadContent'
+import { AffectorFunction } from './Payload/AffectorFunction'
 
 /**
  * Returns an array of uuids for the given items or payloads

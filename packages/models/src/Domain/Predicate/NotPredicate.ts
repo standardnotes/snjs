@@ -1,7 +1,6 @@
-import { ItemInterface } from './../Item/ItemInterface'
-import { PredicateInterface, PredicateJsonForm } from './Interface'
+import { PredicateTarget, PredicateInterface, PredicateJsonForm } from './Interface'
 
-export class NotPredicate<T extends ItemInterface> implements PredicateInterface<T> {
+export class NotPredicate<T extends PredicateTarget> implements PredicateInterface<T> {
   constructor(public readonly predicate: PredicateInterface<T>) {}
 
   matchesItem(item: T): boolean {

@@ -1,8 +1,6 @@
-import { ItemInterface } from './../Item/ItemInterface'
-import { PredicateInterface, PredicateJsonForm } from './Interface'
-import { StringKey } from './Utils'
+import { PredicateTarget, PredicateInterface, PredicateJsonForm, StringKey } from './Interface'
 
-export class IncludesPredicate<T extends ItemInterface> implements PredicateInterface<T> {
+export class IncludesPredicate<T extends PredicateTarget> implements PredicateInterface<T> {
   constructor(
     private readonly keypath: StringKey<T>,
     public readonly predicate: PredicateInterface<T>,

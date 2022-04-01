@@ -1,7 +1,6 @@
 import { SNFile } from './File/File'
 import { SNFeatureRepo } from './FeatureRepo/FeatureRepo'
 import { ContentType } from '@standardnotes/common'
-import { PurePayload } from '@standardnotes/payloads'
 import { SNActionsExtension } from './ActionsExtension/ActionsExtension'
 import { SNComponent } from './Component/Component'
 import { SNEditor } from './Editor/Editor'
@@ -11,7 +10,6 @@ import { SmartView } from './SmartView/SmartView'
 import { SNTag } from './Tag/Tag'
 import { SNTheme } from './Theme/Theme'
 import { SNUserPrefs } from './UserPrefs/UserPrefs'
-
 import { FileMutator } from './File/FileMutator'
 import { MutationType } from './Item/MutationType'
 import { ItemMutator } from './Item/ItemMutator'
@@ -21,6 +19,7 @@ import { ActionsExtensionMutator } from './ActionsExtension/ActionsExtensionMuta
 import { ComponentMutator } from './Component/ComponentMutator'
 import { TagMutator } from './Tag/TagMutator'
 import { NoteMutator } from './Note/NoteMutator'
+import { PurePayload } from './Payload/PurePayload'
 
 type ItemClass = new (payload: PurePayload) => SNItem
 type MutatorClass = new (item: SNItem, type: MutationType) => ItemMutator

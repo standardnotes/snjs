@@ -1,12 +1,23 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Uuid, ProtocolVersion, ContentType } from '@standardnotes/common'
-import { AppDataField } from '../Data/AppDataField'
+import { AppDataField } from './AppDataField'
+import { AppData, ComponentDataDomain, DefaultAppDomain } from './DefaultAppDomain'
 import { PayloadContent } from '../Payload/PayloadContent'
 import { PayloadInterface } from '../Payload/PayloadInterface'
 import { PayloadOverride } from '../Payload/PayloadOverride'
+import { PredicateInterface } from '../Predicate/Interface'
 import { ContentReference } from '../Reference/ContentReference'
 
-export interface ItemInterface {
+export interface ItemContent extends PayloadContent {
+  protected: boolean
+  trashed: boolean
+  pinned: boolean
+  archived: boolean
+  locked: boolean
+  appData: AppData
+}
+
+export interface ItemInterface<C extends ItemContent = ItemContent> {
   readonly payload: PayloadInterface
   readonly conflictOf?: Uuid
   readonly duplicateOf?: Uuid
@@ -19,9 +30,9 @@ export interface ItemInterface {
   readonly locked: boolean
   readonly userModifiedDate: Date
   uuid: Uuid
-  content: string | PayloadContent | undefined
+  content: string | C | undefined
   version: ProtocolVersion
-  safeContent: PayloadContent
+  safeContent: C
   references: ContentReference[]
   content_type: ContentType
   created_at: Date
@@ -42,7 +53,7 @@ export interface ItemInterface {
   updated_at: Date | undefined
   auth_hash: string | undefined
   auth_params: any | undefined
-  singletonPredicate(): any
+  singletonPredicate<T extends ItemInterface>(): PredicateInterface<T>
   singletonStrategy: any
   strategyWhenConflictingWithItem(item: ItemInterface, previousRevision?: any): any
   satisfiesPredicate(predicate: any): boolean
@@ -50,8 +61,10 @@ export interface ItemInterface {
   isItemContentEqualWith(otherItem: ItemInterface): boolean
   payloadRepresentation(override?: PayloadOverride): PayloadInterface
   hasRelationshipWithItem(item: ItemInterface): boolean
-  getDomainData(domain: string): undefined | Record<string, any>
-  contentKeysToIgnoreWhenCheckingEquality(): string[]
+  getDomainData(
+    domain: typeof ComponentDataDomain | typeof DefaultAppDomain,
+  ): undefined | Record<string, any>
+  contentKeysToIgnoreWhenCheckingEquality(): (keyof C)[]
   appDataContentKeysToIgnoreWhenCheckingEquality(): AppDataField[]
-  getContentCopy(): PayloadContent
+  getContentCopy(): C
 }

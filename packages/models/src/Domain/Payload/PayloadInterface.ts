@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { ContentType, ProtocolVersion, Uuid } from '@standardnotes/common'
-
 import { ContentReference } from '../Reference/ContentReference'
 import { PayloadContent } from './PayloadContent'
 import { PayloadField } from './PayloadField'
@@ -8,12 +7,12 @@ import { PayloadFormat } from './PayloadFormat'
 import { PayloadSource } from './PayloadSource'
 import { RawPayload } from './RawPayload'
 
-export interface PayloadInterface {
+export interface PayloadInterface<C extends PayloadContent = PayloadContent> {
   readonly fields: PayloadField[]
   readonly source: PayloadSource
   readonly uuid: string
   readonly content_type: ContentType
-  readonly content?: PayloadContent | string
+  readonly content?: C | string
   readonly deleted?: boolean
   readonly items_key_id?: string
   readonly enc_item_key?: string
@@ -40,10 +39,10 @@ export interface PayloadInterface {
   readonly version: ProtocolVersion
   readonly duplicate_of?: string
 
-  safeContent: PayloadContent
+  safeContent: C
   references: ContentReference[]
   safeReferences: ContentReference[]
-  contentObject: PayloadContent
+  contentObject: C
   contentString: string
   discardable: boolean | undefined
   serverUpdatedAt: Date

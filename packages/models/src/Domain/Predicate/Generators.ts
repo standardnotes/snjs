@@ -1,4 +1,3 @@
-import { ItemInterface } from './../Item/ItemInterface'
 import { CompoundPredicate } from './CompoundPredicate'
 import { IncludesPredicate } from './IncludesPredicate'
 import {
@@ -11,12 +10,13 @@ import {
   AllPredicateOperators,
   RawPredicateInArrayForm,
   SureValueNonObjectTypesAsStrings,
+  StringKey,
+  PredicateTarget,
 } from './Interface'
 import { NotPredicate } from './NotPredicate'
 import { Predicate } from './Predicate'
-import { StringKey } from './Utils'
 
-export function predicateFromArguments<T extends ItemInterface>(
+export function predicateFromArguments<T extends PredicateTarget>(
   keypath: StringKey<T> | undefined,
   operator: PredicateOperator,
   value: SureValue | PredicateJsonForm,
@@ -38,7 +38,7 @@ export function predicateFromArguments<T extends ItemInterface>(
   throw Error('Invalid predicate arguments')
 }
 
-export function compoundPredicateFromArguments<T extends ItemInterface>(
+export function compoundPredicateFromArguments<T extends PredicateTarget>(
   operator: PredicateOperator,
   value: PredicateJsonForm[],
 ): PredicateInterface<T> {
@@ -48,14 +48,14 @@ export function compoundPredicateFromArguments<T extends ItemInterface>(
   return new CompoundPredicate(operator as PredicateCompoundOperator, subPredicates)
 }
 
-export function notPredicateFromArguments<T extends ItemInterface>(
+export function notPredicateFromArguments<T extends PredicateTarget>(
   value: PredicateJsonForm,
 ): PredicateInterface<T> {
   const subPredicate = predicateFromJson(value)
   return new NotPredicate(subPredicate)
 }
 
-export function includesPredicateFromArguments<T extends ItemInterface>(
+export function includesPredicateFromArguments<T extends PredicateTarget>(
   keypath: StringKey<T>,
   value: PredicateJsonForm,
 ): PredicateInterface<T> {
@@ -63,7 +63,7 @@ export function includesPredicateFromArguments<T extends ItemInterface>(
   return new IncludesPredicate<T>(keypath, subPredicate)
 }
 
-export function predicateFromJson<T extends ItemInterface>(
+export function predicateFromJson<T extends PredicateTarget>(
   values: PredicateJsonForm,
 ): PredicateInterface<T> {
   if (Array.isArray(values)) {
@@ -78,9 +78,7 @@ export function predicateFromJson<T extends ItemInterface>(
   )
 }
 
-export function predicateFromDSLString<T extends ItemInterface>(
-  dsl: string,
-): PredicateInterface<T> {
+export function predicateFromDSLString<T extends PredicateTarget>(dsl: string): PredicateInterface<T> {
   try {
     const components = JSON.parse(dsl.substring(1, dsl.length)) as string[]
     components.shift()
