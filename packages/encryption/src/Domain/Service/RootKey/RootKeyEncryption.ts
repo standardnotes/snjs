@@ -5,7 +5,7 @@ import { KeyMode } from './KeyMode'
 import { OperatorManager } from '../../Operator/OperatorManager'
 import { SNRootKey } from '../../RootKey/RootKey'
 import { SNRootKeyParams } from '../../RootKey/RootKeyParams'
-import { UuidGenerator } from '@standardnotes/utils'
+import { UuidGenerator, Uuids } from '@standardnotes/utils'
 import * as Common from '@standardnotes/common'
 import * as Models from '@standardnotes/models'
 import * as OperatorWrapper from '../../Operator/OperatorWrapper'
@@ -556,7 +556,7 @@ export class RootKeyEncryptionService extends Services.AbstractService<RootKeySe
        * Re-encrypting items keys is called by consumers who have specific flows who
        * will sync on their own timing
        */
-      await this.itemManager.setItemsDirty(Models.Uuids(itemsKeys))
+      await this.itemManager.setItemsDirty(Uuids(itemsKeys))
     }
   }
 

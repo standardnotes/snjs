@@ -1,7 +1,13 @@
 import { AccountSyncOperation } from '@Lib/Services/Sync/Account/Operation'
 import { ApplicationSyncOptions } from '../../Application/Options'
 import { ContentType } from '@standardnotes/common'
-import { isNullOrUndefined, removeFromIndex, sleep, subtractFromArray } from '@standardnotes/utils'
+import {
+  isNullOrUndefined,
+  removeFromIndex,
+  sleep,
+  subtractFromArray,
+  Uuids,
+} from '@standardnotes/utils'
 import { ItemManager } from '@Lib/Services/Items/ItemManager'
 import { OfflineSyncOperation } from '@Lib/Services/Sync/Offline/Operation'
 import { PayloadManager } from '../Payloads/PayloadManager'
@@ -515,7 +521,7 @@ export class SNSyncService
      */
     if (items.length > 0) {
       await this.itemManager.changeItems(
-        Models.Uuids(items),
+        Uuids(items),
         (mutator) => {
           mutator.lastSyncBegan = beginDate
         },
@@ -848,7 +854,7 @@ export class SNSyncService
     if (payloadsToEmit.length > 0) {
       await this.payloadManager.emitPayloads(payloadsToEmit, Payloads.PayloadSource.LocalSaved)
       const payloadsToPersist = this.payloadManager.find(
-        Models.Uuids(payloadsToEmit),
+        Uuids(payloadsToEmit),
       ) as Payloads.PurePayload[]
       await this.persistPayloads(payloadsToPersist)
     }
