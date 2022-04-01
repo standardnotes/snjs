@@ -1,5 +1,4 @@
 import { ContentType, ProtocolVersion, Uuid } from '@standardnotes/common'
-import { HistoryEntry } from '../../Runtime/History/HistoryEntry'
 import { dateToLocalizedString, deepFreeze } from '@standardnotes/utils'
 import { PrefKey } from '../../Syncable/UserPrefs/PrefKey'
 import { ItemContentsDiffer, ItemContentsEqual } from './Functions'
@@ -10,11 +9,12 @@ import { AppDataField } from './AppDataField'
 import { ComponentDataDomain, DefaultAppDomain } from './DefaultAppDomain'
 import { ContentReference } from '../Reference/ContentReference'
 import { PayloadSource } from '../Payload/PayloadSource'
-import { ConflictStrategy } from '../Payload/ConflictStrategy'
+import { ConflictStrategy } from './ConflictStrategy'
 import { PredicateInterface } from '../../Runtime/Predicate/Interface'
-import { CopyPayload } from '../Payload/Functions'
+import { CopyPayload } from '../Payload/Utilities/Functions'
 import { SingletonStrategy } from './SingletonStrategy'
 import { PayloadInterface } from '../Payload/PayloadInterface'
+import { HistoryEntryInterface } from '../../Runtime/History/HistoryEntryInterface'
 
 /**
  * The most abstract item that any syncable item needs to extend from.
@@ -284,7 +284,7 @@ export class SNItem<C extends ItemContent = ItemContent> implements ItemInterfac
    */
   public strategyWhenConflictingWithItem(
     item: ItemInterface,
-    previousRevision?: HistoryEntry,
+    previousRevision?: HistoryEntryInterface,
   ): ConflictStrategy {
     if (this.errorDecrypting) {
       return ConflictStrategy.KeepLeftDuplicateRight

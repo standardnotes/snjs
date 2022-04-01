@@ -1,9 +1,9 @@
 import { ComponentArea } from '@standardnotes/features'
-import { HistoryEntry } from '../../Runtime/History/HistoryEntry'
 import { SNComponent } from '../Component/Component'
 import { SNItem } from '../../Abstract/Item/Item'
-import { ConflictStrategy } from '../../Abstract/Payload/ConflictStrategy'
+import { ConflictStrategy } from '../../Abstract/Item/ConflictStrategy'
 import { AppDataField } from '../../Abstract/Item/AppDataField'
+import { HistoryEntryInterface } from '../../Runtime/History'
 
 export class SNTheme extends SNComponent {
   public area: ComponentArea = ComponentArea.Themes
@@ -13,7 +13,10 @@ export class SNTheme extends SNComponent {
   }
 
   /** Do not duplicate under most circumstances. Always keep original */
-  strategyWhenConflictingWithItem(item: SNItem, previousRevision?: HistoryEntry): ConflictStrategy {
+  strategyWhenConflictingWithItem(
+    item: SNItem,
+    previousRevision?: HistoryEntryInterface,
+  ): ConflictStrategy {
     if (this.errorDecrypting) {
       return super.strategyWhenConflictingWithItem(item, previousRevision)
     }

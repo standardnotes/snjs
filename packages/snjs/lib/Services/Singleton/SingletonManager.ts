@@ -1,11 +1,12 @@
 import { ContentType } from '@standardnotes/common'
 import { ItemManager } from '@Lib/Services/Items/ItemManager'
-import { SNItem, SingletonStrategy, Uuids } from '@standardnotes/models'
+import { SNItem, SingletonStrategy } from '@standardnotes/models'
 import {
   arrayByRemovingFromIndex,
   extendArray,
   isNullOrUndefined,
   UuidGenerator,
+  Uuids,
 } from '@standardnotes/utils'
 import {
   CreateMaxPayloadFromAnyObject,

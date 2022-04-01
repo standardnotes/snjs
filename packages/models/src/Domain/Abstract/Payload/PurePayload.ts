@@ -6,9 +6,8 @@ import {
   protocolVersionFromEncryptedString,
 } from '@standardnotes/common'
 import { deepFreeze, isNullOrUndefined, isObject, isString } from '@standardnotes/utils'
-import { ItemContent } from '../Item/ItemContent'
+import { ItemContent, FillItemContent } from '../Item/ItemContent'
 import { ContentReference } from '../Reference/ContentReference'
-import { FillItemContent } from './Functions'
 import { PayloadField } from './PayloadField'
 import { PayloadFormat } from './PayloadFormat'
 import { PayloadInterface } from './PayloadInterface'

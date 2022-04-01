@@ -3,7 +3,6 @@ import { ComponentContent, ComponentInterface } from './ComponentContent'
 import { isValidUrl } from '@standardnotes/utils'
 import { SNItem } from '../../Abstract/Item/Item'
 import { ContentType, Uuid } from '@standardnotes/common'
-import { HistoryEntry } from '../../Runtime/History/HistoryEntry'
 import {
   FeatureIdentifier,
   ThirdPartyFeatureDescription,
@@ -12,10 +11,11 @@ import {
   FeatureDescription,
   ComponentPermission,
 } from '@standardnotes/features'
-import { ConflictStrategy } from '../../Abstract/Payload/ConflictStrategy'
+import { ConflictStrategy } from '../../Abstract/Item/ConflictStrategy'
 import { Predicate } from '../../Runtime/Predicate/Predicate'
 import { AppDataField } from '../../Abstract/Item/AppDataField'
 import { ItemContent } from '../../Abstract/Item/ItemContent'
+import { HistoryEntryInterface } from '../../Runtime/History'
 
 /**
  * Components are mostly iframe based extensions that communicate with the SN parent
@@ -79,7 +79,7 @@ export class SNComponent extends SNItem<ComponentContent> implements ComponentIn
   /** Do not duplicate components under most circumstances. Always keep original */
   public strategyWhenConflictingWithItem(
     item: SNItem,
-    previousRevision?: HistoryEntry,
+    previousRevision?: HistoryEntryInterface,
   ): ConflictStrategy {
     if (this.errorDecrypting) {
       return super.strategyWhenConflictingWithItem(item, previousRevision)

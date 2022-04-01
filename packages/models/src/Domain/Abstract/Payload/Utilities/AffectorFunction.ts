@@ -1,10 +1,10 @@
-import { ContentType } from '@standardnotes/common'
 import { ComponentArea } from '@standardnotes/features'
-import { CreateItemFromPayload } from '../Item/Generator'
-import { ImmutablePayloadCollection } from '../../Runtime/Collection/ImmutablePayloadCollection'
-import { ComponentMutator, SNComponent } from '../../Syncable/Component'
-import { MutationType } from '../Item'
-import { PayloadInterface } from './PayloadInterface'
+import { ContentType } from '@standardnotes/common'
+import { ComponentMutator, SNComponent } from '../../../Syncable/Component'
+import { CreateItemFromPayload } from '../../Item/Generator'
+import { ImmutablePayloadCollection } from '../../../Runtime/Collection/ImmutablePayloadCollection'
+import { MutationType } from '../../Item/MutationType'
+import { PayloadInterface } from '../PayloadInterface'
 
 export type AffectorFunction = (
   basePayload: PayloadInterface,

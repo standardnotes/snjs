@@ -5,7 +5,7 @@ import { SNItem } from './Item'
 import { Uuid } from '@standardnotes/common'
 import { ItemContent } from './ItemContent'
 import { PurePayload } from '../Payload/PurePayload'
-import { CopyPayload, PayloadByMerging } from '../Payload/Functions'
+import { CopyPayload, PayloadByMerging } from '../Payload/Utilities/Functions'
 import { AppDataField } from './AppDataField'
 import { DefaultAppDomain, DomainDataValueType, ItemDomainKey } from './DefaultAppDomain'
 

@@ -7,6 +7,8 @@ import { PredicateInterface } from '../../Runtime/Predicate/Interface'
 import { ContentReference } from '../Reference/ContentReference'
 import { PrefKey } from '../../Syncable/UserPrefs/PrefKey'
 import { ItemContent } from './ItemContent'
+import { HistoryEntryInterface } from '../../Runtime/History'
+import { ConflictStrategy } from './ConflictStrategy'
 
 export interface ItemInterface<C extends ItemContent = ItemContent> {
   readonly payload: PayloadInterface
@@ -46,7 +48,10 @@ export interface ItemInterface<C extends ItemContent = ItemContent> {
   auth_params: any | undefined
   singletonPredicate<T extends ItemInterface>(): PredicateInterface<T>
   singletonStrategy: any
-  strategyWhenConflictingWithItem(item: ItemInterface, previousRevision?: any): any
+  strategyWhenConflictingWithItem(
+    item: ItemInterface,
+    previousRevision?: HistoryEntryInterface,
+  ): ConflictStrategy
   satisfiesPredicate(predicate: any): boolean
   getAppDomainValueWithDefault<T, D extends T>(key: AppDataField | PrefKey, defaultValue: D): T
   getAppDomainValue(key: any): any

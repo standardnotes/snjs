@@ -2,19 +2,15 @@
 import { ContentType, Uuid } from '@standardnotes/common'
 import { Copy, extendArray, pickByCopy, uniqueArray, UuidGenerator } from '@standardnotes/utils'
 import { remove } from 'lodash'
-import { PurePayload } from './PurePayload'
-import { ImmutablePayloadCollection } from '../../Runtime/Collection/ImmutablePayloadCollection'
-import { ContentReference } from '../Reference/ContentReference'
-import { PayloadField } from './PayloadField'
-import { PayloadInterface } from './PayloadInterface'
-import { PayloadSource } from './PayloadSource'
-import { RawPayload } from './RawPayload'
-import { PayloadFormat } from './PayloadFormat'
-import { DefaultAppDomain } from '../Item/DefaultAppDomain'
-import { AppDataField } from '../Item/AppDataField'
-import { ItemContent, SpecializedContent } from '../Item/ItemContent'
-import { CreateItemFromPayload } from '../Item/Generator'
-import { AffectorMapping } from './AffectorFunction'
+import { PurePayload } from '../PurePayload'
+import { ImmutablePayloadCollection } from '../../../Runtime/Collection/ImmutablePayloadCollection'
+import { ContentReference } from '../../Reference/ContentReference'
+import { PayloadField } from '../PayloadField'
+import { PayloadInterface } from '../PayloadInterface'
+import { PayloadSource } from '../PayloadSource'
+import { RawPayload } from '../RawPayload'
+import { PayloadFormat } from '../PayloadFormat'
+import { ItemContent } from '../../Item/ItemContent'
 
 export type Writeable<T> = { -readonly [P in keyof T]: T[P] }
 
@@ -376,58 +372,6 @@ export function isPayloadSourceRetrieved(source: PayloadSource): boolean {
   ].includes(source)
 }
 
-/**
- * Modifies the input object to fill in any missing required values from the
- * content body.
- */
-export function FillItemContent<C extends ItemContent = ItemContent>(content: Partial<C>): C {
-  if (!content.references) {
-    content.references = []
-  }
-
-  if (!content.appData) {
-    content.appData = {
-      [DefaultAppDomain]: {},
-    }
-  }
-
-  if (!content.appData[DefaultAppDomain]) {
-    content.appData[DefaultAppDomain] = {}
-  }
-
-  if (!content.appData[DefaultAppDomain][AppDataField.UserModifiedDate]) {
-    content.appData[DefaultAppDomain][AppDataField.UserModifiedDate] = `${new Date()}`
-  }
-
-  return content as C
-}
-
-export function FillItemContentSpecialized<
-  S extends SpecializedContent,
-  C extends ItemContent = ItemContent,
->(content: S): C {
-  const typedContent = content as unknown as C
-  if (!typedContent.references) {
-    typedContent.references = []
-  }
-
-  if (!typedContent.appData) {
-    typedContent.appData = {
-      [DefaultAppDomain]: {},
-    }
-  }
-
-  if (!typedContent.appData[DefaultAppDomain]) {
-    typedContent.appData[DefaultAppDomain] = {}
-  }
-
-  if (!typedContent.appData[DefaultAppDomain][AppDataField.UserModifiedDate]) {
-    typedContent.appData[DefaultAppDomain][AppDataField.UserModifiedDate] = `${new Date()}`
-  }
-
-  return typedContent
-}
-
 export function filterDisallowedRemotePayloads(payloads: PurePayload[]): PurePayload[] {
   return payloads.filter(isRemotePayloadAllowed)
 }
@@ -446,70 +390,4 @@ export function sureFindPayload(uuid: Uuid, payloads: PurePayload[]): PurePayloa
   return payloads.find((payload) => payload.uuid === uuid) as PurePayload
 }
 
-/**
- * Compares the .content fields for equality, creating new SNItem objects
- * to properly handle .content intricacies.
- */
-export function PayloadContentsEqual(payloadA: PurePayload, payloadB: PurePayload): boolean {
-  const itemA = CreateItemFromPayload(payloadA)
-  const itemB = CreateItemFromPayload(payloadB)
-  return itemA.isItemContentEqualWith(itemB)
-}
 
-/**
- * Copies payload and assigns it a new uuid.
- * @returns An array of payloads that have changed as a result of copying.
- */
-export async function PayloadsByDuplicating<C extends ItemContent = ItemContent>(
-  payload: PayloadInterface<C>,
-  baseCollection: ImmutablePayloadCollection,
-  isConflict: boolean,
-  additionalContent?: Partial<C>,
-): Promise<PayloadInterface<C>[]> {
-  if (payload.errorDecrypting) {
-    throw Error('Attempting to duplicate errored payload')
-  }
-
-  const results: PayloadInterface<C>[] = []
-  const override: Writeable<Partial<PayloadInterface<C>>> = {
-    uuid: UuidGenerator.GenerateUuid(),
-    dirty: true,
-    dirtiedDate: new Date(),
-    lastSyncBegan: undefined,
-    lastSyncEnd: undefined,
-    duplicate_of: payload.uuid,
-  }
-
-  override.content = {
-    ...payload.safeContent,
-    ...additionalContent,
-  }
-
-  if (isConflict) {
-    override.content.conflict_of = payload.uuid
-  }
-
-  const copy = CopyPayload(payload, override)
-
-  results.push(copy)
-
-  /**
-   * Get the payloads that make reference to payload and add the copy.
-   */
-  const updatedReferencing = PayloadsByUpdatingReferencingPayloadReferences(
-    payload,
-    baseCollection,
-    [copy],
-  )
-  extendArray(results, updatedReferencing)
-
-  const affector = AffectorMapping[payload.content_type as ContentType]
-  if (affector) {
-    const affected = affector(payload, copy, baseCollection)
-    if (affected) {
-      extendArray(results, affected)
-    }
-  }
-
-  return results
-}

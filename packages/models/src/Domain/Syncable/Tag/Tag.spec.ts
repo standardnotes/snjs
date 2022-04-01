@@ -1,6 +1,7 @@
 import { SNTag, TagContent } from './Tag'
 import { ContentType } from '@standardnotes/common'
-import { CreateMaxPayloadFromAnyObject, FillItemContent } from '../../Abstract/Payload/Functions'
+import { CreateMaxPayloadFromAnyObject } from '../../Abstract/Payload/Utilities/Functions'
+import { FillItemContent } from '../../Abstract/Item/ItemContent'
 import { ContentReference } from '../../Abstract/Reference/ContentReference'
 
 const randUuid = () => String(Math.random())

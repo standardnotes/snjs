@@ -1,9 +1,9 @@
 import { FeatureDescription, ThirdPartyFeatureDescription } from '@standardnotes/features'
-import { HistoryEntry } from '../../Runtime/History/HistoryEntry'
 import { SNItem } from '../../Abstract/Item'
 import { ItemContent } from '../../Abstract/Item/ItemContent'
-import { ConflictStrategy } from '../../Abstract/Payload/ConflictStrategy'
+import { ConflictStrategy } from '../../Abstract/Item/ConflictStrategy'
 import { PayloadInterface } from '../../Abstract/Payload/PayloadInterface'
+import { HistoryEntryInterface } from '../../Runtime/History/HistoryEntryInterface'
 import { Action } from './Types'
 
 export interface ActionExtensionInterface {
@@ -57,7 +57,10 @@ export class SNActionsExtension extends SNItem<ActionExtensionContent> {
   }
 
   /** Do not duplicate. Always keep original */
-  strategyWhenConflictingWithItem(item: SNItem, previousRevision?: HistoryEntry): ConflictStrategy {
+  strategyWhenConflictingWithItem(
+    item: SNItem,
+    previousRevision?: HistoryEntryInterface,
+  ): ConflictStrategy {
     if (this.errorDecrypting) {
       return super.strategyWhenConflictingWithItem(item, previousRevision)
     }

@@ -1,11 +1,12 @@
-import { SNItem } from '../../Abstract/Item/Item'
+import { ItemInterface } from './../../Abstract/Item/ItemInterface'
 import { isNullOrUndefined } from '@standardnotes/utils'
 import { CreateItemFromPayload } from '../../Abstract/Item/Generator'
 import { SurePayload } from '../../Abstract/Payload/SurePayload'
-import { CopyPayload } from '../../Abstract/Payload/Functions'
+import { CopyPayload } from '../../Abstract/Payload/Utilities/Functions'
 import { NoteContent } from '../../Syncable/Note'
+import { HistoryEntryInterface } from './HistoryEntryInterface'
 
-export class HistoryEntry {
+export class HistoryEntry implements HistoryEntryInterface {
   public readonly payload: SurePayload<NoteContent>
   public readonly previousEntry?: HistoryEntry
   protected readonly defaultContentKeyToDiffOn: keyof NoteContent = 'text'
@@ -33,7 +34,7 @@ export class HistoryEntry {
     }
   }
 
-  public itemFromPayload(): SNItem {
+  public itemFromPayload(): ItemInterface {
     return CreateItemFromPayload(this.payload)
   }
 
