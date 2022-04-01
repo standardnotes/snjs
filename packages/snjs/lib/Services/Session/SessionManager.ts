@@ -468,12 +468,14 @@ export class SNSessionManager
     ephemeral = false,
   ): Promise<Responses.SignInResponse | Responses.HttpResponse> {
     const { wrappingKey, canceled } = await this.challengeService.getWrappingKeyIfApplicable()
+
     if (canceled) {
       return this.apiService.createErrorResponse(
         SignInStrings.PasscodeRequired,
         Responses.StatusCode.LocalValidationError,
       )
     }
+
     const signInResponse = await this.apiService.signIn(
       email,
       rootKey.serverPassword!,
@@ -481,17 +483,21 @@ export class SNSessionManager
       mfaCode,
       ephemeral,
     )
+
     if (!signInResponse.error && signInResponse.data) {
+      const updatedKeyParams = (signInResponse as Responses.SignInResponse).data.key_params
       const expandedRootKey = new SNRootKey(
         CopyPayloadWithContentOverride(rootKey.payload, {
-          keyParams: (signInResponse as Responses.SignInResponse).data.key_params,
+          keyParams: updatedKeyParams || rootKey.keyParams.getPortableValue(),
         }),
       )
+
       await this.handleSuccessAuthResponse(
         signInResponse as Responses.SignInResponse,
         expandedRootKey,
         wrappingKey,
       )
+
       return signInResponse
     } else {
       if (signInResponse.error?.payload?.mfa_key) {

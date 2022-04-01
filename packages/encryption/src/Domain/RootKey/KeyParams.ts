@@ -22,7 +22,12 @@ import { SNRootKeyParams } from './RootKeyParams'
  *  - Account identifier is returned as 'identifier'
  */
 
-export const ValidKeyParamsKeys = [
+type AllKeyParamsContents = KeyParamsContent001 &
+  KeyParamsContent002 &
+  KeyParamsContent003 &
+  KeyParamsContent004
+
+export const ValidKeyParamsKeys: (keyof AllKeyParamsContents)[] = [
   'identifier',
   'pw_cost',
   'pw_nonce',

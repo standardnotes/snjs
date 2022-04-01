@@ -94,7 +94,7 @@ export class SNRootKeyParams {
    * When saving in a file or communicating with server,
    * use the original values.
    */
-  getPortableValue() {
-    return pickByCopy(this.content, ValidKeyParamsKeys as any)
+  getPortableValue(): AnyKeyParamsContent {
+    return pickByCopy(this.content, ValidKeyParamsKeys as (keyof AnyKeyParamsContent)[])
   }
 }

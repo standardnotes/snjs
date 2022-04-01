@@ -504,19 +504,19 @@ describe('keys', function () {
 
   it('compares root keys', async function () {
     const keyParams = {}
-    const a1 = await SNRootKey.Create({
+    const a1 = await CreateNewRootKey({
       version: ProtocolVersion.V004,
       masterKey: '2C26B46B68FFC68FF99B453C1D30413413422D706483BFA0F98A5E886266E7AE',
       serverPassword: 'FCDE2B2EDBA56BF408601FB721FE9B5C338D10EE429EA04FAE5511B68FBF8FB9',
       keyParams,
     })
-    const a2 = await SNRootKey.Create({
+    const a2 = await CreateNewRootKey({
       version: ProtocolVersion.V004,
       masterKey: '2C26B46B68FFC68FF99B453C1D30413413422D706483BFA0F98A5E886266E7AE',
       serverPassword: 'FCDE2B2EDBA56BF408601FB721FE9B5C338D10EE429EA04FAE5511B68FBF8FB9',
       keyParams,
     })
-    const b = await SNRootKey.Create({
+    const b = await CreateNewRootKey({
       version: ProtocolVersion.V004,
       masterKey: '2CF24DBA5FB0A30E26E83B2AC5B9E29E1B161E5C1FA7425E73043362938B9824',
       serverPassword: '486EA46224D1BB4FB680F34F7C9AD96A8F24EC88BE73EA8E5A6C65260E9CB8A7',

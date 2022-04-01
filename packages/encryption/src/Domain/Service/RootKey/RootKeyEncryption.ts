@@ -140,11 +140,11 @@ export class RootKeyEncryptionService extends Services.AbstractService<RootKeySe
       return undefined
     }
 
-    const keyParams = await this.getRootKeyParams()
+    const keyParams = await this.getSureRootKeyParams()
 
     return CreateNewRootKey({
       ...rawKey,
-      keyParams: keyParams?.getPortableValue(),
+      keyParams: keyParams.getPortableValue(),
     })
   }
 
@@ -179,7 +179,7 @@ export class RootKeyEncryptionService extends Services.AbstractService<RootKeySe
     return this.getRootKeyWrapperKeyParams() as Promise<SNRootKeyParams>
   }
 
-  public async getRootKeyParams() {
+  public async getRootKeyParams(): Promise<SNRootKeyParams | undefined> {
     if (this.keyMode === KeyMode.WrapperOnly) {
       return this.getRootKeyWrapperKeyParams()
     } else if (
@@ -192,6 +192,10 @@ export class RootKeyEncryptionService extends Services.AbstractService<RootKeySe
     } else {
       throw `Unhandled key mode for getRootKeyParams ${this.keyMode}`
     }
+  }
+
+  public async getSureRootKeyParams(): Promise<SNRootKeyParams> {
+    return this.getRootKeyParams() as Promise<SNRootKeyParams>
   }
 
   public async computeRootKey(password: string, keyParams: SNRootKeyParams) {
