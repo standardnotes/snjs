@@ -11,7 +11,7 @@ import {
   PayloadField,
   CreateMaxPayloadFromAnyObject,
   PayloadSource,
-} from '@standardnotes/payloads'
+} from '@standardnotes/models'
 import { SNSyncService } from '../Sync/SyncService'
 import { StorageKey } from '@standardnotes/services'
 import { KeyRecoveryStrings } from '../Api/Messages'

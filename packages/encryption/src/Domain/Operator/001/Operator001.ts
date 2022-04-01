@@ -6,14 +6,19 @@ import {
 } from '@standardnotes/common'
 import { Create001KeyParams } from '../../RootKey/KeyParams'
 import { firstHalfOfString, secondHalfOfString, splitString } from '@standardnotes/utils'
-import { ItemsKeyContent, AsynchronousOperator } from '../Operator'
-import { CreateItemFromPayload, ItemsKeyInterface } from '@standardnotes/models'
+import { AsynchronousOperator } from '../Operator'
+import {
+  CreateItemFromPayload,
+  ItemsKeyContent,
+  ItemsKeyInterface,
+  CreateMaxPayloadFromAnyObject,
+  FillItemContent,
+} from '@standardnotes/models'
 import { SNPureCrypto } from '@standardnotes/sncrypto-common'
 import { SNRootKey } from '../../RootKey/RootKey'
 import { SNRootKeyParams } from '../../RootKey/RootKeyParams'
 import { UuidGenerator } from '@standardnotes/utils'
 import { V001Algorithm } from '../../Algorithm'
-import * as Payloads from '@standardnotes/payloads'
 import {
   DecryptedParameters,
   EncryptedParameters,
@@ -48,10 +53,10 @@ export class SNProtocolOperator001 implements AsynchronousOperator {
   protected generateNewItemsKeyContent(): ItemsKeyContent {
     const keyLength = V001Algorithm.EncryptionKeyLength
     const itemsKey = this.crypto.generateRandomKey(keyLength)
-    const response: ItemsKeyContent = {
+    const response: ItemsKeyContent = FillItemContent({
       itemsKey: itemsKey,
       version: ProtocolVersion.V001,
-    }
+    })
     return response
   }
 
@@ -61,10 +66,10 @@ export class SNProtocolOperator001 implements AsynchronousOperator {
    */
   public createItemsKey(): ItemsKeyInterface {
     const content = this.generateNewItemsKeyContent()
-    const payload = Payloads.CreateMaxPayloadFromAnyObject({
+    const payload = CreateMaxPayloadFromAnyObject({
       uuid: UuidGenerator.GenerateUuid(),
       content_type: ContentType.ItemsKey,
-      content: Payloads.FillItemContent(content),
+      content: FillItemContent(content),
     })
     return CreateItemFromPayload(payload)
   }

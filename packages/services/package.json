@@ -30,9 +30,6 @@
     "@standardnotes/responses": "^1.5.1",
     "@standardnotes/utils": "^1.4.6"
   },
-  "peerDependencies": {
-    "@standardnotes/payloads": "^1.4.22"
-  },
   "devDependencies": {
     "@standardnotes/config": "^2.3.0",
     "@types/jest": "^27.4.1",

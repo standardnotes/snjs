@@ -5,7 +5,7 @@ import { SNSingletonManager } from '../Singleton/SingletonManager'
 import { SNSyncService } from '../Sync/SyncService'
 import { ApplicationStage } from '@standardnotes/services'
 import { AbstractService, InternalEventBusInterface, SyncEvent } from '@standardnotes/services'
-import { FillItemContent } from '@standardnotes/payloads'
+import { FillItemContent } from '@standardnotes/models'
 
 const preferencesChangedEvent = 'preferencesChanged'
 type PreferencesChangedEvent = typeof preferencesChangedEvent

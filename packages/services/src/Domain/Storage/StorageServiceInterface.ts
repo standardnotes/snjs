@@ -1,5 +1,5 @@
 import { RootKeyInterface } from '@standardnotes/models'
-import { PurePayload } from '@standardnotes/payloads'
+import { PurePayload } from '@standardnotes/models'
 import { StorageValueModes } from './StorageTypes'
 
 export interface StorageServiceInterface {

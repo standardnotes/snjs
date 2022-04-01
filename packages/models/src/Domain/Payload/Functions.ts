@@ -14,6 +14,7 @@ import { RawPayload } from './RawPayload'
 import { PayloadFormat } from './PayloadFormat'
 import { DefaultAppDomain } from '../Item/DefaultAppDomain'
 import { AppDataField } from '../Item/AppDataField'
+import { ItemContent } from '../Item'
 
 /**
  * Return the payloads that result if you alternated the uuid for the payload.
@@ -362,20 +363,26 @@ export function isPayloadSourceRetrieved(source: PayloadSource): boolean {
  * Modifies the input object to fill in any missing required values from the
  * content body.
  */
-export function FillItemContent(content: Record<string, any>): PayloadContent {
+export function FillItemContent<C extends ItemContent = ItemContent>(content: C): C {
   if (!content.references) {
     content.references = []
   }
+
   if (!content.appData) {
-    content.appData = {}
+    content.appData = {
+      [DefaultAppDomain]: {},
+    }
   }
+
   if (!content.appData[DefaultAppDomain]) {
     content.appData[DefaultAppDomain] = {}
   }
+
   if (!content.appData[DefaultAppDomain][AppDataField.UserModifiedDate]) {
     content.appData[DefaultAppDomain][AppDataField.UserModifiedDate] = `${new Date()}`
   }
-  return content as PayloadContent
+
+  return content
 }
 
 export function filterDisallowedRemotePayloads(payloads: PurePayload[]): PurePayload[] {

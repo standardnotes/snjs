@@ -6,7 +6,7 @@ import { TagsToFoldersMigrationApplicator } from '../../Migrations/Applicators/T
 import { TransactionalMutation } from './TransactionalMutation'
 import { UuidString } from '../../Types/UuidString'
 import * as Models from '@standardnotes/models'
-import * as Payloads from '@standardnotes/payloads'
+import * as Payloads from '@standardnotes/models'
 import * as Services from '@standardnotes/services'
 import { ItemsKeyMutator } from '@standardnotes/encryption'
 

@@ -7,14 +7,15 @@ import { PayloadInterface } from '../Payload/PayloadInterface'
 import { PayloadOverride } from '../Payload/PayloadOverride'
 import { PredicateInterface } from '../Predicate/Interface'
 import { ContentReference } from '../Reference/ContentReference'
+import { PrefKey } from '../UserPrefs/PrefKey'
 
 export interface ItemContent extends PayloadContent {
-  protected: boolean
-  trashed: boolean
-  pinned: boolean
-  archived: boolean
-  locked: boolean
-  appData: AppData
+  protected?: boolean
+  trashed?: boolean
+  pinned?: boolean
+  archived?: boolean
+  locked?: boolean
+  appData?: AppData
 }
 
 export interface ItemInterface<C extends ItemContent = ItemContent> {
@@ -57,6 +58,7 @@ export interface ItemInterface<C extends ItemContent = ItemContent> {
   singletonStrategy: any
   strategyWhenConflictingWithItem(item: ItemInterface, previousRevision?: any): any
   satisfiesPredicate(predicate: any): boolean
+  getAppDomainValueWithDefault<T, D extends T>(key: AppDataField | PrefKey, defaultValue: D): T
   getAppDomainValue(key: any): any
   isItemContentEqualWith(otherItem: ItemInterface): boolean
   payloadRepresentation(override?: PayloadOverride): PayloadInterface
@@ -64,7 +66,7 @@ export interface ItemInterface<C extends ItemContent = ItemContent> {
   getDomainData(
     domain: typeof ComponentDataDomain | typeof DefaultAppDomain,
   ): undefined | Record<string, any>
-  contentKeysToIgnoreWhenCheckingEquality(): (keyof C)[]
+  contentKeysToIgnoreWhenCheckingEquality<C extends ItemContent = ItemContent>(): (keyof C)[]
   appDataContentKeysToIgnoreWhenCheckingEquality(): AppDataField[]
   getContentCopy(): C
 }

@@ -4,7 +4,7 @@ import { ItemManager } from './ItemManager'
 import { PayloadManager } from '../Payloads/PayloadManager'
 import { UuidGenerator } from '@standardnotes/utils'
 import * as Models from '@standardnotes/models'
-import * as Payloads from '@standardnotes/payloads'
+import * as Payloads from '@standardnotes/models'
 
 const setupRandomUuid = () => {
   UuidGenerator.SetGenerator(() => String(Math.random()))

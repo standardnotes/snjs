@@ -1,4 +1,4 @@
-import { PurePayload } from '@standardnotes/payloads'
+import { PurePayload } from '@standardnotes/models'
 import { EncryptedEncryptionIntent } from '../../Intent/EncryptionIntent'
 import { EncryptionSplitWithKey } from './EncryptionSplit'
 

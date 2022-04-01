@@ -4,7 +4,7 @@ import { FindNativeFeature } from '@standardnotes/features'
 import { SNFeaturesService } from '@Lib/Services/Features/FeaturesService'
 
 import { ContentType, Runtime } from '@standardnotes/common'
-import { PayloadSource } from '@standardnotes/payloads'
+import { PayloadSource } from '@standardnotes/models'
 import { ItemManager } from '@Lib/Services/Items/ItemManager'
 import {
   SNItem,

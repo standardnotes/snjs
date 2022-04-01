@@ -4,7 +4,7 @@ import { findDefaultItemsKey } from '../Functions'
 import { OperatorManager } from '../../Operator/OperatorManager'
 import { StandardException } from '../../StandardException'
 import * as OperatorWrapper from '../../Operator/OperatorWrapper'
-import * as Payloads from '@standardnotes/payloads'
+import * as Payloads from '@standardnotes/models'
 import * as Services from '@standardnotes/services'
 import {
   DecryptedParameters,

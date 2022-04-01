@@ -10,7 +10,7 @@ import { SNAlertService } from '../Alert/AlertService'
 import { SNSyncService } from '../Sync/SyncService'
 import { ItemManager } from '@Lib/Services/Items/ItemManager'
 import { UuidGenerator } from '@standardnotes/utils'
-import { FillItemContent } from '@standardnotes/payloads'
+import { FillItemContent } from '@standardnotes/models'
 import { AbstractService, InternalEventBusInterface } from '@standardnotes/services'
 import { FilesClientInterface } from './FilesClientInterface'
 

@@ -10,7 +10,7 @@ import { ListedService } from '../Listed/ListedService'
 import { ActionResponse, HttpResponse } from '@standardnotes/responses'
 import { ContentType } from '@standardnotes/common'
 import { ItemManager } from '@Lib/Services/Items/ItemManager'
-import { PurePayload, CreateMaxPayloadFromAnyObject } from '@standardnotes/payloads'
+import { PurePayload, CreateMaxPayloadFromAnyObject } from '@standardnotes/models'
 import {
   SNActionsExtension,
   Action,

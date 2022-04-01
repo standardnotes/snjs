@@ -14,7 +14,7 @@ import {
   CreateMaxPayloadFromAnyObject,
   CreateSourcedPayloadFromObject,
   PayloadFormat,
-} from '@standardnotes/payloads'
+} from '@standardnotes/models'
 import { ClientDisplayableError } from '@standardnotes/responses'
 import { CreateAnyKeyParams } from '../RootKey/KeyParams'
 import { CreateItemFromPayload, ItemsKeyInterface } from '@standardnotes/models'

@@ -29,7 +29,7 @@ import {
   CreateSourcedPayloadFromObject,
   PayloadSource,
   PayloadFormat,
-} from '@standardnotes/payloads'
+} from '@standardnotes/models'
 import {
   ComponentMessage,
   MessageReplyData,

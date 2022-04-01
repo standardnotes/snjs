@@ -1,6 +1,7 @@
 import { ContentType } from '@standardnotes/common'
 import { CreateMaxPayloadFromAnyObject, FillItemContent } from '../Payload/Functions'
 import { SNComponent } from './Component'
+import { ComponentContent } from './ComponentContent'
 
 describe('component model', () => {
   it('valid hosted url should ignore url', () => {
@@ -11,7 +12,7 @@ describe('component model', () => {
         content: FillItemContent({
           url: 'http://foo.com',
           hosted_url: 'http://bar.com',
-        }),
+        } as ComponentContent),
       }),
     )
 
@@ -27,7 +28,7 @@ describe('component model', () => {
         content: FillItemContent({
           url: 'http://foo.com',
           hosted_url: '#{foo.zoo}',
-        }),
+        } as ComponentContent),
       }),
     )
 

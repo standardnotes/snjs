@@ -1,4 +1,4 @@
-import { IntegrityPayload, RawPayload } from '@standardnotes/payloads'
+import { IntegrityPayload, RawPayload } from '@standardnotes/models'
 import { ItemManagerInterface } from '../Item/ItemManagerInterface'
 import { SyncEvent } from '../Event/SyncEvent'
 

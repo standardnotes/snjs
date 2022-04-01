@@ -4,7 +4,7 @@ import { Environment } from '@Lib/Application/Platforms'
 import { SNLog } from '../../Log'
 import { SNRootKey } from '@standardnotes/encryption'
 import * as Encryption from '@standardnotes/encryption'
-import * as Payloads from '@standardnotes/payloads'
+import * as Payloads from '@standardnotes/models'
 import * as Services from '@standardnotes/services'
 
 /**

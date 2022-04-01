@@ -1,12 +1,6 @@
-import { ConflictStrategy, PayloadContent, PurePayload } from '@standardnotes/payloads'
+import { ConflictStrategy, ItemsKeyContent, PayloadInterface } from '@standardnotes/models'
 import { ProtocolVersion } from '@standardnotes/common'
 import { HistoryEntry, SNItem, ItemsKeyInterface } from '@standardnotes/models'
-
-interface ItemsKeyContent extends PayloadContent {
-  keyVersion: ProtocolVersion
-  isDefault: boolean | undefined
-  itemsKey: string
-}
 
 export function isItemsKey(x: unknown): x is ItemsKeyInterface {
   return x instanceof SNItemsKey
@@ -16,9 +10,15 @@ export function isItemsKey(x: unknown): x is ItemsKeyInterface {
  * A key used to encrypt other items. Items keys are synced and persisted.
  */
 export class SNItemsKey extends SNItem<ItemsKeyContent> implements ItemsKeyInterface {
-  constructor(payload: PurePayload<ItemsKeyContent>) {
+  keyVersion: ProtocolVersion
+  isDefault: boolean | undefined
+  itemsKey: string
+
+  constructor(payload: PayloadInterface<ItemsKeyContent>) {
     super(payload)
-    this.keyVersion = payload.safeContent.keyVersion
+    this.keyVersion = payload.safeContent.version
+    this.isDefault = payload.safeContent.isDefault
+    this.itemsKey = this.payload.safeContent.itemsKey
   }
 
   /** Do not duplicate items keys. Always keep original */
@@ -28,18 +28,6 @@ export class SNItemsKey extends SNItem<ItemsKeyContent> implements ItemsKeyInter
     }
 
     return ConflictStrategy.KeepLeft
-  }
-
-  get keyVersion(): ProtocolVersion {
-    return this.payload.safeContent.versdion
-  }
-
-  get isDefault(): boolean | undefined {
-    return this.payload.safeContent.isDefault
-  }
-
-  get itemsKey(): string {
-    return this.payload.safeContent.itemsKey
   }
 
   get dataAuthenticationKey(): string | undefined {

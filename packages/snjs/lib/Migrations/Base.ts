@@ -1,6 +1,6 @@
 import { AnyKeyParamsContent } from '@standardnotes/common'
 import { SNLog } from '@Lib/Log'
-import { CreateMaxPayloadFromAnyObject } from '@standardnotes/payloads'
+import { CreateMaxPayloadFromAnyObject } from '@standardnotes/models'
 import {
   ChallengeValidation,
   ChallengeReason,

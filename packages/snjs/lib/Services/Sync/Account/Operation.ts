@@ -1,4 +1,4 @@
-import { PurePayload } from '@standardnotes/payloads'
+import { PurePayload } from '@standardnotes/models'
 import { arrayByDifference, subtractFromArray } from '@standardnotes/utils'
 import { SyncResponse } from '@Lib/Services/Sync/Response'
 import { ResponseSignalReceiver, SyncSignal } from '@Lib/Services/Sync/Signals'

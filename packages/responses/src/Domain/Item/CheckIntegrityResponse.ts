@@ -1,4 +1,4 @@
-import { IntegrityPayload } from '@standardnotes/payloads'
+import { IntegrityPayload } from '@standardnotes/models'
 import { MinimalHttpResponse } from '../Http/MinimalHttpResponses'
 
 export type CheckIntegrityResponse = MinimalHttpResponse & {

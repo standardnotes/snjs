@@ -10,7 +10,7 @@ import {
   RawPayload,
   ServerPayloadFields,
   StoragePayloadFields,
-} from '@standardnotes/payloads'
+} from '@standardnotes/models'
 import {
   DecryptedParameters,
   EncryptedParameters,

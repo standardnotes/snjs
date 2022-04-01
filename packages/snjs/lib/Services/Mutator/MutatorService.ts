@@ -12,7 +12,7 @@ import { Strings } from '../../Strings'
 import { TagsToFoldersMigrationApplicator } from '@Lib/Migrations/Applicators/TagsToFolders'
 import { UuidString } from '@Lib/Types/UuidString'
 import * as Models from '@standardnotes/models'
-import * as Payloads from '@standardnotes/payloads'
+import * as Payloads from '@standardnotes/models'
 import * as Utils from '@standardnotes/utils'
 import {
   Challenge,

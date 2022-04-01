@@ -11,7 +11,7 @@ import {
   CreateMaxPayloadFromAnyObject,
   PayloadContent,
   PredicateInterface,
-} from '@standardnotes/payloads'
+} from '@standardnotes/models'
 import { SNSyncService } from '../Sync/SyncService'
 import { AbstractService, InternalEventBusInterface, SyncEvent } from '@standardnotes/services'
 

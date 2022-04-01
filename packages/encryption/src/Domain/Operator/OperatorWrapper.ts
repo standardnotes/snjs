@@ -1,7 +1,7 @@
 import { isAsyncOperator } from './Functions'
 import { OperatorManager } from './OperatorManager'
 import { SNRootKey } from '../RootKey/RootKey'
-import * as Payloads from '@standardnotes/payloads'
+import * as Payloads from '@standardnotes/models'
 import {
   DecryptedParameters,
   EncryptedParameters,

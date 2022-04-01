@@ -20,7 +20,7 @@ import { SyncSignal, SyncStats } from '@Lib/Services/Sync/Signals'
 import { UuidString } from '../../Types/UuidString'
 import * as Encryption from '@standardnotes/encryption'
 import * as Models from '@standardnotes/models'
-import * as Payloads from '@standardnotes/payloads'
+import * as Payloads from '@standardnotes/models'
 import * as Services from '@standardnotes/services'
 import { ItemsKeyInterface } from '@standardnotes/models'
 

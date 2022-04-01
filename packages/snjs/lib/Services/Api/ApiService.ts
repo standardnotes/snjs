@@ -15,7 +15,7 @@ import {
   CreateValetTokenPayload,
   IntegrityPayload,
   PurePayload,
-} from '@standardnotes/payloads'
+} from '@standardnotes/models'
 import * as Responses from '@standardnotes/responses'
 import { API_MESSAGE_FAILED_OFFLINE_ACTIVATION } from '@Lib/Services/Api/Messages'
 import { EncryptedFileInterface } from '../Files/types'

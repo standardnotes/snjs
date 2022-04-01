@@ -8,7 +8,7 @@ import {
 import { SNComponent } from '@standardnotes/models'
 import { UuidString } from '@Lib/Types/UuidString'
 import { ContentType } from '@standardnotes/common'
-import { RawPayload } from '@standardnotes/payloads'
+import { RawPayload } from '@standardnotes/models'
 
 export interface DesktopManagerInterface {
   syncComponentsInstallation(components: SNComponent[]): void

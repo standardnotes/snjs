@@ -2,7 +2,7 @@ import {
   PurePayload,
   FillItemContent,
   CreateMaxPayloadFromAnyObject,
-} from '@standardnotes/payloads'
+} from '@standardnotes/models'
 import { SNRootKeyParams } from './RootKeyParams'
 import { SNItem, RootKeyInterface, RootKeyContent } from '@standardnotes/models'
 import { AnyKeyParamsContent, ContentType, ProtocolVersion } from '@standardnotes/common'

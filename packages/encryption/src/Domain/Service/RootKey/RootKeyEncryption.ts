@@ -8,7 +8,7 @@ import { UuidGenerator } from '@standardnotes/utils'
 import * as Common from '@standardnotes/common'
 import * as Models from '@standardnotes/models'
 import * as OperatorWrapper from '../../Operator/OperatorWrapper'
-import * as Payloads from '@standardnotes/payloads'
+import * as Payloads from '@standardnotes/models'
 import * as Services from '@standardnotes/services'
 import { mergePayloadWithEncryptionParameters } from '../../Intent/Functions'
 import {

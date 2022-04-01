@@ -1,5 +1,5 @@
 import { ConflictType, RawSyncResponse } from '@standardnotes/responses'
-import * as Payloads from '@standardnotes/payloads'
+import * as Payloads from '@standardnotes/models'
 import { deepFreeze, isNullOrUndefined } from '@standardnotes/utils'
 
 export class SyncResponse {

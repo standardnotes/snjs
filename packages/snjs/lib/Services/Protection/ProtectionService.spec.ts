@@ -6,7 +6,7 @@ import { InternalEventBus, InternalEventBusInterface } from '@standardnotes/serv
 import { UuidGenerator } from '@standardnotes/utils'
 import { SNFile } from '@standardnotes/models'
 import { ContentType } from '@standardnotes/common'
-import { FillItemContent, CreateMaxPayloadFromAnyObject } from '@standardnotes/payloads'
+import { FillItemContent, CreateMaxPayloadFromAnyObject } from '@standardnotes/models'
 
 const setupRandomUuid = () => {
   UuidGenerator.SetGenerator(() => String(Math.random()))

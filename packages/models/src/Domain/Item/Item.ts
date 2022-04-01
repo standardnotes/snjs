@@ -53,8 +53,8 @@ export class SNItem<C extends ItemContent = ItemContent> implements ItemInterfac
         this.getAppDomainValueWithDefault(AppDataField.UserModifiedDate, this.serverUpdatedAt || 0),
       )
       this.updatedAtString = dateToLocalizedString(this.userModifiedDate)
-      this.protected = this.payload.safeContent.protected
-      this.trashed = this.payload.safeContent.trashed
+      this.protected = this.payload.safeContent.protected || false
+      this.trashed = this.payload.safeContent.trashed || false
       this.pinned = this.getAppDomainValueWithDefault(AppDataField.Pinned, false)
       this.archived = this.getAppDomainValueWithDefault(AppDataField.Archived, false)
       this.locked = this.getAppDomainValueWithDefault(AppDataField.Locked, false)

@@ -1,5 +1,5 @@
 import { ContentType } from '@standardnotes/common'
-import { PurePayload } from '@standardnotes/payloads'
+import { PurePayload } from '@standardnotes/models'
 /**
  * Sorts payloads according by most recently modified first, according to the priority,
  * whereby the earlier a content_type appears in the priorityList,

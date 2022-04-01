@@ -1,13 +1,12 @@
 import { Create002KeyParams } from '../../RootKey/KeyParams'
-import { ItemsKeyContent } from '../Operator'
-import { CreateItemFromPayload, ItemsKeyInterface } from '@standardnotes/models'
+import { CreateItemFromPayload, ItemsKeyContent, ItemsKeyInterface } from '@standardnotes/models'
 import { SNProtocolOperator001 } from '../001/Operator001'
 import { SNRootKey } from '../../RootKey/RootKey'
 import { SNRootKeyParams } from '../../RootKey/RootKeyParams'
 import { UuidGenerator } from '@standardnotes/utils'
 import { V002Algorithm } from '../../Algorithm'
 import * as Common from '@standardnotes/common'
-import * as Payloads from '@standardnotes/payloads'
+import * as Payloads from '@standardnotes/models'
 import * as Utils from '@standardnotes/utils'
 import {
   DecryptedParameters,

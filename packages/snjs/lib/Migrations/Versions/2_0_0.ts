@@ -8,7 +8,7 @@ import { ProtocolVersion } from '@standardnotes/common'
 import { SNRootKey, EncryptionIntent } from '@standardnotes/encryption'
 import { SNStorageService } from '../../Services/Storage/StorageService'
 import { StorageReader1_0_0 } from '../StorageReaders/Versions/Reader1_0_0'
-import * as Payloads from '@standardnotes/payloads'
+import * as Payloads from '@standardnotes/models'
 import * as Services from '@standardnotes/services'
 import * as Utils from '@standardnotes/utils'
 
