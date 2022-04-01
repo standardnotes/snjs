@@ -1,5 +1,5 @@
 import { ProtocolVersion } from '@standardnotes/common'
-import { RawPayload, RootKeyContent, RootKeyContentSpecialized } from '@standardnotes/models'
+import { RootKeyContentSpecialized } from '@standardnotes/models'
 
 export interface RootKeyInKeychain {
   version: ProtocolVersion
@@ -8,5 +8,3 @@ export interface RootKeyInKeychain {
 }
 
 export type RootKeyContentInStorage = RootKeyContentSpecialized
-
-export type RootKeyInStorage = RawPayload<RootKeyContent>

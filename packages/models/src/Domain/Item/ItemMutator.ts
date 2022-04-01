@@ -3,7 +3,7 @@ import { MutationType } from './MutationType'
 import { PrefKey } from '../UserPrefs/PrefKey'
 import { SNItem } from './Item'
 import { Uuid } from '@standardnotes/common'
-import { ItemContent } from "./ItemContent"
+import { ItemContent } from './ItemContent'
 import { PurePayload } from '../Payload/PurePayload'
 import { CopyPayload, PayloadByMerging } from '../Payload/Functions'
 import { AppDataField } from './AppDataField'

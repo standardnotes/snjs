@@ -15,7 +15,7 @@ import {
 import { ConflictStrategy } from '../Payload/ConflictStrategy'
 import { Predicate } from '../Predicate/Predicate'
 import { AppDataField } from '../Item/AppDataField'
-import { ItemContent } from "../Item/ItemContent"
+import { ItemContent } from '../Item/ItemContent'
 
 /**
  * Components are mostly iframe based extensions that communicate with the SN parent

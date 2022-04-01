@@ -2,7 +2,7 @@ import { PayloadInterface } from './../Payload/PayloadInterface'
 import { SNItem } from '../Item/Item'
 import { PredicateInterface, PredicateJsonForm } from '../Predicate/Interface'
 import { predicateFromJson } from '../Predicate/Generators'
-import { ItemContent } from "../Item/ItemContent"
+import { ItemContent } from '../Item/ItemContent'
 
 export const SMART_TAG_DSL_PREFIX = '!['
 

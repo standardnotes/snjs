@@ -1,7 +1,7 @@
 import { FeatureDescription, ThirdPartyFeatureDescription } from '@standardnotes/features'
 import { HistoryEntry } from '../History/HistoryEntry'
 import { SNItem } from '../Item'
-import { ItemContent } from "../Item/ItemContent"
+import { ItemContent } from '../Item/ItemContent'
 import { ConflictStrategy } from '../Payload/ConflictStrategy'
 import { PayloadInterface } from '../Payload/PayloadInterface'
 import { Action } from './Types'

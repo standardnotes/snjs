@@ -1,5 +1,5 @@
 import { SNItem } from '../Item/Item'
-import { ItemContent } from "../Item/ItemContent"
+import { ItemContent } from '../Item/ItemContent'
 
 export interface FeatureRepoContent extends ItemContent {
   migratedToUserSetting?: boolean
