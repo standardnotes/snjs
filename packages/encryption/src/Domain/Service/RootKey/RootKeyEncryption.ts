@@ -16,6 +16,8 @@ import {
   EncryptedParameters,
   ErroredDecryptingParameters,
 } from '../../Encryption/EncryptedParameters'
+import { ItemsKeyMutator } from '../../ItemsKey'
+import { ItemsKeyInterface } from '@standardnotes/models'
 
 export enum RootKeyServiceEvent {
   RootKeyStatusChanged = 'RootKeyStatusChanged',
@@ -554,14 +556,14 @@ export class RootKeyEncryptionService extends Services.AbstractService<RootKeySe
   }
 
   /**
-   * Creates a new random SNItemsKey to use for item encryption, and adds it to model management.
+   * Creates a new random items key to use for item encryption, and adds it to model management.
    * Consumer must call sync. If the protocol version <= 003, only one items key should be created,
    * and its .itemsKey value should be equal to the root key masterKey value.
    */
-  public async createNewDefaultItemsKey(): Promise<Models.SNItemsKey> {
+  public async createNewDefaultItemsKey(): Promise<ItemsKeyInterface> {
     const rootKey = this.rootKey as SNRootKey
     const operatorVersion = rootKey ? rootKey.keyVersion : Common.ProtocolVersionLatest
-    let itemTemplate: Models.SNItemsKey
+    let itemTemplate: ItemsKeyInterface
 
     if (Common.compareVersions(operatorVersion, Common.ProtocolVersionLastNonrootItemsKey) <= 0) {
       /** Create root key based items key */
@@ -574,7 +576,7 @@ export class RootKeyEncryptionService extends Services.AbstractService<RootKeySe
           version: operatorVersion,
         }),
       })
-      itemTemplate = Models.CreateItemFromPayload(payload) as Models.SNItemsKey
+      itemTemplate = Models.CreateItemFromPayload(payload) as ItemsKeyInterface
     } else {
       /** Create independent items key */
       itemTemplate = this.operatorManager.operatorForVersion(operatorVersion).createItemsKey()
@@ -591,7 +593,7 @@ export class RootKeyEncryptionService extends Services.AbstractService<RootKeySe
       })
     }
 
-    const itemsKey = (await this.itemManager.insertItem(itemTemplate)) as Models.SNItemsKey
+    const itemsKey = (await this.itemManager.insertItem(itemTemplate)) as ItemsKeyInterface
     await this.itemManager.changeItemsKey(itemsKey.uuid, (mutator) => {
       mutator.isDefault = true
     })
@@ -607,7 +609,7 @@ export class RootKeyEncryptionService extends Services.AbstractService<RootKeySe
       await this.itemManager.setItemToBeDeleted(newDefaultItemsKey.uuid)
 
       if (currentDefaultItemsKey) {
-        await this.itemManager.changeItem<Models.ItemsKeyMutator>(
+        await this.itemManager.changeItem<ItemsKeyMutator>(
           currentDefaultItemsKey.uuid,
           (mutator) => {
             mutator.isDefault = true

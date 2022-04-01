@@ -6,7 +6,7 @@ import { findDefaultItemsKey } from '../Functions'
 import { ItemsEncryptionService } from '../Items/ItemsEncryption'
 import { KeyMode } from '../RootKey/KeyMode'
 import { OperatorManager } from '../../Operator/OperatorManager'
-import { SNItemsKey, Uuids } from '@standardnotes/models'
+import { ItemsKeyInterface, Uuids } from '@standardnotes/models'
 import { SNPureCrypto } from '@standardnotes/sncrypto-common'
 import { SNRootKey } from '../../RootKey/RootKey'
 import { SNRootKeyParams } from '../../RootKey/RootKeyParams'
@@ -18,8 +18,16 @@ import * as RootKeyEncryption from '../RootKey/RootKeyEncryption'
 import * as Services from '@standardnotes/services'
 import * as Utils from '@standardnotes/utils'
 import { EncryptedEncryptionIntent, EncryptionIntent } from '../../Intent/EncryptionIntent'
-import { DecryptedParameters, EncryptedParameters, ErroredDecryptingParameters } from '../../Encryption/EncryptedParameters'
-import { CreateIntentPayloadFromObject, encryptedParametersFromPayload, mergePayloadWithEncryptionParameters } from '../../Intent/Functions'
+import {
+  DecryptedParameters,
+  EncryptedParameters,
+  ErroredDecryptingParameters,
+} from '../../Encryption/EncryptedParameters'
+import {
+  CreateIntentPayloadFromObject,
+  encryptedParametersFromPayload,
+  mergePayloadWithEncryptionParameters,
+} from '../../Intent/Functions'
 import { RootKeyEncryptedAuthenticatedData } from '../../Encryption/RootKeyEncryptedAuthenticatedData'
 import { ItemAuthenticatedData } from '../../Encryption/ItemAuthenticatedData'
 import { LegacyAttachedData } from '../../Encryption/LegacyAttachedData'
@@ -163,8 +171,8 @@ export class EncryptionService
     return accountUpgradeAvailable || passcodeUpgradeAvailable
   }
 
-  public getSureDefaultItemsKey(): SNItemsKey {
-    return this.itemsEncryption.getDefaultItemsKey() as SNItemsKey
+  public getSureDefaultItemsKey(): ItemsKeyInterface {
+    return this.itemsEncryption.getDefaultItemsKey() as ItemsKeyInterface
   }
 
   async repersistAllItems(): Promise<void> {
@@ -183,14 +191,14 @@ export class EncryptionService
     await this.itemsEncryption.decryptErroredItems()
   }
 
-  public itemsKeyForPayload(payload: Payloads.PurePayload): SNItemsKey | undefined {
+  public itemsKeyForPayload(payload: Payloads.PurePayload): ItemsKeyInterface | undefined {
     return this.itemsEncryption.itemsKeyForPayload(payload)
   }
 
   public defaultItemsKeyForItemVersion(
     version: Common.ProtocolVersion,
-    fromKeys?: SNItemsKey[],
-  ): SNItemsKey | undefined {
+    fromKeys?: ItemsKeyInterface[],
+  ): ItemsKeyInterface | undefined {
     return this.itemsEncryption.defaultItemsKeyForItemVersion(version, fromKeys)
   }
 
@@ -281,10 +289,7 @@ export class EncryptionService
   public async decryptSplit(
     split: EncryptionSplit.EncryptionSplitWithKey<Payloads.PurePayload>,
   ): Promise<Payloads.PurePayload[]> {
-    const allDecryptedParams: (
-      | DecryptedParameters
-      | ErroredDecryptingParameters
-    )[] = []
+    const allDecryptedParams: (DecryptedParameters | ErroredDecryptingParameters)[] = []
     const allNondecryptablePayloads: Payloads.PurePayload[] = []
 
     const categorizePayloads = (payloads: Payloads.PurePayload[]) => {
@@ -581,11 +586,7 @@ export class EncryptionService
   /** Returns the key params attached to this key's encrypted payload */
   public getEmbeddedPayloadAuthenticatedData(
     payload: Payloads.PurePayload,
-  ):
-    | RootKeyEncryptedAuthenticatedData
-    | ItemAuthenticatedData
-    | LegacyAttachedData
-    | undefined {
+  ): RootKeyEncryptedAuthenticatedData | ItemAuthenticatedData | LegacyAttachedData | undefined {
     const version = payload.version
     if (!version) {
       return undefined
@@ -598,7 +599,7 @@ export class EncryptionService
   }
 
   /** Returns the key params attached to this key's encrypted payload */
-  public getKeyEmbeddedKeyParams(key: SNItemsKey): SNRootKeyParams | undefined {
+  public getKeyEmbeddedKeyParams(key: ItemsKeyInterface): SNRootKeyParams | undefined {
     /** We can only look up key params for keys that are encrypted (as strings) */
     if (key.payload.format === Payloads.PayloadFormat.DecryptedBareObject) {
       return undefined
@@ -649,7 +650,7 @@ export class EncryptionService
     return defaultItemsKey.itemsKey !== rootKey.itemsKey
   }
 
-  public async createNewDefaultItemsKey(): Promise<SNItemsKey> {
+  public async createNewDefaultItemsKey(): Promise<ItemsKeyInterface> {
     return this.rootKeyEncryption.createNewDefaultItemsKey()
   }
 

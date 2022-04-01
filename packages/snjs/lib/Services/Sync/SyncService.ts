@@ -22,6 +22,7 @@ import * as Encryption from '@standardnotes/encryption'
 import * as Models from '@standardnotes/models'
 import * as Payloads from '@standardnotes/payloads'
 import * as Services from '@standardnotes/services'
+import { ItemsKeyInterface } from '@standardnotes/models'
 
 const DEFAULT_MAJOR_CHANGE_THRESHOLD = 15
 const INVALID_SESSION_RESPONSE_STATUS = 401
@@ -890,7 +891,7 @@ export class SNSyncService
         processedItemsKeyPayloads[payload.items_key_id as string]
 
       const itemsKey = itemsKeyPayload
-        ? (Models.CreateItemFromPayload(itemsKeyPayload) as Models.SNItemsKey)
+        ? Models.CreateItemFromPayload<ItemsKeyInterface>(itemsKeyPayload)
         : undefined
 
       const split = Encryption.splitItemsByEncryptionType([payload])

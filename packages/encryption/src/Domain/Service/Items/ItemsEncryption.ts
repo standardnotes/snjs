@@ -1,7 +1,7 @@
+import { ItemsKeyInterface } from '@standardnotes/models'
 import { ContentType, ProtocolVersion } from '@standardnotes/common'
 import { findDefaultItemsKey } from '../Functions'
 import { OperatorManager } from '../../Operator/OperatorManager'
-import { SNItemsKey } from '@standardnotes/models'
 import { StandardException } from '../../StandardException'
 import * as OperatorWrapper from '../../Operator/OperatorWrapper'
 import * as Payloads from '@standardnotes/payloads'
@@ -60,19 +60,19 @@ export class ItemsEncryptionService extends Services.AbstractService {
     return this.itemManager.itemsKeys()
   }
 
-  public itemsKeyForPayload(payload: Payloads.PurePayload): SNItemsKey | undefined {
+  public itemsKeyForPayload(payload: Payloads.PurePayload): ItemsKeyInterface | undefined {
     return this.getItemsKeys().find(
       (key) => key.uuid === payload.items_key_id || key.duplicateOf === payload.items_key_id,
     )
   }
 
-  public getDefaultItemsKey(): SNItemsKey | undefined {
+  public getDefaultItemsKey(): ItemsKeyInterface | undefined {
     return findDefaultItemsKey(this.getItemsKeys())
   }
 
-  private keyToUseForItemEncryption(): SNItemsKey | StandardException {
+  private keyToUseForItemEncryption(): ItemsKeyInterface | StandardException {
     const defaultKey = this.getDefaultItemsKey()
-    let result: SNItemsKey | undefined = undefined
+    let result: ItemsKeyInterface | undefined = undefined
 
     if (this.userVersion && this.userVersion !== defaultKey?.keyVersion) {
       /**
@@ -93,7 +93,9 @@ export class ItemsEncryptionService extends Services.AbstractService {
     return result
   }
 
-  private keyToUseForDecryptionOfPayload(payload: Payloads.PurePayload): SNItemsKey | undefined {
+  private keyToUseForDecryptionOfPayload(
+    payload: Payloads.PurePayload,
+  ): ItemsKeyInterface | undefined {
     if (payload.items_key_id) {
       const itemsKey = this.itemsKeyForPayload(payload)
       return itemsKey
@@ -117,7 +119,7 @@ export class ItemsEncryptionService extends Services.AbstractService {
 
   public async encryptSplitSingle(
     payload: Payloads.PurePayload,
-    key: SNItemsKey,
+    key: ItemsKeyInterface,
   ): Promise<EncryptedParameters> {
     if (payload.format !== Payloads.PayloadFormat.DecryptedBareObject) {
       throw Error('Attempting to encrypt already encrypted payload.')
@@ -137,7 +139,7 @@ export class ItemsEncryptionService extends Services.AbstractService {
 
   public async encryptSplitSingles(
     payloads: Payloads.PurePayload[],
-    key: SNItemsKey,
+    key: ItemsKeyInterface,
   ): Promise<EncryptedParameters[]> {
     return Promise.all(payloads.map((payload) => this.encryptSplitSingle(payload, key)))
   }
@@ -166,7 +168,7 @@ export class ItemsEncryptionService extends Services.AbstractService {
 
   public async decryptPayload(
     payload: Payloads.PurePayload,
-    key: SNItemsKey,
+    key: ItemsKeyInterface,
   ): Promise<DecryptedParameters | ErroredDecryptingParameters> {
     if (!payload.content) {
       return {
@@ -194,7 +196,7 @@ export class ItemsEncryptionService extends Services.AbstractService {
 
   public async decryptPayloads(
     payloads: Payloads.PurePayload[],
-    key: SNItemsKey,
+    key: ItemsKeyInterface,
   ): Promise<(DecryptedParameters | ErroredDecryptingParameters)[]> {
     return Promise.all(payloads.map((payload) => this.decryptPayload(payload, key)))
   }
@@ -221,16 +223,16 @@ export class ItemsEncryptionService extends Services.AbstractService {
   }
 
   /**
-   * When migrating from non-SNItemsKey architecture, many items will not have a
+   * When migrating from non-items key architecture, many items will not have a
    * relationship with any key object. For those items, we can be sure that only 1 key
    * object will correspond to that protocol version.
-   * @returns The SNItemsKey object to decrypt items encrypted
+   * @returns The items key object to decrypt items encrypted
    * with previous protocol version.
    */
   public defaultItemsKeyForItemVersion(
     version: ProtocolVersion,
-    fromKeys?: SNItemsKey[],
-  ): SNItemsKey | undefined {
+    fromKeys?: ItemsKeyInterface[],
+  ): ItemsKeyInterface | undefined {
     /** Try to find one marked default first */
     const searchKeys = fromKeys || this.getItemsKeys()
     const priorityKey = searchKeys.find((key) => {

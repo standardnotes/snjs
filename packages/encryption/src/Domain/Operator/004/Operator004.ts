@@ -1,7 +1,7 @@
 import { ContentType, KeyParamsOrigination, ProtocolVersion } from '@standardnotes/common'
 import { Create004KeyParams } from '../../RootKey/KeyParams'
 import { ItemsKeyContent, SynchronousOperator } from '../Operator'
-import { SNItemsKey, CreateItemFromPayload } from '@standardnotes/models'
+import { CreateItemFromPayload, ItemsKeyInterface } from '@standardnotes/models'
 import { SNPureCrypto } from '@standardnotes/sncrypto-common'
 import { SNRootKey } from '../../RootKey/RootKey'
 import { SNRootKeyParams } from '../../RootKey/RootKeyParams'
@@ -17,6 +17,7 @@ import {
 import { RootKeyEncryptedAuthenticatedData } from '../../Encryption/RootKeyEncryptedAuthenticatedData'
 import { ItemAuthenticatedData } from '../../Encryption/ItemAuthenticatedData'
 import { LegacyAttachedData } from '../../Encryption/LegacyAttachedData'
+import { isItemsKey } from '../../ItemsKey'
 
 const PARTITION_CHARACTER = ':'
 
@@ -45,17 +46,17 @@ export class SNProtocolOperator004 implements SynchronousOperator {
   }
 
   /**
-   * Creates a new random SNItemsKey to use for item encryption.
+   * Creates a new random items key to use for item encryption.
    * The consumer must save/sync this item.
    */
-  public createItemsKey(): SNItemsKey {
+  public createItemsKey(): ItemsKeyInterface {
     const content = this.generateNewItemsKeyContent()
     const payload = Payloads.CreateMaxPayloadFromAnyObject({
       uuid: Utils.UuidGenerator.GenerateUuid(),
       content_type: ContentType.ItemsKey,
       content: Payloads.FillItemContent(content),
     })
-    return CreateItemFromPayload(payload) as SNItemsKey
+    return CreateItemFromPayload(payload)
   }
 
   /**
@@ -183,7 +184,7 @@ export class SNProtocolOperator004 implements SynchronousOperator {
    */
   private generateAuthenticatedDataForPayload(
     payload: Payloads.PurePayload,
-    key: SNItemsKey | SNRootKey,
+    key: ItemsKeyInterface | SNRootKey,
   ): ItemAuthenticatedData | RootKeyEncryptedAuthenticatedData {
     const baseData: ItemAuthenticatedData = {
       u: payload.uuid,
@@ -195,7 +196,7 @@ export class SNProtocolOperator004 implements SynchronousOperator {
         kp: (key as SNRootKey).keyParams.content,
       }
     } else {
-      if (!(key instanceof SNItemsKey)) {
+      if (!isItemsKey(key)) {
         throw Error('Attempting to use non-items key for regular item.')
       }
       return baseData
@@ -221,7 +222,7 @@ export class SNProtocolOperator004 implements SynchronousOperator {
 
   public generateEncryptedParametersSync(
     payload: Payloads.PurePayload,
-    key: SNItemsKey | SNRootKey,
+    key: ItemsKeyInterface | SNRootKey,
   ): EncryptedParameters {
     const itemKey = this.crypto.generateRandomKey(V004Algorithm.EncryptionKeyLength)
     /** Encrypt content with item_key */
@@ -240,7 +241,7 @@ export class SNProtocolOperator004 implements SynchronousOperator {
     )
     return {
       uuid: payload.uuid,
-      items_key_id: key instanceof SNItemsKey ? key.uuid : undefined,
+      items_key_id: isItemsKey(key) ? key.uuid : undefined,
       content: encryptedContentString,
       enc_item_key: encryptedItemKey,
       version: this.version,
@@ -249,7 +250,7 @@ export class SNProtocolOperator004 implements SynchronousOperator {
 
   public generateDecryptedParametersSync(
     encrypted: EncryptedParameters,
-    key: SNItemsKey | SNRootKey,
+    key: ItemsKeyInterface | SNRootKey,
   ): DecryptedParameters | ErroredDecryptingParameters {
     const itemKeyComponents = this.deconstructEncryptedPayloadString(encrypted.enc_item_key)
     const authenticatedData = this.stringToAuthenticatedData(

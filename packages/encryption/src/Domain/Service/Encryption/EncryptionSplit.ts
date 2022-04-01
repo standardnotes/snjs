@@ -1,7 +1,7 @@
 import { ItemInterface, PurePayload } from '@standardnotes/payloads'
-import { SNItemsKey } from '@standardnotes/models'
 import { SNRootKey } from '../../RootKey/RootKey'
 import { ItemContentTypeUsesRootKeyEncryption } from '../../Intent/Functions'
+import { ItemsKeyInterface } from '@standardnotes/models'
 
 type ItemOrPayload = ItemInterface | PurePayload
 
@@ -20,7 +20,7 @@ type UsesItemsKeySplitWithKeyLookup<T extends ItemOrPayload> = {
 
 type UsesItemsKeySplit<T extends ItemOrPayload> = {
   items: T[]
-  key: SNItemsKey
+  key: ItemsKeyInterface
 }
 
 export type EncryptionSplit<T extends ItemOrPayload> = {

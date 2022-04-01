@@ -1,4 +1,4 @@
-import { SNItemsKey, CreateItemFromPayload } from '@standardnotes/models'
+import { CreateItemFromPayload, ItemsKeyInterface } from '@standardnotes/models'
 import {
   SNRootKeyParams,
   EncryptionService,
@@ -106,14 +106,14 @@ export class SNKeyRecoveryService extends AbstractService {
 
         const changedOrInserted = changed
           .concat(inserted)
-          .filter((k) => k.errorDecrypting) as SNItemsKey[]
+          .filter((k) => k.errorDecrypting) as ItemsKeyInterface[]
 
         if (changedOrInserted.length > 0) {
           void this.handleUndecryptableItemsKeys(changedOrInserted)
         }
 
         if (ignored.length > 0) {
-          void this.handleIgnoredItemsKeys(ignored as SNItemsKey[])
+          void this.handleIgnoredItemsKeys(ignored as ItemsKeyInterface[])
         }
       },
     )
@@ -157,7 +157,7 @@ export class SNKeyRecoveryService extends AbstractService {
    * When the app first launches, we will query the isolated storage to see if there are any
    * keys we need to decrypt.
    */
-  private async handleIgnoredItemsKeys(keys: SNItemsKey[], persistIncoming = true) {
+  private async handleIgnoredItemsKeys(keys: ItemsKeyInterface[], persistIncoming = true) {
     /**
      * Persist the keys locally in isolated storage, so that if we don't properly decrypt
      * them in this app session, the user has a chance to later. If there already exists
@@ -177,7 +177,7 @@ export class SNKeyRecoveryService extends AbstractService {
     await this.beginProcessingQueue()
   }
 
-  private async handleUndecryptableItemsKeys(keys: SNItemsKey[]) {
+  private async handleUndecryptableItemsKeys(keys: ItemsKeyInterface[]) {
     this.addKeysToQueue(keys)
     await this.beginProcessingQueue()
   }
@@ -192,7 +192,7 @@ export class SNKeyRecoveryService extends AbstractService {
 
     const keys = rawPayloads
       .map((raw) => CreateMaxPayloadFromAnyObject(raw))
-      .map((p) => CreateItemFromPayload(p)) as SNItemsKey[]
+      .map((p) => CreateItemFromPayload(p)) as ItemsKeyInterface[]
 
     return this.handleIgnoredItemsKeys(keys, false)
   }
@@ -209,7 +209,7 @@ export class SNKeyRecoveryService extends AbstractService {
     await this.storageService.setValue(StorageKey.KeyRecoveryUndecryptableItems, record)
   }
 
-  private async saveToUndecryptables(keys: SNItemsKey[]) {
+  private async saveToUndecryptables(keys: ItemsKeyInterface[]) {
     /** Get the current persisted value */
     const record = await this.getUndecryptables()
     /** Persist incoming keys */
@@ -219,7 +219,7 @@ export class SNKeyRecoveryService extends AbstractService {
     await this.persistUndecryptables(record)
   }
 
-  private async removeFromUndecryptables(key: SNItemsKey) {
+  private async removeFromUndecryptables(key: ItemsKeyInterface) {
     /** Get the current persisted value */
     const record = await this.getUndecryptables()
     delete record[key.uuid]
@@ -282,7 +282,7 @@ export class SNKeyRecoveryService extends AbstractService {
     return wrappingKey
   }
 
-  private addKeysToQueue(keys: SNItemsKey[], callback?: DecryptionCallback) {
+  private addKeysToQueue(keys: ItemsKeyInterface[], callback?: DecryptionCallback) {
     for (const key of keys) {
       const keyParams = this.protocolService.getKeyEmbeddedKeyParams(key)
       if (!keyParams) {
@@ -391,7 +391,7 @@ export class SNKeyRecoveryService extends AbstractService {
     ) {
       /** Get the latest items key we _can_ decrypt */
       const latest = dateSorted(
-        this.itemManager.nonErroredItemsForContentType(ContentType.ItemsKey) as SNItemsKey[],
+        this.itemManager.nonErroredItemsForContentType<ItemsKeyInterface>(ContentType.ItemsKey),
         PayloadField.CreatedAt,
         false,
       )[0]

@@ -46,7 +46,7 @@ export class MutatorService extends AbstractService implements MutatorClientInte
   }
 
   public async insertItem(item: Models.SNItem): Promise<Models.SNItem> {
-    const mutator = Models.createMutatorForItem(item, Models.MutationType.UpdateUserTimestamps)
+    const mutator = Models.CreateMutatorForItem(item, Models.MutationType.UpdateUserTimestamps)
     const dirtiedPayload = mutator.getResult()
     const insertedItem = await this.itemManager.emitItemFromPayload(dirtiedPayload)
     return insertedItem

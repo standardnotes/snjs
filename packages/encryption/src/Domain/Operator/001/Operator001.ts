@@ -7,7 +7,7 @@ import {
 import { Create001KeyParams } from '../../RootKey/KeyParams'
 import { firstHalfOfString, secondHalfOfString, splitString } from '@standardnotes/utils'
 import { ItemsKeyContent, AsynchronousOperator } from '../Operator'
-import { SNItemsKey, CreateItemFromPayload } from '@standardnotes/models'
+import { CreateItemFromPayload, ItemsKeyInterface } from '@standardnotes/models'
 import { SNPureCrypto } from '@standardnotes/sncrypto-common'
 import { SNRootKey } from '../../RootKey/RootKey'
 import { SNRootKeyParams } from '../../RootKey/RootKeyParams'
@@ -22,6 +22,7 @@ import {
 import { RootKeyEncryptedAuthenticatedData } from '../../Encryption/RootKeyEncryptedAuthenticatedData'
 import { ItemAuthenticatedData } from '../../Encryption/ItemAuthenticatedData'
 import { LegacyAttachedData } from '../../Encryption/LegacyAttachedData'
+import { isItemsKey } from '../../ItemsKey'
 
 const NO_IV = '00000000000000000000000000000000'
 
@@ -55,17 +56,17 @@ export class SNProtocolOperator001 implements AsynchronousOperator {
   }
 
   /**
-   * Creates a new random SNItemsKey to use for item encryption.
+   * Creates a new random items key to use for item encryption.
    * The consumer must save/sync this item.
    */
-  public createItemsKey(): SNItemsKey {
+  public createItemsKey(): ItemsKeyInterface {
     const content = this.generateNewItemsKeyContent()
     const payload = Payloads.CreateMaxPayloadFromAnyObject({
       uuid: UuidGenerator.GenerateUuid(),
       content_type: ContentType.ItemsKey,
       content: Payloads.FillItemContent(content),
     })
-    return CreateItemFromPayload(payload) as SNItemsKey
+    return CreateItemFromPayload(payload)
   }
 
   public async createRootKey(
@@ -110,7 +111,7 @@ export class SNProtocolOperator001 implements AsynchronousOperator {
 
   public async generateEncryptedParametersAsync(
     payload: Payloads.PurePayload,
-    key: SNItemsKey | SNRootKey,
+    key: ItemsKeyInterface | SNRootKey,
   ): Promise<EncryptedParameters> {
     /**
      * Generate new item key that is double the key size.
@@ -132,7 +133,7 @@ export class SNProtocolOperator001 implements AsynchronousOperator {
 
     return {
       uuid: payload.uuid,
-      items_key_id: key instanceof SNItemsKey ? key.uuid : undefined,
+      items_key_id: isItemsKey(key) ? key.uuid : undefined,
       content: ciphertext,
       enc_item_key: encItemKey,
       auth_hash: authHash,
@@ -142,7 +143,7 @@ export class SNProtocolOperator001 implements AsynchronousOperator {
 
   public async generateDecryptedParametersAsync(
     encrypted: EncryptedParameters,
-    key: SNItemsKey | SNRootKey,
+    key: ItemsKeyInterface | SNRootKey,
   ): Promise<DecryptedParameters | ErroredDecryptingParameters> {
     if (!encrypted.enc_item_key) {
       console.error(Error('Missing item encryption key, skipping decryption.'))

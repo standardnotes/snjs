@@ -8,6 +8,7 @@ import { UuidString } from '../../Types/UuidString'
 import * as Models from '@standardnotes/models'
 import * as Payloads from '@standardnotes/payloads'
 import * as Services from '@standardnotes/services'
+import { ItemsKeyMutator } from '@standardnotes/encryption'
 
 type ItemsChangeObserver = {
   contentType: ContentType[]
@@ -220,8 +221,8 @@ export class ItemManager
     return this.collection.integrityPayloads()
   }
 
-  itemsKeys(): Models.SNItemsKey[] {
-    return this.collection.displayElements(ContentType.ItemsKey) as Models.SNItemsKey[]
+  itemsKeys(): Models.ItemsKeyInterface[] {
+    return this.collection.displayElements(ContentType.ItemsKey) as Models.ItemsKeyInterface[]
   }
 
   /**
@@ -445,7 +446,7 @@ export class ItemManager
       if (!item) {
         throw Error('Attempting to change non-existant item')
       }
-      const mutator = Models.createMutatorForItem(item, mutationType)
+      const mutator = Models.CreateMutatorForItem(item, mutationType)
       if (mutate) {
         mutate(mutator as M)
       }
@@ -473,7 +474,7 @@ export class ItemManager
       if (!item) {
         continue
       }
-      const mutator = Models.createMutatorForItem(
+      const mutator = Models.CreateMutatorForItem(
         item,
         transaction.mutationType || Models.MutationType.UpdateUserTimestamps,
       )
@@ -493,7 +494,7 @@ export class ItemManager
     payloadSourceKey?: string,
   ): Promise<Models.SNItem | undefined> {
     const item = this.findSureItem(transaction.itemUuid)
-    const mutator = Models.createMutatorForItem(
+    const mutator = Models.CreateMutatorForItem(
       item,
       transaction.mutationType || Models.MutationType.UpdateUserTimestamps,
     )
@@ -586,18 +587,18 @@ export class ItemManager
 
   async changeItemsKey(
     uuid: UuidString,
-    mutate: (mutator: Models.ItemsKeyMutator) => void,
+    mutate: (mutator: Models.ItemsKeyMutatorInterface) => void,
     mutationType: Models.MutationType = Models.MutationType.UpdateUserTimestamps,
     payloadSource = Payloads.PayloadSource.LocalChanged,
     payloadSourceKey?: string,
-  ): Promise<Models.SNItemsKey> {
+  ): Promise<Models.ItemsKeyInterface> {
     const itemsKey = this.findItem(uuid)
     if (!itemsKey) {
       throw Error('Attempting to change non-existant itemsKey')
     }
-    const mutator = new Models.ItemsKeyMutator(itemsKey, mutationType)
+    const mutator = new ItemsKeyMutator(itemsKey, mutationType)
     await this.applyTransform(mutator, mutate, payloadSource, payloadSourceKey)
-    return this.findItem(uuid) as Models.SNItemsKey
+    return this.findItem(uuid) as Models.ItemsKeyInterface
   }
 
   private async applyTransform<T extends Models.ItemMutator>(

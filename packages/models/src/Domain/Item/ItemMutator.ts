@@ -35,7 +35,7 @@ export class ItemMutator {
   }
 
   public getUuid() {
-    return this.payload.uuid!
+    return this.payload.uuid
   }
 
   public getItem() {

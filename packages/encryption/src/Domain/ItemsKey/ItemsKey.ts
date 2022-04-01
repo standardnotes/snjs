@@ -1,12 +1,15 @@
-import { HistoryEntry } from '../History/HistoryEntry'
-import { SNItem } from '../Item/Item'
 import { ConflictStrategy } from '@standardnotes/payloads'
 import { ProtocolVersion } from '@standardnotes/common'
+import { HistoryEntry, SNItem, ItemsKeyInterface } from '@standardnotes/models'
+
+export function isItemsKey(x: unknown): x is ItemsKeyInterface {
+  return x instanceof SNItemsKey
+}
 
 /**
  * A key used to encrypt other items. Items keys are synced and persisted.
  */
-export class SNItemsKey extends SNItem {
+export class SNItemsKey extends SNItem implements ItemsKeyInterface {
   /** Do not duplicate items keys. Always keep original */
   strategyWhenConflictingWithItem(item: SNItem, previousRevision?: HistoryEntry): ConflictStrategy {
     if (this.errorDecrypting) {
