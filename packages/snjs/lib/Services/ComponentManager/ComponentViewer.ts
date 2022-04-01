@@ -6,7 +6,6 @@ import {
   SNItem,
   SNNote,
   SNComponent,
-  Uuids,
   PrefKey,
   NoteContent,
   MutationType,
@@ -55,6 +54,7 @@ import {
   log,
   nonSecureRandomIdentifier,
   UuidGenerator,
+  Uuids
 } from '@standardnotes/utils'
 import { MessageData } from '..'
 

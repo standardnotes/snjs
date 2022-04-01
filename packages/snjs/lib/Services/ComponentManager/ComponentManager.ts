@@ -2,18 +2,10 @@ import { AllowedBatchStreaming } from './types'
 import { SNPreferencesService } from '../Preferences/PreferencesService'
 import { FindNativeFeature } from '@standardnotes/features'
 import { SNFeaturesService } from '@Lib/Services/Features/FeaturesService'
-
-import { ContentType, Runtime } from '@standardnotes/common'
+import { ContentType, Runtime, DisplayStringForContentType } from '@standardnotes/common'
 import { PayloadSource } from '@standardnotes/models'
 import { ItemManager } from '@Lib/Services/Items/ItemManager'
-import {
-  SNItem,
-  SNNote,
-  SNTheme,
-  SNComponent,
-  ComponentMutator,
-  displayStringForContentType,
-} from '@standardnotes/models'
+import { SNItem, SNNote, SNTheme, SNComponent, ComponentMutator } from '@standardnotes/models'
 import { SNAlertService } from '@Lib/Services/Alert/AlertService'
 import { SNSyncService } from '@Lib/Services/Sync/SyncService'
 import find from 'lodash/find'
@@ -620,7 +612,7 @@ export class SNComponentManager extends AbstractService<ComponentManagerEvent, E
             return
           }
           permission.content_types.forEach((contentType) => {
-            const desc = displayStringForContentType(contentType)
+            const desc = DisplayStringForContentType(contentType)
             if (desc) {
               contentTypeStrings.push(`${desc}s`)
             } else {

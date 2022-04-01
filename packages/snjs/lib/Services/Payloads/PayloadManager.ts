@@ -1,7 +1,7 @@
 import { ContentType, Uuid } from '@standardnotes/common'
 import { PayloadsChangeObserver, QueueElement, OverwriteProtectedTypes } from './Types'
-import { removeFromArray } from '@standardnotes/utils'
-import { Uuids, DeltaFileImport } from '@standardnotes/models'
+import { removeFromArray, Uuids } from '@standardnotes/utils'
+import { DeltaFileImport } from '@standardnotes/models'
 import * as Payloads from '@standardnotes/models'
 import * as Services from '@standardnotes/services'
 

@@ -20,6 +20,7 @@ import {
   ChallengeReason,
   ChallengeService,
 } from '../Challenge'
+import { Uuids } from '@standardnotes/utils'
 
 export class MutatorService extends AbstractService implements MutatorClientInterface {
   constructor(
@@ -154,7 +155,7 @@ export class MutatorService extends AbstractService implements MutatorClientInte
     items: I[],
   ): Promise<I[]> {
     const protectedItems = await this.itemManager.changeItems<M, I>(
-      Models.Uuids(items),
+      Uuids(items),
       (mutator) => {
         mutator.protected = true
       },
@@ -174,7 +175,7 @@ export class MutatorService extends AbstractService implements MutatorClientInte
     }
 
     const unprotectedItems = await this.itemManager.changeItems<M, I>(
-      Models.Uuids(items),
+      Uuids(items),
       (mutator) => {
         mutator.protected = false
       },
@@ -245,7 +246,7 @@ export class MutatorService extends AbstractService implements MutatorClientInte
   }
 
   public async setItemsNeedsSync(items: Models.SNItem[]): Promise<(Models.SNItem | undefined)[]> {
-    return this.itemManager.setItemsDirty(Models.Uuids(items))
+    return this.itemManager.setItemsDirty(Uuids(items))
   }
 
   public async deleteItem(item: Models.SNItem): Promise<void> {

@@ -1,5 +1,5 @@
 import { AnyRecord, ContentType } from '@standardnotes/common'
-import { isString, naturalSort, removeFromArray, UuidGenerator } from '@standardnotes/utils'
+import { isString, naturalSort, removeFromArray, UuidGenerator, Uuids } from '@standardnotes/utils'
 import { ItemsClientInterface } from './ItemsClientInterface'
 import { ItemsKeyMutator, SNItemsKey } from '@standardnotes/encryption'
 import { PayloadManager } from '../Payloads/PayloadManager'
@@ -740,7 +740,7 @@ export class ItemManager
     source = Models.PayloadSource.Constructor,
   ): Promise<Models.SNItem[]> {
     await this.payloadManager.emitPayloads(payloads, source)
-    const uuids = Models.Uuids(payloads)
+    const uuids = Uuids(payloads)
     return this.findItems(uuids)
   }
 
@@ -1186,7 +1186,7 @@ export class ItemManager
    */
   public async emptyTrash(): Promise<void> {
     const notes = this.trashedItems
-    await this.setItemsToBeDeleted(Models.Uuids(notes))
+    await this.setItemsToBeDeleted(Uuids(notes))
   }
 
   /**
@@ -1210,7 +1210,7 @@ export class ItemManager
    * local data.
    */
   public async removeAllItemsFromMemory(): Promise<void> {
-    const uuids = Models.Uuids(this.items)
+    const uuids = Uuids(this.items)
     /** We don't want to set as dirty, since we want to dispose of immediately. */
     await this.changeItems(
       uuids,

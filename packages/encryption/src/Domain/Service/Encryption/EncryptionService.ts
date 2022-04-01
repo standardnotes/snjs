@@ -701,7 +701,7 @@ export class EncryptionService
     const hasSyncedItemsKey = !Utils.isNullOrUndefined(defaultSyncedKey)
     if (hasSyncedItemsKey) {
       /** Delete all never synced keys */
-      await this.itemManager.setItemsToBeDeleted(Models.Uuids(neverSyncedKeys))
+      await this.itemManager.setItemsToBeDeleted(Utils.Uuids(neverSyncedKeys))
     } else {
       /**
        * No previous synced items key.
@@ -717,7 +717,7 @@ export class EncryptionService
           return itemsKey.keyVersion !== rootKeyParams.version
         })
         if (toDelete.length > 0) {
-          await this.itemManager.setItemsToBeDeleted(Models.Uuids(toDelete))
+          await this.itemManager.setItemsToBeDeleted(Utils.Uuids(toDelete))
         }
 
         if (this.itemsEncryption.getItemsKeys().length === 0) {
@@ -763,7 +763,7 @@ export class EncryptionService
       .getItemsKeys()
       .filter((key) => key.neverSynced && !key.dirty && !key.deleted)
     if (unsyncedKeys.length > 0) {
-      void this.itemManager.setItemsDirty(Models.Uuids(unsyncedKeys))
+      void this.itemManager.setItemsDirty(Utils.Uuids(unsyncedKeys))
     }
   }
 }
