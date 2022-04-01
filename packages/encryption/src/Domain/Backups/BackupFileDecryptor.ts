@@ -10,10 +10,10 @@ import { extendArray } from '@standardnotes/utils'
 import { EncryptionService } from '../Service/Encryption/EncryptionService'
 import {
   PayloadSource,
-  PurePayload,
   CreateMaxPayloadFromAnyObject,
   CreateSourcedPayloadFromObject,
   PayloadFormat,
+  PayloadInterface,
 } from '@standardnotes/models'
 import { ClientDisplayableError } from '@standardnotes/responses'
 import { CreateAnyKeyParams } from '../RootKey/KeyParams'
@@ -55,7 +55,7 @@ export async function decryptBackupFile(
   }
 }
 
-function getBackupFileType(file: BackupFile, payloads: PurePayload[]): BackupFileType {
+function getBackupFileType(file: BackupFile, payloads: PayloadInterface[]): BackupFileType {
   if (file.keyParams || file.auth_params) {
     return BackupFileType.Encrypted
   } else {
@@ -79,9 +79,9 @@ function getBackupFileType(file: BackupFile, payloads: PurePayload[]): BackupFil
 }
 
 async function decryptEncryptedWithNonEncryptedItemsKey(
-  payloads: PurePayload[],
+  payloads: PayloadInterface[],
   protocolService: EncryptionService,
-): Promise<PurePayload[]> {
+): Promise<PayloadInterface[]> {
   const itemsKeys = payloads
     .filter((payload) => {
       return payload.content_type === ContentType.ItemsKey
@@ -91,7 +91,7 @@ async function decryptEncryptedWithNonEncryptedItemsKey(
 }
 
 function findKeyToUseForPayload(
-  payload: PurePayload,
+  payload: PayloadInterface,
   availableKeys: ItemsKeyInterface[],
   protocolService: EncryptionService,
   keyParams?: SNRootKeyParams,
@@ -136,13 +136,13 @@ function findKeyToUseForPayload(
 }
 
 async function decryptWithItemsKeys(
-  payloads: PurePayload[],
+  payloads: PayloadInterface[],
   itemsKeys: ItemsKeyInterface[],
   protocolService: EncryptionService,
   keyParams?: SNRootKeyParams,
   fallbackRootKey?: SNRootKey,
-): Promise<PurePayload[]> {
-  const decryptedPayloads: PurePayload[] = []
+): Promise<PayloadInterface[]> {
+  const decryptedPayloads: PayloadInterface[] = []
 
   for (const encryptedPayload of payloads) {
     if (ContentTypeUsesRootKeyEncryption(encryptedPayload.content_type)) {
@@ -202,9 +202,9 @@ async function decryptWithItemsKeys(
 async function decryptEncrypted(
   password: string,
   keyParams: SNRootKeyParams,
-  payloads: PurePayload[],
+  payloads: PayloadInterface[],
   protocolService: EncryptionService,
-): Promise<PurePayload[]> {
+): Promise<PayloadInterface[]> {
   const rootKey = await protocolService.computeRootKey(password, keyParams)
 
   const itemsKeysPayloads = payloads.filter((payload) => {
@@ -218,7 +218,7 @@ async function decryptEncrypted(
     },
   })
 
-  const results: PurePayload[] = []
+  const results: PayloadInterface[] = []
   extendArray(results, decryptedItemsKeysPayloads)
 
   const decryptedPayloads = await decryptWithItemsKeys(

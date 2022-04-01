@@ -1,9 +1,9 @@
-import { ItemInterface, PurePayload } from '@standardnotes/models'
+import { ItemInterface, PayloadInterface } from '@standardnotes/models'
 import { SNRootKey } from '../../RootKey/RootKey'
 import { ItemContentTypeUsesRootKeyEncryption } from '../../Intent/Functions'
 import { ItemsKeyInterface } from '@standardnotes/models'
 
-type ItemOrPayload = ItemInterface | PurePayload
+type ItemOrPayload = ItemInterface | PayloadInterface
 
 type UsesRootKeySplit<T extends ItemOrPayload> = {
   items: T[]

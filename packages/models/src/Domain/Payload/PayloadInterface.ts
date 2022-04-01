@@ -1,13 +1,13 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { ContentType, ProtocolVersion, Uuid } from '@standardnotes/common'
+import { ItemContent } from '../Item/ItemContent'
 import { ContentReference } from '../Reference/ContentReference'
-import { PayloadContent } from './PayloadContent'
 import { PayloadField } from './PayloadField'
 import { PayloadFormat } from './PayloadFormat'
 import { PayloadSource } from './PayloadSource'
 import { RawPayload } from './RawPayload'
 
-export interface PayloadInterface<C extends PayloadContent = PayloadContent> {
+export interface PayloadInterface<C extends ItemContent = ItemContent> {
   readonly fields: PayloadField[]
   readonly source: PayloadSource
   readonly uuid: string
@@ -48,5 +48,5 @@ export interface PayloadInterface<C extends PayloadContent = PayloadContent> {
   serverUpdatedAt: Date
   serverUpdatedAtTimestamp: number | undefined
   getReference(uuid: Uuid): ContentReference
-  ejected(): RawPayload
+  ejected(): RawPayload<C>
 }

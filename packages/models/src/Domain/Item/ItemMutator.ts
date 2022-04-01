@@ -3,10 +3,9 @@ import { MutationType } from './MutationType'
 import { PrefKey } from '../UserPrefs/PrefKey'
 import { SNItem } from './Item'
 import { Uuid } from '@standardnotes/common'
-import { ItemContent } from './ItemInterface'
+import { ItemContent } from "./ItemContent"
 import { PurePayload } from '../Payload/PurePayload'
 import { CopyPayload, PayloadByMerging } from '../Payload/Functions'
-import { PayloadContent } from '../Payload/PayloadContent'
 import { AppDataField } from './AppDataField'
 import { DefaultAppDomain, DomainDataValueType, ItemDomainKey } from './DefaultAppDomain'
 
@@ -87,7 +86,7 @@ export class ItemMutator<C extends ItemContent = ItemContent> {
   }
 
   /** Not recommended to use as this might break item schema if used incorrectly */
-  public unsafe_setCustomContent(content: PayloadContent): void {
+  public unsafe_setCustomContent(content: ItemContent): void {
     this.content = Copy(content)
   }
 

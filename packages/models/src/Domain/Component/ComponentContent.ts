@@ -1,6 +1,6 @@
 import { FeatureDescription, ComponentArea, ComponentPermission } from '@standardnotes/features'
 import { Uuid } from '@standardnotes/common'
-import { ItemContent } from '../Item/ItemInterface'
+import { ItemContent } from "../Item/ItemContent"
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 export interface ComponentInterface {

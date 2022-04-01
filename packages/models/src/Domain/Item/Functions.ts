@@ -1,5 +1,6 @@
 import { omitInPlace, sortedCopy } from '@standardnotes/utils'
-import { ItemContent, ItemInterface } from './ItemInterface'
+import { ItemInterface } from './ItemInterface'
+import { ItemContent } from './ItemContent'
 import { DefaultAppDomain } from './DefaultAppDomain'
 import { AppDataField } from './AppDataField'
 

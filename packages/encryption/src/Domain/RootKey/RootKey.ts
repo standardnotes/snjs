@@ -1,12 +1,7 @@
-import {
-  PurePayload,
-  FillItemContent,
-  CreateMaxPayloadFromAnyObject,
-} from '@standardnotes/models'
+import { RootKeyContentInStorage, RootKeyInKeychain } from './Types'
 import { SNRootKeyParams } from './RootKeyParams'
-import { SNItem, RootKeyInterface, RootKeyContent } from '@standardnotes/models'
-import { AnyKeyParamsContent, ContentType, ProtocolVersion } from '@standardnotes/common'
-import { UuidGenerator } from '@standardnotes/utils'
+import { RootKeyInterface, RootKeyContent, SNItem, PayloadInterface } from '@standardnotes/models'
+import { ProtocolVersion } from '@standardnotes/common'
 import { timingSafeEqual } from '@standardnotes/sncrypto-common'
 
 /**
@@ -14,68 +9,17 @@ import { timingSafeEqual } from '@standardnotes/sncrypto-common'
  * and decryption of items keys. A root key extends SNItem for local convenience, but is
  * not part of the syncing or storage ecosystem—root keys are managed independently.
  */
-export class SNRootKey extends SNItem implements RootKeyInterface {
+export class SNRootKey extends SNItem<RootKeyContent> implements RootKeyInterface {
   public readonly keyParams: SNRootKeyParams
 
-  static Create(content: RootKeyContent, uuid?: string) {
-    if (!uuid) {
-      uuid = UuidGenerator.GenerateUuid()
-    }
-    if (!content.version) {
-      if (content.dataAuthenticationKey) {
-        /**
-         * If there's no version stored, it must be either 001 or 002.
-         * If there's a dataAuthenticationKey, it has to be 002. Otherwise it's 001.
-         */
-        content.version = ProtocolVersion.V002
-      } else {
-        content.version = ProtocolVersion.V001
-      }
-    }
-    const payload = CreateMaxPayloadFromAnyObject({
-      uuid: uuid,
-      content_type: ContentType.RootKey,
-      content: FillItemContent(content),
-    })
-    const keyParamsInput = content.keyParams
-    if (!keyParamsInput) {
-      throw Error('Attempting to create root key without key params')
-    }
-    const keyParams =
-      keyParamsInput instanceof SNRootKeyParams
-        ? keyParamsInput
-        : new SNRootKeyParams(keyParamsInput)
-
-    return new SNRootKey(payload, keyParams)
-  }
-
-  /**
-   * Given a root key, expands its key params by making a copy which includes
-   * the inputted key params. Used to expand locally created key params after signing in
-   */
-  static ExpandedCopy(key: SNRootKey, keyParams?: AnyKeyParamsContent) {
-    const content = key.typedContent as RootKeyContent
-    const copiedKey = this.Create({
-      ...content,
-      keyParams: keyParams ? keyParams : content.keyParams,
-    })
-    return copiedKey
-  }
-
-  constructor(payload: PurePayload, keyParams: SNRootKeyParams) {
+  constructor(payload: PayloadInterface<RootKeyContent>) {
     super(payload)
-    this.keyParams = keyParams
-  }
 
-  private get typedContent() {
-    return this.safeContent as Partial<RootKeyContent>
+    this.keyParams = new SNRootKeyParams(payload.safeContent.keyParams)
   }
 
   public get keyVersion(): ProtocolVersion {
-    if (!this.payload.safeContent.version) {
-      throw 'Attempting to create key without version.'
-    }
-    return this.payload.safeContent.version
+    return this.safeContent.version
   }
 
   /**
@@ -86,7 +30,7 @@ export class SNRootKey extends SNItem implements RootKeyInterface {
   }
 
   public get masterKey(): string {
-    return this.payload.safeContent.masterKey
+    return this.safeContent.masterKey
   }
 
   /**
@@ -94,50 +38,52 @@ export class SNRootKey extends SNItem implements RootKeyInterface {
    * this value may be undefined.
    */
   public get serverPassword(): string | undefined {
-    return this.payload.safeContent.serverPassword
+    return this.safeContent.serverPassword
   }
 
   /** 003 and below only. */
   public get dataAuthenticationKey(): string | undefined {
-    return this.payload.safeContent.dataAuthenticationKey
+    return this.safeContent.dataAuthenticationKey
   }
 
-  /**
-   * Compares two keys for equality
-   */
   public compare(otherKey: SNRootKey): boolean {
     if (this.keyVersion !== otherKey.keyVersion) {
       return false
     }
-    const hasServerPassword = !!(this.serverPassword && otherKey.serverPassword)
-    return (
-      timingSafeEqual(this.masterKey, otherKey.masterKey) &&
-      (!hasServerPassword || timingSafeEqual(this.serverPassword!, otherKey.serverPassword!))
-    )
+
+    if (this.serverPassword && otherKey.serverPassword) {
+      return (
+        timingSafeEqual(this.masterKey, otherKey.masterKey) &&
+        timingSafeEqual(this.serverPassword, otherKey.serverPassword)
+      )
+    } else {
+      return timingSafeEqual(this.masterKey, otherKey.masterKey)
+    }
   }
 
   /**
    * @returns Object suitable for persist in storage when wrapped
    */
-  public persistableValueWhenWrapping(): Partial<RootKeyContent> {
-    const keychainValue = this.getKeychainValue()
-    keychainValue.keyParams = this.keyParams.getPortableValue()
-    return keychainValue
+  public persistableValueWhenWrapping(): RootKeyContentInStorage {
+    return {
+      ...this.getKeychainValue(),
+      keyParams: this.keyParams.getPortableValue(),
+    }
   }
 
   /**
    * @returns Object that is suitable for persisting in a keychain
    */
-  public getKeychainValue(): Partial<RootKeyContent> {
-    const values: Partial<RootKeyContent> = {
+  public getKeychainValue(): RootKeyInKeychain {
+    const values: RootKeyInKeychain = {
       version: this.keyVersion,
+      masterKey: this.masterKey,
     }
-    if (this.masterKey) {
-      values.masterKey = this.masterKey
-    }
+
     if (this.dataAuthenticationKey) {
       values.dataAuthenticationKey = this.dataAuthenticationKey
     }
+
     return values
   }
 }

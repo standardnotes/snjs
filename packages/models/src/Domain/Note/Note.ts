@@ -1,7 +1,8 @@
 import { isNullOrUndefined } from '@standardnotes/utils'
 import { ContentType } from '@standardnotes/common'
 import { SNItem } from '../Item/Item'
-import { ItemContent, ItemInterface } from '../Item/ItemInterface'
+import { ItemInterface } from '../Item/ItemInterface'
+import { ItemContent } from '../Item/ItemContent'
 import { PayloadInterface } from '../Payload/PayloadInterface'
 import { PayloadFormat } from '../Payload/PayloadFormat'
 import { AppDataField } from '../Item/AppDataField'
@@ -10,7 +11,7 @@ export interface NoteInterface {
   title: string
   text: string
   mobilePrefersPlainEditor?: boolean
-  hidePreview: boolean
+  hidePreview?: boolean
   preview_plain?: string
   preview_html?: string
   spellcheck?: boolean

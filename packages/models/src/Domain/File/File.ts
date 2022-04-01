@@ -1,10 +1,10 @@
 import { SNItem } from '../Item/Item'
-import { ItemContent } from '../Item/ItemInterface'
+import { ItemContent } from '../Item/ItemContent'
 import { PayloadInterface } from '../Payload/PayloadInterface'
 import { FileMetadata } from './FileMetadata'
 import { FileProtocolV1 } from './FileProtocolV1'
 
-export interface FileInterface extends FileMetadata {
+export interface FileContentSpecialized extends FileMetadata {
   remoteIdentifier: string
   name: string
   key: string
@@ -14,11 +14,11 @@ export interface FileInterface extends FileMetadata {
   mimeType: string
 }
 
-export type FileContent = FileInterface & ItemContent
+export type FileContent = FileContentSpecialized & ItemContent
 
 export class SNFile
   extends SNItem<FileContent>
-  implements FileInterface, FileProtocolV1, FileMetadata
+  implements FileContentSpecialized, FileProtocolV1, FileMetadata
 {
   public readonly remoteIdentifier: string
   public readonly name: string
@@ -39,7 +39,7 @@ export class SNFile
     this.mimeType = this.typedContent.mimeType
   }
 
-  private get typedContent(): FileInterface {
-    return this.safeContent as unknown as FileInterface
+  private get typedContent(): FileContentSpecialized {
+    return this.safeContent as unknown as FileContentSpecialized
   }
 }

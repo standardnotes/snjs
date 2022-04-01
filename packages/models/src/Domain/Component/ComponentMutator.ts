@@ -1,8 +1,9 @@
 import { addIfUnique, removeFromArray } from '@standardnotes/utils'
 import { ItemMutator } from '../Item/ItemMutator'
 import { Uuid } from '@standardnotes/common'
-import { ComponentPermission, ComponentContent } from '@standardnotes/features'
+import { ComponentPermission } from '@standardnotes/features'
 import { AppDataField } from '../Item/AppDataField'
+import { ComponentContent } from './ComponentContent'
 
 export class ComponentMutator extends ItemMutator {
   get typedContent(): Partial<ComponentContent> {

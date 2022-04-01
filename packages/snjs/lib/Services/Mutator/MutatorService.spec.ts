@@ -1,4 +1,4 @@
-import { SNNote } from '@standardnotes/models'
+import { NoteContent, SNNote } from '@standardnotes/models'
 import { EncryptionService } from '@standardnotes/encryption'
 import { ContentType } from '@standardnotes/common'
 import { FillItemContent, CreateMaxPayloadFromAnyObject } from '@standardnotes/models'
@@ -55,7 +55,7 @@ describe('mutator service', () => {
       CreateMaxPayloadFromAnyObject({
         uuid: String(Math.random()),
         content_type: ContentType.Note,
-        content: FillItemContent({
+        content: FillItemContent<NoteContent>({
           title: title,
         }),
       }),

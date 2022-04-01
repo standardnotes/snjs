@@ -1,12 +1,15 @@
 import { ProtocolVersion } from '@standardnotes/common'
-import { ItemContent, ItemInterface } from '../Item/ItemInterface'
+import { ItemInterface } from '../Item/ItemInterface'
+import { ItemContent, SpecializedContent } from '../Item/ItemContent'
 
-export interface ItemsKeyContent extends ItemContent {
+export interface ItemsKeyContentSpecialized extends SpecializedContent {
   version: ProtocolVersion
   isDefault?: boolean | undefined
   itemsKey: string
   dataAuthenticationKey?: string
 }
+
+export type ItemsKeyContent = ItemsKeyContentSpecialized & ItemContent
 
 export interface ItemsKeyInterface extends ItemInterface<ItemsKeyContent> {
   get keyVersion(): ProtocolVersion

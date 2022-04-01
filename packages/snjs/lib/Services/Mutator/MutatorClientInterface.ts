@@ -3,12 +3,11 @@ import { SyncOptions } from '../Sync'
 import { TransactionalMutation } from '../Items'
 import { UuidString } from '@Lib/Types/UuidString'
 import * as Models from '@standardnotes/models'
-import * as Payloads from '@standardnotes/models'
 import { ClientDisplayableError } from '@standardnotes/responses'
 import { BackupFile } from '@standardnotes/encryption'
 
 export interface MutatorClientInterface {
-  savePayload(payload: Payloads.PurePayload): Promise<void>
+  savePayload(payload: Models.PurePayload): Promise<void>
 
   /**
    * Inserts the input item by its payload properties, and marks the item as dirty.
@@ -29,7 +28,7 @@ export interface MutatorClientInterface {
     uuid: UuidString,
     mutate: (mutator: M) => void,
     updateTimestamps?: boolean,
-    payloadSource?: Payloads.PayloadSource,
+    payloadSource?: Models.PayloadSource,
     syncOptions?: SyncOptions,
   ): Promise<Models.SNItem | undefined>
 
@@ -40,7 +39,7 @@ export interface MutatorClientInterface {
     uuids: UuidString[],
     mutate: (mutator: M) => void,
     updateTimestamps?: boolean,
-    payloadSource?: Payloads.PayloadSource,
+    payloadSource?: Models.PayloadSource,
     syncOptions?: SyncOptions,
   ): Promise<void>
 
@@ -69,13 +68,13 @@ export interface MutatorClientInterface {
    */
   runTransactionalMutations(
     transactions: TransactionalMutation[],
-    payloadSource?: Payloads.PayloadSource,
+    payloadSource?: Models.PayloadSource,
     payloadSourceKey?: string,
   ): Promise<(Models.SNItem | undefined)[]>
 
   runTransactionalMutation(
     transaction: TransactionalMutation,
-    payloadSource?: Payloads.PayloadSource,
+    payloadSource?: Models.PayloadSource,
     payloadSourceKey?: string,
   ): Promise<Models.SNItem | undefined>
 
@@ -94,26 +93,29 @@ export interface MutatorClientInterface {
   /**
    * Takes the values of the input item and emits it onto global state.
    */
-  mergeItem(item: Models.SNItem, source: Payloads.PayloadSource): Promise<Models.SNItem>
+  mergeItem(item: Models.SNItem, source: Models.PayloadSource): Promise<Models.SNItem>
 
   /**
    * Creates a managed item.
    * @param needsSync  Whether to mark the item as needing sync. `add` must also be true.
    */
-  createManagedItem(
+  createManagedItem<C extends Models.ItemContent = Models.ItemContent>(
     contentType: ContentType,
-    content: Payloads.PayloadContent,
-    needsSync?: boolean,
-    override?: Payloads.PayloadOverride,
-  ): Promise<Models.SNItem>
+    content: Models.ItemContent,
+    needsSync: boolean,
+    override?: Partial<Models.PayloadInterface<C>>,
+  ): Promise<Models.ItemInterface<C>>
 
   /**
    * Creates an unmanaged item that can be added later.
    */
-  createTemplateItem(
+  createTemplateItem<
+    C extends Models.ItemContent = Models.ItemContent,
+    I extends Models.ItemInterface = Models.ItemInterface,
+  >(
     contentType: ContentType,
-    content?: Payloads.PayloadContent,
-  ): Promise<Models.SNItem>
+    content?: C,
+  ): I
 
   /**
    * @param isUserModified  Whether to change the modified date the user
@@ -132,7 +134,7 @@ export interface MutatorClientInterface {
 
   duplicateItem<T extends Models.SNItem>(
     item: T,
-    additionalContent?: Partial<Payloads.PayloadContent>,
+    additionalContent?: Partial<Models.ItemContent>,
   ): Promise<T>
 
   /**

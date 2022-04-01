@@ -10,12 +10,7 @@ import {
   ItemsServerInterface,
   StorageKey,
 } from '@standardnotes/services'
-import {
-  ApiEndpointParam,
-  CreateValetTokenPayload,
-  IntegrityPayload,
-  PurePayload,
-} from '@standardnotes/models'
+import { IntegrityPayload, PurePayload } from '@standardnotes/models'
 import * as Responses from '@standardnotes/responses'
 import { API_MESSAGE_FAILED_OFFLINE_ACTIVATION } from '@Lib/Services/Api/Messages'
 import { EncryptedFileInterface } from '../Files/types'
@@ -35,7 +30,11 @@ import { SettingsServerInterface } from '../Settings/SettingsServerInterface'
 import { Strings } from '@Lib/Strings'
 import { SNRootKeyParams } from '@standardnotes/encryption'
 import { SNFeatureRepo } from '@standardnotes/models'
-import { ClientDisplayableError } from '@standardnotes/responses'
+import {
+  ApiEndpointParam,
+  ClientDisplayableError,
+  CreateValetTokenPayload,
+} from '@standardnotes/responses'
 
 /** Legacy api version field to be specified in params when calling v0 APIs. */
 const V0_API_VERSION = '20200115'
@@ -731,12 +730,18 @@ export class SNApiService
     try {
       const featuresUrl = repo.offlineFeaturesUrl
       const extensionKey = repo.offlineKey
+      if (!featuresUrl || !extensionKey) {
+        throw Error('Cannot download offline repo without url and offlineKEy')
+      }
+
       const { host } = new URL(featuresUrl)
+
       if (!TRUSTED_FEATURE_HOSTS.includes(host)) {
         return new ClientDisplayableError(
           'This offline features host is not in the trusted allowlist.',
         )
       }
+
       const response: Responses.HttpResponse | Responses.GetOfflineFeaturesResponse =
         await this.request({
           verb: HttpVerb.Get,
@@ -744,6 +749,7 @@ export class SNApiService
           fallbackErrorMessage: messages.API_MESSAGE_FAILED_OFFLINE_FEATURES,
           customHeaders: [{ key: 'x-offline-token', value: extensionKey }],
         })
+
       if (response.error) {
         return ClientDisplayableError.FromError(response.error)
       }

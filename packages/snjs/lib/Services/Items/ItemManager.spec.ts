@@ -4,7 +4,6 @@ import { ItemManager } from './ItemManager'
 import { PayloadManager } from '../Payloads/PayloadManager'
 import { UuidGenerator } from '@standardnotes/utils'
 import * as Models from '@standardnotes/models'
-import * as Payloads from '@standardnotes/models'
 
 const setupRandomUuid = () => {
   UuidGenerator.SetGenerator(() => String(Math.random()))
@@ -14,19 +13,19 @@ const VIEW_NOT_PINNED = '!["Not Pinned", "pinned", "=", false]'
 const VIEW_LAST_DAY = '!["Last Day", "updated_at", ">", "1.days.ago"]'
 const VIEW_LONG = '!["Long", "text.length", ">", 500]'
 
-const NotPinnedPredicate = Payloads.predicateFromJson<Models.SNTag>({
+const NotPinnedPredicate = Models.predicateFromJson<Models.SNTag>({
   keypath: 'pinned',
   operator: '=',
   value: false,
 })
 
-const LastDayPredicate = Payloads.predicateFromJson<Models.SNTag>({
+const LastDayPredicate = Models.predicateFromJson<Models.SNTag>({
   keypath: 'updated_at',
   operator: '>',
   value: '1.days.ago',
 })
 
-const LongTextPredicate = Payloads.predicateFromJson<Models.SNTag>({
+const LongTextPredicate = Models.predicateFromJson<Models.SNTag>({
   keypath: 'text.length' as never,
   operator: '>',
   value: 500,
@@ -63,10 +62,10 @@ describe('itemManager', () => {
 
   const createTag = (title: string) => {
     return new Models.SNTag(
-      Payloads.CreateMaxPayloadFromAnyObject({
+      Models.CreateMaxPayloadFromAnyObject({
         uuid: String(Math.random()),
         content_type: ContentType.Tag,
-        content: Payloads.FillItemContent({
+        content: Models.FillItemContent<Models.TagContent>({
           title: title,
         }),
       }),
@@ -75,10 +74,10 @@ describe('itemManager', () => {
 
   const createNote = (title: string) => {
     return new Models.SNNote(
-      Payloads.CreateMaxPayloadFromAnyObject({
+      Models.CreateMaxPayloadFromAnyObject({
         uuid: String(Math.random()),
         content_type: ContentType.Note,
-        content: Payloads.FillItemContent({
+        content: Models.FillItemContent<Models.NoteContent>({
           title: title,
         }),
       }),
@@ -87,10 +86,10 @@ describe('itemManager', () => {
 
   const createFile = (name: string) => {
     return new Models.SNFile(
-      Payloads.CreateMaxPayloadFromAnyObject({
+      Models.CreateMaxPayloadFromAnyObject({
         uuid: String(Math.random()),
         content_type: ContentType.File,
-        content: Payloads.FillItemContent({
+        content: Models.FillItemContent<Models.FileContent>({
           name: name,
         }),
       }),

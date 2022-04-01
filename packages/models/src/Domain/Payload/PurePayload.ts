@@ -6,10 +6,9 @@ import {
   protocolVersionFromEncryptedString,
 } from '@standardnotes/common'
 import { deepFreeze, isNullOrUndefined, isObject, isString } from '@standardnotes/utils'
-
+import { ItemContent } from '../Item/ItemContent'
 import { ContentReference } from '../Reference/ContentReference'
 import { FillItemContent } from './Functions'
-import { PayloadContent } from './PayloadContent'
 import { PayloadField } from './PayloadField'
 import { PayloadFormat } from './PayloadFormat'
 import { PayloadInterface } from './PayloadInterface'
@@ -32,7 +31,7 @@ import { RawPayload } from './RawPayload'
  * Payloads also have a content format. Formats can either be
  * EncryptedString or DecryptedBareObject.
  */
-export class PurePayload<C extends PayloadContent = PayloadContent> implements PayloadInterface<C> {
+export class PurePayload<C extends ItemContent = ItemContent> implements PayloadInterface<C> {
   /** When constructed, the payload takes in an array of fields that the input raw payload
    * contains. These fields allow consumers to determine whether a given payload has an actual
    * undefined value for payload.content, for example, or whether the payload was constructed
@@ -117,7 +116,7 @@ export class PurePayload<C extends PayloadContent = PayloadContent> implements P
 
     if (isString(this.content)) {
       this.version = protocolVersionFromEncryptedString(this.content as string)
-    } else if (this.content) {
+    } else if (this.content && this.content.version) {
       this.version = this.content.version
     } else {
       this.version = ProtocolVersion.V001
@@ -144,7 +143,7 @@ export class PurePayload<C extends PayloadContent = PayloadContent> implements P
    * generic, non-contextual consumption, such as saving to a backup file or syncing
    * with a server.
    */
-  ejected(): RawPayload {
+  ejected(): RawPayload<C> {
     const optionalFields = [PayloadField.Legacy003AuthHash, PayloadField.Deleted]
     const nonRequiredFields = [
       PayloadField.DirtiedDate,
@@ -154,7 +153,9 @@ export class PurePayload<C extends PayloadContent = PayloadContent> implements P
       PayloadField.LastSyncBegan,
       PayloadField.LastSyncEnd,
     ]
-    const result = {} as RawPayload
+
+    const result = {} as RawPayload<C>
+
     for (const field of this.fields) {
       if (nonRequiredFields.includes(field)) {
         continue
@@ -165,6 +166,7 @@ export class PurePayload<C extends PayloadContent = PayloadContent> implements P
       }
       result[field] = value
     }
+
     return result
   }
 

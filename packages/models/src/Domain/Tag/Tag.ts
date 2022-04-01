@@ -1,6 +1,7 @@
 import { ContentType, Uuid } from '@standardnotes/common'
 import { SNItem } from '../Item'
-import { ItemContent, ItemInterface } from '../Item/ItemInterface'
+import { ItemInterface } from '../Item/ItemInterface'
+import { ItemContent } from "../Item/ItemContent"
 import { PayloadInterface } from '../Payload/PayloadInterface'
 import { ContentReference } from '../Reference/ContentReference'
 import { isTagToParentTagReference } from '../Reference/Functions'

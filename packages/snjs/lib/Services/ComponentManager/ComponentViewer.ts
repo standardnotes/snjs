@@ -24,17 +24,17 @@ import {
   platformToString,
 } from '@Lib/Application/Platforms'
 import {
-  PayloadContent,
+  ItemContent,
   RawPayload,
   CreateSourcedPayloadFromObject,
   PayloadSource,
   PayloadFormat,
+  ComponentDataDomain,
 } from '@standardnotes/models'
 import {
   ComponentMessage,
   MessageReplyData,
   ItemMessagePayload,
-  ComponentDataDomain,
   MessageReply,
   StreamItemsMessageData,
   AllowedBatchContentTypes,
@@ -352,7 +352,7 @@ export class ComponentViewer {
     return this.responseItemsByRemovingPrivateProperties([params])[0]
   }
 
-  contentForItem(item: SNItem): PayloadContent | string | undefined {
+  contentForItem(item: SNItem): ItemContent | string | undefined {
     if (
       item.content_type === ContentType.Note &&
       item.payload.format === PayloadFormat.DecryptedBareObject
@@ -431,6 +431,7 @@ export class ComponentViewer {
     if (removeUrls) {
       privateContentProperties = privateContentProperties.concat(['hosted_url', 'local_url'])
     }
+
     return responseItems.map((responseItem) => {
       const privateProperties = privateContentProperties.slice()
       /** Server extensions are allowed to modify url property */
@@ -440,13 +441,17 @@ export class ComponentViewer {
       if (!responseItem.content || isString(responseItem.content)) {
         return responseItem
       }
-      const content: Partial<PayloadContent> = {}
+
+      let content: Partial<ItemContent> = {}
       for (const [key, value] of Object.entries(responseItem.content)) {
-        /** Only include non-private properties */
         if (!privateProperties.includes(key)) {
-          content[key] = value
+          content = {
+            ...content,
+            [key]: value,
+          }
         }
       }
+
       return {
         ...responseItem,
         content: content,
@@ -634,6 +639,7 @@ export class ComponentViewer {
     this.componentManagerFunctions.runWithPermissions(
       this.component.uuid,
       requiredPermissions,
+
       async () => {
         responsePayloads = this.responseItemsByRemovingPrivateProperties(responsePayloads, true)
         /* Filter locked items */
@@ -739,7 +745,7 @@ export class ComponentViewer {
         const processedItems = []
         for (const responseItem of responseItems) {
           if (!responseItem.uuid) {
-            responseItem.uuid = await UuidGenerator.GenerateUuid()
+            responseItem.uuid = UuidGenerator.GenerateUuid()
           }
           const payload = CreateSourcedPayloadFromObject(
             responseItem,

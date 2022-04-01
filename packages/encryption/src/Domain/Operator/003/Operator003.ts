@@ -1,6 +1,5 @@
 import { splitString } from '@standardnotes/utils'
-import { CreateItemFromPayload, ItemsKeyInterface } from '@standardnotes/models'
-import { ItemsKeyContent } from '../Operator'
+import { CreateItemFromPayload, ItemsKeyContent, ItemsKeyInterface } from '@standardnotes/models'
 import { SNRootKey } from '../../RootKey/RootKey'
 import { V003Algorithm } from '../../Algorithm'
 import { Create003KeyParams } from '../../RootKey/KeyParams'
@@ -9,6 +8,7 @@ import { CreateMaxPayloadFromAnyObject, FillItemContent } from '@standardnotes/m
 import { ContentType, KeyParamsOrigination, ProtocolVersion } from '@standardnotes/common'
 import { UuidGenerator } from '@standardnotes/utils'
 import { SNRootKeyParams } from '../../RootKey/RootKeyParams'
+import { CreateNewRootKey } from '../../RootKey/Functions'
 
 /**
  * @legacy
@@ -25,11 +25,11 @@ export class SNProtocolOperator003 extends SNProtocolOperator002 {
     const keyLength = V003Algorithm.EncryptionKeyLength
     const itemsKey = this.crypto.generateRandomKey(keyLength)
     const authKey = this.crypto.generateRandomKey(keyLength)
-    const response: ItemsKeyContent = {
+    const response = FillItemContent<ItemsKeyContent>({
       itemsKey: itemsKey,
       dataAuthenticationKey: authKey,
       version: ProtocolVersion.V003,
-    }
+    })
     return response
   }
 
@@ -71,14 +71,14 @@ export class SNProtocolOperator003 extends SNProtocolOperator002 {
     }
 
     const partitions = splitString(derivedKey, 3)
-    const key = SNRootKey.Create({
+
+    return CreateNewRootKey({
       serverPassword: partitions[0],
       masterKey: partitions[1],
       dataAuthenticationKey: partitions[2],
       version: ProtocolVersion.V003,
       keyParams: keyParams.getPortableValue(),
     })
-    return key
   }
 
   public async createRootKey(

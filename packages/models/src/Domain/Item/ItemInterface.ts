@@ -1,22 +1,12 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Uuid, ProtocolVersion, ContentType } from '@standardnotes/common'
 import { AppDataField } from './AppDataField'
-import { AppData, ComponentDataDomain, DefaultAppDomain } from './DefaultAppDomain'
-import { PayloadContent } from '../Payload/PayloadContent'
+import { ComponentDataDomain, DefaultAppDomain } from './DefaultAppDomain'
 import { PayloadInterface } from '../Payload/PayloadInterface'
-import { PayloadOverride } from '../Payload/PayloadOverride'
 import { PredicateInterface } from '../Predicate/Interface'
 import { ContentReference } from '../Reference/ContentReference'
 import { PrefKey } from '../UserPrefs/PrefKey'
-
-export interface ItemContent extends PayloadContent {
-  protected?: boolean
-  trashed?: boolean
-  pinned?: boolean
-  archived?: boolean
-  locked?: boolean
-  appData?: AppData
-}
+import { ItemContent } from './ItemContent'
 
 export interface ItemInterface<C extends ItemContent = ItemContent> {
   readonly payload: PayloadInterface
@@ -61,7 +51,7 @@ export interface ItemInterface<C extends ItemContent = ItemContent> {
   getAppDomainValueWithDefault<T, D extends T>(key: AppDataField | PrefKey, defaultValue: D): T
   getAppDomainValue(key: any): any
   isItemContentEqualWith(otherItem: ItemInterface): boolean
-  payloadRepresentation(override?: PayloadOverride): PayloadInterface
+  payloadRepresentation(override?: Partial<PayloadInterface<C>>): PayloadInterface
   hasRelationshipWithItem(item: ItemInterface): boolean
   getDomainData(
     domain: typeof ComponentDataDomain | typeof DefaultAppDomain,

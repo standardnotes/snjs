@@ -5,16 +5,15 @@ import { remove } from 'lodash'
 import { PurePayload } from '../Payload/PurePayload'
 import { ImmutablePayloadCollection } from '../Collection/ImmutablePayloadCollection'
 import { ContentReference } from '../Reference/ContentReference'
-import { PayloadContent } from './PayloadContent'
 import { PayloadField } from './PayloadField'
 import { PayloadInterface } from './PayloadInterface'
-import { PayloadOverride } from './PayloadOverride'
 import { PayloadSource } from './PayloadSource'
 import { RawPayload } from './RawPayload'
 import { PayloadFormat } from './PayloadFormat'
 import { DefaultAppDomain } from '../Item/DefaultAppDomain'
 import { AppDataField } from '../Item/AppDataField'
-import { ItemContent } from '../Item'
+import { ItemContent, SpecializedContent } from '../Item/ItemContent'
+import { Writeable } from '../Writeable'
 
 /**
  * Return the payloads that result if you alternated the uuid for the payload.
@@ -35,8 +34,8 @@ export async function PayloadsByAlternatingUuid(
     uuid: UuidGenerator.GenerateUuid(),
     dirty: true,
     dirtiedDate: new Date(),
-    lastSyncBegan: null,
-    lastSyncEnd: null,
+    lastSyncBegan: undefined,
+    lastSyncEnd: undefined,
     duplicate_of: payload.uuid,
   })
   results.push(copy)
@@ -153,11 +152,11 @@ export function payloadFieldsForSource(source: PayloadSource): PayloadField[] {
     throw `No payload fields found for source ${source}`
   }
 }
-export function CreatePayload<C extends PayloadContent = PayloadContent>(
+export function CreatePayload<C extends ItemContent = ItemContent>(
   object: any,
   fields: PayloadField[],
   source?: PayloadSource,
-  override?: PayloadOverride,
+  override?: Partial<PayloadInterface<C>>,
 ): PayloadInterface<C> {
   const rawPayload = pickByCopy(object, fields)
 
@@ -176,18 +175,30 @@ export function CreatePayload<C extends PayloadContent = PayloadContent>(
   return new PurePayload(rawPayload, newFields, source || PayloadSource.Constructor)
 }
 
-export function CopyPayload<C extends PayloadContent = PayloadContent>(
+export function CopyPayload<C extends ItemContent = ItemContent>(
   payload: PayloadInterface<C>,
-  override?: PayloadOverride,
+  override?: Partial<PayloadInterface<C>>,
 ): PayloadInterface<C> {
   return CreatePayload(payload, payload.fields, payload.source, override)
 }
 
-export function CreateSourcedPayloadFromObject(
-  object: RawPayload,
+export function CopyPayloadWithContentOverride<C extends ItemContent = ItemContent>(
+  payload: PayloadInterface<C>,
+  contentOverride: Partial<C>,
+): PayloadInterface<C> {
+  return CreatePayload(payload, payload.fields, payload.source, {
+    content: {
+      ...payload.safeContent,
+      ...contentOverride,
+    },
+  })
+}
+
+export function CreateSourcedPayloadFromObject<C extends ItemContent = ItemContent>(
+  object: RawPayload<C>,
   source: PayloadSource,
-  override?: PayloadOverride,
-): PayloadInterface {
+  override?: Partial<PayloadInterface<C>>,
+): PayloadInterface<C> {
   const payloadFields = payloadFieldsForSource(source)
   return CreatePayload(object, payloadFields, source, override)
 }
@@ -198,29 +209,32 @@ export function CreateSourcedPayloadFromObject(
  * fields. If override value is passed, values in here take final precedence, including
  * above both payload and mergeWith values.
  */
-export function PayloadByMerging(
-  payload: PayloadInterface,
-  mergeWith: PayloadInterface,
+export function PayloadByMerging<C extends ItemContent = ItemContent>(
+  payload: PayloadInterface<C>,
+  mergeWith: PayloadInterface<C>,
   fields?: PayloadField[],
-  override?: PayloadOverride,
-): PayloadInterface {
-  const resultOverride: PayloadOverride = {}
+  override?: Partial<PayloadInterface<C>>,
+): PayloadInterface<C> {
+  const resultOverride: Writeable<Partial<PayloadInterface<C>>> = {}
   const useFields = fields || mergeWith.fields
+
   for (const field of useFields) {
     resultOverride[field] = mergeWith[field]
   }
+
   if (override) {
     const keys = Object.keys(override) as PayloadField[]
     for (const key of keys) {
       resultOverride[key] = override[key]
     }
   }
+
   return CopyPayload(payload, resultOverride)
 }
 
-export function CreateMaxPayloadFromAnyObject<C extends PayloadContent = PayloadContent>(
-  object: RawPayload,
-  override?: PayloadOverride,
+export function CreateMaxPayloadFromAnyObject<C extends ItemContent = ItemContent>(
+  object: RawPayload<C>,
+  override?: Partial<PayloadInterface<C>>,
   source?: PayloadSource,
 ): PayloadInterface<C> {
   return CreatePayload(object, MaxPayloadFields.slice(), source, override)
@@ -363,7 +377,7 @@ export function isPayloadSourceRetrieved(source: PayloadSource): boolean {
  * Modifies the input object to fill in any missing required values from the
  * content body.
  */
-export function FillItemContent<C extends ItemContent = ItemContent>(content: C): C {
+export function FillItemContent<C extends ItemContent = ItemContent>(content: Partial<C>): C {
   if (!content.references) {
     content.references = []
   }
@@ -382,7 +396,33 @@ export function FillItemContent<C extends ItemContent = ItemContent>(content: C)
     content.appData[DefaultAppDomain][AppDataField.UserModifiedDate] = `${new Date()}`
   }
 
-  return content
+  return content as C
+}
+
+export function FillItemContentSpecialized<
+  S extends SpecializedContent,
+  C extends ItemContent = ItemContent,
+>(content: S): C {
+  const typedContent = content as unknown as C
+  if (!typedContent.references) {
+    typedContent.references = []
+  }
+
+  if (!typedContent.appData) {
+    typedContent.appData = {
+      [DefaultAppDomain]: {},
+    }
+  }
+
+  if (!typedContent.appData[DefaultAppDomain]) {
+    typedContent.appData[DefaultAppDomain] = {}
+  }
+
+  if (!typedContent.appData[DefaultAppDomain][AppDataField.UserModifiedDate]) {
+    typedContent.appData[DefaultAppDomain][AppDataField.UserModifiedDate] = `${new Date()}`
+  }
+
+  return typedContent
 }
 
 export function filterDisallowedRemotePayloads(payloads: PurePayload[]): PurePayload[] {

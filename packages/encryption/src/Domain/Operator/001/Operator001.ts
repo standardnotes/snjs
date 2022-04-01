@@ -13,6 +13,8 @@ import {
   ItemsKeyInterface,
   CreateMaxPayloadFromAnyObject,
   FillItemContent,
+  PayloadInterface,
+  ItemContent,
 } from '@standardnotes/models'
 import { SNPureCrypto } from '@standardnotes/sncrypto-common'
 import { SNRootKey } from '../../RootKey/RootKey'
@@ -28,6 +30,7 @@ import { RootKeyEncryptedAuthenticatedData } from '../../Encryption/RootKeyEncry
 import { ItemAuthenticatedData } from '../../Encryption/ItemAuthenticatedData'
 import { LegacyAttachedData } from '../../Encryption/LegacyAttachedData'
 import { isItemsKey } from '../../ItemsKey'
+import { CreateNewRootKey } from '../../RootKey/Functions'
 
 const NO_IV = '00000000000000000000000000000000'
 
@@ -53,7 +56,7 @@ export class SNProtocolOperator001 implements AsynchronousOperator {
   protected generateNewItemsKeyContent(): ItemsKeyContent {
     const keyLength = V001Algorithm.EncryptionKeyLength
     const itemsKey = this.crypto.generateRandomKey(keyLength)
-    const response: ItemsKeyContent = FillItemContent({
+    const response = FillItemContent<ItemsKeyContent>({
       itemsKey: itemsKey,
       version: ProtocolVersion.V001,
     })
@@ -65,11 +68,10 @@ export class SNProtocolOperator001 implements AsynchronousOperator {
    * The consumer must save/sync this item.
    */
   public createItemsKey(): ItemsKeyInterface {
-    const content = this.generateNewItemsKeyContent()
     const payload = CreateMaxPayloadFromAnyObject({
       uuid: UuidGenerator.GenerateUuid(),
       content_type: ContentType.ItemsKey,
-      content: FillItemContent(content),
+      content: this.generateNewItemsKeyContent(),
     })
     return CreateItemFromPayload(payload)
   }
@@ -115,7 +117,7 @@ export class SNProtocolOperator001 implements AsynchronousOperator {
   }
 
   public async generateEncryptedParametersAsync(
-    payload: Payloads.PurePayload,
+    payload: PayloadInterface,
     key: ItemsKeyInterface | SNRootKey,
   ): Promise<EncryptedParameters> {
     /**
@@ -146,10 +148,10 @@ export class SNProtocolOperator001 implements AsynchronousOperator {
     }
   }
 
-  public async generateDecryptedParametersAsync(
+  public async generateDecryptedParametersAsync<C extends ItemContent = ItemContent>(
     encrypted: EncryptedParameters,
     key: ItemsKeyInterface | SNRootKey,
-  ): Promise<DecryptedParameters | ErroredDecryptingParameters> {
+  ): Promise<DecryptedParameters<C> | ErroredDecryptingParameters> {
     if (!encrypted.enc_item_key) {
       console.error(Error('Missing item encryption key, skipping decryption.'))
       return {
@@ -216,13 +218,11 @@ export class SNProtocolOperator001 implements AsynchronousOperator {
 
     const partitions = splitString(derivedKey, 2)
 
-    const key = SNRootKey.Create({
+    return CreateNewRootKey({
       serverPassword: partitions[0],
       masterKey: partitions[1],
       version: ProtocolVersion.V001,
       keyParams: keyParams.getPortableValue(),
     })
-
-    return key
   }
 }

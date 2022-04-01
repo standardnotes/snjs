@@ -1,62 +1,38 @@
+import { AbstractService, InternalEventBusInterface } from '@standardnotes/services'
 import { Base64String } from '@standardnotes/sncrypto-common'
-import { Subscription } from '@standardnotes/auth'
 import { ClientDisplayableError } from '@standardnotes/responses'
-import {
-  ProtocolVersion,
-  AnyKeyParamsContent,
-  KeyParamsOrigination,
-  isProtocolVersionExpired,
-  leftVersionGreaterThanOrEqualToRight,
-} from '@standardnotes/common'
-import {
-  ChallengeKeyboardType,
-  ChallengeValidation,
-  Challenge,
-  ChallengePrompt,
-  ChallengeReason,
-  ChallengeService,
-} from '../Challenge'
-import {
-  GetSubscriptionResponse,
-  ChangeCredentialsResponse,
-  HttpResponse,
-  KeyParamsResponse,
-  RegistrationResponse,
-  SessionListResponse,
-  SignInResponse,
-  StatusCode,
-  User,
-  AvailableSubscriptions,
-  GetAvailableSubscriptionsResponse,
-} from '@standardnotes/responses'
-import { EncryptionService } from '@standardnotes/encryption'
+import { CopyPayloadWithContentOverride } from '@standardnotes/models'
+import { EncryptionService, CreateNewRootKey } from '@standardnotes/encryption'
+import { isNullOrUndefined } from '@standardnotes/utils'
+import { JwtSession } from './Sessions/JwtSession'
+import { KeyParamsFromApiResponse, SNRootKeyParams, SNRootKey } from '@standardnotes/encryption'
+import { PromptTitles, RegisterStrings, SessionStrings, SignInStrings } from '../Api/Messages'
+import { RemoteSession, RawStorageValue } from './Sessions/Types'
+import { Session } from './Sessions/Session'
+import { SessionFromRawStorageValue } from './Sessions/Generator'
+import { SessionsClientInterface } from './SessionsClientInterface'
+import { ShareToken } from './ShareToken'
+import { SNAlertService } from '@Lib/Services/Alert/AlertService'
 import { SNApiService } from '../Api/ApiService'
 import { SNStorageService } from '../Storage/StorageService'
-import { KeyParamsFromApiResponse, SNRootKeyParams, SNRootKey } from '@standardnotes/encryption'
-import { isNullOrUndefined } from '@standardnotes/utils'
-import { SNAlertService } from '@Lib/Services/Alert/AlertService'
-import { StorageKey } from '@standardnotes/services'
-import * as messages from '../Api/Messages'
-import { PromptTitles, RegisterStrings, SessionStrings, SignInStrings } from '../Api/Messages'
-import { UuidString } from '@Lib/Types/UuidString'
 import { SNWebSocketsService } from '../Api/WebsocketsService'
-import { AbstractService, InternalEventBusInterface } from '@standardnotes/services'
+import { StorageKey } from '@standardnotes/services'
 import { Strings } from '@Lib/Strings'
-import { ShareToken } from './ShareToken'
-import { Session } from './Sessions/Session'
-import { RemoteSession, RawStorageValue } from './Sessions/Types'
+import { Subscription } from '@standardnotes/auth'
 import { TokenSession } from './Sessions/TokenSession'
-import { JwtSession } from './Sessions/JwtSession'
-import { SessionsClientInterface } from './SessionsClientInterface'
-import { SessionFromRawStorageValue } from './Sessions/Generator'
+import { UuidString } from '@Lib/Types/UuidString'
+import * as Challenge from '../Challenge'
+import * as Common from '@standardnotes/common'
+import * as Messages from '../Api/Messages'
+import * as Responses from '@standardnotes/responses'
 
 export const MINIMUM_PASSWORD_LENGTH = 8
 export const MissingAccountParams = 'missing-params'
 
 type SessionManagerResponse = {
-  response: HttpResponse
+  response: Responses.HttpResponse
   rootKey?: SNRootKey
-  keyParams?: AnyKeyParamsContent
+  keyParams?: Common.AnyKeyParamsContent
 }
 
 const cleanedEmailString = (email: string) => {
@@ -77,7 +53,7 @@ export class SNSessionManager
   extends AbstractService<SessionEvent>
   implements SessionsClientInterface
 {
-  private user?: User
+  private user?: Responses.User
   private isSessionRenewChallengePresented = false
 
   constructor(
@@ -85,7 +61,7 @@ export class SNSessionManager
     private apiService: SNApiService,
     private alertService: SNAlertService,
     private protocolService: EncryptionService,
-    private challengeService: ChallengeService,
+    private challengeService: Challenge.ChallengeService,
     private webSocketsService: SNWebSocketsService,
     protected internalEventBus: InternalEventBusInterface,
   ) {
@@ -110,7 +86,7 @@ export class SNSessionManager
     super.deinit()
   }
 
-  private setUser(user?: User) {
+  private setUser(user?: Responses.User) {
     this.user = user
     this.apiService.setUser(user)
   }
@@ -151,7 +127,7 @@ export class SNSessionManager
   }
 
   public getSureUser() {
-    return this.user as User
+    return this.user as Responses.User
   }
 
   public getSession() {
@@ -177,27 +153,27 @@ export class SNSessionManager
 
   public async reauthenticateInvalidSession(
     cancelable = true,
-    onResponse?: (response: HttpResponse) => void,
+    onResponse?: (response: Responses.HttpResponse) => void,
   ): Promise<void> {
     if (this.isSessionRenewChallengePresented) {
       return
     }
     this.isSessionRenewChallengePresented = true
-    const challenge = new Challenge(
+    const challenge = new Challenge.Challenge(
       [
-        new ChallengePrompt(
-          ChallengeValidation.None,
+        new Challenge.ChallengePrompt(
+          Challenge.ChallengeValidation.None,
           undefined,
           SessionStrings.EmailInputPlaceholder,
           false,
         ),
-        new ChallengePrompt(
-          ChallengeValidation.None,
+        new Challenge.ChallengePrompt(
+          Challenge.ChallengeValidation.None,
           undefined,
           SessionStrings.PasswordInputPlaceholder,
         ),
       ],
-      ChallengeReason.Custom,
+      Challenge.ChallengeReason.Custom,
       cancelable,
       SessionStrings.EnterEmailAndPassword,
       SessionStrings.RecoverSession(this.getUser()?.email),
@@ -247,13 +223,13 @@ export class SNSessionManager
       return ClientDisplayableError.FromError(result.error)
     }
 
-    const subscription = (result as GetSubscriptionResponse).data!.subscription!
+    const subscription = (result as Responses.GetSubscriptionResponse).data!.subscription!
 
     return subscription
   }
 
   public async getAvailableSubscriptions(): Promise<
-    AvailableSubscriptions | ClientDisplayableError
+    Responses.AvailableSubscriptions | ClientDisplayableError
   > {
     const response = await this.apiService.getAvailableSubscriptions()
 
@@ -261,21 +237,21 @@ export class SNSessionManager
       return ClientDisplayableError.FromError(response.error)
     }
 
-    return (response as GetAvailableSubscriptionsResponse).data!
+    return (response as Responses.GetAvailableSubscriptionsResponse).data!
   }
 
   private async promptForMfaValue() {
-    const challenge = new Challenge(
+    const challenge = new Challenge.Challenge(
       [
-        new ChallengePrompt(
-          ChallengeValidation.None,
+        new Challenge.ChallengePrompt(
+          Challenge.ChallengeValidation.None,
           PromptTitles.Mfa,
           SessionStrings.MfaInputPlaceholder,
           false,
-          ChallengeKeyboardType.Numeric,
+          Challenge.ChallengeKeyboardType.Numeric,
         ),
       ],
-      ChallengeReason.Custom,
+      Challenge.ChallengeReason.Custom,
       true,
       SessionStrings.EnterMfa,
     )
@@ -294,7 +270,7 @@ export class SNSessionManager
     if (password.length < MINIMUM_PASSWORD_LENGTH) {
       return {
         response: this.apiService.createErrorResponse(
-          messages.InsufficientPasswordMessage(MINIMUM_PASSWORD_LENGTH),
+          Messages.InsufficientPasswordMessage(MINIMUM_PASSWORD_LENGTH),
         ),
       }
     }
@@ -303,7 +279,7 @@ export class SNSessionManager
       return {
         response: this.apiService.createErrorResponse(
           RegisterStrings.PasscodeRequired,
-          StatusCode.LocalValidationError,
+          Responses.StatusCode.LocalValidationError,
         ),
       }
     }
@@ -311,7 +287,7 @@ export class SNSessionManager
     const rootKey = await this.protocolService.createRootKey(
       email,
       password,
-      KeyParamsOrigination.Registration,
+      Common.KeyParamsOrigination.Registration,
     )
     const serverPassword = rootKey.serverPassword!
     const keyParams = rootKey.keyParams
@@ -323,7 +299,7 @@ export class SNSessionManager
     )
     if (!registerResponse.error && registerResponse.data) {
       await this.handleSuccessAuthResponse(
-        registerResponse as RegistrationResponse,
+        registerResponse as Responses.RegistrationResponse,
         rootKey,
         wrappingKey,
       )
@@ -340,7 +316,7 @@ export class SNSessionManager
     mfaCode?: string,
   ): Promise<{
     keyParams?: SNRootKeyParams
-    response: KeyParamsResponse | HttpResponse
+    response: Responses.KeyParamsResponse | Responses.HttpResponse
     mfaKeyPath?: string
     mfaCode?: string
   }> {
@@ -357,7 +333,7 @@ export class SNSessionManager
           return {
             response: this.apiService.createErrorResponse(
               SignInStrings.SignInCanceledMissingMfa,
-              StatusCode.CanceledMfa,
+              Responses.StatusCode.CanceledMfa,
             ),
           }
         }
@@ -367,10 +343,10 @@ export class SNSessionManager
       }
     }
     /** Make sure to use client value for identifier/email */
-    const keyParams = KeyParamsFromApiResponse(response as KeyParamsResponse, email)
+    const keyParams = KeyParamsFromApiResponse(response as Responses.KeyParamsResponse, email)
     if (!keyParams || !keyParams.version) {
       return {
-        response: this.apiService.createErrorResponse(messages.API_MESSAGE_FALLBACK_LOGIN_FAIL),
+        response: this.apiService.createErrorResponse(Messages.API_MESSAGE_FALLBACK_LOGIN_FAIL),
       }
     }
     return { keyParams, response, mfaKeyPath, mfaCode }
@@ -381,13 +357,13 @@ export class SNSessionManager
     password: string,
     strict = false,
     ephemeral = false,
-    minAllowedVersion?: ProtocolVersion,
+    minAllowedVersion?: Common.ProtocolVersion,
   ): Promise<SessionManagerResponse> {
     const result = await this.performSignIn(email, password, strict, ephemeral, minAllowedVersion)
     if (
       result.response.error &&
-      result.response.error.status !== StatusCode.LocalValidationError &&
-      result.response.error.status !== StatusCode.CanceledMfa
+      result.response.error.status !== Responses.StatusCode.LocalValidationError &&
+      result.response.error.status !== Responses.StatusCode.CanceledMfa
     ) {
       const cleanedEmail = cleanedEmailString(email)
       if (cleanedEmail !== email) {
@@ -408,7 +384,7 @@ export class SNSessionManager
     password: string,
     strict = false,
     ephemeral = false,
-    minAllowedVersion?: ProtocolVersion,
+    minAllowedVersion?: Common.ProtocolVersion,
   ): Promise<SessionManagerResponse> {
     const paramsResult = await this.retrieveKeyParams(email)
     if (paramsResult.response.error) {
@@ -420,21 +396,21 @@ export class SNSessionManager
     if (!this.protocolService.supportedVersions().includes(keyParams.version)) {
       if (this.protocolService.isVersionNewerThanLibraryVersion(keyParams.version)) {
         return {
-          response: this.apiService.createErrorResponse(messages.UNSUPPORTED_PROTOCOL_VERSION),
+          response: this.apiService.createErrorResponse(Messages.UNSUPPORTED_PROTOCOL_VERSION),
         }
       } else {
         return {
-          response: this.apiService.createErrorResponse(messages.EXPIRED_PROTOCOL_VERSION),
+          response: this.apiService.createErrorResponse(Messages.EXPIRED_PROTOCOL_VERSION),
         }
       }
     }
 
-    if (isProtocolVersionExpired(keyParams.version)) {
+    if (Common.isProtocolVersionExpired(keyParams.version)) {
       /* Cost minimums only apply to now outdated versions (001 and 002) */
       const minimum = this.protocolService.costMinimumForVersion(keyParams.version)
       if (keyParams.content002.pw_cost < minimum) {
         return {
-          response: this.apiService.createErrorResponse(messages.INVALID_PASSWORD_COST),
+          response: this.apiService.createErrorResponse(Messages.INVALID_PASSWORD_COST),
         }
       }
 
@@ -447,14 +423,14 @@ export class SNSessionManager
 
       if (!confirmed) {
         return {
-          response: this.apiService.createErrorResponse(messages.API_MESSAGE_FALLBACK_LOGIN_FAIL),
+          response: this.apiService.createErrorResponse(Messages.API_MESSAGE_FALLBACK_LOGIN_FAIL),
         }
       }
     }
 
     if (!this.protocolService.platformSupportsKeyDerivation(keyParams)) {
       return {
-        response: this.apiService.createErrorResponse(messages.UNSUPPORTED_KEY_DERIVATION),
+        response: this.apiService.createErrorResponse(Messages.UNSUPPORTED_KEY_DERIVATION),
       }
     }
 
@@ -463,10 +439,10 @@ export class SNSessionManager
     }
 
     if (!isNullOrUndefined(minAllowedVersion)) {
-      if (!leftVersionGreaterThanOrEqualToRight(keyParams.version, minAllowedVersion)) {
+      if (!Common.leftVersionGreaterThanOrEqualToRight(keyParams.version, minAllowedVersion)) {
         return {
           response: this.apiService.createErrorResponse(
-            messages.StrictSignInFailed(keyParams.version, minAllowedVersion),
+            Messages.StrictSignInFailed(keyParams.version, minAllowedVersion),
           ),
         }
       }
@@ -490,12 +466,12 @@ export class SNSessionManager
     mfaKeyPath?: string,
     mfaCode?: string,
     ephemeral = false,
-  ): Promise<SignInResponse | HttpResponse> {
+  ): Promise<Responses.SignInResponse | Responses.HttpResponse> {
     const { wrappingKey, canceled } = await this.challengeService.getWrappingKeyIfApplicable()
     if (canceled) {
       return this.apiService.createErrorResponse(
         SignInStrings.PasscodeRequired,
-        StatusCode.LocalValidationError,
+        Responses.StatusCode.LocalValidationError,
       )
     }
     const signInResponse = await this.apiService.signIn(
@@ -506,12 +482,13 @@ export class SNSessionManager
       ephemeral,
     )
     if (!signInResponse.error && signInResponse.data) {
-      const expandedRootKey = await SNRootKey.ExpandedCopy(
-        rootKey,
-        (signInResponse as SignInResponse).data.key_params,
+      const expandedRootKey = new SNRootKey(
+        CopyPayloadWithContentOverride(rootKey.payload, {
+          keyParams: (signInResponse as Responses.SignInResponse).data.key_params,
+        }),
       )
       await this.handleSuccessAuthResponse(
-        signInResponse as SignInResponse,
+        signInResponse as Responses.SignInResponse,
         expandedRootKey,
         wrappingKey,
       )
@@ -527,7 +504,7 @@ export class SNSessionManager
           /** User dismissed window without input */
           return this.apiService.createErrorResponse(
             SignInStrings.SignInCanceledMissingMfa,
-            StatusCode.CanceledMfa,
+            Responses.StatusCode.CanceledMfa,
           )
         }
         return this.bypassChecksAndSignInWithRootKey(
@@ -559,24 +536,24 @@ export class SNSessionManager
     })
 
     return this.processChangeCredentialsResponse(
-      response as ChangeCredentialsResponse,
+      response as Responses.ChangeCredentialsResponse,
       parameters.newRootKey,
       parameters.wrappingKey,
     )
   }
 
   public async getSessionsList(): Promise<
-    (HttpResponse & { data: RemoteSession[] }) | HttpResponse
+    (Responses.HttpResponse & { data: RemoteSession[] }) | Responses.HttpResponse
   > {
     const response = await this.apiService.getSessionsList()
     if (response.error || isNullOrUndefined(response.data)) {
       return response
     }
     ;(
-      response as HttpResponse & {
+      response as Responses.HttpResponse & {
         data: RemoteSession[]
       }
-    ).data = (response as SessionListResponse).data
+    ).data = (response as Responses.SessionListResponse).data
       .map<RemoteSession>((session) => ({
         ...session,
         updated_at: new Date(session.updated_at),
@@ -585,7 +562,7 @@ export class SNSessionManager
     return response
   }
 
-  public async revokeSession(sessionId: UuidString): Promise<HttpResponse> {
+  public async revokeSession(sessionId: UuidString): Promise<Responses.HttpResponse> {
     const response = await this.apiService.deleteSession(sessionId)
     return response
   }
@@ -593,7 +570,7 @@ export class SNSessionManager
   public async revokeAllOtherSessions(): Promise<void> {
     const response = await this.getSessionsList()
     if (response.error != undefined || response.data == undefined) {
-      throw new Error(response.error?.message ?? messages.API_MESSAGE_GENERIC_SYNC_FAIL)
+      throw new Error(response.error?.message ?? Messages.API_MESSAGE_GENERIC_SYNC_FAIL)
     }
     const sessions = response.data as RemoteSession[]
     const otherSessions = sessions.filter((session) => !session.current)
@@ -601,20 +578,20 @@ export class SNSessionManager
   }
 
   private async processChangeCredentialsResponse(
-    response: ChangeCredentialsResponse,
+    response: Responses.ChangeCredentialsResponse,
     newRootKey: SNRootKey,
     wrappingKey?: SNRootKey,
   ): Promise<SessionManagerResponse> {
     if (!response.error && response.data) {
       await this.handleSuccessAuthResponse(
-        response as ChangeCredentialsResponse,
+        response as Responses.ChangeCredentialsResponse,
         newRootKey,
         wrappingKey,
       )
     }
     return {
       response: response,
-      keyParams: (response as ChangeCredentialsResponse).data?.key_params,
+      keyParams: (response as Responses.ChangeCredentialsResponse).data?.key_params,
     }
   }
 
@@ -652,7 +629,7 @@ export class SNSessionManager
   public async populateSessionFromDemoShareToken(token: Base64String): Promise<void> {
     const sharePayload = this.decodeDemoShareToken(token)
 
-    const rootKey = SNRootKey.Create({
+    const rootKey = CreateNewRootKey({
       masterKey: sharePayload.masterKey,
       keyParams: sharePayload.keyParams,
       version: sharePayload.keyParams.version,
@@ -673,7 +650,7 @@ export class SNSessionManager
 
   private async populateSession(
     rootKey: SNRootKey,
-    user: User,
+    user: Responses.User,
     session: Session,
     host: string,
     wrappingKey?: SNRootKey,
@@ -692,12 +669,15 @@ export class SNSessionManager
   }
 
   private async handleSuccessAuthResponse(
-    response: RegistrationResponse | SignInResponse | ChangeCredentialsResponse,
+    response:
+      | Responses.RegistrationResponse
+      | Responses.SignInResponse
+      | Responses.ChangeCredentialsResponse,
     rootKey: SNRootKey,
     wrappingKey?: SNRootKey,
   ) {
     const { data } = response
-    const user = data.user as User
+    const user = data.user as Responses.User
 
     const isLegacyJwtResponse = data.token != undefined
     if (isLegacyJwtResponse) {

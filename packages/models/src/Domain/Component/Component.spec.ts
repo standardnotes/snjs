@@ -9,7 +9,7 @@ describe('component model', () => {
       CreateMaxPayloadFromAnyObject({
         uuid: String(Math.random()),
         content_type: ContentType.Component,
-        content: FillItemContent({
+        content: FillItemContent<ComponentContent>({
           url: 'http://foo.com',
           hosted_url: 'http://bar.com',
         } as ComponentContent),

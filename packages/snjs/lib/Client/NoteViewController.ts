@@ -1,4 +1,4 @@
-import { NoteMutator, SNItem, SNNote, SNTag } from '@standardnotes/models'
+import { NoteMutator, SNItem, SNNote, SNTag, NoteContent } from '@standardnotes/models'
 import { removeFromArray } from '@standardnotes/utils'
 import { ContentType } from '@standardnotes/common'
 import { PayloadSource } from '@standardnotes/models'
@@ -10,6 +10,7 @@ export const STRING_SAVING_WHILE_DOCUMENT_HIDDEN =
 export const STRING_DELETED_NOTE =
   'The note you are attempting to edit has been deleted, and is awaiting sync. Changes you make will be disregarded.'
 export const STRING_INVALID_NOTE =
+  // eslint-disable-next-line quotes
   "The note you are attempting to save can not be found or has been deleted. Changes you make will not be synced. Please copy this note's text and start a new note."
 
 export const STRING_ELLIPSES = '...'
@@ -45,11 +46,14 @@ export class NoteViewController {
 
   async initialize(): Promise<void> {
     if (!this.note) {
-      const note = (await this.application.mutator.createTemplateItem(ContentType.Note, {
-        text: '',
-        title: this.defaultTitle,
-        references: [],
-      })) as SNNote
+      const note = await this.application.mutator.createTemplateItem<NoteContent, SNNote>(
+        ContentType.Note,
+        {
+          text: '',
+          title: this.defaultTitle || '',
+          references: [],
+        },
+      )
       if (this.defaultTag) {
         const tag = this.application.items.findItem(this.defaultTag) as SNTag
         await this.application.items.addTagToNote(note, tag, true)

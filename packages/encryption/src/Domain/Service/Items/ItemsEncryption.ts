@@ -1,10 +1,9 @@
-import { ItemsKeyInterface } from '@standardnotes/models'
 import { ContentType, ProtocolVersion } from '@standardnotes/common'
 import { findDefaultItemsKey } from '../Functions'
 import { OperatorManager } from '../../Operator/OperatorManager'
 import { StandardException } from '../../StandardException'
 import * as OperatorWrapper from '../../Operator/OperatorWrapper'
-import * as Payloads from '@standardnotes/models'
+import * as Models from '@standardnotes/models'
 import * as Services from '@standardnotes/services'
 import {
   DecryptedParameters,
@@ -52,7 +51,7 @@ export class ItemsEncryptionService extends Services.AbstractService {
    */
   async repersistAllItems() {
     const items = this.itemManager.allItems()
-    const payloads = items.map((item) => Payloads.CreateMaxPayloadFromAnyObject(item))
+    const payloads = items.map((item) => Models.CreateMaxPayloadFromAnyObject(item))
     return this.storageService.savePayloads(payloads)
   }
 
@@ -60,19 +59,19 @@ export class ItemsEncryptionService extends Services.AbstractService {
     return this.itemManager.itemsKeys()
   }
 
-  public itemsKeyForPayload(payload: Payloads.PurePayload): ItemsKeyInterface | undefined {
+  public itemsKeyForPayload(payload: Models.PurePayload): Models.ItemsKeyInterface | undefined {
     return this.getItemsKeys().find(
       (key) => key.uuid === payload.items_key_id || key.duplicateOf === payload.items_key_id,
     )
   }
 
-  public getDefaultItemsKey(): ItemsKeyInterface | undefined {
+  public getDefaultItemsKey(): Models.ItemsKeyInterface | undefined {
     return findDefaultItemsKey(this.getItemsKeys())
   }
 
-  private keyToUseForItemEncryption(): ItemsKeyInterface | StandardException {
+  private keyToUseForItemEncryption(): Models.ItemsKeyInterface | StandardException {
     const defaultKey = this.getDefaultItemsKey()
-    let result: ItemsKeyInterface | undefined = undefined
+    let result: Models.ItemsKeyInterface | undefined = undefined
 
     if (this.userVersion && this.userVersion !== defaultKey?.keyVersion) {
       /**
@@ -94,8 +93,8 @@ export class ItemsEncryptionService extends Services.AbstractService {
   }
 
   private keyToUseForDecryptionOfPayload(
-    payload: Payloads.PurePayload,
-  ): ItemsKeyInterface | undefined {
+    payload: Models.PurePayload,
+  ): Models.ItemsKeyInterface | undefined {
     if (payload.items_key_id) {
       const itemsKey = this.itemsKeyForPayload(payload)
       return itemsKey
@@ -106,7 +105,7 @@ export class ItemsEncryptionService extends Services.AbstractService {
   }
 
   public async encryptSplitSingleWithKeyLookup(
-    payload: Payloads.PurePayload,
+    payload: Models.PurePayload,
   ): Promise<EncryptedParameters> {
     const key = this.keyToUseForItemEncryption()
 
@@ -118,10 +117,10 @@ export class ItemsEncryptionService extends Services.AbstractService {
   }
 
   public async encryptSplitSingle(
-    payload: Payloads.PurePayload,
-    key: ItemsKeyInterface,
+    payload: Models.PurePayload,
+    key: Models.ItemsKeyInterface,
   ): Promise<EncryptedParameters> {
-    if (payload.format !== Payloads.PayloadFormat.DecryptedBareObject) {
+    if (payload.format !== Models.PayloadFormat.DecryptedBareObject) {
       throw Error('Attempting to encrypt already encrypted payload.')
     }
     if (!payload.content) {
@@ -138,20 +137,20 @@ export class ItemsEncryptionService extends Services.AbstractService {
   }
 
   public async encryptSplitSingles(
-    payloads: Payloads.PurePayload[],
-    key: ItemsKeyInterface,
+    payloads: Models.PurePayload[],
+    key: Models.ItemsKeyInterface,
   ): Promise<EncryptedParameters[]> {
     return Promise.all(payloads.map((payload) => this.encryptSplitSingle(payload, key)))
   }
 
   public async encryptSplitSinglesWithKeyLookup(
-    payloads: Payloads.PurePayload[],
+    payloads: Models.PurePayload[],
   ): Promise<EncryptedParameters[]> {
     return Promise.all(payloads.map((payload) => this.encryptSplitSingleWithKeyLookup(payload)))
   }
 
   public async decryptPayloadWithKeyLookup(
-    payload: Payloads.PurePayload,
+    payload: Models.PurePayload,
   ): Promise<DecryptedParameters | ErroredDecryptingParameters> {
     const key = this.keyToUseForDecryptionOfPayload(payload)
 
@@ -167,8 +166,8 @@ export class ItemsEncryptionService extends Services.AbstractService {
   }
 
   public async decryptPayload(
-    payload: Payloads.PurePayload,
-    key: ItemsKeyInterface,
+    payload: Models.PurePayload,
+    key: Models.ItemsKeyInterface,
   ): Promise<DecryptedParameters | ErroredDecryptingParameters> {
     if (!payload.content) {
       return {
@@ -189,14 +188,14 @@ export class ItemsEncryptionService extends Services.AbstractService {
   }
 
   public async decryptPayloadsWithKeyLookup(
-    payloads: Payloads.PurePayload[],
+    payloads: Models.PurePayload[],
   ): Promise<(DecryptedParameters | ErroredDecryptingParameters)[]> {
     return Promise.all(payloads.map((payload) => this.decryptPayloadWithKeyLookup(payload)))
   }
 
   public async decryptPayloads(
-    payloads: Payloads.PurePayload[],
-    key: ItemsKeyInterface,
+    payloads: Models.PurePayload[],
+    key: Models.ItemsKeyInterface,
   ): Promise<(DecryptedParameters | ErroredDecryptingParameters)[]> {
     return Promise.all(payloads.map((payload) => this.decryptPayload(payload, key)))
   }
@@ -215,11 +214,11 @@ export class ItemsEncryptionService extends Services.AbstractService {
 
     const decryptedParams = await this.decryptPayloadsWithKeyLookup(payloads)
     const decryptedPayloads = decryptedParams.map((decryptedParam) => {
-      const originalPayload = Payloads.sureFindPayload(decryptedParam.uuid, payloads)
+      const originalPayload = Models.sureFindPayload(decryptedParam.uuid, payloads)
       return mergePayloadWithEncryptionParameters(originalPayload, decryptedParam)
     })
 
-    await this.payloadManager.emitPayloads(decryptedPayloads, Payloads.PayloadSource.LocalChanged)
+    await this.payloadManager.emitPayloads(decryptedPayloads, Models.PayloadSource.LocalChanged)
   }
 
   /**
@@ -231,8 +230,8 @@ export class ItemsEncryptionService extends Services.AbstractService {
    */
   public defaultItemsKeyForItemVersion(
     version: ProtocolVersion,
-    fromKeys?: ItemsKeyInterface[],
-  ): ItemsKeyInterface | undefined {
+    fromKeys?: Models.ItemsKeyInterface[],
+  ): Models.ItemsKeyInterface | undefined {
     /** Try to find one marked default first */
     const searchKeys = fromKeys || this.getItemsKeys()
     const priorityKey = searchKeys.find((key) => {

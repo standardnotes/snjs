@@ -4,7 +4,7 @@ import { SNStorageService } from '../Storage/StorageService'
 import { SNProtectionService } from './ProtectionService'
 import { InternalEventBus, InternalEventBusInterface } from '@standardnotes/services'
 import { UuidGenerator } from '@standardnotes/utils'
-import { SNFile } from '@standardnotes/models'
+import { FileContent, SNFile } from '@standardnotes/models'
 import { ContentType } from '@standardnotes/common'
 import { FillItemContent, CreateMaxPayloadFromAnyObject } from '@standardnotes/models'
 
@@ -33,7 +33,7 @@ describe('protectionService', () => {
       CreateMaxPayloadFromAnyObject({
         uuid: String(Math.random()),
         content_type: ContentType.File,
-        content: FillItemContent({
+        content: FillItemContent<FileContent>({
           name: name,
           protected: isProtected,
         }),

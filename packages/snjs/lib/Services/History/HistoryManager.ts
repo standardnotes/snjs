@@ -1,4 +1,4 @@
-import { ContentType } from '@standardnotes/common'
+import { ContentType, Uuid } from '@standardnotes/common'
 import { EncryptionService } from '@standardnotes/encryption'
 import { isNullOrUndefined, removeFromArray } from '@standardnotes/utils'
 import { ItemManager } from '@Lib/Services/Items/ItemManager'
@@ -7,14 +7,13 @@ import { SNStorageService } from '@Lib/Services/Storage/StorageService'
 import { StorageKey } from '@standardnotes/services'
 import { UuidString } from '../../Types/UuidString'
 import * as Models from '@standardnotes/models'
-import * as Payloads from '@standardnotes/models'
 import * as Responses from '@standardnotes/responses'
 import * as Services from '@standardnotes/services'
 
 const PersistTimeout = 2000
 
 type PersistableHistoryEntry = {
-  payload: Payloads.RawPayload
+  payload: Models.RawPayload
 }
 
 type PersistableHistory = Record<UuidString, PersistableHistoryEntry[]>
@@ -104,17 +103,20 @@ export class SNHistoryManager extends Services.AbstractService {
     const rawHistory: PersistableHistory = await this.storageService.getValue(
       StorageKey.SessionHistoryRevisions,
     )
+
     if (!rawHistory) {
       return historyMap
     }
+
     for (const [uuid, historyDescending] of Object.entries(rawHistory)) {
       const historyAscending = historyDescending.slice().reverse()
       const entries: Models.HistoryEntry[] = []
       for (const rawEntry of historyAscending) {
-        const payload = Payloads.CreateSourcedPayloadFromObject(
+        const payload = Models.CreateSourcedPayloadFromObject(
           rawEntry.payload,
-          Payloads.PayloadSource.SessionHistory,
-        ) as Payloads.SurePayload
+          Models.PayloadSource.SessionHistory,
+        ) as Models.SurePayload<Models.NoteContent>
+
         const previousEntry = Models.historyMapFunctions.getNewestRevision(entries)
         const entry = Models.CreateHistoryEntryForPayload(payload, previousEntry)
         entries.unshift(entry)
@@ -131,15 +133,15 @@ export class SNHistoryManager extends Services.AbstractService {
         continue
       }
       const payload = item.payload
-      if (item.deleted || payload.format !== Payloads.PayloadFormat.DecryptedBareObject) {
+      if (item.deleted || payload.format !== Models.PayloadFormat.DecryptedBareObject) {
         continue
       }
       const itemHistory = this.history[item.uuid] || []
       const latestEntry = Models.historyMapFunctions.getNewestRevision(itemHistory)
-      const historyPayload = Payloads.CreateSourcedPayloadFromObject(
+      const historyPayload = Models.CreateSourcedPayloadFromObject(
         item,
-        Payloads.PayloadSource.SessionHistory,
-      ) as Payloads.SurePayload
+        Models.PayloadSource.SessionHistory,
+      ) as Models.SurePayload<Models.NoteContent>
       const currentValueEntry = Models.CreateHistoryEntryForPayload(historyPayload, latestEntry)
       if (currentValueEntry.isDiscardable()) {
         continue
@@ -293,8 +295,8 @@ export class SNHistoryManager extends Services.AbstractService {
     }
     const revision = (revisionResponse as Responses.SingleRevisionResponse).data
 
-    const serverPayload = Payloads.CreateMaxPayloadFromAnyObject(
-      revision as unknown as Payloads.RawPayload,
+    const serverPayload = Models.CreateMaxPayloadFromAnyObject(
+      revision as unknown as Models.RawPayload<Models.NoteContent>,
     )
     /**
      * When an item is duplicated, its revisions also carry over to the newly created item.
@@ -302,25 +304,21 @@ export class SNHistoryManager extends Services.AbstractService {
      * these olders revisions (which have not been mutated after copy) with the source item's
      * uuid.
      */
-    const embeddedParams = await this.protocolService.getEmbeddedPayloadAuthenticatedData(
-      serverPayload,
-    )
-    const sourceItemUuid = embeddedParams?.u
-    const payload = Payloads.CopyPayload(
-      Payloads.CreateMaxPayloadFromAnyObject(revision as unknown as Payloads.RawPayload),
-      {
-        uuid: sourceItemUuid || revision.item_uuid,
-      },
-    )
+    const embeddedParams = this.protocolService.getEmbeddedPayloadAuthenticatedData(serverPayload)
+    const sourceItemUuid = embeddedParams?.u as Uuid | undefined
 
-    if (!Payloads.isRemotePayloadAllowed(payload)) {
+    const payload = Models.CopyPayload(serverPayload, {
+      uuid: sourceItemUuid || revision.item_uuid,
+    })
+
+    if (!Models.isRemotePayloadAllowed(payload)) {
       console.error('Remote payload is disallowed', payload)
       return undefined
     }
 
-    const encryptedPayload = Payloads.CreateSourcedPayloadFromObject(
+    const encryptedPayload = Models.CreateSourcedPayloadFromObject(
       payload,
-      Payloads.PayloadSource.RemoteHistory,
+      Models.PayloadSource.RemoteHistory,
     )
     const decryptedPayload = await this.protocolService.decryptSplitSingle({
       usesItemsKeyWithKeyLookup: { items: [encryptedPayload] },
@@ -328,7 +326,7 @@ export class SNHistoryManager extends Services.AbstractService {
     if (decryptedPayload.errorDecrypting) {
       return undefined
     }
-    return new Models.HistoryEntry(decryptedPayload as Payloads.SurePayload)
+    return new Models.HistoryEntry(decryptedPayload as Models.SurePayload<Models.NoteContent>)
   }
 
   async deleteRemoteRevision(

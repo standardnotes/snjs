@@ -3,7 +3,8 @@ import { HistoryEntry } from '../History/HistoryEntry'
 import { dateToLocalizedString, deepFreeze } from '@standardnotes/utils'
 import { PrefKey } from '../UserPrefs/PrefKey'
 import { ItemContentsDiffer, ItemContentsEqual } from './Functions'
-import { ItemContent, ItemInterface } from './ItemInterface'
+import { ItemInterface } from './ItemInterface'
+import { ItemContent } from './ItemContent'
 import { PayloadFormat } from '../Payload/PayloadFormat'
 import { AppDataField } from './AppDataField'
 import { ComponentDataDomain, DefaultAppDomain } from './DefaultAppDomain'
@@ -11,7 +12,6 @@ import { ContentReference } from '../Reference/ContentReference'
 import { PayloadSource } from '../Payload/PayloadSource'
 import { ConflictStrategy } from '../Payload/ConflictStrategy'
 import { PredicateInterface } from '../Predicate/Interface'
-import { PayloadOverride } from '../Payload/PayloadOverride'
 import { CopyPayload } from '../Payload/Functions'
 import { SingletonStrategy } from './SingletonStrategy'
 import { PayloadInterface } from '../Payload/PayloadInterface'
@@ -170,7 +170,7 @@ export class SNItem<C extends ItemContent = ItemContent> implements ItemInterfac
     return this.payload.duplicate_of
   }
 
-  public payloadRepresentation(override?: PayloadOverride) {
+  public payloadRepresentation(override?: Partial<PayloadInterface<C>>) {
     return CopyPayload(this.payload, override)
   }
 

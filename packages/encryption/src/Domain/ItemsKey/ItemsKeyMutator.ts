@@ -1,5 +1,4 @@
-import { ItemMutator, ItemsKeyMutatorInterface } from '@standardnotes/models'
-import { ItemsKeyContent } from './ItemsKey'
+import { ItemMutator, ItemsKeyMutatorInterface, ItemsKeyContent } from '@standardnotes/models'
 
 export class ItemsKeyMutator
   extends ItemMutator<ItemsKeyContent>

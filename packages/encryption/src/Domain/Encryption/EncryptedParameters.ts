@@ -1,5 +1,5 @@
 import { ProtocolVersion } from '@standardnotes/common'
-import { PayloadContent } from '@standardnotes/models'
+import { ItemContent } from '@standardnotes/models'
 
 export type EncryptedParameters = {
   uuid: string
@@ -12,9 +12,9 @@ export type EncryptedParameters = {
   auth_hash?: string
 }
 
-export type DecryptedParameters = {
+export type DecryptedParameters<C extends ItemContent = ItemContent> = {
   uuid: string
-  content: PayloadContent
+  content: C
   items_key_id: undefined
   enc_item_key: undefined
   errorDecrypting: false
