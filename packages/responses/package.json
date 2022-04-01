@@ -37,6 +37,6 @@
     "@standardnotes/auth": "^3.18.3",
     "@standardnotes/common": "^1.19.1",
     "@standardnotes/features": "^1.36.3",
-    "@standardnotes/models": "1.1.1"
+    "@standardnotes/models": "1.1.2"
   }
 }
