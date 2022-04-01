@@ -1,6 +1,6 @@
 {
   "name": "@standardnotes/responses",
-  "version": "1.5.1",
+  "version": "1.6.0",
   "engines": {
     "node": ">=14.0.0 <17.0.0"
   },
@@ -36,7 +36,7 @@
   "dependencies": {
     "@standardnotes/auth": "^3.18.3",
     "@standardnotes/common": "^1.19.1",
-    "@standardnotes/features": "^1.36.3",
-    "@standardnotes/models": "1.1.2"
+    "@standardnotes/features": "^1.37.0",
+    "@standardnotes/models": "^1.2.0"
   }
 }

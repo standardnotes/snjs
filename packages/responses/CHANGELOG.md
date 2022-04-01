@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.6.0](https://github.com/standardnotes/snjs/compare/@standardnotes/responses@1.5.1...@standardnotes/responses@1.6.0) (2022-04-01)
+
+
+### Features
+
+* content interfaces and model type strictness ([#685](https://github.com/standardnotes/snjs/issues/685)) ([e2450c5](https://github.com/standardnotes/snjs/commit/e2450c59e8309d7080efaa03905b2abc728d9403))
+
+
+
+
+
 ## [1.5.1](https://github.com/standardnotes/snjs/compare/@standardnotes/responses@1.5.0...@standardnotes/responses@1.5.1) (2022-03-31)
 
 **Note:** Version bump only for package @standardnotes/responses
