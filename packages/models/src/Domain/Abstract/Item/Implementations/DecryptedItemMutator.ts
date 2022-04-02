@@ -4,12 +4,8 @@ import { PrefKey } from '../../../Syncable/UserPrefs/PrefKey'
 import { DecryptedItem } from './DecryptedItem'
 import { Uuid } from '@standardnotes/common'
 import { ItemContent } from '../Interfaces/ItemContent'
-import { PurePayload } from '../../Payload/Implementations/PurePayload'
-import { CopyPayload, PayloadByMerging } from '../../Payload/Utilities/Functions'
 import { AppDataField } from '../Types/AppDataField'
 import { DefaultAppDomain, DomainDataValueType, ItemDomainKey } from '../Types/DefaultAppDomain'
-import { GenericItem } from './GenericItem'
-import { PayloadInterface } from '../../Payload'
 import { ItemMutator } from './ItemMutator'
 import { DecryptedPayloadInterface } from '../../Payload/Interfaces/DecryptedPayload'
 
@@ -18,7 +14,6 @@ import { DecryptedPayloadInterface } from '../../Payload/Interfaces/DecryptedPay
  * Subclasses of mutators can modify the content field directly, but cannot modify the payload directly.
  * All changes to the payload must occur by copying the payload and reassigning its value.
  */
-
 export class DecryptedItemMutator<C extends ItemContent = ItemContent> extends ItemMutator {
   public readonly item: DecryptedItem<C>
   protected payload: DecryptedPayloadInterface
@@ -34,77 +29,19 @@ export class DecryptedItemMutator<C extends ItemContent = ItemContent> extends I
 
   public getResult() {
     if (this.type === MutationType.NonDirtying) {
-      return CopyPayload(this.payload, {
-        content: this.content,
-      })
+      return super.getResult()
     }
 
-    if (!this.payload.deleted) {
-      if (this.type === MutationType.UpdateUserTimestamps) {
-        this.userModifiedDate = new Date()
-      } else {
-        const currentValue = this.item.userModifiedDate
-        if (!currentValue) {
-          this.userModifiedDate = new Date(this.item.serverUpdatedAt!)
-        }
+    if (this.type === MutationType.UpdateUserTimestamps) {
+      this.userModifiedDate = new Date()
+    } else {
+      const currentValue = this.item.userModifiedDate
+      if (!currentValue) {
+        this.userModifiedDate = new Date(this.item.serverUpdatedAt)
       }
     }
 
-    const result = CopyPayload(this.payload, {
-      content: this.content,
-      dirty: true,
-      dirtiedDate: new Date(),
-    })
-
-    return result
-  }
-
-  /** Merges the input payload with the base payload */
-  public mergePayload(payload: PurePayload) {
-    const merged = PayloadByMerging(this.payload, payload)
-    this.payload = merged
-
-    const mutableCopy = Copy(merged)
-    this.content = mutableCopy
-  }
-
-  /** Not recommended to use as this might break item schema if used incorrectly */
-  public unsafe_setCustomContent(content: ItemContent): void {
-    this.content = Copy(content)
-  }
-
-  public setDeleted() {
-    this.content = undefined
-    this.payload = CopyPayload(this.payload, {
-      content: this.content,
-      deleted: true,
-    })
-  }
-
-  public set lastSyncBegan(began: Date) {
-    this.payload = CopyPayload(this.payload, {
-      content: this.content,
-      lastSyncBegan: began,
-    })
-  }
-
-  public set errorDecrypting(errorDecrypting: boolean) {
-    this.payload = CopyPayload(this.payload, {
-      content: this.content,
-      errorDecrypting: errorDecrypting,
-    })
-  }
-
-  public set updated_at(updated_at: Date) {
-    this.payload = CopyPayload(this.payload, {
-      updated_at: updated_at,
-    })
-  }
-
-  public set updated_at_timestamp(updated_at_timestamp: number) {
-    this.payload = CopyPayload(this.payload, {
-      updated_at_timestamp,
-    })
+    return super.getResult()
   }
 
   public set userModifiedDate(date: Date) {
@@ -112,15 +49,15 @@ export class DecryptedItemMutator<C extends ItemContent = ItemContent> extends I
   }
 
   public set conflictOf(conflictOf: Uuid | undefined) {
-    this.sureContent.conflict_of = conflictOf
+    this.content.conflict_of = conflictOf
   }
 
   public set protected(isProtected: boolean) {
-    this.sureContent.protected = isProtected
+    this.content.protected = isProtected
   }
 
   public set trashed(trashed: boolean) {
-    this.sureContent.trashed = trashed
+    this.content.trashed = trashed
   }
 
   public set pinned(pinned: boolean) {
@@ -139,17 +76,13 @@ export class DecryptedItemMutator<C extends ItemContent = ItemContent> extends I
    * Overwrites the entirety of this domain's data with the data arg.
    */
   public setDomainData(data: DomainDataValueType, domain: ItemDomainKey): void {
-    if (this.payload.errorDecrypting) {
-      return
-    }
-
-    if (!this.sureContent.appData) {
-      this.sureContent.appData = {
+    if (!this.content.appData) {
+      this.content.appData = {
         [DefaultAppDomain]: {},
       }
     }
 
-    this.sureContent.appData[domain] = data
+    this.content.appData[domain] = data
   }
 
   /**
@@ -161,21 +94,17 @@ export class DecryptedItemMutator<C extends ItemContent = ItemContent> extends I
     value: unknown,
     domain: ItemDomainKey,
   ): void {
-    if (this.payload.errorDecrypting) {
-      return
-    }
-
-    if (!this.sureContent.appData) {
-      this.sureContent.appData = {
+    if (!this.content.appData) {
+      this.content.appData = {
         [DefaultAppDomain]: {},
       }
     }
 
-    if (!this.sureContent.appData[domain]) {
-      this.sureContent.appData[domain] = {}
+    if (!this.content.appData[domain]) {
+      this.content.appData[domain] = {}
     }
 
-    const domainData = this.sureContent.appData[domain] as DomainDataValueType
+    const domainData = this.content.appData[domain] as DomainDataValueType
     domainData[key] = value
   }
 
@@ -184,19 +113,19 @@ export class DecryptedItemMutator<C extends ItemContent = ItemContent> extends I
   }
 
   public addItemAsRelationship(item: DecryptedItem) {
-    const references = this.sureContent.references || []
+    const references = this.content.references || []
     if (!references.find((r) => r.uuid === item.uuid)) {
       references.push({
         uuid: item.uuid,
         content_type: item.content_type,
       })
     }
-    this.sureContent.references = references
+    this.content.references = references
   }
 
   public removeItemAsRelationship(item: DecryptedItem) {
-    let references = this.sureContent.references || []
+    let references = this.content.references || []
     references = references.filter((r) => r.uuid !== item.uuid)
-    this.sureContent.references = references
+    this.content.references = references
   }
 }

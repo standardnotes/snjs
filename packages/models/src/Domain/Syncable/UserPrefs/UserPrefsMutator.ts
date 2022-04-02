@@ -1,7 +1,7 @@
-import { ItemMutator } from '../../Abstract/Item/Implementations/ItemMutator'
+import { DecryptedItemMutator } from '../../Abstract/Item/Implementations/DecryptedItemMutator'
 import { PrefKey, PrefValue } from './PrefKey'
 
-export class UserPrefsMutator extends ItemMutator {
+export class UserPrefsMutator extends DecryptedItemMutator {
   setPref<K extends PrefKey>(key: K, value: PrefValue[K]): void {
     this.setAppDataItem(key, value)
   }

@@ -1,17 +1,17 @@
 import { ContentType } from '@standardnotes/common'
 import { SNNote } from '../Note/Note'
-import { ItemMutator } from '../../Abstract/Item/Implementations/ItemMutator'
 import { FileContent } from './File'
 import { FileToNoteReference } from '../../Abstract/Reference/FileToNoteReference'
 import { ContenteReferenceType } from '../../Abstract/Reference/ContenteReferenceType'
+import { DecryptedItemMutator } from '../../Abstract/Item/Implementations/DecryptedItemMutator'
 
-export class FileMutator extends ItemMutator<FileContent> {
+export class FileMutator extends DecryptedItemMutator<FileContent> {
   set name(newName: string) {
-    this.sureContent.name = newName
+    this.content.name = newName
   }
 
   set encryptionHeader(encryptionHeader: string) {
-    this.sureContent.encryptionHeader = encryptionHeader
+    this.content.encryptionHeader = encryptionHeader
   }
 
   public associateWithNote(note: SNNote): void {
@@ -21,13 +21,13 @@ export class FileMutator extends ItemMutator<FileContent> {
       uuid: note.uuid,
     }
 
-    const references = this.sureContent.references || []
+    const references = this.content.references || []
     references.push(reference)
-    this.sureContent.references = references
+    this.content.references = references
   }
 
   public disassociateWithNote(note: SNNote): void {
     const references = this.item.references.filter((ref) => ref.uuid !== note.uuid)
-    this.sureContent.references = references
+    this.content.references = references
   }
 }

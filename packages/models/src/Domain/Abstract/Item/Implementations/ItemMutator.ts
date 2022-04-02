@@ -1,17 +1,13 @@
 import { Copy } from '@standardnotes/utils'
 import { MutationType } from '../Types/MutationType'
-import { PrefKey } from '../../../Syncable/UserPrefs/PrefKey'
 import { DecryptedItem } from './DecryptedItem'
-import { Uuid } from '@standardnotes/common'
 import { ItemContent } from '../Interfaces/ItemContent'
 import { PurePayload } from '../../Payload/Implementations/PurePayload'
 import { CopyPayload, PayloadByMerging } from '../../Payload/Utilities/Functions'
-import { AppDataField } from '../Types/AppDataField'
-import { DefaultAppDomain, DomainDataValueType, ItemDomainKey } from '../Types/DefaultAppDomain'
 import { GenericItem } from './GenericItem'
 import { PayloadInterface } from '../../Payload'
 import { isDecryptedItem } from '../Interfaces/TypeCheck'
-import { isDecryptedPayload, isDeletedPayload } from '../../Payload/Interfaces/TypeCheck'
+import { isDecryptedPayload } from '../../Payload/Interfaces/TypeCheck'
 
 /**
  * An item mutator takes in an item, and an operation, and returns the resulting payload.
@@ -48,17 +44,6 @@ export class ItemMutator<C extends ItemContent = ItemContent> {
       return CopyPayload(this.payload, {
         content: this.content,
       })
-    }
-
-    if (!isDeletedPayload(this.payload)) {
-      if (this.type === MutationType.UpdateUserTimestamps) {
-        this.userModifiedDate = new Date()
-      } else {
-        const currentValue = this.item.userModifiedDate
-        if (!currentValue) {
-          this.userModifiedDate = new Date(this.item.serverUpdatedAt)
-        }
-      }
     }
 
     const result = CopyPayload(this.payload, {
@@ -120,98 +105,5 @@ export class ItemMutator<C extends ItemContent = ItemContent> {
     this.payload = CopyPayload(this.payload, {
       updated_at_timestamp,
     })
-  }
-
-  public set userModifiedDate(date: Date) {
-    this.setAppDataItem(AppDataField.UserModifiedDate, date)
-  }
-
-  public set conflictOf(conflictOf: Uuid | undefined) {
-    this.sureContent.conflict_of = conflictOf
-  }
-
-  public set protected(isProtected: boolean) {
-    this.sureContent.protected = isProtected
-  }
-
-  public set trashed(trashed: boolean) {
-    this.sureContent.trashed = trashed
-  }
-
-  public set pinned(pinned: boolean) {
-    this.setAppDataItem(AppDataField.Pinned, pinned)
-  }
-
-  public set archived(archived: boolean) {
-    this.setAppDataItem(AppDataField.Archived, archived)
-  }
-
-  public set locked(locked: boolean) {
-    this.setAppDataItem(AppDataField.Locked, locked)
-  }
-
-  /**
-   * Overwrites the entirety of this domain's data with the data arg.
-   */
-  public setDomainData(data: DomainDataValueType, domain: ItemDomainKey): void {
-    if (this.payload.errorDecrypting) {
-      return
-    }
-
-    if (!this.sureContent.appData) {
-      this.sureContent.appData = {
-        [DefaultAppDomain]: {},
-      }
-    }
-
-    this.sureContent.appData[domain] = data
-  }
-
-  /**
-   * First gets the domain data for the input domain.
-   * Then sets data[key] = value
-   */
-  public setDomainDataKey(
-    key: keyof DomainDataValueType,
-    value: unknown,
-    domain: ItemDomainKey,
-  ): void {
-    if (this.payload.errorDecrypting) {
-      return
-    }
-
-    if (!this.sureContent.appData) {
-      this.sureContent.appData = {
-        [DefaultAppDomain]: {},
-      }
-    }
-
-    if (!this.sureContent.appData[domain]) {
-      this.sureContent.appData[domain] = {}
-    }
-
-    const domainData = this.sureContent.appData[domain] as DomainDataValueType
-    domainData[key] = value
-  }
-
-  public setAppDataItem(key: AppDataField | PrefKey, value: unknown) {
-    this.setDomainDataKey(key, value, DefaultAppDomain)
-  }
-
-  public addItemAsRelationship(item: DecryptedItem) {
-    const references = this.sureContent.references || []
-    if (!references.find((r) => r.uuid === item.uuid)) {
-      references.push({
-        uuid: item.uuid,
-        content_type: item.content_type,
-      })
-    }
-    this.sureContent.references = references
-  }
-
-  public removeItemAsRelationship(item: DecryptedItem) {
-    let references = this.sureContent.references || []
-    references = references.filter((r) => r.uuid !== item.uuid)
-    this.sureContent.references = references
   }
 }
