@@ -1,4 +1,4 @@
-import { ItemMutator } from '../../Abstract/Item/ItemMutator'
+import { ItemMutator } from '../../Abstract/Item/Implementations/ItemMutator'
 import { ContentType } from '@standardnotes/common'
 import { TagContent, SNTag } from './Tag'
 import { isTagToParentTagReference } from '../../Abstract/Reference/Functions'

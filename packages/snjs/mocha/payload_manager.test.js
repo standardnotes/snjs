@@ -49,7 +49,7 @@ describe('payload manager', () => {
     const newTitle = `${Math.random()}`
     const changedPayload = CopyPayload(payload, {
       content: {
-        ...payload.safeContent,
+        ...payload.content,
         title: newTitle,
       },
     })
@@ -85,7 +85,7 @@ describe('payload manager', () => {
     await this.payloadManager.emitPayload(
       CopyPayload(payload, {
         content: {
-          ...payload.safeContent,
+          ...payload.content,
           title: 'new title',
         },
       }),

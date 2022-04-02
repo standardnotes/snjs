@@ -92,7 +92,7 @@ describe('featuresService', () => {
     return new SNComponent({
       uuid: '789',
       content_type: ContentType.Component,
-      safeContent: {
+      content: {
         package_info: {
           hosted_url: 'https://example.com/component',
           identifier: identifier || FeatureIdentifier.BoldEditor,
@@ -107,7 +107,7 @@ describe('featuresService', () => {
     return new SNComponent({
       uuid: '789',
       content_type: ContentType.Component,
-      safeContent: {
+      content: {
         package_info: {
           hosted_url: 'https://example.com/component',
           identifier: FeatureIdentifier.DeprecatedFileSafe,
@@ -121,7 +121,7 @@ describe('featuresService', () => {
     return new SNComponent({
       uuid: '789',
       content_type: ContentType.Component,
-      safeContent: {
+      content: {
         local_url: 'sn://Extensions/non-native-identifier/dist/index.html',
         hosted_url: 'https://example.com/component',
         package_info: {
@@ -301,7 +301,7 @@ describe('featuresService', () => {
         const component = new SNComponent({
           uuid: '789',
           content_type: ContentType.Component,
-          safeContent: {
+          content: {
             hosted_url: 'https://example.com/component',
             package_info: {
               identifier: 'non-native-identifier',

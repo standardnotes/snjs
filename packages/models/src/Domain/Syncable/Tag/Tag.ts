@@ -1,10 +1,10 @@
 import { ContentType, Uuid } from '@standardnotes/common'
-import { SNItem } from '../../Abstract/Item'
-import { ItemInterface } from '../../Abstract/Item/ItemInterface'
-import { ItemContent } from '../../Abstract/Item/ItemContent'
-import { PayloadInterface } from '../../Abstract/Payload/PayloadInterface'
+import { DecryptedItem } from '../../Abstract/Item'
+import { ItemInterface } from '../../Abstract/Item/Interfaces/ItemInterface'
+import { ItemContent } from '../../Abstract/Item/Interfaces/ItemContent'
 import { ContentReference } from '../../Abstract/Reference/ContentReference'
 import { isTagToParentTagReference } from '../../Abstract/Reference/Functions'
+import { DecryptedPayloadInterface } from '../../Abstract/Payload/Interfaces/DecryptedPayload'
 
 export const TagFolderDelimitter = '.'
 
@@ -21,20 +21,20 @@ export const isTag = (x: ItemInterface): x is SNTag => x.content_type === Conten
  * Allows organization of notes into groups.
  * A tag can have many notes, and a note can have many tags.
  */
-export class SNTag extends SNItem<TagContent> implements TagInterface {
+export class SNTag extends DecryptedItem<TagContent> implements TagInterface {
   public readonly title: string
   /** Whether to render child tags in view hierarchy. Opposite of collapsed. */
   public readonly expanded: boolean
 
-  constructor(payload: PayloadInterface<TagContent>) {
+  constructor(payload: DecryptedPayloadInterface<TagContent>) {
     super(payload)
-    this.title = this.payload.safeContent.title || ''
+    this.title = this.payload.content.title || ''
     this.expanded =
-      this.payload.safeContent.expanded != undefined ? this.payload.safeContent.expanded : true
+      this.payload.content.expanded != undefined ? this.payload.content.expanded : true
   }
 
   get noteReferences(): ContentReference[] {
-    const references = this.payload.safeReferences
+    const references = this.payload.references
     return references.filter((ref) => ref.content_type === ContentType.Note)
   }
 

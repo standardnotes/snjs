@@ -1,6 +1,6 @@
 import { ContentType } from '@standardnotes/common'
 import { NoteContent } from '../../Syncable/Note'
-import { PayloadField } from '../../Abstract/Payload/PayloadField'
+import { PayloadField } from '../../Abstract/Payload/Types/PayloadField'
 import { SurePayload } from '../../Abstract/Payload/SurePayload'
 import { HistoryEntry } from './HistoryEntry'
 import { NoteHistoryEntry } from './NoteHistoryEntry'

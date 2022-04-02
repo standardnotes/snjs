@@ -14,11 +14,11 @@ export class SNItemsKey extends SNItem<ItemsKeyContent> implements ItemsKeyInter
   isDefault: boolean | undefined
   itemsKey: string
 
-  constructor(payload: PayloadInterface<ItemsKeyContent>) {
+  constructor(payload: DecryptedPayloadInterface<ItemsKeyContent>) {
     super(payload)
-    this.keyVersion = payload.safeContent.version
-    this.isDefault = payload.safeContent.isDefault
-    this.itemsKey = this.payload.safeContent.itemsKey
+    this.keyVersion = payload.content.version
+    this.isDefault = payload.content.isDefault
+    this.itemsKey = this.payload.content.itemsKey
   }
 
   /** Do not duplicate items keys. Always keep original */
@@ -37,6 +37,6 @@ export class SNItemsKey extends SNItem<ItemsKeyContent> implements ItemsKeyInter
     if (this.keyVersion === ProtocolVersion.V004) {
       throw 'Attempting to access legacy data authentication key.'
     }
-    return this.payload.safeContent.dataAuthenticationKey
+    return this.payload.content.dataAuthenticationKey
   }
 }

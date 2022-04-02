@@ -1,8 +1,8 @@
 import { FeatureDescription, ThirdPartyFeatureDescription } from '@standardnotes/features'
-import { SNItem } from '../../Abstract/Item'
-import { ItemContent } from '../../Abstract/Item/ItemContent'
-import { ConflictStrategy } from '../../Abstract/Item/ConflictStrategy'
-import { PayloadInterface } from '../../Abstract/Payload/PayloadInterface'
+import { DecryptedItem } from '../../Abstract/Item'
+import { ItemContent } from '../../Abstract/Item/Interfaces/ItemContent'
+import { ConflictStrategy } from '../../Abstract/Item/Types/ConflictStrategy'
+import { DecryptedPayloadInterface } from '../../Abstract/Payload/Interfaces/DecryptedPayload'
 import { HistoryEntryInterface } from '../../Runtime/History/HistoryEntryInterface'
 import { Action } from './Types'
 
@@ -22,7 +22,7 @@ export type ActionExtensionContent = ActionExtensionInterface & ItemContent
 /**
  * Related to the SNActionsService and the local Action model.
  */
-export class SNActionsExtension extends SNItem<ActionExtensionContent> {
+export class SNActionsExtension extends DecryptedItem<ActionExtensionContent> {
   public readonly actions: Action[] = []
   public readonly description: string
   public readonly url: string
@@ -31,15 +31,15 @@ export class SNActionsExtension extends SNItem<ActionExtensionContent> {
   public readonly name: string
   public readonly package_info: FeatureDescription
 
-  constructor(payload: PayloadInterface<ActionExtensionContent>) {
+  constructor(payload: DecryptedPayloadInterface<ActionExtensionContent>) {
     super(payload)
-    this.name = payload.safeContent.name || ''
-    this.description = payload.safeContent.description || ''
-    this.url = payload.safeContent.hosted_url || payload.safeContent.url
-    this.supported_types = payload.safeContent.supported_types
-    this.package_info = this.payload.safeContent.package_info || {}
-    this.deprecation = payload.safeContent.deprecation
-    this.actions = payload.safeContent.actions
+    this.name = payload.content.name || ''
+    this.description = payload.content.description || ''
+    this.url = payload.content.hosted_url || payload.content.url
+    this.supported_types = payload.content.supported_types
+    this.package_info = this.payload.content.package_info || {}
+    this.deprecation = payload.content.deprecation
+    this.actions = payload.content.actions
   }
 
   public get thirdPartyPackageInfo(): ThirdPartyFeatureDescription {
@@ -50,7 +50,7 @@ export class SNActionsExtension extends SNItem<ActionExtensionContent> {
     return (this.package_info.identifier as string) === 'org.standardnotes.listed'
   }
 
-  actionsWithContextForItem(item: SNItem): Action[] {
+  actionsWithContextForItem(item: DecryptedItem): Action[] {
     return this.actions.filter((action) => {
       return action.context === item.content_type || action.context === 'Item'
     })
@@ -58,13 +58,9 @@ export class SNActionsExtension extends SNItem<ActionExtensionContent> {
 
   /** Do not duplicate. Always keep original */
   strategyWhenConflictingWithItem(
-    item: SNItem,
-    previousRevision?: HistoryEntryInterface,
+    _item: DecryptedItem,
+    _previousRevision?: HistoryEntryInterface,
   ): ConflictStrategy {
-    if (this.errorDecrypting) {
-      return super.strategyWhenConflictingWithItem(item, previousRevision)
-    }
-
     return ConflictStrategy.KeepLeft
   }
 }

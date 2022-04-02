@@ -1,4 +1,4 @@
-import { ItemMutator } from '../../Abstract/Item/ItemMutator'
+import { ItemMutator } from '../../Abstract/Item/Implementations/ItemMutator'
 import { ActionExtensionContent } from './ActionsExtension'
 import { Action } from './Types'
 

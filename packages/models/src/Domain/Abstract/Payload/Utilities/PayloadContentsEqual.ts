@@ -1,5 +1,5 @@
-import { PurePayload } from '../PurePayload'
-import { CreateItemFromPayload } from '../../Item/Generator'
+import { PurePayload } from '../Implementations/PurePayload'
+import { CreateItemFromPayload } from '../../Item/Utilities/Generator'
 
 /**
  * Compares the .content fields for equality, creating new SNItem objects

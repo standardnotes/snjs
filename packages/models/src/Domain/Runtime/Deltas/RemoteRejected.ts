@@ -1,6 +1,6 @@
 import { ImmutablePayloadCollection } from '../Collection/ImmutablePayloadCollection'
 import { CreateSourcedPayloadFromObject } from '../../Abstract/Payload/Utilities/Functions'
-import { PayloadSource } from '../../Abstract/Payload/PayloadSource'
+import { PayloadSource } from '../../Abstract/Payload/Types/PayloadSource'
 import { PayloadsDelta } from './Delta'
 
 export class DeltaRemoteRejected extends PayloadsDelta {

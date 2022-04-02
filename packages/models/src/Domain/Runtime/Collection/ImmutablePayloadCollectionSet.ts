@@ -1,4 +1,4 @@
-import { PayloadSource } from '../../Abstract/Payload/PayloadSource'
+import { PayloadSource } from '../../Abstract/Payload/Types/PayloadSource'
 import { ImmutablePayloadCollection } from './ImmutablePayloadCollection'
 
 export class ImmutablePayloadCollectionSet {

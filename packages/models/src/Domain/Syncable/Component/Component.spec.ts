@@ -1,6 +1,6 @@
 import { ContentType } from '@standardnotes/common'
 import { CreateMaxPayloadFromAnyObject } from '../../Abstract/Payload/Utilities/Functions'
-import { FillItemContent } from '../../Abstract/Item/ItemContent'
+import { FillItemContent } from '../../Abstract/Item/Interfaces/ItemContent'
 import { SNComponent } from './Component'
 import { ComponentContent } from './ComponentContent'
 

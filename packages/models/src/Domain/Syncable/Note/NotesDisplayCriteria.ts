@@ -1,6 +1,6 @@
 import { ContentType } from '@standardnotes/common'
 import { NoteWithTags } from './NoteWithTags'
-import { SNItem } from '../../Abstract/Item'
+import { DecryptedItem } from '../../Abstract/Item'
 import { SNTag } from '../Tag'
 import { SNNote } from '.'
 import { SmartView } from '../SmartView'
@@ -44,7 +44,7 @@ export class NotesDisplayCriteria {
   computeFilters(collection: ItemCollection): NoteFilter[] {
     const filters: NoteFilter[] = []
 
-    let viewsPredicate: CompoundPredicate<SNItem> | undefined = undefined
+    let viewsPredicate: CompoundPredicate<DecryptedItem> | undefined = undefined
     if (this.views.length > 0) {
       const compoundPredicate = new CompoundPredicate(
         'and',

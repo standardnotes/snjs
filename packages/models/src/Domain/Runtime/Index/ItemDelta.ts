@@ -1,4 +1,4 @@
-import { ItemInterface } from '../../Abstract/Item/ItemInterface'
+import { ItemInterface } from '../../Abstract/Item/Interfaces/ItemInterface'
 
 export interface ItemDelta {
   changed: ItemInterface[]

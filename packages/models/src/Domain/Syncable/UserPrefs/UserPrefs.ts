@@ -1,9 +1,9 @@
-import { SNItem } from '../../Abstract/Item/Item'
+import { DecryptedItem } from '../../Abstract/Item/Implementations/DecryptedItem'
 import { ContentType } from '@standardnotes/common'
 import { Predicate } from '../../Runtime/Predicate/Predicate'
 import { PrefKey, PrefValue } from './PrefKey'
 
-export class SNUserPrefs extends SNItem {
+export class SNUserPrefs extends DecryptedItem {
   static singletonPredicate = new Predicate('content_type', '=', ContentType.UserPrefs)
 
   get isSingleton(): true {

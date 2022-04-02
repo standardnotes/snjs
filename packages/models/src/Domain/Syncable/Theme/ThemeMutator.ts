@@ -1,6 +1,6 @@
-import { AppDataField } from '../../Abstract/Item/AppDataField'
+import { AppDataField } from '../../Abstract/Item/Types/AppDataField'
 import { ComponentContent } from '../Component/ComponentContent'
-import { ItemMutator } from '../../Abstract/Item/ItemMutator'
+import { ItemMutator } from '../../Abstract/Item/Implementations/ItemMutator'
 
 export class ThemeMutator extends ItemMutator<ComponentContent> {
   setMobileRules(rules: unknown) {

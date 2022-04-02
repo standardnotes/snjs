@@ -283,7 +283,7 @@ describe('featuresService', () => {
       const existingItem = new SNComponent({
         uuid: '789',
         content_type: ContentType.Component,
-        safeContent: {
+        content: {
           package_info: {
             identifier: FeatureIdentifier.BoldEditor,
             valid_until: new Date(),
@@ -341,7 +341,7 @@ describe('featuresService', () => {
       const existingItem = new SNComponent({
         uuid: '456',
         content_type: ContentType.Theme,
-        safeContent: {
+        content: {
           package_info: {
             identifier: FeatureIdentifier.MidnightTheme,
             valid_until: new Date(),
@@ -553,7 +553,7 @@ describe('featuresService', () => {
           new SNComponent({
             uuid: '123',
             content_type: ContentType.Theme,
-            safeContent: {
+            content: {
               valid_until: themeFeature.expires_at,
               package_info: {
                 ...themeFeature,
@@ -563,7 +563,7 @@ describe('featuresService', () => {
           new SNComponent({
             uuid: '456',
             content_type: ContentType.Component,
-            safeContent: {
+            content: {
               valid_until: new Date(editorFeature.expires_at),
               package_info: {
                 ...editorFeature,
@@ -748,7 +748,7 @@ describe('featuresService', () => {
       const extensionRepoItem = new SNFeatureRepo({
         uuid: '456',
         content_type: ContentType.ExtensionRepo,
-        safeContent: {
+        content: {
           url: `https://extensions.standardnotes.org/${extensionKey}`,
         },
       } as never)

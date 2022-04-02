@@ -358,7 +358,7 @@ export class ComponentViewer {
       item.payload.format === PayloadFormat.DecryptedBareObject
     ) {
       const note = item as SNNote
-      const content = note.safeContent as NoteContent
+      const content = note.content as NoteContent
       const spellcheck =
         note.spellcheck != undefined
           ? note.spellcheck

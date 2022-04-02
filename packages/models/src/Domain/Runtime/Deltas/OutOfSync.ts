@@ -1,6 +1,6 @@
 import { extendArray } from '@standardnotes/utils'
 import { ImmutablePayloadCollection } from '../Collection/ImmutablePayloadCollection'
-import { PayloadSource } from '../../Abstract/Payload/PayloadSource'
+import { PayloadSource } from '../../Abstract/Payload/Types/PayloadSource'
 import { PayloadsDelta } from './Delta'
 import { PayloadsByDuplicating } from '../../Abstract/Payload/Utilities/PayloadsByDuplicating'
 import { PayloadContentsEqual } from '../../Abstract/Payload/Utilities/PayloadContentsEqual'

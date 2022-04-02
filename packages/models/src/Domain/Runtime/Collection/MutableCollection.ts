@@ -2,8 +2,8 @@
 import { extendArray, isString, UuidMap } from '@standardnotes/utils'
 import { ContentType, Uuid } from '@standardnotes/common'
 import { remove } from 'lodash'
-import { ItemInterface } from '../../Abstract/Item/ItemInterface'
-import { PayloadInterface } from '../../Abstract/Payload/PayloadInterface'
+import { ItemInterface } from '../../Abstract/Item/Interfaces/ItemInterface'
+import { PayloadInterface } from '../../Abstract/Payload/Interfaces/PayloadInterface'
 import { IntegrityPayload } from '../../Abstract/Payload/IntegrityPayload'
 
 export class MutableCollection<T extends PayloadInterface | ItemInterface> {
@@ -148,7 +148,7 @@ export class MutableCollection<T extends PayloadInterface | ItemInterface> {
         this.nondeletedIndex.delete(element.uuid)
       } else {
         this.nondeletedIndex.add(element.uuid)
-        const conflictOf = element.safeContent.conflict_of
+        const conflictOf = element.content.conflict_of
         if (conflictOf) {
           this.conflictMap.establishRelationship(conflictOf, element.uuid)
         }

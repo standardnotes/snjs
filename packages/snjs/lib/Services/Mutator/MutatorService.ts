@@ -379,7 +379,7 @@ export class MutatorService extends AbstractService implements MutatorClientInte
          * case of exceptions breaking up the import proccess */
         if (
           payload.content_type === ContentType.Component &&
-          (payload.safeContent as Models.ComponentContent).active
+          (payload.content as Models.ComponentContent).active
         ) {
           const typedContent = payload as Models.PayloadInterface<Models.ComponentContent>
           return Models.CopyPayloadWithContentOverride(typedContent, {

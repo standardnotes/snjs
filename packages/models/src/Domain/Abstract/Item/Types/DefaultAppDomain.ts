@@ -1,4 +1,4 @@
-import { PrefKey } from '../../Syncable/UserPrefs/PrefKey'
+import { PrefKey } from '../../../Syncable/UserPrefs/PrefKey'
 import { AppDataField } from './AppDataField'
 
 export const DefaultAppDomain = 'org.standardnotes.sn'

@@ -1,8 +1,8 @@
 import { ComponentArea } from '@standardnotes/features'
 import { SNComponent } from '../Component/Component'
-import { SNItem } from '../../Abstract/Item/Item'
-import { ConflictStrategy } from '../../Abstract/Item/ConflictStrategy'
-import { AppDataField } from '../../Abstract/Item/AppDataField'
+import { DecryptedItem } from '../../Abstract/Item/Implementations/DecryptedItem'
+import { ConflictStrategy } from '../../Abstract/Item/Types/ConflictStrategy'
+import { AppDataField } from '../../Abstract/Item/Types/AppDataField'
 import { HistoryEntryInterface } from '../../Runtime/History'
 
 export class SNTheme extends SNComponent {
@@ -14,13 +14,9 @@ export class SNTheme extends SNComponent {
 
   /** Do not duplicate under most circumstances. Always keep original */
   strategyWhenConflictingWithItem(
-    item: SNItem,
-    previousRevision?: HistoryEntryInterface,
+    _item: DecryptedItem,
+    _previousRevision?: HistoryEntryInterface,
   ): ConflictStrategy {
-    if (this.errorDecrypting) {
-      return super.strategyWhenConflictingWithItem(item, previousRevision)
-    }
-
     return ConflictStrategy.KeepLeft
   }
 

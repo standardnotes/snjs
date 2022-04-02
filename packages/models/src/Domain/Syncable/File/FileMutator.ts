@@ -1,6 +1,6 @@
 import { ContentType } from '@standardnotes/common'
 import { SNNote } from '../Note/Note'
-import { ItemMutator } from '../../Abstract/Item/ItemMutator'
+import { ItemMutator } from '../../Abstract/Item/Implementations/ItemMutator'
 import { FileContent } from './File'
 import { FileToNoteReference } from '../../Abstract/Reference/FileToNoteReference'
 import { ContenteReferenceType } from '../../Abstract/Reference/ContenteReferenceType'

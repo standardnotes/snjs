@@ -5,7 +5,7 @@ import { ContentType } from '@standardnotes/common'
 import { NotesDisplayCriteria } from '../Note/NotesDisplayCriteria'
 import { SmartView, SystemViewId } from '.'
 import { CreateMaxPayloadFromAnyObject } from '../../Abstract/Payload/Utilities/Functions'
-import { FillItemContent } from '../../Abstract/Item/ItemContent'
+import { FillItemContent } from '../../Abstract/Item/Interfaces/ItemContent'
 import { Predicate } from '../../Runtime/Predicate/Predicate'
 import { CompoundPredicate } from '../../Runtime/Predicate/CompoundPredicate'
 

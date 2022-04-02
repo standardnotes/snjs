@@ -57,7 +57,7 @@ describe('app models', () => {
 
     const mutated = CreateMaxPayloadFromAnyObject(params1, {
       content: {
-        ...params1.safeContent,
+        ...params1.content,
         references: [
           {
             uuid: params2.uuid,
@@ -84,7 +84,7 @@ describe('app models', () => {
     const payload = Factory.createNotePayload()
     const mutated = CreateMaxPayloadFromAnyObject(payload, {
       content: {
-        ...payload.safeContent,
+        ...payload.content,
         foo: 'bar',
       },
     })
@@ -140,7 +140,7 @@ describe('app models', () => {
 
     const damagedPayload = CopyPayload(refreshedItem1.payload, {
       content: {
-        ...refreshedItem1.safeContent,
+        ...refreshedItem1.content,
         // damage references of one object
         references: [],
       },
@@ -236,7 +236,7 @@ describe('app models', () => {
       refreshedItem1.payloadRepresentation({
         deleted: true,
         content: {
-          ...refreshedItem1.payload.safeContent,
+          ...refreshedItem1.payload.content,
           references: [],
         },
       }),

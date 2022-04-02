@@ -81,7 +81,7 @@ describe('payload encryption', function () {
     const changedText = `${Math.random()}`
     const changedPayload = CreateMaxPayloadFromAnyObject(payload, {
       content: {
-        ...payload.safeContent,
+        ...payload.content,
         text: changedText,
       },
     })
@@ -109,7 +109,7 @@ describe('payload encryption', function () {
 
     const mutated = CreateMaxPayloadFromAnyObject(tagPayload, {
       content: {
-        ...tagPayload.safeContent,
+        ...tagPayload.content,
         references: [],
       },
     })

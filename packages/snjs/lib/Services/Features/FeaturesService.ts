@@ -571,8 +571,8 @@ export class SNFeaturesService
     const expired = new Date(feature.expires_at || 0).getTime() < now.getTime()
 
     const existingItem = currentItems.find((item) => {
-      if (item.safeContent.package_info) {
-        const itemIdentifier = item.safeContent.package_info.identifier
+      if (item.content.package_info) {
+        const itemIdentifier = item.content.package_info.identifier
         return itemIdentifier === feature.identifier && !item.deleted
       }
       return false

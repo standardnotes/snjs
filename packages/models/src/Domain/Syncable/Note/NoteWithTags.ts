@@ -1,4 +1,4 @@
-import { PayloadInterface } from '../../Abstract/Payload/PayloadInterface'
+import { PayloadInterface } from '../../Abstract/Payload/Interfaces/PayloadInterface'
 import { SNTag } from '../Tag'
 import { NoteContent, SNNote } from './Note'
 
@@ -7,9 +7,9 @@ interface NoteWithTagsContent extends NoteContent {
 }
 
 export class NoteWithTags extends SNNote {
-  constructor(payload: PayloadInterface<NoteWithTagsContent>, public readonly tags?: SNTag[]) {
+  constructor(payload: DecryptedPayloadInterface<NoteWithTagsContent>, public readonly tags?: SNTag[]) {
     super(payload)
-    this.tags = tags || payload.safeContent.tags
+    this.tags = tags || payload.content.tags
   }
 
   static Create(payload: PayloadInterface<NoteContent>, tags?: SNTag[]) {

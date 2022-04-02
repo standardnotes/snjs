@@ -1,8 +1,8 @@
 import { omitInPlace, sortedCopy } from '@standardnotes/utils'
-import { ItemInterface } from './ItemInterface'
-import { ItemContent } from './ItemContent'
-import { DefaultAppDomain } from './DefaultAppDomain'
-import { AppDataField } from './AppDataField'
+import { ItemInterface } from '../Interfaces/ItemInterface'
+import { ItemContent } from '../Interfaces/ItemContent'
+import { DefaultAppDomain } from '../Types/DefaultAppDomain'
+import { AppDataField } from '../Types/AppDataField'
 
 export function ItemContentsDiffer(
   item1: ItemInterface,

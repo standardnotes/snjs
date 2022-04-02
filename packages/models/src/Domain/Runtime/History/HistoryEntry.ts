@@ -1,6 +1,6 @@
-import { ItemInterface } from './../../Abstract/Item/ItemInterface'
+import { ItemInterface } from '../../Abstract/Item/Interfaces/ItemInterface'
 import { isNullOrUndefined } from '@standardnotes/utils'
-import { CreateItemFromPayload } from '../../Abstract/Item/Generator'
+import { CreateItemFromPayload } from '../../Abstract/Item/Utilities/Generator'
 import { SurePayload } from '../../Abstract/Payload/SurePayload'
 import { CopyPayload } from '../../Abstract/Payload/Utilities/Functions'
 import { NoteContent } from '../../Syncable/Note'

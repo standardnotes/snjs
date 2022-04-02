@@ -1,7 +1,6 @@
-import { PayloadInterface } from '../../Abstract/Payload/PayloadInterface'
 import { ComponentContent, ComponentInterface } from './ComponentContent'
 import { isValidUrl } from '@standardnotes/utils'
-import { SNItem } from '../../Abstract/Item/Item'
+import { DecryptedItem } from '../../Abstract/Item/Implementations/DecryptedItem'
 import { ContentType, Uuid } from '@standardnotes/common'
 import {
   FeatureIdentifier,
@@ -11,18 +10,19 @@ import {
   FeatureDescription,
   ComponentPermission,
 } from '@standardnotes/features'
-import { ConflictStrategy } from '../../Abstract/Item/ConflictStrategy'
+import { ConflictStrategy } from '../../Abstract/Item/Types/ConflictStrategy'
 import { Predicate } from '../../Runtime/Predicate/Predicate'
-import { AppDataField } from '../../Abstract/Item/AppDataField'
-import { ItemContent } from '../../Abstract/Item/ItemContent'
+import { AppDataField } from '../../Abstract/Item/Types/AppDataField'
+import { ItemContent } from '../../Abstract/Item/Interfaces/ItemContent'
 import { HistoryEntryInterface } from '../../Runtime/History'
+import { DecryptedPayloadInterface } from '../../Abstract/Payload/Interfaces/DecryptedPayload'
 
 /**
  * Components are mostly iframe based extensions that communicate with the SN parent
  * via the postMessage API. However, a theme can also be a component, which is activated
  * only by its url.
  */
-export class SNComponent extends SNItem<ComponentContent> implements ComponentInterface {
+export class SNComponent extends DecryptedItem<ComponentContent> implements ComponentInterface {
   public readonly componentData: Record<string, any>
   /** Items that have requested a component to be disabled in its context */
   public readonly disassociatedItemIds: string[]
@@ -41,31 +41,31 @@ export class SNComponent extends SNItem<ComponentContent> implements ComponentIn
   public readonly legacy_url?: string
   public readonly isMobileDefault: boolean
 
-  constructor(payload: PayloadInterface<ComponentContent>) {
+  constructor(payload: DecryptedPayloadInterface<ComponentContent>) {
     super(payload)
     /** Custom data that a component can store in itself */
-    this.componentData = this.payload.safeContent.componentData || {}
+    this.componentData = this.payload.content.componentData || {}
 
-    if (payload.safeContent.hosted_url && isValidUrl(payload.safeContent.hosted_url)) {
-      this.hosted_url = payload.safeContent.hosted_url
-    } else if (payload.safeContent.url && isValidUrl(payload.safeContent.url)) {
-      this.hosted_url = payload.safeContent.url
-    } else if (payload.safeContent.legacy_url && isValidUrl(payload.safeContent.legacy_url)) {
-      this.hosted_url = payload.safeContent.legacy_url
+    if (payload.content.hosted_url && isValidUrl(payload.content.hosted_url)) {
+      this.hosted_url = payload.content.hosted_url
+    } else if (payload.content.url && isValidUrl(payload.content.url)) {
+      this.hosted_url = payload.content.url
+    } else if (payload.content.legacy_url && isValidUrl(payload.content.legacy_url)) {
+      this.hosted_url = payload.content.legacy_url
     }
-    this.local_url = payload.safeContent.local_url
+    this.local_url = payload.content.local_url
 
-    this.valid_until = new Date(payload.safeContent.valid_until || 0)
-    this.offlineOnly = payload.safeContent.offlineOnly
-    this.name = payload.safeContent.name
-    this.area = payload.safeContent.area
-    this.package_info = payload.safeContent.package_info || {}
-    this.permissions = payload.safeContent.permissions || []
-    this.active = payload.safeContent.active
-    this.autoupdateDisabled = payload.safeContent.autoupdateDisabled
-    this.disassociatedItemIds = payload.safeContent.disassociatedItemIds || []
-    this.associatedItemIds = payload.safeContent.associatedItemIds || []
-    this.isMobileDefault = payload.safeContent.isMobileDefault
+    this.valid_until = new Date(payload.content.valid_until || 0)
+    this.offlineOnly = payload.content.offlineOnly
+    this.name = payload.content.name
+    this.area = payload.content.area
+    this.package_info = payload.content.package_info || {}
+    this.permissions = payload.content.permissions || []
+    this.active = payload.content.active
+    this.autoupdateDisabled = payload.content.autoupdateDisabled
+    this.disassociatedItemIds = payload.content.disassociatedItemIds || []
+    this.associatedItemIds = payload.content.associatedItemIds || []
+    this.isMobileDefault = payload.content.isMobileDefault
     /**
      * @legacy
      * We don't want to set this.url directly, as we'd like to phase it out.
@@ -73,17 +73,14 @@ export class SNComponent extends SNItem<ComponentContent> implements ComponentIn
      * need to set this if content.hosted_url is blank, otherwise,
      * hosted_url is the url replacement.
      */
-    this.legacy_url = !payload.safeContent.hosted_url ? payload.safeContent.url : undefined
+    this.legacy_url = !payload.content.hosted_url ? payload.content.url : undefined
   }
 
   /** Do not duplicate components under most circumstances. Always keep original */
   public strategyWhenConflictingWithItem(
-    item: SNItem,
-    previousRevision?: HistoryEntryInterface,
+    _item: DecryptedItem,
+    _previousRevision?: HistoryEntryInterface,
   ): ConflictStrategy {
-    if (this.errorDecrypting) {
-      return super.strategyWhenConflictingWithItem(item, previousRevision)
-    }
     return ConflictStrategy.KeepLeft
   }
 

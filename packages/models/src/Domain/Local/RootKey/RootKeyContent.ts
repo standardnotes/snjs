@@ -1,4 +1,4 @@
-import { ItemContent } from '../../Abstract/Item/ItemContent'
+import { ItemContent } from '../../Abstract/Item/Interfaces/ItemContent'
 import { ProtocolVersion, AnyKeyParamsContent } from '@standardnotes/common'
 
 export interface RootKeyContentSpecialized {

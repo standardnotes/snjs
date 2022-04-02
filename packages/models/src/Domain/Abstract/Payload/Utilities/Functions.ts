@@ -2,15 +2,15 @@
 import { ContentType, Uuid } from '@standardnotes/common'
 import { Copy, extendArray, pickByCopy, uniqueArray, UuidGenerator } from '@standardnotes/utils'
 import { remove } from 'lodash'
-import { PurePayload } from '../PurePayload'
+import { PurePayload } from '../Implementations/PurePayload'
 import { ImmutablePayloadCollection } from '../../../Runtime/Collection/ImmutablePayloadCollection'
 import { ContentReference } from '../../Reference/ContentReference'
-import { PayloadField } from '../PayloadField'
-import { PayloadInterface } from '../PayloadInterface'
-import { PayloadSource } from '../PayloadSource'
+import { PayloadField } from '../Types/PayloadField'
+import { PayloadInterface } from '../Interfaces/PayloadInterface'
+import { PayloadSource } from '../Types/PayloadSource'
 import { RawPayload } from '../RawPayload'
-import { PayloadFormat } from '../PayloadFormat'
-import { ItemContent } from '../../Item/ItemContent'
+import { PayloadFormat } from '../Types/PayloadFormat'
+import { ItemContent } from '../../Item/Interfaces/ItemContent'
 
 export type Writeable<T> = { -readonly [P in keyof T]: T[P] }
 
@@ -103,7 +103,7 @@ export function PayloadsByUpdatingReferencingPayloadReferences(
       dirty: true,
       dirtiedDate: new Date(),
       content: {
-        ...referencingPayload.safeContent,
+        ...referencingPayload.content,
         references,
       },
     })
@@ -187,7 +187,7 @@ export function CopyPayloadWithContentOverride<C extends ItemContent = ItemConte
 ): PayloadInterface<C> {
   return CreatePayload(payload, payload.fields, payload.source, {
     content: {
-      ...payload.safeContent,
+      ...payload.content,
       ...contentOverride,
     },
   })

@@ -82,7 +82,7 @@ describe('model manager mapping', () => {
     const newTitle = 'updated title'
     const mutated = CreateMaxPayloadFromAnyObject(payload, {
       content: {
-        ...payload.safeContent,
+        ...payload.content,
         title: newTitle,
       },
     })

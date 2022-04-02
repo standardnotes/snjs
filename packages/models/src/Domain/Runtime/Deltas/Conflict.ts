@@ -1,14 +1,14 @@
 import { greaterOfTwoDates, uniqCombineObjArrays } from '@standardnotes/utils'
 import { ImmutablePayloadCollection } from '../Collection/ImmutablePayloadCollection'
-import { CreateItemFromPayload } from '../../Abstract/Item/Generator'
+import { CreateItemFromPayload } from '../../Abstract/Item/Utilities/Generator'
 import { HistoryMap, historyMapFunctions } from '../History/HistoryMap'
-import { ConflictStrategy } from '../../Abstract/Item/ConflictStrategy'
+import { ConflictStrategy } from '../../Abstract/Item/Types/ConflictStrategy'
 import { CopyPayload, PayloadByMerging } from '../../Abstract/Payload/Utilities/Functions'
 import { PayloadsByDuplicating } from '../../Abstract/Payload/Utilities/PayloadsByDuplicating'
 import { PayloadContentsEqual } from '../../Abstract/Payload/Utilities/PayloadContentsEqual'
-import { PayloadField } from '../../Abstract/Payload/PayloadField'
-import { PayloadSource } from '../../Abstract/Payload/PayloadSource'
-import { PurePayload } from '../../Abstract/Payload/PurePayload'
+import { PayloadField } from '../../Abstract/Payload/Types/PayloadField'
+import { PayloadSource } from '../../Abstract/Payload/Types/PayloadSource'
+import { PurePayload } from '../../Abstract/Payload/Implementations/PurePayload'
 
 export class ConflictDelta {
   constructor(
@@ -124,7 +124,7 @@ export class ConflictDelta {
         dirty: true,
         dirtiedDate: new Date(),
         content: {
-          ...this.basePayload.safeContent,
+          ...this.basePayload.content,
           references: refs,
         },
       })

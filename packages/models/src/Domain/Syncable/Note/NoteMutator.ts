@@ -1,5 +1,5 @@
-import { AppDataField } from '../../Abstract/Item/AppDataField'
-import { ItemMutator } from '../../Abstract/Item/ItemMutator'
+import { AppDataField } from '../../Abstract/Item/Types/AppDataField'
+import { ItemMutator } from '../../Abstract/Item/Implementations/ItemMutator'
 import { NoteContent } from './Note'
 
 export class NoteMutator extends ItemMutator<NoteContent> {

@@ -1,8 +1,8 @@
 import { ContentType } from '@standardnotes/common'
 import { extendArray, UuidGenerator } from '@standardnotes/utils'
 import { ImmutablePayloadCollection } from '../../../Runtime/Collection/ImmutablePayloadCollection'
-import { PayloadInterface } from '../PayloadInterface'
-import { ItemContent } from '../../Item/ItemContent'
+import { PayloadInterface } from '../Interfaces/PayloadInterface'
+import { ItemContent } from '../../Item/Interfaces/ItemContent'
 import { AffectorMapping } from './AffectorFunction'
 import { Writeable, CopyPayload, PayloadsByUpdatingReferencingPayloadReferences } from './Functions'
 
@@ -31,7 +31,7 @@ export async function PayloadsByDuplicating<C extends ItemContent = ItemContent>
   }
 
   override.content = {
-    ...payload.safeContent,
+    ...payload.content,
     ...additionalContent,
   }
 

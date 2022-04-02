@@ -1,4 +1,4 @@
-import { ItemMutator } from '../../Abstract/Item/ItemMutator'
+import { ItemMutator } from '../../Abstract/Item/Implementations/ItemMutator'
 import { PrefKey, PrefValue } from './PrefKey'
 
 export class UserPrefsMutator extends ItemMutator {

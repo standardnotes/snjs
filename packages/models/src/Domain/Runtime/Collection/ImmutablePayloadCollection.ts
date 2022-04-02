@@ -1,8 +1,8 @@
 import { ContentType, Uuid } from '@standardnotes/common'
 import { UuidMap } from '@standardnotes/utils'
-import { PayloadInterface } from '../../Abstract/Payload/PayloadInterface'
-import { PayloadSource } from '../../Abstract/Payload/PayloadSource'
-import { PurePayload } from '../../Abstract/Payload/PurePayload'
+import { PayloadInterface } from '../../Abstract/Payload/Interfaces/PayloadInterface'
+import { PayloadSource } from '../../Abstract/Payload/Types/PayloadSource'
+import { PurePayload } from '../../Abstract/Payload/Implementations/PurePayload'
 import { MutableCollection } from './MutableCollection'
 
 /**

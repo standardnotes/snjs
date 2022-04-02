@@ -1,4 +1,4 @@
-import { ItemMutator } from '../../Abstract/Item/ItemMutator'
+import { ItemMutator } from '../../Abstract/Item/Implementations/ItemMutator'
 import { FeatureRepoContent } from './FeatureRepo'
 
 export class FeatureRepoMutator extends ItemMutator<FeatureRepoContent> {

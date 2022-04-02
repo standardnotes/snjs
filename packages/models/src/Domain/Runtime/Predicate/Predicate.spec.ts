@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-import { ItemInterface } from '../../Abstract/Item/ItemInterface'
+import { ItemInterface } from '../../Abstract/Item/Interfaces/ItemInterface'
 import { ContentType } from '@standardnotes/common'
 import {
   compoundPredicateFromArguments,

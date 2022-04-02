@@ -61,7 +61,7 @@ describe('payload collections', () => {
     expect(collection.conflictsOf(payload.uuid)).to.eql([conflict])
 
     const manualResults = collection.all().find((p) => {
-      return p.safeContent.conflict_of === payload.uuid
+      return p.content.conflict_of === payload.uuid
     })
     expect(collection.conflictsOf(payload.uuid)).to.eql([manualResults])
   })

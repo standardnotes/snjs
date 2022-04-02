@@ -128,7 +128,7 @@ describe('importing', function () {
     await application.itemManager.emitItemsFromPayloads(pair, PayloadSource.LocalChanged)
     const mutatedTag = CreateMaxPayloadFromAnyObject(tagPayload, {
       content: {
-        ...tagPayload.safeContent,
+        ...tagPayload.content,
         references: [],
       },
     })
@@ -153,13 +153,13 @@ describe('importing', function () {
     const tag = application.itemManager.tags[0]
     const mutatedNote = CreateMaxPayloadFromAnyObject(notePayload, {
       content: {
-        ...notePayload.safeContent,
+        ...notePayload.content,
         title: `${Math.random()}`,
       },
     })
     const mutatedTag = CreateMaxPayloadFromAnyObject(tagPayload, {
       content: {
-        ...tagPayload.safeContent,
+        ...tagPayload.content,
         title: `${Math.random()}`,
       },
     })

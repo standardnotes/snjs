@@ -1,4 +1,4 @@
-import { ItemInterface } from './../../Abstract/Item/ItemInterface'
+import { ItemInterface } from '../../Abstract/Item/Interfaces/ItemInterface'
 import { SurePayload } from '../../Abstract/Payload/SurePayload'
 import { NoteContent } from '../../Syncable/Note'
 

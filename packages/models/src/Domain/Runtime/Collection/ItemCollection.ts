@@ -4,7 +4,7 @@ import { compareValues, isNullOrUndefined, uniqueArrayByKey } from '@standardnot
 import { CollectionSort } from './CollectionSort'
 import { MutableCollection } from './MutableCollection'
 import { CollectionSortDirection } from './CollectionSortDirection'
-import { ItemInterface } from '../../Abstract/Item/ItemInterface'
+import { ItemInterface } from '../../Abstract/Item/Interfaces/ItemInterface'
 import { SNIndex } from '../Index/SNIndex'
 import { ItemDelta } from '../Index/ItemDelta'
 

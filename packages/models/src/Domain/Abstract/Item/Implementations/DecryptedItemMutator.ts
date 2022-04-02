@@ -1,13 +1,17 @@
 import { Copy } from '@standardnotes/utils'
-import { MutationType } from './MutationType'
-import { PrefKey } from '../../Syncable/UserPrefs/PrefKey'
-import { SNItem } from './Item'
+import { MutationType } from '../Types/MutationType'
+import { PrefKey } from '../../../Syncable/UserPrefs/PrefKey'
+import { DecryptedItem } from './DecryptedItem'
 import { Uuid } from '@standardnotes/common'
-import { ItemContent } from './ItemContent'
-import { PurePayload } from '../Payload/PurePayload'
-import { CopyPayload, PayloadByMerging } from '../Payload/Utilities/Functions'
-import { AppDataField } from './AppDataField'
-import { DefaultAppDomain, DomainDataValueType, ItemDomainKey } from './DefaultAppDomain'
+import { ItemContent } from '../Interfaces/ItemContent'
+import { PurePayload } from '../../Payload/Implementations/PurePayload'
+import { CopyPayload, PayloadByMerging } from '../../Payload/Utilities/Functions'
+import { AppDataField } from '../Types/AppDataField'
+import { DefaultAppDomain, DomainDataValueType, ItemDomainKey } from '../Types/DefaultAppDomain'
+import { GenericItem } from './GenericItem'
+import { PayloadInterface } from '../../Payload'
+import { ItemMutator } from './ItemMutator'
+import { DecryptedPayloadInterface } from '../../Payload/Interfaces/DecryptedPayload'
 
 /**
  * An item mutator takes in an item, and an operation, and returns the resulting payload.
@@ -15,36 +19,17 @@ import { DefaultAppDomain, DomainDataValueType, ItemDomainKey } from './DefaultA
  * All changes to the payload must occur by copying the payload and reassigning its value.
  */
 
-export class ItemMutator<C extends ItemContent = ItemContent> {
-  public readonly item: SNItem<C>
+export class DecryptedItemMutator<C extends ItemContent = ItemContent> extends ItemMutator {
+  public readonly item: DecryptedItem<C>
+  protected payload: DecryptedPayloadInterface
   protected readonly type: MutationType
-  protected payload: PurePayload
-  protected content?: C
+  protected content: C
 
-  constructor(item: SNItem<C>, type: MutationType) {
-    this.item = item
-    this.type = type
-    this.payload = item.payload
+  constructor(item: DecryptedItem<C>, type: MutationType) {
+    super(item, type)
 
-    if (this.payload.content) {
-      /** this.content needs to be mutable, so we make a copy */
-      this.content = Copy(this.payload.content)
-    }
-  }
-
-  public get sureContent(): C {
-    if (!this.content) {
-      throw Error('Attempting to access non-existant mutator content')
-    }
-    return this.content
-  }
-
-  public getUuid() {
-    return this.payload.uuid
-  }
-
-  public getItem() {
-    return this.item
+    const mutableCopy = Copy(this.payload.content)
+    this.content = mutableCopy
   }
 
   public getResult() {
@@ -76,13 +61,11 @@ export class ItemMutator<C extends ItemContent = ItemContent> {
 
   /** Merges the input payload with the base payload */
   public mergePayload(payload: PurePayload) {
-    this.payload = PayloadByMerging(this.payload, payload)
-    if (this.payload.content) {
-      /** this.content needs to be mutable, so we make a copy */
-      this.content = Copy(this.payload.safeContent)
-    } else {
-      this.content = undefined
-    }
+    const merged = PayloadByMerging(this.payload, payload)
+    this.payload = merged
+
+    const mutableCopy = Copy(merged)
+    this.content = mutableCopy
   }
 
   /** Not recommended to use as this might break item schema if used incorrectly */
@@ -200,7 +183,7 @@ export class ItemMutator<C extends ItemContent = ItemContent> {
     this.setDomainDataKey(key, value, DefaultAppDomain)
   }
 
-  public addItemAsRelationship(item: SNItem) {
+  public addItemAsRelationship(item: DecryptedItem) {
     const references = this.sureContent.references || []
     if (!references.find((r) => r.uuid === item.uuid)) {
       references.push({
@@ -211,7 +194,7 @@ export class ItemMutator<C extends ItemContent = ItemContent> {
     this.sureContent.references = references
   }
 
-  public removeItemAsRelationship(item: SNItem) {
+  public removeItemAsRelationship(item: DecryptedItem) {
     let references = this.sureContent.references || []
     references = references.filter((r) => r.uuid !== item.uuid)
     this.sureContent.references = references
