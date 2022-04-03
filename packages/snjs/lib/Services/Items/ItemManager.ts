@@ -31,7 +31,7 @@ export class ItemManager
   private unsubChangeObserver: () => void
   private observers: ItemsChangeObserver[] = []
   private collection!: Models.ItemCollection
-  private notesView!: Models.ItemCollectionNotesView
+  private notesView!: Models.NotesCollection
   private systemSmartViews: Models.SmartView[]
   private tagNotesIndex!: Models.TagNotesIndex
 
@@ -62,7 +62,7 @@ export class ItemManager
     this.collection.setDisplayOptions(ContentType.Component, Models.CollectionSort.CreatedAt, 'asc')
     this.collection.setDisplayOptions(ContentType.Theme, Models.CollectionSort.Title, 'asc')
     this.collection.setDisplayOptions(ContentType.SmartView, Models.CollectionSort.Title, 'dsc')
-    this.notesView = new Models.ItemCollectionNotesView(this.collection)
+    this.notesView = new Models.NotesCollection(this.collection)
     this.tagNotesIndex = new Models.TagNotesIndex(this.collection, this.tagNotesIndex?.observers)
   }
 
@@ -77,7 +77,7 @@ export class ItemManager
    * Creates an unmanaged item from a payload.
    */
   public createItemFromPayload(payload: Models.PurePayload): Models.SNItem {
-    return Models.CreateItemFromPayload(payload)
+    return Models.CreateDecryptedItemFromPayload(payload)
   }
 
   /**
@@ -329,7 +329,7 @@ export class ItemManager
     sourceKey?: string,
   ) {
     const createItems = (items: Models.PurePayload[]) =>
-      items.map((item) => Models.CreateItemFromPayload(item))
+      items.map((item) => Models.CreateDecryptedItemFromPayload(item))
 
     const delta: Models.ItemDelta = {
       changed: createItems(changed),
@@ -708,7 +708,7 @@ export class ItemManager
       content_type: contentType,
       content: Models.FillItemContent<C>(content || {}),
     })
-    return Models.CreateItemFromPayload(payload)
+    return Models.CreateDecryptedItemFromPayload(payload)
   }
 
   /**

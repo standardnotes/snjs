@@ -19,6 +19,8 @@ export function isDeletedPayload(payload: PayloadInterface): payload is DeletedP
   return 'deleted' in payload
 }
 
-export function isEncryptedErroredPayload(payload: PayloadInterface): boolean {
+export function isEncryptedErroredPayload(
+  payload: PayloadInterface,
+): payload is EncryptedPayloadInterface {
   return isEncryptedPayload(payload) && payload.errorDecrypting === true
 }

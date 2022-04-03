@@ -1,4 +1,4 @@
-import { ImmutablePayloadCollection } from '../Collection/ImmutablePayloadCollection'
+import { ImmutablePayloadCollection } from '../Collection/Payload/ImmutablePayloadCollection'
 import { CreateSourcedPayloadFromObject } from '../../Abstract/Payload/Utilities/Functions'
 import { PayloadSource } from '../../Abstract/Payload/Types/PayloadSource'
 import { PayloadsDelta } from './Delta'
@@ -8,7 +8,7 @@ export class DeltaRemoteRejected extends PayloadsDelta {
   public async resultingCollection(): Promise<ImmutablePayloadCollection> {
     const results = []
     for (const payload of this.applyCollection.all()) {
-      const decrypted = this.findRelatedPayload(payload.uuid, PayloadSource.DecryptedTransient)
+      const decrypted = this.findRelatedDecryptedTransientPayload(payload.uuid)
       if (!decrypted) {
         throw 'Unable to find decrypted counterpart for rejected payload.'
       }

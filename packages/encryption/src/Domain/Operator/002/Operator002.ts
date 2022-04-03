@@ -50,7 +50,7 @@ export class SNProtocolOperator002 extends SNProtocolOperator001 {
       content_type: Common.ContentType.ItemsKey,
       content: this.generateNewItemsKeyContent(),
     })
-    return Models.CreateItemFromPayload(payload)
+    return Models.CreateDecryptedItemFromPayload(payload)
   }
 
   public async createRootKey(

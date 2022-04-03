@@ -106,7 +106,7 @@ describe('mutator', () => {
     const item = this.createNote()
     const mutator = new ItemMutator(item)
     const payload = mutator.getResult()
-    const resultItem = CreateItemFromPayload(payload)
+    const resultItem = CreateDecryptedItemFromPayload(payload)
     expect(resultItem.userModifiedDate).to.be.ok
   })
 

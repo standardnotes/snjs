@@ -45,7 +45,7 @@ describe('note display criteria', function () {
     const collection = emptyCollection()
     const notes = []
     titles.forEach((title, index) => {
-      notes.push(CreateItemFromPayload(Factory.createNotePayload(title, bodies[index])))
+      notes.push(CreateDecryptedItemFromPayload(Factory.createNotePayload(title, bodies[index])))
     })
     collection.set(notes)
     return collection

@@ -18,7 +18,7 @@ import {
   ActionsExtensionMutator,
   SNItem,
   MutationType,
-  CreateItemFromPayload,
+  CreateDecryptedItemFromPayload,
 } from '@standardnotes/models'
 import { SNSyncService } from '../Sync/SyncService'
 import { PayloadManager } from '../Payloads/PayloadManager'
@@ -129,7 +129,7 @@ export class SNActionsService extends AbstractService {
     mutator.actions = actions
 
     const payloadResult = mutator.getResult()
-    return CreateItemFromPayload(payloadResult) as SNActionsExtension
+    return CreateDecryptedItemFromPayload(payloadResult) as SNActionsExtension
   }
 
   public async runAction(action: Action, item: SNItem): Promise<ActionResponse | undefined> {
@@ -156,7 +156,7 @@ export class SNActionsService extends AbstractService {
       .then(async (response) => {
         const payload = await this.payloadByDecryptingResponse(response as ActionResponse)
         if (payload) {
-          const item = CreateItemFromPayload(payload)
+          const item = CreateDecryptedItemFromPayload(payload)
           return {
             ...response,
             item,

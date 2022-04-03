@@ -1,12 +1,12 @@
 import { omitInPlace, sortedCopy } from '@standardnotes/utils'
-import { ItemInterface } from '../Interfaces/ItemInterface'
 import { ItemContent } from '../Interfaces/ItemContent'
 import { DefaultAppDomain } from '../Types/DefaultAppDomain'
 import { AppDataField } from '../Types/AppDataField'
+import { DecryptedItemInterface } from '../Interfaces/DecryptedItem'
 
 export function ItemContentsDiffer(
-  item1: ItemInterface,
-  item2: ItemInterface,
+  item1: DecryptedItemInterface,
+  item2: DecryptedItemInterface,
   excludeContentKeys: (keyof ItemContent)[] = [],
 ) {
   return !ItemContentsEqual(

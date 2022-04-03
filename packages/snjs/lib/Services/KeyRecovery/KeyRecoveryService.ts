@@ -1,4 +1,4 @@
-import { CreateItemFromPayload, ItemsKeyInterface } from '@standardnotes/models'
+import { CreateDecryptedItemFromPayload, ItemsKeyInterface } from '@standardnotes/models'
 import {
   SNRootKeyParams,
   EncryptionService,
@@ -192,7 +192,7 @@ export class SNKeyRecoveryService extends AbstractService {
 
     const keys = rawPayloads
       .map((raw) => CreateMaxPayloadFromAnyObject(raw))
-      .map((p) => CreateItemFromPayload(p)) as ItemsKeyInterface[]
+      .map((p) => CreateDecryptedItemFromPayload(p)) as ItemsKeyInterface[]
 
     return this.handleIgnoredItemsKeys(keys, false)
   }

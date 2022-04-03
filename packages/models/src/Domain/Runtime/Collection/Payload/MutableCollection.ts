@@ -1,12 +1,16 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
+import { DecryptedPayloadInterface } from './../../../Abstract/Payload/Interfaces/DecryptedPayload'
 import { extendArray, isString, UuidMap } from '@standardnotes/utils'
 import { ContentType, Uuid } from '@standardnotes/common'
 import { remove } from 'lodash'
-import { ItemInterface } from '../../Abstract/Item/Interfaces/ItemInterface'
-import { PayloadInterface } from '../../Abstract/Payload/Interfaces/PayloadInterface'
-import { IntegrityPayload } from '../../Abstract/Payload/IntegrityPayload'
+import { PayloadInterface } from '../../../Abstract/Payload/Interfaces/PayloadInterface'
+import { IntegrityPayload } from '../../../Abstract/Payload/IntegrityPayload'
+import {
+  isDecryptedPayload,
+  isDeletedPayload,
+  isEncryptedErroredPayload,
+} from '../../../Abstract/Payload/Interfaces/TypeCheck'
 
-export class MutableCollection<T extends PayloadInterface | ItemInterface> {
+export class MutableCollection<T extends PayloadInterface = PayloadInterface> {
   readonly map: Partial<Record<Uuid, T>> = {}
   readonly typedMap: Partial<Record<ContentType, T[]>> = {}
 
@@ -28,6 +32,7 @@ export class MutableCollection<T extends PayloadInterface | ItemInterface> {
    * This allows callers to determine for a given item, who references it?
    * It would be prohibitive to look this up on demand */
   readonly referenceMap: UuidMap
+
   /** Maintains an index for each item uuid where the value is an array of uuids that are
    * conflicts of that item. So if Note B and C are conflicts of Note A,
    * conflictMap[A.uuid] == [B.uuid, C.uuid] */
@@ -68,7 +73,7 @@ export class MutableCollection<T extends PayloadInterface | ItemInterface> {
       }
     } else {
       return Object.keys(this.map).map((uuid: Uuid) => {
-        return this.map[uuid]!
+        return this.map[uuid]
       }) as T[]
     }
   }
@@ -110,50 +115,70 @@ export class MutableCollection<T extends PayloadInterface | ItemInterface> {
    */
   public findAll(uuids: Uuid[], includeBlanks = false): T[] {
     const results = []
+
     for (const id of uuids) {
       const element = this.map[id]
       if (element || includeBlanks) {
         results.push(element)
       }
     }
+
     return results as T[]
+  }
+
+  public findAllDecrypted(uuids: Uuid[]): DecryptedPayloadInterface[] {
+    const allResults = this.findAll(uuids)
+    const filtered: DecryptedPayloadInterface[] = []
+
+    allResults.forEach((payload) => {
+      if (isDecryptedPayload(payload)) {
+        filtered.push(payload)
+      }
+    })
+
+    return filtered
   }
 
   public set(elements: T | T[]): void {
     elements = Array.isArray(elements) ? elements : [elements]
+
     if (elements.length === 0) {
       console.warn('Attempting to set 0 elements onto collection')
       return
     }
+
     for (const element of elements) {
-      this.map[element.uuid!] = element
+      this.map[element.uuid] = element
       this.setToTypedMap(element)
 
-      /** Dirty index */
       if (element.dirty) {
         this.dirtyIndex.add(element.uuid)
       } else {
         this.dirtyIndex.delete(element.uuid)
       }
 
-      /** Invalids index */
-      if (element.errorDecrypting || element.waitingForKey) {
+      if (
+        isEncryptedErroredPayload(element) &&
+        (element.errorDecrypting || element.waitingForKey)
+      ) {
         this.invalidsIndex.add(element.uuid)
       } else {
         this.invalidsIndex.delete(element.uuid)
       }
 
-      if (element.deleted) {
-        this.referenceMap.removeFromMap(element.uuid!)
+      if (isDeletedPayload(element)) {
+        this.referenceMap.removeFromMap(element.uuid)
         this.nondeletedIndex.delete(element.uuid)
-      } else {
+      } else if (isDecryptedPayload(element)) {
         this.nondeletedIndex.add(element.uuid)
+
         const conflictOf = element.content.conflict_of
         if (conflictOf) {
           this.conflictMap.establishRelationship(conflictOf, element.uuid)
         }
+
         this.referenceMap.setAllRelationships(
-          element.uuid!,
+          element.uuid,
           element.references.map((r) => r.uuid),
         )
       }
@@ -166,21 +191,21 @@ export class MutableCollection<T extends PayloadInterface | ItemInterface> {
       this.conflictMap.removeFromMap(element.uuid)
       this.referenceMap.removeFromMap(element.uuid)
       this.deleteFromTypedMap(element)
-      delete this.map[element.uuid!]
+      delete this.map[element.uuid]
     }
   }
 
   private setToTypedMap(element: T): void {
-    const array = this.typedMap[element.content_type!] || ([] as T[])
-    remove(array, { uuid: element.uuid! as any })
+    const array = this.typedMap[element.content_type] || ([] as T[])
+    remove(array, { uuid: element.uuid as never })
     array.push(element)
-    this.typedMap[element.content_type!] = array
+    this.typedMap[element.content_type] = array
   }
 
   private deleteFromTypedMap(element: T): void {
-    const array = this.typedMap[element.content_type!] || ([] as T[])
-    remove(array, { uuid: element.uuid! as any })
-    this.typedMap[element.content_type!] = array
+    const array = this.typedMap[element.content_type] || ([] as T[])
+    remove(array, { uuid: element.uuid as never })
+    this.typedMap[element.content_type] = array
   }
 
   public uuidsThatReferenceUuid(uuid: Uuid): Uuid[] {
@@ -190,12 +215,17 @@ export class MutableCollection<T extends PayloadInterface | ItemInterface> {
     return this.referenceMap.getInverseRelationships(uuid)
   }
 
-  public elementsReferencingElement(element: T, contentType?: ContentType): T[] {
+  public elementsReferencingElement(
+    element: T,
+    contentType?: ContentType,
+  ): DecryptedPayloadInterface[] {
     const uuids = this.uuidsThatReferenceUuid(element.uuid)
-    const items = this.findAll(uuids) as T[]
+    const items = this.findAllDecrypted(uuids)
+
     if (!contentType) {
       return items
     }
+
     return items.filter((item) => item.content_type === contentType)
   }
 
@@ -211,8 +241,8 @@ export class MutableCollection<T extends PayloadInterface | ItemInterface> {
     return this.findAll(uuids) as T[]
   }
 
-  public conflictsOf(uuid: Uuid): T[] {
+  public conflictsOf(uuid: Uuid): DecryptedPayloadInterface[] {
     const uuids = this.conflictMap.getDirectRelationships(uuid)
-    return this.findAll(uuids) as T[]
+    return this.findAllDecrypted(uuids)
   }
 }

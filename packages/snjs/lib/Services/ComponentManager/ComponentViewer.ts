@@ -9,7 +9,7 @@ import {
   PrefKey,
   NoteContent,
   MutationType,
-  CreateItemFromPayload,
+  CreateDecryptedItemFromPayload,
 } from '@standardnotes/models'
 import find from 'lodash/find'
 import uniq from 'lodash/uniq'
@@ -681,7 +681,7 @@ export class ComponentViewer {
         for (const payload of payloads) {
           const item = this.itemManager.findItem(payload.uuid)
           if (!item) {
-            const template = CreateItemFromPayload(payload)
+            const template = CreateDecryptedItemFromPayload(payload)
             await this.itemManager.insertItem(template)
           } else {
             if (payload.content_type !== item.content_type) {
@@ -751,7 +751,7 @@ export class ComponentViewer {
             responseItem,
             PayloadSource.ComponentCreated,
           )
-          const template = CreateItemFromPayload(payload)
+          const template = CreateDecryptedItemFromPayload(payload)
           const item = await this.itemManager.insertItem(template)
           await this.itemManager.changeItem(
             item.uuid,

@@ -166,6 +166,10 @@ export abstract class GenericItem implements ItemInterface {
       return ConflictStrategy.KeepRight
     }
 
+    if (!isDecryptedItem(item) || !isDecryptedItem(this)) {
+      return ConflictStrategy.KeepLeftDuplicateRight
+    }
+
     const contentDiffers = ItemContentsDiffer(this, item)
     if (!contentDiffers) {
       return ConflictStrategy.KeepRight

@@ -8,7 +8,7 @@ import { Create001KeyParams } from '../../RootKey/KeyParams'
 import { firstHalfOfString, secondHalfOfString, splitString } from '@standardnotes/utils'
 import { AsynchronousOperator } from '../Operator'
 import {
-  CreateItemFromPayload,
+  CreateDecryptedItemFromPayload,
   ItemsKeyContent,
   ItemsKeyInterface,
   CreateMaxPayloadFromAnyObject,
@@ -73,7 +73,7 @@ export class SNProtocolOperator001 implements AsynchronousOperator {
       content_type: ContentType.ItemsKey,
       content: this.generateNewItemsKeyContent(),
     })
-    return CreateItemFromPayload(payload)
+    return CreateDecryptedItemFromPayload(payload)
   }
 
   public async createRootKey(

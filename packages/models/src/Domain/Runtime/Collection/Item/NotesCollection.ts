@@ -1,25 +1,25 @@
 import { ContentType } from '@standardnotes/common'
-import { SNNote } from '../../Syncable/Note'
-import { isSystemView, SmartView } from '../../Syncable/SmartView'
-import { SNTag } from '../../Syncable/Tag'
+import { SNNote } from '../../../Syncable/Note'
+import { isSystemView, SmartView } from '../../../Syncable/SmartView'
+import { SNTag } from '../../../Syncable/Tag'
 import {
   criteriaForSmartView,
   NotesDisplayCriteria,
   notesMatchingCriteria,
-} from '../../Syncable/Note/NotesDisplayCriteria'
-import { SNIndex } from '../Index/SNIndex'
-import { ItemCollection } from './ItemCollection'
-import { ItemDelta } from '../Index/ItemDelta'
+} from '../../../Syncable/Note/NotesDisplayCriteria'
+import { SNIndex } from '../../Index/SNIndex'
+import { DecryptedItemCollection } from './DecryptedItemCollection'
+import { ItemDelta } from '../../Index/ItemDelta'
 
 /**
  * A view into ItemCollection that allows filtering by tag and smart view.
  */
-export class ItemCollectionNotesView implements SNIndex {
+export class NotesCollection implements SNIndex {
   private displayedNotes: SNNote[] = []
   private needsRebuilding = true
 
   constructor(
-    private collection: ItemCollection,
+    private collection: DecryptedItemCollection,
     private criteria: NotesDisplayCriteria = NotesDisplayCriteria.Create({}),
   ) {}
 

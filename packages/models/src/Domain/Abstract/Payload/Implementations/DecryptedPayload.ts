@@ -3,6 +3,7 @@ import { FillItemContent, ItemContent } from '../../Item'
 import { ContentReference } from '../../Reference/ContentReference'
 import { DecryptedPayloadInterface } from '../Interfaces/DecryptedPayload'
 import { PayloadField } from '../Types/PayloadField'
+import { PayloadFormat } from '../Types/PayloadFormat'
 import { PayloadSource } from '../Types/PayloadSource'
 import { PurePayload } from './PurePayload'
 
@@ -11,6 +12,8 @@ export class DecryptedPayload<C extends ItemContent = ItemContent>
   implements DecryptedPayloadInterface<C>
 {
   readonly content: C
+  readonly format = PayloadFormat.DecryptedBareObject
+
 
   constructor(
     rawPayload: DecryptedPayloadInterface<C>,

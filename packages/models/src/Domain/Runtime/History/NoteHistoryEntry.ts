@@ -6,7 +6,7 @@ export class NoteHistoryEntry extends HistoryEntry {
     if (this.payload.updated_at.getTime() > 0) {
       return this.payload.updated_at.toLocaleString()
     } else {
-      return this.payload.created_at!.toLocaleString()
+      return this.payload.created_at.toLocaleString()
     }
   }
 

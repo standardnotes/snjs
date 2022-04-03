@@ -1,46 +1,107 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { remove } from 'lodash'
 import { ContentType, Uuid } from '@standardnotes/common'
-import { compareValues, isNullOrUndefined, uniqueArrayByKey } from '@standardnotes/utils'
-import { CollectionSort } from './CollectionSort'
-import { MutableCollection } from './MutableCollection'
-import { CollectionSortDirection } from './CollectionSortDirection'
-import { ItemInterface } from '../../Abstract/Item/Interfaces/ItemInterface'
-import { SNIndex } from '../Index/SNIndex'
-import { ItemDelta } from '../Index/ItemDelta'
+import {
+  compareValues,
+  extendArray,
+  isNullOrUndefined,
+  uniqueArrayByKey,
+} from '@standardnotes/utils'
+import { CollectionSort } from '../CollectionSort'
+import { CollectionSortDirection } from '../CollectionSortDirection'
+import { SNIndex } from '../../Index/SNIndex'
+import { ItemDelta } from '../../Index/ItemDelta'
+import { isDeletedItem, isEncryptedErroredItem } from '../../../Abstract/Item/Interfaces/TypeCheck'
+import { isNote } from '../../../Syncable/Note'
+import { DecryptedItemInterface } from '../../../Abstract/Item/Interfaces/DecryptedItem'
 
-/** The item collection class builds on mutable collection by providing an option to keep
- * items sorted and filtered. */
-export class ItemCollection extends MutableCollection<ItemInterface> implements SNIndex {
+export class DecryptedItemCollection implements SNIndex {
+  readonly map: Partial<Record<Uuid, DecryptedItemInterface>> = {}
+  readonly typedMap: Partial<Record<ContentType, DecryptedItemInterface[]>> = {}
+
   private displaySortBy: Partial<
     Record<
       ContentType,
       {
-        key: CollectionSort
+        key: keyof DecryptedItemInterface
         dir: CollectionSortDirection
       }
     >
   > = {}
-  private displayFilter: Partial<Record<ContentType, (element: ItemInterface) => boolean>> = {}
 
-  /** A display ready map of uuids-to-position in sorted array. i.e filteredMap[contentType]
+  private displayFilter: Partial<
+    Record<ContentType, (element: DecryptedItemInterface) => boolean>
+  > = {}
+
+  /**
+   * A display ready map of uuids-to-position in sorted array. i.e filteredMap[contentType]
    * returns {uuid_123: 1, uuid_456: 2}, where 1 and 2 are the positions of the element
    * in the sorted array. We keep track of positions so that when we want to re-sort or remove
-   * and element, we don't have to search the entire sorted array to do so. */
+   * and element, we don't have to search the entire sorted array to do so.
+   */
   private filteredMap: Partial<Record<ContentType, Record<Uuid, number>>> = {}
-  /** A sorted representation of the filteredMap, where sortedMap[contentType] returns
-   * an array of sorted elements, based on the current displaySortBy */
-  private sortedMap: Partial<Record<ContentType, ItemInterface[]>> = {}
 
-  public set(elements: ItemInterface | ItemInterface[]): void {
+  /**
+   * A sorted representation of the filteredMap, where sortedMap[contentType] returns
+   * an array of sorted elements, based on the current displaySortBy
+   */
+  private sortedMap: Partial<Record<ContentType, DecryptedItemInterface[]>> = {}
+
+  public set(elements: DecryptedItemInterface | DecryptedItemInterface[]): void {
     elements = uniqueArrayByKey(Array.isArray(elements) ? elements : [elements], 'uuid')
-    super.set(elements)
+
+    for (const element of elements) {
+      this.map[element.uuid] = element
+      this.setToTypedMap(element)
+    }
+
     this.filterSortElements(elements)
   }
 
-  public discard(elements: ItemInterface | ItemInterface[]): void {
+  public discard(elements: DecryptedItemInterface | DecryptedItemInterface[]): void {
     elements = Array.isArray(elements) ? elements : [elements]
-    super.discard(elements)
+
+    for (const element of elements) {
+      delete this.map[element.uuid]
+      this.deleteFromTypedMap(element)
+    }
+
     this.filterSortElements(elements)
+  }
+
+  private setToTypedMap(element: DecryptedItemInterface): void {
+    const array = this.typedMap[element.content_type] || ([] as DecryptedItemInterface[])
+    remove(array, { uuid: element.uuid as never })
+    array.push(element)
+    this.typedMap[element.content_type] = array
+  }
+
+  private deleteFromTypedMap(element: DecryptedItemInterface): void {
+    const array = this.typedMap[element.content_type] || ([] as DecryptedItemInterface[])
+    remove(array, { uuid: element.uuid as never })
+    this.typedMap[element.content_type] = array
+  }
+
+  public find(uuid: Uuid): DecryptedItemInterface | undefined {
+    return this.map[uuid]
+  }
+
+  public all(contentType?: ContentType | ContentType[]): DecryptedItemInterface[] {
+    if (contentType) {
+      if (Array.isArray(contentType)) {
+        const elements = [] as DecryptedItemInterface[]
+        for (const type of contentType) {
+          extendArray(elements, this.typedMap[type] || [])
+        }
+        return elements
+      } else {
+        return this.typedMap[contentType]?.slice() || []
+      }
+    } else {
+      return Object.keys(this.map).map((uuid: Uuid) => {
+        return this.map[uuid]
+      }) as DecryptedItemInterface[]
+    }
   }
 
   /**
@@ -57,7 +118,7 @@ export class ItemCollection extends MutableCollection<ItemInterface> implements 
     contentType: ContentType,
     sortBy = CollectionSort.CreatedAt,
     direction: CollectionSortDirection = 'asc',
-    filter?: (element: ItemInterface) => boolean,
+    filter?: (element: DecryptedItemInterface) => boolean,
   ): void {
     const existingSortBy = this.displaySortBy[contentType]
     const existingFilter = this.displayFilter[contentType]
@@ -77,7 +138,7 @@ export class ItemCollection extends MutableCollection<ItemInterface> implements 
     /** Reset existing maps */
     this.filteredMap[contentType] = {}
     this.sortedMap[contentType] = []
-    /** Re-process all elements */
+
     const elements = this.all(contentType)
     if (elements.length > 0) {
       this.filterSortElements(elements)
@@ -86,7 +147,7 @@ export class ItemCollection extends MutableCollection<ItemInterface> implements 
 
   /** Returns the filtered and sorted list of elements for this content type,
    * according to the options set via `setDisplayOptions` */
-  public displayElements(contentType: ContentType): ItemInterface[] {
+  public displayElements(contentType: ContentType): DecryptedItemInterface[] {
     const elements = this.sortedMap[contentType]
     if (!elements) {
       throw Error(
@@ -97,10 +158,11 @@ export class ItemCollection extends MutableCollection<ItemInterface> implements 
     return elements.slice()
   }
 
-  private filterSortElements(elements: ItemInterface[]) {
+  private filterSortElements(elements: DecryptedItemInterface[]) {
     if (Object.keys(this.displaySortBy).length === 0) {
       return
     }
+
     /** If a content type is added to this set, we are indicating the entire sorted
      * array will need to be re-sorted. The reason for sorting the entire array and not
      * just inserting an element using binary search is that we need to keep track of the
@@ -111,9 +173,11 @@ export class ItemCollection extends MutableCollection<ItemInterface> implements 
       const contentType = element.content_type
       const sortBy = this.displaySortBy[contentType]
       /** Sort by is required, but filter is not */
+
       if (!sortBy) {
         continue
       }
+
       const filter = this.displayFilter[contentType]
       /** Filtered content type map */
       const filteredCTMap = this.filteredMap[contentType]!
@@ -124,24 +188,31 @@ export class ItemCollection extends MutableCollection<ItemInterface> implements 
         : undefined
 
       /**
-       *  If the element is deleted, or if it no longer exists in the primary map (because
+       * If the element is deleted, or if it no longer exists in the primary map (because
        * it was discarded without neccessarily being marked as deleted), it does not pass
        * the filter. If no filter the element passes by default.
        */
       const passes =
-        element.deleted || !this.map[element.uuid] ? false : filter ? filter(element) : true
+        isDeletedItem(element) || !this.map[element.uuid] ? false : filter ? filter(element) : true
+
       if (passes) {
         if (!isNullOrUndefined(previousElement)) {
-          /** Check to see if the element has changed its sort value. If so, we need to re-sort.
-           * Previous element might be encrypted. */
-          const previousValue = previousElement.errorDecrypting
+          /**
+           * Check to see if the element has changed its sort value.
+           * If so, we need to re-sort. Previous element might be encrypted.
+           */
+          const previousValue = isEncryptedErroredItem(previousElement)
             ? undefined
-            : previousElement[sortBy.key as keyof ItemInterface]
+            : previousElement[sortBy.key]
+
           const newValue = (element as any)[sortBy.key]
+
           /** Replace the current element with the new one. */
           sortedElements[previousIndex] = element
+
           /** If the pinned status of the element has changed, it needs to be resorted */
           const pinChanged = previousElement!.pinned !== element.pinned
+
           if (!compareValues(previousValue, newValue) || pinChanged) {
             /** Needs resort because its re-sort value has changed,
              * and thus its position might change */
@@ -150,6 +221,7 @@ export class ItemCollection extends MutableCollection<ItemInterface> implements 
         } else {
           /** Has not yet been inserted */
           sortedElements.push(element)
+
           /** Needs re-sort because we're just pushing the element to the end here */
           typesNeedingResort.add(contentType)
         }
@@ -157,9 +229,11 @@ export class ItemCollection extends MutableCollection<ItemInterface> implements 
         /** Doesn't pass filter, remove from sorted and filtered */
         if (!isNullOrUndefined(previousIndex)) {
           delete filteredCTMap[element.uuid]
+
           /** We don't yet remove the element directly from the array, since mutating
            * the array inside a loop could render all other upcoming indexes invalid */
           ;(sortedElements[previousIndex] as any) = undefined
+
           /** Since an element is being removed from the array, we need to recompute
            * the new positions for elements that are staying */
           typesNeedingResort.add(contentType)
@@ -176,9 +250,14 @@ export class ItemCollection extends MutableCollection<ItemInterface> implements 
     const sortedElements = this.sortedMap[contentType]!
     const sortBy = this.displaySortBy[contentType]!
     const filteredCTMap = this.filteredMap[contentType]!
+
     /** Resort the elements array, and update the saved positions */
     /** @O(n * log(n)) */
-    const sortFn = (a?: ItemInterface, b?: ItemInterface, skipPinnedCheck = false): number => {
+    const sortFn = (
+      a?: DecryptedItemInterface,
+      b?: DecryptedItemInterface,
+      skipPinnedCheck = false,
+    ): number => {
       /** If the elements are undefined, move to beginning */
       if (!a) {
         return -1
@@ -186,7 +265,8 @@ export class ItemCollection extends MutableCollection<ItemInterface> implements 
       if (!b) {
         return 1
       }
-      if (!skipPinnedCheck) {
+
+      if (!skipPinnedCheck && isNote(a) && isNote(b)) {
         if (a.pinned && b.pinned) {
           return sortFn(a, b, true)
         }
@@ -197,9 +277,11 @@ export class ItemCollection extends MutableCollection<ItemInterface> implements 
           return 1
         }
       }
+
       const aValue: string = (a as any)[sortBy.key] || ''
       const bValue: string = (b as any)[sortBy.key] || ''
       let vector = 1
+
       if (sortBy.dir === 'asc') {
         vector *= -1
       }
@@ -218,14 +300,17 @@ export class ItemCollection extends MutableCollection<ItemInterface> implements 
         return 0
       }
     }
+
     const resorted = sortedElements.sort((a, b) => {
       return sortFn(a, b)
     })
+
     /** Now that resorted contains the sorted elements (but also can contain undefined element)
      * we create another array that filters out any of the undefinedes. We also keep track of the
      * current index while we loop and set that in the filteredCTMap. */
-    const cleaned = [] as ItemInterface[]
+    const cleaned = []
     let currentIndex = 0
+
     /** @O(n) */
     for (const element of resorted) {
       if (!element) {
@@ -235,10 +320,11 @@ export class ItemCollection extends MutableCollection<ItemInterface> implements 
       filteredCTMap[element.uuid] = currentIndex
       currentIndex++
     }
+
     this.sortedMap[contentType] = cleaned
   }
 
-  public onChange(delta: ItemDelta): void {
+  public onChange(delta: ItemDelta<DecryptedItemInterface>): void {
     const changedOrInserted = delta.changed.concat(delta.inserted)
 
     if (changedOrInserted.length > 0) {

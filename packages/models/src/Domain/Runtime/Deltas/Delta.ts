@@ -1,7 +1,10 @@
-import { ImmutablePayloadCollection } from '../Collection/ImmutablePayloadCollection'
-import { ImmutablePayloadCollectionSet } from '../Collection/ImmutablePayloadCollectionSet'
+import { DecryptedPayloadInterface } from './../../Abstract/Payload/Interfaces/DecryptedPayload'
+import { PayloadInterface } from './../../Abstract/Payload/Interfaces/PayloadInterface'
+import { ImmutablePayloadCollection } from '../Collection/Payload/ImmutablePayloadCollection'
+import { ImmutablePayloadCollectionSet } from '../Collection/Payload/ImmutablePayloadCollectionSet'
 import { HistoryMap } from '../History/HistoryMap'
 import { PayloadSource } from '../../Abstract/Payload/Types/PayloadSource'
+import { Uuid } from '@standardnotes/common'
 /**
  * A payload delta is a class that defines instructions that process an incoming collection
  * of payloads, applies some set of operations on those payloads wrt to the current base state,
@@ -18,7 +21,7 @@ import { PayloadSource } from '../../Abstract/Payload/Types/PayloadSource'
  * baseCollection, the data the server is sending as applyCollection, and determine what
  * the end state of the data should look like.
  */
-export class PayloadsDelta {
+export class PayloadsDelta<T extends PayloadInterface = PayloadInterface> {
   /**
    * @param baseCollection The authoratitive collection on top of which to compute changes.
    * @param applyCollection The collection of payloads to apply, from one given source only.
@@ -26,8 +29,8 @@ export class PayloadsDelta {
    *                             that may be neccessary to carry out computation.
    */
   constructor(
-    protected readonly baseCollection: ImmutablePayloadCollection,
-    protected readonly applyCollection: ImmutablePayloadCollection,
+    protected readonly baseCollection: ImmutablePayloadCollection<T>,
+    protected readonly applyCollection: ImmutablePayloadCollection<T>,
     protected readonly relatedCollectionSet?: ImmutablePayloadCollectionSet,
     protected readonly historyMap?: HistoryMap,
   ) {}
@@ -37,15 +40,19 @@ export class PayloadsDelta {
     throw 'Must override PayloadDelta.resultingCollection.'
   }
 
-  /**
-   * @param id  - The uuid of the payload to find
-   */
-  protected findBasePayload(id: string) {
+  protected findBasePayload(id: Uuid) {
     return this.baseCollection.find(id)
   }
 
   protected findRelatedPayload(id: string, source: PayloadSource) {
     const collection = this.relatedCollectionSet?.collectionForSource(source)
     return collection?.find(id)
+  }
+
+  protected findRelatedDecryptedTransientPayload(id: Uuid) {
+    const collection = this.relatedCollectionSet?.collectionForSource(
+      PayloadSource.DecryptedTransient,
+    )
+    return collection?.find(id) as DecryptedPayloadInterface
   }
 }

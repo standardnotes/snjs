@@ -185,8 +185,8 @@ describe('payload collections', () => {
   it('pinning note should update sort', async () => {
     const collection = new ItemCollection()
     collection.setDisplayOptions(ContentType.Note, CollectionSort.CreatedAt, 'asc')
-    const unpinned1 = CreateItemFromPayload(Factory.createNotePayload('fo'))
-    const unpinned2 = CreateItemFromPayload(Factory.createNotePayload('foo'))
+    const unpinned1 = CreateDecryptedItemFromPayload(Factory.createNotePayload('fo'))
+    const unpinned2 = CreateDecryptedItemFromPayload(Factory.createNotePayload('foo'))
 
     collection.set([unpinned1, unpinned2])
     const sorted = collection.displayElements(ContentType.Note)
@@ -194,7 +194,7 @@ describe('payload collections', () => {
     expect(sorted[0].uuid).to.equal(unpinned1.uuid)
     expect(sorted[1].uuid).to.equal(unpinned2.uuid)
 
-    const pinned2 = CreateItemFromPayload(
+    const pinned2 = CreateDecryptedItemFromPayload(
       CopyPayload(unpinned2.payload, {
         content: {
           ...unpinned1.content,
@@ -215,9 +215,9 @@ describe('payload collections', () => {
 
   it('setDisplayOptions should not fail for encrypted items', async () => {
     const collection = new ItemCollection()
-    const regularPayload1 = CreateItemFromPayload(Factory.createNotePayload('foo', 'noteText'))
-    const regularPayload2 = CreateItemFromPayload(Factory.createNotePayload('foo', 'noteText2'))
-    const encryptedPayloadUpdated = CreateItemFromPayload(
+    const regularPayload1 = CreateDecryptedItemFromPayload(Factory.createNotePayload('foo', 'noteText'))
+    const regularPayload2 = CreateDecryptedItemFromPayload(Factory.createNotePayload('foo', 'noteText2'))
+    const encryptedPayloadUpdated = CreateDecryptedItemFromPayload(
       CopyPayload(regularPayload1.payload, {
         ...regularPayload1.payload,
         errorDecrypting: true,

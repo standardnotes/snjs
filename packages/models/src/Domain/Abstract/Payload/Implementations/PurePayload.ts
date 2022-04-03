@@ -4,6 +4,7 @@ import { deepFreeze, isNullOrUndefined } from '@standardnotes/utils'
 import { PayloadField } from '../Types/PayloadField'
 import { PayloadInterface } from '../Interfaces/PayloadInterface'
 import { PayloadSource } from '../Types/PayloadSource'
+import { Writeable } from '../Utilities/Functions'
 
 export abstract class PurePayload implements PayloadInterface {
   readonly fields: PayloadField[]
@@ -13,8 +14,8 @@ export abstract class PurePayload implements PayloadInterface {
 
   readonly created_at: Date
   readonly updated_at: Date
-  readonly created_at_timestamp?: number
-  readonly updated_at_timestamp?: number
+  readonly created_at_timestamp: number = 0
+  readonly updated_at_timestamp: number = 0
   readonly dirtiedDate?: Date
   readonly dirty?: boolean
 
@@ -77,7 +78,7 @@ export abstract class PurePayload implements PayloadInterface {
       PayloadField.LastSyncEnd,
     ]
 
-    const result = {} as PayloadInterface
+    const result = {} as Writeable<PayloadInterface>
 
     for (const field of this.fields) {
       if (nonRequiredFields.includes(field)) {

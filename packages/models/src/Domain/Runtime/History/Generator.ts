@@ -1,12 +1,12 @@
+import { DecryptedPayloadInterface } from './../../Abstract/Payload/Interfaces/DecryptedPayload'
 import { ContentType } from '@standardnotes/common'
 import { NoteContent } from '../../Syncable/Note'
 import { PayloadField } from '../../Abstract/Payload/Types/PayloadField'
-import { SurePayload } from '../../Abstract/Payload/SurePayload'
 import { HistoryEntry } from './HistoryEntry'
 import { NoteHistoryEntry } from './NoteHistoryEntry'
 
 export function CreateHistoryEntryForPayload(
-  payload: SurePayload<NoteContent>,
+  payload: DecryptedPayloadInterface<NoteContent>,
   previousEntry?: HistoryEntry,
 ): HistoryEntry {
   const type = payload[PayloadField.ContentType] as ContentType

@@ -897,7 +897,7 @@ export class SNSyncService
         processedItemsKeyPayloads[payload.items_key_id as string]
 
       const itemsKey = itemsKeyPayload
-        ? Models.CreateItemFromPayload<ItemsKeyInterface>(itemsKeyPayload)
+        ? Models.CreateDecryptedItemFromPayload<ItemsKeyInterface>(itemsKeyPayload)
         : undefined
 
       const split = Encryption.splitItemsByEncryptionType([payload])

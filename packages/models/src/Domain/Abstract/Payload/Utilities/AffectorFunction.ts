@@ -1,8 +1,8 @@
 import { ComponentArea } from '@standardnotes/features'
 import { ContentType } from '@standardnotes/common'
 import { ComponentMutator, SNComponent } from '../../../Syncable/Component'
-import { CreateItemFromPayload } from '../../Item/Utilities/Generator'
-import { ImmutablePayloadCollection } from '../../../Runtime/Collection/ImmutablePayloadCollection'
+import { CreateDecryptedItemFromPayload } from '../../Item/Utilities/Generator'
+import { ImmutablePayloadCollection } from '../../../Runtime/Collection/Payload/ImmutablePayloadCollection'
 import { MutationType } from '../../Item/Types/MutationType'
 import { PayloadInterface } from '../Interfaces/PayloadInterface'
 
@@ -19,7 +19,7 @@ function NoteDuplicationAffectedPayloads(
 ) {
   /** If note has editor, maintain editor relationship in duplicate note */
   const components = baseCollection.all(ContentType.Component).map((payload) => {
-    return CreateItemFromPayload(payload)
+    return CreateDecryptedItemFromPayload(payload)
   }) as SNComponent[]
   const editor = components
     .filter((c) => c.area === ComponentArea.Editor)

@@ -651,7 +651,7 @@ describe('key recovery service', function () {
         (payload) => payload.uuid === newDefaultKey.uuid,
       )
       const storedParams = await appA.protocolService.getKeyEmbeddedKeyParams(
-        CreateItemFromPayload(CreateMaxPayloadFromAnyObject(stored)),
+        CreateDecryptedItemFromPayload(CreateMaxPayloadFromAnyObject(stored)),
       )
 
       const correctStored = (
@@ -659,7 +659,7 @@ describe('key recovery service', function () {
       ).find((payload) => payload.uuid === newDefaultKey.uuid)
 
       const correctParams = await appB.protocolService.getKeyEmbeddedKeyParams(
-        CreateItemFromPayload(CreateMaxPayloadFromAnyObject(correctStored)),
+        CreateDecryptedItemFromPayload(CreateMaxPayloadFromAnyObject(correctStored)),
       )
 
       expect(storedParams).to.eql(correctParams)

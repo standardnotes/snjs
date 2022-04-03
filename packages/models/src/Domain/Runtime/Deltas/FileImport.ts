@@ -1,15 +1,27 @@
 import { extendArray } from '@standardnotes/utils'
-import { ImmutablePayloadCollection } from '../Collection/ImmutablePayloadCollection'
+import { ImmutablePayloadCollection } from '../Collection/Payload/ImmutablePayloadCollection'
 import { CopyPayload } from '../../Abstract/Payload/Utilities/Functions'
 import { PayloadSource } from '../../Abstract/Payload/Types/PayloadSource'
-import { PurePayload } from '../../Abstract/Payload/Implementations/PurePayload'
 import { ConflictDelta } from './Conflict'
 import { PayloadsDelta } from './Delta'
+import { DecryptedPayloadInterface } from '../../Abstract/Payload/Interfaces/DecryptedPayload'
+import { ImmutablePayloadCollectionSet } from '../Collection/Payload/ImmutablePayloadCollectionSet'
+import { HistoryMap } from '../History'
 
-export class DeltaFileImport extends PayloadsDelta {
+export class DeltaFileImport extends PayloadsDelta<DecryptedPayloadInterface> {
+  constructor(
+    protected readonly baseCollection: ImmutablePayloadCollection<DecryptedPayloadInterface>,
+    protected readonly applyCollection: ImmutablePayloadCollection<DecryptedPayloadInterface>,
+    protected readonly relatedCollectionSet?: ImmutablePayloadCollectionSet,
+    protected readonly historyMap?: HistoryMap,
+  ) {
+    super(baseCollection, applyCollection, relatedCollectionSet, historyMap)
+  }
+
   public async resultingCollection() {
-    const results: Array<PurePayload> = []
-    for (const payload of this.applyCollection!.all()) {
+    const results: Array<DecryptedPayloadInterface> = []
+
+    for (const payload of this.applyCollection.all()) {
       const handled = await this.payloadsByHandlingPayload(payload, results)
       const payloads = handled.map((result) => {
         return CopyPayload(result, {
@@ -20,12 +32,13 @@ export class DeltaFileImport extends PayloadsDelta {
       })
       extendArray(results, payloads)
     }
+
     return ImmutablePayloadCollection.WithPayloads(results, PayloadSource.FileImport)
   }
 
   private async payloadsByHandlingPayload(
-    payload: PurePayload,
-    currentResults: Array<PurePayload>,
+    payload: DecryptedPayloadInterface,
+    currentResults: Array<DecryptedPayloadInterface>,
   ) {
     /**
      * Check to see if we've already processed a payload for this id.
@@ -36,7 +49,7 @@ export class DeltaFileImport extends PayloadsDelta {
      * would contain the most recent value.
      */
     let current = currentResults.find((candidate) => {
-      return candidate.contentObject.conflict_of === payload.uuid
+      return candidate.content.conflict_of === payload.uuid
     })
     /**
      * If no latest conflict, find by uuid directly.

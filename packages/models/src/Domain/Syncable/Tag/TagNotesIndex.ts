@@ -3,7 +3,7 @@ import { Uuid } from '@standardnotes/common'
 import { isNote, SNNote } from '../Note'
 import { isTag, SNTag } from '.'
 import { SNIndex } from '../../Runtime/Index/SNIndex'
-import { ItemCollection } from '../../Runtime/Collection/ItemCollection'
+import { DecryptedItemCollection } from '../../Runtime/Collection/Item/DecryptedItemCollection'
 import { ItemDelta } from '../../Runtime/Index/ItemDelta'
 
 /** tagUuid undefined signifies all notes count change */
@@ -14,7 +14,7 @@ export class TagNotesIndex implements SNIndex {
   private allCountableNotes = new Set<Uuid>()
 
   constructor(
-    private collection: ItemCollection,
+    private collection: DecryptedItemCollection,
     public observers: TagNoteCountChangeObserver[] = [],
   ) {}
 

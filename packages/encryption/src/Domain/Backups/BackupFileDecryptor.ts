@@ -17,7 +17,7 @@ import {
 } from '@standardnotes/models'
 import { ClientDisplayableError } from '@standardnotes/responses'
 import { CreateAnyKeyParams } from '../RootKey/KeyParams'
-import { CreateItemFromPayload, ItemsKeyInterface } from '@standardnotes/models'
+import { CreateDecryptedItemFromPayload, ItemsKeyInterface } from '@standardnotes/models'
 import { SNRootKeyParams } from '../RootKey/RootKeyParams'
 import { SNRootKey } from '../RootKey/RootKey'
 import { ContentTypeUsesRootKeyEncryption } from '../Intent/Functions'
@@ -86,7 +86,7 @@ async function decryptEncryptedWithNonEncryptedItemsKey(
     .filter((payload) => {
       return payload.content_type === ContentType.ItemsKey
     })
-    .map((p) => CreateItemFromPayload<ItemsKeyInterface>(p))
+    .map((p) => CreateDecryptedItemFromPayload<ItemsKeyInterface>(p))
   return decryptWithItemsKeys(payloads, itemsKeys, protocolService)
 }
 
@@ -223,7 +223,7 @@ async function decryptEncrypted(
 
   const decryptedPayloads = await decryptWithItemsKeys(
     payloads,
-    decryptedItemsKeysPayloads.map((p) => CreateItemFromPayload(p)),
+    decryptedItemsKeysPayloads.map((p) => CreateDecryptedItemFromPayload(p)),
     protocolService,
     keyParams,
     rootKey,

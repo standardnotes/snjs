@@ -746,7 +746,7 @@ export class Migration2_0_0 extends Migration {
         dirtiedDate: new Date(),
       })
 
-      const itemsKey = Models.CreateItemFromPayload<Models.ItemsKeyInterface>(payload)
+      const itemsKey = Models.CreateDecryptedItemFromPayload<Models.ItemsKeyInterface>(payload)
 
       await this.services.itemManager.emitItemFromPayload(
         itemsKey.payloadRepresentation(),

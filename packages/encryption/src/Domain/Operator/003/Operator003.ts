@@ -1,5 +1,5 @@
 import { splitString } from '@standardnotes/utils'
-import { CreateItemFromPayload, ItemsKeyContent, ItemsKeyInterface } from '@standardnotes/models'
+import { CreateDecryptedItemFromPayload, ItemsKeyContent, ItemsKeyInterface } from '@standardnotes/models'
 import { SNRootKey } from '../../RootKey/RootKey'
 import { V003Algorithm } from '../../Algorithm'
 import { Create003KeyParams } from '../../RootKey/KeyParams'
@@ -44,7 +44,7 @@ export class SNProtocolOperator003 extends SNProtocolOperator002 {
       content_type: ContentType.ItemsKey,
       content: FillItemContent(content),
     })
-    return CreateItemFromPayload(payload)
+    return CreateDecryptedItemFromPayload(payload)
   }
 
   public async computeRootKey(password: string, keyParams: SNRootKeyParams): Promise<SNRootKey> {

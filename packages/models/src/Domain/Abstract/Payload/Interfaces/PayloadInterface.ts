@@ -1,5 +1,6 @@
-import { ContentType, ProtocolVersion } from '@standardnotes/common'
+import { ContentType, ProtocolVersion, Uuid } from '@standardnotes/common'
 import { PayloadField } from '../Types/PayloadField'
+import { PayloadFormat } from '../Types/PayloadFormat'
 import { PayloadSource } from '../Types/PayloadSource'
 
 /**
@@ -27,14 +28,16 @@ export interface PayloadInterface {
    * */
   readonly fields: PayloadField[]
   readonly source: PayloadSource
-  readonly uuid: string
+  readonly uuid: Uuid
   readonly content_type: ContentType
+  readonly format: PayloadFormat
+  version: ProtocolVersion
 
   /** updated_at is set by the server only, and not the client.*/
   readonly updated_at: Date
   readonly created_at: Date
-  readonly created_at_timestamp?: number
-  readonly updated_at_timestamp?: number
+  readonly created_at_timestamp: number
+  readonly updated_at_timestamp: number
   serverUpdatedAt: Date
   serverUpdatedAtTimestamp: number | undefined
 
@@ -43,8 +46,7 @@ export interface PayloadInterface {
   readonly lastSyncBegan?: Date
   readonly lastSyncEnd?: Date
 
-  version: ProtocolVersion
-  readonly duplicate_of?: string
+  readonly duplicate_of?: Uuid
 
   ejected(): PayloadInterface
 }

@@ -1,3 +1,4 @@
+import { DecryptedPayloadInterface } from './../../Payload/Interfaces/DecryptedPayload'
 import { SNFile } from '../../../Syncable/File/File'
 import { SNFeatureRepo } from '../../../Syncable/FeatureRepo/FeatureRepo'
 import { ContentType } from '@standardnotes/common'
@@ -19,12 +20,19 @@ import { ActionsExtensionMutator } from '../../../Syncable/ActionsExtension/Acti
 import { ComponentMutator } from '../../../Syncable/Component/ComponentMutator'
 import { TagMutator } from '../../../Syncable/Tag/TagMutator'
 import { NoteMutator } from '../../../Syncable/Note/NoteMutator'
-import { PurePayload } from '../../Payload/Implementations/PurePayload'
-import { ItemInterface } from '..'
+import { DecryptedItemInterface } from '../Interfaces/DecryptedItem'
+import { ItemContent } from '../Interfaces/ItemContent'
 
-type ItemClass = new (payload: PurePayload) => DecryptedItem
+type ItemClass<C extends ItemContent = ItemContent> = new (
+  payload: DecryptedPayloadInterface<C>,
+) => DecryptedItem<C>
+
 type MutatorClass = new (item: DecryptedItem, type: MutationType) => ItemMutator
-type MappingEntry = { itemClass: ItemClass; mutatorClass?: MutatorClass }
+
+type MappingEntry<C extends ItemContent = ItemContent> = {
+  itemClass: ItemClass<C>
+  mutatorClass?: MutatorClass
+}
 
 const ContentTypeClassMapping: Partial<Record<ContentType, MappingEntry>> = {
   [ContentType.ActionsExtension]: {
@@ -65,9 +73,10 @@ export function RegisterItemClass(
   }
 }
 
-export function CreateItemFromPayload<T extends ItemInterface = ItemInterface>(
-  payload: PurePayload,
-): T {
+export function CreateDecryptedItemFromPayload<
+  C extends ItemContent = ItemContent,
+  T extends DecryptedItemInterface<C> = DecryptedItemInterface<C>,
+>(payload: DecryptedPayloadInterface<C>): T {
   const lookupClass = ContentTypeClassMapping[payload.content_type]
   const itemClass = lookupClass ? lookupClass.itemClass : DecryptedItem
   const item = new itemClass(payload)

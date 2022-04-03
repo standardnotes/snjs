@@ -6,8 +6,11 @@ import { PrefKey } from '../../../Syncable/UserPrefs/PrefKey'
 import { ItemContent } from './ItemContent'
 import { DecryptedPayloadInterface } from '../../Payload/Interfaces/DecryptedPayload'
 import { ItemInterface } from './ItemInterface'
+import { SortableItem } from '../../../Runtime/Collection/CollectionSort'
 
-export interface DecryptedItemInterface<C extends ItemContent = ItemContent> extends ItemInterface {
+export interface DecryptedItemInterface<C extends ItemContent = ItemContent>
+  extends ItemInterface,
+    SortableItem {
   readonly payload: DecryptedPayloadInterface<C>
   readonly conflictOf?: Uuid
   readonly duplicateOf?: Uuid

@@ -1,4 +1,4 @@
-import { ImmutablePayloadCollection } from '../Collection/ImmutablePayloadCollection'
+import { ImmutablePayloadCollection } from '../Collection/Payload/ImmutablePayloadCollection'
 import { CreateSourcedPayloadFromObject } from '../../Abstract/Payload/Utilities/Functions'
 import { PayloadSource } from '../../Abstract/Payload/Types/PayloadSource'
 import { PayloadsDelta } from './Delta'

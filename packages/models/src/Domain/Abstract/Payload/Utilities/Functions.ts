@@ -1,16 +1,17 @@
+import { DecryptedPayload } from './../Implementations/DecryptedPayload'
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { ContentType, Uuid } from '@standardnotes/common'
 import { Copy, extendArray, pickByCopy, uniqueArray, UuidGenerator } from '@standardnotes/utils'
 import { remove } from 'lodash'
-import { PurePayload } from '../Implementations/PurePayload'
-import { ImmutablePayloadCollection } from '../../../Runtime/Collection/ImmutablePayloadCollection'
+import { ImmutablePayloadCollection } from '../../../Runtime/Collection/Payload/ImmutablePayloadCollection'
 import { ContentReference } from '../../Reference/ContentReference'
 import { PayloadField } from '../Types/PayloadField'
 import { PayloadInterface } from '../Interfaces/PayloadInterface'
 import { PayloadSource } from '../Types/PayloadSource'
-import { RawPayload } from '../RawPayload'
 import { PayloadFormat } from '../Types/PayloadFormat'
 import { ItemContent } from '../../Item/Interfaces/ItemContent'
+import { DecryptedPayloadInterface } from '../Interfaces/DecryptedPayload'
+import { PurePayload } from '../Implementations/PurePayload'
 
 export type Writeable<T> = { -readonly [P in keyof T]: T[P] }
 
@@ -21,7 +22,7 @@ export type Writeable<T> = { -readonly [P in keyof T]: T[P] }
  * @returns An array of payloads that have changed as a result of copying.
  */
 export async function PayloadsByAlternatingUuid(
-  payload: PayloadInterface,
+  payload: DecryptedPayloadInterface,
   baseCollection: ImmutablePayloadCollection,
 ): Promise<PayloadInterface[]> {
   const results: PayloadInterface[] = []
@@ -77,15 +78,15 @@ export async function PayloadsByAlternatingUuid(
 }
 
 export function PayloadsByUpdatingReferencingPayloadReferences(
-  payload: PayloadInterface,
+  payload: DecryptedPayloadInterface,
   baseCollection: ImmutablePayloadCollection,
-  add: PayloadInterface[] = [],
+  add: DecryptedPayloadInterface[] = [],
   removeIds: Uuid[] = [],
-): PayloadInterface[] {
+): DecryptedPayloadInterface[] {
   const referencingPayloads = baseCollection.elementsReferencingElement(payload)
   const results = []
   for (const referencingPayload of referencingPayloads) {
-    const references = referencingPayload.contentObject.references.slice()
+    const references = referencingPayload.content.references.slice()
     const reference = referencingPayload.getReference(payload.uuid)
 
     for (const addPayload of add) {
@@ -152,11 +153,11 @@ export function payloadFieldsForSource(source: PayloadSource): PayloadField[] {
   }
 }
 export function CreatePayload<C extends ItemContent = ItemContent>(
-  object: any,
+  object: PayloadInterface,
   fields: PayloadField[],
   source?: PayloadSource,
-  override?: Partial<PayloadInterface<C>>,
-): PayloadInterface<C> {
+  override?: Partial<PayloadInterface>,
+): PayloadInterface {
   const rawPayload = pickByCopy(object, fields)
 
   const overrideFields =
@@ -174,17 +175,17 @@ export function CreatePayload<C extends ItemContent = ItemContent>(
   return new PurePayload(rawPayload, newFields, source || PayloadSource.Constructor)
 }
 
-export function CopyPayload<C extends ItemContent = ItemContent>(
-  payload: PayloadInterface<C>,
-  override?: Partial<PayloadInterface<C>>,
-): PayloadInterface<C> {
+export function CopyPayload<P extends PayloadInterface = PayloadInterface>(
+  payload: P,
+  override?: Partial<P>,
+): P {
   return CreatePayload(payload, payload.fields, payload.source, override)
 }
 
 export function CopyPayloadWithContentOverride<C extends ItemContent = ItemContent>(
-  payload: PayloadInterface<C>,
+  payload: DecryptedPayloadInterface<C>,
   contentOverride: Partial<C>,
-): PayloadInterface<C> {
+): DecryptedPayloadInterface<C> {
   return CreatePayload(payload, payload.fields, payload.source, {
     content: {
       ...payload.content,
@@ -193,11 +194,19 @@ export function CopyPayloadWithContentOverride<C extends ItemContent = ItemConte
   })
 }
 
-export function CreateSourcedPayloadFromObject<C extends ItemContent = ItemContent>(
-  object: RawPayload<C>,
+export function CreateSourcedPayloadFromObject(
+  object: PayloadInterface,
   source: PayloadSource,
-  override?: Partial<PayloadInterface<C>>,
-): PayloadInterface<C> {
+  override?: Partial<PayloadInterface>,
+): PayloadInterface {
+  if (source === PayloadSource.ComponentRetrieved) {
+    return new DecryptedPayload({
+      uuid: '123',
+      content: {},
+      content_type: object.content_type,
+      created_at: object.created_at,
+    })
+  }
   const payloadFields = payloadFieldsForSource(source)
   return CreatePayload(object, payloadFields, source, override)
 }
@@ -208,13 +217,13 @@ export function CreateSourcedPayloadFromObject<C extends ItemContent = ItemConte
  * fields. If override value is passed, values in here take final precedence, including
  * above both payload and mergeWith values.
  */
-export function PayloadByMerging<C extends ItemContent = ItemContent>(
-  payload: PayloadInterface<C>,
-  mergeWith: PayloadInterface<C>,
+export function PayloadByMerging(
+  payload: PayloadInterface,
+  mergeWith: PayloadInterface,
   fields?: PayloadField[],
-  override?: Partial<PayloadInterface<C>>,
-): PayloadInterface<C> {
-  const resultOverride: Writeable<Partial<PayloadInterface<C>>> = {}
+  override?: Partial<PayloadInterface>,
+): PayloadInterface {
+  const resultOverride: Writeable<Partial<PayloadInterface>> = {}
   const useFields = fields || mergeWith.fields
 
   for (const field of useFields) {
@@ -231,130 +240,13 @@ export function PayloadByMerging<C extends ItemContent = ItemContent>(
   return CopyPayload(payload, resultOverride)
 }
 
-export function CreateMaxPayloadFromAnyObject<C extends ItemContent = ItemContent>(
-  object: RawPayload<C>,
-  override?: Partial<PayloadInterface<C>>,
+export function CreateMaxPayloadFromAnyObject(
+  object: PayloadInterface,
+  override?: Partial<PayloadInterface>,
   source?: PayloadSource,
-): PayloadInterface<C> {
+): PayloadInterface {
   return CreatePayload(object, MaxPayloadFields.slice(), source, override)
 }
-
-/** The MaxItemPayload represents a payload with all possible fields */
-export const MaxPayloadFields = Object.freeze([
-  PayloadField.Uuid,
-  PayloadField.ContentType,
-  PayloadField.ItemsKeyId,
-  PayloadField.EncItemKey,
-  PayloadField.Content,
-  PayloadField.CreatedAt,
-  PayloadField.ServerUpdatedAt,
-  PayloadField.CreatedAtTimestamp,
-  PayloadField.ServerUpdatedAtTimestamp,
-  PayloadField.Deleted,
-  PayloadField.Legacy003AuthHash,
-  PayloadField.Legacy003AuthParams,
-  PayloadField.Dirty,
-  PayloadField.DirtiedDate,
-  PayloadField.ErrorDecrypting,
-  PayloadField.ErrorDecryptingChanged,
-  PayloadField.WaitingForKey,
-  PayloadField.LastSyncBegan,
-  PayloadField.LastSyncEnd,
-  PayloadField.DuplicateOf,
-])
-
-export const FilePayloadFields = Object.freeze([
-  PayloadField.Uuid,
-  PayloadField.ContentType,
-  PayloadField.ItemsKeyId,
-  PayloadField.EncItemKey,
-  PayloadField.Content,
-  PayloadField.CreatedAt,
-  PayloadField.ServerUpdatedAt,
-  PayloadField.CreatedAtTimestamp,
-  PayloadField.ServerUpdatedAtTimestamp,
-  PayloadField.Legacy003AuthHash,
-  PayloadField.DuplicateOf,
-])
-
-export const StoragePayloadFields = Object.freeze([
-  PayloadField.Uuid,
-  PayloadField.ContentType,
-  PayloadField.ItemsKeyId,
-  PayloadField.EncItemKey,
-  PayloadField.Content,
-  PayloadField.CreatedAt,
-  PayloadField.ServerUpdatedAt,
-  PayloadField.CreatedAtTimestamp,
-  PayloadField.ServerUpdatedAtTimestamp,
-  PayloadField.Deleted,
-  PayloadField.Legacy003AuthHash,
-  PayloadField.Legacy003AuthParams,
-  PayloadField.Dirty,
-  PayloadField.DirtiedDate,
-  PayloadField.ErrorDecrypting,
-  PayloadField.WaitingForKey,
-  PayloadField.DuplicateOf,
-])
-
-export const ServerPayloadFields = Object.freeze([
-  PayloadField.Uuid,
-  PayloadField.ContentType,
-  PayloadField.ItemsKeyId,
-  PayloadField.EncItemKey,
-  PayloadField.Content,
-  PayloadField.CreatedAt,
-  PayloadField.ServerUpdatedAt,
-  PayloadField.CreatedAtTimestamp,
-  PayloadField.ServerUpdatedAtTimestamp,
-  PayloadField.Deleted,
-  PayloadField.Legacy003AuthHash,
-  PayloadField.DuplicateOf,
-])
-
-export const SessionHistoryPayloadFields = Object.freeze([
-  PayloadField.Uuid,
-  PayloadField.ContentType,
-  PayloadField.Content,
-  PayloadField.ServerUpdatedAt,
-])
-
-/** Represents a payload with permissible fields for when a
- * payload is retrieved from a component for saving */
-export const ComponentRetrievedPayloadFields = Object.freeze([
-  PayloadField.Uuid,
-  PayloadField.Content,
-  PayloadField.ContentType,
-  PayloadField.CreatedAt,
-])
-
-/** Represents a payload with permissible fields for when a
- * component wants to create a new item */
-export const ComponentCreatedPayloadFields = Object.freeze([
-  PayloadField.Uuid,
-  PayloadField.Content,
-  PayloadField.ContentType,
-  PayloadField.CreatedAt,
-])
-
-/**
- * The saved server item payload represents the payload we want to map
- * when mapping saved_items from the server. We only want to map the
- * updated_at value the server returns for the item, and basically
- * nothing else.
- */
-export const ServerSavedPayloadFields = Object.freeze([
-  PayloadField.Uuid,
-  PayloadField.ContentType,
-  PayloadField.ServerUpdatedAt,
-  PayloadField.ServerUpdatedAtTimestamp,
-  PayloadField.CreatedAtTimestamp,
-  PayloadField.Deleted,
-  PayloadField.Dirty,
-  PayloadField.LastSyncEnd,
-])
-
-export const RemoteHistoryPayloadFields = Object.freeze(ServerPayloadFields.slice())
 
 /**
  * Whether the changed payload represents only an internal change that shouldn't
@@ -372,11 +264,11 @@ export function isPayloadSourceRetrieved(source: PayloadSource): boolean {
   ].includes(source)
 }
 
-export function filterDisallowedRemotePayloads(payloads: PurePayload[]): PurePayload[] {
+export function filterDisallowedRemotePayloads(payloads: PayloadInterface[]): PayloadInterface[] {
   return payloads.filter(isRemotePayloadAllowed)
 }
 
-export function isRemotePayloadAllowed(payload: PurePayload): boolean {
+export function isRemotePayloadAllowed(payload: PayloadInterface): boolean {
   if (payload.format === PayloadFormat.Deleted) {
     return payload.content == undefined
   }
@@ -386,8 +278,6 @@ export function isRemotePayloadAllowed(payload: PurePayload): boolean {
   return acceptableFormats.includes(payload.format)
 }
 
-export function sureFindPayload(uuid: Uuid, payloads: PurePayload[]): PurePayload {
-  return payloads.find((payload) => payload.uuid === uuid) as PurePayload
+export function sureFindPayload(uuid: Uuid, payloads: PayloadInterface[]): PayloadInterface {
+  return payloads.find((payload) => payload.uuid === uuid) as PayloadInterface
 }
-
-

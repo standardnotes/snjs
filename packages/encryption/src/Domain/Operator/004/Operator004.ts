@@ -2,7 +2,7 @@ import { ContentType, KeyParamsOrigination, ProtocolVersion } from '@standardnot
 import { Create004KeyParams } from '../../RootKey/KeyParams'
 import { SynchronousOperator } from '../Operator'
 import {
-  CreateItemFromPayload,
+  CreateDecryptedItemFromPayload,
   FillItemContent,
   ItemContent,
   ItemsKeyContent,
@@ -62,7 +62,7 @@ export class SNProtocolOperator004 implements SynchronousOperator {
       content_type: ContentType.ItemsKey,
       content: this.generateNewItemsKeyContent(),
     })
-    return CreateItemFromPayload(payload)
+    return CreateDecryptedItemFromPayload(payload)
   }
 
   /**
