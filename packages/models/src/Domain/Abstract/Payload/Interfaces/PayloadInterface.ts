@@ -1,5 +1,5 @@
 import { ContentType, ProtocolVersion, Uuid } from '@standardnotes/common'
-import { PayloadField } from '../Types/PayloadField'
+import { ValidPayloadKey } from '../Types/PayloadField'
 import { PayloadFormat } from '../Types/PayloadFormat'
 import { PayloadSource } from '../Types/PayloadSource'
 
@@ -26,7 +26,7 @@ export interface PayloadInterface {
    * undefined value for payload.content, for example, or whether the payload was constructed
    * to omit that field altogether (as in the case of server saved payloads)
    * */
-  readonly fields: PayloadField[]
+  readonly fields: ValidPayloadKey[]
   readonly source: PayloadSource
   readonly uuid: Uuid
   readonly content_type: ContentType
@@ -38,8 +38,8 @@ export interface PayloadInterface {
   readonly created_at: Date
   readonly created_at_timestamp: number
   readonly updated_at_timestamp: number
-  serverUpdatedAt: Date
-  serverUpdatedAtTimestamp: number | undefined
+  get serverUpdatedAt(): Date
+  get serverUpdatedAtTimestamp(): number
 
   readonly dirtiedDate?: Date
   readonly dirty?: boolean

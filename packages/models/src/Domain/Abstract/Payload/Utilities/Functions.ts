@@ -1,17 +1,34 @@
-import { DecryptedPayload } from './../Implementations/DecryptedPayload'
-/* eslint-disable @typescript-eslint/no-explicit-any */
+import { EncryptedTransferPayload } from './../../TransferPayload/Interfaces/EncryptedTransferPayload'
+import { EncryptedPayload } from './../Implementations/EncryptedPayload'
+import { ContentlessPayload } from './../Implementations/ContentlessPayload'
+import { DeletedTransferPayload } from './../../TransferPayload/Interfaces/DeletedTransferPayload'
+import { DeletedPayload } from './../Implementations/DeletedPayload'
 import { ContentType, Uuid } from '@standardnotes/common'
-import { Copy, extendArray, pickByCopy, uniqueArray, UuidGenerator } from '@standardnotes/utils'
+import {
+  Copy,
+  extendArray,
+  isString,
+  pickByCopy,
+  uniqueArray,
+  UuidGenerator,
+} from '@standardnotes/utils'
 import { remove } from 'lodash'
 import { ImmutablePayloadCollection } from '../../../Runtime/Collection/Payload/ImmutablePayloadCollection'
 import { ContentReference } from '../../Reference/ContentReference'
-import { PayloadField } from '../Types/PayloadField'
+import { MaxPayloadFields, ValidPayloadKey } from '../Types/PayloadField'
 import { PayloadInterface } from '../Interfaces/PayloadInterface'
 import { PayloadSource } from '../Types/PayloadSource'
 import { PayloadFormat } from '../Types/PayloadFormat'
 import { ItemContent } from '../../Item/Interfaces/ItemContent'
 import { DecryptedPayloadInterface } from '../Interfaces/DecryptedPayload'
 import { PurePayload } from '../Implementations/PurePayload'
+import { isEncryptedPayload } from '../Interfaces/TypeCheck'
+import { EncryptedPayloadInterface } from '../Interfaces/EncryptedPayload'
+import { TransferPayload } from '../../TransferPayload/Interfaces/TransferPayload'
+import { MaxTransferPayload } from '../../TransferPayload/Interfaces/MaxTransferPayload'
+import { DecryptedPayload } from '../Implementations/DecryptedPayload'
+import { DecryptedTransferPayload } from '../../TransferPayload/Interfaces/DecryptedTransferPayload'
+import { MaxPayloadInterface } from '../Interfaces/MaxPayloadInterface'
 
 export type Writeable<T> = { -readonly [P in keyof T]: T[P] }
 
@@ -56,24 +73,38 @@ export async function PayloadsByAlternatingUuid(
     /**
      * Update any payloads who are still encrypted and whose items_key_id point to this uuid
      */
-    const matchingPayloads = baseCollection.all().filter((p) => p.items_key_id === payload.uuid)
+    const matchingPayloads = baseCollection
+      .all()
+      .filter(
+        (p) => isEncryptedPayload(p) && p.items_key_id === payload.uuid,
+      ) as EncryptedPayloadInterface[]
+
     const adjustedPayloads = matchingPayloads.map((a) =>
       CopyPayload(a, { items_key_id: copy.uuid }),
     )
+
     if (adjustedPayloads.length > 0) {
       extendArray(results, adjustedPayloads)
     }
   }
 
-  const updatedSelf = CopyPayload(payload, {
-    deleted: true,
-    /** Do not set as dirty; this item is non-syncable
-        and should be immediately discarded */
-    dirty: false,
-    content: undefined,
-  })
+  const deletedSelf = new DeletedPayload(
+    {
+      /**
+       * Do not set as dirty; this item is non-syncable
+       * and should be immediately discarded
+       */
+      dirty: false,
+      content: undefined,
+      uuid: payload.uuid,
+      content_type: payload.content_type,
+      deleted: true,
+    },
+    payload.fields,
+    payload.source,
+  )
+  results.push(deletedSelf)
 
-  results.push(updatedSelf)
   return results
 }
 
@@ -113,102 +144,70 @@ export function PayloadsByUpdatingReferencingPayloadReferences(
   return results
 }
 
-export function payloadFieldsForSource(source: PayloadSource): PayloadField[] {
-  if (source === PayloadSource.FileImport) {
-    return FilePayloadFields.slice()
-  }
-
-  if (source === PayloadSource.SessionHistory) {
-    return SessionHistoryPayloadFields.slice()
-  }
-
-  if (source === PayloadSource.RemoteHistory) {
-    return RemoteHistoryPayloadFields.slice()
-  }
-
-  if (source === PayloadSource.ComponentRetrieved) {
-    return ComponentRetrievedPayloadFields.slice()
-  }
-
-  if (source === PayloadSource.ComponentCreated) {
-    return ComponentCreatedPayloadFields.slice()
-  }
-
-  if (source === PayloadSource.LocalRetrieved || source === PayloadSource.LocalChanged) {
-    return StoragePayloadFields.slice()
-  }
-
-  if (
-    source === PayloadSource.RemoteRetrieved ||
-    source === PayloadSource.ConflictData ||
-    source === PayloadSource.ConflictUuid ||
-    source === PayloadSource.RemoteRejected
-  ) {
-    return ServerPayloadFields.slice()
-  }
-  if (source === PayloadSource.LocalSaved || source === PayloadSource.RemoteSaved) {
-    return ServerSavedPayloadFields.slice()
-  } else {
-    throw `No payload fields found for source ${source}`
-  }
-}
-export function CreatePayload<C extends ItemContent = ItemContent>(
-  object: PayloadInterface,
-  fields: PayloadField[],
-  source?: PayloadSource,
-  override?: Partial<PayloadInterface>,
+export function CreatePayload(
+  object: Partial<MaxTransferPayload>,
+  fields: ValidPayloadKey[],
+  source: PayloadSource = PayloadSource.Constructor,
+  override?: Partial<MaxTransferPayload>,
 ): PayloadInterface {
-  const rawPayload = pickByCopy(object, fields)
+  const rawPayload: MaxTransferPayload = pickByCopy(object, fields) as MaxTransferPayload
 
   const overrideFields =
     override instanceof PurePayload
       ? override.fields.slice()
-      : (Object.keys(override || []) as PayloadField[])
+      : (Object.keys(override || []) as ValidPayloadKey[])
 
+  const typedOverride = override as MaxTransferPayload
   for (const field of overrideFields) {
-    const value = override?.[field] as unknown
-    rawPayload[field] = value ? Copy(value) : value
+    const value = typedOverride?.[field] as unknown
+    rawPayload[field] = (value ? Copy(value) : value) as never
   }
 
   const newFields = uniqueArray(fields.concat(overrideFields))
 
-  return new PurePayload(rawPayload, newFields, source || PayloadSource.Constructor)
+  if (rawPayload.deleted) {
+    return new DeletedPayload(rawPayload as unknown as DeletedTransferPayload, newFields, source)
+  } else if (!rawPayload.content) {
+    return new ContentlessPayload(rawPayload as unknown as ContentlessPayload, newFields, source)
+  } else if (isString(rawPayload.content)) {
+    return new EncryptedPayload(
+      rawPayload as unknown as EncryptedTransferPayload,
+      newFields,
+      source,
+    )
+  } else {
+    return new DecryptedPayload(
+      rawPayload as unknown as DecryptedTransferPayload,
+      newFields,
+      source,
+    )
+  }
 }
 
 export function CopyPayload<P extends PayloadInterface = PayloadInterface>(
   payload: P,
-  override?: Partial<P>,
+  override?: Partial<MaxTransferPayload>,
 ): P {
-  return CreatePayload(payload, payload.fields, payload.source, override)
+  const result = CreatePayload(
+    payload as unknown as MaxTransferPayload,
+    payload.fields,
+    payload.source,
+    override,
+  )
+  return result as P
 }
 
 export function CopyPayloadWithContentOverride<C extends ItemContent = ItemContent>(
   payload: DecryptedPayloadInterface<C>,
   contentOverride: Partial<C>,
 ): DecryptedPayloadInterface<C> {
-  return CreatePayload(payload, payload.fields, payload.source, {
+  const result = CreatePayload(payload, payload.fields, payload.source, {
     content: {
       ...payload.content,
       ...contentOverride,
     },
   })
-}
-
-export function CreateSourcedPayloadFromObject(
-  object: PayloadInterface,
-  source: PayloadSource,
-  override?: Partial<PayloadInterface>,
-): PayloadInterface {
-  if (source === PayloadSource.ComponentRetrieved) {
-    return new DecryptedPayload({
-      uuid: '123',
-      content: {},
-      content_type: object.content_type,
-      created_at: object.created_at,
-    })
-  }
-  const payloadFields = payloadFieldsForSource(source)
-  return CreatePayload(object, payloadFields, source, override)
+  return result as DecryptedPayloadInterface<C>
 }
 
 /**
@@ -217,23 +216,24 @@ export function CreateSourcedPayloadFromObject(
  * fields. If override value is passed, values in here take final precedence, including
  * above both payload and mergeWith values.
  */
-export function PayloadByMerging(
-  payload: PayloadInterface,
-  mergeWith: PayloadInterface,
-  fields?: PayloadField[],
-  override?: Partial<PayloadInterface>,
-): PayloadInterface {
-  const resultOverride: Writeable<Partial<PayloadInterface>> = {}
+export function PayloadByMerging<P extends MaxPayloadInterface = MaxPayloadInterface>(
+  payload: P,
+  mergeWith: P,
+  fields?: ValidPayloadKey[],
+  override?: Partial<P>,
+): P {
+  const resultOverride: Writeable<Partial<MaxPayloadInterface>> = {}
   const useFields = fields || mergeWith.fields
 
   for (const field of useFields) {
-    resultOverride[field] = mergeWith[field]
+    const newValue = mergeWith[field]
+    resultOverride[field] = newValue as never
   }
 
   if (override) {
-    const keys = Object.keys(override) as PayloadField[]
+    const keys = Object.keys(override) as ValidPayloadKey[]
     for (const key of keys) {
-      resultOverride[key] = override[key]
+      resultOverride[key] = override[key] as never
     }
   }
 
@@ -241,7 +241,7 @@ export function PayloadByMerging(
 }
 
 export function CreateMaxPayloadFromAnyObject(
-  object: PayloadInterface,
+  object: TransferPayload,
   override?: Partial<PayloadInterface>,
   source?: PayloadSource,
 ): PayloadInterface {
@@ -270,7 +270,7 @@ export function filterDisallowedRemotePayloads(payloads: PayloadInterface[]): Pa
 
 export function isRemotePayloadAllowed(payload: PayloadInterface): boolean {
   if (payload.format === PayloadFormat.Deleted) {
-    return payload.content == undefined
+    return (payload as EncryptedPayloadInterface).content == undefined
   }
 
   const acceptableFormats = [PayloadFormat.EncryptedString, PayloadFormat.MetadataOnly]

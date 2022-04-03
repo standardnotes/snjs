@@ -89,41 +89,11 @@ export class SNHistoryManager extends Services.AbstractService {
 
   /** For local session history */
   async initializeFromDisk(): Promise<void> {
-    this.persistable = await this.storageService.getValue(StorageKey.SessionHistoryPersistable)
-    this.history = await this.getPersistedHistory()
     this.autoOptimize = this.storageService.getValue(
       StorageKey.SessionHistoryOptimize,
       undefined,
       true,
     )
-  }
-
-  private async getPersistedHistory(): Promise<Record<UuidString, Models.HistoryEntry[]>> {
-    const historyMap: Record<UuidString, Models.HistoryEntry[]> = {}
-    const rawHistory: PersistableHistory = await this.storageService.getValue(
-      StorageKey.SessionHistoryRevisions,
-    )
-
-    if (!rawHistory) {
-      return historyMap
-    }
-
-    for (const [uuid, historyDescending] of Object.entries(rawHistory)) {
-      const historyAscending = historyDescending.slice().reverse()
-      const entries: Models.HistoryEntry[] = []
-      for (const rawEntry of historyAscending) {
-        const payload = Models.CreateSourcedPayloadFromObject(
-          rawEntry.payload,
-          Models.PayloadSource.SessionHistory,
-        ) as Models.SurePayload<Models.NoteContent>
-
-        const previousEntry = Models.historyMapFunctions.getNewestRevision(entries)
-        const entry = Models.CreateHistoryEntryForPayload(payload, previousEntry)
-        entries.unshift(entry)
-      }
-      historyMap[uuid] = entries
-    }
-    return historyMap
   }
 
   private recordNewHistoryForItems(items: Models.SNItem[]) {

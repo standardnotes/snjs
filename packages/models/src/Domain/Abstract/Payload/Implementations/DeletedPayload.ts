@@ -1,12 +1,19 @@
+import { DeletedTransferPayload } from './../../TransferPayload/Interfaces/DeletedTransferPayload'
 import { DeletedPayloadInterface } from '../Interfaces/DeletedPayload'
-import { PayloadField } from '../Types/PayloadField'
+import { ValidPayloadKey } from '../Types/PayloadField'
+import { PayloadFormat } from '../Types/PayloadFormat'
 import { PayloadSource } from '../Types/PayloadSource'
 import { PurePayload } from './PurePayload'
 
 export class DeletedPayload extends PurePayload implements DeletedPayloadInterface {
   readonly deleted: true
+  readonly format: PayloadFormat.Deleted
 
-  constructor(rawPayload: DeletedPayloadInterface, fields: PayloadField[], source: PayloadSource) {
+  constructor(
+    rawPayload: DeletedTransferPayload,
+    fields: ValidPayloadKey[],
+    source: PayloadSource,
+  ) {
     super(rawPayload, fields, source)
   }
 

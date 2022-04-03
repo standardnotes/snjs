@@ -1,8 +1,9 @@
 import { ProtocolVersion, Uuid } from '@standardnotes/common'
 import { FillItemContent, ItemContent } from '../../Item'
 import { ContentReference } from '../../Reference/ContentReference'
+import { DecryptedTransferPayload } from '../../TransferPayload/Interfaces/DecryptedTransferPayload'
 import { DecryptedPayloadInterface } from '../Interfaces/DecryptedPayload'
-import { PayloadField } from '../Types/PayloadField'
+import { ValidPayloadKey } from '../Types/PayloadField'
 import { PayloadFormat } from '../Types/PayloadFormat'
 import { PayloadSource } from '../Types/PayloadSource'
 import { PurePayload } from './PurePayload'
@@ -14,10 +15,9 @@ export class DecryptedPayload<C extends ItemContent = ItemContent>
   readonly content: C
   readonly format = PayloadFormat.DecryptedBareObject
 
-
   constructor(
-    rawPayload: DecryptedPayloadInterface<C>,
-    fields: PayloadField[],
+    rawPayload: DecryptedTransferPayload<C>,
+    fields: ValidPayloadKey[],
     source: PayloadSource,
   ) {
     super(rawPayload, fields, source)

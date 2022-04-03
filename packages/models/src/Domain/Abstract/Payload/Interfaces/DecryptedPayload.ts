@@ -8,6 +8,6 @@ export interface DecryptedPayloadInterface<C extends ItemContent = ItemContent>
   extends PayloadInterface {
   readonly content: C
   readonly format: PayloadFormat.DecryptedBareObject
-  references: ContentReference[]
+  get references(): ContentReference[]
   getReference(uuid: Uuid): ContentReference
 }

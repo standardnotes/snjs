@@ -1,16 +1,18 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { ContentType, ProtocolVersion } from '@standardnotes/common'
 import { deepFreeze, isNullOrUndefined } from '@standardnotes/utils'
-import { PayloadField } from '../Types/PayloadField'
+import { PayloadField, ValidPayloadKey } from '../Types/PayloadField'
 import { PayloadInterface } from '../Interfaces/PayloadInterface'
 import { PayloadSource } from '../Types/PayloadSource'
 import { Writeable } from '../Utilities/Functions'
+import { PayloadFormat } from '../Types/PayloadFormat'
+import { TransferPayload } from '../../TransferPayload/Interfaces/TransferPayload'
 
 export abstract class PurePayload implements PayloadInterface {
-  readonly fields: PayloadField[]
+  readonly fields: ValidPayloadKey[]
   readonly source: PayloadSource
   readonly uuid: string
   readonly content_type: ContentType
+  readonly format: PayloadFormat
 
   readonly created_at: Date
   readonly updated_at: Date
@@ -25,10 +27,10 @@ export abstract class PurePayload implements PayloadInterface {
   version: ProtocolVersion
   readonly duplicate_of?: string
 
-  constructor(rawPayload: PayloadInterface, fields: PayloadField[], source: PayloadSource) {
-    this.fields = fields || (Object.keys(rawPayload) as PayloadField[])
+  constructor(rawPayload: TransferPayload, fields: ValidPayloadKey[], source: PayloadSource) {
     this.source = source != undefined ? source : PayloadSource.Constructor
     this.uuid = rawPayload.uuid
+    this.fields = fields
 
     if (!this.uuid && this.fields.includes(PayloadField.Uuid)) {
       throw Error(
@@ -43,8 +45,8 @@ export abstract class PurePayload implements PayloadInterface {
 
     this.created_at = new Date(rawPayload.created_at || new Date())
     this.updated_at = new Date(rawPayload.updated_at || 0)
-    this.created_at_timestamp = rawPayload.created_at_timestamp
-    this.updated_at_timestamp = rawPayload.updated_at_timestamp
+    this.created_at_timestamp = rawPayload.created_at_timestamp || 0
+    this.updated_at_timestamp = rawPayload.updated_at_timestamp || 0
     this.lastSyncBegan = rawPayload.lastSyncBegan ? new Date(rawPayload.lastSyncBegan) : undefined
     this.lastSyncEnd = rawPayload.lastSyncEnd ? new Date(rawPayload.lastSyncEnd) : undefined
 
@@ -100,7 +102,7 @@ export abstract class PurePayload implements PayloadInterface {
     return this.updated_at
   }
 
-  public get serverUpdatedAtTimestamp(): number | undefined {
+  public get serverUpdatedAtTimestamp(): number {
     return this.updated_at_timestamp
   }
 }

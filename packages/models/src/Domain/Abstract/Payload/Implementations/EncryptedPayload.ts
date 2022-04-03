@@ -1,6 +1,8 @@
 import { protocolVersionFromEncryptedString } from '@standardnotes/common'
+import { EncryptedTransferPayload } from '../../TransferPayload/Interfaces/EncryptedTransferPayload'
 import { EncryptedPayloadInterface } from '../Interfaces/EncryptedPayload'
-import { PayloadField } from '../Types/PayloadField'
+import { ValidPayloadKey } from '../Types/PayloadField'
+import { PayloadFormat } from '../Types/PayloadFormat'
 import { PayloadSource } from '../Types/PayloadSource'
 import { PurePayload } from './PurePayload'
 
@@ -11,6 +13,7 @@ export class EncryptedPayload extends PurePayload implements EncryptedPayloadInt
   readonly errorDecrypting?: boolean
   readonly waitingForKey?: boolean
   readonly errorDecryptingValueChanged?: boolean
+  readonly format: PayloadFormat.EncryptedString
 
   /** @deprecated */
   readonly auth_hash?: string
@@ -19,8 +22,8 @@ export class EncryptedPayload extends PurePayload implements EncryptedPayloadInt
   readonly auth_params?: unknown
 
   constructor(
-    rawPayload: EncryptedPayloadInterface,
-    fields: PayloadField[],
+    rawPayload: EncryptedTransferPayload,
+    fields: ValidPayloadKey[],
     source: PayloadSource,
   ) {
     super(rawPayload, fields, source)
