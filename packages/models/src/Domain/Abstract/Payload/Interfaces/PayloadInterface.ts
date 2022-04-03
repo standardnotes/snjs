@@ -1,5 +1,5 @@
 import { ContentType, ProtocolVersion, Uuid } from '@standardnotes/common'
-import { ValidPayloadKey } from '../Types/PayloadField'
+import { TransferPayload } from '../../TransferPayload/Interfaces/TransferPayload'
 import { PayloadFormat } from '../Types/PayloadFormat'
 import { PayloadSource } from '../Types/PayloadSource'
 
@@ -20,13 +20,6 @@ import { PayloadSource } from '../Types/PayloadSource'
  * EncryptedString or DecryptedBareObject.
  */
 export interface PayloadInterface {
-  /**
-   * When constructed, the payload takes in an array of fields that the input raw payload
-   * contains. These fields allow consumers to determine whether a given payload has an actual
-   * undefined value for payload.content, for example, or whether the payload was constructed
-   * to omit that field altogether (as in the case of server saved payloads)
-   * */
-  readonly fields: ValidPayloadKey[]
   readonly source: PayloadSource
   readonly uuid: Uuid
   readonly content_type: ContentType
@@ -48,5 +41,11 @@ export interface PayloadInterface {
 
   readonly duplicate_of?: Uuid
 
-  ejected(): PayloadInterface
+  /**
+   * Returns a generic object with all payload fields except any that are meta-data
+   * related (such as `fields`, `dirtiedDate`, etc). "Ejected" means a payload for
+   * generic, non-contextual consumption, such as saving to a backup file or syncing
+   * with a server.
+   */
+  ejected(): TransferPayload
 }

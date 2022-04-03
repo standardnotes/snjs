@@ -2,9 +2,10 @@ import { EncryptedItemInterface } from '../Interfaces/EncryptedItem'
 import { EncryptedPayloadInterface } from '../../Payload/Interfaces/EncryptedPayload'
 import { GenericItem } from './GenericItem'
 
-export class EncryptedItem extends GenericItem implements EncryptedItemInterface {
-  readonly payload: EncryptedPayloadInterface
-
+export class EncryptedItem
+  extends GenericItem<EncryptedPayloadInterface>
+  implements EncryptedItemInterface
+{
   constructor(payload: EncryptedPayloadInterface) {
     super(payload)
   }

@@ -1,4 +1,4 @@
-import { DecryptedItemMutator } from '../../Abstract/Item/Implementations/DecryptedItemMutator'
+import { DecryptedItemMutator } from '../../Abstract/Item/Mutator/DecryptedItemMutator'
 import { ActionExtensionContent } from './ActionsExtension'
 import { Action } from './Types'
 

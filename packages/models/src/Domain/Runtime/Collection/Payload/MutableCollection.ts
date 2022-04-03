@@ -1,3 +1,4 @@
+import { CollectionInterface } from './../CollectionInterface'
 import { DecryptedPayloadInterface } from './../../../Abstract/Payload/Interfaces/DecryptedPayload'
 import { extendArray, isString, UuidMap } from '@standardnotes/utils'
 import { ContentType, Uuid } from '@standardnotes/common'
@@ -10,7 +11,9 @@ import {
   isEncryptedErroredPayload,
 } from '../../../Abstract/Payload/Interfaces/TypeCheck'
 
-export class MutableCollection<T extends PayloadInterface = PayloadInterface> {
+export class MutableCollection<T extends PayloadInterface = PayloadInterface>
+  implements CollectionInterface
+{
   readonly map: Partial<Record<Uuid, T>> = {}
   readonly typedMap: Partial<Record<ContentType, T[]>> = {}
 
@@ -23,14 +26,6 @@ export class MutableCollection<T extends PayloadInterface = PayloadInterface> {
   /** An array of uuids of items that are not marked as deleted */
   nondeletedIndex: Set<Uuid> = new Set()
 
-  /** Maintains an index where the direct map for each item id is an array
-   * of item ids that the item references. This is essentially equivalent to
-   * item.content.references, but keeps state even when the item is deleted.
-   * So if tag A references Note B, referenceMap.directMap[A.uuid] == [B.uuid].
-   * The inverse map for each item is an array of item ids where the items reference the
-   * key item. So if tag A references Note B, referenceMap.inverseMap[B.uuid] == [A.uuid].
-   * This allows callers to determine for a given item, who references it?
-   * It would be prohibitive to look this up on demand */
   readonly referenceMap: UuidMap
 
   /** Maintains an index for each item uuid where the value is an array of uuids that are
@@ -76,6 +71,19 @@ export class MutableCollection<T extends PayloadInterface = PayloadInterface> {
         return this.map[uuid]
       }) as T[]
     }
+  }
+
+  public allDecrypted(contentType: ContentType | ContentType[]): DecryptedPayloadInterface[] {
+    const allResults = this.all(contentType)
+    const filtered: DecryptedPayloadInterface[] = []
+
+    allResults.forEach((payload) => {
+      if (isDecryptedPayload(payload)) {
+        filtered.push(payload)
+      }
+    })
+
+    return filtered
   }
 
   public find(uuid: Uuid): T | undefined {

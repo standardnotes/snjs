@@ -1,11 +1,13 @@
+import {
+  CollectionSortDirection,
+  CollectionSortProperty,
+} from './../../Runtime/Collection/CollectionSort'
 import { ContentType } from '@standardnotes/common'
 import { NoteWithTags } from './NoteWithTags'
 import { DecryptedItem } from '../../Abstract/Item'
 import { SNTag } from '../Tag'
 import { SNNote } from '.'
 import { SmartView } from '../SmartView'
-import { CollectionSort } from '../../Runtime/Collection/CollectionSort'
-import { CollectionSortDirection } from '../../Runtime/Collection/CollectionSortDirection'
 import { DecryptedItemCollection } from '../../Runtime/Collection/Item/DecryptedItemCollection'
 import { CompoundPredicate } from '../../Runtime/Predicate/CompoundPredicate'
 
@@ -22,7 +24,7 @@ export class NotesDisplayCriteria {
   public includeProtected?: boolean
   public includeTrashed?: boolean
   public includeArchived?: boolean
-  public sortProperty?: CollectionSort
+  public sortProperty?: CollectionSortProperty
   public sortDirection?: CollectionSortDirection
 
   static Create(properties: Partial<NotesDisplayCriteria>): NotesDisplayCriteria {

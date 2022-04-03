@@ -1,17 +1,4 @@
-import { ValidPayloadKey } from './../../../Payload/Types/PayloadField'
-import { PayloadField } from '../../../Payload'
 import { TransferPayload } from './../TransferPayload'
-
-export const SyncSavedPayloadFields: Readonly<ValidPayloadKey[]> = Object.freeze([
-  PayloadField.ContentType,
-  PayloadField.CreatedAtTimestamp,
-  PayloadField.Deleted,
-  PayloadField.Dirty,
-  PayloadField.LastSyncEnd,
-  PayloadField.ServerUpdatedAt,
-  PayloadField.ServerUpdatedAtTimestamp,
-  PayloadField.Uuid,
-])
 
 /**
  * The saved sync item payload represents the payload we want to map

@@ -1,6 +1,6 @@
 import { AppDataField } from '../../Abstract/Item/Types/AppDataField'
 import { NoteContent } from './Note'
-import { DecryptedItemMutator } from '../../Abstract/Item/Implementations/DecryptedItemMutator'
+import { DecryptedItemMutator } from '../../Abstract/Item/Mutator/DecryptedItemMutator'
 
 export class NoteMutator extends DecryptedItemMutator<NoteContent> {
   set title(title: string) {

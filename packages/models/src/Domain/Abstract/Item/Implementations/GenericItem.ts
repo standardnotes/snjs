@@ -16,14 +16,16 @@ import {
   isEncryptedItem,
 } from '../Interfaces/TypeCheck'
 
-export abstract class GenericItem implements ItemInterface {
-  payload: PayloadInterface
+export abstract class GenericItem<P extends PayloadInterface = PayloadInterface>
+  implements ItemInterface<PayloadInterface>
+{
+  payload: P
   public readonly duplicateOf?: Uuid
   public readonly createdAtString?: string
   public updatedAtString?: string
   public userModifiedDate: Date
 
-  constructor(payload: PayloadInterface) {
+  constructor(payload: P) {
     this.payload = payload
     this.duplicateOf = payload.duplicate_of
     this.createdAtString = this.created_at && dateToLocalizedString(this.created_at)
@@ -92,7 +94,7 @@ export abstract class GenericItem implements ItemInterface {
     return this.payload.duplicate_of
   }
 
-  public payloadRepresentation(override?: Partial<PayloadInterface>) {
+  public payloadRepresentation(override?: Partial<P>) {
     return CopyPayload(this.payload, override)
   }
 

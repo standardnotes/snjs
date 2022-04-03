@@ -1,7 +1,6 @@
 import { protocolVersionFromEncryptedString } from '@standardnotes/common'
 import { EncryptedTransferPayload } from '../../TransferPayload/Interfaces/EncryptedTransferPayload'
 import { EncryptedPayloadInterface } from '../Interfaces/EncryptedPayload'
-import { ValidPayloadKey } from '../Types/PayloadField'
 import { PayloadFormat } from '../Types/PayloadFormat'
 import { PayloadSource } from '../Types/PayloadSource'
 import { PurePayload } from './PurePayload'
@@ -14,6 +13,7 @@ export class EncryptedPayload extends PurePayload implements EncryptedPayloadInt
   readonly waitingForKey?: boolean
   readonly errorDecryptingValueChanged?: boolean
   readonly format: PayloadFormat.EncryptedString
+  readonly deleted: false
 
   /** @deprecated */
   readonly auth_hash?: string
@@ -21,12 +21,8 @@ export class EncryptedPayload extends PurePayload implements EncryptedPayloadInt
   /** @deprecated */
   readonly auth_params?: unknown
 
-  constructor(
-    rawPayload: EncryptedTransferPayload,
-    fields: ValidPayloadKey[],
-    source: PayloadSource,
-  ) {
-    super(rawPayload, fields, source)
+  constructor(rawPayload: EncryptedTransferPayload, source: PayloadSource) {
+    super(rawPayload, source)
 
     this.content = rawPayload.content
     this.items_key_id = rawPayload.items_key_id
@@ -39,5 +35,19 @@ export class EncryptedPayload extends PurePayload implements EncryptedPayloadInt
     this.auth_params = rawPayload.auth_params
 
     this.version = protocolVersionFromEncryptedString(this.content)
+  }
+
+  ejected(): EncryptedTransferPayload {
+    const values = {
+      content: this.content,
+      enc_item_key: this.enc_item_key,
+      items_key_id: this.items_key_id,
+      auth_hash: this.auth_hash,
+    }
+
+    return {
+      ...super.ejected(),
+      ...values,
+    }
   }
 }

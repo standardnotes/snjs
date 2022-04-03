@@ -3,10 +3,9 @@ import { ImmutablePayloadCollection } from '../Collection/Payload/ImmutablePaylo
 import { CreateDecryptedItemFromPayload } from '../../Abstract/Item/Utilities/Generator'
 import { HistoryMap, historyMapFunctions } from '../History/HistoryMap'
 import { ConflictStrategy } from '../../Abstract/Item/Types/ConflictStrategy'
-import { CopyPayload, PayloadByMerging } from '../../Abstract/Payload/Utilities/Functions'
+import { CopyPayload } from '../../Abstract/Payload/Utilities/Functions'
 import { PayloadsByDuplicating } from '../../Abstract/Payload/Utilities/PayloadsByDuplicating'
 import { PayloadContentsEqual } from '../../Abstract/Payload/Utilities/PayloadContentsEqual'
-import { PayloadField } from '../../Abstract/Payload/Types/PayloadField'
 import { PayloadSource } from '../../Abstract/Payload/Types/PayloadSource'
 import { PayloadInterface } from '../../Abstract/Payload'
 import {
@@ -80,14 +79,10 @@ export class ConflictDelta {
     }
 
     if (strategy === ConflictStrategy.KeepRight) {
-      const result = PayloadByMerging(
-        this.applyPayload,
-        this.basePayload,
-        [PayloadField.LastSyncBegan],
-        {
-          lastSyncEnd: new Date(),
-        },
-      )
+      const result = CopyPayload(this.applyPayload, {
+        lastSyncBegan: this.basePayload.lastSyncBegan,
+        lastSyncEnd: new Date(),
+      })
       return [result]
     }
 
@@ -119,14 +114,10 @@ export class ConflictDelta {
 
     if (strategy === ConflictStrategy.DuplicateLeftKeepRight) {
       const leftPayloads = await PayloadsByDuplicating(this.basePayload, this.baseCollection, true)
-      const rightPayload = PayloadByMerging(
-        this.applyPayload,
-        this.basePayload,
-        [PayloadField.LastSyncBegan],
-        {
-          lastSyncEnd: new Date(),
-        },
-      )
+      const rightPayload = CopyPayload(this.applyPayload, {
+        lastSyncBegan: this.basePayload.lastSyncBegan,
+        lastSyncEnd: new Date(),
+      })
       return leftPayloads.concat([rightPayload])
     }
 

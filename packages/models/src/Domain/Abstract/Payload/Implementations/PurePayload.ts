@@ -1,14 +1,11 @@
 import { ContentType, ProtocolVersion } from '@standardnotes/common'
-import { deepFreeze, isNullOrUndefined } from '@standardnotes/utils'
-import { PayloadField, ValidPayloadKey } from '../Types/PayloadField'
+import { deepFreeze } from '@standardnotes/utils'
 import { PayloadInterface } from '../Interfaces/PayloadInterface'
 import { PayloadSource } from '../Types/PayloadSource'
-import { Writeable } from '../Utilities/Functions'
 import { PayloadFormat } from '../Types/PayloadFormat'
 import { TransferPayload } from '../../TransferPayload/Interfaces/TransferPayload'
 
 export abstract class PurePayload implements PayloadInterface {
-  readonly fields: ValidPayloadKey[]
   readonly source: PayloadSource
   readonly uuid: string
   readonly content_type: ContentType
@@ -27,14 +24,13 @@ export abstract class PurePayload implements PayloadInterface {
   version: ProtocolVersion
   readonly duplicate_of?: string
 
-  constructor(rawPayload: TransferPayload, fields: ValidPayloadKey[], source: PayloadSource) {
+  constructor(rawPayload: TransferPayload, source: PayloadSource) {
     this.source = source != undefined ? source : PayloadSource.Constructor
     this.uuid = rawPayload.uuid
-    this.fields = fields
 
-    if (!this.uuid && this.fields.includes(PayloadField.Uuid)) {
+    if (!this.uuid) {
       throw Error(
-        `uuid is null, yet this payloads fields indicate it shouldnt be.
+        `Attempting to construct payload with null uuid
         Content type: ${rawPayload.content_type}`,
       )
     }
@@ -63,39 +59,17 @@ export abstract class PurePayload implements PayloadInterface {
     }, 0)
   }
 
-  /**
-   * Returns a generic object with all payload fields except any that are meta-data
-   * related (such as `fields`, `dirtiedDate`, etc). "Ejected" means a payload for
-   * generic, non-contextual consumption, such as saving to a backup file or syncing
-   * with a server.
-   */
-  ejected(): PayloadInterface {
-    const optionalFields = [PayloadField.Legacy003AuthHash, PayloadField.Deleted]
-    const nonRequiredFields = [
-      PayloadField.DirtiedDate,
-      PayloadField.ErrorDecrypting,
-      PayloadField.ErrorDecryptingChanged,
-      PayloadField.WaitingForKey,
-      PayloadField.LastSyncBegan,
-      PayloadField.LastSyncEnd,
-    ]
-
-    const result = {} as Writeable<PayloadInterface>
-
-    for (const field of this.fields) {
-      if (nonRequiredFields.includes(field)) {
-        continue
-      }
-      const value = this[field]
-
-      if (isNullOrUndefined(value) && optionalFields.includes(field)) {
-        continue
-      }
-
-      result[field] = value
+  ejected(): TransferPayload {
+    return {
+      uuid: this.uuid,
+      content_type: this.content_type,
+      created_at: this.created_at,
+      updated_at: this.updated_at,
+      created_at_timestamp: this.created_at_timestamp,
+      updated_at_timestamp: this.updated_at_timestamp,
+      dirty: this.dirty,
+      duplicate_of: this.duplicate_of,
     }
-
-    return result
   }
 
   public get serverUpdatedAt(): Date {

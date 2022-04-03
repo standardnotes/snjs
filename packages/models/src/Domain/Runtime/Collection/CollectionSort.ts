@@ -11,3 +11,5 @@ export const CollectionSort: Record<string, keyof SortableItem> = {
 }
 
 export type CollectionSortDirection = 'asc' | 'dsc'
+
+export type CollectionSortProperty = keyof SortableItem

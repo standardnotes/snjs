@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
+import { CollectionSortDirection } from './../CollectionSort'
 import { remove } from 'lodash'
 import { ContentType, Uuid } from '@standardnotes/common'
 import {
@@ -6,16 +6,17 @@ import {
   extendArray,
   isNullOrUndefined,
   uniqueArrayByKey,
+  UuidMap,
 } from '@standardnotes/utils'
 import { CollectionSort } from '../CollectionSort'
-import { CollectionSortDirection } from '../CollectionSortDirection'
 import { SNIndex } from '../../Index/SNIndex'
 import { ItemDelta } from '../../Index/ItemDelta'
 import { isDeletedItem, isEncryptedErroredItem } from '../../../Abstract/Item/Interfaces/TypeCheck'
 import { isNote } from '../../../Syncable/Note'
 import { DecryptedItemInterface } from '../../../Abstract/Item/Interfaces/DecryptedItem'
+import { CollectionInterface } from '../CollectionInterface'
 
-export class DecryptedItemCollection implements SNIndex {
+export class DecryptedItemCollection implements SNIndex, CollectionInterface {
   readonly map: Partial<Record<Uuid, DecryptedItemInterface>> = {}
   readonly typedMap: Partial<Record<ContentType, DecryptedItemInterface[]>> = {}
 
@@ -32,6 +33,8 @@ export class DecryptedItemCollection implements SNIndex {
   private displayFilter: Partial<
     Record<ContentType, (element: DecryptedItemInterface) => boolean>
   > = {}
+
+  readonly referenceMap: UuidMap
 
   /**
    * A display ready map of uuids-to-position in sorted array. i.e filteredMap[contentType]
@@ -53,6 +56,15 @@ export class DecryptedItemCollection implements SNIndex {
     for (const element of elements) {
       this.map[element.uuid] = element
       this.setToTypedMap(element)
+
+      if (isDeletedItem(element)) {
+        this.referenceMap.removeFromMap(element.uuid)
+      } else {
+        this.referenceMap.setAllRelationships(
+          element.uuid,
+          element.references.map((r) => r.uuid),
+        )
+      }
     }
 
     this.filterSortElements(elements)
@@ -64,9 +76,45 @@ export class DecryptedItemCollection implements SNIndex {
     for (const element of elements) {
       delete this.map[element.uuid]
       this.deleteFromTypedMap(element)
+      this.referenceMap.removeFromMap(element.uuid)
     }
 
     this.filterSortElements(elements)
+  }
+
+  public uuidReferencesForUuid(uuid: Uuid): Uuid[] {
+    return this.referenceMap.getDirectRelationships(uuid)
+  }
+
+  public uuidsThatReferenceUuid(uuid: Uuid): Uuid[] {
+    return this.referenceMap.getInverseRelationships(uuid)
+  }
+
+  public findAll(uuids: Uuid[], includeBlanks = false): DecryptedItemInterface[] {
+    const results = []
+
+    for (const id of uuids) {
+      const element = this.map[id]
+      if (element || includeBlanks) {
+        results.push(element)
+      }
+    }
+
+    return results as DecryptedItemInterface[]
+  }
+
+  public elementsReferencingElement(
+    element: DecryptedItemInterface,
+    contentType?: ContentType,
+  ): DecryptedItemInterface[] {
+    const uuids = this.uuidsThatReferenceUuid(element.uuid)
+    const items = this.findAll(uuids)
+
+    if (!contentType) {
+      return items
+    }
+
+    return items.filter((item) => item.content_type === contentType)
   }
 
   private setToTypedMap(element: DecryptedItemInterface): void {

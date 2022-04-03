@@ -3,7 +3,6 @@ import { FillItemContent, ItemContent } from '../../Item'
 import { ContentReference } from '../../Reference/ContentReference'
 import { DecryptedTransferPayload } from '../../TransferPayload/Interfaces/DecryptedTransferPayload'
 import { DecryptedPayloadInterface } from '../Interfaces/DecryptedPayload'
-import { ValidPayloadKey } from '../Types/PayloadField'
 import { PayloadFormat } from '../Types/PayloadFormat'
 import { PayloadSource } from '../Types/PayloadSource'
 import { PurePayload } from './PurePayload'
@@ -15,12 +14,8 @@ export class DecryptedPayload<C extends ItemContent = ItemContent>
   readonly content: C
   readonly format = PayloadFormat.DecryptedBareObject
 
-  constructor(
-    rawPayload: DecryptedTransferPayload<C>,
-    fields: ValidPayloadKey[],
-    source: PayloadSource,
-  ) {
-    super(rawPayload, fields, source)
+  constructor(rawPayload: DecryptedTransferPayload<C>, source: PayloadSource) {
+    super(rawPayload, source)
 
     this.content = FillItemContent<C>(rawPayload.content)
     this.version = this.content.version || ProtocolVersion.V001
@@ -38,5 +33,16 @@ export class DecryptedPayload<C extends ItemContent = ItemContent>
     }
 
     return result
+  }
+
+  ejected(): DecryptedTransferPayload {
+    const values = {
+      content: this.content,
+    }
+
+    return {
+      ...super.ejected(),
+      ...values,
+    }
   }
 }

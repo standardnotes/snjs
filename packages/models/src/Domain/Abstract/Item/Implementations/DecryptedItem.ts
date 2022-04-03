@@ -12,10 +12,9 @@ import { ItemInterface } from '../Interfaces/ItemInterface'
 import { PrefKey } from '../../../Syncable/UserPrefs/PrefKey'
 
 export class DecryptedItem<C extends ItemContent = ItemContent>
-  extends GenericItem
+  extends GenericItem<DecryptedPayloadInterface<C>>
   implements DecryptedItemInterface<C>
 {
-  payload: DecryptedPayloadInterface<C>
   public readonly conflictOf?: Uuid
   public readonly protected: boolean = false
   public readonly trashed: boolean = false

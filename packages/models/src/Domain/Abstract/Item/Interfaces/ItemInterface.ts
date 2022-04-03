@@ -4,8 +4,8 @@ import { PredicateInterface } from '../../../Runtime/Predicate/Interface'
 import { HistoryEntryInterface } from '../../../Runtime/History'
 import { ConflictStrategy } from '../Types/ConflictStrategy'
 
-export interface ItemInterface {
-  payload: PayloadInterface
+export interface ItemInterface<P extends PayloadInterface = PayloadInterface> {
+  payload: P
   readonly conflictOf?: Uuid
   readonly duplicateOf?: Uuid
   readonly createdAtString?: string
@@ -30,12 +30,15 @@ export interface ItemInterface {
   updated_at: Date | undefined
 
   singletonPredicate<T extends ItemInterface>(): PredicateInterface<T>
+
   singletonStrategy: any
+
   strategyWhenConflictingWithItem(
     item: ItemInterface,
     previousRevision?: HistoryEntryInterface,
   ): ConflictStrategy
+
   satisfiesPredicate(predicate: any): boolean
 
-  payloadRepresentation(override?: Partial<PayloadInterface>): PayloadInterface
+  payloadRepresentation(override?: Partial<P>): P
 }

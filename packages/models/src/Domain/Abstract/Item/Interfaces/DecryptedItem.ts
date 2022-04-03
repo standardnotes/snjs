@@ -7,9 +7,10 @@ import { ItemContent } from './ItemContent'
 import { DecryptedPayloadInterface } from '../../Payload/Interfaces/DecryptedPayload'
 import { ItemInterface } from './ItemInterface'
 import { SortableItem } from '../../../Runtime/Collection/CollectionSort'
+import { PayloadInterface } from '../../Payload'
 
 export interface DecryptedItemInterface<C extends ItemContent = ItemContent>
-  extends ItemInterface,
+  extends ItemInterface<DecryptedPayloadInterface>,
     SortableItem {
   readonly payload: DecryptedPayloadInterface<C>
   readonly conflictOf?: Uuid
@@ -27,11 +28,11 @@ export interface DecryptedItemInterface<C extends ItemContent = ItemContent>
 
   getAppDomainValue(key: any): any
 
-  isItemContentEqualWith(otherItem: ItemInterface): boolean
+  isItemContentEqualWith(otherItem: ItemInterface<PayloadInterface>): boolean
 
   payloadRepresentation(override?: Partial<DecryptedPayloadInterface<C>>): DecryptedPayloadInterface
 
-  hasRelationshipWithItem(item: ItemInterface): boolean
+  hasRelationshipWithItem(item: ItemInterface<PayloadInterface>): boolean
 
   getDomainData(
     domain: typeof ComponentDataDomain | typeof DefaultAppDomain,

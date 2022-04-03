@@ -1,11 +1,12 @@
-import { DecryptedPayloadInterface } from './../Interfaces/DecryptedPayload'
+import { TransferPayload } from './../../TransferPayload/Interfaces/TransferPayload'
 import { extendArray, UuidGenerator } from '@standardnotes/utils'
 import { ImmutablePayloadCollection } from '../../../Runtime/Collection/Payload/ImmutablePayloadCollection'
 import { ItemContent } from '../../Item/Interfaces/ItemContent'
 import { AffectorMapping } from './AffectorFunction'
-import { Writeable, CopyPayload, PayloadsByUpdatingReferencingPayloadReferences } from './Functions'
+import { CopyPayload, PayloadsByUpdatingReferencingPayloadReferences } from './Functions'
 import { PayloadInterface } from '../Interfaces/PayloadInterface'
 import { isDecryptedPayload } from '../Interfaces/TypeCheck'
+import { DecryptedTransferPayload } from '../../TransferPayload/Interfaces/DecryptedTransferPayload'
 
 /**
  * Copies payload and assigns it a new uuid.
@@ -19,7 +20,7 @@ export async function PayloadsByDuplicating<C extends ItemContent = ItemContent>
 ): Promise<PayloadInterface[]> {
   const results: PayloadInterface[] = []
 
-  const override: Writeable<Partial<PayloadInterface>> = {
+  const override: Partial<TransferPayload> = {
     uuid: UuidGenerator.GenerateUuid(),
     dirty: true,
     dirtiedDate: new Date(),
@@ -29,7 +30,7 @@ export async function PayloadsByDuplicating<C extends ItemContent = ItemContent>
   }
 
   if (isDecryptedPayload(payload)) {
-    const decryptedOverride = override as Writeable<DecryptedPayloadInterface>
+    const decryptedOverride = override as DecryptedTransferPayload
     decryptedOverride.content = {
       ...payload.content,
       ...additionalContent,
@@ -43,7 +44,7 @@ export async function PayloadsByDuplicating<C extends ItemContent = ItemContent>
   const copy = CopyPayload(payload, override)
   results.push(copy)
 
-  if (isDecryptedPayload(payload)) {
+  if (isDecryptedPayload(payload) && isDecryptedPayload(copy)) {
     /**
      * Get the payloads that make reference to payload and add the copy.
      */

@@ -1,10 +1,10 @@
 import { Copy } from '@standardnotes/utils'
 import { MutationType } from '../Types/MutationType'
-import { DecryptedItem } from './DecryptedItem'
+import { DecryptedItem } from '../Implementations/DecryptedItem'
 import { ItemContent } from '../Interfaces/ItemContent'
 import { PurePayload } from '../../Payload/Implementations/PurePayload'
 import { CopyPayload, PayloadByMerging } from '../../Payload/Utilities/Functions'
-import { GenericItem } from './GenericItem'
+import { GenericItem } from '../Implementations/GenericItem'
 import { PayloadInterface } from '../../Payload'
 import { isDecryptedItem } from '../Interfaces/TypeCheck'
 import { isDecryptedPayload } from '../../Payload/Interfaces/TypeCheck'
@@ -20,7 +20,7 @@ export class ItemMutator<C extends ItemContent = ItemContent> {
   protected readonly type: MutationType
   protected content?: C
 
-  constructor(item: DecryptedItem<C>, type: MutationType) {
+  constructor(item: GenericItem, type: MutationType) {
     this.item = item
     this.type = type
     this.payload = item.payload

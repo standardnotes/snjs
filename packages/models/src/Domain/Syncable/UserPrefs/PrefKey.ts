@@ -1,5 +1,5 @@
+import { CollectionSortProperty } from './../../Runtime/Collection/CollectionSort'
 import { FeatureIdentifier } from '@standardnotes/features'
-import { CollectionSort } from '../../Runtime/Collection/CollectionSort'
 
 export enum PrefKey {
   TagsPanelWidth = 'tagsPanelWidth',
@@ -33,7 +33,7 @@ export type PrefValue = {
   [PrefKey.EditorMonospaceEnabled]: boolean
   [PrefKey.EditorSpellcheck]: boolean
   [PrefKey.EditorResizersEnabled]: boolean
-  [PrefKey.SortNotesBy]: CollectionSort
+  [PrefKey.SortNotesBy]: CollectionSortProperty
   [PrefKey.SortNotesReverse]: boolean
   [PrefKey.NotesShowArchived]: boolean
   [PrefKey.NotesShowTrashed]: boolean

@@ -1,6 +1,6 @@
 import { AppDataField } from '../../Abstract/Item/Types/AppDataField'
 import { ComponentContent } from '../Component/ComponentContent'
-import { DecryptedItemMutator } from '../../Abstract/Item/Implementations/DecryptedItemMutator'
+import { DecryptedItemMutator } from '../../Abstract/Item/Mutator/DecryptedItemMutator'
 
 export class ThemeMutator extends DecryptedItemMutator<ComponentContent> {
   setMobileRules(rules: unknown) {

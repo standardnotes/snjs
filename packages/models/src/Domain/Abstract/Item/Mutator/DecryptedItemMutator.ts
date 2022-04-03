@@ -1,7 +1,7 @@
 import { Copy } from '@standardnotes/utils'
 import { MutationType } from '../Types/MutationType'
 import { PrefKey } from '../../../Syncable/UserPrefs/PrefKey'
-import { DecryptedItem } from './DecryptedItem'
+import { DecryptedItem } from '../Implementations/DecryptedItem'
 import { Uuid } from '@standardnotes/common'
 import { ItemContent } from '../Interfaces/ItemContent'
 import { AppDataField } from '../Types/AppDataField'

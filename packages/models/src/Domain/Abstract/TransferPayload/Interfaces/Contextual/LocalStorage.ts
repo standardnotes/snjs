@@ -1,26 +1,5 @@
 import { Uuid } from '@standardnotes/common'
-import { PayloadField, ValidPayloadKey } from '../../../Payload'
 import { TransferPayload } from './../TransferPayload'
-
-export const StoragePayloadFields: Readonly<ValidPayloadKey[]> = Object.freeze([
-  PayloadField.Content,
-  PayloadField.ContentType,
-  PayloadField.CreatedAt,
-  PayloadField.CreatedAtTimestamp,
-  PayloadField.Deleted,
-  PayloadField.DirtiedDate,
-  PayloadField.Dirty,
-  PayloadField.DuplicateOf,
-  PayloadField.EncItemKey,
-  PayloadField.ErrorDecrypting,
-  PayloadField.ItemsKeyId,
-  PayloadField.Legacy003AuthHash,
-  PayloadField.Legacy003AuthParams,
-  PayloadField.ServerUpdatedAt,
-  PayloadField.ServerUpdatedAtTimestamp,
-  PayloadField.Uuid,
-  PayloadField.WaitingForKey,
-])
 
 export interface LocalStorageTransferPayload extends TransferPayload {
   auth_hash?: string

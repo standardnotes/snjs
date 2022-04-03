@@ -27,7 +27,6 @@ export class DeltaFileImport extends PayloadsDelta<DecryptedPayloadInterface> {
         return CopyPayload(result, {
           dirty: true,
           dirtiedDate: new Date(),
-          deleted: false,
         })
       })
       extendArray(results, payloads)

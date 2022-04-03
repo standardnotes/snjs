@@ -3,7 +3,7 @@ import { Uuid } from '@standardnotes/common'
 import { ComponentPermission } from '@standardnotes/features'
 import { AppDataField } from '../../Abstract/Item/Types/AppDataField'
 import { ComponentContent } from './ComponentContent'
-import { DecryptedItemMutator } from '../../Abstract/Item/Implementations/DecryptedItemMutator'
+import { DecryptedItemMutator } from '../../Abstract/Item/Mutator/DecryptedItemMutator'
 
 export class ComponentMutator extends DecryptedItemMutator<ComponentContent> {
   set active(active: boolean) {

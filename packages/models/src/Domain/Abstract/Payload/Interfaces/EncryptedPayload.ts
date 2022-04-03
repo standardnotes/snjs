@@ -6,6 +6,7 @@ export interface EncryptedPayloadInterface extends PayloadInterface {
   readonly enc_item_key: string
   readonly items_key_id?: string
   readonly format: PayloadFormat.EncryptedString
+  readonly deleted: false
 
   readonly errorDecrypting?: boolean
   readonly waitingForKey?: boolean

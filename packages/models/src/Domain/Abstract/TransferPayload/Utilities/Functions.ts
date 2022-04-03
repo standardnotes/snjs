@@ -1,68 +1,47 @@
+import { DeletedPayload } from './../../Payload/Implementations/DeletedPayload'
+import { isString } from '@standardnotes/utils'
 import { ContentlessPayload } from './../../Payload/Implementations/ContentlessPayload'
-import {
-  ComponentCreatedPayloadFields,
-  ComponentCreateTransferPayload,
-} from '../Interfaces/Contextual/ComponentCreate'
+import { ComponentCreateTransferPayload } from '../Interfaces/Contextual/ComponentCreate'
 import { PayloadSource } from './../../Payload/Types/PayloadSource'
 import { DecryptedPayload } from '../../Payload/Implementations/DecryptedPayload'
-
-import { isString } from '@standardnotes/utils'
 import { EncryptedPayload } from '../../Payload/Implementations/EncryptedPayload'
 import { EncryptedTransferPayload } from '../Interfaces/EncryptedTransferPayload'
 import { DecryptedTransferPayload } from '../Interfaces/DecryptedTransferPayload'
-import {
-  ComponentRetrievedPayloadFields,
-  ComponentRetrievedTransferPayload,
-} from '../Interfaces/Contextual/ComponentRetrieved'
+import { ComponentRetrievedTransferPayload } from '../Interfaces/Contextual/ComponentRetrieved'
 import { SyncSavedTransferPayload } from '../Interfaces/Contextual/ServerSaved'
-import { FileImportTransferPayload, FilePayloadFields } from '../Interfaces/Contextual/FileImport'
-import {
-  LocalStorageTransferPayload,
-  StoragePayloadFields,
-} from '../Interfaces/Contextual/LocalStorage'
-import {
-  SessionHistoryPayloadFields,
-  SessionHistoryTransferPayload,
-} from '../Interfaces/Contextual/SessionHistory'
-import {
-  ServerPushOrRetrievedTransferPayload,
-  ServerPushPayloadFields,
-} from '../Interfaces/Contextual/ServerPushOrRetrieved'
+import { FileImportTransferPayload } from '../Interfaces/Contextual/FileImport'
+import { LocalStorageTransferPayload } from '../Interfaces/Contextual/LocalStorage'
+import { SessionHistoryTransferPayload } from '../Interfaces/Contextual/SessionHistory'
+import { ServerPushOrRetrievedTransferPayload } from '../Interfaces/Contextual/ServerPushOrRetrieved'
+import { isDeletedTransferPayload, isEncryptedTransferPayload } from '../Interfaces/TypeCheck'
 
 export function CreateComponentRetrievedTransferPayload(
   object: ComponentRetrievedTransferPayload,
 ): ComponentRetrievedTransferPayload {
-  return new DecryptedPayload(
-    object,
-    ComponentRetrievedPayloadFields.slice(),
-    PayloadSource.ComponentRetrieved,
-  )
+  return new DecryptedPayload(object, PayloadSource.ComponentRetrieved)
 }
 
 export function CreateComponentCreateTransferPayload(
   object: ComponentCreateTransferPayload,
 ): ComponentCreateTransferPayload {
-  return new DecryptedPayload(
-    object,
-    ComponentCreatedPayloadFields.slice(),
-    PayloadSource.ComponentCreated,
-  )
+  return new DecryptedPayload(object, PayloadSource.ComponentCreated)
 }
 
 export function CreateSessionHistoryTransferPayload(
   object: SessionHistoryTransferPayload,
 ): SessionHistoryTransferPayload {
-  return new DecryptedPayload(
-    object,
-    SessionHistoryPayloadFields.slice(),
-    PayloadSource.SessionHistory,
-  )
+  return new DecryptedPayload(object, PayloadSource.SessionHistory)
 }
 
 export function CreateRemoteHistoryTransferPayload(
   object: ServerPushOrRetrievedTransferPayload,
 ): ServerPushOrRetrievedTransferPayload {
-  return new EncryptedPayload(object, ServerPushPayloadFields.slice(), PayloadSource.RemoteHistory)
+  if (isDeletedTransferPayload(object)) {
+    return new DeletedPayload(object, PayloadSource.RemoteHistory)
+  } else if (isEncryptedTransferPayload(object)) {
+    return new EncryptedPayload(object, PayloadSource.RemoteHistory)
+  }
+  throw Error('Unhandled case in CreateRemoteHistoryTransferPayload')
 }
 
 export function CreateRemoteRetrievedTransferPayload(
@@ -72,50 +51,46 @@ export function CreateRemoteRetrievedTransferPayload(
     | PayloadSource.ConflictData
     | PayloadSource.ConflictUuid
     | PayloadSource.RemoteRejected,
+  override?: Partial<ServerPushOrRetrievedTransferPayload>,
 ): ServerPushOrRetrievedTransferPayload {
-  return new EncryptedPayload(object, ServerPushPayloadFields.slice(), source)
+  if (isDeletedTransferPayload(object)) {
+    return new DeletedPayload(object, source)
+  } else if (isEncryptedTransferPayload(object)) {
+    return new EncryptedPayload(
+      {
+        ...object,
+        ...override,
+      },
+      source,
+    )
+  }
+  throw Error('Unhandled case in CreateRemoteRetrievedTransferPayload')
 }
 
 export function CreateLocalSavedTransferPayload(
   object: SyncSavedTransferPayload,
 ): SyncSavedTransferPayload {
-  return new ContentlessPayload(
-    object,
-    ComponentCreatedPayloadFields.slice(),
-    PayloadSource.LocalSaved,
-  )
+  return new ContentlessPayload(object, PayloadSource.LocalSaved)
 }
 
 export function CreateRemoteSavedTransferPayload(
   object: SyncSavedTransferPayload,
 ): SyncSavedTransferPayload {
-  return new ContentlessPayload(
-    object,
-    ComponentCreatedPayloadFields.slice(),
-    PayloadSource.RemoteSaved,
-  )
+  return new ContentlessPayload(object, PayloadSource.RemoteSaved)
 }
 
 export function CreateFileImportTransferPayload(
   object: FileImportTransferPayload,
 ): FileImportTransferPayload {
   if (isString(object.content)) {
-    return new EncryptedPayload(
-      object as EncryptedTransferPayload,
-      FilePayloadFields.slice(),
-      PayloadSource.FileImport,
-    )
+    return new EncryptedPayload(object as EncryptedTransferPayload, PayloadSource.FileImport)
   } else {
-    return new DecryptedPayload(
-      object as DecryptedTransferPayload,
-      FilePayloadFields.slice(),
-      PayloadSource.FileImport,
-    )
+    return new DecryptedPayload(object as DecryptedTransferPayload, PayloadSource.FileImport)
   }
 }
 
 export function CreateLocalStorageTransferPayload(
   object: LocalStorageTransferPayload,
 ): LocalStorageTransferPayload {
-  return new EncryptedPayload(object, StoragePayloadFields.slice(), PayloadSource.ComponentCreated)
+  return new EncryptedPayload(object, PayloadSource.ComponentCreated)
 }

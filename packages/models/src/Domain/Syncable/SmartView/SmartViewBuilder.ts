@@ -4,53 +4,53 @@ import { NoteWithTags } from '../Note/NoteWithTags'
 import { ContentType } from '@standardnotes/common'
 import { NotesDisplayCriteria } from '../Note/NotesDisplayCriteria'
 import { SmartView, SystemViewId } from '.'
-import { CreateMaxPayloadFromAnyObject } from '../../Abstract/Payload/Utilities/Functions'
+import { CreateDecryptedPayload } from '../../Abstract/Payload/Utilities/Functions'
 import { FillItemContent } from '../../Abstract/Item/Interfaces/ItemContent'
 import { Predicate } from '../../Runtime/Predicate/Predicate'
 import { CompoundPredicate } from '../../Runtime/Predicate/CompoundPredicate'
 
 export function BuildSmartViews(criteria: NotesDisplayCriteria): SmartView[] {
   const notes = new SmartView(
-    CreateMaxPayloadFromAnyObject({
+    CreateDecryptedPayload({
       uuid: SystemViewId.AllNotes,
       content_type: ContentType.SmartView,
-      content: FillItemContent({
+      content: FillItemContent<SmartViewContent>({
         title: 'Notes',
         predicate: allNotesPredicate(criteria).toJson(),
-      } as SmartViewContent),
+      }),
     }),
   )
 
   const archived = new SmartView(
-    CreateMaxPayloadFromAnyObject({
+    CreateDecryptedPayload({
       uuid: SystemViewId.ArchivedNotes,
       content_type: ContentType.SmartView,
-      content: FillItemContent({
+      content: FillItemContent<SmartViewContent>({
         title: 'Archived',
         predicate: archivedNotesPredicate(criteria).toJson(),
-      } as SmartViewContent),
+      }),
     }),
   )
 
   const trash = new SmartView(
-    CreateMaxPayloadFromAnyObject({
+    CreateDecryptedPayload({
       uuid: SystemViewId.TrashedNotes,
       content_type: ContentType.SmartView,
-      content: FillItemContent({
+      content: FillItemContent<SmartViewContent>({
         title: 'Trash',
         predicate: trashedNotesPredicate(criteria).toJson(),
-      } as SmartViewContent),
+      }),
     }),
   )
 
   const untagged = new SmartView(
-    CreateMaxPayloadFromAnyObject({
+    CreateDecryptedPayload({
       uuid: SystemViewId.UntaggedNotes,
       content_type: ContentType.SmartView,
-      content: FillItemContent({
+      content: FillItemContent<SmartViewContent>({
         title: 'Untagged',
         predicate: untaggedNotesPredicate(criteria).toJson(),
-      } as SmartViewContent),
+      }),
     }),
   )
 

@@ -3,7 +3,7 @@ import { SNNote } from '../Note/Note'
 import { FileContent } from './File'
 import { FileToNoteReference } from '../../Abstract/Reference/FileToNoteReference'
 import { ContenteReferenceType } from '../../Abstract/Reference/ContenteReferenceType'
-import { DecryptedItemMutator } from '../../Abstract/Item/Implementations/DecryptedItemMutator'
+import { DecryptedItemMutator } from '../../Abstract/Item/Mutator/DecryptedItemMutator'
 
 export class FileMutator extends DecryptedItemMutator<FileContent> {
   set name(newName: string) {
