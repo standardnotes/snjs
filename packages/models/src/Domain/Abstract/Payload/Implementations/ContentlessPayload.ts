@@ -26,8 +26,8 @@ export class ContentlessPayload extends PurePayload implements ContentlessPayloa
   mergedWith(payload: ContentlessPayloadInterface): ContentlessPayloadInterface {
     return new ContentlessPayload(
       {
-        ...this,
-        ...payload,
+        ...this.ejected(),
+        ...payload.ejected(),
       },
       this.source,
     )

@@ -54,8 +54,8 @@ export class EncryptedPayload extends PurePayload implements EncryptedPayloadInt
   mergedWith(payload: EncryptedPayloadInterface): EncryptedPayloadInterface {
     return new EncryptedPayload(
       {
-        ...this,
-        ...payload,
+        ...this.ejected(),
+        ...payload.ejected(),
       },
       this.source,
     )

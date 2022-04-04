@@ -32,8 +32,8 @@ export class DeletedPayload extends PurePayload implements DeletedPayloadInterfa
   mergedWith(payload: DeletedPayloadInterface): DeletedPayloadInterface {
     return new DeletedPayload(
       {
-        ...this,
-        ...payload,
+        ...this.ejected(),
+        ...payload.ejected(),
       },
       this.source,
     )

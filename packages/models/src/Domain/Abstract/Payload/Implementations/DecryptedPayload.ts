@@ -49,8 +49,8 @@ export class DecryptedPayload<C extends ItemContent = ItemContent>
   mergedWith(payload: DecryptedPayloadInterface): DecryptedPayloadInterface {
     return new DecryptedPayload(
       {
-        ...this,
-        ...payload,
+        ...this.ejected(),
+        ...payload.ejected(),
       },
       this.source,
     )
