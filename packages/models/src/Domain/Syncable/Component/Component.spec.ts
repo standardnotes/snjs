@@ -1,5 +1,6 @@
+import { PayloadSource } from './../../Abstract/Payload/Types/PayloadSource'
+import { DecryptedPayload } from './../../Abstract/Payload/Implementations/DecryptedPayload'
 import { ContentType } from '@standardnotes/common'
-import { CreateMaxPayloadFromAnyObject } from '../../Abstract/Payload/Utilities/Functions'
 import { FillItemContent } from '../../Abstract/Item/Interfaces/ItemContent'
 import { SNComponent } from './Component'
 import { ComponentContent } from './ComponentContent'
@@ -7,14 +8,17 @@ import { ComponentContent } from './ComponentContent'
 describe('component model', () => {
   it('valid hosted url should ignore url', () => {
     const component = new SNComponent(
-      CreateMaxPayloadFromAnyObject({
-        uuid: String(Math.random()),
-        content_type: ContentType.Component,
-        content: FillItemContent<ComponentContent>({
-          url: 'http://foo.com',
-          hosted_url: 'http://bar.com',
-        } as ComponentContent),
-      }),
+      new DecryptedPayload(
+        {
+          uuid: String(Math.random()),
+          content_type: ContentType.Component,
+          content: FillItemContent<ComponentContent>({
+            url: 'http://foo.com',
+            hosted_url: 'http://bar.com',
+          } as ComponentContent),
+        },
+        PayloadSource.Constructor,
+      ),
     )
 
     expect(component.hasValidHostedUrl()).toBe(true)
@@ -23,14 +27,17 @@ describe('component model', () => {
 
   it('invalid hosted url should fallback to url', () => {
     const component = new SNComponent(
-      CreateMaxPayloadFromAnyObject({
-        uuid: String(Math.random()),
-        content_type: ContentType.Component,
-        content: FillItemContent({
-          url: 'http://foo.com',
-          hosted_url: '#{foo.zoo}',
-        } as ComponentContent),
-      }),
+      new DecryptedPayload(
+        {
+          uuid: String(Math.random()),
+          content_type: ContentType.Component,
+          content: FillItemContent({
+            url: 'http://foo.com',
+            hosted_url: '#{foo.zoo}',
+          } as ComponentContent),
+        },
+        PayloadSource.Constructor,
+      ),
     )
 
     expect(component.hasValidHostedUrl()).toBe(true)

@@ -1,7 +1,7 @@
 import { Uuid } from '@standardnotes/common'
 import { AppDataField } from '../Types/AppDataField'
 import { ComponentDataDomain, DefaultAppDomain } from '../Types/DefaultAppDomain'
-import { ContentReference } from '../../Reference/ContentReference'
+import { ContentReference } from '../Reference/ContentReference'
 import { dateToLocalizedString } from '@standardnotes/utils'
 import { DecryptedItemInterface } from '../Interfaces/DecryptedItem'
 import { DecryptedPayloadInterface } from '../../Payload/Interfaces/DecryptedPayload'

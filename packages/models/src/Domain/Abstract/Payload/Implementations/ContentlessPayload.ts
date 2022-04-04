@@ -8,7 +8,7 @@ export class ContentlessPayload extends PurePayload implements ContentlessPayloa
   readonly format: PayloadFormat.Deleted
   readonly content: undefined
 
-  constructor(rawPayload: ContentlessTransferPayload, source: PayloadSource) {
+  constructor(rawPayload: ContentlessTransferPayload, source = PayloadSource.Constructor) {
     super(rawPayload, source)
   }
 
@@ -21,5 +21,15 @@ export class ContentlessPayload extends PurePayload implements ContentlessPayloa
       ...super.ejected(),
       ...values,
     }
+  }
+
+  mergedWith(payload: ContentlessPayloadInterface): ContentlessPayloadInterface {
+    return new ContentlessPayload(
+      {
+        ...this,
+        ...payload,
+      },
+      this.source,
+    )
   }
 }

@@ -5,7 +5,7 @@ import { ContentType, Uuid } from '@standardnotes/common'
 import { Copy, extendArray, UuidGenerator } from '@standardnotes/utils'
 import { remove } from 'lodash'
 import { ImmutablePayloadCollection } from '../../../Runtime/Collection/Payload/ImmutablePayloadCollection'
-import { ContentReference } from '../../Reference/ContentReference'
+import { ContentReference } from '../../Item/Reference/ContentReference'
 import { PayloadInterface } from '../Interfaces/PayloadInterface'
 import { PayloadSource } from '../Types/PayloadSource'
 import { PayloadFormat } from '../Types/PayloadFormat'
@@ -21,7 +21,6 @@ import {
   isDeletedTransferPayload,
   isEncryptedTransferPayload,
 } from '../../TransferPayload/Interfaces/TypeCheck'
-import { DecryptedTransferPayload } from '../../TransferPayload/Interfaces/DecryptedTransferPayload'
 
 /**
  * Return the payloads that result if you alternated the uuid for the payload.
@@ -178,51 +177,6 @@ export function CopyPayloadWithContentOverride<C extends ItemContent = ItemConte
     },
   })
   return result as DecryptedPayloadInterface<C>
-}
-
-/**
- * Makes a new payload by starting with input payload, then overriding values of all
- * keys of mergeWith.fields. If wanting to merge only specific fields, pass an array of
- * fields. If override value is passed, values in here take final precedence, including
- * above both payload and mergeWith values.
- */
-export function PayloadByMerging<P extends PayloadInterface = PayloadInterface>(
-  payload: P,
-  mergeWith: P,
-  override?: Partial<P>,
-): P {
-  const result: P = {
-    ...payload,
-    ...mergeWith,
-    ...override,
-  }
-
-  return CreatePayload(result, payload.source) as P
-}
-
-export function CreateMaxPayloadFromAnyObject<T extends TransferPayload = TransferPayload>(
-  object: T,
-  override?: Partial<T>,
-  source?: PayloadSource,
-): PayloadInterface {
-  return CreatePayload(object, source, override)
-}
-
-export function CreateDecryptedPayload<
-  C extends ItemContent = ItemContent,
-  T extends DecryptedTransferPayload<C> = DecryptedTransferPayload<C>,
->(
-  object: T,
-  override?: Partial<T>,
-  source: PayloadSource = PayloadSource.Constructor,
-): DecryptedPayloadInterface<C> {
-  return new DecryptedPayload(
-    {
-      ...object,
-      ...override,
-    },
-    source,
-  )
 }
 
 /**

@@ -1,6 +1,6 @@
 import { ProtocolVersion, Uuid } from '@standardnotes/common'
 import { FillItemContent, ItemContent } from '../../Item'
-import { ContentReference } from '../../Reference/ContentReference'
+import { ContentReference } from '../../Item/Reference/ContentReference'
 import { DecryptedTransferPayload } from '../../TransferPayload/Interfaces/DecryptedTransferPayload'
 import { DecryptedPayloadInterface } from '../Interfaces/DecryptedPayload'
 import { PayloadFormat } from '../Types/PayloadFormat'
@@ -14,7 +14,7 @@ export class DecryptedPayload<C extends ItemContent = ItemContent>
   readonly content: C
   readonly format = PayloadFormat.DecryptedBareObject
 
-  constructor(rawPayload: DecryptedTransferPayload<C>, source: PayloadSource) {
+  constructor(rawPayload: DecryptedTransferPayload<C>, source = PayloadSource.Constructor) {
     super(rawPayload, source)
 
     this.content = FillItemContent<C>(rawPayload.content)
@@ -44,5 +44,15 @@ export class DecryptedPayload<C extends ItemContent = ItemContent>
       ...super.ejected(),
       ...values,
     }
+  }
+
+  mergedWith(payload: DecryptedPayloadInterface): DecryptedPayloadInterface {
+    return new DecryptedPayload(
+      {
+        ...this,
+        ...payload,
+      },
+      this.source,
+    )
   }
 }

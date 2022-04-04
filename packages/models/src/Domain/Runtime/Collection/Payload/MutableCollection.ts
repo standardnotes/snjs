@@ -10,6 +10,7 @@ import {
   isDeletedPayload,
   isEncryptedErroredPayload,
 } from '../../../Abstract/Payload/Interfaces/TypeCheck'
+import { ItemContent } from '../../../Abstract/Item'
 
 export class MutableCollection<T extends PayloadInterface = PayloadInterface>
   implements CollectionInterface
@@ -73,12 +74,14 @@ export class MutableCollection<T extends PayloadInterface = PayloadInterface>
     }
   }
 
-  public allDecrypted(contentType: ContentType | ContentType[]): DecryptedPayloadInterface[] {
+  public allDecrypted<C extends ItemContent = ItemContent>(
+    contentType: ContentType,
+  ): DecryptedPayloadInterface<C>[] {
     const allResults = this.all(contentType)
-    const filtered: DecryptedPayloadInterface[] = []
+    const filtered: DecryptedPayloadInterface<C>[] = []
 
     allResults.forEach((payload) => {
-      if (isDecryptedPayload(payload)) {
+      if (isDecryptedPayload<C>(payload)) {
         filtered.push(payload)
       }
     })

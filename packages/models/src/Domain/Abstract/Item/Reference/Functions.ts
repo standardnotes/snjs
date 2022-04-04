@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { ContentType } from '@standardnotes/common'
-import { ItemInterface } from '../Item/Interfaces/ItemInterface'
+import { ItemInterface } from '../Interfaces/ItemInterface'
 import { ContenteReferenceType } from './ContenteReferenceType'
 import { ContentReference } from './ContentReference'
 import { LegacyAnonymousReference } from './LegacyAnonymousReference'

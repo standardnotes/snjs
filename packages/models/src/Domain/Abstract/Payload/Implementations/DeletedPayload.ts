@@ -9,7 +9,7 @@ export class DeletedPayload extends PurePayload implements DeletedPayloadInterfa
   readonly content: undefined
   readonly format: PayloadFormat.Deleted
 
-  constructor(rawPayload: DeletedTransferPayload, source: PayloadSource) {
+  constructor(rawPayload: DeletedTransferPayload, source = PayloadSource.Constructor) {
     super(rawPayload, source)
   }
 
@@ -27,5 +27,15 @@ export class DeletedPayload extends PurePayload implements DeletedPayloadInterfa
       ...super.ejected(),
       ...values,
     }
+  }
+
+  mergedWith(payload: DeletedPayloadInterface): DeletedPayloadInterface {
+    return new DeletedPayload(
+      {
+        ...this,
+        ...payload,
+      },
+      this.source,
+    )
   }
 }

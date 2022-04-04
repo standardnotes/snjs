@@ -24,8 +24,8 @@ export abstract class PurePayload implements PayloadInterface {
   version: ProtocolVersion
   readonly duplicate_of?: string
 
-  constructor(rawPayload: TransferPayload, source: PayloadSource) {
-    this.source = source != undefined ? source : PayloadSource.Constructor
+  constructor(rawPayload: TransferPayload, source = PayloadSource.Constructor) {
+    this.source = source
     this.uuid = rawPayload.uuid
 
     if (!this.uuid) {
@@ -79,4 +79,6 @@ export abstract class PurePayload implements PayloadInterface {
   public get serverUpdatedAtTimestamp(): number {
     return this.updated_at_timestamp
   }
+
+  abstract mergedWith(payload: PayloadInterface): PayloadInterface
 }

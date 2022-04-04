@@ -19,9 +19,11 @@ function NoteDuplicationAffectedPayloads(
   baseCollection: ImmutablePayloadCollection,
 ) {
   /** If note has editor, maintain editor relationship in duplicate note */
-  const components = baseCollection.allDecrypted(ContentType.Component).map((payload) => {
-    return CreateDecryptedItemFromPayload<ComponentContent, SNComponent>(payload)
-  })
+  const components = baseCollection
+    .allDecrypted<ComponentContent>(ContentType.Component)
+    .map((payload) => {
+      return CreateDecryptedItemFromPayload<ComponentContent, SNComponent>(payload)
+    })
   const editor = components
     .filter((c) => c.area === ComponentArea.Editor)
     .find((e) => {

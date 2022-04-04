@@ -1,5 +1,4 @@
 export * from './IntegrityPayload'
-export * from './Types/PayloadField'
 export * from './Types/PayloadFormat'
 export * from './Interfaces/PayloadInterface'
 export * from './Types/PayloadSource'

@@ -1,17 +1,21 @@
+import { PayloadSource } from './../../Abstract/Payload/Types/PayloadSource'
+import { DecryptedPayload } from './../../Abstract/Payload/Implementations/DecryptedPayload'
 import { NoteContent, SNNote } from './Note'
 import { ContentType } from '@standardnotes/common'
-import { CreateMaxPayloadFromAnyObject } from '../../Abstract/Payload/Utilities/Functions'
 import { FillItemContent } from '../../Abstract/Item/Interfaces/ItemContent'
 
 const randUuid = () => String(Math.random())
 
 const create = (payload?: Partial<NoteContent>): SNNote =>
   new SNNote(
-    CreateMaxPayloadFromAnyObject({
-      uuid: randUuid(),
-      content_type: ContentType.Note,
-      content: FillItemContent({ ...payload } as NoteContent),
-    }),
+    new DecryptedPayload(
+      {
+        uuid: randUuid(),
+        content_type: ContentType.Note,
+        content: FillItemContent({ ...payload }),
+      },
+      PayloadSource.Constructor,
+    ),
   )
 
 describe('SNNote Tests', () => {

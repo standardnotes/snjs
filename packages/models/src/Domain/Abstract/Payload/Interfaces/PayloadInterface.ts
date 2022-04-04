@@ -48,4 +48,9 @@ export interface PayloadInterface {
    * with a server.
    */
   ejected(): TransferPayload
+
+  /**
+   * Returns a new payload by applying the input payload on top of the instance payload.
+   */
+  mergedWith(payload: PayloadInterface): PayloadInterface
 }

@@ -8,12 +8,8 @@ import { AppDataField } from '../Types/AppDataField'
 import { DefaultAppDomain, DomainDataValueType, ItemDomainKey } from '../Types/DefaultAppDomain'
 import { ItemMutator } from './ItemMutator'
 import { DecryptedPayloadInterface } from '../../Payload/Interfaces/DecryptedPayload'
+import { CopyPayload } from '../../Payload'
 
-/**
- * An item mutator takes in an item, and an operation, and returns the resulting payload.
- * Subclasses of mutators can modify the content field directly, but cannot modify the payload directly.
- * All changes to the payload must occur by copying the payload and reassigning its value.
- */
 export class DecryptedItemMutator<C extends ItemContent = ItemContent> extends ItemMutator {
   public readonly item: DecryptedItem<C>
   protected payload: DecryptedPayloadInterface
@@ -29,7 +25,9 @@ export class DecryptedItemMutator<C extends ItemContent = ItemContent> extends I
 
   public getResult() {
     if (this.type === MutationType.NonDirtying) {
-      return super.getResult()
+      return CopyPayload(this.payload, {
+        content: this.content,
+      })
     }
 
     if (this.type === MutationType.UpdateUserTimestamps) {
@@ -41,7 +39,34 @@ export class DecryptedItemMutator<C extends ItemContent = ItemContent> extends I
       }
     }
 
-    return super.getResult()
+    const result = CopyPayload(this.payload, {
+      content: this.content,
+      dirty: true,
+      dirtiedDate: new Date(),
+    })
+
+    return result
+  }
+
+  /** Merges the input payload with the base payload */
+  public mergePayload(payload: DecryptedPayloadInterface) {
+    const merged = this.payload.mergedWith(payload)
+    this.payload = merged
+
+    const mutableContent = Copy(merged.content)
+    this.content = mutableContent
+  }
+
+  public set lastSyncBegan(began: Date) {
+    this.payload = CopyPayload(this.payload, {
+      content: this.content,
+      lastSyncBegan: began,
+    })
+  }
+
+  /** Not recommended to use as this might break item schema if used incorrectly */
+  public unsafe_setCustomContent(content: ItemContent): void {
+    this.content = Copy(content)
   }
 
   public set userModifiedDate(date: Date) {

@@ -21,7 +21,7 @@ export class EncryptedPayload extends PurePayload implements EncryptedPayloadInt
   /** @deprecated */
   readonly auth_params?: unknown
 
-  constructor(rawPayload: EncryptedTransferPayload, source: PayloadSource) {
+  constructor(rawPayload: EncryptedTransferPayload, source = PayloadSource.Constructor) {
     super(rawPayload, source)
 
     this.content = rawPayload.content
@@ -49,5 +49,15 @@ export class EncryptedPayload extends PurePayload implements EncryptedPayloadInt
       ...super.ejected(),
       ...values,
     }
+  }
+
+  mergedWith(payload: EncryptedPayloadInterface): EncryptedPayloadInterface {
+    return new EncryptedPayload(
+      {
+        ...this,
+        ...payload,
+      },
+      this.source,
+    )
   }
 }

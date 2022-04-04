@@ -1,17 +1,17 @@
+import { DecryptedPayload } from './../../Abstract/Payload/Implementations/DecryptedPayload'
 import { SNNote } from '../Note/Note'
 import { SmartViewContent } from './SmartView'
 import { NoteWithTags } from '../Note/NoteWithTags'
 import { ContentType } from '@standardnotes/common'
 import { NotesDisplayCriteria } from '../Note/NotesDisplayCriteria'
 import { SmartView, SystemViewId } from '.'
-import { CreateDecryptedPayload } from '../../Abstract/Payload/Utilities/Functions'
 import { FillItemContent } from '../../Abstract/Item/Interfaces/ItemContent'
 import { Predicate } from '../../Runtime/Predicate/Predicate'
 import { CompoundPredicate } from '../../Runtime/Predicate/CompoundPredicate'
 
 export function BuildSmartViews(criteria: NotesDisplayCriteria): SmartView[] {
   const notes = new SmartView(
-    CreateDecryptedPayload({
+    new DecryptedPayload({
       uuid: SystemViewId.AllNotes,
       content_type: ContentType.SmartView,
       content: FillItemContent<SmartViewContent>({
@@ -22,7 +22,7 @@ export function BuildSmartViews(criteria: NotesDisplayCriteria): SmartView[] {
   )
 
   const archived = new SmartView(
-    CreateDecryptedPayload({
+    new DecryptedPayload({
       uuid: SystemViewId.ArchivedNotes,
       content_type: ContentType.SmartView,
       content: FillItemContent<SmartViewContent>({
@@ -33,7 +33,7 @@ export function BuildSmartViews(criteria: NotesDisplayCriteria): SmartView[] {
   )
 
   const trash = new SmartView(
-    CreateDecryptedPayload({
+    new DecryptedPayload({
       uuid: SystemViewId.TrashedNotes,
       content_type: ContentType.SmartView,
       content: FillItemContent<SmartViewContent>({
@@ -44,7 +44,7 @@ export function BuildSmartViews(criteria: NotesDisplayCriteria): SmartView[] {
   )
 
   const untagged = new SmartView(
-    CreateDecryptedPayload({
+    new DecryptedPayload({
       uuid: SystemViewId.UntaggedNotes,
       content_type: ContentType.SmartView,
       content: FillItemContent<SmartViewContent>({

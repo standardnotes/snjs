@@ -17,4 +17,6 @@ export interface EncryptedPayloadInterface extends PayloadInterface {
 
   /** @deprecated */
   readonly auth_params?: unknown
+
+  mergedWith(payload: EncryptedPayloadInterface): EncryptedPayloadInterface
 }

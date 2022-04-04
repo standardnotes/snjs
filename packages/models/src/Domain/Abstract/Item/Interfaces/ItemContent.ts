@@ -1,6 +1,6 @@
 import { Uuid, ProtocolVersion } from '@standardnotes/common'
 import { AppData, DefaultAppDomain } from '../Types/DefaultAppDomain'
-import { ContentReference } from '../../Reference/ContentReference'
+import { ContentReference } from '../Reference/ContentReference'
 import { AppDataField } from '../Types/AppDataField'
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface

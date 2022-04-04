@@ -1,11 +1,12 @@
+import { ItemContent } from '../../Item'
 import { DecryptedPayloadInterface } from './DecryptedPayload'
 import { DeletedPayloadInterface } from './DeletedPayload'
 import { EncryptedPayloadInterface } from './EncryptedPayload'
 import { PayloadInterface } from './PayloadInterface'
 
-export function isDecryptedPayload(
+export function isDecryptedPayload<C extends ItemContent = ItemContent>(
   payload: PayloadInterface,
-): payload is DecryptedPayloadInterface {
+): payload is DecryptedPayloadInterface<C> {
   return 'references' in payload
 }
 
