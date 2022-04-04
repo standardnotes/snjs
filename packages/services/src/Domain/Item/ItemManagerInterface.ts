@@ -9,7 +9,6 @@ import {
 import {
   ItemInterface,
   PayloadInterface,
-  IntegrityPayload,
   PayloadSource,
   EncryptedItemInterface,
   DeletedItemInterface,
@@ -50,8 +49,6 @@ export interface ItemManagerInterface extends AbstractService {
 
   allItems(): ItemInterface[]
 
-  integrityPayloads: IntegrityPayload[]
-
   /**
    * Inserts the item as-is by reading its payload value. This function will not
    * modify item in any way (such as marking it as dirty). It is up to the caller
@@ -65,11 +62,6 @@ export interface ItemManagerInterface extends AbstractService {
    * Returns all non-deleted items keys
    */
   itemsKeys(): ItemsKeyInterface[]
-
-  /**
-   * Returns all items that have not been able to decrypt.
-   */
-  get invalidItems(): ItemInterface[]
 
   /**
    * Consumers wanting to modify an item should run it through this block,

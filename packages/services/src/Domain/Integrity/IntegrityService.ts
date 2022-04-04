@@ -1,6 +1,5 @@
 import { IntegrityEvent } from './IntegrityEvent'
 import { AbstractService } from '../Service/AbstractService'
-import { ItemManagerInterface } from '../Item/ItemManagerInterface'
 import { ItemsServerInterface } from '../Item/ItemsServerInterface'
 import { IntegrityApiInterface } from './IntegrityApiInterface'
 import { GetSingleItemResponse } from '@standardnotes/responses'
@@ -10,14 +9,16 @@ import { InternalEventBusInterface } from '../Internal/InternalEventBusInterface
 import { SyncEvent } from '../Event/SyncEvent'
 import { IntegrityEventPayload } from './IntegrityEventPayload'
 import { SyncSource } from '../Sync/SyncSource'
+import { PayloadManagerInterface } from '../Payloads/PayloadManagerInterface'
 
 export class IntegrityService
   extends AbstractService<IntegrityEvent, IntegrityEventPayload>
-  implements InternalEventHandlerInterface {
+  implements InternalEventHandlerInterface
+{
   constructor(
     private integrityApi: IntegrityApiInterface,
     private itemApi: ItemsServerInterface,
-    private itemManager: ItemManagerInterface,
+    private payloadManager: PayloadManagerInterface,
     protected internalEventBus: InternalEventBusInterface,
   ) {
     super(internalEventBus)
@@ -28,7 +29,9 @@ export class IntegrityService
       return
     }
 
-    const integrityCheckResponse = await this.integrityApi.checkIntegrity(this.itemManager.integrityPayloads)
+    const integrityCheckResponse = await this.integrityApi.checkIntegrity(
+      this.payloadManager.integrityPayloads,
+    )
     if (integrityCheckResponse.error !== undefined) {
       this.log(`Could not obtain integrity check: ${integrityCheckResponse.error}`)
 
@@ -44,7 +47,11 @@ export class IntegrityService
 
     const rawPayloads = []
     for (const serverItemResponse of serverItemResponses) {
-      if (serverItemResponse.data === undefined || serverItemResponse.error || !('item' in serverItemResponse.data)) {
+      if (
+        serverItemResponse.data === undefined ||
+        serverItemResponse.error ||
+        !('item' in serverItemResponse.data)
+      ) {
         this.log(`Could not obtain item for integrity adjustments: ${serverItemResponse.error}`)
 
         continue

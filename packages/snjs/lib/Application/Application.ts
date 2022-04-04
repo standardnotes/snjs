@@ -25,7 +25,11 @@ type ApplicationObserver = {
   singleEvent?: ApplicationEvent
   callback: ApplicationEventCallback
 }
-type ItemStream = (items: Models.SNItem[], source: Models.PayloadSource) => void
+type ItemStream = (
+  changedOrInserted: Models.DecryptedItemInterface[],
+  removed: (Models.EncryptedItemInterface | Models.DeletedItemInterface)[],
+  source: Models.PayloadSource,
+) => void
 type ObserverRemover = () => void
 
 /** The main entrypoint of an application. */
@@ -421,17 +425,20 @@ export class SNApplication implements InternalServices.ListedClientInterface {
   ): () => void {
     const observer = this.itemManager.addObserver(
       contentType,
-      (changed, inserted, discarded, _ignored, source) => {
-        const all = changed.concat(inserted).concat(discarded)
-        stream(all, source)
+      (changed, inserted, removed, _ignored, source) => {
+        const all = changed.concat(inserted)
+        stream(all, removed, source)
       },
     )
+
     /** Push current values now */
     const matches = this.itemManager.getItems(contentType)
     if (matches.length > 0) {
-      stream(matches, Models.PayloadSource.InitialObserverRegistrationPush)
+      stream(matches, [], Models.PayloadSource.InitialObserverRegistrationPush)
     }
+
     this.streamRemovers.push(observer)
+
     return () => {
       observer()
       Utils.removeFromArray(this.streamRemovers, observer)
@@ -1053,7 +1060,7 @@ export class SNApplication implements InternalServices.ListedClientInterface {
     this.integrityService = new ExternalServices.IntegrityService(
       this.apiService,
       this.apiService,
-      this.itemManager,
+      this.payloadManager,
       this.internalEventBus,
     )
 

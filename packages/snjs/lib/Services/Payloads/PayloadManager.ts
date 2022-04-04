@@ -11,13 +11,13 @@ import {
   isDeletedPayload,
   isEncryptedErroredPayload,
   PayloadInterface,
-  MutableCollection,
   ImmutablePayloadCollection,
   IntegrityPayload,
   EncryptedPayloadInterface,
   PayloadSource,
   DeletedPayloadInterface,
   DecryptedPayloadInterface,
+  PayloadCollection,
 } from '@standardnotes/models'
 import * as Services from '@standardnotes/services'
 
@@ -38,12 +38,12 @@ export class PayloadManager
   implements Services.PayloadManagerInterface
 {
   private changeObservers: PayloadsChangeObserver[] = []
-  public collection: MutableCollection<PayloadInterface>
+  public collection: PayloadCollection<PayloadInterface>
   private emitQueue: EmitQueue = []
 
   constructor(protected internalEventBus: Services.InternalEventBusInterface) {
     super(internalEventBus)
-    this.collection = new MutableCollection()
+    this.collection = new PayloadCollection()
   }
 
   /**
@@ -62,7 +62,7 @@ export class PayloadManager
   }
 
   public resetState() {
-    this.collection = new MutableCollection()
+    this.collection = new PayloadCollection()
   }
 
   public find(uuids: Uuid[]) {

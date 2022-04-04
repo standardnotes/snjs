@@ -8,6 +8,7 @@ import { UuidString } from '../../Types/UuidString'
 import * as Models from '@standardnotes/models'
 import * as Services from '@standardnotes/services'
 import { DecryptedPayload, DeletedItem, EncryptedItem } from '@standardnotes/models'
+import { ItemsClientInterface } from './ItemsClientInterface'
 
 type ItemsChangeObserver = {
   contentType: ContentType[]
@@ -24,8 +25,10 @@ type ItemsChangeObserver = {
  * will then notify  its observers (which is us), we'll convert the payloads to items,
  * and then  we'll propagate them to our listeners.
  */
-export class ItemManager extends Services.AbstractService {
-  // implements Services.ItemManagerInterface, ItemsClientInterface
+export class ItemManager
+  extends Services.AbstractService
+  implements Services.ItemManagerInterface, ItemsClientInterface
+{
   private unsubChangeObserver: () => void
   private observers: ItemsChangeObserver[] = []
   private collection!: Models.DecryptedItemCollection
@@ -74,7 +77,9 @@ export class ItemManager extends Services.AbstractService {
   /**
    * Creates an unmanaged item from a payload.
    */
-  public createItemFromPayload(payload: Models.DecryptedPayloadInterface): Models.DecryptedItem {
+  public createItemFromPayload(
+    payload: Models.DecryptedPayloadInterface,
+  ): Models.DecryptedItemInterface {
     return Models.CreateDecryptedItemFromPayload(payload)
   }
 

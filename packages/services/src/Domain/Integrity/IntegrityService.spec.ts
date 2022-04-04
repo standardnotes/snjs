@@ -1,5 +1,4 @@
 import { IntegrityPayload, TransferPayload } from '@standardnotes/models'
-import { ItemManagerInterface } from '../Item/ItemManagerInterface'
 import { SyncEvent } from '../Event/SyncEvent'
 
 import { InternalEventBusInterface } from '../Internal/InternalEventBusInterface'
@@ -7,15 +6,16 @@ import { ItemsServerInterface } from '../Item/ItemsServerInterface'
 import { SyncSource } from '../Sync/SyncSource'
 import { IntegrityApiInterface } from './IntegrityApiInterface'
 import { IntegrityService } from './IntegrityService'
+import { PayloadManagerInterface } from '../Payloads/PayloadManagerInterface'
 
 describe('IntegrityService', () => {
   let integrityApi: IntegrityApiInterface
   let itemApi: ItemsServerInterface
-  let itemManager: ItemManagerInterface
+  let payloadManager: PayloadManagerInterface
   let internalEventBus: InternalEventBusInterface
 
   const createService = () =>
-    new IntegrityService(integrityApi, itemApi, itemManager, internalEventBus)
+    new IntegrityService(integrityApi, itemApi, payloadManager, internalEventBus)
 
   beforeEach(() => {
     integrityApi = {} as jest.Mocked<IntegrityApiInterface>
@@ -24,8 +24,8 @@ describe('IntegrityService', () => {
     itemApi = {} as jest.Mocked<ItemsServerInterface>
     itemApi.getSingleItem = jest.fn()
 
-    itemManager = {} as jest.Mocked<ItemManagerInterface>
-    itemManager.integrityPayloads = []
+    payloadManager = {} as jest.Mocked<PayloadManagerInterface>
+    payloadManager.integrityPayloads = []
 
     internalEventBus = {} as jest.Mocked<InternalEventBusInterface>
     internalEventBus.publishSync = jest.fn()

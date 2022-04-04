@@ -1,4 +1,4 @@
-import { PayloadSource, PayloadInterface } from '@standardnotes/models'
+import { PayloadSource, PayloadInterface, IntegrityPayload } from '@standardnotes/models'
 
 export interface PayloadManagerInterface {
   emitPayloads(
@@ -6,4 +6,6 @@ export interface PayloadManagerInterface {
     source: PayloadSource,
     sourceKey?: string,
   ): Promise<PayloadInterface[]>
+
+  integrityPayloads: IntegrityPayload[]
 }
