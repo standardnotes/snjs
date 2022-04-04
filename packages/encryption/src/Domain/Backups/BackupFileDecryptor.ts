@@ -9,11 +9,14 @@ import { BackupFile, BackupFileType } from './BackupFile'
 import { extendArray } from '@standardnotes/utils'
 import { EncryptionService } from '../Service/Encryption/EncryptionService'
 import {
-  PayloadSource,
-  CreateMaxPayloadFromAnyObject,
-  CreateSourcedPayloadFromObject,
   PayloadFormat,
   PayloadInterface,
+  CreateFileImportPayload,
+  DecryptedPayloadInterface,
+  ItemsKeyContent,
+  EncryptedPayloadInterface,
+  isEncryptedPayload,
+  isDecryptedPayload,
 } from '@standardnotes/models'
 import { ClientDisplayableError } from '@standardnotes/responses'
 import { CreateAnyKeyParams } from '../RootKey/KeyParams'
@@ -21,7 +24,7 @@ import { CreateDecryptedItemFromPayload, ItemsKeyInterface } from '@standardnote
 import { SNRootKeyParams } from '../RootKey/RootKeyParams'
 import { SNRootKey } from '../RootKey/RootKey'
 import { ContentTypeUsesRootKeyEncryption } from '../Intent/Functions'
-import { isItemsKey } from '../ItemsKey'
+import { isItemsKey, SNItemsKey } from '../ItemsKey'
 
 export async function decryptBackupFile(
   file: BackupFile,
@@ -29,8 +32,9 @@ export async function decryptBackupFile(
   password?: string,
 ) {
   const payloads = file.items.map((rawItem) => {
-    return CreateSourcedPayloadFromObject(rawItem, PayloadSource.FileImport)
+    return CreateFileImportPayload(rawItem)
   })
+  const encrypted = payloads.filter(isEncryptedPayload) as EncryptedPayloadInterface[]
   const type = getBackupFileType(file, payloads)
 
   switch (type) {
@@ -44,7 +48,7 @@ export async function decryptBackupFile(
       return decryptEncrypted(
         password,
         CreateAnyKeyParams(keyParamsData),
-        payloads,
+        encrypted,
         protocolService,
       )
     }
@@ -79,19 +83,29 @@ function getBackupFileType(file: BackupFile, payloads: PayloadInterface[]): Back
 }
 
 async function decryptEncryptedWithNonEncryptedItemsKey(
-  payloads: PayloadInterface[],
+  allPayloads: (EncryptedPayloadInterface | DecryptedPayloadInterface)[],
   protocolService: EncryptionService,
 ): Promise<PayloadInterface[]> {
-  const itemsKeys = payloads
-    .filter((payload) => {
-      return payload.content_type === ContentType.ItemsKey
-    })
-    .map((p) => CreateDecryptedItemFromPayload<ItemsKeyInterface>(p))
-  return decryptWithItemsKeys(payloads, itemsKeys, protocolService)
+  const decryptedItemsKeys: DecryptedPayloadInterface<ItemsKeyContent>[] = []
+  const encryptedPayloads: EncryptedPayloadInterface[] = []
+
+  allPayloads.forEach((payload) => {
+    if (payload.content_type === ContentType.ItemsKey && isDecryptedPayload(payload)) {
+      decryptedItemsKeys.push(payload as DecryptedPayloadInterface<ItemsKeyContent>)
+    } else if (isEncryptedPayload(payload)) {
+      encryptedPayloads.push(payload)
+    }
+  })
+
+  const itemsKeys = decryptedItemsKeys.map((p) =>
+    CreateDecryptedItemFromPayload<ItemsKeyContent, SNItemsKey>(p),
+  )
+
+  return decryptWithItemsKeys(encryptedPayloads, itemsKeys, protocolService)
 }
 
 function findKeyToUseForPayload(
-  payload: PayloadInterface,
+  payload: EncryptedPayloadInterface,
   availableKeys: ItemsKeyInterface[],
   protocolService: EncryptionService,
   keyParams?: SNRootKeyParams,
@@ -136,13 +150,13 @@ function findKeyToUseForPayload(
 }
 
 async function decryptWithItemsKeys(
-  payloads: PayloadInterface[],
+  payloads: EncryptedPayloadInterface[],
   itemsKeys: ItemsKeyInterface[],
   protocolService: EncryptionService,
   keyParams?: SNRootKeyParams,
   fallbackRootKey?: SNRootKey,
 ): Promise<PayloadInterface[]> {
-  const decryptedPayloads: PayloadInterface[] = []
+  const decryptedPayloads: (DecryptedPayloadInterface | EncryptedPayloadInterface)[] = []
 
   for (const encryptedPayload of payloads) {
     if (ContentTypeUsesRootKeyEncryption(encryptedPayload.content_type)) {
@@ -160,7 +174,7 @@ async function decryptWithItemsKeys(
 
       if (!key) {
         decryptedPayloads.push(
-          CreateMaxPayloadFromAnyObject(encryptedPayload, {
+          encryptedPayload.copy({
             errorDecrypting: true,
             errorDecryptingValueChanged: !encryptedPayload.errorDecrypting,
           }),
@@ -187,7 +201,7 @@ async function decryptWithItemsKeys(
       }
     } catch (e) {
       decryptedPayloads.push(
-        CreateMaxPayloadFromAnyObject(encryptedPayload, {
+        encryptedPayload.copy({
           errorDecrypting: true,
           errorDecryptingValueChanged: !encryptedPayload.errorDecrypting,
         }),
@@ -202,9 +216,9 @@ async function decryptWithItemsKeys(
 async function decryptEncrypted(
   password: string,
   keyParams: SNRootKeyParams,
-  payloads: PayloadInterface[],
+  payloads: EncryptedPayloadInterface[],
   protocolService: EncryptionService,
-): Promise<PayloadInterface[]> {
+): Promise<(EncryptedPayloadInterface | DecryptedPayloadInterface)[]> {
   const rootKey = await protocolService.computeRootKey(password, keyParams)
 
   const itemsKeysPayloads = payloads.filter((payload) => {
@@ -218,7 +232,7 @@ async function decryptEncrypted(
     },
   })
 
-  const results: PayloadInterface[] = []
+  const results: (EncryptedPayloadInterface | DecryptedPayloadInterface)[] = []
   extendArray(results, decryptedItemsKeysPayloads)
 
   const decryptedPayloads = await decryptWithItemsKeys(

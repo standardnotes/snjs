@@ -157,7 +157,7 @@ describe('backups', function () {
           items: [note.payload],
         },
       },
-      EncryptionIntent.FileEncrypted,
+      EncryptedExportIntent.FileEncrypted,
     )
     const errored = CopyPayload(encrypted, {
       errorDecrypting: true,

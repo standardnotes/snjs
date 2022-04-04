@@ -2,8 +2,6 @@ import { DecryptedTransferPayload } from './../../TransferPayload/Interfaces/Dec
 import { Uuid } from '@standardnotes/common'
 import { AppDataField } from '../Types/AppDataField'
 import { ComponentDataDomain, DefaultAppDomain } from '../Types/DefaultAppDomain'
-import { ContentReference } from '../Reference/ContentReference'
-import { dateToLocalizedString } from '@standardnotes/utils'
 import { DecryptedItemInterface } from '../Interfaces/DecryptedItem'
 import { DecryptedPayloadInterface } from '../../Payload/Interfaces/DecryptedPayload'
 import { GenericItem } from './GenericItem'
@@ -11,6 +9,8 @@ import { ItemContent } from '../Interfaces/ItemContent'
 import { ItemContentsEqual } from '../Utilities/Functions'
 import { ItemInterface } from '../Interfaces/ItemInterface'
 import { PrefKey } from '../../../Syncable/UserPrefs/PrefKey'
+import { ContentReference } from '../../Reference/ContentReference'
+import { dateToLocalizedString } from '@standardnotes/utils'
 
 export class DecryptedItem<C extends ItemContent = ItemContent>
   extends GenericItem<DecryptedPayloadInterface<C>>

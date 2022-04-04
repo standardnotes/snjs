@@ -1,16 +1,16 @@
 import { ItemContent, PayloadInterface } from '@standardnotes/models'
-import { EncryptedEncryptionIntent } from '../../Intent/EncryptionIntent'
+import { EncryptedExportIntent } from '../../Intent/ExportIntent'
 import { EncryptionSplitWithKey } from './EncryptionSplit'
 
 export interface EncryptionProvider {
   encryptSplit(
     split: EncryptionSplitWithKey<PayloadInterface>,
-    intent: EncryptedEncryptionIntent,
+    intent: EncryptedExportIntent,
   ): Promise<PayloadInterface[]>
 
   encryptSplitSingle(
     split: EncryptionSplitWithKey<PayloadInterface>,
-    intent: EncryptedEncryptionIntent,
+    intent: EncryptedExportIntent,
   ): Promise<PayloadInterface>
 
   decryptSplitSingle<C extends ItemContent = ItemContent>(

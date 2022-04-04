@@ -112,7 +112,7 @@ describe('protocol', function () {
           items: [payload],
         },
       },
-      EncryptionIntent.Sync,
+      EncryptedExportIntent.Sync,
     )
     const ejected = result.ejected()
     expect(ejected.fields).to.not.be.ok
@@ -129,7 +129,7 @@ describe('protocol', function () {
           items: [payload],
         },
       },
-      EncryptionIntent.Sync,
+      EncryptedExportIntent.Sync,
     )
     expect(encryptedPayload).to.be.ok
     expect(encryptedPayload).to.contain.keys('duplicate_of')
@@ -143,7 +143,7 @@ describe('protocol', function () {
           items: [payload],
         },
       },
-      EncryptionIntent.Sync,
+      EncryptedExportIntent.Sync,
     )
     const ejected = encryptedPayload.ejected()
     expect(ejected).to.be.ok
@@ -158,7 +158,7 @@ describe('protocol', function () {
           items: [payload],
         },
       },
-      EncryptionIntent.LocalStorageEncrypted,
+      EncryptedExportIntent.LocalStorageEncrypted,
     )
     expect(encryptedPayload).to.be.ok
     expect(encryptedPayload).to.contain.keys('duplicate_of')
@@ -172,7 +172,7 @@ describe('protocol', function () {
           items: [payload],
         },
       },
-      EncryptionIntent.LocalStorageEncrypted,
+      EncryptedExportIntent.LocalStorageEncrypted,
     )
     const ejected = encryptedPayload.ejected()
     expect(ejected).to.be.ok
@@ -187,7 +187,7 @@ describe('protocol', function () {
           items: [payload],
         },
       },
-      EncryptionIntent.FileEncrypted,
+      EncryptedExportIntent.FileEncrypted,
     )
     expect(encryptedPayload).to.be.ok
     expect(encryptedPayload).to.contain.keys('duplicate_of')
@@ -201,7 +201,7 @@ describe('protocol', function () {
           items: [payload],
         },
       },
-      EncryptionIntent.FileEncrypted,
+      EncryptedExportIntent.FileEncrypted,
     )
     const ejected = encryptedPayload.ejected()
     expect(ejected).to.be.ok

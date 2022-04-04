@@ -246,9 +246,10 @@ describe('singletons', function () {
     const item = this.application.itemManager.items.find(
       (item) => item.content_type === ContentType.UserPrefs,
     )
-    await this.application.itemManager.changeItem(item.uuid, (mutator) => {
-      mutator.errorDecrypting = true
-    })
+    /** @TODO: errorDecrypting no longer exists on mutator */
+    // await this.application.itemManager.changeItem(item.uuid, (mutator) => {
+    //   mutator.errorDecrypting = true
+    // })
 
     const predicate = new Predicate('content_type', '=', item.content_type)
     const resolvedItem = await this.application.singletonManager.findOrCreateSingleton(

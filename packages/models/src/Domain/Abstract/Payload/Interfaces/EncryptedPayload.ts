@@ -20,6 +20,10 @@ export interface EncryptedPayloadInterface extends PayloadInterface {
   /** @deprecated */
   readonly auth_params?: unknown
 
+  ejected(): EncryptedTransferPayload
   mergedWith(payload: EncryptedPayloadInterface): EncryptedPayloadInterface
-  copy(override?: Partial<EncryptedTransferPayload>, source?: PayloadSource): EncryptedPayloadInterface
+  copy(
+    override?: Partial<EncryptedTransferPayload>,
+    source?: PayloadSource,
+  ): EncryptedPayloadInterface
 }

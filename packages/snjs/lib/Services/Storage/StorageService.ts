@@ -235,14 +235,14 @@ export class SNStorageService
 
       const encryptedPayload = await this.encryptionProvider.encryptSplitSingle(
         split,
-        Encryption.EncryptionIntent.LocalStorageEncrypted,
+        Encryption.EncryptedExportIntent.LocalStorageEncrypted,
       )
 
       rawContent[Services.ValueModesKeys.Wrapped] = encryptedPayload.ejected()
     } else {
       const packagedPayload = Encryption.CreateIntentPayloadFromObject(
         payload,
-        Encryption.EncryptionIntent.LocalStorageDecrypted,
+        Encryption.DecryptedExportIntent.LocalStorageDecrypted,
       )
       rawContent[Services.ValueModesKeys.Wrapped] = packagedPayload.ejected()
     }
@@ -408,13 +408,13 @@ export class SNStorageService
     const keyLookupSplit = Encryption.createKeyLookupSplitFromSplit(split)
     const encryptedPayloads = await this.encryptionProvider.encryptSplit(
       keyLookupSplit,
-      Encryption.EncryptionIntent.LocalStorageEncrypted,
+      Encryption.EncryptedExportIntent.LocalStorageEncrypted,
     )
 
     const nonEncryptedPayloads = unencryptables.map((payload) =>
       Encryption.CreateIntentPayloadFromObject(
         payload,
-        Encryption.EncryptionIntent.LocalStorageDecrypted,
+        Encryption.DecryptedExportIntent.LocalStorageDecrypted,
       ),
     )
 

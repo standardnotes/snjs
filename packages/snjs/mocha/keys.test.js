@@ -22,36 +22,12 @@ describe('keys', function () {
     localStorage.clear()
   })
 
-  it('validate isLocalStorageIntent', function () {
-    expect(isLocalStorageIntent(EncryptionIntent.Sync)).to.equal(false)
-    expect(isLocalStorageIntent(EncryptionIntent.LocalStorageEncrypted)).to.equal(true)
-    expect(isLocalStorageIntent(EncryptionIntent.LocalStorageDecrypted)).to.equal(true)
-    expect(isLocalStorageIntent(EncryptionIntent.FileEncrypted)).to.equal(false)
-    expect(isLocalStorageIntent(EncryptionIntent.FileDecrypted)).to.equal(false)
-  })
-
-  it('validate isFileIntent', function () {
-    expect(isFileIntent(EncryptionIntent.Sync)).to.equal(false)
-    expect(isFileIntent(EncryptionIntent.LocalStorageEncrypted)).to.equal(false)
-    expect(isFileIntent(EncryptionIntent.LocalStorageDecrypted)).to.equal(false)
-    expect(isFileIntent(EncryptionIntent.FileEncrypted)).to.equal(true)
-    expect(isFileIntent(EncryptionIntent.FileDecrypted)).to.equal(true)
-  })
-
-  it('validate isDecryptedIntent', function () {
-    expect(isDecryptedIntent(EncryptionIntent.Sync)).to.equal(false)
-    expect(isDecryptedIntent(EncryptionIntent.LocalStorageEncrypted)).to.equal(false)
-    expect(isDecryptedIntent(EncryptionIntent.LocalStorageDecrypted)).to.equal(true)
-    expect(isDecryptedIntent(EncryptionIntent.FileEncrypted)).to.equal(false)
-    expect(isDecryptedIntent(EncryptionIntent.FileDecrypted)).to.equal(true)
-  })
-
   it('validate intentRequiresEncryption', function () {
-    expect(intentRequiresEncryption(EncryptionIntent.Sync)).to.equal(true)
-    expect(intentRequiresEncryption(EncryptionIntent.LocalStorageEncrypted)).to.equal(true)
-    expect(intentRequiresEncryption(EncryptionIntent.LocalStorageDecrypted)).to.equal(false)
-    expect(intentRequiresEncryption(EncryptionIntent.FileEncrypted)).to.equal(true)
-    expect(intentRequiresEncryption(EncryptionIntent.FileDecrypted)).to.equal(false)
+    expect(intentRequiresEncryption(EncryptedExportIntent.Sync)).to.equal(true)
+    expect(intentRequiresEncryption(EncryptedExportIntent.LocalStorageEncrypted)).to.equal(true)
+    expect(intentRequiresEncryption(DecryptedExportIntent.LocalStorageDecrypted)).to.equal(false)
+    expect(intentRequiresEncryption(EncryptedExportIntent.FileEncrypted)).to.equal(true)
+    expect(intentRequiresEncryption(DecryptedExportIntent.FileDecrypted)).to.equal(false)
   })
 
   it('should not have root key by default', async function () {
@@ -74,7 +50,7 @@ describe('keys', function () {
           items: [payload],
         },
       },
-      EncryptionIntent.LocalStorageEncrypted,
+      EncryptedExportIntent.LocalStorageEncrypted,
     )
     expect(processedPayload.format).to.equal(PayloadFormat.EncryptedString)
   })
@@ -132,7 +108,7 @@ describe('keys', function () {
           key: rootKey,
         },
       },
-      EncryptionIntent.Sync,
+      EncryptedExportIntent.Sync,
     )
     /** Should not have an items_key_id */
     expect(encryptedPayload.items_key_id).to.not.be.ok
@@ -184,7 +160,7 @@ describe('keys', function () {
           items: [note],
         },
       },
-      EncryptionIntent.Sync,
+      EncryptedExportIntent.Sync,
     )
 
     const itemsKey = this.application.protocolService.itemsKeyForPayload(encryptedPayload)
@@ -200,7 +176,7 @@ describe('keys', function () {
           items: [note],
         },
       },
-      EncryptionIntent.Sync,
+      EncryptedExportIntent.Sync,
     )
 
     const itemsKey = this.application.protocolService.itemsKeyForPayload(encryptedPayload)
@@ -224,7 +200,7 @@ describe('keys', function () {
           items: [notePayload],
         },
       },
-      EncryptionIntent.Sync,
+      EncryptedExportIntent.Sync,
     )
 
     const itemsKey = this.application.protocolService.itemsKeyForPayload(encryptedPayload)
@@ -292,7 +268,7 @@ describe('keys', function () {
           items: [payload],
         },
       },
-      EncryptionIntent.Sync,
+      EncryptedExportIntent.Sync,
     )
     expect(typeof encryptedPayload.content).to.equal('string')
     expect(encryptedPayload.content.substring(0, 3)).to.equal(
@@ -466,7 +442,7 @@ describe('keys', function () {
           items: [note.payload],
         },
       },
-      EncryptionIntent.Sync,
+      EncryptedExportIntent.Sync,
     )
     expect(payload.items_key_id).to.equal(newDefaultItemsKey.uuid)
   })
@@ -497,7 +473,7 @@ describe('keys', function () {
           items: [note.payload],
         },
       },
-      EncryptionIntent.Sync,
+      EncryptedExportIntent.Sync,
     )
     expect(payload.items_key_id).to.equal(newDefaultItemsKey.uuid)
   })

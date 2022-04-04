@@ -1,6 +1,11 @@
-import { ConflictStrategy, ItemsKeyContent, PayloadInterface } from '@standardnotes/models'
+import {
+  ConflictStrategy,
+  ItemsKeyContent,
+  DecryptedItem,
+  DecryptedPayloadInterface,
+} from '@standardnotes/models'
 import { ProtocolVersion } from '@standardnotes/common'
-import { HistoryEntryInterface, SNItem, ItemsKeyInterface } from '@standardnotes/models'
+import { HistoryEntryInterface, ItemsKeyInterface } from '@standardnotes/models'
 
 export function isItemsKey(x: unknown): x is ItemsKeyInterface {
   return x instanceof SNItemsKey
@@ -9,7 +14,7 @@ export function isItemsKey(x: unknown): x is ItemsKeyInterface {
 /**
  * A key used to encrypt other items. Items keys are synced and persisted.
  */
-export class SNItemsKey extends SNItem<ItemsKeyContent> implements ItemsKeyInterface {
+export class SNItemsKey extends DecryptedItem<ItemsKeyContent> implements ItemsKeyInterface {
   keyVersion: ProtocolVersion
   isDefault: boolean | undefined
   itemsKey: string
@@ -23,13 +28,9 @@ export class SNItemsKey extends SNItem<ItemsKeyContent> implements ItemsKeyInter
 
   /** Do not duplicate items keys. Always keep original */
   strategyWhenConflictingWithItem(
-    item: SNItem,
-    previousRevision?: HistoryEntryInterface,
+    _item: DecryptedItem,
+    _previousRevision?: HistoryEntryInterface,
   ): ConflictStrategy {
-    if (this.errorDecrypting) {
-      return super.strategyWhenConflictingWithItem(item, previousRevision)
-    }
-
     return ConflictStrategy.KeepLeft
   }
 

@@ -136,7 +136,7 @@ export class PayloadManager
         continue
       }
 
-      const newPayload = masterPayload ? Payloads.PayloadByMerging(masterPayload, payload) : payload
+      const newPayload = masterPayload ? masterPayload.mergedWith(payload) : payload
       if (newPayload.discardable) {
         /** The item has been deleted and synced,
          * and can thus be removed from our local record */

@@ -1,20 +1,116 @@
 import { Uuid } from '@standardnotes/common'
-import { TransferPayload } from './../TransferPayload'
+import { ContextPayload } from './ContextPayload'
+import { ItemContent } from '../../../Item'
+import {
+  DecryptedPayload,
+  DecryptedPayloadInterface,
+  DeletedPayload,
+  DeletedPayloadInterface,
+  EncryptedPayload,
+  EncryptedPayloadInterface,
+} from '../../../Payload'
+import { EncryptedTransferPayload } from '../EncryptedTransferPayload'
+import { DecryptedTransferPayload } from '../DecryptedTransferPayload'
+import { DeletedTransferPayload } from '../DeletedTransferPayload'
 
-export interface LocalStorageTransferPayload extends TransferPayload {
+export interface LocalStorageEncryptedContextualPayload extends ContextPayload {
   auth_hash?: string
   auth_params?: unknown
   content: string
-  created_at_timestamp: number
+  created_at_timestamp?: number
   created_at: Date
-  deleted?: boolean
-  dirtiedDate?: Date
-  dirty?: boolean
-  duplicate_of?: Uuid
+  dirtiedDate: Date | undefined
+  dirty: boolean
+  duplicate_of: Uuid | undefined
   enc_item_key: string
-  errorDecrypting?: boolean
-  items_key_id?: string
-  updated_at_timestamp?: number
-  updated_at: Date
-  waitingForKey?: boolean
+  errorDecrypting: boolean | undefined
+  items_key_id: string | undefined
+  updated_at_timestamp: number | undefined
+  updated_at: Date | undefined
+  waitingForKey: boolean | undefined
+}
+
+export interface LocalStorageDecryptedContextualPayload<C extends ItemContent = ItemContent>
+  extends ContextPayload {
+  content: C
+  created_at_timestamp?: number
+  created_at: Date
+  dirtiedDate: Date | undefined
+  dirty: boolean
+  duplicate_of?: Uuid
+  updated_at_timestamp: number | undefined
+  updated_at: Date | undefined
+}
+
+export interface LocalStorageDeletedContextualPayload extends ContextPayload {
+  content: undefined
+  created_at_timestamp?: number
+  created_at: Date
+  deleted: true
+  dirtiedDate: Date | undefined
+  dirty: true
+  duplicate_of?: Uuid
+  updated_at_timestamp: number | undefined
+  updated_at: Date | undefined
+}
+
+export function createEncryptedPayloadForLocalStorage(
+  fromPayload: EncryptedPayloadInterface,
+): EncryptedPayloadInterface {
+  const params: LocalStorageEncryptedContextualPayload = {
+    auth_hash: fromPayload.auth_hash,
+    auth_params: fromPayload.auth_params,
+    content_type: fromPayload.content_type,
+    content: fromPayload.content,
+    created_at_timestamp: fromPayload.created_at_timestamp,
+    created_at: fromPayload.created_at,
+    dirtiedDate: fromPayload.dirtiedDate,
+    dirty: fromPayload.dirty || false,
+    duplicate_of: fromPayload.duplicate_of,
+    enc_item_key: fromPayload.enc_item_key,
+    errorDecrypting: fromPayload.errorDecrypting,
+    items_key_id: fromPayload.items_key_id,
+    updated_at_timestamp: fromPayload.updated_at_timestamp,
+    updated_at: fromPayload.updated_at,
+    uuid: fromPayload.uuid,
+    waitingForKey: fromPayload.waitingForKey,
+  }
+  return new EncryptedPayload(params as EncryptedTransferPayload)
+}
+
+export function createDecryptedPayloadForLocalStorage(
+  fromPayload: DecryptedPayloadInterface,
+): DecryptedPayloadInterface {
+  const params: LocalStorageDecryptedContextualPayload = {
+    content_type: fromPayload.content_type,
+    content: fromPayload.content,
+    created_at_timestamp: fromPayload.created_at_timestamp,
+    created_at: fromPayload.created_at,
+    duplicate_of: fromPayload.duplicate_of,
+    updated_at_timestamp: fromPayload.updated_at_timestamp,
+    updated_at: fromPayload.updated_at,
+    uuid: fromPayload.uuid,
+    dirty: fromPayload.dirty || false,
+    dirtiedDate: fromPayload.dirtiedDate,
+  }
+  return new DecryptedPayload(params as DecryptedTransferPayload)
+}
+
+export function createDeletedPayloadForLocalStorage(
+  fromPayload: DeletedPayloadInterface,
+): DeletedPayloadInterface {
+  const params: LocalStorageDeletedContextualPayload = {
+    content_type: fromPayload.content_type,
+    content: undefined,
+    created_at_timestamp: fromPayload.created_at_timestamp,
+    created_at: fromPayload.created_at,
+    deleted: true,
+    dirtiedDate: fromPayload.dirtiedDate,
+    dirty: true,
+    duplicate_of: fromPayload.duplicate_of,
+    updated_at_timestamp: fromPayload.updated_at_timestamp,
+    updated_at: fromPayload.updated_at,
+    uuid: fromPayload.uuid,
+  }
+  return new DeletedPayload(params as DeletedTransferPayload)
 }

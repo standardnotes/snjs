@@ -58,7 +58,7 @@ describe('key recovery service', function () {
           key: randomRootKey,
         },
       },
-      EncryptionIntent.Sync,
+      EncryptedExportIntent.Sync,
     )
 
     /** Attempt decryption and insert into rotation in errored state  */
@@ -126,7 +126,7 @@ describe('key recovery service', function () {
           key: randomRootKey,
         },
       },
-      EncryptionIntent.Sync,
+      EncryptedExportIntent.Sync,
     )
 
     /** Attempt decryption and insert into rotation in errored state  */
@@ -350,7 +350,7 @@ describe('key recovery service', function () {
           key: randomRootKey,
         },
       },
-      EncryptionIntent.Sync,
+      EncryptedExportIntent.Sync,
     )
     await application.payloadManager.emitPayload(
       CopyPayload(encrypted, {
@@ -397,7 +397,7 @@ describe('key recovery service', function () {
           items: [itemsKey.payload],
         },
       },
-      EncryptionIntent.Sync,
+      EncryptedExportIntent.Sync,
     )
     const newUpdated = new Date()
     await application.payloadManager.emitPayload(
@@ -458,7 +458,7 @@ describe('key recovery service', function () {
           items: [itemsKey.payload],
         },
       },
-      EncryptionIntent.Sync,
+      EncryptedExportIntent.Sync,
     )
 
     await application.payloadManager.emitPayload(
@@ -543,7 +543,7 @@ describe('key recovery service', function () {
           key: randomRootKey,
         },
       },
-      EncryptionIntent.Sync,
+      EncryptedExportIntent.Sync,
     )
 
     /** Attempt decryption and insert into rotation in errored state  */
@@ -630,7 +630,7 @@ describe('key recovery service', function () {
             items: [newDefaultKey.payload],
           },
         },
-        EncryptionIntent.Sync,
+        EncryptedExportIntent.Sync,
       )
 
       /** Insert foreign items key into appA, which shouldn't be able to decrypt it yet */

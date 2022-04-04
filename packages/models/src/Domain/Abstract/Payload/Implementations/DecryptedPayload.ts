@@ -1,6 +1,6 @@
 import { ProtocolVersion, Uuid } from '@standardnotes/common'
 import { FillItemContent, ItemContent } from '../../Item'
-import { ContentReference } from '../../Item/Reference/ContentReference'
+import { ContentReference } from '../../Reference/ContentReference'
 import { DecryptedTransferPayload } from '../../TransferPayload/Interfaces/DecryptedTransferPayload'
 import { DecryptedPayloadInterface } from '../Interfaces/DecryptedPayload'
 import { PayloadFormat } from '../Types/PayloadFormat'

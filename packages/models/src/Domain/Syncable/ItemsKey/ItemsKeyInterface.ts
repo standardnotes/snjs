@@ -1,5 +1,5 @@
-import { DecryptedItemInterface } from './../../Abstract/Item/Interfaces/DecryptedItem'
 import { ProtocolVersion } from '@standardnotes/common'
+import { DecryptedItemInterface } from './../../Abstract/Item/Interfaces/DecryptedItem'
 import { ItemContent, SpecializedContent } from '../../Abstract/Item/Interfaces/ItemContent'
 
 export interface ItemsKeyContentSpecialized extends SpecializedContent {

@@ -126,7 +126,7 @@ describe('actions service', () => {
           items: [payload],
         },
       },
-      EncryptionIntent.Sync,
+      EncryptedExportIntent.Sync,
     )
 
     this.fakeServer.respondWith(

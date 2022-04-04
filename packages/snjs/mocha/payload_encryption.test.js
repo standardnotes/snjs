@@ -53,7 +53,7 @@ describe('payload encryption', function () {
           items: [notePayload],
         },
       },
-      EncryptionIntent.Sync,
+      EncryptedExportIntent.Sync,
     )
 
     expect(encryptedPayload.dirty).to.not.be.ok
@@ -124,7 +124,7 @@ describe('payload encryption', function () {
           items: [payload],
         },
       },
-      EncryptionIntent.Sync,
+      EncryptedExportIntent.Sync,
     )
     expect(encryptedPayload.enc_item_key).to.be.ok
     expect(encryptedPayload.uuid).to.be.ok
@@ -145,7 +145,7 @@ describe('payload encryption', function () {
           items: [payload],
         },
       },
-      EncryptionIntent.LocalStorageEncrypted,
+      EncryptedExportIntent.LocalStorageEncrypted,
     )
 
     expect(encryptedPayload.enc_item_key).to.be.ok
@@ -169,7 +169,7 @@ describe('payload encryption', function () {
           items: [payload],
         },
       },
-      EncryptionIntent.FileEncrypted,
+      EncryptedExportIntent.FileEncrypted,
     )
     expect(encryptedPayload.enc_item_key).to.be.ok
     expect(encryptedPayload.uuid).to.be.ok
@@ -193,7 +193,7 @@ describe('payload encryption', function () {
           items: [mutatedPayload],
         },
       },
-      EncryptionIntent.Sync,
+      EncryptedExportIntent.Sync,
     )
     expect(encryptedPayload.content).to.eql(payload.content)
     expect(encryptedPayload.enc_item_key).to.be.ok

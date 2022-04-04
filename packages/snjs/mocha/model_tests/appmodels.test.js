@@ -292,7 +292,7 @@ describe('app models', () => {
           items: [item1.payload],
         },
       },
-      EncryptionIntent.Sync,
+      EncryptedExportIntent.Sync,
     )
     const errored = CopyPayload(encrypted, {
       errorDecrypting: true,

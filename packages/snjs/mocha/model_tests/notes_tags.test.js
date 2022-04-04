@@ -620,7 +620,8 @@ describe('notes and tags', () => {
       )
       await this.application.mutator.changeItem(olderNote.uuid, (mutator) => {
         const threeDays = 3 * 24 * 60 * 60 * 1000
-        mutator.updated_at = new Date(Date.now() - threeDays)
+        /** @TODO updated_at no longer exists on mutator */
+        // mutator.updated_at = new Date(Date.now() - threeDays)
       })
 
       /** Create an unsynced note which shouldn't get an updated_at */

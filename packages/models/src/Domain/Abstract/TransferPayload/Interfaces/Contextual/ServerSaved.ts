@@ -1,4 +1,4 @@
-import { TransferPayload } from './../TransferPayload'
+import { ContextPayload } from './ContextPayload'
 
 /**
  * The saved sync item payload represents the payload we want to map
@@ -6,7 +6,7 @@ import { TransferPayload } from './../TransferPayload'
  * updated_at value the server returns for the item, and basically
  * nothing else.
  */
-export interface SyncSavedTransferPayload extends TransferPayload {
+export interface SyncSavedContextualPayload extends ContextPayload {
   content: undefined
   created_at_timestamp: number
   deleted?: boolean

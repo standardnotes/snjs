@@ -373,7 +373,7 @@ export class SNSyncService
   ): Promise<Payloads.PurePayload[]> {
     const split = Encryption.splitItemsByEncryptionType(payloads)
     const keyLookupSplit = Encryption.createKeyLookupSplitFromSplit(split)
-    return this.protocolService.encryptSplit(keyLookupSplit, Encryption.EncryptionIntent.Sync)
+    return this.protocolService.encryptSplit(keyLookupSplit, Encryption.EncryptedExportIntent.Sync)
   }
 
   public async downloadFirstSync(

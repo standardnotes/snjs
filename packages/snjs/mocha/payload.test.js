@@ -120,7 +120,7 @@ describe('payload', () => {
       dirty: true,
       dirtiedDate: new Date(),
     })
-    const merged = PayloadByMerging(payload, otherPayload)
+    const merged = payload.mergedWith(otherPayload)
 
     expect(merged.content).to.eql(payload.content)
     expect(merged.uuid).to.equal(payload.uuid)
@@ -133,7 +133,7 @@ describe('payload', () => {
     const otherPayload = new PurePayload({
       content: undefined,
     })
-    const merged = PayloadByMerging(payload, otherPayload)
+    const merged = payload.mergedWith(otherPayload)
 
     expect(merged.uuid).to.equal(payload.uuid)
     expect(merged.content).to.not.be.ok
@@ -169,7 +169,7 @@ describe('payload', () => {
     )
     const intentPayload = CreateIntentPayloadFromObject(
       payload,
-      EncryptionIntent.LocalStorageEncrypted,
+      EncryptedExportIntent.LocalStorageEncrypted,
       override,
     )
 
@@ -184,7 +184,7 @@ describe('payload', () => {
     }
     const intentPayload = CreateIntentPayloadFromObject(
       payload,
-      EncryptionIntent.LocalStorageEncrypted,
+      EncryptedExportIntent.LocalStorageEncrypted,
       override,
     )
 

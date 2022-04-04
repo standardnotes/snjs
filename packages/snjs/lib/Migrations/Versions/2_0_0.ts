@@ -4,7 +4,7 @@ import { Migration } from '@Lib/Migrations/Migration'
 import { MigrationServices } from '../MigrationServices'
 import { PreviousSnjsVersion2_0_0 } from '../../Version'
 import { ProtocolVersion } from '@standardnotes/common'
-import { SNRootKey, EncryptionIntent, CreateNewRootKey } from '@standardnotes/encryption'
+import { SNRootKey, ExportIntent, CreateNewRootKey } from '@standardnotes/encryption'
 import { SNStorageService } from '../../Services/Storage/StorageService'
 import { StorageReader1_0_0 } from '../StorageReaders/Versions/Reader1_0_0'
 import * as Models from '@standardnotes/models'
@@ -272,7 +272,7 @@ export class Migration2_0_0 extends Migration {
             key: passcodeKey,
           },
         },
-        EncryptionIntent.LocalStorageEncrypted,
+        EncryptedExportIntent.LocalStorageEncrypted,
       )
     }
     return {
@@ -303,7 +303,7 @@ export class Migration2_0_0 extends Migration {
           key: key,
         },
       },
-      EncryptionIntent.LocalStorageEncrypted,
+      EncryptedExportIntent.LocalStorageEncrypted,
     )
 
     return wrapped.ejected()
@@ -473,7 +473,7 @@ export class Migration2_0_0 extends Migration {
               key: passcodeKey,
             },
           },
-          EncryptionIntent.LocalStorageEncrypted,
+          EncryptedExportIntent.LocalStorageEncrypted,
         )
         rawStructure.nonwrapped[Services.StorageKey.WrappedRootKey] = newWrappedAccountKey.ejected()
 
@@ -502,7 +502,7 @@ export class Migration2_0_0 extends Migration {
               key: passcodeKey,
             },
           },
-          EncryptionIntent.LocalStorageEncrypted,
+          EncryptedExportIntent.LocalStorageEncrypted,
         )
         rawStructure.wrapped = wrapped.ejected()
 

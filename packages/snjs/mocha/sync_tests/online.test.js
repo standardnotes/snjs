@@ -280,7 +280,7 @@ describe('online syncing', function () {
           items: [note.payloadRepresentation()],
         },
       },
-      EncryptionIntent.Sync,
+      EncryptedExportIntent.Sync,
     )
     const errorred = CreateMaxPayloadFromAnyObject(encrypted, {
       errorDecrypting: true,
@@ -866,7 +866,7 @@ describe('online syncing', function () {
           items: [note.payload],
         },
       },
-      EncryptionIntent.Sync,
+      EncryptedExportIntent.Sync,
     )
     const errored = CopyPayload(encrypted, {
       errorDecrypting: true,

@@ -16,17 +16,13 @@ import * as Models from '@standardnotes/models'
 import * as RootKeyEncryption from '../RootKey/RootKeyEncryption'
 import * as Services from '@standardnotes/services'
 import * as Utils from '@standardnotes/utils'
-import { EncryptedEncryptionIntent, EncryptionIntent } from '../../Intent/EncryptionIntent'
+import { EncryptedExportIntent } from '../../Intent/ExportIntent'
 import {
   DecryptedParameters,
   EncryptedParameters,
   ErroredDecryptingParameters,
 } from '../../Encryption/EncryptedParameters'
-import {
-  CreateIntentPayloadFromObject,
-  encryptedParametersFromPayload,
-  mergePayloadWithEncryptionParameters,
-} from '../../Intent/Functions'
+import { encryptedParametersFromPayload } from '../../Intent/Functions'
 import { RootKeyEncryptedAuthenticatedData } from '../../Encryption/RootKeyEncryptedAuthenticatedData'
 import { ItemAuthenticatedData } from '../../Encryption/ItemAuthenticatedData'
 import { LegacyAttachedData } from '../../Encryption/LegacyAttachedData'
@@ -205,14 +201,14 @@ export class EncryptionService
 
   public async encryptSplitSingle(
     split: EncryptionSplit.EncryptionSplitWithKey<Models.PayloadInterface>,
-    intent: EncryptedEncryptionIntent,
+    intent: EncryptedExportIntent,
   ): Promise<Models.PayloadInterface> {
     return (await this.encryptSplit(split, intent))[0]
   }
 
   public async encryptSplit(
     split: EncryptionSplit.EncryptionSplitWithKey<Models.PayloadInterface>,
-    intent: EncryptedEncryptionIntent,
+    intent: EncryptedExportIntent,
   ): Promise<Models.PayloadInterface[]> {
     const allEncryptedParams: EncryptedParameters[] = []
     const allNonencryptablePayloads: Models.PayloadInterface[] = []
@@ -475,7 +471,7 @@ export class EncryptionService
     const payloads = this.itemManager.allItems().map((item) => item.payload)
     const split = EncryptionSplit.splitItemsByEncryptionType(payloads)
     const keyLookupSplit = EncryptionSplit.createKeyLookupSplitFromSplit(split)
-    const result = await this.encryptSplit(keyLookupSplit, EncryptionIntent.FileEncrypted)
+    const result = await this.encryptSplit(keyLookupSplit, EncryptedExportIntent.FileEncrypted)
     const ejected = result.map((payload) => payload.ejected())
 
     const data: BackupFile = {

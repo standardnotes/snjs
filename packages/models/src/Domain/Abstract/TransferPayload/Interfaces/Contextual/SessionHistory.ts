@@ -1,8 +1,8 @@
 import { ItemContent } from '../../../Item/Interfaces/ItemContent'
-import { TransferPayload } from '../TransferPayload'
+import { ContextPayload } from './ContextPayload'
 
-export interface SessionHistoryTransferPayload<C extends ItemContent = ItemContent>
-  extends TransferPayload {
+export interface SessionHistoryContextualPayload<C extends ItemContent = ItemContent>
+  extends ContextPayload {
   content: C
   updated_at: Date
 }

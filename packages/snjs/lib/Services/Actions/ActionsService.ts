@@ -1,4 +1,4 @@
-import { EncryptionService, SNRootKey, EncryptionIntent } from '@standardnotes/encryption'
+import { EncryptionService, SNRootKey, ExportIntent } from '@standardnotes/encryption'
 import {
   Challenge,
   ChallengeValidation,
@@ -314,7 +314,7 @@ export class SNActionsService extends AbstractService {
       {
         usesItemsKeyWithKeyLookup: { items: [item.payload] },
       },
-      EncryptionIntent.FileEncrypted,
+      EncryptedExportIntent.FileEncrypted,
     )
 
     return encrypted.ejected()

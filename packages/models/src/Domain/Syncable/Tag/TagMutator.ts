@@ -1,8 +1,8 @@
 import { ContentType } from '@standardnotes/common'
 import { TagContent, SNTag } from './Tag'
-import { isTagToParentTagReference } from '../../Abstract/Item/Reference/Functions'
-import { TagToParentTagReference } from '../../Abstract/Item/Reference/TagToParentTagReference'
-import { ContenteReferenceType } from '../../Abstract/Item/Reference/ContenteReferenceType'
+import { isTagToParentTagReference } from '../../Abstract/Reference/Functions'
+import { TagToParentTagReference } from '../../Abstract/Reference/TagToParentTagReference'
+import { ContenteReferenceType } from '../../Abstract/Reference/ContenteReferenceType'
 import { DecryptedItemMutator } from '../../Abstract/Item/Mutator/DecryptedItemMutator'
 
 export class TagMutator extends DecryptedItemMutator<TagContent> {
