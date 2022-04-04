@@ -1,7 +1,7 @@
+import { DecryptedItemInterface } from './../Interfaces/DecryptedItem'
 import { Copy } from '@standardnotes/utils'
 import { MutationType } from '../Types/MutationType'
 import { PrefKey } from '../../../Syncable/UserPrefs/PrefKey'
-import { DecryptedItem } from '../Implementations/DecryptedItem'
 import { Uuid } from '@standardnotes/common'
 import { ItemContent } from '../Interfaces/ItemContent'
 import { AppDataField } from '../Types/AppDataField'
@@ -10,12 +10,12 @@ import { ItemMutator } from './ItemMutator'
 import { DecryptedPayloadInterface } from '../../Payload/Interfaces/DecryptedPayload'
 
 export class DecryptedItemMutator<C extends ItemContent = ItemContent> extends ItemMutator {
-  public readonly item: DecryptedItem<C>
+  public readonly item: DecryptedItemInterface<C>
   protected payload: DecryptedPayloadInterface
   protected readonly type: MutationType
   protected content: C
 
-  constructor(item: DecryptedItem<C>, type: MutationType) {
+  constructor(item: DecryptedItemInterface<C>, type: MutationType) {
     super(item, type)
 
     const mutableCopy = Copy(this.payload.content)
@@ -64,7 +64,7 @@ export class DecryptedItemMutator<C extends ItemContent = ItemContent> extends I
   }
 
   /** Not recommended to use as this might break item schema if used incorrectly */
-  public unsafe_setCustomContent(content: ItemContent): void {
+  public unsafe_setCustomContent(content: C): void {
     this.content = Copy(content)
   }
 
@@ -136,7 +136,7 @@ export class DecryptedItemMutator<C extends ItemContent = ItemContent> extends I
     this.setDomainDataKey(key, value, DefaultAppDomain)
   }
 
-  public addItemAsRelationship(item: DecryptedItem) {
+  public addItemAsRelationship(item: DecryptedItemInterface) {
     const references = this.content.references || []
     if (!references.find((r) => r.uuid === item.uuid)) {
       references.push({
@@ -147,7 +147,7 @@ export class DecryptedItemMutator<C extends ItemContent = ItemContent> extends I
     this.content.references = references
   }
 
-  public removeItemAsRelationship(item: DecryptedItem) {
+  public removeItemAsRelationship(item: DecryptedItemInterface) {
     let references = this.content.references || []
     references = references.filter((r) => r.uuid !== item.uuid)
     this.content.references = references

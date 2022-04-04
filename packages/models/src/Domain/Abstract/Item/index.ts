@@ -1,5 +1,6 @@
 export * from './Implementations/DecryptedItem'
 export * from './Implementations/DecryptedItem'
+export * from './Implementations/DeletedItem'
 export * from './Implementations/EncryptedItem'
 export * from './Implementations/GenericItem'
 export * from './Interfaces/DecryptedItem'

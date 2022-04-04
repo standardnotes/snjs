@@ -1,29 +1,29 @@
-import { ItemInterface, PayloadInterface } from '@standardnotes/models'
+import { DecryptedPayloadInterface, EncryptedPayloadInterface } from '@standardnotes/models'
 import { SNRootKey } from '../../RootKey/RootKey'
 import { ItemContentTypeUsesRootKeyEncryption } from '../../Intent/Functions'
 import { ItemsKeyInterface } from '@standardnotes/models'
 
-type ItemOrPayload = ItemInterface | PayloadInterface
+type EncryptedOrDecryptedPayload = EncryptedPayloadInterface | DecryptedPayloadInterface
 
-type UsesRootKeySplit<T extends ItemOrPayload> = {
+type UsesRootKeySplit<T extends EncryptedOrDecryptedPayload> = {
   items: T[]
   key: SNRootKey
 }
 
-type UsesRootKeySplitWithKeyLookup<T extends ItemOrPayload> = {
+type UsesRootKeySplitWithKeyLookup<T extends EncryptedOrDecryptedPayload> = {
   items: T[]
 }
 
-type UsesItemsKeySplitWithKeyLookup<T extends ItemOrPayload> = {
+type UsesItemsKeySplitWithKeyLookup<T extends EncryptedOrDecryptedPayload> = {
   items: T[]
 }
 
-type UsesItemsKeySplit<T extends ItemOrPayload> = {
+type UsesItemsKeySplit<T extends EncryptedOrDecryptedPayload> = {
   items: T[]
   key: ItemsKeyInterface
 }
 
-export type EncryptionSplit<T extends ItemOrPayload> = {
+export type EncryptionSplit<T extends EncryptedOrDecryptedPayload> = {
   usesRootKey?: {
     items: T[]
   }
@@ -32,14 +32,14 @@ export type EncryptionSplit<T extends ItemOrPayload> = {
   }
 }
 
-export type EncryptionSplitWithKey<T extends ItemOrPayload> = {
+export type EncryptionSplitWithKey<T extends EncryptedOrDecryptedPayload> = {
   usesRootKey?: UsesRootKeySplit<T>
   usesRootKeyWithKeyLookup?: UsesRootKeySplitWithKeyLookup<T>
   usesItemsKey?: UsesItemsKeySplit<T>
   usesItemsKeyWithKeyLookup?: UsesItemsKeySplitWithKeyLookup<T>
 }
 
-export function createKeyLookupSplitFromSplit<T extends ItemOrPayload>(
+export function createKeyLookupSplitFromSplit<T extends EncryptedOrDecryptedPayload>(
   split: EncryptionSplit<T>,
 ): EncryptionSplitWithKey<T> {
   const result: EncryptionSplitWithKey<T> = {}
@@ -55,7 +55,7 @@ export function createKeyLookupSplitFromSplit<T extends ItemOrPayload>(
   return result
 }
 
-export function splitItemsByEncryptionType<T extends ItemOrPayload>(
+export function splitItemsByEncryptionType<T extends EncryptedOrDecryptedPayload>(
   items: T[],
 ): EncryptionSplit<T> {
   const usesRootKey: T[] = []
@@ -75,7 +75,7 @@ export function splitItemsByEncryptionType<T extends ItemOrPayload>(
   }
 }
 
-export function findPayloadInSplit<T extends ItemOrPayload>(
+export function findPayloadInSplit<T extends EncryptedOrDecryptedPayload>(
   uuid: string,
   split: EncryptionSplitWithKey<T>,
 ): T {

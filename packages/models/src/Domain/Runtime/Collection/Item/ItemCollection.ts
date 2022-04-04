@@ -1,13 +1,6 @@
-import { CollectionSortDirection } from './../CollectionSort'
-import { remove } from 'lodash'
+import { CollectionSortDirection } from '../CollectionSort'
 import { ContentType, Uuid } from '@standardnotes/common'
-import {
-  compareValues,
-  extendArray,
-  isNullOrUndefined,
-  uniqueArrayByKey,
-  UuidMap,
-} from '@standardnotes/utils'
+import { compareValues, isNullOrUndefined, uniqueArrayByKey, UuidMap } from '@standardnotes/utils'
 import { CollectionSort } from '../CollectionSort'
 import { SNIndex } from '../../Index/SNIndex'
 import { ItemDelta } from '../../Index/ItemDelta'
@@ -15,11 +8,13 @@ import { isDeletedItem, isEncryptedErroredItem } from '../../../Abstract/Item/In
 import { isNote } from '../../../Syncable/Note'
 import { DecryptedItemInterface } from '../../../Abstract/Item/Interfaces/DecryptedItem'
 import { CollectionInterface } from '../CollectionInterface'
+import { DeletedItemInterface } from '../../../Abstract/Item'
+import { Collection } from '../Collection'
 
-export class DecryptedItemCollection implements SNIndex, CollectionInterface {
-  readonly map: Partial<Record<Uuid, DecryptedItemInterface>> = {}
-  readonly typedMap: Partial<Record<ContentType, DecryptedItemInterface[]>> = {}
-
+export class DecryptedItemCollection
+  extends Collection<DecryptedItemInterface, DeletedItemInterface>
+  implements SNIndex, CollectionInterface
+{
   private displaySortBy: Partial<
     Record<
       ContentType,
@@ -51,12 +46,11 @@ export class DecryptedItemCollection implements SNIndex, CollectionInterface {
   private sortedMap: Partial<Record<ContentType, DecryptedItemInterface[]>> = {}
 
   public set(elements: DecryptedItemInterface | DecryptedItemInterface[]): void {
+    super.set(elements)
+
     elements = uniqueArrayByKey(Array.isArray(elements) ? elements : [elements], 'uuid')
 
     for (const element of elements) {
-      this.map[element.uuid] = element
-      this.setToTypedMap(element)
-
       if (isDeletedItem(element)) {
         this.referenceMap.removeFromMap(element.uuid)
       } else {
@@ -70,16 +64,27 @@ export class DecryptedItemCollection implements SNIndex, CollectionInterface {
     this.filterSortElements(elements)
   }
 
-  public discard(elements: DecryptedItemInterface | DecryptedItemInterface[]): void {
+  public discard(elements: (DecryptedItemInterface | DeletedItemInterface)[]): void {
+    super.discard(elements)
+
     elements = Array.isArray(elements) ? elements : [elements]
 
     for (const element of elements) {
       delete this.map[element.uuid]
-      this.deleteFromTypedMap(element)
       this.referenceMap.removeFromMap(element.uuid)
     }
 
     this.filterSortElements(elements)
+  }
+
+  public onChange(delta: ItemDelta): void {
+    const changedOrInserted = delta.changed.concat(delta.inserted)
+
+    if (changedOrInserted.length > 0) {
+      this.set(changedOrInserted)
+    }
+
+    this.discard(delta.discarded)
   }
 
   public uuidReferencesForUuid(uuid: Uuid): Uuid[] {
@@ -88,19 +93,6 @@ export class DecryptedItemCollection implements SNIndex, CollectionInterface {
 
   public uuidsThatReferenceUuid(uuid: Uuid): Uuid[] {
     return this.referenceMap.getInverseRelationships(uuid)
-  }
-
-  public findAll(uuids: Uuid[], includeBlanks = false): DecryptedItemInterface[] {
-    const results = []
-
-    for (const id of uuids) {
-      const element = this.map[id]
-      if (element || includeBlanks) {
-        results.push(element)
-      }
-    }
-
-    return results as DecryptedItemInterface[]
   }
 
   public elementsReferencingElement(
@@ -115,41 +107,6 @@ export class DecryptedItemCollection implements SNIndex, CollectionInterface {
     }
 
     return items.filter((item) => item.content_type === contentType)
-  }
-
-  private setToTypedMap(element: DecryptedItemInterface): void {
-    const array = this.typedMap[element.content_type] || ([] as DecryptedItemInterface[])
-    remove(array, { uuid: element.uuid as never })
-    array.push(element)
-    this.typedMap[element.content_type] = array
-  }
-
-  private deleteFromTypedMap(element: DecryptedItemInterface): void {
-    const array = this.typedMap[element.content_type] || ([] as DecryptedItemInterface[])
-    remove(array, { uuid: element.uuid as never })
-    this.typedMap[element.content_type] = array
-  }
-
-  public find(uuid: Uuid): DecryptedItemInterface | undefined {
-    return this.map[uuid]
-  }
-
-  public all(contentType?: ContentType | ContentType[]): DecryptedItemInterface[] {
-    if (contentType) {
-      if (Array.isArray(contentType)) {
-        const elements = [] as DecryptedItemInterface[]
-        for (const type of contentType) {
-          extendArray(elements, this.typedMap[type] || [])
-        }
-        return elements
-      } else {
-        return this.typedMap[contentType]?.slice() || []
-      }
-    } else {
-      return Object.keys(this.map).map((uuid: Uuid) => {
-        return this.map[uuid]
-      }) as DecryptedItemInterface[]
-    }
   }
 
   /**
@@ -206,7 +163,7 @@ export class DecryptedItemCollection implements SNIndex, CollectionInterface {
     return elements.slice()
   }
 
-  private filterSortElements(elements: DecryptedItemInterface[]) {
+  private filterSortElements(elements: (DecryptedItemInterface | DeletedItemInterface)[]) {
     if (Object.keys(this.displaySortBy).length === 0) {
       return
     }
@@ -240,8 +197,27 @@ export class DecryptedItemCollection implements SNIndex, CollectionInterface {
        * it was discarded without neccessarily being marked as deleted), it does not pass
        * the filter. If no filter the element passes by default.
        */
-      const passes =
-        isDeletedItem(element) || !this.map[element.uuid] ? false : filter ? filter(element) : true
+
+      const remove = () => {
+        if (!isNullOrUndefined(previousIndex)) {
+          delete filteredCTMap[element.uuid]
+
+          /** We don't yet remove the element directly from the array, since mutating
+           * the array inside a loop could render all other upcoming indexes invalid */
+          ;(sortedElements[previousIndex] as unknown) = undefined
+
+          /** Since an element is being removed from the array, we need to recompute
+           * the new positions for elements that are staying */
+          typesNeedingResort.add(contentType)
+        }
+      }
+
+      if (isDeletedItem(element)) {
+        remove()
+        continue
+      }
+
+      const passes = !this.map[element.uuid] ? false : filter ? filter(element) : true
 
       if (passes) {
         if (!isNullOrUndefined(previousElement)) {
@@ -275,17 +251,7 @@ export class DecryptedItemCollection implements SNIndex, CollectionInterface {
         }
       } else {
         /** Doesn't pass filter, remove from sorted and filtered */
-        if (!isNullOrUndefined(previousIndex)) {
-          delete filteredCTMap[element.uuid]
-
-          /** We don't yet remove the element directly from the array, since mutating
-           * the array inside a loop could render all other upcoming indexes invalid */
-          ;(sortedElements[previousIndex] as any) = undefined
-
-          /** Since an element is being removed from the array, we need to recompute
-           * the new positions for elements that are staying */
-          typesNeedingResort.add(contentType)
-        }
+        remove()
       }
     }
 
@@ -370,15 +336,5 @@ export class DecryptedItemCollection implements SNIndex, CollectionInterface {
     }
 
     this.sortedMap[contentType] = cleaned
-  }
-
-  public onChange(delta: ItemDelta<DecryptedItemInterface>): void {
-    const changedOrInserted = delta.changed.concat(delta.inserted)
-
-    if (changedOrInserted.length > 0) {
-      this.set(changedOrInserted)
-    }
-
-    this.discard(delta.discarded)
   }
 }

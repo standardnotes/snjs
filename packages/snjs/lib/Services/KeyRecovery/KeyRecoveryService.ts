@@ -391,7 +391,7 @@ export class SNKeyRecoveryService extends AbstractService {
     ) {
       /** Get the latest items key we _can_ decrypt */
       const latest = dateSorted(
-        this.itemManager.nonErroredItemsForContentType<ItemsKeyInterface>(ContentType.ItemsKey),
+        this.itemManager.getItems<ItemsKeyInterface>(ContentType.ItemsKey),
         PayloadField.CreatedAt,
         false,
       )[0]

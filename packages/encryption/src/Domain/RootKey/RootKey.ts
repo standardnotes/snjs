@@ -1,6 +1,11 @@
 import { RootKeyContentInStorage, RootKeyInKeychain } from './Types'
 import { SNRootKeyParams } from './RootKeyParams'
-import { RootKeyInterface, RootKeyContent, SNItem, PayloadInterface } from '@standardnotes/models'
+import {
+  RootKeyInterface,
+  RootKeyContent,
+  DecryptedItem,
+  DecryptedPayloadInterface,
+} from '@standardnotes/models'
 import { ProtocolVersion } from '@standardnotes/common'
 import { timingSafeEqual } from '@standardnotes/sncrypto-common'
 
@@ -9,7 +14,7 @@ import { timingSafeEqual } from '@standardnotes/sncrypto-common'
  * and decryption of items keys. A root key extends SNItem for local convenience, but is
  * not part of the syncing or storage ecosystem—root keys are managed independently.
  */
-export class SNRootKey extends SNItem<RootKeyContent> implements RootKeyInterface {
+export class SNRootKey extends DecryptedItem<RootKeyContent> implements RootKeyInterface {
   public readonly keyParams: SNRootKeyParams
 
   constructor(payload: DecryptedPayloadInterface<RootKeyContent>) {

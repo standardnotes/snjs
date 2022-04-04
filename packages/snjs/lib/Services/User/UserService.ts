@@ -97,7 +97,7 @@ export class UserService
         await this.notifyEvent(AccountEvent.SignedInOrRegistered)
         this.unlockSyncing()
         await this.syncService.downloadFirstSync(300)
-        void this.protocolService.decryptErroredItems()
+        void this.protocolService.decryptErroredPayloads()
       } else {
         this.unlockSyncing()
       }
@@ -152,12 +152,12 @@ export class UserService
           })
           .then(() => {
             if (!awaitSync) {
-              void this.protocolService.decryptErroredItems()
+              void this.protocolService.decryptErroredPayloads()
             }
           })
         if (awaitSync) {
           await syncPromise
-          await this.protocolService.decryptErroredItems()
+          await this.protocolService.decryptErroredPayloads()
         }
       } else {
         this.unlockSyncing()
@@ -218,7 +218,7 @@ export class UserService
       void this.syncService.downloadFirstSync(1_000, {
         checkIntegrity: true,
       })
-      void this.protocolService.decryptErroredItems()
+      void this.protocolService.decryptErroredPayloads()
     }
     this.unlockSyncing()
     return response

@@ -35,3 +35,9 @@ export type ErroredDecryptingParameters = {
   waitingForKey?: boolean
   errorDecryptingValueChanged?: boolean
 }
+
+export function isErrorDecryptingParameters(
+  x: EncryptedParameters | DecryptedParameters | ErroredDecryptingParameters,
+): x is ErroredDecryptingParameters {
+  return (x as ErroredDecryptingParameters).errorDecrypting
+}

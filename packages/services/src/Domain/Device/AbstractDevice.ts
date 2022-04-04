@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { ApplicationIdentifier } from '@standardnotes/common'
-import { RawPayload } from '@standardnotes/models'
+import { TransferPayload } from '@standardnotes/models'
 import { getGlobalScope, isNullOrUndefined } from '@standardnotes/utils'
 import { DeviceInterface } from './DeviceInterface'
 
@@ -77,7 +77,7 @@ export abstract class AbstractDevice implements DeviceInterface {
     identifier: ApplicationIdentifier,
   ): Promise<{ isNewDatabase?: boolean } | undefined>
 
-  abstract getAllRawDatabasePayloads(identifier: ApplicationIdentifier): Promise<RawPayload[]>
+  abstract getAllRawDatabasePayloads(identifier: ApplicationIdentifier): Promise<TransferPayload[]>
 
   abstract saveRawDatabasePayload(payload: any, identifier: ApplicationIdentifier): Promise<void>
 

@@ -13,7 +13,7 @@ export interface MutatorClientInterface {
    * Inserts the input item by its payload properties, and marks the item as dirty.
    * A sync is not performed after an item is inserted. This must be handled by the caller.
    */
-  insertItem(item: Models.SNItem): Promise<Models.SNItem>
+  insertItem(item: Models.DecryptedItemInterface): Promise<Models.DecryptedItemInterface>
 
   /**
    * Saves the item by uuid by finding it, setting it as dirty if its not already,
@@ -24,18 +24,18 @@ export interface MutatorClientInterface {
   /**
    * Mutates a pre-existing item, marks it as dirty, and syncs it
    */
-  changeAndSaveItem<M extends Models.ItemMutator = Models.ItemMutator>(
+  changeAndSaveItem<M extends Models.DecryptedItemMutator = Models.DecryptedItemMutator>(
     uuid: UuidString,
     mutate: (mutator: M) => void,
     updateTimestamps?: boolean,
     payloadSource?: Models.PayloadSource,
     syncOptions?: SyncOptions,
-  ): Promise<Models.SNItem | undefined>
+  ): Promise<Models.DecryptedItemInterface | undefined>
 
   /**
    * Mutates pre-existing items, marks them as dirty, and syncs
    */
-  changeAndSaveItems<M extends Models.ItemMutator = Models.ItemMutator>(
+  changeAndSaveItems<M extends Models.DecryptedItemMutator = Models.DecryptedItemMutator>(
     uuids: UuidString[],
     mutate: (mutator: M) => void,
     updateTimestamps?: boolean,
@@ -46,20 +46,20 @@ export interface MutatorClientInterface {
   /**
    * Mutates a pre-existing item and marks it as dirty. Does not sync changes.
    */
-  changeItem<M extends Models.ItemMutator>(
+  changeItem<M extends Models.DecryptedItemMutator>(
     uuid: UuidString,
     mutate: (mutator: M) => void,
     updateTimestamps?: boolean,
-  ): Promise<Models.SNItem | undefined>
+  ): Promise<Models.DecryptedItemInterface | undefined>
 
   /**
    * Mutates a pre-existing items and marks them as dirty. Does not sync changes.
    */
-  changeItems<M extends Models.ItemMutator = Models.ItemMutator>(
+  changeItems<M extends Models.DecryptedItemMutator = Models.DecryptedItemMutator>(
     uuids: UuidString[],
     mutate: (mutator: M) => void,
     updateTimestamps?: boolean,
-  ): Promise<(Models.SNItem | undefined)[]>
+  ): Promise<(Models.DecryptedItemInterface | undefined)[]>
 
   /**
    * Run unique mutations per each item in the array, then only propagate all changes
@@ -70,13 +70,13 @@ export interface MutatorClientInterface {
     transactions: TransactionalMutation[],
     payloadSource?: Models.PayloadSource,
     payloadSourceKey?: string,
-  ): Promise<(Models.SNItem | undefined)[]>
+  ): Promise<(Models.DecryptedItemInterface | undefined)[]>
 
   runTransactionalMutation(
     transaction: TransactionalMutation,
     payloadSource?: Models.PayloadSource,
     payloadSourceKey?: string,
-  ): Promise<Models.SNItem | undefined>
+  ): Promise<Models.DecryptedItemInterface | undefined>
 
   protectNote(note: Models.SNNote): Promise<Models.SNNote>
 
@@ -93,25 +93,17 @@ export interface MutatorClientInterface {
   /**
    * Takes the values of the input item and emits it onto global state.
    */
-  mergeItem(item: Models.SNItem, source: Models.PayloadSource): Promise<Models.SNItem>
-
-  /**
-   * Creates a managed item.
-   * @param needsSync  Whether to mark the item as needing sync. `add` must also be true.
-   */
-  createManagedItem<C extends Models.ItemContent = Models.ItemContent>(
-    contentType: ContentType,
-    content: Models.ItemContent,
-    needsSync: boolean,
-    override?: Partial<Models.PayloadInterface<C>>,
-  ): Promise<Models.ItemInterface<C>>
+  mergeItem(
+    item: Models.DecryptedItemInterface,
+    source: Models.PayloadSource,
+  ): Promise<Models.DecryptedItemInterface>
 
   /**
    * Creates an unmanaged item that can be added later.
    */
   createTemplateItem<
     C extends Models.ItemContent = Models.ItemContent,
-    I extends Models.ItemInterface = Models.ItemInterface,
+    I extends Models.DecryptedItemInterface = Models.DecryptedItemInterface,
   >(
     contentType: ContentType,
     content?: C,
@@ -122,17 +114,19 @@ export interface MutatorClientInterface {
    * sees of the item.
    */
   setItemNeedsSync(
-    item: Models.SNItem,
+    item: Models.DecryptedItemInterface,
     isUserModified?: boolean,
-  ): Promise<Models.SNItem | undefined>
+  ): Promise<Models.DecryptedItemInterface | undefined>
 
-  setItemsNeedsSync(items: Models.SNItem[]): Promise<(Models.SNItem | undefined)[]>
+  setItemsNeedsSync(
+    items: Models.DecryptedItemInterface[],
+  ): Promise<(Models.DecryptedItemInterface | undefined)[]>
 
-  deleteItem(item: Models.SNItem): Promise<void>
+  deleteItem(item: Models.DecryptedItemInterface): Promise<void>
 
   emptyTrash(): Promise<void>
 
-  duplicateItem<T extends Models.SNItem>(
+  duplicateItem<T extends Models.DecryptedItemInterface>(
     item: T,
     additionalContent?: Partial<Models.ItemContent>,
   ): Promise<T>
@@ -176,7 +170,7 @@ export interface MutatorClientInterface {
     awaitSync?: boolean,
   ): Promise<
     | {
-        affectedItems: Models.SNItem[]
+        affectedItems: Models.DecryptedItemInterface[]
         errorCount: number
       }
     | {

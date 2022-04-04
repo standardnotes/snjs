@@ -8,7 +8,7 @@ import {
   notesMatchingCriteria,
 } from '../../../Syncable/Note/NotesDisplayCriteria'
 import { SNIndex } from '../../Index/SNIndex'
-import { DecryptedItemCollection } from './DecryptedItemCollection'
+import { DecryptedItemCollection } from './ItemCollection'
 import { ItemDelta } from '../../Index/ItemDelta'
 
 /**

@@ -576,7 +576,7 @@ export class ComponentViewer {
         /* Push immediately now */
         const items: SNItem[] = []
         for (const contentType of types) {
-          extendArray(items, this.itemManager.nonErroredItemsForContentType(contentType))
+          extendArray(items, this.itemManager.getItems(contentType))
         }
         this.sendItemsInReply(items, message)
       },

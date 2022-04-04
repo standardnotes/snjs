@@ -2,14 +2,14 @@ import { ContentType, Uuid } from '@standardnotes/common'
 import { UuidMap } from '@standardnotes/utils'
 import { PayloadInterface } from '../../../Abstract/Payload/Interfaces/PayloadInterface'
 import { PayloadSource } from '../../../Abstract/Payload/Types/PayloadSource'
-import { MutableCollection } from './MutableCollection'
+import { PayloadCollection } from './PayloadCollection'
 
 /**
  * A collection of payloads coming from a single source.
  */
 export class ImmutablePayloadCollection<
   T extends PayloadInterface = PayloadInterface,
-> extends MutableCollection<T> {
+> extends PayloadCollection<T> {
   public source?: PayloadSource
 
   /** We don't use a constructor for this because we don't want the constructor to have
@@ -17,8 +17,8 @@ export class ImmutablePayloadCollection<
   static WithPayloads<T extends PayloadInterface = PayloadInterface>(
     payloads: T[] = [],
     source?: PayloadSource,
-  ): ImmutablePayloadCollection {
-    const collection = new ImmutablePayloadCollection()
+  ): ImmutablePayloadCollection<T> {
+    const collection = new ImmutablePayloadCollection<T>()
     collection.source = source
     if (payloads.length > 0) {
       collection.set(payloads)
@@ -28,8 +28,8 @@ export class ImmutablePayloadCollection<
   }
 
   static FromCollection<T extends PayloadInterface = PayloadInterface>(
-    collection: MutableCollection<T>,
-  ): ImmutablePayloadCollection {
+    collection: PayloadCollection<T>,
+  ): ImmutablePayloadCollection<T> {
     const mapCopy = Object.freeze(Object.assign({}, collection.map))
     const typedMapCopy = Object.freeze(Object.assign({}, collection.typedMap))
     const referenceMapCopy = Object.freeze(collection.referenceMap.makeCopy()) as UuidMap
@@ -45,12 +45,12 @@ export class ImmutablePayloadCollection<
     return result
   }
 
-  mutableCopy(): MutableCollection<T> {
+  mutableCopy(): PayloadCollection<T> {
     const mapCopy = Object.assign({}, this.map)
     const typedMapCopy = Object.assign({}, this.typedMap)
     const referenceMapCopy = this.referenceMap.makeCopy() as UuidMap
     const conflictMapCopy = this.conflictMap.makeCopy() as UuidMap
-    const result = new MutableCollection(
+    const result = new PayloadCollection(
       true,
       mapCopy as Partial<Record<Uuid, T>>,
       typedMapCopy as Partial<Record<ContentType, T[]>>,

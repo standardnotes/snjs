@@ -300,7 +300,7 @@ export async function registerOldUser({ application, email, password, version })
     mode: SyncMode.DownloadFirst,
     ...syncOptions,
   })
-  await application.protocolService.decryptErroredItems()
+  await application.protocolService.decryptErroredPayloads()
 }
 
 export function createStorageItemPayload(contentType) {
@@ -617,6 +617,32 @@ export function pinNote(application, note) {
   return application.mutator.changeItem(note.uuid, (mutator) => {
     mutator.pinned = true
   })
+}
+
+export async function insertItemWithOverride(
+  application,
+  contentType,
+  content,
+  needsSync = false,
+  errorDecrypting,
+) {
+  let item = await application.itemManager.insertItem(contentType, content, needsSync)
+  if (errorDecrypting) {
+    item = await application.itemManager.emitItemFromPayload(
+      new EncryptedPayload({
+        ...item.payload.copy(),
+        errorDecrypting,
+      }),
+    )
+  } else {
+    item = await application.itemManager.emitItemFromPayload(
+      new DecryptedPayload({
+        ...item.payload.copy(),
+      }),
+    )
+  }
+
+  return item
 }
 
 export async function alternateUuidForItem(application, uuid) {

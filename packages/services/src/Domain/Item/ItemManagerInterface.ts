@@ -1,32 +1,33 @@
 import { ContentType, Uuid } from '@standardnotes/common'
 import {
-  SNItem,
   MutationType,
-  ItemMutator,
   ItemsKeyInterface,
   ItemsKeyMutatorInterface,
+  DecryptedItemInterface,
+  DecryptedItemMutator,
 } from '@standardnotes/models'
 import {
   ItemInterface,
   PayloadInterface,
   IntegrityPayload,
   PayloadSource,
-  PurePayload,
+  EncryptedItemInterface,
+  DeletedItemInterface,
 } from '@standardnotes/models'
 import { AbstractService } from '../Service/AbstractService'
 
-export type ItemManagerChangeObserverCallback<T extends SNItem | PurePayload> = (
+export type ItemManagerChangeObserverCallback = (
   /** The items are pre-existing but have been changed */
-  changed: T[],
+  changed: DecryptedItemInterface[],
 
   /** The items have been newly inserted */
-  inserted: T[],
+  inserted: DecryptedItemInterface[],
 
-  /** The items have been deleted from local state (and remote state if applicable) */
-  discarded: T[],
+  /** The items should no longer be displayed in the interface, either due to being deleted, or becoming error-encrypted */
+  removed: (EncryptedItemInterface | DeletedItemInterface)[],
 
   /** Items for which encrypted overwrite protection is enabled and enacted */
-  ignored: T[],
+  ignored: EncryptedItemInterface[],
 
   source: PayloadSource,
   sourceKey?: string,
@@ -35,13 +36,13 @@ export type ItemManagerChangeObserverCallback<T extends SNItem | PurePayload> = 
 export interface ItemManagerInterface extends AbstractService {
   addObserver(
     contentType: ContentType | ContentType[],
-    callback: ItemManagerChangeObserverCallback<SNItem>,
+    callback: ItemManagerChangeObserverCallback,
   ): () => void
 
   /**
    * Marks the item as deleted and needing sync.
    */
-  setItemToBeDeleted(uuid: Uuid, source?: PayloadSource): Promise<SNItem | undefined>
+  setItemToBeDeleted(uuid: Uuid, source?: PayloadSource): Promise<ItemInterface | undefined>
 
   setItemsToBeDeleted(uuids: Uuid[]): Promise<(ItemInterface | undefined)[]>
 
@@ -56,7 +57,7 @@ export interface ItemManagerInterface extends AbstractService {
    * modify item in any way (such as marking it as dirty). It is up to the caller
    * to pass in a dirtied item if that is their intention.
    */
-  insertItem(item: SNItem): Promise<SNItem>
+  insertItem(item: DecryptedItemInterface): Promise<DecryptedItemInterface>
 
   emitItemFromPayload(payload: PayloadInterface, source: PayloadSource): Promise<ItemInterface>
 
@@ -75,7 +76,10 @@ export interface ItemManagerInterface extends AbstractService {
    * so that data is properly mapped through our function, and latest state
    * is properly reconciled.
    */
-  changeItem<M extends ItemMutator = ItemMutator, I extends ItemInterface = SNItem>(
+  changeItem<
+    M extends DecryptedItemMutator = DecryptedItemMutator,
+    I extends DecryptedItemInterface = DecryptedItemInterface,
+  >(
     uuid: Uuid,
     mutate?: (mutator: M) => void,
     mutationType?: MutationType,

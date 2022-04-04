@@ -88,7 +88,7 @@ export class ListedService extends AbstractService implements ListedClientInterf
 
   private getLegacyListedAccounts(): ListedAccount[] {
     const extensions = this.itemManager
-      .nonErroredItemsForContentType<SNActionsExtension>(ContentType.ActionsExtension)
+      .getItems<SNActionsExtension>(ContentType.ActionsExtension)
       .filter((extension) => extension.isListedExtension)
 
     const accounts: ListedAccount[] = []

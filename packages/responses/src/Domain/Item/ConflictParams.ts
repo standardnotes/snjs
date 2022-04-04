@@ -1,10 +1,10 @@
-import { RawPayload } from '@standardnotes/models'
+import { TransferPayload } from '@standardnotes/models'
 import { ConflictType } from './ConflictType'
 
 export type ConflictParams = {
   type: ConflictType
-  server_item?: RawPayload
-  unsaved_item?: RawPayload
+  server_item?: TransferPayload
+  unsaved_item?: TransferPayload
   /** @legacay */
-  item?: RawPayload
+  item?: TransferPayload
 }

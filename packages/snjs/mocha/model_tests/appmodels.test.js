@@ -305,7 +305,7 @@ describe('app models', () => {
     expect(this.application.items.findItem(item1.uuid).payload.items_key_id).to.equal(itemsKey.uuid)
 
     sinon
-      .stub(this.application.protocolService.itemsEncryption, 'decryptErroredItems')
+      .stub(this.application.protocolService.itemsEncryption, 'decryptErroredPayloads')
       .callsFake(() => {
         // prevent auto decryption
       })
@@ -372,7 +372,7 @@ describe('app models', () => {
 
   it('maintains editor reference when duplicating note', async function () {
     const note = await Factory.createMappedNote(this.application)
-    const editor = await this.application.mutator.createManagedItem(
+    const editor = await this.application.itemManager.insertItem(
       ContentType.Component,
       { area: ComponentArea.Editor },
       true,

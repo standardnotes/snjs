@@ -3,7 +3,7 @@ import { Uuid } from '@standardnotes/common'
 import { isNote, SNNote } from '../Note'
 import { isTag, SNTag } from '.'
 import { SNIndex } from '../../Runtime/Index/SNIndex'
-import { DecryptedItemCollection } from '../../Runtime/Collection/Item/DecryptedItemCollection'
+import { DecryptedItemCollection } from '../../Runtime/Collection/Item/ItemCollection'
 import { ItemDelta } from '../../Runtime/Index/ItemDelta'
 
 /** tagUuid undefined signifies all notes count change */

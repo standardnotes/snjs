@@ -21,11 +21,13 @@ import {
   DecryptedParameters,
   EncryptedParameters,
   ErroredDecryptingParameters,
+  isErrorDecryptingParameters,
 } from '../../Encryption/EncryptedParameters'
 import { encryptedParametersFromPayload } from '../../Intent/Functions'
 import { RootKeyEncryptedAuthenticatedData } from '../../Encryption/RootKeyEncryptedAuthenticatedData'
 import { ItemAuthenticatedData } from '../../Encryption/ItemAuthenticatedData'
 import { LegacyAttachedData } from '../../Encryption/LegacyAttachedData'
+import { EncryptedPayload } from '@standardnotes/models'
 
 export enum EncryptionServiceEvent {
   RootKeyStatusChanged = 'RootKeyStatusChanged',
@@ -182,8 +184,8 @@ export class EncryptionService
     return this.rootKeyEncryption.createNewItemsKeyWithRollback()
   }
 
-  public async decryptErroredItems(): Promise<void> {
-    await this.itemsEncryption.decryptErroredItems()
+  public async decryptErroredPayloads(): Promise<void> {
+    await this.itemsEncryption.decryptErroredPayloads()
   }
 
   public itemsKeyForPayload(
@@ -200,159 +202,115 @@ export class EncryptionService
   }
 
   public async encryptSplitSingle(
-    split: EncryptionSplit.EncryptionSplitWithKey<Models.PayloadInterface>,
-    intent: EncryptedExportIntent,
-  ): Promise<Models.PayloadInterface> {
-    return (await this.encryptSplit(split, intent))[0]
+    split: EncryptionSplit.EncryptionSplitWithKey<Models.DecryptedPayloadInterface>,
+  ): Promise<Models.EncryptedPayloadInterface> {
+    return (await this.encryptSplit(split))[0]
   }
 
   public async encryptSplit(
-    split: EncryptionSplit.EncryptionSplitWithKey<Models.PayloadInterface>,
-    intent: EncryptedExportIntent,
-  ): Promise<Models.PayloadInterface[]> {
+    split: EncryptionSplit.EncryptionSplitWithKey<Models.DecryptedPayloadInterface>,
+  ): Promise<Models.EncryptedPayloadInterface[]> {
     const allEncryptedParams: EncryptedParameters[] = []
-    const allNonencryptablePayloads: Models.PayloadInterface[] = []
-
-    const categorizePayloads = (payloads: Models.PayloadInterface[]) => {
-      const encryptables: Models.PayloadInterface[] = []
-      const nonencryptables: Models.PayloadInterface[] = []
-
-      for (const payload of payloads) {
-        if (payload.errorDecrypting || payload.deleted) {
-          nonencryptables.push(payload)
-        } else {
-          encryptables.push(payload)
-        }
-      }
-
-      return { encryptables, nonencryptables }
-    }
 
     if (split.usesRootKey) {
-      const categorized = categorizePayloads(split.usesRootKey.items)
-      const rootKeyEncrypted = await this.rootKeyEncryption.encryptSplitSingles(
-        categorized.encryptables,
+      const rootKeyEncrypted = await this.rootKeyEncryption.encryptPayloads(
+        split.usesRootKey.items,
         split.usesRootKey.key,
       )
       Utils.extendArray(allEncryptedParams, rootKeyEncrypted)
-      Utils.extendArray(allNonencryptablePayloads, categorized.nonencryptables)
     }
 
     if (split.usesItemsKey) {
-      const categorized = categorizePayloads(split.usesItemsKey.items)
-      const itemsKeyEncrypted = await this.itemsEncryption.encryptSplitSingles(
-        categorized.encryptables,
+      const itemsKeyEncrypted = await this.itemsEncryption.encryptPayloads(
+        split.usesItemsKey.items,
         split.usesItemsKey.key,
       )
       Utils.extendArray(allEncryptedParams, itemsKeyEncrypted)
-      Utils.extendArray(allNonencryptablePayloads, categorized.nonencryptables)
     }
 
     if (split.usesRootKeyWithKeyLookup) {
-      const categorized = categorizePayloads(split.usesRootKeyWithKeyLookup.items)
-      const rootKeyEncrypted = await this.rootKeyEncryption.encryptSplitSinglesWithKeyLookup(
-        categorized.encryptables,
+      const rootKeyEncrypted = await this.rootKeyEncryption.encryptPayloadsWithKeyLookup(
+        split.usesRootKeyWithKeyLookup.items,
       )
       Utils.extendArray(allEncryptedParams, rootKeyEncrypted)
-      Utils.extendArray(allNonencryptablePayloads, categorized.nonencryptables)
     }
 
     if (split.usesItemsKeyWithKeyLookup) {
-      const categorized = categorizePayloads(split.usesItemsKeyWithKeyLookup.items)
-      const itemsKeyEncrypted = await this.itemsEncryption.encryptSplitSinglesWithKeyLookup(
-        categorized.encryptables,
+      const itemsKeyEncrypted = await this.itemsEncryption.encryptPayloadsWithKeyLookup(
+        split.usesItemsKeyWithKeyLookup.items,
       )
       Utils.extendArray(allEncryptedParams, itemsKeyEncrypted)
-      Utils.extendArray(allNonencryptablePayloads, categorized.nonencryptables)
     }
 
-    const packagedEncrypted = allEncryptedParams.map((encryptedParams) =>
-      CreateIntentPayloadFromObject(
-        EncryptionSplit.findPayloadInSplit(encryptedParams.uuid, split),
-        intent,
-        encryptedParams,
-      ),
+    const packagedEncrypted = allEncryptedParams.map(
+      (encryptedParams) =>
+        new EncryptedPayload({
+          ...EncryptionSplit.findPayloadInSplit(encryptedParams.uuid, split),
+          ...encryptedParams,
+        }),
     )
 
-    return allNonencryptablePayloads.concat(packagedEncrypted)
+    return packagedEncrypted
   }
 
   public async decryptSplitSingle<C extends Models.ItemContent = Models.ItemContent>(
-    split: EncryptionSplit.EncryptionSplitWithKey<Models.PayloadInterface<C>>,
-  ): Promise<Models.PayloadInterface<C>> {
-    return (await this.decryptSplit(split))[0]
+    split: EncryptionSplit.EncryptionSplitWithKey<Models.EncryptedPayloadInterface>,
+  ): Promise<Models.DecryptedPayloadInterface<C> | Models.EncryptedPayloadInterface> {
+    const results = await this.decryptSplit<C>(split)
+    return results[0]
   }
 
   public async decryptSplit<C extends Models.ItemContent = Models.ItemContent>(
-    split: EncryptionSplit.EncryptionSplitWithKey<Models.PayloadInterface<C>>,
-  ): Promise<Models.PayloadInterface<C>[]> {
-    const allDecryptedParams: (DecryptedParameters<C> | ErroredDecryptingParameters)[] = []
-    const allNondecryptablePayloads: Models.PayloadInterface<C>[] = []
-
-    const categorizePayloads = (payloads: Models.PayloadInterface[]) => {
-      const decryptables: Models.PayloadInterface[] = []
-      const nondecryptables: Models.PayloadInterface[] = []
-
-      for (const payload of payloads) {
-        const isDeletedPendingSync = payload.deleted === true && payload.content === undefined
-        const alreadyDecrypted = payload.format === Models.PayloadFormat.DecryptedBareObject
-        if (isDeletedPendingSync || alreadyDecrypted) {
-          nondecryptables.push(payload)
-        } else {
-          decryptables.push(payload)
-        }
-      }
-
-      return { decryptables, nondecryptables }
-    }
+    split: EncryptionSplit.EncryptionSplitWithKey<Models.EncryptedPayloadInterface>,
+  ): Promise<(Models.DecryptedPayloadInterface<C> | Models.EncryptedPayloadInterface)[]> {
+    const resultParams: (DecryptedParameters<C> | ErroredDecryptingParameters)[] = []
 
     if (split.usesRootKey) {
-      const categorized = categorizePayloads(split.usesRootKey.items)
       const rootKeyDecrypted = await this.rootKeyEncryption.decryptPayloads(
-        categorized.decryptables,
+        split.usesRootKey.items,
         split.usesRootKey.key,
       )
-      Utils.extendArray(allDecryptedParams, rootKeyDecrypted)
-      Utils.extendArray(allNondecryptablePayloads, categorized.nondecryptables)
+      Utils.extendArray(resultParams, rootKeyDecrypted)
     }
 
     if (split.usesRootKeyWithKeyLookup) {
-      const categorized = categorizePayloads(split.usesRootKeyWithKeyLookup.items)
       const rootKeyDecrypted = await this.rootKeyEncryption.decryptPayloadsWithKeyLookup(
-        categorized.decryptables,
+        split.usesRootKeyWithKeyLookup.items,
       )
-      Utils.extendArray(allDecryptedParams, rootKeyDecrypted)
-      Utils.extendArray(allNondecryptablePayloads, categorized.nondecryptables)
+      Utils.extendArray(resultParams, rootKeyDecrypted)
     }
 
     if (split.usesItemsKey) {
-      const categorized = categorizePayloads(split.usesItemsKey.items)
       const itemsKeyDecrypted = await this.itemsEncryption.decryptPayloads(
-        categorized.decryptables,
+        split.usesItemsKey.items,
         split.usesItemsKey.key,
       )
-      Utils.extendArray(allDecryptedParams, itemsKeyDecrypted)
-      Utils.extendArray(allNondecryptablePayloads, categorized.nondecryptables)
+      Utils.extendArray(resultParams, itemsKeyDecrypted)
     }
 
     if (split.usesItemsKeyWithKeyLookup) {
-      const categorized = categorizePayloads(split.usesItemsKeyWithKeyLookup.items)
       const itemsKeyDecrypted = await this.itemsEncryption.decryptPayloadsWithKeyLookup(
-        categorized.decryptables,
+        split.usesItemsKeyWithKeyLookup.items,
       )
-      Utils.extendArray(allDecryptedParams, itemsKeyDecrypted)
-      Utils.extendArray(allNondecryptablePayloads, categorized.nondecryptables)
+      Utils.extendArray(resultParams, itemsKeyDecrypted)
     }
 
-    const packagedDecrypted = allDecryptedParams.map((decryptedParams) => {
-      const original = EncryptionSplit.findPayloadInSplit(decryptedParams.uuid, split)
-      return mergePayloadWithEncryptionParameters(original, {
-        ...decryptedParams,
-        errorDecryptingValueChanged: original.errorDecrypting !== decryptedParams.errorDecrypting,
-      })
+    const packagedResults = resultParams.map((params) => {
+      const original = EncryptionSplit.findPayloadInSplit(params.uuid, split)
+      if (isErrorDecryptingParameters(params)) {
+        return new Models.EncryptedPayload({
+          ...original,
+          ...params,
+        })
+      } else {
+        return new Models.DecryptedPayload({
+          ...original,
+          ...params,
+        })
+      }
     })
 
-    return allNondecryptablePayloads.concat(packagedDecrypted)
+    return packagedResults
   }
 
   /**

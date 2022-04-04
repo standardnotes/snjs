@@ -1,9 +1,9 @@
-import { PayloadSource, PurePayload } from '@standardnotes/models'
+import { PayloadSource, PayloadInterface } from '@standardnotes/models'
 
 export interface PayloadManagerInterface {
   emitPayloads(
-    payloads: PurePayload[],
+    payloads: PayloadInterface[],
     source: PayloadSource,
     sourceKey?: string,
-  ): Promise<PurePayload[]>
+  ): Promise<PayloadInterface[]>
 }

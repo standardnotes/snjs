@@ -1,18 +1,39 @@
 import { ContentType } from '@standardnotes/common'
-import { PurePayload, PayloadSource } from '@standardnotes/models'
-import { ItemManagerChangeObserverCallback } from '@standardnotes/services'
+import {
+  DeletedPayloadInterface,
+  EncryptedPayloadInterface,
+  PayloadInterface,
+  PayloadSource,
+} from '@standardnotes/models'
+
+export type PayloadsChangeObserverCallback = (
+  /** The items are pre-existing but have been changed */
+  changed: PayloadInterface[],
+
+  /** The items have been newly inserted */
+  inserted: PayloadInterface[],
+
+  /** The items have been deleted from local state (and remote state if applicable) */
+  discarded: DeletedPayloadInterface[],
+
+  /** Items for which encrypted overwrite protection is enabled and enacted */
+  ignored: EncryptedPayloadInterface[],
+
+  source: PayloadSource,
+  sourceKey?: string,
+) => void
 
 export type PayloadsChangeObserver = {
   types: ContentType[]
-  callback: ItemManagerChangeObserverCallback<PurePayload>
+  callback: PayloadsChangeObserverCallback
   priority: number
 }
 
-export type QueueElement = {
-  payloads: PurePayload[]
+export type QueueElement<P extends PayloadInterface = PayloadInterface> = {
+  payloads: P[]
   source: PayloadSource
   sourceKey?: string
-  resolve: (alteredPayloads: PurePayload[]) => void
+  resolve: (alteredPayloads: P[]) => void
 }
 
 /**

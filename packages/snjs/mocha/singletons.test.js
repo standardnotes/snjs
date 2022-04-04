@@ -63,8 +63,8 @@ describe('singletons', function () {
       new Predicate('content_type', '=', ContentType.Component),
       new Predicate('package_info.identifier', '=', this.extManagerId),
     ])
-    this.createExtMgr = async () => {
-      return this.application.mutator.createManagedItem(
+    this.createExtMgr = () => {
+      return this.application.itemManager.insertItem(
         ContentType.Component,
         {
           package_info: {
@@ -213,7 +213,7 @@ describe('singletons', function () {
     /** After signing in, the instance retrieved from the server should be the one kept */
     const latestPrefs = await findOrCreatePrefsSingleton(this.application)
     expect(latestPrefs.uuid).to.equal(ogPrefs.uuid)
-    const allPrefs = this.application.itemManager.nonErroredItemsForContentType(
+    const allPrefs = this.application.itemManager.getItems(
       ogPrefs.content_type,
     )
     expect(allPrefs.length).to.equal(1)
@@ -236,7 +236,7 @@ describe('singletons', function () {
     /** After signing in, the instance retrieved from the server should be the one kept */
     const latestPrefs = await findOrCreatePrefsSingleton(this.application)
     expect(latestPrefs.uuid).to.equal(ogPrefs.uuid)
-    const allPrefs = this.application.itemManager.nonErroredItemsForContentType(
+    const allPrefs = this.application.itemManager.getItems(
       ogPrefs.content_type,
     )
     expect(allPrefs.length).to.equal(1)
@@ -271,7 +271,7 @@ describe('singletons', function () {
      * is then subsequently decrypted, singleton logic runs again for the item.
      */
 
-    await this.application.mutator.createManagedItem(
+    await Factory.insertItemWithOverride(
       ContentType.Component,
       {
         package_info: {
@@ -280,12 +280,10 @@ describe('singletons', function () {
         },
       },
       true,
-      {
-        errorDecrypting: false,
-      },
+      false,
     )
 
-    const errored = await this.application.mutator.createManagedItem(
+    const errored = await this.application.itemManager.insertItem(
       ContentType.Component,
       {
         package_info: {
@@ -294,9 +292,7 @@ describe('singletons', function () {
         },
       },
       true,
-      {
-        errorDecrypting: true,
-      },
+      true,
     )
 
     this.expectedItemCount += 1

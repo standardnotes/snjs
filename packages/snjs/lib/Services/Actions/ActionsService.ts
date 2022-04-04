@@ -79,7 +79,7 @@ export class SNActionsService extends AbstractService {
   }
 
   public getExtensions(): SNActionsExtension[] {
-    const extensionItems = this.itemManager.nonErroredItemsForContentType<SNActionsExtension>(
+    const extensionItems = this.itemManager.getItems<SNActionsExtension>(
       ContentType.ActionsExtension,
     )
     const excludingListed = extensionItems.filter((extension) => !extension.isListedExtension)

@@ -10,7 +10,6 @@ import {
   EncryptedParameters,
   ErroredDecryptingParameters,
 } from '../../Encryption/EncryptedParameters'
-import { mergePayloadWithEncryptionParameters } from '../../Intent/Functions'
 
 export class ItemsEncryptionService extends Services.AbstractService {
   private removeItemsObserver!: () => void
@@ -29,7 +28,7 @@ export class ItemsEncryptionService extends Services.AbstractService {
       [ContentType.ItemsKey],
       (changed, inserted) => {
         if (changed.concat(inserted).length > 0) {
-          void this.decryptErroredItems()
+          void this.decryptErroredPayloads()
         }
       },
     )
@@ -51,7 +50,7 @@ export class ItemsEncryptionService extends Services.AbstractService {
    */
   async repersistAllItems() {
     const items = this.itemManager.allItems()
-    const payloads = items.map((item) => Models.CreateMaxPayloadFromAnyObject(item))
+    const payloads = items.map((item) => new Models.DecryptedPayload(item.payload.ejected()))
     return this.storageService.savePayloads(payloads)
   }
 
@@ -59,7 +58,9 @@ export class ItemsEncryptionService extends Services.AbstractService {
     return this.itemManager.itemsKeys()
   }
 
-  public itemsKeyForPayload(payload: Models.PurePayload): Models.ItemsKeyInterface | undefined {
+  public itemsKeyForPayload(
+    payload: Models.EncryptedPayloadInterface,
+  ): Models.ItemsKeyInterface | undefined {
     return this.getItemsKeys().find(
       (key) => key.uuid === payload.items_key_id || key.duplicateOf === payload.items_key_id,
     )
@@ -93,7 +94,7 @@ export class ItemsEncryptionService extends Services.AbstractService {
   }
 
   private keyToUseForDecryptionOfPayload(
-    payload: Models.PurePayload,
+    payload: Models.EncryptedPayloadInterface,
   ): Models.ItemsKeyInterface | undefined {
     if (payload.items_key_id) {
       const itemsKey = this.itemsKeyForPayload(payload)
@@ -104,8 +105,8 @@ export class ItemsEncryptionService extends Services.AbstractService {
     return defaultKey
   }
 
-  public async encryptSplitSingleWithKeyLookup(
-    payload: Models.PurePayload,
+  public async encryptPayloadWithKeyLookup(
+    payload: Models.DecryptedPayloadInterface,
   ): Promise<EncryptedParameters> {
     const key = this.keyToUseForItemEncryption()
 
@@ -113,11 +114,11 @@ export class ItemsEncryptionService extends Services.AbstractService {
       throw Error(key.message)
     }
 
-    return this.encryptSplitSingle(payload, key)
+    return this.encryptPayload(payload, key)
   }
 
-  public async encryptSplitSingle(
-    payload: Models.PurePayload,
+  public async encryptPayload(
+    payload: Models.DecryptedPayloadInterface,
     key: Models.ItemsKeyInterface,
   ): Promise<EncryptedParameters> {
     if (payload.format !== Models.PayloadFormat.DecryptedBareObject) {
@@ -129,28 +130,25 @@ export class ItemsEncryptionService extends Services.AbstractService {
     if (!payload.uuid) {
       throw Error('Attempting to encrypt payload with no UuidGenerator.')
     }
-    if (key.errorDecrypting || key.waitingForKey) {
-      throw Error('Attempting to encrypt payload with encrypted key.')
-    }
 
     return OperatorWrapper.encryptPayload(payload, key, this.operatorManager)
   }
 
-  public async encryptSplitSingles(
-    payloads: Models.PurePayload[],
+  public async encryptPayloads(
+    payloads: Models.DecryptedPayloadInterface[],
     key: Models.ItemsKeyInterface,
   ): Promise<EncryptedParameters[]> {
-    return Promise.all(payloads.map((payload) => this.encryptSplitSingle(payload, key)))
+    return Promise.all(payloads.map((payload) => this.encryptPayload(payload, key)))
   }
 
-  public async encryptSplitSinglesWithKeyLookup(
-    payloads: Models.PurePayload[],
+  public async encryptPayloadsWithKeyLookup(
+    payloads: Models.DecryptedPayloadInterface[],
   ): Promise<EncryptedParameters[]> {
-    return Promise.all(payloads.map((payload) => this.encryptSplitSingleWithKeyLookup(payload)))
+    return Promise.all(payloads.map((payload) => this.encryptPayloadWithKeyLookup(payload)))
   }
 
   public async decryptPayloadWithKeyLookup(
-    payload: Models.PurePayload,
+    payload: Models.EncryptedPayloadInterface,
   ): Promise<DecryptedParameters | ErroredDecryptingParameters> {
     const key = this.keyToUseForDecryptionOfPayload(payload)
 
@@ -166,7 +164,7 @@ export class ItemsEncryptionService extends Services.AbstractService {
   }
 
   public async decryptPayload(
-    payload: Models.PurePayload,
+    payload: Models.EncryptedPayloadInterface,
     key: Models.ItemsKeyInterface,
   ): Promise<DecryptedParameters | ErroredDecryptingParameters> {
     if (!payload.content) {
@@ -176,31 +174,23 @@ export class ItemsEncryptionService extends Services.AbstractService {
       }
     }
 
-    if (key.errorDecrypting) {
-      return {
-        uuid: payload.uuid,
-        waitingForKey: true,
-        errorDecrypting: true,
-      }
-    }
-
     return OperatorWrapper.decryptPayload(payload, key, this.operatorManager)
   }
 
   public async decryptPayloadsWithKeyLookup(
-    payloads: Models.PurePayload[],
+    payloads: Models.EncryptedPayloadInterface[],
   ): Promise<(DecryptedParameters | ErroredDecryptingParameters)[]> {
     return Promise.all(payloads.map((payload) => this.decryptPayloadWithKeyLookup(payload)))
   }
 
   public async decryptPayloads(
-    payloads: Models.PurePayload[],
+    payloads: Models.EncryptedPayloadInterface[],
     key: Models.ItemsKeyInterface,
   ): Promise<(DecryptedParameters | ErroredDecryptingParameters)[]> {
     return Promise.all(payloads.map((payload) => this.decryptPayload(payload, key)))
   }
 
-  public async decryptErroredItems(): Promise<void> {
+  public async decryptErroredPayloads(): Promise<void> {
     const items = this.itemManager.invalidItems.filter(
       (i) => i.content_type !== ContentType.ItemsKey,
     )

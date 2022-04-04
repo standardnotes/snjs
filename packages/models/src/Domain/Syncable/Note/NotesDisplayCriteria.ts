@@ -8,7 +8,7 @@ import { DecryptedItem } from '../../Abstract/Item'
 import { SNTag } from '../Tag'
 import { SNNote } from '.'
 import { SmartView } from '../SmartView'
-import { DecryptedItemCollection } from '../../Runtime/Collection/Item/DecryptedItemCollection'
+import { DecryptedItemCollection } from '../../Runtime/Collection/Item/ItemCollection'
 import { CompoundPredicate } from '../../Runtime/Predicate/CompoundPredicate'
 
 export type SearchQuery = {

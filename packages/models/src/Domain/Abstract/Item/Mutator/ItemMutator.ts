@@ -1,7 +1,7 @@
 import { DeletedPayload } from './../../Payload/Implementations/DeletedPayload'
 import { MutationType } from '../Types/MutationType'
-import { GenericItem } from '../Implementations/GenericItem'
 import { PayloadInterface } from '../../Payload'
+import { ItemInterface } from '../Interfaces/ItemInterface'
 
 /**
  * An item mutator takes in an item, and an operation, and returns the resulting payload.
@@ -9,11 +9,11 @@ import { PayloadInterface } from '../../Payload'
  * All changes to the payload must occur by copying the payload and reassigning its value.
  */
 export class ItemMutator {
-  public readonly item: GenericItem
+  public readonly item: ItemInterface
   protected payload: PayloadInterface
   protected readonly type: MutationType
 
-  constructor(item: GenericItem, type: MutationType) {
+  constructor(item: ItemInterface, type: MutationType) {
     this.item = item
     this.type = type
     this.payload = item.payload

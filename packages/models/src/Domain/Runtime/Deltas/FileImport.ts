@@ -6,10 +6,11 @@ import { PayloadsDelta } from './Delta'
 import { DecryptedPayloadInterface } from '../../Abstract/Payload/Interfaces/DecryptedPayload'
 import { ImmutablePayloadCollectionSet } from '../Collection/Payload/ImmutablePayloadCollectionSet'
 import { HistoryMap } from '../History'
+import { isDecryptedPayload, PayloadInterface } from '../../Abstract/Payload'
 
-export class DeltaFileImport extends PayloadsDelta<DecryptedPayloadInterface> {
+export class DeltaFileImport extends PayloadsDelta {
   constructor(
-    protected readonly baseCollection: ImmutablePayloadCollection<DecryptedPayloadInterface>,
+    protected readonly baseCollection: ImmutablePayloadCollection<PayloadInterface>,
     protected readonly applyCollection: ImmutablePayloadCollection<DecryptedPayloadInterface>,
     protected readonly relatedCollectionSet?: ImmutablePayloadCollectionSet,
     protected readonly historyMap?: HistoryMap,
@@ -61,7 +62,10 @@ export class DeltaFileImport extends PayloadsDelta<DecryptedPayloadInterface> {
      * If not found in current results, use the base value.
      */
     if (!current) {
-      current = this.findBasePayload(payload.uuid)
+      const baseCurrent = this.findBasePayload(payload.uuid)
+      if (baseCurrent && isDecryptedPayload(baseCurrent)) {
+        current = baseCurrent
+      }
     }
     /**
      * If the current doesn't exist, we're creating a new item from payload.

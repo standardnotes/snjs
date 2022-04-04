@@ -1,9 +1,27 @@
 import { ContentType, Uuid } from '@standardnotes/common'
-import { PayloadsChangeObserver, QueueElement, OverwriteProtectedTypes } from './Types'
+import {
+  PayloadsChangeObserver,
+  QueueElement,
+  OverwriteProtectedTypes,
+  PayloadsChangeObserverCallback,
+} from './Types'
 import { removeFromArray, Uuids } from '@standardnotes/utils'
-import { DeltaFileImport } from '@standardnotes/models'
-import * as Payloads from '@standardnotes/models'
+import {
+  DeltaFileImport,
+  isDeletedPayload,
+  isEncryptedErroredPayload,
+  PayloadInterface,
+  MutableCollection,
+  ImmutablePayloadCollection,
+  IntegrityPayload,
+  EncryptedPayloadInterface,
+  PayloadSource,
+  DeletedPayloadInterface,
+  DecryptedPayloadInterface,
+} from '@standardnotes/models'
 import * as Services from '@standardnotes/services'
+
+type EmitQueue<P extends PayloadInterface = PayloadInterface> = QueueElement<P>[]
 
 /**
  * The payload manager is responsible for keeping state regarding what items exist in the
@@ -20,12 +38,12 @@ export class PayloadManager
   implements Services.PayloadManagerInterface
 {
   private changeObservers: PayloadsChangeObserver[] = []
-  public collection: Payloads.MutableCollection<Payloads.PurePayload>
-  private emitQueue: QueueElement[] = []
+  public collection: MutableCollection<PayloadInterface>
+  private emitQueue: EmitQueue = []
 
   constructor(protected internalEventBus: Services.InternalEventBusInterface) {
     super(internalEventBus)
-    this.collection = new Payloads.MutableCollection()
+    this.collection = new MutableCollection()
   }
 
   /**
@@ -34,7 +52,7 @@ export class PayloadManager
    * as needed to make decisions, like about duplication or uuid alteration.
    */
   public getMasterCollection() {
-    return Payloads.ImmutablePayloadCollection.FromCollection(this.collection)
+    return ImmutablePayloadCollection.FromCollection(this.collection)
   }
 
   public deinit() {
@@ -44,7 +62,7 @@ export class PayloadManager
   }
 
   public resetState() {
-    this.collection = new Payloads.MutableCollection()
+    this.collection = new MutableCollection()
   }
 
   public find(uuids: Uuid[]) {
@@ -55,8 +73,23 @@ export class PayloadManager
    * One of many mapping helpers available.
    * This function maps a collection of payloads.
    */
-  public async emitCollection(collection: Payloads.ImmutablePayloadCollection, sourceKey?: string) {
+  public async emitCollection(collection: ImmutablePayloadCollection, sourceKey?: string) {
     return this.emitPayloads(collection.all(), collection.source!, sourceKey)
+  }
+
+  public get integrityPayloads(): IntegrityPayload[] {
+    return this.collection.integrityPayloads()
+  }
+
+  /**
+   * Returns a detached array of all items which are not deleted
+   */
+  public get nonDeletedItems() {
+    return this.collection.nondeletedElements()
+  }
+
+  public get invalidItems(): EncryptedPayloadInterface[] {
+    return this.collection.invalidElements()
   }
 
   /**
@@ -65,11 +98,11 @@ export class PayloadManager
    * @returns every paylod altered as a result of this operation, to be
    * saved to storage by the caller
    */
-  public async emitPayload(
-    payload: Payloads.PurePayload,
-    source: Payloads.PayloadSource,
+  public async emitPayload<P extends PayloadInterface = PayloadInterface>(
+    payload: P,
+    source: PayloadSource,
     sourceKey?: string,
-  ): Promise<Payloads.PurePayload[]> {
+  ): Promise<P[]> {
     return this.emitPayloads([payload], source, sourceKey)
   }
 
@@ -79,21 +112,23 @@ export class PayloadManager
    * @returns every paylod altered as a result of this operation, to be
    * saved to storage by the caller
    */
-  public async emitPayloads(
-    payloads: Payloads.PurePayload[],
-    source: Payloads.PayloadSource,
+  public async emitPayloads<P extends PayloadInterface = PayloadInterface>(
+    payloads: P[],
+    source: PayloadSource,
     sourceKey?: string,
-  ): Promise<Payloads.PurePayload[]> {
+  ): Promise<P[]> {
     if (payloads.length === 0) {
       console.warn('Attempting to emit 0 payloads.')
     }
     return new Promise((resolve) => {
-      this.emitQueue.push({
+      const element: QueueElement<P> = {
         payloads,
         source,
         sourceKey,
         resolve,
-      })
+      }
+
+      this.emitQueue.push(element as unknown as QueueElement<PayloadInterface>)
 
       if (this.emitQueue.length === 1) {
         void this.popQueue()
@@ -112,11 +147,11 @@ export class PayloadManager
     }
   }
 
-  private mergePayloadsOntoMaster(payloads: Payloads.PurePayload[]) {
-    const changed: Payloads.PurePayload[] = []
-    const inserted: Payloads.PurePayload[] = []
-    const discarded: Payloads.PurePayload[] = []
-    const ignored: Payloads.PurePayload[] = []
+  private mergePayloadsOntoMaster(payloads: PayloadInterface[]) {
+    const changed: PayloadInterface[] = []
+    const inserted: PayloadInterface[] = []
+    const discarded: DeletedPayloadInterface[] = []
+    const ignored: EncryptedPayloadInterface[] = []
 
     for (const payload of payloads) {
       if (!payload.uuid || !payload.content_type) {
@@ -128,16 +163,16 @@ export class PayloadManager
 
       if (
         OverwriteProtectedTypes.includes(payload.content_type) &&
-        payload.errorDecrypting &&
+        isEncryptedErroredPayload(payload) &&
         masterPayload &&
-        !masterPayload.errorDecrypting
+        !isEncryptedErroredPayload(masterPayload)
       ) {
         ignored.push(payload)
         continue
       }
 
       const newPayload = masterPayload ? masterPayload.mergedWith(payload) : payload
-      if (newPayload.discardable) {
+      if (isDeletedPayload(newPayload) && newPayload.discardable) {
         /** The item has been deleted and synced,
          * and can thus be removed from our local record */
         this.collection.discard(newPayload)
@@ -162,7 +197,7 @@ export class PayloadManager
    */
   public addObserver(
     types: ContentType | ContentType[],
-    callback: Services.ItemManagerChangeObserverCallback<Payloads.PurePayload>,
+    callback: PayloadsChangeObserverCallback,
     priority = 1,
   ) {
     if (!Array.isArray(types)) {
@@ -184,18 +219,21 @@ export class PayloadManager
    * explicitely understand what they are doing (want to propagate model state without mapping)
    */
   public notifyChangeObservers(
-    changed: Payloads.PurePayload[],
-    inserted: Payloads.PurePayload[],
-    discarded: Payloads.PurePayload[],
-    ignored: Payloads.PurePayload[],
-    source: Payloads.PayloadSource,
+    changed: PayloadInterface[],
+    inserted: PayloadInterface[],
+    discarded: DeletedPayloadInterface[],
+    ignored: EncryptedPayloadInterface[],
+    source: PayloadSource,
     sourceKey?: string,
   ) {
     /** Slice the observers array as sort modifies in-place */
     const observers = this.changeObservers.slice().sort((a, b) => {
       return a.priority < b.priority ? -1 : 1
     })
-    const filter = (payloads: Payloads.PurePayload[], types: ContentType[]) => {
+    const filter = <P extends PayloadInterface = PayloadInterface>(
+      payloads: P[],
+      types: ContentType[],
+    ) => {
       return types.includes(ContentType.Any)
         ? payloads.slice()
         : payloads.slice().filter((payload) => {
@@ -219,10 +257,10 @@ export class PayloadManager
    * and marks the items as dirty.
    * @returns Resulting items
    */
-  public async importPayloads(payloads: Payloads.PurePayload[]) {
+  public async importPayloads(payloads: DecryptedPayloadInterface[]) {
     const delta = new DeltaFileImport(
       this.getMasterCollection(),
-      Payloads.ImmutablePayloadCollection.WithPayloads(payloads, Payloads.PayloadSource.FileImport),
+      ImmutablePayloadCollection.WithPayloads(payloads, PayloadSource.FileImport),
       undefined,
     )
     const collection = await delta.resultingCollection()
@@ -230,7 +268,7 @@ export class PayloadManager
     return Uuids(collection.payloads)
   }
 
-  public removePayloadLocally(payload: Payloads.PurePayload) {
+  public removePayloadLocally(payload: PayloadInterface) {
     this.collection.discard(payload)
   }
 }

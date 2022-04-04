@@ -1,25 +1,26 @@
-import { ItemContent, PayloadInterface } from '@standardnotes/models'
-import { EncryptedExportIntent } from '../../Intent/ExportIntent'
+import {
+  DecryptedPayloadInterface,
+  EncryptedPayloadInterface,
+  ItemContent,
+} from '@standardnotes/models'
 import { EncryptionSplitWithKey } from './EncryptionSplit'
 
 export interface EncryptionProvider {
   encryptSplit(
-    split: EncryptionSplitWithKey<PayloadInterface>,
-    intent: EncryptedExportIntent,
-  ): Promise<PayloadInterface[]>
+    split: EncryptionSplitWithKey<DecryptedPayloadInterface>,
+  ): Promise<EncryptedPayloadInterface[]>
 
   encryptSplitSingle(
-    split: EncryptionSplitWithKey<PayloadInterface>,
-    intent: EncryptedExportIntent,
-  ): Promise<PayloadInterface>
+    split: EncryptionSplitWithKey<DecryptedPayloadInterface>,
+  ): Promise<EncryptedPayloadInterface>
 
   decryptSplitSingle<C extends ItemContent = ItemContent>(
-    split: EncryptionSplitWithKey<PayloadInterface<C>>,
-  ): Promise<PayloadInterface<C>>
+    split: EncryptionSplitWithKey<EncryptedPayloadInterface>,
+  ): Promise<DecryptedPayloadInterface<C> | EncryptedPayloadInterface>
 
   decryptSplit<C extends ItemContent = ItemContent>(
-    split: EncryptionSplitWithKey<PayloadInterface<C>>,
-  ): Promise<PayloadInterface<C>[]>
+    split: EncryptionSplitWithKey<EncryptedPayloadInterface>,
+  ): Promise<(DecryptedPayloadInterface<C> | EncryptedPayloadInterface)[]>
 
   hasRootKeyEncryptionSource(): boolean
 }

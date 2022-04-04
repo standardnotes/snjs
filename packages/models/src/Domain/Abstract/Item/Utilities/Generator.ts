@@ -22,16 +22,20 @@ import { TagMutator } from '../../../Syncable/Tag/TagMutator'
 import { NoteMutator } from '../../../Syncable/Note/NoteMutator'
 import { DecryptedItemInterface } from '../Interfaces/DecryptedItem'
 import { ItemContent } from '../Interfaces/ItemContent'
+import { DecryptedItemMutator } from '../Mutator/DecryptedItemMutator'
 
 type ItemClass<C extends ItemContent = ItemContent> = new (
   payload: DecryptedPayloadInterface<C>,
 ) => DecryptedItem<C>
 
-type MutatorClass = new (item: DecryptedItem, type: MutationType) => ItemMutator
+type MutatorClass<C extends ItemContent = ItemContent> = new (
+  item: DecryptedItemInterface,
+  type: MutationType,
+) => DecryptedItemMutator<C>
 
 type MappingEntry<C extends ItemContent = ItemContent> = {
   itemClass: ItemClass<C>
-  mutatorClass?: MutatorClass
+  mutatorClass?: MutatorClass<C>
 }
 
 const ContentTypeClassMapping: Partial<Record<ContentType, MappingEntry>> = {
@@ -50,10 +54,10 @@ const ContentTypeClassMapping: Partial<Record<ContentType, MappingEntry>> = {
   [ContentType.UserPrefs]: { itemClass: SNUserPrefs, mutatorClass: UserPrefsMutator },
 }
 
-export function CreateMutatorForItem<I extends DecryptedItem, M extends ItemMutator = ItemMutator>(
-  item: I,
-  type: MutationType,
-): M {
+export function CreateMutatorForItem<
+  I extends DecryptedItemInterface,
+  M extends DecryptedItemMutator = DecryptedItemMutator,
+>(item: I, type: MutationType): M {
   const lookupValue = ContentTypeClassMapping[item.content_type]?.mutatorClass
   if (lookupValue) {
     return new lookupValue(item, type) as M

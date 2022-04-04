@@ -1,4 +1,4 @@
-import { IntegrityPayload, RawPayload } from '@standardnotes/models'
+import { IntegrityPayload, TransferPayload } from '@standardnotes/models'
 import { ItemManagerInterface } from '../Item/ItemManagerInterface'
 import { SyncEvent } from '../Event/SyncEvent'
 
@@ -42,7 +42,7 @@ describe('IntegrityService', () => {
         item: {
           uuid: '1-2-3',
           content: 'foobar',
-        } as RawPayload,
+        } as Partial<TransferPayload>,
       },
     })
 
