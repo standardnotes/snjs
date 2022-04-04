@@ -3,7 +3,6 @@ import { ImmutablePayloadCollection } from '../Collection/Payload/ImmutablePaylo
 import { PayloadSource } from '../../Abstract/Payload/Types/PayloadSource'
 import { PayloadsDelta } from './Delta'
 import { isDeletedPayload } from '../../Abstract/Payload/Interfaces/TypeCheck'
-import { CopyPayload } from '../../Abstract/Payload'
 
 export class DeltaRemoteSaved extends PayloadsDelta {
   public async resultingCollection() {
@@ -27,8 +26,7 @@ export class DeltaRemoteSaved extends PayloadsDelta {
         )
         processed.push(result)
       } else {
-        const result = CopyPayload(
-          payload,
+        const result = payload.copy(
           {
             lastSyncEnd: new Date(),
             dirty: deletedState,

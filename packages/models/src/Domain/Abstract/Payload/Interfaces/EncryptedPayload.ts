@@ -1,4 +1,6 @@
+import { EncryptedTransferPayload } from '../../TransferPayload/Interfaces/EncryptedTransferPayload'
 import { PayloadFormat } from '../Types/PayloadFormat'
+import { PayloadSource } from '../Types/PayloadSource'
 import { PayloadInterface } from './PayloadInterface'
 
 export interface EncryptedPayloadInterface extends PayloadInterface {
@@ -19,4 +21,5 @@ export interface EncryptedPayloadInterface extends PayloadInterface {
   readonly auth_params?: unknown
 
   mergedWith(payload: EncryptedPayloadInterface): EncryptedPayloadInterface
+  copy(override?: Partial<EncryptedTransferPayload>, source?: PayloadSource): EncryptedPayloadInterface
 }

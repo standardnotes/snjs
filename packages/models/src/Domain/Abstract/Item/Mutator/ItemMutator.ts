@@ -1,6 +1,5 @@
 import { DeletedPayload } from './../../Payload/Implementations/DeletedPayload'
 import { MutationType } from '../Types/MutationType'
-import { CopyPayload } from '../../Payload/Utilities/Functions'
 import { GenericItem } from '../Implementations/GenericItem'
 import { PayloadInterface } from '../../Payload'
 
@@ -30,10 +29,10 @@ export class ItemMutator {
 
   public getResult() {
     if (this.type === MutationType.NonDirtying) {
-      return CopyPayload(this.payload)
+      return this.payload.copy()
     }
 
-    const result = CopyPayload(this.payload, {
+    const result = this.payload.copy({
       dirty: true,
       dirtiedDate: new Date(),
     })
@@ -53,7 +52,7 @@ export class ItemMutator {
   }
 
   public set lastSyncBegan(began: Date) {
-    this.payload = CopyPayload(this.payload, {
+    this.payload = this.payload.copy({
       lastSyncBegan: began,
     })
   }

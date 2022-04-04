@@ -30,7 +30,7 @@ export interface DecryptedItemInterface<C extends ItemContent = ItemContent>
 
   isItemContentEqualWith(otherItem: ItemInterface<PayloadInterface>): boolean
 
-  payloadRepresentation(override?: Partial<DecryptedPayloadInterface<C>>): DecryptedPayloadInterface
+  payloadRepresentation(override?: Partial<DecryptedPayloadInterface<C>>): DecryptedPayloadInterface<C>
 
   hasRelationshipWithItem(item: ItemInterface<PayloadInterface>): boolean
 

@@ -1,8 +1,10 @@
+import { TransferPayload } from './../../TransferPayload/Interfaces/TransferPayload'
 import { Uuid, ProtocolVersion, ContentType } from '@standardnotes/common'
 import { PayloadInterface } from '../../Payload/Interfaces/PayloadInterface'
 import { PredicateInterface } from '../../../Runtime/Predicate/Interface'
 import { HistoryEntryInterface } from '../../../Runtime/History'
 import { ConflictStrategy } from '../Types/ConflictStrategy'
+import { SingletonStrategy } from '../Types/SingletonStrategy'
 
 export interface ItemInterface<P extends PayloadInterface = PayloadInterface> {
   payload: P
@@ -31,14 +33,14 @@ export interface ItemInterface<P extends PayloadInterface = PayloadInterface> {
 
   singletonPredicate<T extends ItemInterface>(): PredicateInterface<T>
 
-  singletonStrategy: any
+  singletonStrategy: SingletonStrategy
 
   strategyWhenConflictingWithItem(
     item: ItemInterface,
     previousRevision?: HistoryEntryInterface,
   ): ConflictStrategy
 
-  satisfiesPredicate(predicate: any): boolean
+  satisfiesPredicate(predicate: PredicateInterface<ItemInterface>): boolean
 
-  payloadRepresentation(override?: Partial<P>): P
+  payloadRepresentation(override?: Partial<TransferPayload>): P
 }

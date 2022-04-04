@@ -1,5 +1,4 @@
 import { ImmutablePayloadCollection } from '../Collection/Payload/ImmutablePayloadCollection'
-import { CopyPayload } from '../../Abstract/Payload/Utilities/Functions'
 import { PayloadSource } from '../../Abstract/Payload/Types/PayloadSource'
 import { PayloadsDelta } from './Delta'
 
@@ -12,8 +11,7 @@ export class DeltaRemoteRejected extends PayloadsDelta {
       if (!decrypted) {
         throw 'Unable to find decrypted counterpart for rejected payload.'
       }
-      const result = CopyPayload(
-        decrypted,
+      const result = decrypted.copy(
         {
           lastSyncEnd: new Date(),
           dirty: false,

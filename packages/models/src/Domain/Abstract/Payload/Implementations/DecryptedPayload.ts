@@ -35,7 +35,7 @@ export class DecryptedPayload<C extends ItemContent = ItemContent>
     return result
   }
 
-  ejected(): DecryptedTransferPayload {
+  ejected(): DecryptedTransferPayload<C> {
     const values = {
       content: this.content,
     }
@@ -53,6 +53,19 @@ export class DecryptedPayload<C extends ItemContent = ItemContent>
         ...payload.ejected(),
       },
       this.source,
+    )
+  }
+
+  copy(
+    override?: Partial<DecryptedTransferPayload<C>>,
+    source = this.source,
+  ): DecryptedPayloadInterface<C> {
+    return new DecryptedPayload(
+      {
+        ...this.ejected(),
+        ...override,
+      },
+      source,
     )
   }
 }

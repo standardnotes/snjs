@@ -8,7 +8,6 @@ import { AppDataField } from '../Types/AppDataField'
 import { DefaultAppDomain, DomainDataValueType, ItemDomainKey } from '../Types/DefaultAppDomain'
 import { ItemMutator } from './ItemMutator'
 import { DecryptedPayloadInterface } from '../../Payload/Interfaces/DecryptedPayload'
-import { CopyPayload } from '../../Payload'
 
 export class DecryptedItemMutator<C extends ItemContent = ItemContent> extends ItemMutator {
   public readonly item: DecryptedItem<C>
@@ -25,7 +24,7 @@ export class DecryptedItemMutator<C extends ItemContent = ItemContent> extends I
 
   public getResult() {
     if (this.type === MutationType.NonDirtying) {
-      return CopyPayload(this.payload, {
+      return this.payload.copy({
         content: this.content,
       })
     }
@@ -39,7 +38,7 @@ export class DecryptedItemMutator<C extends ItemContent = ItemContent> extends I
       }
     }
 
-    const result = CopyPayload(this.payload, {
+    const result = this.payload.copy({
       content: this.content,
       dirty: true,
       dirtiedDate: new Date(),
@@ -58,7 +57,7 @@ export class DecryptedItemMutator<C extends ItemContent = ItemContent> extends I
   }
 
   public set lastSyncBegan(began: Date) {
-    this.payload = CopyPayload(this.payload, {
+    this.payload = this.payload.copy({
       content: this.content,
       lastSyncBegan: began,
     })

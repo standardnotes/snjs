@@ -37,7 +37,7 @@ export async function PayloadsByAlternatingUuid(
    * We need to clone payload and give it a new uuid,
    * then delete item with old uuid from db (cannot modify uuids in our IndexedDB setup)
    */
-  const copy = CopyPayload(payload, {
+  const copy = payload.copy({
     uuid: UuidGenerator.GenerateUuid(),
     dirty: true,
     dirtiedDate: new Date(),
@@ -69,9 +69,7 @@ export async function PayloadsByAlternatingUuid(
         (p) => isEncryptedPayload(p) && p.items_key_id === payload.uuid,
       ) as EncryptedPayloadInterface[]
 
-    const adjustedPayloads = matchingPayloads.map((a) =>
-      CopyPayload(a, { items_key_id: copy.uuid }),
-    )
+    const adjustedPayloads = matchingPayloads.map((a) => a.copy({ items_key_id: copy.uuid }))
 
     if (adjustedPayloads.length > 0) {
       extendArray(results, adjustedPayloads)
@@ -120,7 +118,7 @@ export function PayloadsByUpdatingReferencingPayloadReferences(
     for (const id of removeIds) {
       remove(references, { uuid: id })
     }
-    const result = CopyPayload(referencingPayload, {
+    const result = referencingPayload.copy({
       dirty: true,
       dirtiedDate: new Date(),
       content: {

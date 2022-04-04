@@ -2,7 +2,6 @@ import { DecryptedItemInterface } from './../../Abstract/Item/Interfaces/Decrypt
 import { DecryptedPayloadInterface } from './../../Abstract/Payload/Interfaces/DecryptedPayload'
 import { isNullOrUndefined } from '@standardnotes/utils'
 import { CreateDecryptedItemFromPayload } from '../../Abstract/Item/Utilities/Generator'
-import { CopyPayload } from '../../Abstract/Payload/Utilities/Functions'
 import { NoteContent } from '../../Syncable/Note'
 import { HistoryEntryInterface } from './HistoryEntryInterface'
 
@@ -14,7 +13,7 @@ export class HistoryEntry implements HistoryEntryInterface {
   protected readonly hasPreviousEntry: boolean
 
   constructor(payload: DecryptedPayloadInterface<NoteContent>, previousEntry?: HistoryEntry) {
-    this.payload = CopyPayload(payload)
+    this.payload = payload.copy()
     this.previousEntry = previousEntry
     this.hasPreviousEntry = !isNullOrUndefined(previousEntry)
     /** We'll try to compute the delta based on an assumed

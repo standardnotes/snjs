@@ -1,6 +1,5 @@
 import { extendArray } from '@standardnotes/utils'
 import { ImmutablePayloadCollection } from '../Collection/Payload/ImmutablePayloadCollection'
-import { CopyPayload } from '../../Abstract/Payload/Utilities/Functions'
 import { PayloadSource } from '../../Abstract/Payload/Types/PayloadSource'
 import { ConflictDelta } from './Conflict'
 import { PayloadsDelta } from './Delta'
@@ -24,7 +23,7 @@ export class DeltaFileImport extends PayloadsDelta<DecryptedPayloadInterface> {
     for (const payload of this.applyCollection.all()) {
       const handled = await this.payloadsByHandlingPayload(payload, results)
       const payloads = handled.map((result) => {
-        return CopyPayload(result, {
+        return result.copy({
           dirty: true,
           dirtiedDate: new Date(),
         })

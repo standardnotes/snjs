@@ -1,3 +1,4 @@
+import { TransferPayload } from './../../TransferPayload/Interfaces/TransferPayload'
 import { ContentType, Uuid } from '@standardnotes/common'
 import { dateToLocalizedString, deepFreeze } from '@standardnotes/utils'
 import { ItemContentsDiffer } from '../Utilities/Functions'
@@ -5,7 +6,6 @@ import { ItemInterface } from '../Interfaces/ItemInterface'
 import { PayloadSource } from '../../Payload/Types/PayloadSource'
 import { ConflictStrategy } from '../Types/ConflictStrategy'
 import { PredicateInterface } from '../../../Runtime/Predicate/Interface'
-import { CopyPayload } from '../../Payload/Utilities/Functions'
 import { SingletonStrategy } from '../Types/SingletonStrategy'
 import { PayloadInterface } from '../../Payload/Interfaces/PayloadInterface'
 import { HistoryEntryInterface } from '../../../Runtime/History/HistoryEntryInterface'
@@ -94,8 +94,8 @@ export abstract class GenericItem<P extends PayloadInterface = PayloadInterface>
     return this.payload.duplicate_of
   }
 
-  public payloadRepresentation(override?: Partial<P>) {
-    return CopyPayload(this.payload, override)
+  public payloadRepresentation(override?: Partial<TransferPayload>): PayloadInterface {
+    return this.payload.copy(override)
   }
 
   /** Whether the item has never been synced to a server */

@@ -60,4 +60,17 @@ export class EncryptedPayload extends PurePayload implements EncryptedPayloadInt
       this.source,
     )
   }
+
+  copy(
+    override?: Partial<EncryptedTransferPayload>,
+    source = this.source,
+  ): EncryptedPayloadInterface {
+    return new EncryptedPayload(
+      {
+        ...this.ejected(),
+        ...override,
+      },
+      source,
+    )
+  }
 }

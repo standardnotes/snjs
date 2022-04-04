@@ -32,4 +32,17 @@ export class ContentlessPayload extends PurePayload implements ContentlessPayloa
       this.source,
     )
   }
+
+  copy(
+    override?: Partial<ContentlessTransferPayload>,
+    source = this.source,
+  ): ContentlessPayloadInterface {
+    return new ContentlessPayload(
+      {
+        ...this.ejected(),
+        ...override,
+      },
+      source,
+    )
+  }
 }

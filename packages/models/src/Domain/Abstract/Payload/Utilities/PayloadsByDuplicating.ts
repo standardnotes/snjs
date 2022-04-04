@@ -3,7 +3,7 @@ import { extendArray, UuidGenerator } from '@standardnotes/utils'
 import { ImmutablePayloadCollection } from '../../../Runtime/Collection/Payload/ImmutablePayloadCollection'
 import { ItemContent } from '../../Item/Interfaces/ItemContent'
 import { AffectorMapping } from './AffectorFunction'
-import { CopyPayload, PayloadsByUpdatingReferencingPayloadReferences } from './Functions'
+import { PayloadsByUpdatingReferencingPayloadReferences } from './Functions'
 import { PayloadInterface } from '../Interfaces/PayloadInterface'
 import { isDecryptedPayload } from '../Interfaces/TypeCheck'
 import { DecryptedTransferPayload } from '../../TransferPayload/Interfaces/DecryptedTransferPayload'
@@ -41,7 +41,7 @@ export async function PayloadsByDuplicating<C extends ItemContent = ItemContent>
     }
   }
 
-  const copy = CopyPayload(payload, override)
+  const copy = payload.copy(override)
   results.push(copy)
 
   if (isDecryptedPayload(payload) && isDecryptedPayload(copy)) {

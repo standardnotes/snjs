@@ -1,3 +1,4 @@
+import { DecryptedTransferPayload } from './../../TransferPayload/Interfaces/DecryptedTransferPayload'
 import { Uuid } from '@standardnotes/common'
 import { AppDataField } from '../Types/AppDataField'
 import { ComponentDataDomain, DefaultAppDomain } from '../Types/DefaultAppDomain'
@@ -94,6 +95,12 @@ export class DecryptedItem<C extends ItemContent = ItemContent>
   ): T {
     const appData = this.getDomainData(DefaultAppDomain)
     return (appData?.[key] as T) || defaultValue
+  }
+
+  public payloadRepresentation(
+    override?: Partial<DecryptedTransferPayload<C>>,
+  ): DecryptedPayloadInterface<C> {
+    return this.payload.copy(override)
   }
 
   /**

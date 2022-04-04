@@ -38,4 +38,14 @@ export class DeletedPayload extends PurePayload implements DeletedPayloadInterfa
       this.source,
     )
   }
+
+  copy(override?: Partial<DeletedTransferPayload>, source = this.source): DeletedPayloadInterface {
+    return new DeletedPayload(
+      {
+        ...this.ejected(),
+        ...override,
+      },
+      source,
+    )
+  }
 }

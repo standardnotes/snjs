@@ -53,4 +53,6 @@ export interface PayloadInterface {
    * Returns a new payload by applying the input payload on top of the instance payload.
    */
   mergedWith(payload: PayloadInterface): PayloadInterface
+
+  copy(override?: Partial<TransferPayload>, source?: PayloadSource): PayloadInterface
 }

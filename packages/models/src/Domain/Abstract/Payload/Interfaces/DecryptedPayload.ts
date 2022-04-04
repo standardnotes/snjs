@@ -1,8 +1,10 @@
+import { DecryptedTransferPayload } from './../../TransferPayload/Interfaces/DecryptedTransferPayload'
 import { Uuid } from '@standardnotes/common'
 import { ItemContent } from '../../Item'
 import { ContentReference } from '../../Item/Reference/ContentReference'
 import { PayloadFormat } from '../Types/PayloadFormat'
 import { PayloadInterface } from './PayloadInterface'
+import { PayloadSource } from '../Types/PayloadSource'
 
 export interface DecryptedPayloadInterface<C extends ItemContent = ItemContent>
   extends PayloadInterface {
@@ -11,4 +13,8 @@ export interface DecryptedPayloadInterface<C extends ItemContent = ItemContent>
   get references(): ContentReference[]
   getReference(uuid: Uuid): ContentReference
   mergedWith(payload: DecryptedPayloadInterface): DecryptedPayloadInterface
+  copy(
+    override?: Partial<DecryptedTransferPayload>,
+    source?: PayloadSource,
+  ): DecryptedPayloadInterface<C>
 }

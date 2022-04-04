@@ -81,4 +81,5 @@ export abstract class PurePayload implements PayloadInterface {
   }
 
   abstract mergedWith(payload: PayloadInterface): PayloadInterface
+  abstract copy(override?: Partial<TransferPayload>, source?: PayloadSource): PayloadInterface
 }

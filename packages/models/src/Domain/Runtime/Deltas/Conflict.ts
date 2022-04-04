@@ -3,7 +3,6 @@ import { ImmutablePayloadCollection } from '../Collection/Payload/ImmutablePaylo
 import { CreateDecryptedItemFromPayload } from '../../Abstract/Item/Utilities/Generator'
 import { HistoryMap, historyMapFunctions } from '../History/HistoryMap'
 import { ConflictStrategy } from '../../Abstract/Item/Types/ConflictStrategy'
-import { CopyPayload } from '../../Abstract/Payload/Utilities/Functions'
 import { PayloadsByDuplicating } from '../../Abstract/Payload/Utilities/PayloadsByDuplicating'
 import { PayloadContentsEqual } from '../../Abstract/Payload/Utilities/PayloadContentsEqual'
 import { PayloadSource } from '../../Abstract/Payload/Types/PayloadSource'
@@ -69,7 +68,7 @@ export class ConflictDelta {
         this.basePayload.updated_at_timestamp,
         this.applyPayload.updated_at_timestamp,
       )
-      const leftPayload = CopyPayload(this.basePayload, {
+      const leftPayload = this.basePayload.copy({
         updated_at: updatedAt,
         updated_at_timestamp: updatedAtTimestamp,
         dirty: true,
@@ -79,7 +78,7 @@ export class ConflictDelta {
     }
 
     if (strategy === ConflictStrategy.KeepRight) {
-      const result = CopyPayload(this.applyPayload, {
+      const result = this.applyPayload.copy({
         lastSyncBegan: this.basePayload.lastSyncBegan,
         lastSyncEnd: new Date(),
       })
@@ -97,7 +96,7 @@ export class ConflictDelta {
         this.applyPayload.updated_at_timestamp,
       )
 
-      const leftPayload = CopyPayload(this.basePayload, {
+      const leftPayload = this.basePayload.copy({
         updated_at: updatedAt,
         updated_at_timestamp: updatedAtTimestamp,
         dirty: true,
@@ -114,7 +113,7 @@ export class ConflictDelta {
 
     if (strategy === ConflictStrategy.DuplicateLeftKeepRight) {
       const leftPayloads = await PayloadsByDuplicating(this.basePayload, this.baseCollection, true)
-      const rightPayload = CopyPayload(this.applyPayload, {
+      const rightPayload = this.applyPayload.copy({
         lastSyncBegan: this.basePayload.lastSyncBegan,
         lastSyncEnd: new Date(),
       })
@@ -139,7 +138,7 @@ export class ConflictDelta {
         this.basePayload.updated_at_timestamp,
         this.applyPayload.updated_at_timestamp,
       )
-      const payload = CopyPayload(this.basePayload, {
+      const payload = this.basePayload.copy({
         updated_at: updatedAt,
         updated_at_timestamp: updatedAtTimestamp,
         dirty: true,
