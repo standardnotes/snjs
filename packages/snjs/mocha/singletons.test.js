@@ -246,7 +246,7 @@ describe('singletons', function () {
     const item = this.application.itemManager.items.find(
       (item) => item.content_type === ContentType.UserPrefs,
     )
-    /** @TODO: errorDecrypting no longer exists on mutator */
+    throw Error('@TESTTODO: errorDecrypting no longer exists on mutator')
     // await this.application.itemManager.changeItem(item.uuid, (mutator) => {
     //   mutator.errorDecrypting = true
     // })

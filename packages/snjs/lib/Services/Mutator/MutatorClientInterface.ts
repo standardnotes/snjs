@@ -7,8 +7,6 @@ import { ClientDisplayableError } from '@standardnotes/responses'
 import { BackupFile } from '@standardnotes/encryption'
 
 export interface MutatorClientInterface {
-  savePayload(payload: Models.PurePayload): Promise<void>
-
   /**
    * Inserts the input item by its payload properties, and marks the item as dirty.
    * A sync is not performed after an item is inserted. This must be handled by the caller.
@@ -16,16 +14,10 @@ export interface MutatorClientInterface {
   insertItem(item: Models.DecryptedItemInterface): Promise<Models.DecryptedItemInterface>
 
   /**
-   * Saves the item by uuid by finding it, setting it as dirty if its not already,
-   * and performing a sync request.
-   */
-  saveItem(uuid: UuidString): Promise<void>
-
-  /**
    * Mutates a pre-existing item, marks it as dirty, and syncs it
    */
   changeAndSaveItem<M extends Models.DecryptedItemMutator = Models.DecryptedItemMutator>(
-    uuid: UuidString,
+    itemToLookupUuidFor: Models.DecryptedItemInterface,
     mutate: (mutator: M) => void,
     updateTimestamps?: boolean,
     payloadSource?: Models.PayloadSource,
@@ -36,7 +28,7 @@ export interface MutatorClientInterface {
    * Mutates pre-existing items, marks them as dirty, and syncs
    */
   changeAndSaveItems<M extends Models.DecryptedItemMutator = Models.DecryptedItemMutator>(
-    uuids: UuidString[],
+    itemsToLookupUuidsFor: Models.DecryptedItemInterface[],
     mutate: (mutator: M) => void,
     updateTimestamps?: boolean,
     payloadSource?: Models.PayloadSource,
@@ -47,7 +39,7 @@ export interface MutatorClientInterface {
    * Mutates a pre-existing item and marks it as dirty. Does not sync changes.
    */
   changeItem<M extends Models.DecryptedItemMutator>(
-    uuid: UuidString,
+    itemToLookupUuidFor: Models.DecryptedItemInterface,
     mutate: (mutator: M) => void,
     updateTimestamps?: boolean,
   ): Promise<Models.DecryptedItemInterface | undefined>
@@ -56,7 +48,7 @@ export interface MutatorClientInterface {
    * Mutates a pre-existing items and marks them as dirty. Does not sync changes.
    */
   changeItems<M extends Models.DecryptedItemMutator = Models.DecryptedItemMutator>(
-    uuids: UuidString[],
+    itemsToLookupUuidsFor: Models.DecryptedItemInterface[],
     mutate: (mutator: M) => void,
     updateTimestamps?: boolean,
   ): Promise<(Models.DecryptedItemInterface | undefined)[]>

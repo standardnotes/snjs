@@ -4,9 +4,11 @@ import {
   EncryptedItemInterface,
 } from '../../Abstract/Item'
 
+export type DecryptedOrDeletedItem = DecryptedItemInterface | DeletedItemInterface
+
 export interface ItemDelta {
-  changed: DecryptedItemInterface[]
-  inserted: DecryptedItemInterface[]
+  changed: DecryptedOrDeletedItem[]
+  inserted: DecryptedOrDeletedItem[]
   discarded: DeletedItemInterface[]
   ignored: EncryptedItemInterface[]
 }

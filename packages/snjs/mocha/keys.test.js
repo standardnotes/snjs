@@ -129,7 +129,13 @@ describe('keys', function () {
     const itemsKeys = this.application.itemManager.itemsKeys()
     expect(itemsKeys.length).to.equal(1)
     const notePayload = Factory.createNotePayload()
-    await this.application.mutator.savePayload(notePayload)
+
+    const dirtied = CopyPayload(notePayload, {
+      dirty: true,
+      dirtiedDate: new Date(),
+    })
+    await this.application.payloadManager.emitPayload(dirtied, PayloadSource.LocalChanged)
+    await this.application.sync.sync()
 
     const rawPayloads = await this.application.storageService.getAllRawPayloads()
     const rawNotePayload = rawPayloads.find((r) => r.content_type === ContentType.Note)

@@ -35,7 +35,7 @@ describe('history manager', () => {
 
     function setTextAndSync(application, item, text) {
       return application.mutator.changeAndSaveItem(
-        item.uuid,
+        item,
         (mutator) => {
           mutator.text = text
         },
@@ -54,12 +54,12 @@ describe('history manager', () => {
       expect(this.historyManager.sessionHistoryForItem(item).length).to.equal(0)
 
       /** Sync with same contents, should not create new entry */
-      await this.application.mutator.saveItem(item.uuid)
+      await Factory.markDirtyAndSyncItem(this.application, item)
       expect(this.historyManager.sessionHistoryForItem(item).length).to.equal(0)
 
       /** Sync with different contents, should create new entry */
       await this.application.mutator.changeAndSaveItem(
-        item.uuid,
+        item,
         (mutator) => {
           mutator.title = Math.random()
         },
@@ -72,9 +72,9 @@ describe('history manager', () => {
       this.historyManager.clearHistoryForItem(item)
       expect(this.historyManager.sessionHistoryForItem(item).length).to.equal(0)
 
-      await this.application.mutator.saveItem(item.uuid)
+      await Factory.markDirtyAndSyncItem(this.application, item)
       await this.application.mutator.changeAndSaveItem(
-        item.uuid,
+        item,
         (mutator) => {
           mutator.title = Math.random()
         },
@@ -96,7 +96,7 @@ describe('history manager', () => {
       await context.launch()
       expect(context.application.historyManager.sessionHistoryForItem(item).length).to.equal(0)
       await context.application.mutator.changeAndSaveItem(
-        item.uuid,
+        item,
         (mutator) => {
           mutator.title = Math.random()
         },
@@ -120,7 +120,7 @@ describe('history manager', () => {
       expect(context.application.historyManager.sessionHistoryForItem(item).length).to.equal(0)
 
       await context.application.mutator.changeAndSaveItem(
-        item.uuid,
+        item,
         (mutator) => {
           mutator.title = Math.random()
         },
@@ -200,7 +200,7 @@ describe('history manager', () => {
         payload,
         PayloadSource.LocalChanged,
       )
-      await this.application.itemManager.setItemDirty(item.uuid)
+      await this.application.itemManager.setItemDirty(item)
       await this.application.syncService.sync(syncOptions)
       /** It should keep the first and last by default */
       item = await setTextAndSync(this.application, item, item.content.text)
@@ -242,7 +242,7 @@ describe('history manager', () => {
         PayloadSource.LocalChanged,
       )
 
-      await this.application.itemManager.setItemDirty(item.uuid)
+      await this.application.itemManager.setItemDirty(item)
       await this.application.syncService.sync(syncOptions)
 
       item = await setTextAndSync(
@@ -292,7 +292,7 @@ describe('history manager', () => {
       await this.application.itemManager.emitItemFromPayload(payload, PayloadSource.LocalChanged)
       const item = this.application.items.findItem(payload.uuid)
       await this.application.mutator.changeAndSaveItem(
-        item.uuid,
+        item,
         (mutator) => {
           mutator.title = Math.random()
         },
@@ -343,13 +343,13 @@ describe('history manager', () => {
       expect(itemHistory.length).to.equal(1)
 
       /** Sync within 5 minutes, should not create a new entry */
-      await this.application.mutator.saveItem(item.uuid)
+      await Factory.markDirtyAndSyncItem(this.application, item)
       itemHistory = await this.historyManager.remoteHistoryForItem(item)
       expect(itemHistory.length).to.equal(1)
 
       /** Sync with different contents, should not create a new entry */
       await this.application.mutator.changeAndSaveItem(
-        item.uuid,
+        item,
         (mutator) => {
           mutator.title = Math.random()
         },
@@ -368,7 +368,7 @@ describe('history manager', () => {
       /** Sync with different contents, should create new entry */
       const newTitleAfterFirstChange = `The title should be: ${Math.random()}`
       await this.application.mutator.changeAndSaveItem(
-        item.uuid,
+        item,
         (mutator) => {
           mutator.title = newTitleAfterFirstChange
         },
@@ -394,9 +394,9 @@ describe('history manager', () => {
 
     it('duplicate revisions should not have the originals uuid', async function () {
       const note = await Factory.createSyncedNote(this.application)
-      await this.application.mutator.saveItem(note.uuid)
-      const dupe = await this.application.itemManager.duplicateItem(note.uuid, true)
-      await this.application.mutator.saveItem(dupe.uuid)
+      await Factory.markDirtyAndSyncItem(this.application, note)
+      const dupe = await this.application.itemManager.duplicateItem(note, true)
+      await Factory.markDirtyAndSyncItem(this.application, dupe)
 
       const dupeHistory = await this.historyManager.remoteHistoryForItem(dupe)
       const dupeRevision = await this.historyManager.fetchRemoteRevision(dupe.uuid, dupeHistory[0])
@@ -412,16 +412,16 @@ describe('history manager', () => {
 
       /** Make a few changes to note */
       await Factory.sleep(Factory.ServerRevisionFrequency)
-      await this.application.mutator.saveItem(note.uuid)
+      await Factory.markDirtyAndSyncItem(this.application, note)
 
       await Factory.sleep(Factory.ServerRevisionFrequency)
-      await this.application.mutator.saveItem(note.uuid)
+      await Factory.markDirtyAndSyncItem(this.application, note)
 
       await Factory.sleep(Factory.ServerRevisionFrequency)
-      await this.application.mutator.saveItem(note.uuid)
+      await Factory.markDirtyAndSyncItem(this.application, note)
 
-      const dupe = await this.application.itemManager.duplicateItem(note.uuid, true)
-      await this.application.mutator.saveItem(dupe.uuid)
+      const dupe = await this.application.itemManager.duplicateItem(note, true)
+      await Factory.markDirtyAndSyncItem(this.application, dupe)
 
       const expectedRevisions = 3
       const noteHistory = await this.historyManager.remoteHistoryForItem(note)
@@ -439,18 +439,18 @@ describe('history manager', () => {
       await Factory.sleep(Factory.ServerRevisionFrequency)
       const changedText = `${Math.random()}`
       /** Make a few changes to note */
-      await this.application.mutator.changeAndSaveItem(note.uuid, (mutator) => {
+      await this.application.mutator.changeAndSaveItem(note, (mutator) => {
         mutator.title = changedText
       })
-      await this.application.mutator.saveItem(note.uuid)
+      await Factory.markDirtyAndSyncItem(this.application, note)
 
-      const dupe = await this.application.itemManager.duplicateItem(note.uuid, true)
-      await this.application.mutator.saveItem(dupe.uuid)
+      const dupe = await this.application.itemManager.duplicateItem(note, true)
+      await Factory.markDirtyAndSyncItem(this.application, dupe)
       const itemHistory = await this.historyManager.remoteHistoryForItem(dupe)
       expect(itemHistory.length).to.be.above(1)
       const oldestRevision = lastElement(itemHistory)
 
-      const fetched = await this.historyManager.fetchRemoteRevision(dupe.uuid, oldestRevision)
+      const fetched = await this.historyManager.fetchRemoteRevision(dupe, oldestRevision)
       expect(fetched.payload.errorDecrypting).to.not.be.ok
       expect(fetched.payload.content.title).to.equal(changedText)
     })

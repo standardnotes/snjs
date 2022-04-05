@@ -232,7 +232,7 @@ describe('online syncing', function () {
     expect(this.application.itemManager.itemsKeys().length).to.equal(1)
     const note = await Factory.createMappedNote(this.application)
     this.expectedItemCount++
-    await this.application.itemManager.setItemDirty(note.uuid)
+    await this.application.itemManager.setItemDirty(note)
     await this.application.syncService.sync(syncOptions)
     const rawPayloads = await this.application.storageService.getAllRawPayloads()
     const notePayload = noteObjectsFromObjects(rawPayloads)
@@ -271,7 +271,7 @@ describe('online syncing', function () {
     const note = await Factory.createMappedNote(this.application)
     this.expectedItemCount++
     const originalTitle = note.content.title
-    await this.application.itemManager.setItemDirty(note.uuid)
+    await this.application.itemManager.setItemDirty(note)
     await this.application.syncService.sync(syncOptions)
 
     const encrypted = await this.application.protocolService.encryptSplitSingle(
@@ -308,7 +308,7 @@ describe('online syncing', function () {
 
   it('signing into account with pre-existing items', async function () {
     const note = await Factory.createMappedNote(this.application)
-    await this.application.mutator.saveItem(note.uuid)
+    await Factory.markDirtyAndSyncItem(this.application, note.uuid)
     this.expectedItemCount += 1
 
     this.application = await Factory.signOutApplicationAndReturnNew(this.application)
@@ -320,13 +320,13 @@ describe('online syncing', function () {
   it('removes item from storage upon deletion', async function () {
     let note = await Factory.createMappedNote(this.application)
     this.expectedItemCount++
-    await this.application.itemManager.setItemDirty(note.uuid)
+    await this.application.itemManager.setItemDirty(note)
     await this.application.syncService.sync(syncOptions)
     note = this.application.items.findItem(note.uuid)
     expect(note.dirty).to.equal(false)
     expect(this.application.itemManager.items.length).to.equal(this.expectedItemCount)
 
-    await this.application.itemManager.setItemToBeDeleted(note.uuid)
+    await this.application.itemManager.setItemToBeDeleted(note)
     note = this.application.items.findItem(note.uuid)
     expect(note.dirty).to.equal(true)
     this.expectedItemCount--
@@ -344,15 +344,15 @@ describe('online syncing', function () {
 
   it('retrieving item with no content should correctly map local state', async function () {
     const note = await Factory.createMappedNote(this.application)
-    await this.application.itemManager.setItemDirty(note.uuid)
+    await this.application.itemManager.setItemDirty(note)
     await this.application.syncService.sync(syncOptions)
     const syncToken = await this.application.syncService.getLastSyncToken()
     this.expectedItemCount++
     expect(this.application.itemManager.items.length).to.equal(this.expectedItemCount)
 
     // client A
-    await this.application.itemManager.setItemToBeDeleted(note.uuid)
-    await this.application.itemManager.setItemDirty(note.uuid)
+    await this.application.itemManager.setItemToBeDeleted(note)
+    await this.application.itemManager.setItemDirty(note)
     await this.application.syncService.sync(syncOptions)
 
     // Subtract 1
@@ -376,7 +376,7 @@ describe('online syncing', function () {
     const sync = this.application.sync.sync()
     /** Sleep so sync call can begin preparations but not fully begin */
     await Factory.sleep(0.1)
-    await this.application.itemManager.setItemToBeDeleted(note.uuid)
+    await this.application.itemManager.setItemToBeDeleted(note)
     this.expectedItemCount--
     await sync
     this.application.syncService.ut_endLatencySimulator()
@@ -389,8 +389,8 @@ describe('online syncing', function () {
 
   it('items that are never synced and deleted should not be uploaded to server', async function () {
     const note = await Factory.createMappedNote(this.application)
-    await this.application.itemManager.setItemDirty(note.uuid)
-    await this.application.itemManager.setItemToBeDeleted(note.uuid)
+    await this.application.itemManager.setItemDirty(note)
+    await this.application.itemManager.setItemToBeDeleted(note)
 
     let success = true
     let didCompleteRelevantSync = false
@@ -419,14 +419,14 @@ describe('online syncing', function () {
   it('items that are deleted after download first sync complete should not be uploaded to server', async function () {
     /** The singleton manager may delete items are download first. We dont want those uploaded to server. */
     const note = await Factory.createMappedNote(this.application)
-    await this.application.itemManager.setItemDirty(note.uuid)
+    await this.application.itemManager.setItemDirty(note)
 
     let success = true
     let didCompleteRelevantSync = false
     let beginCheckingResponse = false
     this.application.syncService.addEventObserver(async (eventName, data) => {
       if (eventName === SyncEvent.DownloadFirstSyncCompleted) {
-        await this.application.itemManager.setItemToBeDeleted(note.uuid)
+        await this.application.itemManager.setItemToBeDeleted(note)
         beginCheckingResponse = true
       }
       if (!beginCheckingResponse) {
@@ -482,7 +482,7 @@ describe('online syncing', function () {
     const largeItemCount = 160
     for (let i = 0; i < largeItemCount; i++) {
       const note = await Factory.createMappedNote(this.application)
-      await this.application.itemManager.setItemDirty(note.uuid)
+      await this.application.itemManager.setItemDirty(note)
     }
 
     this.expectedItemCount += largeItemCount
@@ -496,7 +496,7 @@ describe('online syncing', function () {
     const largeItemCount = SyncUpDownLimit + 10
     for (let i = 0; i < largeItemCount; i++) {
       const note = await Factory.createMappedNote(this.application)
-      await this.application.itemManager.setItemDirty(note.uuid)
+      await this.application.itemManager.setItemDirty(note)
     }
     /** Upload */
     this.application.syncService.sync({ awaitAll: true, checkIntegrity: false })
@@ -521,7 +521,7 @@ describe('online syncing', function () {
 
   it('syncing an item should storage it encrypted', async function () {
     const note = await Factory.createMappedNote(this.application)
-    await this.application.itemManager.setItemDirty(note.uuid)
+    await this.application.itemManager.setItemDirty(note)
     await this.application.syncService.sync(syncOptions)
     this.expectedItemCount++
     const rawPayloads = await this.application.syncService.getDatabasePayloads()
@@ -531,7 +531,7 @@ describe('online syncing', function () {
 
   it('syncing an item before data load should storage it encrypted', async function () {
     const note = await Factory.createMappedNote(this.application)
-    await this.application.itemManager.setItemDirty(note.uuid)
+    await this.application.itemManager.setItemDirty(note)
     this.expectedItemCount++
 
     /** Simulate database not loaded */
@@ -572,7 +572,7 @@ describe('online syncing', function () {
     expect(this.application.itemManager.getDirtyItems().length).to.equal(0)
 
     let note = await Factory.createMappedNote(this.application)
-    note = await this.application.itemManager.changeItem(note.uuid, (mutator) => {
+    note = await this.application.itemManager.changeItem(note, (mutator) => {
       mutator.text = `${Math.random()}`
     })
     /** This sync request should exit prematurely as we called ut_setDatabaseNotLoaded */
@@ -646,13 +646,13 @@ describe('online syncing', function () {
 
   it('valid sync date tracking', async function () {
     let note = await Factory.createMappedNote(this.application)
-    note = await this.application.itemManager.setItemDirty(note.uuid)
+    note = await this.application.itemManager.setItemDirty(note)
     this.expectedItemCount++
 
     expect(note.dirty).to.equal(true)
     expect(note.dirtiedDate).to.be.at.most(new Date())
 
-    note = await this.application.itemManager.changeItem(note.uuid, (mutator) => {
+    note = await this.application.itemManager.changeItem(note, (mutator) => {
       mutator.text = `${Math.random()}`
     })
     const sync = this.application.sync.sync(syncOptions)
@@ -692,7 +692,7 @@ describe('online syncing', function () {
      * It will do based on comparing whether item.dirtiedDate > item.lastSyncBegan
      */
     let note = await Factory.createMappedNote(this.application)
-    await this.application.itemManager.setItemDirty(note.uuid)
+    await this.application.itemManager.setItemDirty(note)
     this.expectedItemCount++
 
     // client A. Don't await, we want to do other stuff.
@@ -703,12 +703,12 @@ describe('online syncing', function () {
 
     // While that sync is going on, we want to modify this item many times.
     const text = `${Math.random()}`
-    note = await this.application.itemManager.changeItem(note.uuid, (mutator) => {
+    note = await this.application.itemManager.changeItem(note, (mutator) => {
       mutator.text = text
     })
-    await this.application.itemManager.setItemDirty(note.uuid)
-    await this.application.itemManager.setItemDirty(note.uuid)
-    await this.application.itemManager.setItemDirty(note.uuid)
+    await this.application.itemManager.setItemDirty(note)
+    await this.application.itemManager.setItemDirty(note)
+    await this.application.itemManager.setItemDirty(note)
     expect(note.dirtiedDate).to.be.above(note.lastSyncBegan)
 
     // Now do a regular sync with no latency.
@@ -758,7 +758,7 @@ describe('online syncing', function () {
     const newText = `${Math.random()}`
     setTimeout(
       async function () {
-        await this.application.itemManager.changeItem(note.uuid, (mutator) => {
+        await this.application.itemManager.changeItem(note, (mutator) => {
           mutator.text = newText
         })
       }.bind(this),
@@ -800,7 +800,7 @@ describe('online syncing', function () {
     this.application.syncService.addEventObserver(async (eventName) => {
       if (eventName === SyncEvent.SyncWillBegin && !didPerformMutatation) {
         didPerformMutatation = true
-        await this.application.itemManager.changeItem(note.uuid, (mutator) => {
+        await this.application.itemManager.changeItem(note, (mutator) => {
           mutator.text = newText
         })
       }

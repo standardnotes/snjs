@@ -436,7 +436,7 @@ export class SNComponentManager extends AbstractService<ComponentManagerEvent, E
             }
           }
 
-          await this.itemManager.changeItem(component.uuid, (m) => {
+          await this.itemManager.changeItem(component, (m) => {
             const mutator = m as ComponentMutator
             mutator.permissions = componentPermissions
           })

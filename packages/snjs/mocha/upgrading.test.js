@@ -172,7 +172,7 @@ describe('upgrading', () => {
   it('protocol version should be upgraded on password change', async function () {
     /** Delete default items key that is created on launch */
     const itemsKey = await this.application.protocolService.getSureDefaultItemsKey()
-    await this.application.itemManager.setItemToBeDeleted(itemsKey.uuid)
+    await this.application.itemManager.setItemToBeDeleted(itemsKey)
     expect(this.application.itemManager.itemsKeys().length).to.equal(0)
 
     Factory.createMappedNote(this.application)
@@ -214,7 +214,7 @@ describe('upgrading', () => {
     /** After change, note should now be encrypted with latest protocol version */
 
     const note = this.application.itemManager.notes[0]
-    await this.application.mutator.saveItem(note.uuid)
+    await Factory.markDirtyAndSyncItem(this.application, note.uuid)
 
     const refreshedNotePayloads = await Factory.getStoragePayloadsOfType(
       this.application,

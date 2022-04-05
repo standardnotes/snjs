@@ -31,6 +31,8 @@ import {
   isEncryptedPayload,
 } from '../../Payload'
 import { DeletedItem } from '../Implementations/DeletedItem'
+import { EncryptedItemInterface } from '../Interfaces/EncryptedItem'
+import { DeletedItemInterface } from '../Interfaces/DeletedItem'
 
 type ItemClass<C extends ItemContent = ItemContent> = new (
   payload: DecryptedPayloadInterface<C>,
@@ -100,7 +102,7 @@ export function CreateItemFromPayload<
   T extends DecryptedItemInterface<C> = DecryptedItemInterface<C>,
 >(
   payload: DecryptedPayloadInterface<C> | EncryptedPayloadInterface | DeletedPayloadInterface,
-): EncryptedItem | DeletedItem | T {
+): EncryptedItemInterface | DeletedItemInterface | T {
   if (isDecryptedPayload(payload)) {
     return CreateDecryptedItemFromPayload<C, T>(payload)
   } else if (isEncryptedPayload(payload)) {

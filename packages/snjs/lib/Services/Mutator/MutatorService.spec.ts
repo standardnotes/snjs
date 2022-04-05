@@ -1,7 +1,7 @@
 import { NoteContent, SNNote } from '@standardnotes/models'
 import { EncryptionService } from '@standardnotes/encryption'
 import { ContentType } from '@standardnotes/common'
-import { FillItemContent, CreateMaxPayloadFromAnyObject } from '@standardnotes/models'
+import { FillItemContent } from '@standardnotes/models'
 import { InternalEventBusInterface } from '@standardnotes/services'
 import {
   ChallengeService,
@@ -67,7 +67,7 @@ describe('mutator service', () => {
     it('pinning should not update timestamps', async () => {
       const note = await insertNote('hello')
       const pinnedNote = await mutatorService.changeItem(
-        note.uuid,
+        note,
         (mutator) => {
           mutator.pinned = true
         },

@@ -369,11 +369,11 @@ describe('basic auth', () => {
     /** Create conflict for a note */
     /** First modify the item without saving so that
      * our local contents digress from the server's */
-    await this.application.mutator.changeItem(note.uuid, (mutator) => {
+    await this.application.mutator.changeItem(note, (mutator) => {
       mutator.title = `${Math.random()}`
     })
     await this.application.mutator.changeAndSaveItem(
-      note.uuid,
+      note,
       (mutator) => {
         mutator.title = `${Math.random()}`
         mutator.updated_at_timestamp = Factory.dateToMicroseconds(Factory.yesterday())

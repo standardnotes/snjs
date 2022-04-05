@@ -291,7 +291,7 @@ export async function registerOldUser({ application, email, password, version })
     accountKey.keyParams,
   )
   /** Mark all existing items as dirty. */
-  await application.itemManager.changeItems(Uuids(application.itemManager.items), (m) => {
+  await application.itemManager.changeItems(application.itemManager.items, (m) => {
     m.dirty = true
   })
   await application.sessionManager.handleSuccessAuthResponse(response, accountKey)
@@ -331,8 +331,11 @@ export async function createMappedTag(application, tagParams = {}) {
 
 export async function createSyncedNote(application, title, text) {
   const payload = createNotePayload(title, text)
-  await application.itemManager.emitItemFromPayload(payload, PayloadSource.LocalChanged)
-  await application.itemManager.setItemDirty(payload.uuid)
+  const item = await application.itemManager.emitItemFromPayload(
+    payload,
+    PayloadSource.LocalChanged,
+  )
+  await application.itemManager.setItemDirty(item)
   await application.syncService.sync(syncOptions)
   const note = application.items.findItem(payload.uuid)
   return note
@@ -351,7 +354,7 @@ export async function createManyMappedNotes(application, count) {
   const createdNotes = []
   for (let i = 0; i < count; i++) {
     const note = await createMappedNote(application)
-    await application.itemManager.setItemDirty(note.uuid)
+    await application.itemManager.setItemDirty(note)
     createdNotes.push(note)
   }
   return createdNotes
@@ -614,7 +617,7 @@ export async function createTags(
 }
 
 export function pinNote(application, note) {
-  return application.mutator.changeItem(note.uuid, (mutator) => {
+  return application.mutator.changeItem(note, (mutator) => {
     mutator.pinned = true
   })
 }
@@ -655,4 +658,15 @@ export async function alternateUuidForItem(application, uuid) {
   await application.payloadManager.emitPayloads(results, PayloadSource.LocalChanged)
   await application.syncService.persistPayloads(results)
   return application.itemManager.findItem(results[0].uuid)
+}
+
+export async function markDirtyAndSyncItem(application, itemToLookupUuidFor) {
+  const item = application.itemManager.findItem(itemToLookupUuidFor.uuid)
+  if (!item) {
+    throw Error('Attempting to save non-inserted item')
+  }
+  if (!item.dirty) {
+    await application.itemManager.changeItem(item, undefined, MutationType.NoUpdateUserTimestamps)
+  }
+  await application.sync.syncService.sync()
 }

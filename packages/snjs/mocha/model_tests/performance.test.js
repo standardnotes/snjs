@@ -66,7 +66,7 @@ describe('mapping performance', () => {
     expect(seconds).to.be.at.most(expectedRunTime)
 
     for (const note of application.itemManager.getItems(ContentType.Note)) {
-      expect(application.itemManager.itemsReferencingItem(note.uuid).length).to.be.above(0)
+      expect(application.itemManager.itemsReferencingItem(note).length).to.be.above(0)
     }
     await Factory.safeDeinit(application)
   }).timeout(20000)
@@ -133,7 +133,7 @@ describe('mapping performance', () => {
 
     application.itemManager.getItems(ContentType.Tag)[0]
     for (const note of application.itemManager.getItems(ContentType.Note)) {
-      expect(application.itemManager.itemsReferencingItem(note.uuid).length).to.equal(1)
+      expect(application.itemManager.itemsReferencingItem(note).length).to.equal(1)
     }
     await Factory.safeDeinit(application)
   }).timeout(20000)

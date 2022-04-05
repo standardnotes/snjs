@@ -67,7 +67,7 @@ describe('model manager mapping', () => {
     this.expectedItemCount++
 
     let item = this.application.itemManager.items[0]
-    item = await this.application.itemManager.changeItem(item.uuid, (mutator) => {
+    item = await this.application.itemManager.changeItem(item, (mutator) => {
       mutator.setDeleted()
     })
     const payload2 = CreateMaxPayloadFromAnyObject(item)
@@ -96,7 +96,7 @@ describe('model manager mapping', () => {
     const payload = Factory.createNotePayload()
     await this.application.itemManager.emitItemsFromPayloads([payload], PayloadSource.LocalChanged)
     const note = this.application.itemManager.notes[0]
-    await this.application.itemManager.setItemDirty(note.uuid)
+    await this.application.itemManager.setItemDirty(note)
     const dirtyItems = this.application.itemManager.getDirtyItems()
     expect(dirtyItems.length).to.equal(1)
   })

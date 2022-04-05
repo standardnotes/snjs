@@ -132,7 +132,7 @@ describe('itemManager', () => {
       await itemManager.insertItems([tag])
 
       expect(() => itemManager.setTagParent(tag, tag)).toThrow()
-      expect(itemManager.getTagParent(tag.uuid)).toBeUndefined()
+      expect(itemManager.getTagParent(tag)).toBeUndefined()
     })
 
     it('forbids a tag to be its own ancestor', async () => {
@@ -146,7 +146,7 @@ describe('itemManager', () => {
       await itemManager.setTagParent(grandParent, parent)
 
       expect(() => itemManager.setTagParent(child, grandParent)).toThrow()
-      expect(itemManager.getTagParent(grandParent.uuid)).toBeUndefined()
+      expect(itemManager.getTagParent(grandParent)).toBeUndefined()
     })
 
     it('getTagParent', async () => {
@@ -156,7 +156,7 @@ describe('itemManager', () => {
       await itemManager.insertItems([parent, child])
       await itemManager.setTagParent(parent, child)
 
-      expect(itemManager.getTagParent(child.uuid)?.uuid).toBe(parent.uuid)
+      expect(itemManager.getTagParent(child)?.uuid).toBe(parent.uuid)
     })
 
     it('findTagByTitleAndParent', async () => {
@@ -170,8 +170,8 @@ describe('itemManager', () => {
       await itemManager.setTagParent(parent, duplicateNameChild)
 
       const a = itemManager.findTagByTitleAndParent('name1', undefined)
-      const b = itemManager.findTagByTitleAndParent('name1', parent?.uuid)
-      const c = itemManager.findTagByTitleAndParent('name1', child?.uuid)
+      const b = itemManager.findTagByTitleAndParent('name1', parent)
+      const c = itemManager.findTagByTitleAndParent('name1', child)
 
       expect(a?.uuid).toEqual(parent.uuid)
       expect(b?.uuid).toEqual(duplicateNameChild.uuid)
@@ -187,18 +187,18 @@ describe('itemManager', () => {
       await itemManager.setTagParent(parent, child)
 
       const childA = await itemManager.findOrCreateTagByTitle('child')
-      const childB = await itemManager.findOrCreateTagByTitle('child', parent.uuid)
-      const childC = await itemManager.findOrCreateTagByTitle('child-bis', parent.uuid)
-      const childD = await itemManager.findOrCreateTagByTitle('child-bis', parent.uuid)
+      const childB = await itemManager.findOrCreateTagByTitle('child', parent)
+      const childC = await itemManager.findOrCreateTagByTitle('child-bis', parent)
+      const childD = await itemManager.findOrCreateTagByTitle('child-bis', parent)
 
       expect(childA.uuid).not.toEqual(child.uuid)
       expect(childB.uuid).toEqual(child.uuid)
       expect(childD.uuid).toEqual(childC.uuid)
 
-      expect(itemManager.getTagParent(childA.uuid)?.uuid).toBe(undefined)
-      expect(itemManager.getTagParent(childB.uuid)?.uuid).toBe(parent.uuid)
-      expect(itemManager.getTagParent(childC.uuid)?.uuid).toBe(parent.uuid)
-      expect(itemManager.getTagParent(childD.uuid)?.uuid).toBe(parent.uuid)
+      expect(itemManager.getTagParent(childA)?.uuid).toBe(undefined)
+      expect(itemManager.getTagParent(childB)?.uuid).toBe(parent.uuid)
+      expect(itemManager.getTagParent(childC)?.uuid).toBe(parent.uuid)
+      expect(itemManager.getTagParent(childD)?.uuid).toBe(parent.uuid)
     })
 
     it('findOrCreateTagParentChain', async () => {
@@ -237,17 +237,17 @@ describe('itemManager', () => {
       await itemManager.setTagParent(parent, child)
       await itemManager.setTagParent(grandParent, parent)
 
-      expect(itemManager.isTagAncestor(grandParent.uuid, parent.uuid)).toEqual(true)
-      expect(itemManager.isTagAncestor(grandParent.uuid, child.uuid)).toEqual(true)
-      expect(itemManager.isTagAncestor(parent.uuid, child.uuid)).toEqual(true)
+      expect(itemManager.isTagAncestor(grandParent, parent)).toEqual(true)
+      expect(itemManager.isTagAncestor(grandParent, child)).toEqual(true)
+      expect(itemManager.isTagAncestor(parent, child)).toEqual(true)
 
-      expect(itemManager.isTagAncestor(parent.uuid, grandParent.uuid)).toBeFalsy()
-      expect(itemManager.isTagAncestor(child.uuid, grandParent.uuid)).toBeFalsy()
-      expect(itemManager.isTagAncestor(grandParent.uuid, grandParent.uuid)).toBeFalsy()
+      expect(itemManager.isTagAncestor(parent, grandParent)).toBeFalsy()
+      expect(itemManager.isTagAncestor(child, grandParent)).toBeFalsy()
+      expect(itemManager.isTagAncestor(grandParent, grandParent)).toBeFalsy()
 
-      expect(itemManager.isTagAncestor(another.uuid, grandParent.uuid)).toBeFalsy()
-      expect(itemManager.isTagAncestor(child.uuid, another.uuid)).toBeFalsy()
-      expect(itemManager.isTagAncestor(grandParent.uuid, another.uuid)).toBeFalsy()
+      expect(itemManager.isTagAncestor(another, grandParent)).toBeFalsy()
+      expect(itemManager.isTagAncestor(child, another)).toBeFalsy()
+      expect(itemManager.isTagAncestor(grandParent, another)).toBeFalsy()
     })
 
     it('unsetTagRelationship', async () => {
@@ -256,11 +256,11 @@ describe('itemManager', () => {
       const child = createTag('child')
       await itemManager.insertItems([parent, child])
       await itemManager.setTagParent(parent, child)
-      expect(itemManager.getTagParent(child.uuid)?.uuid).toBe(parent.uuid)
+      expect(itemManager.getTagParent(child)?.uuid).toBe(parent.uuid)
 
       await itemManager.unsetTagParent(child)
 
-      expect(itemManager.getTagParent(child.uuid)).toBeUndefined()
+      expect(itemManager.getTagParent(child)).toBeUndefined()
     })
 
     it('getTagParentChain', async () => {
@@ -274,7 +274,7 @@ describe('itemManager', () => {
       await itemManager.setTagParent(grandParent, parent)
       await itemManager.setTagParent(greatGrandParent, grandParent)
 
-      const uuidChain = itemManager.getTagParentChain(child.uuid).map((tag) => tag.uuid)
+      const uuidChain = itemManager.getTagParentChain(child).map((tag) => tag.uuid)
 
       expect(uuidChain).toHaveLength(3)
       expect(uuidChain).toEqual([greatGrandParent.uuid, grandParent.uuid, parent.uuid])
@@ -474,14 +474,14 @@ describe('itemManager', () => {
       expect(itemManager.countableNotesForTag(tag1)).toBe(2)
       expect(itemManager.allCountableNotesCount()).toBe(2)
 
-      await itemManager.changeItem<Models.NoteMutator>(note1.uuid, (m) => {
+      await itemManager.changeItem<Models.NoteMutator>(note1, (m) => {
         m.archived = true
       })
 
       expect(itemManager.allCountableNotesCount()).toBe(1)
       expect(itemManager.countableNotesForTag(tag1)).toBe(1)
 
-      await itemManager.changeItem<Models.NoteMutator>(note1.uuid, (m) => {
+      await itemManager.changeItem<Models.NoteMutator>(note1, (m) => {
         m.archived = false
       })
 
@@ -570,7 +570,7 @@ describe('itemManager', () => {
 
     const tag = await itemManager.createSmartView('Not Pinned', NotPinnedPredicate)
 
-    await itemManager.changeItem<Models.TagMutator>(tag.uuid, (m) => {
+    await itemManager.changeItem<Models.TagMutator>(tag, (m) => {
       m.title = 'New Title'
     })
 

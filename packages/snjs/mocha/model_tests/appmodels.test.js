@@ -76,8 +76,8 @@ describe('app models', () => {
     expect(item1.content.references.length).to.equal(1)
     expect(item2.content.references.length).to.equal(0)
 
-    expect(this.application.itemManager.itemsReferencingItem(item1.uuid).length).to.equal(0)
-    expect(this.application.itemManager.itemsReferencingItem(item2.uuid).length).to.equal(1)
+    expect(this.application.itemManager.itemsReferencingItem(item1).length).to.equal(0)
+    expect(this.application.itemManager.itemsReferencingItem(item2).length).to.equal(1)
   })
 
   it('mapping an item twice shouldnt cause problems', async function () {
@@ -110,10 +110,10 @@ describe('app models', () => {
     const item1 = await Factory.createMappedNote(this.application)
     const item2 = await Factory.createMappedNote(this.application)
 
-    await this.application.itemManager.changeItem(item1.uuid, (mutator) => {
+    await this.application.itemManager.changeItem(item1, (mutator) => {
       mutator.addItemAsRelationship(item2)
     })
-    await this.application.itemManager.changeItem(item2.uuid, (mutator) => {
+    await this.application.itemManager.changeItem(item2, (mutator) => {
       mutator.addItemAsRelationship(item1)
     })
 
@@ -125,10 +125,10 @@ describe('app models', () => {
     var item1 = await Factory.createMappedNote(this.application)
     var item2 = await Factory.createMappedNote(this.application)
 
-    await this.application.itemManager.changeItem(item1.uuid, (mutator) => {
+    await this.application.itemManager.changeItem(item1, (mutator) => {
       mutator.addItemAsRelationship(item2)
     })
-    await this.application.itemManager.changeItem(item2.uuid, (mutator) => {
+    await this.application.itemManager.changeItem(item2, (mutator) => {
       mutator.addItemAsRelationship(item1)
     })
 
@@ -160,10 +160,10 @@ describe('app models', () => {
   it('creating and removing relationships between two items should have valid references', async function () {
     var item1 = await Factory.createMappedNote(this.application)
     var item2 = await Factory.createMappedNote(this.application)
-    await this.application.itemManager.changeItem(item1.uuid, (mutator) => {
+    await this.application.itemManager.changeItem(item1, (mutator) => {
       mutator.addItemAsRelationship(item2)
     })
-    await this.application.itemManager.changeItem(item2.uuid, (mutator) => {
+    await this.application.itemManager.changeItem(item2, (mutator) => {
       mutator.addItemAsRelationship(item1)
     })
 
@@ -173,13 +173,13 @@ describe('app models', () => {
     expect(refreshedItem1.content.references.length).to.equal(1)
     expect(refreshedItem2.content.references.length).to.equal(1)
 
-    expect(this.application.itemManager.itemsReferencingItem(item1.uuid)).to.include(refreshedItem2)
-    expect(this.application.itemManager.itemsReferencingItem(item2.uuid)).to.include(refreshedItem1)
+    expect(this.application.itemManager.itemsReferencingItem(item1)).to.include(refreshedItem2)
+    expect(this.application.itemManager.itemsReferencingItem(item2)).to.include(refreshedItem1)
 
-    await this.application.itemManager.changeItem(item1.uuid, (mutator) => {
+    await this.application.itemManager.changeItem(item1, (mutator) => {
       mutator.removeItemAsRelationship(item2)
     })
-    await this.application.itemManager.changeItem(item2.uuid, (mutator) => {
+    await this.application.itemManager.changeItem(item2, (mutator) => {
       mutator.removeItemAsRelationship(item1)
     })
 
@@ -189,13 +189,13 @@ describe('app models', () => {
     expect(refreshedItem1_2.content.references.length).to.equal(0)
     expect(refreshedItem2_2.content.references.length).to.equal(0)
 
-    expect(this.application.itemManager.itemsReferencingItem(item1.uuid).length).to.equal(0)
-    expect(this.application.itemManager.itemsReferencingItem(item2.uuid).length).to.equal(0)
+    expect(this.application.itemManager.itemsReferencingItem(item1).length).to.equal(0)
+    expect(this.application.itemManager.itemsReferencingItem(item2).length).to.equal(0)
   })
 
   it('properly duplicates item with no relationships', async function () {
     const item = await Factory.createMappedNote(this.application)
-    const duplicate = await this.application.itemManager.duplicateItem(item.uuid)
+    const duplicate = await this.application.itemManager.duplicateItem(item)
     expect(duplicate.uuid).to.not.equal(item.uuid)
     expect(item.isItemContentEqualWith(duplicate)).to.equal(true)
     expect(item.created_at.toISOString()).to.equal(duplicate.created_at.toISOString())
@@ -206,18 +206,18 @@ describe('app models', () => {
     const item1 = await Factory.createMappedNote(this.application)
     const item2 = await Factory.createMappedNote(this.application)
 
-    const refreshedItem1 = await this.application.itemManager.changeItem(item1.uuid, (mutator) => {
+    const refreshedItem1 = await this.application.itemManager.changeItem(item1, (mutator) => {
       mutator.addItemAsRelationship(item2)
     })
 
     expect(refreshedItem1.content.references.length).to.equal(1)
 
-    const duplicate = await this.application.itemManager.duplicateItem(item1.uuid)
+    const duplicate = await this.application.itemManager.duplicateItem(item1)
     expect(duplicate.uuid).to.not.equal(item1.uuid)
     expect(duplicate.content.references.length).to.equal(1)
 
-    expect(this.application.itemManager.itemsReferencingItem(item1.uuid).length).to.equal(0)
-    expect(this.application.itemManager.itemsReferencingItem(item2.uuid).length).to.equal(2)
+    expect(this.application.itemManager.itemsReferencingItem(item1).length).to.equal(0)
+    expect(this.application.itemManager.itemsReferencingItem(item2).length).to.equal(2)
 
     const refreshedItem1_2 = this.application.itemManager.findItem(item1.uuid)
     expect(refreshedItem1_2.isItemContentEqualWith(duplicate)).to.equal(true)
@@ -228,7 +228,7 @@ describe('app models', () => {
   it('removing references should update cross-refs', async function () {
     const item1 = await Factory.createMappedNote(this.application)
     const item2 = await Factory.createMappedNote(this.application)
-    const refreshedItem1 = await this.application.itemManager.changeItem(item1.uuid, (mutator) => {
+    const refreshedItem1 = await this.application.itemManager.changeItem(item1, (mutator) => {
       mutator.addItemAsRelationship(item2)
     })
 
@@ -243,8 +243,8 @@ describe('app models', () => {
       PayloadSource.LocalSaved,
     )
 
-    expect(this.application.itemManager.itemsReferencingItem(item2.uuid).length).to.equal(0)
-    expect(this.application.itemManager.itemsReferencingItem(item1.uuid).length).to.equal(0)
+    expect(this.application.itemManager.itemsReferencingItem(item2).length).to.equal(0)
+    expect(this.application.itemManager.itemsReferencingItem(item1).length).to.equal(0)
     expect(refreshedItem1_2.content.references.length).to.equal(0)
   })
 
@@ -252,12 +252,12 @@ describe('app models', () => {
     const item1 = await Factory.createMappedNote(this.application)
     const item2 = await Factory.createMappedNote(this.application)
 
-    const refreshedItem1 = await this.application.itemManager.changeItem(item1.uuid, (mutator) => {
+    const refreshedItem1 = await this.application.itemManager.changeItem(item1, (mutator) => {
       mutator.addItemAsRelationship(item2)
     })
 
     expect(refreshedItem1.content.references.length).to.equal(1)
-    expect(this.application.itemManager.itemsReferencingItem(item2.uuid).length).to.equal(1)
+    expect(this.application.itemManager.itemsReferencingItem(item2).length).to.equal(1)
 
     const alternatedItem = await Factory.alternateUuidForItem(this.application, item1.uuid)
     const refreshedItem1_2 = this.application.itemManager.findItem(item1.uuid)
@@ -270,7 +270,7 @@ describe('app models', () => {
       0,
     )
 
-    expect(this.application.itemManager.itemsReferencingItem(item2.uuid).length).to.equal(1)
+    expect(this.application.itemManager.itemsReferencingItem(item2).length).to.equal(1)
 
     expect(alternatedItem.hasRelationshipWithItem(item2)).to.equal(true)
     expect(alternatedItem.dirty).to.equal(true)
@@ -321,11 +321,11 @@ describe('app models', () => {
     const item2 = await Factory.createMappedNote(this.application)
     this.expectedItemCount += 2
 
-    await this.application.itemManager.changeItem(item1.uuid, (mutator) => {
+    await this.application.itemManager.changeItem(item1, (mutator) => {
       mutator.addItemAsRelationship(item2)
     })
 
-    expect(this.application.itemManager.itemsReferencingItem(item2.uuid).length).to.equal(1)
+    expect(this.application.itemManager.itemsReferencingItem(item2).length).to.equal(1)
 
     const alternatedItem1 = await Factory.alternateUuidForItem(this.application, item1.uuid)
     const alternatedItem2 = await Factory.alternateUuidForItem(this.application, item2.uuid)
@@ -340,7 +340,7 @@ describe('app models', () => {
     expect(refreshedAltItem1.content.references[0].uuid).to.equal(alternatedItem2.uuid)
     expect(alternatedItem2.content.references.length).to.equal(0)
 
-    expect(this.application.itemManager.itemsReferencingItem(alternatedItem2.uuid).length).to.equal(
+    expect(this.application.itemManager.itemsReferencingItem(alternatedItem2).length).to.equal(
       1,
     )
 
@@ -352,13 +352,13 @@ describe('app models', () => {
   it('maintains referencing relationships when duplicating', async function () {
     const tag = await Factory.createMappedTag(this.application)
     const note = await Factory.createMappedNote(this.application)
-    const refreshedTag = await this.application.itemManager.changeItem(tag.uuid, (mutator) => {
+    const refreshedTag = await this.application.itemManager.changeItem(tag, (mutator) => {
       mutator.addItemAsRelationship(note)
     })
 
     expect(refreshedTag.content.references.length).to.equal(1)
 
-    const noteCopy = await this.application.itemManager.duplicateItem(note.uuid)
+    const noteCopy = await this.application.itemManager.duplicateItem(note)
     expect(note.uuid).to.not.equal(noteCopy.uuid)
 
     expect(this.application.itemManager.notes.length).to.equal(2)
@@ -377,13 +377,13 @@ describe('app models', () => {
       { area: ComponentArea.Editor },
       true,
     )
-    await this.application.itemManager.changeComponent(editor.uuid, (mutator) => {
+    await this.application.itemManager.changeComponent(editor, (mutator) => {
       mutator.associateWithItem(note.uuid)
     })
 
     expect(this.application.componentManager.editorForNote(note).uuid).to.equal(editor.uuid)
 
-    const duplicate = await this.application.itemManager.duplicateItem(note.uuid, true)
+    const duplicate = await this.application.itemManager.duplicateItem(note, true)
     expect(this.application.componentManager.editorForNote(duplicate).uuid).to.equal(editor.uuid)
   })
 })

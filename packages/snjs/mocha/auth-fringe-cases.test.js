@@ -88,7 +88,7 @@ describe('auth fringe cases', () => {
         staleText,
       )
       const serverText = 'server text'
-      await context.application.mutator.changeAndSaveItem(firstVersionOfNote.uuid, (mutator) => {
+      await context.application.mutator.changeAndSaveItem(firstVersionOfNote, (mutator) => {
         mutator.text = serverText
       })
       const newApplication = await Factory.signOutApplicationAndReturnNew(context.application)

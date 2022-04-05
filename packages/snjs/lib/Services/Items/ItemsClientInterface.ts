@@ -62,9 +62,15 @@ export interface ItemsClientInterface {
 
   hasTagsNeedingFoldersMigration(): boolean
 
-  referencesForItem(uuid: UuidString, contentType?: ContentType): DecryptedItemInterface[]
+  referencesForItem(
+    itemToLookupUuidFor: DecryptedItemInterface,
+    contentType?: ContentType,
+  ): DecryptedItemInterface[]
 
-  itemsReferencingItem(uuid: UuidString, contentType?: ContentType): DecryptedItemInterface[]
+  itemsReferencingItem(
+    itemToLookupUuidFor: DecryptedItemInterface,
+    contentType?: ContentType,
+  ): DecryptedItemInterface[]
 
   /**
    * Finds tags with title or component starting with a search query and (optionally) not associated with a note
@@ -74,28 +80,24 @@ export interface ItemsClientInterface {
    */
   searchTags(searchQuery: string, note?: SNNote): SNTag[]
 
-  isValidTagParent(parentTagUuid: UuidString, childTagUuid: UuidString): boolean
+  isValidTagParent(parentTagToLookUpUuidFor: SNTag, childToLookUpUuidFor: SNTag): boolean
 
   /**
    * Returns the parent for a tag
-   * @param tagUuid - The tag for which parents need to be found
-   * @returns The current parent or undefined
    */
-  getTagParent(tagUuid: UuidString): SNTag | undefined
+  getTagParent(itemToLookupUuidFor: SNTag): SNTag | undefined
 
   /**
    * Returns the hierarchy of parents for a tag
-   * @param tagUuid - The tag for which parents need to be found
    * @returns Array containing all parent tags
    */
-  getTagParentChain(tagUuid: UuidString): SNTag[]
+  getTagParentChain(itemToLookupUuidFor: SNTag): SNTag[]
 
   /**
    * Returns all descendants for a tag
-   * @param tagUuid - The tag for which descendants need to be found
    * @returns Array containing all descendant tags
    */
-  getTagChildren(tagUuid: UuidString): SNTag[]
+  getTagChildren(itemToLookupUuidFor: SNTag): SNTag[]
 
   /**
    * Get tags for a note sorted in natural order

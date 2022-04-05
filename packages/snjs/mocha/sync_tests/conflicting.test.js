@@ -73,11 +73,11 @@ describe('online conflict handling', function () {
     await this.application.syncService.sync(syncOptions)
     /** First modify the item without saving so that
      * our local contents digress from the server's */
-    await this.application.mutator.changeItem(item.uuid, (mutator) => {
+    await this.application.mutator.changeItem(item, (mutator) => {
       mutator.content.foo = `${Math.random()}`
     })
     await this.application.mutator.changeAndSaveItem(
-      item.uuid,
+      item,
       (mutator) => {
         /** Conflict the item */
         mutator.content.foo = 'zar'
@@ -101,11 +101,11 @@ describe('online conflict handling', function () {
     await this.application.syncService.sync(syncOptions)
     /** First modify the item without saving so that
      * our local contents digress from the server's */
-    await this.application.mutator.changeItem(item.uuid, (mutator) => {
+    await this.application.mutator.changeItem(item, (mutator) => {
       mutator.title = `${Math.random()}`
     })
     await this.application.mutator.changeAndSaveItem(
-      item.uuid,
+      item,
       (mutator) => {
         /** Conflict the item */
         mutator.content.foo = 'zar'
@@ -137,7 +137,7 @@ describe('online conflict handling', function () {
     await this.application.syncService.sync(syncOptions)
 
     await this.application.mutator.changeAndSaveItem(
-      editor.uuid,
+      editor,
       (mutator) => {
         mutator.associateWithItem(note.uuid)
       },
@@ -151,11 +151,11 @@ describe('online conflict handling', function () {
     /** Conflict the note */
     /** First modify the item without saving so that
      * our local contents digress from the server's */
-    await this.application.mutator.changeItem(note.uuid, (mutator) => {
+    await this.application.mutator.changeItem(note, (mutator) => {
       mutator.title = `${Math.random()}`
     })
     await this.application.mutator.changeAndSaveItem(
-      note.uuid,
+      note,
       (mutator) => {
         mutator.content.title = 'zar'
         mutator.updated_at_timestamp = Factory.dateToMicroseconds(Factory.yesterday())
@@ -178,7 +178,7 @@ describe('online conflict handling', function () {
     // create an item and sync it
     const note = await Factory.createMappedNote(this.application)
     this.expectedItemCount++
-    await this.application.itemManager.setItemDirty(note.uuid)
+    await this.application.itemManager.setItemDirty(note)
     await this.application.syncService.sync(syncOptions)
 
     const rawPayloads = await this.application.storageService.getAllRawPayloads()
@@ -187,7 +187,7 @@ describe('online conflict handling', function () {
     const originalValue = note.title
     const dirtyValue = `${Math.random()}`
 
-    await this.application.itemManager.changeNote(note.uuid, (mutator) => {
+    await this.application.itemManager.changeNote(note, (mutator) => {
       // modify this item locally to have differing contents from server
       mutator.title = dirtyValue
       // Intentionally don't change updated_at. We want to simulate a chaotic case where
@@ -224,18 +224,18 @@ describe('online conflict handling', function () {
   it('should handle sync conflicts by duplicating differing data', async function () {
     // create an item and sync it
     const note = await Factory.createMappedNote(this.application)
-    await this.application.mutator.saveItem(note.uuid)
+    await Factory.markDirtyAndSyncItem(this.application, note)
     this.expectedItemCount++
 
     const rawPayloads = await this.application.storageService.getAllRawPayloads()
     expect(rawPayloads.length).to.equal(this.expectedItemCount)
     /** First modify the item without saving so that
      * our local contents digress from the server's */
-    await this.application.mutator.changeItem(note.uuid, (mutator) => {
+    await this.application.mutator.changeItem(note, (mutator) => {
       mutator.title = `${Math.random()}`
     })
     await this.application.mutator.changeAndSaveItem(
-      note.uuid,
+      note,
       (mutator) => {
         // modify this item to have stale values
         mutator.title = `${Math.random()}`
@@ -259,15 +259,15 @@ describe('online conflict handling', function () {
 
   it('basic conflict with clearing local state', async function () {
     const note = await Factory.createMappedNote(this.application)
-    await this.application.mutator.saveItem(note.uuid)
+    await Factory.markDirtyAndSyncItem(this.application, note)
     this.expectedItemCount += 1
     /** First modify the item without saving so that
      * our local contents digress from the server's */
-    await this.application.mutator.changeItem(note.uuid, (mutator) => {
+    await this.application.mutator.changeItem(note, (mutator) => {
       mutator.title = `${Math.random()}`
     })
     await this.application.mutator.changeAndSaveItem(
-      note.uuid,
+      note,
       (mutator) => {
         /** Create conflict for a note */
         mutator.title = `${Math.random()}`
@@ -294,17 +294,17 @@ describe('online conflict handling', function () {
 
   it('should duplicate item if saving a modified item and clearing our sync token', async function () {
     let note = await Factory.createMappedNote(this.application)
-    await this.application.itemManager.setItemDirty(note.uuid)
+    await this.application.itemManager.setItemDirty(note)
     await this.application.syncService.sync(syncOptions)
     this.expectedItemCount++
 
     const newTitle = `${Math.random()}`
     /** First modify the item without saving so that
      * our local contents digress from the server's */
-    await this.application.mutator.changeItem(note.uuid, (mutator) => {
+    await this.application.mutator.changeItem(note, (mutator) => {
       mutator.title = `${Math.random()}`
     })
-    await this.application.itemManager.changeItem(note.uuid, (mutator) => {
+    await this.application.itemManager.changeItem(note, (mutator) => {
       // modify this item to have stale values
       mutator.title = newTitle
       mutator.updated_at_timestamp = Factory.dateToMicroseconds(Factory.yesterday())
@@ -328,11 +328,11 @@ describe('online conflict handling', function () {
   it('should handle sync conflicts by not duplicating same data', async function () {
     const note = await Factory.createMappedNote(this.application)
     this.expectedItemCount++
-    await this.application.itemManager.setItemDirty(note.uuid)
+    await this.application.itemManager.setItemDirty(note)
     await this.application.syncService.sync(syncOptions)
 
     // keep item as is and set dirty
-    await this.application.itemManager.setItemDirty(note.uuid)
+    await this.application.itemManager.setItemDirty(note)
 
     // clear sync token so that all items are retrieved on next sync
     this.application.syncService.clearSyncPositionTokens()
@@ -344,11 +344,11 @@ describe('online conflict handling', function () {
 
   it('clearing conflict_of on two clients simultaneously should keep us in sync', async function () {
     const note = await Factory.createMappedNote(this.application)
-    await this.application.itemManager.setItemDirty(note.uuid)
+    await this.application.itemManager.setItemDirty(note)
     this.expectedItemCount++
 
     await this.application.mutator.changeAndSaveItem(
-      note.uuid,
+      note,
       (mutator) => {
         // client A
         mutator.content.conflict_of = 'foo'
@@ -361,7 +361,7 @@ describe('online conflict handling', function () {
     // client B
     await this.application.syncService.clearSyncPositionTokens()
     await this.application.itemManager.changeItem(
-      note.uuid,
+      note,
       (mutator) => {
         mutator.content.conflict_of = 'bar'
       },
@@ -378,11 +378,11 @@ describe('online conflict handling', function () {
 
   it('setting property on two clients simultaneously should create conflict', async function () {
     const note = await Factory.createMappedNote(this.application)
-    await this.application.itemManager.setItemDirty(note.uuid)
+    await this.application.itemManager.setItemDirty(note)
     this.expectedItemCount++
 
     await this.application.mutator.changeAndSaveItem(
-      note.uuid,
+      note,
       (mutator) => {
         // client A
         mutator.content.foo = 'foo'
@@ -393,13 +393,13 @@ describe('online conflict handling', function () {
     )
     /** First modify the item without saving so that
      * our local contents digress from the server's */
-    await this.application.mutator.changeItem(note.uuid, (mutator) => {
+    await this.application.mutator.changeItem(note, (mutator) => {
       mutator.title = `${Math.random()}`
     })
     // client B
     await this.application.syncService.clearSyncPositionTokens()
     await this.application.mutator.changeAndSaveItem(
-      note.uuid,
+      note,
       (mutator) => {
         mutator.content.foo = 'bar'
         mutator.updated_at_timestamp = Factory.dateToMicroseconds(Factory.yesterday())
@@ -416,12 +416,12 @@ describe('online conflict handling', function () {
     const note = await Factory.createMappedNote(this.application)
     const originalPayload = note.payloadRepresentation()
     this.expectedItemCount++
-    await this.application.itemManager.setItemDirty(note.uuid)
+    await this.application.itemManager.setItemDirty(note)
     await this.application.syncService.sync(syncOptions)
     expect(this.application.itemManager.items.length).to.equal(this.expectedItemCount)
 
     // client A
-    await this.application.itemManager.setItemToBeDeleted(note.uuid)
+    await this.application.itemManager.setItemToBeDeleted(note)
     await this.application.syncService.sync(syncOptions)
     this.expectedItemCount--
     expect(this.application.itemManager.items.length).to.equal(this.expectedItemCount)
@@ -439,7 +439,7 @@ describe('online conflict handling', function () {
     )
     const resultNote = this.application.itemManager.findItem(note.uuid)
     expect(resultNote.uuid).to.equal(note.uuid)
-    await this.application.itemManager.setItemDirty(resultNote.uuid)
+    await this.application.itemManager.setItemDirty(resultNote)
     await this.application.syncService.sync(syncOptions)
 
     // We expect that this item is now gone for good, and a duplicate has not been created.
@@ -449,7 +449,7 @@ describe('online conflict handling', function () {
 
   it('if server says not deleted but client says deleted, keep server state', async function () {
     const note = await Factory.createMappedNote(this.application)
-    await this.application.itemManager.setItemDirty(note.uuid)
+    await this.application.itemManager.setItemDirty(note)
     this.expectedItemCount++
 
     // client A
@@ -462,7 +462,7 @@ describe('online conflict handling', function () {
     // This client says this item is deleted, but the server is saying its not deleted.
     // In this case, we want to keep the server copy.
     await this.application.mutator.changeAndSaveItem(
-      note.uuid,
+      note,
       (mutator) => {
         mutator.setDeleted()
         mutator.updated_at_timestamp = Factory.dateToMicroseconds(Factory.yesterday())
@@ -479,18 +479,18 @@ describe('online conflict handling', function () {
 
   it('should create conflict if syncing an item that is stale', async function () {
     let note = await Factory.createMappedNote(this.application)
-    await this.application.itemManager.setItemDirty(note.uuid)
+    await this.application.itemManager.setItemDirty(note)
     await this.application.syncService.sync(syncOptions)
     note = this.application.items.findItem(note.uuid)
     expect(note.dirty).to.equal(false)
     this.expectedItemCount++
     /** First modify the item without saving so that
      * our local contents digress from the server's */
-    await this.application.mutator.changeItem(note.uuid, (mutator) => {
+    await this.application.mutator.changeItem(note, (mutator) => {
       mutator.title = `${Math.random()}`
     })
     note = await this.application.mutator.changeAndSaveItem(
-      note.uuid,
+      note,
       (mutator) => {
         mutator.text = 'Stale text'
         mutator.updated_at_timestamp = Factory.dateToMicroseconds(Factory.yesterday())
@@ -514,13 +514,13 @@ describe('online conflict handling', function () {
 
   it('creating conflict with exactly equal content should keep us in sync', async function () {
     const note = await Factory.createMappedNote(this.application)
-    await this.application.itemManager.setItemDirty(note.uuid)
+    await this.application.itemManager.setItemDirty(note)
     this.expectedItemCount++
 
     await this.application.syncService.sync(syncOptions)
 
     await this.application.mutator.changeAndSaveItem(
-      note.uuid,
+      note,
       (mutator) => {
         mutator.updated_at_timestamp = Factory.dateToMicroseconds(Factory.yesterday())
       },
@@ -558,10 +558,10 @@ describe('online conflict handling', function () {
     for (const note of this.application.itemManager.notes) {
       /** First modify the item without saving so that
        * our local contents digress from the server's */
-      await this.application.itemManager.changeItem(note.uuid, (mutator) => {
+      await this.application.itemManager.changeItem(note, (mutator) => {
         mutator.text = '1'
       })
-      await this.application.itemManager.changeItem(note.uuid, (mutator) => {
+      await this.application.itemManager.changeItem(note, (mutator) => {
         mutator.text = '2'
         mutator.updated_at_timestamp = Factory.dateToMicroseconds(yesterday)
       })
@@ -592,20 +592,20 @@ describe('online conflict handling', function () {
     expect(tag).to.be.ok
     expect(userPrefs).to.be.ok
 
-    tag = await this.application.itemManager.changeItem(tag.uuid, (mutator) => {
+    tag = await this.application.itemManager.changeItem(tag, (mutator) => {
       mutator.addItemAsRelationship(userPrefs)
     })
 
-    await this.application.itemManager.setItemDirty(userPrefs.uuid)
+    await this.application.itemManager.setItemDirty(userPrefs)
     userPrefs = this.application.items.findItem(userPrefs.uuid)
 
-    expect(this.application.itemManager.itemsReferencingItem(userPrefs.uuid).length).to.equal(1)
-    expect(this.application.itemManager.itemsReferencingItem(userPrefs.uuid)).to.include(tag)
+    expect(this.application.itemManager.itemsReferencingItem(userPrefs).length).to.equal(1)
+    expect(this.application.itemManager.itemsReferencingItem(userPrefs)).to.include(tag)
 
     await this.application.syncService.sync(syncOptions)
     expect(this.application.itemManager.items.length).to.equal(this.expectedItemCount)
 
-    tag = await this.application.itemManager.changeItem(tag.uuid, (mutator) => {
+    tag = await this.application.itemManager.changeItem(tag, (mutator) => {
       mutator.content.title = `${Math.random()}`
       mutator.updated_at_timestamp = Factory.dateToMicroseconds(Factory.yesterday())
     })
@@ -622,12 +622,12 @@ describe('online conflict handling', function () {
 
     expect(fooItem2.content.conflict_of).to.equal(tag.uuid)
     // Two items now link to this original object
-    const referencingItems = this.application.itemManager.itemsReferencingItem(userPrefs.uuid)
+    const referencingItems = this.application.itemManager.itemsReferencingItem(userPrefs)
     expect(referencingItems.length).to.equal(2)
     expect(referencingItems[0]).to.not.equal(referencingItems[1])
 
-    expect(this.application.itemManager.itemsReferencingItem(tag.uuid).length).to.equal(0)
-    expect(this.application.itemManager.itemsReferencingItem(fooItem2.uuid).length).to.equal(0)
+    expect(this.application.itemManager.itemsReferencingItem(tag).length).to.equal(0)
+    expect(this.application.itemManager.itemsReferencingItem(fooItem2).length).to.equal(0)
 
     expect(tag.content.references.length).to.equal(1)
     expect(fooItem2.content.references.length).to.equal(1)
@@ -650,7 +650,7 @@ describe('online conflict handling', function () {
     let tag = await Factory.createMappedTag(this.application)
     let note = await Factory.createMappedNote(this.application)
     tag = await this.application.mutator.changeAndSaveItem(
-      tag.uuid,
+      tag,
       (mutator) => {
         mutator.addItemAsRelationship(note)
       },
@@ -658,7 +658,7 @@ describe('online conflict handling', function () {
       undefined,
       syncOptions,
     )
-    await this.application.itemManager.setItemDirty(note.uuid)
+    await this.application.itemManager.setItemDirty(note)
     this.expectedItemCount += 2
 
     await this.application.syncService.sync(syncOptions)
@@ -667,11 +667,11 @@ describe('online conflict handling', function () {
     const newText = `${Math.random()}`
     /** First modify the item without saving so that
      * our local contents digress from the server's */
-    await this.application.mutator.changeItem(note.uuid, (mutator) => {
+    await this.application.mutator.changeItem(note, (mutator) => {
       mutator.title = `${Math.random()}`
     })
     note = await this.application.mutator.changeAndSaveItem(
-      note.uuid,
+      note,
       (mutator) => {
         mutator.updated_at_timestamp = Factory.dateToMicroseconds(Factory.yesterday())
         mutator.text = newText
@@ -683,7 +683,7 @@ describe('online conflict handling', function () {
 
     // conflict the tag but keep its content the same
     tag = await this.application.mutator.changeAndSaveItem(
-      tag.uuid,
+      tag,
       (mutator) => {
         mutator.updated_at_timestamp = Factory.dateToMicroseconds(Factory.yesterday())
       },
@@ -714,7 +714,7 @@ describe('online conflict handling', function () {
 
     const baseTitle = 'base title'
     /** Change the note */
-    const noteAfterChange = await this.application.itemManager.changeItem(note.uuid, (mutator) => {
+    const noteAfterChange = await this.application.itemManager.changeItem(note, (mutator) => {
       mutator.title = baseTitle
     })
     await this.application.sync.sync()
@@ -727,7 +727,7 @@ describe('online conflict handling', function () {
 
     /** Change the item to its final title and sync */
     const finalTitle = 'final title'
-    await this.application.itemManager.changeItem(note.uuid, (mutator) => {
+    await this.application.itemManager.changeItem(note, (mutator) => {
       mutator.title = finalTitle
     })
     await this.application.sync.sync()
@@ -848,7 +848,7 @@ describe('online conflict handling', function () {
     await Factory.createSyncedNoteWithTag(this.application)
     const tag = this.application.itemManager.tags[0]
     const note2 = await Factory.createMappedNote(this.application)
-    await this.application.mutator.changeAndSaveItem(tag.uuid, (mutator) => {
+    await this.application.mutator.changeAndSaveItem(tag, (mutator) => {
       mutator.addItemAsRelationship(note2)
     })
     let backupFile = await this.application.createEncryptedBackupFile()
@@ -870,7 +870,7 @@ describe('online conflict handling', function () {
     Factory.handlePasswordChallenges(newApp, password)
     await newApp.mutator.importData(backupFile, true)
     const newTag = newApp.itemManager.tags[0]
-    const notes = newApp.items.referencesForItem(newTag.uuid)
+    const notes = newApp.items.referencesForItem(newTag)
     expect(notes.length).to.equal(2)
     await Factory.safeDeinit(newApp)
   }).timeout(10000)
@@ -886,7 +886,7 @@ describe('online conflict handling', function () {
 
     /** First modify the item without saving so that
      * our local contents digress from the server's */
-    await this.application.mutator.changeItem(note.uuid, (mutator) => {
+    await this.application.mutator.changeItem(note, (mutator) => {
       mutator.title = `${Math.random()}`
     })
     /**
@@ -914,7 +914,7 @@ describe('online conflict handling', function () {
 
     /** First modify the item without saving so that
      * our local contents digress from the server's */
-    await this.application.mutator.changeItem(note.uuid, (mutator) => {
+    await this.application.mutator.changeItem(note, (mutator) => {
       mutator.title = `${Math.random()}`
     })
     const modified = CopyPayload(note.payload, {

@@ -159,7 +159,7 @@ export class NoteViewController {
     }
 
     await this.application.mutator.changeItem(
-      this.note.uuid,
+      this.note,
       (mutator) => {
         const noteMutator = mutator as NoteMutator
         if (dto.customMutate) {

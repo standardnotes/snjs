@@ -1,4 +1,4 @@
-import { ContentType, Uuid } from '@standardnotes/common'
+import { ContentType } from '@standardnotes/common'
 import {
   MutationType,
   ItemsKeyInterface,
@@ -36,11 +36,17 @@ export interface ItemManagerInterface extends AbstractService {
   /**
    * Marks the item as deleted and needing sync.
    */
-  setItemToBeDeleted(uuid: Uuid, source?: PayloadSource): Promise<void>
+  setItemToBeDeleted(
+    itemToLookupUuidFor: DecryptedItemInterface,
+    source?: PayloadSource,
+  ): Promise<void>
 
-  setItemsToBeDeleted(uuids: Uuid[]): Promise<void>
+  setItemsToBeDeleted(itemsToLookupUuidsFor: DecryptedItemInterface[]): Promise<void>
 
-  setItemsDirty(uuids: Uuid[], isUserModified?: boolean): Promise<ItemInterface[]>
+  setItemsDirty(
+    itemsToLookupUuidsFor: DecryptedItemInterface[],
+    isUserModified?: boolean,
+  ): Promise<DecryptedItemInterface[]>
 
   allItems(): DecryptedItemInterface[]
 
@@ -70,7 +76,7 @@ export interface ItemManagerInterface extends AbstractService {
     M extends DecryptedItemMutator = DecryptedItemMutator,
     I extends DecryptedItemInterface = DecryptedItemInterface,
   >(
-    uuid: Uuid,
+    itemToLookupUuidFor: I,
     mutate?: (mutator: M) => void,
     mutationType?: MutationType,
     payloadSource?: PayloadSource,
@@ -78,7 +84,7 @@ export interface ItemManagerInterface extends AbstractService {
   ): Promise<I>
 
   changeItemsKey(
-    uuid: Uuid,
+    itemToLookupUuidFor: ItemsKeyInterface,
     mutate: (mutator: ItemsKeyMutatorInterface) => void,
     mutationType?: MutationType,
     payloadSource?: PayloadSource,

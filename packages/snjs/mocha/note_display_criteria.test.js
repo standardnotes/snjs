@@ -91,7 +91,7 @@ describe('note display criteria', function () {
   it('includePinned off', async function () {
     await this.createNote()
     const pendingPin = await this.createNote()
-    await this.itemManager.changeItem(pendingPin.uuid, (mutator) => {
+    await this.itemManager.changeItem(pendingPin, (mutator) => {
       mutator.pinned = true
     })
     const criteria = NotesDisplayCriteria.Create({
@@ -103,7 +103,7 @@ describe('note display criteria', function () {
   it('includePinned on', async function () {
     await this.createNote()
     const pendingPin = await this.createNote()
-    await this.itemManager.changeItem(pendingPin.uuid, (mutator) => {
+    await this.itemManager.changeItem(pendingPin, (mutator) => {
       mutator.pinned = true
     })
     const criteria = NotesDisplayCriteria.Create({ includePinned: true })
@@ -113,7 +113,7 @@ describe('note display criteria', function () {
   it('includeTrashed off', async function () {
     await this.createNote()
     const pendingTrash = await this.createNote()
-    await this.itemManager.changeItem(pendingTrash.uuid, (mutator) => {
+    await this.itemManager.changeItem(pendingTrash, (mutator) => {
       mutator.trashed = true
     })
     const criteria = NotesDisplayCriteria.Create({ includeTrashed: false })
@@ -123,7 +123,7 @@ describe('note display criteria', function () {
   it('includeTrashed on', async function () {
     await this.createNote()
     const pendingTrash = await this.createNote()
-    await this.itemManager.changeItem(pendingTrash.uuid, (mutator) => {
+    await this.itemManager.changeItem(pendingTrash, (mutator) => {
       mutator.trashed = true
     })
     const criteria = NotesDisplayCriteria.Create({ includeTrashed: true })
@@ -133,7 +133,7 @@ describe('note display criteria', function () {
   it('includeArchived off', async function () {
     await this.createNote()
     const pendingArchive = await this.createNote()
-    await this.itemManager.changeItem(pendingArchive.uuid, (mutator) => {
+    await this.itemManager.changeItem(pendingArchive, (mutator) => {
       mutator.archived = true
     })
     const criteria = NotesDisplayCriteria.Create({ includeArchived: false })
@@ -143,7 +143,7 @@ describe('note display criteria', function () {
   it('includeArchived on', async function () {
     await this.createNote()
     const pendingArchive = await this.createNote()
-    await this.itemManager.changeItem(pendingArchive.uuid, (mutator) => {
+    await this.itemManager.changeItem(pendingArchive, (mutator) => {
       mutator.archived = true
     })
     const criteria = NotesDisplayCriteria.Create({
@@ -155,7 +155,7 @@ describe('note display criteria', function () {
   it('includeProtected off', async function () {
     await this.createNote()
     const pendingProtected = await this.createNote()
-    await this.itemManager.changeItem(pendingProtected.uuid, (mutator) => {
+    await this.itemManager.changeItem(pendingProtected, (mutator) => {
       mutator.protected = true
     })
     const criteria = NotesDisplayCriteria.Create({ includeProtected: false })
@@ -165,7 +165,7 @@ describe('note display criteria', function () {
   it('includeProtected on', async function () {
     await this.createNote()
     const pendingProtected = await this.createNote()
-    await this.itemManager.changeItem(pendingProtected.uuid, (mutator) => {
+    await this.itemManager.changeItem(pendingProtected, (mutator) => {
       mutator.protected = true
     })
     const criteria = NotesDisplayCriteria.Create({
@@ -176,7 +176,7 @@ describe('note display criteria', function () {
 
   it('protectedSearchEnabled false', async function () {
     const normal = await this.createNote('hello', 'world')
-    await this.itemManager.changeItem(normal.uuid, (mutator) => {
+    await this.itemManager.changeItem(normal, (mutator) => {
       mutator.protected = true
     })
     const criteria = NotesDisplayCriteria.Create({
@@ -187,7 +187,7 @@ describe('note display criteria', function () {
 
   it('protectedSearchEnabled true', async function () {
     const normal = await this.createNote()
-    await this.itemManager.changeItem(normal.uuid, (mutator) => {
+    await this.itemManager.changeItem(normal, (mutator) => {
       mutator.protected = true
     })
     const criteria = NotesDisplayCriteria.Create({
@@ -247,7 +247,7 @@ describe('note display criteria', function () {
 
     it('trashed note', async function () {
       const normal = await this.createNote()
-      await this.itemManager.changeItem(normal.uuid, (mutator) => {
+      await this.itemManager.changeItem(normal, (mutator) => {
         mutator.trashed = true
       })
 
@@ -282,7 +282,7 @@ describe('note display criteria', function () {
 
     it('archived note', async function () {
       const normal = await this.createNote()
-      await this.itemManager.changeItem(normal.uuid, (mutator) => {
+      await this.itemManager.changeItem(normal, (mutator) => {
         mutator.trashed = false
         mutator.archived = true
       })
@@ -317,7 +317,7 @@ describe('note display criteria', function () {
 
     it('archived + trashed note', async function () {
       const normal = await this.createNote()
-      await this.itemManager.changeItem(normal.uuid, (mutator) => {
+      await this.itemManager.changeItem(normal, (mutator) => {
         mutator.trashed = true
         mutator.archived = true
       })
@@ -379,7 +379,7 @@ describe('note display criteria', function () {
     it('trashed note', async function () {
       const normal = await this.createNote()
 
-      await this.itemManager.changeItem(normal.uuid, (mutator) => {
+      await this.itemManager.changeItem(normal, (mutator) => {
         mutator.trashed = true
       })
 
@@ -427,7 +427,7 @@ describe('note display criteria', function () {
     it('archived + trashed note', async function () {
       const normal = await this.createNote()
 
-      await this.itemManager.changeItem(normal.uuid, (mutator) => {
+      await this.itemManager.changeItem(normal, (mutator) => {
         mutator.trashed = true
         mutator.archived = true
       })
@@ -488,7 +488,7 @@ describe('note display criteria', function () {
 
     it('archived note', async function () {
       const normal = await this.createNote()
-      await this.itemManager.changeItem(normal.uuid, (mutator) => {
+      await this.itemManager.changeItem(normal, (mutator) => {
         mutator.archived = true
       })
 
@@ -535,7 +535,7 @@ describe('note display criteria', function () {
 
     it('archived + trashed note', async function () {
       const normal = await this.createNote()
-      await this.itemManager.changeItem(normal.uuid, (mutator) => {
+      await this.itemManager.changeItem(normal, (mutator) => {
         mutator.trashed = true
         mutator.archived = true
       })
@@ -601,7 +601,7 @@ describe('note display criteria', function () {
 
     it('archived note', async function () {
       const normal = await this.createNote()
-      await this.itemManager.changeItem(normal.uuid, (mutator) => {
+      await this.itemManager.changeItem(normal, (mutator) => {
         mutator.archived = true
       })
 
@@ -648,7 +648,7 @@ describe('note display criteria', function () {
 
     it('archived + trashed note', async function () {
       const normal = await this.createNote()
-      await this.itemManager.changeItem(normal.uuid, (mutator) => {
+      await this.itemManager.changeItem(normal, (mutator) => {
         mutator.trashed = true
         mutator.archived = true
       })

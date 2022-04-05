@@ -787,7 +787,7 @@ export class ComponentViewer {
           const item = await this.itemManager.insertItem(template)
 
           await this.itemManager.changeItem(
-            item.uuid,
+            item,
             (mutator) => {
               if (responseItem.clientData) {
                 const allComponentData = Copy(item.getDomainData(ComponentDataDomain) || {})

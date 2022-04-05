@@ -76,7 +76,7 @@ describe('importing', function () {
     expect(tag.noteCount).to.equal(1)
 
     expect(note.content.references.length).to.equal(0)
-    expect(application.itemManager.itemsReferencingItem(note.uuid).length).to.equal(1)
+    expect(application.itemManager.itemsReferencingItem(note).length).to.equal(1)
 
     await application.mutator.importData(
       {
@@ -91,7 +91,7 @@ describe('importing', function () {
     expect(tag.noteCount).to.equal(1)
 
     expect(note.content.references.length).to.equal(0)
-    expect(application.itemManager.itemsReferencingItem(note.uuid).length).to.equal(1)
+    expect(application.itemManager.itemsReferencingItem(note).length).to.equal(1)
   })
 
   it('importing same note many times should create only one duplicate', async function () {
@@ -184,13 +184,13 @@ describe('importing', function () {
 
     const refreshedNote = application.itemManager.findItem(note.uuid)
     expect(refreshedNote.content.references.length).to.equal(0)
-    expect(application.itemManager.itemsReferencingItem(refreshedNote.uuid).length).to.equal(2)
+    expect(application.itemManager.itemsReferencingItem(refreshedNote).length).to.equal(2)
 
     expect(newTag.content.references.length).to.equal(1)
     expect(newTag.noteCount).to.equal(1)
 
     expect(newNote.content.references.length).to.equal(0)
-    expect(application.itemManager.itemsReferencingItem(newNote.uuid).length).to.equal(1)
+    expect(application.itemManager.itemsReferencingItem(newNote).length).to.equal(1)
   })
 
   it('when importing items, imported values should not be used to determine if changed', async function () {
@@ -209,7 +209,7 @@ describe('importing', function () {
     const tag = await Factory.createMappedTag(application)
     expectedItemCount += 2
 
-    await application.itemManager.changeItem(tag.uuid, (mutator) => {
+    await application.itemManager.changeItem(tag, (mutator) => {
       mutator.addItemAsRelationship(note)
     })
 
@@ -860,7 +860,7 @@ describe('importing', function () {
 
     const importedNote = application.itemManager.notes[0]
     const importedTag = application.itemManager.tags[0]
-    expect(application.itemManager.referencesForItem(importedTag.uuid).length).to.equal(1)
-    expect(application.itemManager.itemsReferencingItem(importedNote.uuid).length).to.equal(1)
+    expect(application.itemManager.referencesForItem(importedTag).length).to.equal(1)
+    expect(application.itemManager.itemsReferencingItem(importedNote).length).to.equal(1)
   })
 })
