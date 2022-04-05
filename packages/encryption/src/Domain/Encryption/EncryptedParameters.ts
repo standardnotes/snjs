@@ -15,18 +15,6 @@ export type EncryptedParameters = {
 export type DecryptedParameters<C extends ItemContent = ItemContent> = {
   uuid: string
   content: C
-  items_key_id: undefined
-  enc_item_key: undefined
-  errorDecrypting: false
-  waitingForKey: false
-  errorDecryptingValueChanged?: boolean
-
-  /** @deprecated */
-  auth_hash: undefined
-
-  /** @deprecated */
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  auth_params?: any
 }
 
 export type ErroredDecryptingParameters = {

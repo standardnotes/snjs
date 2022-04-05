@@ -33,8 +33,8 @@ export class PayloadCollection<
 
   constructor(
     copy = false,
-    mapCopy?: Partial<Record<Uuid, P>>,
-    typedMapCopy?: Partial<Record<ContentType, P[]>>,
+    mapCopy?: Partial<Record<Uuid, P | D>>,
+    typedMapCopy?: Partial<Record<ContentType, (P | D)[]>>,
     referenceMapCopy?: UuidMap,
     conflictMapCopy?: UuidMap,
   ) {

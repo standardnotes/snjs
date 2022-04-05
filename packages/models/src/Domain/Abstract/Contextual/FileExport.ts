@@ -1,14 +1,7 @@
 import { Uuid } from '@standardnotes/common'
 import { ItemContent } from '../Item'
 import { ContextPayload } from './ContextPayload'
-import {
-  DecryptedPayload,
-  DecryptedPayloadInterface,
-  EncryptedPayload,
-  EncryptedPayloadInterface,
-} from '../Payload'
-import { EncryptedTransferPayload } from '../TransferPayload/Interfaces/EncryptedTransferPayload'
-import { DecryptedTransferPayload } from '../TransferPayload/Interfaces/DecryptedTransferPayload'
+import { DecryptedPayloadInterface, EncryptedPayloadInterface } from '../Payload'
 
 export interface FileEncryptedExportContextualPayload extends ContextPayload {
   auth_hash?: string
@@ -32,10 +25,10 @@ export interface FileDecryptedExportContextualPayload<C extends ItemContent = It
   updated_at_timestamp?: number
 }
 
-export function createEncryptedPayloadForFileExport(
+export function createEncryptedFileExportContextPayload(
   fromPayload: EncryptedPayloadInterface,
-): EncryptedPayloadInterface {
-  const params: FileEncryptedExportContextualPayload = {
+): FileEncryptedExportContextualPayload {
+  return {
     auth_hash: fromPayload.auth_hash,
     content_type: fromPayload.content_type,
     content: fromPayload.content,
@@ -48,13 +41,12 @@ export function createEncryptedPayloadForFileExport(
     updated_at: fromPayload.updated_at,
     uuid: fromPayload.uuid,
   }
-  return new EncryptedPayload(params as EncryptedTransferPayload)
 }
 
-export function createDecryptedPayloadForFileExport(
+export function createDecryptedFileExportContextPayload(
   fromPayload: DecryptedPayloadInterface,
-): DecryptedPayloadInterface {
-  const params: FileDecryptedExportContextualPayload = {
+): FileDecryptedExportContextualPayload {
+  return {
     content_type: fromPayload.content_type,
     content: fromPayload.content,
     created_at_timestamp: fromPayload.created_at_timestamp,
@@ -64,5 +56,4 @@ export function createDecryptedPayloadForFileExport(
     updated_at: fromPayload.updated_at,
     uuid: fromPayload.uuid,
   }
-  return new DecryptedPayload(params as DecryptedTransferPayload)
 }

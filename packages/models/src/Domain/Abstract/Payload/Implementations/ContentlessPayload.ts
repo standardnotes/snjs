@@ -9,16 +9,13 @@ export class ContentlessPayload
   implements ContentlessPayloadInterface
 {
   readonly format: PayloadFormat.Deleted = PayloadFormat.Deleted
-  readonly content: undefined
 
   constructor(rawPayload: ContentlessTransferPayload, source = PayloadSource.Constructor) {
     super(rawPayload, source)
   }
 
   ejected(): ContentlessTransferPayload {
-    const values = {
-      content: this.content,
-    }
+    const values = {}
 
     return {
       ...super.ejected(),

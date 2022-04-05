@@ -9,16 +9,16 @@ export interface CollectionElement {
   deleted?: boolean
 }
 
-export interface DiscardableCollectionElement extends CollectionElement {
+export interface DeletedCollectionElement extends CollectionElement {
   deleted: true
 }
 
 export abstract class Collection<
-  E extends CollectionElement,
-  D extends DiscardableCollectionElement,
+  Element extends CollectionElement,
+  DeletedElement extends DeletedCollectionElement,
 > {
-  readonly map: Partial<Record<Uuid, E>> = {}
-  readonly typedMap: Partial<Record<ContentType, E[]>> = {}
+  readonly map: Partial<Record<Uuid, Element | DeletedElement>> = {}
+  readonly typedMap: Partial<Record<ContentType, (Element | DeletedElement)[]>> = {}
 
   /** An array of uuids of items that are dirty */
   dirtyIndex: Set<Uuid> = new Set()
@@ -26,10 +26,18 @@ export abstract class Collection<
   /** An array of uuids of items that are not marked as deleted */
   nondeletedIndex: Set<Uuid> = new Set()
 
+  isNonDeletedElement(e: Element | DeletedElement): e is Element {
+    return !this.isDeletedElement(e)
+  }
+
+  isDeletedElement(e: Element | DeletedElement): e is DeletedElement {
+    return (e as DeletedCollectionElement).deleted === true
+  }
+
   constructor(
     copy = false,
-    mapCopy?: Partial<Record<Uuid, E>>,
-    typedMapCopy?: Partial<Record<ContentType, E[]>>,
+    mapCopy?: Partial<Record<Uuid, Element | DeletedElement>>,
+    typedMapCopy?: Partial<Record<ContentType, (Element | DeletedElement)[]>>,
   ) {
     if (copy) {
       this.map = mapCopy!
@@ -41,10 +49,10 @@ export abstract class Collection<
     return Object.keys(this.map)
   }
 
-  public all(contentType?: ContentType | ContentType[]): E[] {
+  public all(contentType?: ContentType | ContentType[]): (Element | DeletedElement)[] {
     if (contentType) {
       if (Array.isArray(contentType)) {
-        const elements: E[] = []
+        const elements: (Element | DeletedElement)[] = []
         for (const type of contentType) {
           extendArray(elements, this.typedMap[type] || [])
         }
@@ -55,28 +63,42 @@ export abstract class Collection<
     } else {
       return Object.keys(this.map).map((uuid: Uuid) => {
         return this.map[uuid]
-      }) as E[]
+      }) as (Element | DeletedElement)[]
     }
   }
 
-  public find(uuid: Uuid): E | undefined {
+  public allNondeleted<E extends Element>(contentType?: ContentType | ContentType[]): E[] {
+    const all = this.all(contentType)
+    const filtered = all.filter(this.isNonDeletedElement) as E[]
+    return filtered
+  }
+
+  public find(uuid: Uuid): Element | DeletedElement | undefined {
     return this.map[uuid]
   }
 
+  public findNondeleted<E extends Element>(uuid: Uuid): E | undefined {
+    const result = this.map[uuid]
+    if (result && this.isNonDeletedElement(result)) {
+      return result as E
+    }
+    return undefined
+  }
+
   /** Returns all elements that are marked as dirty */
-  public dirtyElements(): E[] {
+  public dirtyElements(): (Element | DeletedElement)[] {
     const uuids = Array.from(this.dirtyIndex)
     return this.findAll(uuids)
   }
 
   /** Returns all elements that are not marked as deleted */
-  public nondeletedElements(): E[] {
+  public nondeletedElements(): Element[] {
     const uuids = Array.from(this.nondeletedIndex)
-    return this.findAll(uuids)
+    return this.findAll(uuids).filter(this.isNonDeletedElement)
   }
 
-  public findAll(uuids: Uuid[]): E[] {
-    const results: E[] = []
+  public findAll(uuids: Uuid[]): (Element | DeletedElement)[] {
+    const results: (Element | DeletedElement)[] = []
 
     for (const id of uuids) {
       const element = this.map[id]
@@ -88,22 +110,52 @@ export abstract class Collection<
     return results
   }
 
-  /**
-   * If an item is not found, an `undefined` element
-   * will be inserted into the array.
-   */
-  public findAllIncludingBlanks(uuids: Uuid[]): (E | undefined)[] {
+  public findAllNondeleted<E extends Element>(uuids: Uuid[]): E[] {
+    const results: E[] = []
+
+    for (const id of uuids) {
+      const element = this.map[id]
+      if (element && this.isNonDeletedElement(element)) {
+        results.push(element as E)
+      }
+    }
+
+    return results
+  }
+
+  public findAllNondeletedIncludingBlanks<E extends Element>(uuids: Uuid[]): (E | undefined)[] {
     const results: (E | undefined)[] = []
 
     for (const id of uuids) {
       const element = this.map[id]
+      if (!element || this.isDeletedElement(element)) {
+        results.push(undefined)
+      } else {
+        results.push(element as E)
+      }
+    }
+
+    return results
+  }
+
+  /**
+   * If an item is not found, an `undefined` element
+   * will be inserted into the array.
+   */
+  public findAllIncludingBlanks<E extends Element>(
+    uuids: Uuid[],
+  ): (E | DeletedElement | undefined)[] {
+    const results: (E | DeletedElement | undefined)[] = []
+
+    for (const id of uuids) {
+      const element = this.map[id] as E | DeletedElement | undefined
       results.push(element)
     }
 
     return results
   }
 
-  public set(elements: E | E[]): void {
+  public set(elements: Element | DeletedElement | (Element | DeletedElement)[]): void {
     elements = Array.isArray(elements) ? elements : [elements]
 
     if (elements.length === 0) {
@@ -129,7 +181,7 @@ export abstract class Collection<
     }
   }
 
-  public discard(elements: (E | D) | (E | D)[]): void {
+  public discard(elements: Element | DeletedElement | (Element | DeletedElement)[]): void {
     elements = Array.isArray(elements) ? elements : [elements]
     for (const element of elements) {
       this.deleteFromTypedMap(element)
@@ -137,14 +189,14 @@ export abstract class Collection<
     }
   }
 
-  private setToTypedMap(element: E): void {
+  private setToTypedMap(element: Element | DeletedElement): void {
     const array = this.typedMap[element.content_type] || []
     remove(array, { uuid: element.uuid as never })
     array.push(element)
     this.typedMap[element.content_type] = array
   }
 
-  private deleteFromTypedMap(element: E | D): void {
+  private deleteFromTypedMap(element: Element | DeletedElement): void {
     const array = this.typedMap[element.content_type] || []
     remove(array, { uuid: element.uuid as never })
     this.typedMap[element.content_type] = array

@@ -122,6 +122,8 @@ export interface ItemsClientInterface {
    */
   findItems<T extends DecryptedItemInterface>(uuids: UuidString[]): T[]
 
+  findSureItem<T extends DecryptedItemInterface = DecryptedItemInterface>(uuid: UuidString): T
+
   /**
    * Returns all items.
    */

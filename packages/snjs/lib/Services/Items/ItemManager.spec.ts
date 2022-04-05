@@ -109,7 +109,7 @@ describe('itemManager', () => {
       })
       itemManager.setNotesDisplayCriteria(criteria)
 
-      const notes = itemManager.getDisplayableItems(ContentType.Note)
+      const notes = itemManager.getDisplayableNotes()
       expect(notes).toHaveLength(1)
     })
   })
@@ -299,7 +299,7 @@ describe('itemManager', () => {
       })
       itemManager.setNotesDisplayCriteria(criteria)
 
-      const notes = itemManager.getDisplayableItems(ContentType.Note)
+      const notes = itemManager.getDisplayableNotes()
       expect(notes).toHaveLength(1)
     })
 

@@ -59,7 +59,11 @@ export abstract class PurePayload<T extends TransferPayload> implements PayloadI
   }
 
   ejected(): T {
-    const result: TransferPayload = {
+    return this.ejectedBase() as T
+  }
+
+  ejectedBase(): TransferPayload {
+    return {
       uuid: this.uuid,
       content_type: this.content_type,
       created_at: this.created_at,
@@ -69,8 +73,6 @@ export abstract class PurePayload<T extends TransferPayload> implements PayloadI
       dirty: this.dirty,
       duplicate_of: this.duplicate_of,
     }
-
-    return result as T
   }
 
   public get serverUpdatedAt(): Date {

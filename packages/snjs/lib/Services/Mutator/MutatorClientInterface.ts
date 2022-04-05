@@ -103,7 +103,7 @@ export interface MutatorClientInterface {
    */
   createTemplateItem<
     C extends Models.ItemContent = Models.ItemContent,
-    I extends Models.DecryptedItemInterface = Models.DecryptedItemInterface,
+    I extends Models.DecryptedItemInterface<C> = Models.DecryptedItemInterface<C>,
   >(
     contentType: ContentType,
     content?: C,

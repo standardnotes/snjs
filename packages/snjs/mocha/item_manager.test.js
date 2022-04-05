@@ -515,7 +515,7 @@ describe('item manager', function () {
         }),
       )
 
-      expect(this.itemManager.getDisplayableItems(ContentType.Note).length).to.equal(0)
+      expect(this.itemManager.getDisplayableNotes().length).to.equal(0)
     })
 
     it('archived view should not include trashed notes by default', async function () {
@@ -532,7 +532,7 @@ describe('item manager', function () {
         }),
       )
 
-      expect(this.itemManager.getDisplayableItems(ContentType.Note).length).to.equal(0)
+      expect(this.itemManager.getDisplayableNotes().length).to.equal(0)
     })
 
     it('trashed view should include archived notes by default', async function () {
@@ -549,7 +549,7 @@ describe('item manager', function () {
         }),
       )
 
-      expect(this.itemManager.getDisplayableItems(ContentType.Note).length).to.equal(1)
+      expect(this.itemManager.getDisplayableNotes().length).to.equal(1)
     })
   })
 

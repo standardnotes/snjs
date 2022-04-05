@@ -3,8 +3,16 @@ import { ImmutablePayloadCollection } from '../Collection/Payload/ImmutablePaylo
 import { PayloadSource } from '../../Abstract/Payload/Types/PayloadSource'
 import { PayloadsDelta } from './Delta'
 import { isDeletedPayload } from '../../Abstract/Payload/Interfaces/TypeCheck'
+import {
+  ContentlessPayloadInterface,
+  DeletedPayloadInterface,
+  PayloadInterface,
+} from '../../Abstract/Payload'
 
-export class DeltaRemoteSaved extends PayloadsDelta {
+export class DeltaRemoteSaved extends PayloadsDelta<
+  PayloadInterface,
+  ContentlessPayloadInterface | DeletedPayloadInterface
+> {
   public async resultingCollection() {
     const processed = []
     for (const payload of this.applyCollection.all()) {
@@ -36,6 +44,7 @@ export class DeltaRemoteSaved extends PayloadsDelta {
         processed.push(result)
       }
     }
+
     return ImmutablePayloadCollection.WithPayloads(processed, PayloadSource.RemoteSaved)
   }
 }

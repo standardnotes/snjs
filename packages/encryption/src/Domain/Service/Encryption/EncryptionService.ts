@@ -1,3 +1,4 @@
+import { EncryptedExportIntent } from './../../Intent/ExportIntent'
 import { BackupFile } from '../../Backups/BackupFile'
 import { CreateAnyKeyParams } from '../../RootKey/KeyParams'
 import { decryptBackupFile } from '../../Backups/BackupFileDecryptor'
@@ -27,7 +28,7 @@ import { encryptedParametersFromPayload } from '../../Intent/Functions'
 import { RootKeyEncryptedAuthenticatedData } from '../../Encryption/RootKeyEncryptedAuthenticatedData'
 import { ItemAuthenticatedData } from '../../Encryption/ItemAuthenticatedData'
 import { LegacyAttachedData } from '../../Encryption/LegacyAttachedData'
-import { EncryptedPayload } from '@standardnotes/models'
+import { createEncryptedFileExportContextPayload, EncryptedPayload } from '@standardnotes/models'
 
 export enum EncryptionServiceEvent {
   RootKeyStatusChanged = 'RootKeyStatusChanged',
@@ -189,7 +190,7 @@ export class EncryptionService
   }
 
   public itemsKeyForPayload(
-    payload: Models.PayloadInterface,
+    payload: Models.EncryptedPayloadInterface,
   ): Models.ItemsKeyInterface | undefined {
     return this.itemsEncryption.itemsKeyForPayload(payload)
   }
@@ -299,12 +300,12 @@ export class EncryptionService
       const original = EncryptionSplit.findPayloadInSplit(params.uuid, split)
       if (isErrorDecryptingParameters(params)) {
         return new Models.EncryptedPayload({
-          ...original,
+          ...original.ejected(),
           ...params,
         })
       } else {
-        return new Models.DecryptedPayload({
-          ...original,
+        return new Models.DecryptedPayload<C>({
+          ...original.ejectedBase(),
           ...params,
         })
       }
@@ -429,8 +430,8 @@ export class EncryptionService
     const payloads = this.itemManager.allItems().map((item) => item.payload)
     const split = EncryptionSplit.splitItemsByEncryptionType(payloads)
     const keyLookupSplit = EncryptionSplit.createKeyLookupSplitFromSplit(split)
-    const result = await this.encryptSplit(keyLookupSplit, EncryptedExportIntent.FileEncrypted)
-    const ejected = result.map((payload) => payload.ejected())
+    const result = await this.encryptSplit(keyLookupSplit)
+    const ejected = result.map((payload) => createEncryptedFileExportContextPayload(payload))
 
     const data: BackupFile = {
       version: Common.ProtocolVersionLatest,

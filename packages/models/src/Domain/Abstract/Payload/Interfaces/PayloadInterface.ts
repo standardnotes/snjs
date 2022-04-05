@@ -48,6 +48,9 @@ export interface PayloadInterface<T extends TransferPayload = TransferPayload> {
    */
   ejected(): T
 
+  /** Returns only base parameters common to all payloads */
+  ejectedBase(): TransferPayload
+
   /**
    * Returns a new payload by applying the input payload on top of the instance payload.
    */

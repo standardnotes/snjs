@@ -4,6 +4,9 @@ import {
   QueueElement,
   OverwriteProtectedTypes,
   PayloadsChangeObserverCallback,
+  EmitQueue,
+  EmitInPayloads,
+  EmitOutPayloads,
 } from './Types'
 import { removeFromArray, Uuids } from '@standardnotes/utils'
 import {
@@ -18,10 +21,9 @@ import {
   DeletedPayloadInterface,
   DecryptedPayloadInterface,
   PayloadCollection,
+  MergePayloads,
 } from '@standardnotes/models'
 import * as Services from '@standardnotes/services'
-
-type EmitQueue<P extends PayloadInterface = PayloadInterface> = QueueElement<P>[]
 
 /**
  * The payload manager is responsible for keeping state regarding what items exist in the
@@ -38,7 +40,7 @@ export class PayloadManager
   implements Services.PayloadManagerInterface
 {
   private changeObservers: PayloadsChangeObserver[] = []
-  public collection: PayloadCollection<PayloadInterface>
+  public collection: PayloadCollection<EmitOutPayloads>
   private emitQueue: EmitQueue = []
 
   constructor(protected internalEventBus: Services.InternalEventBusInterface) {
@@ -98,7 +100,7 @@ export class PayloadManager
    * @returns every paylod altered as a result of this operation, to be
    * saved to storage by the caller
    */
-  public async emitPayload<P extends PayloadInterface = PayloadInterface>(
+  public async emitPayload<P extends EmitInPayloads = EmitInPayloads>(
     payload: P,
     source: PayloadSource,
     sourceKey?: string,
@@ -112,7 +114,7 @@ export class PayloadManager
    * @returns every paylod altered as a result of this operation, to be
    * saved to storage by the caller
    */
-  public async emitPayloads<P extends PayloadInterface = PayloadInterface>(
+  public async emitPayloads<P extends EmitInPayloads = EmitInPayloads>(
     payloads: P[],
     source: PayloadSource,
     sourceKey?: string,
@@ -138,18 +140,23 @@ export class PayloadManager
 
   private popQueue() {
     const first = this.emitQueue[0]
-    const { changed, inserted, removed, ignored } = this.mergePayloadsOntoMaster(first.payloads)
-    this.notifyChangeObservers(changed, inserted, removed, ignored, first.source, first.sourceKey)
+
+    const { changed, inserted, discarded, ignored } = this.mergePayloadsOntoMaster(first.payloads)
+
+    this.notifyChangeObservers(changed, inserted, discarded, ignored, first.source, first.sourceKey)
+
     removeFromArray(this.emitQueue, first)
-    first.resolve(changed.concat(inserted, removed))
+
+    first.resolve(changed.concat(inserted, discarded))
+
     if (this.emitQueue.length > 0) {
       void this.popQueue()
     }
   }
 
-  private mergePayloadsOntoMaster(payloads: PayloadInterface[]) {
-    const changed: PayloadInterface[] = []
-    const inserted: PayloadInterface[] = []
+  private mergePayloadsOntoMaster(payloads: EmitInPayloads[]) {
+    const changed: EmitOutPayloads[] = []
+    const inserted: EmitOutPayloads[] = []
     const discarded: DeletedPayloadInterface[] = []
     const ignored: EncryptedPayloadInterface[] = []
 
@@ -171,7 +178,9 @@ export class PayloadManager
         continue
       }
 
-      const newPayload = masterPayload ? masterPayload.mergedWith(payload) : payload
+      const newPayload = masterPayload
+        ? MergePayloads(masterPayload, payload)
+        : (payload as EmitOutPayloads)
       if (isDeletedPayload(newPayload) && newPayload.discardable) {
         /** The item has been deleted and synced,
          * and can thus be removed from our local record */
@@ -186,7 +195,7 @@ export class PayloadManager
         }
       }
     }
-    return { changed, inserted, removed, ignored }
+    return { changed, inserted, discarded, ignored }
   }
 
   /**
@@ -219,8 +228,8 @@ export class PayloadManager
    * explicitely understand what they are doing (want to propagate model state without mapping)
    */
   public notifyChangeObservers(
-    changed: PayloadInterface[],
-    inserted: PayloadInterface[],
+    changed: EmitOutPayloads[],
+    inserted: EmitOutPayloads[],
     discarded: DeletedPayloadInterface[],
     ignored: EncryptedPayloadInterface[],
     source: PayloadSource,
@@ -230,7 +239,8 @@ export class PayloadManager
     const observers = this.changeObservers.slice().sort((a, b) => {
       return a.priority < b.priority ? -1 : 1
     })
-    const filter = <P extends PayloadInterface = PayloadInterface>(
+
+    const filter = <P extends EmitOutPayloads = EmitOutPayloads>(
       payloads: P[],
       types: ContentType[],
     ) => {
@@ -240,6 +250,7 @@ export class PayloadManager
             return types.includes(payload.content_type)
           })
     }
+
     for (const observer of observers) {
       observer.callback(
         filter(changed, observer.types),
@@ -268,7 +279,7 @@ export class PayloadManager
     return Uuids(collection.payloads)
   }
 
-  public removePayloadLocally(payload: PayloadInterface) {
+  public removePayloadLocally(payload: EmitOutPayloads) {
     this.collection.discard(payload)
   }
 }

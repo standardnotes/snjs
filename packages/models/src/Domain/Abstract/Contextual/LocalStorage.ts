@@ -2,16 +2,10 @@ import { Uuid } from '@standardnotes/common'
 import { ContextPayload } from './ContextPayload'
 import { ItemContent } from '../Item'
 import {
-  DecryptedPayload,
   DecryptedPayloadInterface,
-  DeletedPayload,
   DeletedPayloadInterface,
-  EncryptedPayload,
   EncryptedPayloadInterface,
 } from '../Payload'
-import { EncryptedTransferPayload } from '../TransferPayload/Interfaces/EncryptedTransferPayload'
-import { DecryptedTransferPayload } from '../TransferPayload/Interfaces/DecryptedTransferPayload'
-import { DeletedTransferPayload } from '../TransferPayload/Interfaces/DeletedTransferPayload'
 
 export interface LocalStorageEncryptedContextualPayload extends ContextPayload {
   auth_hash?: string
@@ -54,10 +48,10 @@ export interface LocalStorageDeletedContextualPayload extends ContextPayload {
   updated_at: Date | undefined
 }
 
-export function createEncryptedPayloadForLocalStorage(
+export function createEncryptedLocalStorageContextPayload(
   fromPayload: EncryptedPayloadInterface,
-): EncryptedPayloadInterface {
-  const params: LocalStorageEncryptedContextualPayload = {
+): LocalStorageEncryptedContextualPayload {
+  return {
     auth_hash: fromPayload.auth_hash,
     auth_params: fromPayload.auth_params,
     content_type: fromPayload.content_type,
@@ -75,13 +69,12 @@ export function createEncryptedPayloadForLocalStorage(
     uuid: fromPayload.uuid,
     waitingForKey: fromPayload.waitingForKey,
   }
-  return new EncryptedPayload(params as EncryptedTransferPayload)
 }
 
-export function createDecryptedPayloadForLocalStorage(
+export function createDecryptedLocalStorageContextPayload(
   fromPayload: DecryptedPayloadInterface,
-): DecryptedPayloadInterface {
-  const params: LocalStorageDecryptedContextualPayload = {
+): LocalStorageDecryptedContextualPayload {
+  return {
     content_type: fromPayload.content_type,
     content: fromPayload.content,
     created_at_timestamp: fromPayload.created_at_timestamp,
@@ -93,13 +86,12 @@ export function createDecryptedPayloadForLocalStorage(
     dirty: fromPayload.dirty || false,
     dirtiedDate: fromPayload.dirtiedDate,
   }
-  return new DecryptedPayload(params as DecryptedTransferPayload)
 }
 
-export function createDeletedPayloadForLocalStorage(
+export function createDeletedLocalStorageContextPayload(
   fromPayload: DeletedPayloadInterface,
-): DeletedPayloadInterface {
-  const params: LocalStorageDeletedContextualPayload = {
+): LocalStorageDeletedContextualPayload {
+  return {
     content_type: fromPayload.content_type,
     content: undefined,
     created_at_timestamp: fromPayload.created_at_timestamp,
@@ -112,5 +104,4 @@ export function createDeletedPayloadForLocalStorage(
     updated_at: fromPayload.updated_at,
     uuid: fromPayload.uuid,
   }
-  return new DeletedPayload(params as DeletedTransferPayload)
 }

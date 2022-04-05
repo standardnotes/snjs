@@ -13,6 +13,7 @@ export class DeltaRemoteRetrieved extends PayloadsDelta {
   public async resultingCollection(): Promise<ImmutablePayloadCollection> {
     const filtered: Array<PayloadInterface> = []
     const conflicted: Array<PayloadInterface> = []
+
     /**
      * If we have retrieved an item that was saved as part of this ongoing sync operation,
      * or if the item is locally dirty, filter it out of retrieved_items, and add to potential conflicts.
@@ -22,6 +23,7 @@ export class DeltaRemoteRetrieved extends PayloadsDelta {
         received.uuid as string,
         PayloadSource.SavedOrSaving,
       )
+
       const decrypted = this.findRelatedDecryptedTransientPayload(received.uuid as string)
       if (!decrypted) {
         /** Decrypted should only be missing in case of deleted retrieved item */
@@ -32,15 +34,18 @@ export class DeltaRemoteRetrieved extends PayloadsDelta {
         filtered.push(received)
         continue
       }
+
       if (savedOrSaving) {
         conflicted.push(decrypted)
         continue
       }
+
       const base = this.findBasePayload(received.uuid as string)
       if (base?.dirty && !isEncryptedErroredPayload(base)) {
         conflicted.push(decrypted)
         continue
       }
+
       filtered.push(decrypted)
     }
 
@@ -55,16 +60,19 @@ export class DeltaRemoteRetrieved extends PayloadsDelta {
       if (!decrypted) {
         continue
       }
+
       const current = this.findBasePayload(conflict.uuid)
       if (!current) {
         continue
       }
+
       const delta = new ConflictDelta(
         this.baseCollection,
         current,
         decrypted,
         PayloadSource.ConflictData,
       )
+
       const deltaCollection = await delta.resultingCollection()
       const payloads = deltaCollection.all()
       extendArray(conflictResults, payloads)

@@ -1,3 +1,4 @@
+import { EncryptedItem } from './../Implementations/EncryptedItem'
 import { DecryptedPayloadInterface } from './../../Payload/Interfaces/DecryptedPayload'
 import { SNFile } from '../../../Syncable/File/File'
 import { SNFeatureRepo } from '../../../Syncable/FeatureRepo/FeatureRepo'
@@ -22,6 +23,14 @@ import { NoteMutator } from '../../../Syncable/Note/NoteMutator'
 import { DecryptedItemInterface } from '../Interfaces/DecryptedItem'
 import { ItemContent } from '../Interfaces/ItemContent'
 import { DecryptedItemMutator } from '../Mutator/DecryptedItemMutator'
+import {
+  DeletedPayloadInterface,
+  EncryptedPayloadInterface,
+  isDecryptedPayload,
+  isDeletedPayload,
+  isEncryptedPayload,
+} from '../../Payload'
+import { DeletedItem } from '../Implementations/DeletedItem'
 
 type ItemClass<C extends ItemContent = ItemContent> = new (
   payload: DecryptedPayloadInterface<C>,
@@ -84,4 +93,21 @@ export function CreateDecryptedItemFromPayload<
   const itemClass = lookupClass ? lookupClass.itemClass : DecryptedItem
   const item = new itemClass(payload)
   return item as unknown as T
+}
+
+export function CreateItemFromPayload<
+  C extends ItemContent = ItemContent,
+  T extends DecryptedItemInterface<C> = DecryptedItemInterface<C>,
+>(
+  payload: DecryptedPayloadInterface<C> | EncryptedPayloadInterface | DeletedPayloadInterface,
+): EncryptedItem | DeletedItem | T {
+  if (isDecryptedPayload(payload)) {
+    return CreateDecryptedItemFromPayload<C, T>(payload)
+  } else if (isEncryptedPayload(payload)) {
+    return new EncryptedItem(payload)
+  } else if (isDeletedPayload(payload)) {
+    return new DeletedItem(payload)
+  }
+
+  throw Error('Unhandled case in CreateItemFromPayload')
 }

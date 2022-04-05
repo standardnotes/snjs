@@ -8,7 +8,7 @@ import {
   notesMatchingCriteria,
 } from '../../../Syncable/Note/NotesDisplayCriteria'
 import { SNIndex } from '../../Index/SNIndex'
-import { DecryptedItemCollection } from './ItemCollection'
+import { ItemCollection } from './ItemCollection'
 import { ItemDelta } from '../../Index/ItemDelta'
 
 /**
@@ -19,7 +19,7 @@ export class NotesCollection implements SNIndex {
   private needsRebuilding = true
 
   constructor(
-    private collection: DecryptedItemCollection,
+    private collection: ItemCollection,
     private criteria: NotesDisplayCriteria = NotesDisplayCriteria.Create({}),
   ) {}
 

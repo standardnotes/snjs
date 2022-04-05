@@ -1,17 +1,32 @@
 import { ContentType } from '@standardnotes/common'
 import {
+  ContentlessPayloadInterface,
+  DecryptedPayloadInterface,
   DeletedPayloadInterface,
   EncryptedPayloadInterface,
   PayloadInterface,
   PayloadSource,
 } from '@standardnotes/models'
 
+export type EmitQueue<P extends PayloadInterface = PayloadInterface> = QueueElement<P>[]
+
+export type EmitInPayloads =
+  | DecryptedPayloadInterface
+  | DeletedPayloadInterface
+  | EncryptedPayloadInterface
+  | ContentlessPayloadInterface
+
+export type EmitOutPayloads =
+  | DecryptedPayloadInterface
+  | DeletedPayloadInterface
+  | EncryptedPayloadInterface
+
 export type PayloadsChangeObserverCallback = (
   /** The items are pre-existing but have been changed */
-  changed: PayloadInterface[],
+  changed: EmitOutPayloads[],
 
   /** The items have been newly inserted */
-  inserted: PayloadInterface[],
+  inserted: EmitOutPayloads[],
 
   /** The items have been deleted from local state (and remote state if applicable) */
   discarded: DeletedPayloadInterface[],

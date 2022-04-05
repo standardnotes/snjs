@@ -14,8 +14,8 @@ import {
   isDecryptedItem,
   isNotEncryptedItem,
   isNote,
-  createComponentRetrievedPayload,
-  createComponentCreatedPayload,
+  createComponentRetrievedContextPayload,
+  createComponentCreatedContextPayload,
 } from '@standardnotes/models'
 import find from 'lodash/find'
 import uniq from 'lodash/uniq'
@@ -698,7 +698,7 @@ export class ComponentViewer {
         }
 
         const payloads = responsePayloads.map((responseItem) => {
-          return createComponentRetrievedPayload(responseItem)
+          return createComponentRetrievedContextPayload(responseItem)
         })
 
         for (const payload of payloads) {
@@ -781,7 +781,7 @@ export class ComponentViewer {
             responseItem.uuid = UuidGenerator.GenerateUuid()
           }
 
-          const payload = createComponentCreatedPayload(responseItem)
+          const payload = createComponentCreatedContextPayload(responseItem)
 
           const template = CreateDecryptedItemFromPayload(payload)
           const item = await this.itemManager.insertItem(template)

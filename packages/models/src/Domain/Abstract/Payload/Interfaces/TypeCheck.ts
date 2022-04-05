@@ -1,4 +1,5 @@
 import { ItemContent } from '../../Item'
+import { ContentlessPayload } from '../Implementations/ContentlessPayload'
 import { DecryptedPayloadInterface } from './DecryptedPayload'
 import { DeletedPayloadInterface } from './DeletedPayload'
 import { EncryptedPayloadInterface } from './EncryptedPayload'
@@ -24,4 +25,8 @@ export function isEncryptedErroredPayload(
   payload: PayloadInterface,
 ): payload is EncryptedPayloadInterface {
   return isEncryptedPayload(payload) && payload.errorDecrypting === true
+}
+
+export function isContentlessPayload(payload: PayloadInterface): payload is ContentlessPayload {
+  return !('content' in payload)
 }

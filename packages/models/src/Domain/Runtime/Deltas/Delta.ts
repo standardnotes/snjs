@@ -21,7 +21,10 @@ import { Uuid } from '@standardnotes/common'
  * baseCollection, the data the server is sending as applyCollection, and determine what
  * the end state of the data should look like.
  */
-export class PayloadsDelta<T extends PayloadInterface = PayloadInterface> {
+export class PayloadsDelta<
+  B extends PayloadInterface = PayloadInterface,
+  A extends PayloadInterface = PayloadInterface,
+> {
   /**
    * @param baseCollection The authoratitive collection on top of which to compute changes.
    * @param applyCollection The collection of payloads to apply, from one given source only.
@@ -29,8 +32,8 @@ export class PayloadsDelta<T extends PayloadInterface = PayloadInterface> {
    *                             that may be neccessary to carry out computation.
    */
   constructor(
-    protected readonly baseCollection: ImmutablePayloadCollection<T>,
-    protected readonly applyCollection: ImmutablePayloadCollection<T>,
+    protected readonly baseCollection: ImmutablePayloadCollection<B>,
+    protected readonly applyCollection: ImmutablePayloadCollection<A>,
     protected readonly relatedCollectionSet?: ImmutablePayloadCollectionSet,
     protected readonly historyMap?: HistoryMap,
   ) {}

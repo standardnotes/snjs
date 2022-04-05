@@ -5,14 +5,9 @@ import {
   ItemsKeyMutatorInterface,
   DecryptedItemInterface,
   DecryptedItemMutator,
+  DecryptedPayloadInterface,
 } from '@standardnotes/models'
-import {
-  ItemInterface,
-  PayloadInterface,
-  PayloadSource,
-  EncryptedItemInterface,
-  DeletedItemInterface,
-} from '@standardnotes/models'
+import { PayloadSource, EncryptedItemInterface, DeletedItemInterface } from '@standardnotes/models'
 import { AbstractService } from '../Service/AbstractService'
 
 export type ItemManagerChangeObserverCallback = (
@@ -41,13 +36,13 @@ export interface ItemManagerInterface extends AbstractService {
   /**
    * Marks the item as deleted and needing sync.
    */
-  setItemToBeDeleted(uuid: Uuid, source?: PayloadSource): Promise<ItemInterface | undefined>
+  setItemToBeDeleted(uuid: Uuid, source?: PayloadSource): Promise<void>
 
-  setItemsToBeDeleted(uuids: Uuid[]): Promise<(ItemInterface | undefined)[]>
+  setItemsToBeDeleted(uuids: Uuid[]): Promise<void>
 
   setItemsDirty(uuids: Uuid[], isUserModified?: boolean): Promise<ItemInterface[]>
 
-  allItems(): ItemInterface[]
+  allItems(): DecryptedItemInterface[]
 
   /**
    * Inserts the item as-is by reading its payload value. This function will not
@@ -56,7 +51,10 @@ export interface ItemManagerInterface extends AbstractService {
    */
   insertItem(item: DecryptedItemInterface): Promise<DecryptedItemInterface>
 
-  emitItemFromPayload(payload: PayloadInterface, source: PayloadSource): Promise<ItemInterface>
+  emitItemFromPayload(
+    payload: DecryptedPayloadInterface,
+    source: PayloadSource,
+  ): Promise<DecryptedItemInterface>
 
   /**
    * Returns all non-deleted items keys

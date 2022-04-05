@@ -8,7 +8,7 @@ import { DecryptedItem } from '../../Abstract/Item'
 import { SNTag } from '../Tag'
 import { SNNote } from '.'
 import { SmartView } from '../SmartView'
-import { DecryptedItemCollection } from '../../Runtime/Collection/Item/ItemCollection'
+import { ItemCollection } from '../../Runtime/Collection/Item/ItemCollection'
 import { CompoundPredicate } from '../../Runtime/Predicate/CompoundPredicate'
 
 export type SearchQuery = {
@@ -43,7 +43,7 @@ export class NotesDisplayCriteria {
     return Object.freeze(copy)
   }
 
-  computeFilters(collection: DecryptedItemCollection): NoteFilter[] {
+  computeFilters(collection: ItemCollection): NoteFilter[] {
     const filters: NoteFilter[] = []
 
     let viewsPredicate: CompoundPredicate<DecryptedItem> | undefined = undefined
@@ -108,7 +108,7 @@ export function criteriaForSmartView(view: SmartView): NotesDisplayCriteria {
 
 export function notesMatchingCriteria(
   criteria: NotesDisplayCriteria,
-  collection: DecryptedItemCollection,
+  collection: ItemCollection,
 ): SNNote[] {
   const filters = criteria.computeFilters(collection)
   const allNotes = collection.displayElements(ContentType.Note) as SNNote[]
@@ -129,7 +129,7 @@ function notePassesFilters(note: SNNote, filters: NoteFilter[]) {
 export function noteMatchesQuery(
   noteToMatch: SNNote,
   searchQuery: SearchQuery,
-  noteCollection: DecryptedItemCollection,
+  noteCollection: ItemCollection,
 ): boolean {
   const noteTags = noteCollection.elementsReferencingElement(
     noteToMatch,

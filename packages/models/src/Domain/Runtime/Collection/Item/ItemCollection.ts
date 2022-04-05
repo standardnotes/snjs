@@ -11,7 +11,7 @@ import { CollectionInterface } from '../CollectionInterface'
 import { DeletedItemInterface } from '../../../Abstract/Item'
 import { Collection } from '../Collection'
 
-export class DecryptedItemCollection
+export class ItemCollection
   extends Collection<DecryptedItemInterface, DeletedItemInterface>
   implements SNIndex, CollectionInterface
 {
@@ -59,7 +59,7 @@ export class DecryptedItemCollection
     }
   }
 
-  public set(elements: DecryptedItemInterface | DecryptedItemInterface[]): void {
+  public set(elements: (DecryptedItemInterface | DeletedItemInterface)[]): void {
     super.set(elements)
 
     elements = uniqueArrayByKey(Array.isArray(elements) ? elements : [elements], 'uuid')
@@ -84,7 +84,6 @@ export class DecryptedItemCollection
     elements = Array.isArray(elements) ? elements : [elements]
 
     for (const element of elements) {
-      delete this.map[element.uuid]
       this.referenceMap.removeFromMap(element.uuid)
     }
 
@@ -114,7 +113,7 @@ export class DecryptedItemCollection
     contentType?: ContentType,
   ): DecryptedItemInterface[] {
     const uuids = this.uuidsThatReferenceUuid(element.uuid)
-    const items = this.findAll(uuids)
+    const items = this.findAllNondeleted(uuids)
 
     if (!contentType) {
       return items
@@ -164,9 +163,13 @@ export class DecryptedItemCollection
     }
   }
 
-  /** Returns the filtered and sorted list of elements for this content type,
-   * according to the options set via `setDisplayOptions` */
-  public displayElements(contentType: ContentType): DecryptedItemInterface[] {
+  /**
+   * Returns the filtered and sorted list of elements for this content type,
+   * according to the options set via `setDisplayOptions`
+   */
+  public displayElements<I extends DecryptedItemInterface = DecryptedItemInterface>(
+    contentType: ContentType,
+  ): I[] {
     const elements = this.sortedMap[contentType]
     if (!elements) {
       throw Error(
@@ -174,7 +177,7 @@ export class DecryptedItemCollection
        non-configured content type ${contentType}`,
       )
     }
-    return elements.slice()
+    return elements.slice() as I[]
   }
 
   private filterSortElements(elements: (DecryptedItemInterface | DeletedItemInterface)[]) {

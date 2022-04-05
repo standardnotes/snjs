@@ -7,7 +7,14 @@ import { TransactionalMutation } from './TransactionalMutation'
 import { UuidString } from '../../Types/UuidString'
 import * as Models from '@standardnotes/models'
 import * as Services from '@standardnotes/services'
-import { DecryptedPayload, DeletedItem, EncryptedItem } from '@standardnotes/models'
+import {
+  CreateItemFromPayload,
+  DecryptedPayload,
+  DeletedPayloadInterface,
+  DeleteItemMutator,
+  MutationType,
+  SNNote,
+} from '@standardnotes/models'
 import { ItemsClientInterface } from './ItemsClientInterface'
 
 type ItemsChangeObserver = {
@@ -31,8 +38,8 @@ export class ItemManager
 {
   private unsubChangeObserver: () => void
   private observers: ItemsChangeObserver[] = []
-  private collection!: Models.DecryptedItemCollection
-  private notesView!: Models.NotesCollection
+  private collection!: Models.ItemCollection
+  private notesCollection!: Models.NotesCollection
   private systemSmartViews: Models.SmartView[]
   private tagNotesIndex!: Models.TagNotesIndex
 
@@ -56,14 +63,14 @@ export class ItemManager
   }
 
   private createCollection() {
-    this.collection = new Models.DecryptedItemCollection()
+    this.collection = new Models.ItemCollection()
     this.collection.setDisplayOptions(ContentType.Note, Models.CollectionSort.CreatedAt, 'dsc')
     this.collection.setDisplayOptions(ContentType.Tag, Models.CollectionSort.Title, 'dsc')
     this.collection.setDisplayOptions(ContentType.ItemsKey, Models.CollectionSort.CreatedAt, 'asc')
     this.collection.setDisplayOptions(ContentType.Component, Models.CollectionSort.CreatedAt, 'asc')
     this.collection.setDisplayOptions(ContentType.Theme, Models.CollectionSort.Title, 'asc')
     this.collection.setDisplayOptions(ContentType.SmartView, Models.CollectionSort.Title, 'dsc')
-    this.notesView = new Models.NotesCollection(this.collection)
+    this.notesCollection = new Models.NotesCollection(this.collection)
     this.tagNotesIndex = new Models.TagNotesIndex(this.collection, this.tagNotesIndex?.observers)
   }
 
@@ -141,16 +148,21 @@ export class ItemManager
       ...override,
     })
 
-    this.notesView.setCriteria(updatedCriteria)
+    this.notesCollection.setCriteria(updatedCriteria)
   }
 
   public getDisplayableItems<T extends Models.DecryptedItemInterface>(
-    contentType: ContentType,
+    contentType:
+      | ContentType.Tag
+      | ContentType.SmartView
+      | ContentType.Theme
+      | ContentType.Component,
   ): T[] {
-    if (contentType === ContentType.Note) {
-      return this.notesView.displayElements() as unknown as T[]
-    }
-    return this.collection.displayElements(contentType) as unknown as T[]
+    return this.collection.displayElements(contentType)
+  }
+
+  public getDisplayableNotes(): SNNote[] {
+    return this.notesCollection.displayElements()
   }
 
   public deinit(): void {
@@ -158,7 +170,7 @@ export class ItemManager
     ;(this.unsubChangeObserver as unknown) = undefined
     ;(this.payloadManager as unknown) = undefined
     ;(this.collection as unknown) = undefined
-    ;(this.notesView as unknown) = undefined
+    ;(this.notesCollection as unknown) = undefined
   }
 
   resetState(): void {
@@ -171,10 +183,10 @@ export class ItemManager
   findItem<T extends Models.DecryptedItemInterface = Models.DecryptedItemInterface>(
     uuid: UuidString,
   ): T | undefined {
-    const itemFromCollection = this.collection.find(uuid)
+    const itemFromCollection = this.collection.findNondeleted<T>(uuid)
 
     if (itemFromCollection) {
-      return itemFromCollection as T
+      return itemFromCollection
     }
 
     const itemFromSmartViews = this.systemSmartViews.find((tag) => tag.uuid === uuid)
@@ -196,22 +208,24 @@ export class ItemManager
    * Returns all items matching given ids
    */
   findItems<T extends Models.DecryptedItemInterface>(uuids: UuidString[]): T[] {
-    return this.collection.findAll(uuids) as T[]
+    return this.collection.findAllNondeleted(uuids)
   }
 
   /**
    * If item is not found, an `undefined` element
    * will be inserted into the array.
    */
-  findItemsIncludingBlanks<T extends Models.DecryptedItemInterface>(uuids: UuidString[]): T[] {
-    return this.collection.findAllIncludingBlanks(uuids) as T[]
+  findItemsIncludingBlanks<T extends Models.DecryptedItemInterface>(
+    uuids: UuidString[],
+  ): (T | undefined)[] {
+    return this.collection.findAllNondeletedIncludingBlanks(uuids)
   }
 
   /**
    * Returns a detached array of all items
    */
   public get items(): Models.DecryptedItemInterface[] {
-    return this.collection.all()
+    return this.collection.nondeletedElements()
   }
 
   itemsKeys(): Models.ItemsKeyInterface[] {
@@ -222,7 +236,7 @@ export class ItemManager
    * Returns all non-deleted notes
    */
   get notes() {
-    return this.notesView.displayElements()
+    return this.notesCollection.displayElements()
   }
 
   /**
@@ -336,7 +350,7 @@ export class ItemManager
     source: Models.PayloadSource,
     sourceKey?: string,
   ) {
-    const removeItems: (Models.EncryptedItemInterface | Models.DeletedItemInterface)[] = []
+    const createItem = (payload: Models.PayloadInterface) => CreateItemFromPayload(payload)
     const changedItems: Models.DecryptedItemInterface[] = []
     const insertedItems: Models.DecryptedItemInterface[] = []
     const discardedItems: Models.DeletedItemInterface[] = discardedPayloads.map(
@@ -347,11 +361,7 @@ export class ItemManager
     )
 
     for (const payload of changedPayloads) {
-      if (Models.isDeletedPayload(payload)) {
-        removeItems.push(new DeletedItem(payload))
-      } else if (Models.isEncryptedErroredPayload(payload)) {
-        removeItems.push(new EncryptedItem(payload))
-      } else if (Models.isDecryptedPayload(payload)) {
+      if (Models.isDecryptedPayload(payload)) {
         const item = Models.CreateDecryptedItemFromPayload(payload)
         changedItems.push(item)
       }
@@ -372,7 +382,7 @@ export class ItemManager
     }
 
     this.collection.onChange(delta)
-    this.notesView.onChange(delta)
+    this.notesCollection.onChange(delta)
     this.tagNotesIndex.onChange(delta)
 
     this.notifyObservers(
@@ -672,7 +682,7 @@ export class ItemManager
   /**
    * Returns an array of items that need to be synced.
    */
-  public getDirtyItems(): Models.DecryptedItemInterface[] {
+  public getDirtyItems(): (Models.DecryptedItemInterface | Models.DeletedItemInterface)[] {
     const dirty = this.collection.dirtyElements()
     return dirty.filter((item) => {
       return item.isSyncable
@@ -777,21 +787,17 @@ export class ItemManager
 
   public async setItemToBeDeleted(
     uuid: UuidString,
-    source?: Models.PayloadSource,
-  ): Promise<Models.DecryptedItemInterface | undefined> {
+    source: Models.PayloadSource = Models.PayloadSource.LocalChanged,
+  ): Promise<void> {
     /** Capture referencing ids before we delete the item below, otherwise
      * the index may be updated before we get a chance to act on it */
     const referencingIds = this.collection.uuidsThatReferenceUuid(uuid)
 
     const item = this.findSureItem(uuid)
-    const changedItem = await this.changeItem(
-      uuid,
-      (mutator) => {
-        mutator.setDeleted()
-      },
-      undefined,
-      source,
-    )
+    const mutator = new DeleteItemMutator(item, MutationType.UpdateUserTimestamps)
+    const deletedPayload = mutator.getDeletedResult()
+
+    await this.payloadManager.emitPayload(deletedPayload, source)
 
     /** Handle indirect relationships.
      * (Direct relationships are cleared by clearing content above) */
@@ -803,16 +809,13 @@ export class ItemManager
         })
       }
     }
-    return changedItem
   }
 
   /**
    * Like `setItemToBeDeleted`, but acts on an array of items.
    */
-  public async setItemsToBeDeleted(
-    uuids: UuidString[],
-  ): Promise<(Models.DecryptedItemInterface | undefined)[]> {
-    return Promise.all(uuids.map((uuid) => this.setItemToBeDeleted(uuid)))
+  public async setItemsToBeDeleted(uuids: UuidString[]): Promise<void> {
+    await Promise.all(uuids.map((uuid) => this.setItemToBeDeleted(uuid)))
   }
 
   /**
@@ -821,8 +824,7 @@ export class ItemManager
   public getItems<T extends Models.DecryptedItemInterface>(
     contentType: ContentType | ContentType[],
   ): T[] {
-    const items = this.collection.all(contentType)
-    return items as T[]
+    return this.collection.allNondeleted<T>(contentType)
   }
 
   /**
@@ -832,7 +834,7 @@ export class ItemManager
     contentType: ContentType,
     predicate: Models.PredicateInterface<T>,
   ): T[] {
-    return this.itemsMatchingPredicates(contentType, [predicate]) as T[]
+    return this.itemsMatchingPredicates(contentType, [predicate])
   }
 
   /**
@@ -841,7 +843,7 @@ export class ItemManager
   public itemsMatchingPredicates<T extends Models.DecryptedItemInterface>(
     contentType: ContentType,
     predicates: Models.PredicateInterface<T>[],
-  ): Models.DecryptedItemInterface[] {
+  ): T[] {
     const subItems = this.getItems<T>(contentType)
     return this.subItemsMatchingPredicates(subItems, predicates)
   }
@@ -914,6 +916,7 @@ export class ItemManager
     if (parentId) {
       return this.findItem(parentId) as Models.SNTag
     }
+    return undefined
   }
 
   public getTagPrefixTitle(tag: Models.SNTag): string | undefined {
@@ -1165,7 +1168,7 @@ export class ItemManager
   }
 
   public notesMatchingSmartView(view: Models.SmartView): Models.SNNote[] {
-    return this.notesView.notesMatchingSmartView(view)
+    return this.notesCollection.notesMatchingSmartView(view)
   }
 
   public get allNotesSmartView(): Models.SmartView {
@@ -1226,14 +1229,19 @@ export class ItemManager
    */
   public async removeAllItemsFromMemory(): Promise<void> {
     const uuids = Uuids(this.items)
-    /** We don't want to set as dirty, since we want to dispose of immediately. */
-    await this.changeItems(
-      uuids,
-      (mutator) => {
-        mutator.setDeleted()
-      },
-      Models.MutationType.NonDirtying,
-    )
+    const results: DeletedPayloadInterface[] = []
+
+    for (const uuid of uuids) {
+      const mutator = new DeleteItemMutator(
+        this.findSureItem(uuid),
+        /** We don't want to set as dirty, since we want to dispose of immediately. */
+        Models.MutationType.NonDirtying,
+      )
+      results.push(mutator.getDeletedResult())
+    }
+
+    await this.payloadManager.emitPayloads(results, Models.PayloadSource.LocalChanged)
+
     this.resetState()
     this.payloadManager.resetState()
   }

@@ -1,12 +1,12 @@
 import { ContentType } from '@standardnotes/common'
 import {
   EncryptedPayloadInterface,
-  createEncryptedPayloadForFileExport,
-  createEncryptedPayloadForSync,
-  createEncryptedPayloadForLocalStorage,
+  createEncryptedFileExportContextPayload,
+  createEncryptedSyncContextPayload,
+  createEncryptedLocalStorageContextPayload,
   DecryptedPayloadInterface,
-  createDecryptedPayloadForFileExport,
-  createDecryptedPayloadForLocalStorage,
+  createDecryptedFileExportContextPayload,
+  createDecryptedLocalStorageContextPayload,
 } from '@standardnotes/models'
 import { EncryptedParameters } from '../Encryption/EncryptedParameters'
 import { EncryptedExportIntent, DecryptedExportIntent } from './ExportIntent'
@@ -42,11 +42,11 @@ export function CreateEncryptedContextPayload(
 ): EncryptedPayloadInterface {
   switch (intent) {
     case EncryptedExportIntent.Sync:
-      return createEncryptedPayloadForSync(fromPayload)
+      return createEncryptedSyncContextPayload(fromPayload)
     case EncryptedExportIntent.FileEncrypted:
-      return createEncryptedPayloadForFileExport(fromPayload)
+      return createEncryptedFileExportContextPayload(fromPayload)
     case EncryptedExportIntent.LocalStorageEncrypted:
-      return createEncryptedPayloadForLocalStorage(fromPayload)
+      return createEncryptedLocalStorageContextPayload(fromPayload)
   }
 }
 
@@ -56,9 +56,9 @@ export function CreateDecryptedContextPayload(
 ): DecryptedPayloadInterface {
   switch (intent) {
     case DecryptedExportIntent.FileDecrypted:
-      return createDecryptedPayloadForFileExport(fromPayload)
+      return createDecryptedFileExportContextPayload(fromPayload)
     case DecryptedExportIntent.LocalStorageDecrypted:
-      return createDecryptedPayloadForLocalStorage(fromPayload)
+      return createDecryptedLocalStorageContextPayload(fromPayload)
   }
 }
 

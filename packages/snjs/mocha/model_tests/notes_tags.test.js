@@ -330,7 +330,7 @@ describe('notes and tags', () => {
       }),
     )
     const titles = this.application.items
-      .getDisplayableItems(ContentType.Note)
+      .getDisplayableNotes()
       .map((note) => note.title)
     expect(titles).to.deep.equal(['A', 'B', 'Y', 'Z'])
   })
@@ -382,7 +382,7 @@ describe('notes and tags', () => {
           tags: [tag],
         }),
       )
-      const displayedNotes = this.application.items.getDisplayableItems(ContentType.Note)
+      const displayedNotes = this.application.items.getDisplayableNotes()
       expect(displayedNotes.length).to.equal(1)
       expect(displayedNotes[0].uuid).to.equal(taggedNote.uuid)
     })
@@ -406,7 +406,7 @@ describe('notes and tags', () => {
           includeTrashed: false,
         }),
       )
-      const displayedNotes = this.application.items.getDisplayableItems(ContentType.Note)
+      const displayedNotes = this.application.items.getDisplayableNotes()
       expect(displayedNotes.length).to.equal(1)
       expect(displayedNotes[0].uuid).to.equal(taggedNote.uuid)
     })
@@ -440,7 +440,7 @@ describe('notes and tags', () => {
         }),
       )
 
-      const displayedNotes = this.application.items.getDisplayableItems(ContentType.Note)
+      const displayedNotes = this.application.items.getDisplayableNotes()
       expect(displayedNotes).to.have.length(4)
       expect(displayedNotes[0].title).to.equal('B')
       expect(displayedNotes[1].title).to.equal('A')
@@ -478,7 +478,7 @@ describe('notes and tags', () => {
         }),
       )
 
-      const displayedNotes = this.application.items.getDisplayableItems(ContentType.Note)
+      const displayedNotes = this.application.items.getDisplayableNotes()
       expect(displayedNotes).to.deep.equal(matches)
       expect(matches.length).to.equal(1)
       expect(matches[0].uuid).to.equal(note.uuid)
@@ -518,7 +518,7 @@ describe('notes and tags', () => {
         }),
       )
 
-      const displayedNotes = this.application.items.getDisplayableItems(ContentType.Note)
+      const displayedNotes = this.application.items.getDisplayableNotes()
       expect(displayedNotes).to.deep.equal(matches)
       expect(matches.length).to.equal(1)
       expect(matches[0].uuid).to.equal(note.uuid)
@@ -557,7 +557,7 @@ describe('notes and tags', () => {
         }),
       )
 
-      const displayedNotes = this.application.items.getDisplayableItems(ContentType.Note)
+      const displayedNotes = this.application.items.getDisplayableNotes()
       expect(displayedNotes).to.deep.equal(matches)
       expect(matches.length).to.equal(1)
       expect(matches[0].uuid).to.equal(unpinnedNote.uuid)
@@ -594,7 +594,7 @@ describe('notes and tags', () => {
           views: [view],
         }),
       )
-      const displayedNotes = this.application.items.getDisplayableItems(ContentType.Note)
+      const displayedNotes = this.application.items.getDisplayableNotes()
       expect(displayedNotes).to.deep.equal(matches)
       expect(matches.length).to.equal(1)
       expect(matches[0].uuid).to.equal(longNote.uuid)
@@ -649,7 +649,7 @@ describe('notes and tags', () => {
           views: [view],
         }),
       )
-      const displayedNotes = this.application.items.getDisplayableItems(ContentType.Note)
+      const displayedNotes = this.application.items.getDisplayableNotes()
       expect(displayedNotes).to.deep.equal(matches)
       expect(matches.length).to.equal(1)
       expect(matches[0].uuid).to.equal(recentNote.uuid)
@@ -685,7 +685,7 @@ describe('notes and tags', () => {
           views: [view],
         }),
       )
-      const displayedNotes = this.application.items.getDisplayableItems(ContentType.Note)
+      const displayedNotes = this.application.items.getDisplayableNotes()
       expect(displayedNotes).to.deep.equal(matches)
       expect(matches.length).to.equal(1)
       expect(matches[0].uuid).to.equal(untaggedNote.uuid)
@@ -721,7 +721,7 @@ describe('notes and tags', () => {
           views: [view],
         }),
       )
-      const displayedNotes = this.application.items.getDisplayableItems(ContentType.Note)
+      const displayedNotes = this.application.items.getDisplayableNotes()
       expect(displayedNotes).to.deep.equal(matches)
       expect(matches.length).to.equal(1)
       expect(matches[0].uuid).to.equal(taggedNote.uuid)
@@ -772,7 +772,7 @@ describe('notes and tags', () => {
           views: [view],
         }),
       )
-      const displayedNotes = this.application.items.getDisplayableItems(ContentType.Note)
+      const displayedNotes = this.application.items.getDisplayableNotes()
       expect(displayedNotes).to.deep.equal(matches)
       expect(matches.length).to.equal(1)
       expect(matches[0].uuid).to.equal(pinnedAndLockedNote.uuid)
@@ -829,7 +829,7 @@ describe('notes and tags', () => {
           views: [view],
         }),
       )
-      const displayedNotes = this.application.items.getDisplayableItems(ContentType.Note)
+      const displayedNotes = this.application.items.getDisplayableNotes()
       expect(displayedNotes.length).to.equal(matches.length)
       expect(matches.length).to.equal(3)
       expect(matches.find((note) => note.uuid === protectedNote.uuid)).to.exist
@@ -863,7 +863,7 @@ describe('notes and tags', () => {
       }),
     )
 
-    const displayedNotes = this.application.items.getDisplayableItems(ContentType.Note)
+    const displayedNotes = this.application.items.getDisplayableNotes()
     expect(displayedNotes.length).to.equal(2)
     expect(displayedNotes[0].uuid).to.equal(notePayload1.uuid)
     expect(displayedNotes[1].uuid).to.equal(notePayload4.uuid)
@@ -894,7 +894,7 @@ describe('notes and tags', () => {
       }),
     )
 
-    const displayedNotes = this.application.items.getDisplayableItems(ContentType.Note)
+    const displayedNotes = this.application.items.getDisplayableNotes()
     expect(displayedNotes.length).to.equal(3)
     expect(displayedNotes[0].uuid).to.equal(notePayload1.uuid)
     expect(displayedNotes[1].uuid).to.equal(notePayload2.uuid)

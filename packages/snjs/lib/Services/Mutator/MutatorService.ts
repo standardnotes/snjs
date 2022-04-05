@@ -36,7 +36,7 @@ export class MutatorService extends AbstractService implements MutatorClientInte
     super(internalEventBus)
   }
 
-  public async savePayload(payload: Models.PurePayload): Promise<void> {
+  public async savePayload(payload: Models.PayloadInterface): Promise<void> {
     const dirtied = Models.CopyPayload(payload, {
       dirty: true,
       dirtiedDate: new Date(),
@@ -48,7 +48,10 @@ export class MutatorService extends AbstractService implements MutatorClientInte
   public async insertItem(
     item: Models.DecryptedItemInterface,
   ): Promise<Models.DecryptedItemInterface> {
-    const mutator = Models.CreateDecryptedMutatorForItem(item, Models.MutationType.UpdateUserTimestamps)
+    const mutator = Models.CreateDecryptedMutatorForItem(
+      item,
+      Models.MutationType.UpdateUserTimestamps,
+    )
     const dirtiedPayload = mutator.getResult()
     const insertedItem = await this.itemManager.emitItemFromPayload(dirtiedPayload)
     return insertedItem
@@ -231,7 +234,7 @@ export class MutatorService extends AbstractService implements MutatorClientInte
 
   public createTemplateItem<
     C extends Models.ItemContent = Models.ItemContent,
-    I extends Models.DecryptedItemInterface = Models.DecryptedItemInterface,
+    I extends Models.DecryptedItemInterface<C> = Models.DecryptedItemInterface<C>,
   >(contentType: ContentType, content?: C): I {
     return this.itemManager.createTemplateItem(contentType, content)
   }

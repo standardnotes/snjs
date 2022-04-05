@@ -1,12 +1,5 @@
 import { Uuid } from '@standardnotes/common'
-import {
-  DeletedPayload,
-  DeletedPayloadInterface,
-  EncryptedPayload,
-  EncryptedPayloadInterface,
-} from '../Payload'
-import { DeletedTransferPayload } from '../TransferPayload/Interfaces/DeletedTransferPayload'
-import { EncryptedTransferPayload } from '../TransferPayload/Interfaces/EncryptedTransferPayload'
+import { DeletedPayloadInterface, EncryptedPayloadInterface } from '../Payload'
 import { ContextPayload } from './ContextPayload'
 
 export interface ServerSyncContextualPayload extends ContextPayload {
@@ -22,10 +15,10 @@ export interface ServerSyncContextualPayload extends ContextPayload {
   updated_at: Date
 }
 
-export function createEncryptedPayloadForSync(
+export function createEncryptedSyncContextPayload(
   fromPayload: EncryptedPayloadInterface,
-): EncryptedPayloadInterface {
-  const params: ServerSyncContextualPayload = {
+): ServerSyncContextualPayload {
+  return {
     content_type: fromPayload.content_type,
     created_at_timestamp: fromPayload.created_at_timestamp,
     created_at: fromPayload.created_at,
@@ -39,13 +32,12 @@ export function createEncryptedPayloadForSync(
     items_key_id: fromPayload.items_key_id,
     auth_hash: fromPayload.auth_hash,
   }
-  return new EncryptedPayload(params as EncryptedTransferPayload)
 }
 
-export function createDeletedPayloadForSync(
+export function createDeletedSyncContextPayload(
   fromPayload: DeletedPayloadInterface,
-): DeletedPayloadInterface {
-  const params: ServerSyncContextualPayload = {
+): ServerSyncContextualPayload {
+  return {
     content_type: fromPayload.content_type,
     created_at_timestamp: fromPayload.created_at_timestamp,
     created_at: fromPayload.created_at,
@@ -56,5 +48,4 @@ export function createDeletedPayloadForSync(
     uuid: fromPayload.uuid,
     content: undefined,
   }
-  return new DeletedPayload(params as DeletedTransferPayload)
 }

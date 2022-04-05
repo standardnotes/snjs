@@ -1,5 +1,4 @@
 import { ItemContent } from '../Item/Interfaces/ItemContent'
-import { DecryptedPayload, DecryptedPayloadInterface, PayloadSource } from '../Payload'
 import { DecryptedTransferPayload } from '../TransferPayload'
 import { ContextPayload } from './ContextPayload'
 
@@ -13,14 +12,13 @@ export interface ComponentRetrievedContextualPayload<C extends ItemContent = Ite
   created_at?: Date
 }
 
-export function createComponentRetrievedPayload(
+export function createComponentRetrievedContextPayload(
   fromPayload: DecryptedTransferPayload,
-): DecryptedPayloadInterface {
-  const params: ComponentRetrievedContextualPayload = {
+): ComponentRetrievedContextualPayload {
+  return {
     content_type: fromPayload.content_type,
     content: fromPayload.content,
     created_at: fromPayload.created_at,
     uuid: fromPayload.uuid,
   }
-  return new DecryptedPayload(params, PayloadSource.ComponentRetrieved)
 }

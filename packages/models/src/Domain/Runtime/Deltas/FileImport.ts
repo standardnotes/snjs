@@ -6,7 +6,11 @@ import { PayloadsDelta } from './Delta'
 import { DecryptedPayloadInterface } from '../../Abstract/Payload/Interfaces/DecryptedPayload'
 import { ImmutablePayloadCollectionSet } from '../Collection/Payload/ImmutablePayloadCollectionSet'
 import { HistoryMap } from '../History'
-import { isDecryptedPayload, PayloadInterface } from '../../Abstract/Payload'
+import {
+  DeletedPayloadInterface,
+  isDecryptedPayload,
+  PayloadInterface,
+} from '../../Abstract/Payload'
 
 export class DeltaFileImport extends PayloadsDelta {
   constructor(
@@ -36,7 +40,7 @@ export class DeltaFileImport extends PayloadsDelta {
   }
 
   private async payloadsByHandlingPayload(
-    payload: DecryptedPayloadInterface,
+    payload: DecryptedPayloadInterface | DeletedPayloadInterface,
     currentResults: Array<DecryptedPayloadInterface>,
   ) {
     /**
