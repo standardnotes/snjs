@@ -387,6 +387,7 @@ export class SNApplication implements InternalServices.ListedClientInterface {
     if (await this.protectionService.authorizeSessionRevoking()) {
       return this.sessionManager.revokeSession(sessionId)
     }
+    return undefined
   }
 
   /**
@@ -1189,7 +1190,6 @@ export class SNApplication implements InternalServices.ListedClientInterface {
       this.alertService,
       this.environment,
       this.platform,
-      this.options.runtime,
       this.internalEventBus,
     )
     this.services.push(this.componentManager)

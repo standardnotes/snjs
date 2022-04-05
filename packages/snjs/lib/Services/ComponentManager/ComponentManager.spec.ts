@@ -12,11 +12,9 @@ import {
 import { DesktopManagerInterface } from '@Lib/Services/ComponentManager/types'
 import { FeatureIdentifier } from '@standardnotes/features'
 import { ContentType } from '@standardnotes/common'
-import { SNItem, SNComponent } from '@standardnotes/models'
+import { GenericItem, SNComponent } from '@standardnotes/models'
 import { Environment, Platform } from '@Lib/Application/Platforms'
-import { Runtime } from '@standardnotes/common'
 import { SNAlertService } from '@Lib/Services/Alert/AlertService'
-
 import { ItemManager } from '@Lib/Services/Items/ItemManager'
 import { SNFeaturesService } from '@Lib/Services/Features/FeaturesService'
 import { SNComponentManager } from './ComponentManager'
@@ -52,7 +50,6 @@ describe('featuresService', () => {
       alertService,
       environment,
       platform,
-      Runtime.Prod,
       internalEventBus,
     )
     manager.setDesktopManager(desktopManager)
@@ -67,7 +64,7 @@ describe('featuresService', () => {
     itemManager = {} as jest.Mocked<ItemManager>
     itemManager.getItems = jest.fn().mockReturnValue([])
     itemManager.createItem = jest.fn()
-    itemManager.changeComponent = jest.fn().mockReturnValue({} as jest.Mocked<SNItem>)
+    itemManager.changeComponent = jest.fn().mockReturnValue({} as jest.Mocked<GenericItem>)
     itemManager.setItemsToBeDeleted = jest.fn()
     itemManager.addObserver = jest.fn()
     itemManager.changeItem = jest.fn()
