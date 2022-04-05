@@ -1,14 +1,14 @@
 import { Uuid } from '@standardnotes/common'
-import { ItemContent } from '../../../Item'
+import { ItemContent } from '../Item'
 import { ContextPayload } from './ContextPayload'
 import {
   DecryptedPayload,
   DecryptedPayloadInterface,
   EncryptedPayload,
   EncryptedPayloadInterface,
-} from '../../../Payload'
-import { EncryptedTransferPayload } from '../EncryptedTransferPayload'
-import { DecryptedTransferPayload } from '../DecryptedTransferPayload'
+} from '../Payload'
+import { EncryptedTransferPayload } from '../TransferPayload/Interfaces/EncryptedTransferPayload'
+import { DecryptedTransferPayload } from '../TransferPayload/Interfaces/DecryptedTransferPayload'
 
 export interface FileEncryptedExportContextualPayload extends ContextPayload {
   auth_hash?: string

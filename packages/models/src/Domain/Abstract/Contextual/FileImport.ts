@@ -1,5 +1,5 @@
 import { Uuid } from '@standardnotes/common'
-import { ItemContent } from '../../../Item/Interfaces/ItemContent'
+import { ItemContent } from '../Item/Interfaces/ItemContent'
 import { ContextPayload } from './ContextPayload'
 
 export interface FileImportContextualPayload<C extends ItemContent = ItemContent>

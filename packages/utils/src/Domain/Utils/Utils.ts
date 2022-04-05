@@ -77,6 +77,13 @@ export function searchArray<T>(
   return find(array, predicate) as T
 }
 
+export function sureSearchArray<T>(
+  array: T[],
+  predicate: Partial<T>
+): T {
+  return searchArray(array, predicate) as T
+}
+
 /**
  * @returns Whether the value is a function or object
  */

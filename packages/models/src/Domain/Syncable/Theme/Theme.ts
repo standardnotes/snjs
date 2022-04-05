@@ -4,6 +4,10 @@ import { DecryptedItem } from '../../Abstract/Item/Implementations/DecryptedItem
 import { ConflictStrategy } from '../../Abstract/Item/Types/ConflictStrategy'
 import { AppDataField } from '../../Abstract/Item/Types/AppDataField'
 import { HistoryEntryInterface } from '../../Runtime/History'
+import { ItemInterface } from '../../Abstract/Item'
+import { ContentType } from '@standardnotes/common'
+
+export const isTheme = (x: ItemInterface): x is SNTheme => x.content_type === ContentType.Theme
 
 export class SNTheme extends SNComponent {
   public area: ComponentArea = ComponentArea.Themes

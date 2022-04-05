@@ -4,9 +4,9 @@ import {
   DeletedPayloadInterface,
   EncryptedPayload,
   EncryptedPayloadInterface,
-} from '../../../Payload'
-import { DeletedTransferPayload } from '../DeletedTransferPayload'
-import { EncryptedTransferPayload } from '../EncryptedTransferPayload'
+} from '../Payload'
+import { DeletedTransferPayload } from '../TransferPayload/Interfaces/DeletedTransferPayload'
+import { EncryptedTransferPayload } from '../TransferPayload/Interfaces/EncryptedTransferPayload'
 import { ContextPayload } from './ContextPayload'
 
 export interface ServerSyncContextualPayload extends ContextPayload {

@@ -1,4 +1,4 @@
-import { ItemContent } from '../../../Item/Interfaces/ItemContent'
+import { ItemContent } from '../Item/Interfaces/ItemContent'
 import { ContextPayload } from './ContextPayload'
 
 export interface SessionHistoryContextualPayload<C extends ItemContent = ItemContent>

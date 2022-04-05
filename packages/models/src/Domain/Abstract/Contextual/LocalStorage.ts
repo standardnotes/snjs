@@ -1,6 +1,6 @@
 import { Uuid } from '@standardnotes/common'
 import { ContextPayload } from './ContextPayload'
-import { ItemContent } from '../../../Item'
+import { ItemContent } from '../Item'
 import {
   DecryptedPayload,
   DecryptedPayloadInterface,
@@ -8,10 +8,10 @@ import {
   DeletedPayloadInterface,
   EncryptedPayload,
   EncryptedPayloadInterface,
-} from '../../../Payload'
-import { EncryptedTransferPayload } from '../EncryptedTransferPayload'
-import { DecryptedTransferPayload } from '../DecryptedTransferPayload'
-import { DeletedTransferPayload } from '../DeletedTransferPayload'
+} from '../Payload'
+import { EncryptedTransferPayload } from '../TransferPayload/Interfaces/EncryptedTransferPayload'
+import { DecryptedTransferPayload } from '../TransferPayload/Interfaces/DecryptedTransferPayload'
+import { DeletedTransferPayload } from '../TransferPayload/Interfaces/DeletedTransferPayload'
 
 export interface LocalStorageEncryptedContextualPayload extends ContextPayload {
   auth_hash?: string
