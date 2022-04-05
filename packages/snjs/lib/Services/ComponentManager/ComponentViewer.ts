@@ -3,13 +3,17 @@ import { FeatureStatus, FeaturesEvent } from '@Lib/Services/Features'
 import { SNFeaturesService } from '@Lib/Services'
 import { ComponentArea, FindNativeFeature } from '@standardnotes/features'
 import {
-  SNItem,
   SNNote,
   SNComponent,
   PrefKey,
   NoteContent,
   MutationType,
   CreateDecryptedItemFromPayload,
+  DecryptedItemInterface,
+  DeletedItemInterface,
+  EncryptedItemInterface,
+  isDecryptedItem,
+  isEncryptedItem,
 } from '@standardnotes/models'
 import find from 'lodash/find'
 import uniq from 'lodash/uniq'
@@ -24,8 +28,6 @@ import {
 } from '@Lib/Application/Platforms'
 import {
   ItemContent,
-  RawPayload,
-  CreateSourcedPayloadFromObject,
   PayloadSource,
   PayloadFormat,
   ComponentDataDomain,
@@ -43,9 +45,8 @@ import {
 import { ComponentAction, ComponentPermission } from '@standardnotes/features'
 import { ItemManager } from '@Lib/Services/Items/ItemManager'
 import { UuidString } from '@Lib/Types/UuidString'
-import { ContentType, Runtime } from '@standardnotes/common'
+import { ContentType } from '@standardnotes/common'
 import {
-  concatArrays,
   isString,
   extendArray,
   searchArray,
@@ -54,7 +55,7 @@ import {
   log,
   nonSecureRandomIdentifier,
   UuidGenerator,
-  Uuids
+  Uuids,
 } from '@standardnotes/utils'
 import { MessageData } from '..'
 
@@ -99,7 +100,7 @@ export class ComponentViewer {
   private loggingEnabled = false
   public identifier = nonSecureRandomIdentifier()
   private actionObservers: ActionObserver[] = []
-  public overrideContextItem?: SNItem
+  public overrideContextItem?: DecryptedItemInterface
   private featureStatus: FeatureStatus
   private removeFeaturesObserver: () => void
   private eventObservers: EventObserver[] = []
@@ -119,7 +120,6 @@ export class ComponentViewer {
     featuresService: SNFeaturesService,
     private environment: Environment,
     private platform: Platform,
-    private runtime: Runtime,
     private componentManagerFunctions: ComponentManagerFunctions,
     public readonly url?: string,
     private contextItemUuid?: UuidString,
@@ -127,8 +127,8 @@ export class ComponentViewer {
   ) {
     this.removeItemObserver = this.itemManager.addObserver(
       ContentType.Any,
-      (changed, inserted, discarded, _ignored, source, sourceKey) => {
-        const items = concatArrays(changed, inserted, discarded) as SNItem[]
+      (changed, inserted, removed, _ignored, source, sourceKey) => {
+        const items = [...changed, ...inserted, ...removed]
         this.handleChangesInItems(items, source, sourceKey)
       },
     )
@@ -233,16 +233,24 @@ export class ComponentViewer {
     if (this.hasUrlError()) {
       return ComponentViewerError.MissingUrl
     }
+
+    return undefined
   }
 
-  private updateOurComponentRefFromChangedItems(items: SNItem[]): void {
+  private updateOurComponentRefFromChangedItems(
+    items: (DecryptedItemInterface | DeletedItemInterface | EncryptedItemInterface)[],
+  ): void {
     const updatedComponent = items.find((item) => item.uuid === this.component.uuid)
-    if (updatedComponent) {
+    if (updatedComponent && isDecryptedItem(updatedComponent)) {
       this.component = updatedComponent as SNComponent
     }
   }
 
-  handleChangesInItems(items: SNItem[], source?: PayloadSource, sourceKey?: string): void {
+  handleChangesInItems(
+    items: (DecryptedItemInterface | DeletedItemInterface | EncryptedItemInterface)[],
+    source?: PayloadSource,
+    sourceKey?: string,
+  ): void {
     this.updateOurComponentRefFromChangedItems(items)
 
     const areWeOriginator = sourceKey && sourceKey === this.component.uuid
@@ -254,8 +262,10 @@ export class ComponentViewer {
       const relevantItems = items.filter((item) => {
         return this.streamItems?.includes(item.content_type)
       })
+
       if (relevantItems.length > 0) {
-        this.sendManyItemsThroughBridge(relevantItems)
+        const nonencryptedItems = relevantItems.filter(() => isEncryptedItem)
+        this.sendManyItemsThroughBridge(relevantItems.filter(isEncryptedItem))
       }
     }
 
@@ -267,13 +277,14 @@ export class ComponentViewer {
     }
   }
 
-  sendManyItemsThroughBridge(items: SNItem[]): void {
+  sendManyItemsThroughBridge(items: (DecryptedItemInterface | DeletedItemInterface)[]): void {
     const requiredPermissions: ComponentPermission[] = [
       {
         name: ComponentAction.StreamItems,
         content_types: this.streamItems!.sort(),
       },
     ]
+
     this.componentManagerFunctions.runWithPermissions(
       this.component.uuid,
       requiredPermissions,
@@ -283,7 +294,7 @@ export class ComponentViewer {
     )
   }
 
-  sendContextItemThroughBridge(item: SNItem, source?: PayloadSource): void {
+  sendContextItemThroughBridge(item: DecryptedItemInterface, source?: PayloadSource): void {
     const requiredContextPermissions = [
       {
         name: ComponentAction.StreamContextItem,
@@ -317,7 +328,7 @@ export class ComponentViewer {
   }
 
   private sendItemsInReply(
-    items: SNItem[],
+    items: DecryptedItemInterface[],
     message: ComponentMessage,
     source?: PayloadSource,
   ): void {
@@ -330,7 +341,7 @@ export class ComponentViewer {
     this.replyToMessage(message, responseData)
   }
 
-  private jsonForItem(item: SNItem, source?: PayloadSource): ItemMessagePayload {
+  private jsonForItem(item: DecryptedItemInterface, source?: PayloadSource): ItemMessagePayload {
     const isMetadatUpdate =
       source === PayloadSource.RemoteSaved ||
       source === PayloadSource.LocalSaved ||
@@ -352,7 +363,7 @@ export class ComponentViewer {
     return this.responseItemsByRemovingPrivateProperties([params])[0]
   }
 
-  contentForItem(item: SNItem): ItemContent | string | undefined {
+  contentForItem(item: DecryptedItemInterface): ItemContent | string | undefined {
     if (
       item.content_type === ContentType.Note &&
       item.payload.format === PayloadFormat.DecryptedBareObject
@@ -574,7 +585,7 @@ export class ComponentViewer {
           this.streamItemsOriginalMessage = message
         }
         /* Push immediately now */
-        const items: SNItem[] = []
+        const items: DecryptedItemInterface[] = []
         for (const contentType of types) {
           extendArray(items, this.itemManager.getItems(contentType))
         }

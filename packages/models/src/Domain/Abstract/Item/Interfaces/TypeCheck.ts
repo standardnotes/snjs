@@ -11,6 +11,12 @@ export function isEncryptedItem(item: ItemInterface): item is EncryptedItemInter
   return 'errorDecrypting' in item
 }
 
+export function isNotEncryptedItem(
+  item: DecryptedItemInterface | DeletedItemInterface | EncryptedItemInterface,
+): item is DecryptedItemInterface | DeletedItemInterface {
+  return !isEncryptedItem(item)
+}
+
 export function isDeletedItem(item: ItemInterface): item is DeletedItemInterface {
   return 'deleted' in item
 }

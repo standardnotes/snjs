@@ -9,10 +9,10 @@ import { DefaultAppDomain, DomainDataValueType, ItemDomainKey } from '../Types/D
 import { ItemMutator } from './ItemMutator'
 import { DecryptedPayloadInterface } from '../../Payload/Interfaces/DecryptedPayload'
 
-export class DecryptedItemMutator<C extends ItemContent = ItemContent> extends ItemMutator {
-  public readonly item: DecryptedItemInterface<C>
-  protected payload: DecryptedPayloadInterface
-  protected readonly type: MutationType
+export class DecryptedItemMutator<C extends ItemContent = ItemContent> extends ItemMutator<
+  DecryptedPayloadInterface<C>,
+  DecryptedItemInterface<C>
+> {
   protected content: C
 
   constructor(item: DecryptedItemInterface<C>, type: MutationType) {
@@ -48,7 +48,7 @@ export class DecryptedItemMutator<C extends ItemContent = ItemContent> extends I
   }
 
   /** Merges the input payload with the base payload */
-  public mergePayload(payload: DecryptedPayloadInterface) {
+  public mergePayload(payload: DecryptedPayloadInterface<C>) {
     const merged = this.payload.mergedWith(payload)
     this.payload = merged
 

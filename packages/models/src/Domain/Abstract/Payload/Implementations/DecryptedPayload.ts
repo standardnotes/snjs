@@ -7,14 +7,18 @@ import { PayloadFormat } from '../Types/PayloadFormat'
 import { PayloadSource } from '../Types/PayloadSource'
 import { PurePayload } from './PurePayload'
 
-export class DecryptedPayload<C extends ItemContent = ItemContent>
-  extends PurePayload
+export class DecryptedPayload<
+    C extends ItemContent = ItemContent,
+    T extends DecryptedTransferPayload<C> = DecryptedTransferPayload<C>,
+  >
+  extends PurePayload<T>
   implements DecryptedPayloadInterface<C>
 {
   readonly content: C
-  readonly format = PayloadFormat.DecryptedBareObject
+  readonly format: PayloadFormat.DecryptedBareObject = PayloadFormat.DecryptedBareObject
+  readonly version: ProtocolVersion
 
-  constructor(rawPayload: DecryptedTransferPayload<C>, source = PayloadSource.Constructor) {
+  constructor(rawPayload: T, source = PayloadSource.Constructor) {
     super(rawPayload, source)
 
     this.content = FillItemContent<C>(rawPayload.content)
@@ -35,7 +39,7 @@ export class DecryptedPayload<C extends ItemContent = ItemContent>
     return result
   }
 
-  ejected(): DecryptedTransferPayload<C> {
+  ejected(): T {
     const values = {
       content: this.content,
     }
@@ -46,26 +50,25 @@ export class DecryptedPayload<C extends ItemContent = ItemContent>
     }
   }
 
-  mergedWith(payload: DecryptedPayloadInterface): DecryptedPayloadInterface {
-    return new DecryptedPayload(
+  mergedWith(payload: this): this {
+    const result = new DecryptedPayload(
       {
         ...this.ejected(),
         ...payload.ejected(),
       },
       this.source,
     )
+    return result as this
   }
 
-  copy(
-    override?: Partial<DecryptedTransferPayload<C>>,
-    source = this.source,
-  ): DecryptedPayloadInterface<C> {
-    return new DecryptedPayload(
+  copy(override?: Partial<T>, source = this.source): this {
+    const result = new DecryptedPayload(
       {
         ...this.ejected(),
         ...override,
       },
       source,
     )
+    return result as this
   }
 }

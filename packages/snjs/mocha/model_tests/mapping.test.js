@@ -122,7 +122,7 @@ describe('model manager mapping', () => {
     return new Promise((resolve) => {
       this.application.itemManager.addObserver(
         ContentType.Any,
-        (changed, inserted, discarded, _ignored) => {
+        (changed, inserted, removed, _ignored) => {
           expect(changed[0].uuid === item.uuid)
           resolve()
         },

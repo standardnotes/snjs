@@ -470,7 +470,7 @@ export class ItemManager
       if (!item) {
         throw Error('Attempting to change non-existant item')
       }
-      const mutator = Models.CreateMutatorForItem(item, mutationType)
+      const mutator = Models.CreateDecryptedMutatorForItem(item, mutationType)
       if (mutate) {
         mutate(mutator as M)
       }
@@ -498,7 +498,7 @@ export class ItemManager
       if (!item) {
         continue
       }
-      const mutator = Models.CreateMutatorForItem(
+      const mutator = Models.CreateDecryptedMutatorForItem(
         item,
         transaction.mutationType || Models.MutationType.UpdateUserTimestamps,
       )
@@ -518,7 +518,7 @@ export class ItemManager
     payloadSourceKey?: string,
   ): Promise<Models.DecryptedItemInterface | undefined> {
     const item = this.findSureItem(transaction.itemUuid)
-    const mutator = Models.CreateMutatorForItem(
+    const mutator = Models.CreateDecryptedMutatorForItem(
       item,
       transaction.mutationType || Models.MutationType.UpdateUserTimestamps,
     )

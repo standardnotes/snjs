@@ -45,6 +45,20 @@ export class DecryptedItemCollection
    */
   private sortedMap: Partial<Record<ContentType, DecryptedItemInterface[]>> = {}
 
+  constructor(
+    copy = false,
+    mapCopy?: Partial<Record<Uuid, DecryptedItemInterface>>,
+    typedMapCopy?: Partial<Record<ContentType, DecryptedItemInterface[]>>,
+    referenceMapCopy?: UuidMap,
+  ) {
+    super(copy, mapCopy, typedMapCopy)
+    if (copy) {
+      this.referenceMap = referenceMapCopy!
+    } else {
+      this.referenceMap = new UuidMap()
+    }
+  }
+
   public set(elements: DecryptedItemInterface | DecryptedItemInterface[]): void {
     super.set(elements)
 

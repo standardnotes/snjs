@@ -5,13 +5,13 @@ import { SNFeaturesService } from '@Lib/Services/Features/FeaturesService'
 import { ContentType, Runtime, DisplayStringForContentType } from '@standardnotes/common'
 import { PayloadSource } from '@standardnotes/models'
 import { ItemManager } from '@Lib/Services/Items/ItemManager'
-import { SNItem, SNNote, SNTheme, SNComponent, ComponentMutator } from '@standardnotes/models'
+import { SNNote, SNTheme, SNComponent, ComponentMutator } from '@standardnotes/models'
 import { SNAlertService } from '@Lib/Services/Alert/AlertService'
 import { SNSyncService } from '@Lib/Services/Sync/SyncService'
 import find from 'lodash/find'
 import uniq from 'lodash/uniq'
 import { ComponentArea, ComponentAction, ComponentPermission } from '@standardnotes/features'
-import { Copy, concatArrays, filterFromArray, removeFromArray, sleep } from '@standardnotes/utils'
+import { Copy, filterFromArray, removeFromArray, sleep } from '@standardnotes/utils'
 import { Environment, Platform } from '@Lib/Application/Platforms'
 import { UuidString } from '@Lib/Types/UuidString'
 import {
@@ -173,13 +173,17 @@ export class SNComponentManager extends AbstractService<ComponentManagerEvent, E
   addItemObserver(): void {
     this.removeItemObserver = this.itemManager.addObserver(
       ContentType.Any,
-      (changed, inserted, discarded, _ignored, source) => {
-        const items = concatArrays(changed, inserted, discarded) as SNItem[]
+      (changed, inserted, removed, _ignored, source) => {
+        const items = [
+          ...changed,
+          ...inserted,
+          ...discarded
+        ]
         const syncedComponents = items.filter((item) => {
           return (
             item.content_type === ContentType.Component || item.content_type === ContentType.Theme
           )
-        }) as SNComponent[]
+        })
         this.handleChangedComponents(syncedComponents, source)
       },
     )
@@ -195,7 +199,7 @@ export class SNComponentManager extends AbstractService<ComponentManagerEvent, E
             // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
             iframe.dataset.componentViewerId!,
           )!
-          this.notifyEvent(ComponentManagerEvent.ViewerDidFocus, {
+          void this.notifyEvent(ComponentManagerEvent.ViewerDidFocus, {
             componentViewer: viewer,
           })
         })

@@ -1,15 +1,15 @@
-import { ContentType, ProtocolVersion } from '@standardnotes/common'
+import { ContentType } from '@standardnotes/common'
 import { deepFreeze } from '@standardnotes/utils'
 import { PayloadInterface } from '../Interfaces/PayloadInterface'
 import { PayloadSource } from '../Types/PayloadSource'
 import { PayloadFormat } from '../Types/PayloadFormat'
 import { TransferPayload } from '../../TransferPayload/Interfaces/TransferPayload'
 
-export abstract class PurePayload implements PayloadInterface {
+export abstract class PurePayload<T extends TransferPayload> implements PayloadInterface<T> {
   readonly source: PayloadSource
   readonly uuid: string
   readonly content_type: ContentType
-  readonly format: PayloadFormat
+  abstract readonly format: PayloadFormat
 
   readonly created_at: Date
   readonly updated_at: Date
@@ -21,10 +21,9 @@ export abstract class PurePayload implements PayloadInterface {
   readonly lastSyncBegan?: Date
   readonly lastSyncEnd?: Date
 
-  version: ProtocolVersion
   readonly duplicate_of?: string
 
-  constructor(rawPayload: TransferPayload, source = PayloadSource.Constructor) {
+  constructor(rawPayload: T, source = PayloadSource.Constructor) {
     this.source = source
     this.uuid = rawPayload.uuid
 
@@ -59,8 +58,8 @@ export abstract class PurePayload implements PayloadInterface {
     }, 0)
   }
 
-  ejected(): TransferPayload {
-    return {
+  ejected(): T {
+    const result: TransferPayload = {
       uuid: this.uuid,
       content_type: this.content_type,
       created_at: this.created_at,
@@ -70,6 +69,8 @@ export abstract class PurePayload implements PayloadInterface {
       dirty: this.dirty,
       duplicate_of: this.duplicate_of,
     }
+
+    return result as T
   }
 
   public get serverUpdatedAt(): Date {
@@ -80,6 +81,7 @@ export abstract class PurePayload implements PayloadInterface {
     return this.updated_at_timestamp
   }
 
-  abstract mergedWith(payload: PayloadInterface): PayloadInterface
-  abstract copy(override?: Partial<TransferPayload>, source?: PayloadSource): PayloadInterface
+  abstract mergedWith(payload: this): this
+
+  abstract copy(override?: Partial<TransferPayload>, source?: PayloadSource): this
 }

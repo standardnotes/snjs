@@ -138,10 +138,10 @@ export class PayloadManager
 
   private popQueue() {
     const first = this.emitQueue[0]
-    const { changed, inserted, discarded, ignored } = this.mergePayloadsOntoMaster(first.payloads)
-    this.notifyChangeObservers(changed, inserted, discarded, ignored, first.source, first.sourceKey)
+    const { changed, inserted, removed, ignored } = this.mergePayloadsOntoMaster(first.payloads)
+    this.notifyChangeObservers(changed, inserted, removed, ignored, first.source, first.sourceKey)
     removeFromArray(this.emitQueue, first)
-    first.resolve(changed.concat(inserted, discarded))
+    first.resolve(changed.concat(inserted, removed))
     if (this.emitQueue.length > 0) {
       void this.popQueue()
     }
@@ -186,7 +186,7 @@ export class PayloadManager
         }
       }
     }
-    return { changed, inserted, discarded, ignored }
+    return { changed, inserted, removed, ignored }
   }
 
   /**

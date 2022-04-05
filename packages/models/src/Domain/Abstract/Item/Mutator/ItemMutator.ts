@@ -1,19 +1,22 @@
-import { DeletedPayload } from './../../Payload/Implementations/DeletedPayload'
 import { MutationType } from '../Types/MutationType'
 import { PayloadInterface } from '../../Payload'
 import { ItemInterface } from '../Interfaces/ItemInterface'
+import { TransferPayload } from '../../TransferPayload'
 
 /**
  * An item mutator takes in an item, and an operation, and returns the resulting payload.
  * Subclasses of mutators can modify the content field directly, but cannot modify the payload directly.
  * All changes to the payload must occur by copying the payload and reassigning its value.
  */
-export class ItemMutator {
-  public readonly item: ItemInterface
-  protected payload: PayloadInterface
+export class ItemMutator<
+  P extends PayloadInterface<TransferPayload> = PayloadInterface<TransferPayload>,
+  I extends ItemInterface<P> = ItemInterface<P>,
+> {
+  public readonly item: I
+  protected payload: P
   protected readonly type: MutationType
 
-  constructor(item: ItemInterface, type: MutationType) {
+  constructor(item: I, type: MutationType) {
     this.item = item
     this.type = type
     this.payload = item.payload
@@ -23,11 +26,11 @@ export class ItemMutator {
     return this.payload.uuid
   }
 
-  public getItem() {
+  public getItem(): I {
     return this.item
   }
 
-  public getResult() {
+  public getResult(): P {
     if (this.type === MutationType.NonDirtying) {
       return this.payload.copy()
     }
@@ -38,17 +41,6 @@ export class ItemMutator {
     })
 
     return result
-  }
-
-  public setDeleted() {
-    this.payload = new DeletedPayload(
-      {
-        ...this.payload,
-        deleted: true,
-        content: undefined,
-      },
-      this.payload.source,
-    )
   }
 
   public set lastSyncBegan(began: Date) {

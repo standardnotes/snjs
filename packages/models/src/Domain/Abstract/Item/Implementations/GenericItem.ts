@@ -45,10 +45,6 @@ export abstract class GenericItem<P extends PayloadInterface = PayloadInterface>
     return this.payload.uuid
   }
 
-  get version() {
-    return this.payload.version
-  }
-
   get content_type(): ContentType {
     return this.payload.content_type
   }

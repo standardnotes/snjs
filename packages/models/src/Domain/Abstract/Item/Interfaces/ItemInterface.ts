@@ -1,5 +1,5 @@
 import { TransferPayload } from './../../TransferPayload/Interfaces/TransferPayload'
-import { Uuid, ProtocolVersion, ContentType } from '@standardnotes/common'
+import { Uuid, ContentType } from '@standardnotes/common'
 import { PayloadInterface } from '../../Payload/Interfaces/PayloadInterface'
 import { PredicateInterface } from '../../../Runtime/Predicate/Interface'
 import { HistoryEntryInterface } from '../../../Runtime/History'
@@ -14,7 +14,6 @@ export interface ItemInterface<P extends PayloadInterface = PayloadInterface> {
   readonly updatedAtString?: string
 
   uuid: Uuid
-  version: ProtocolVersion
 
   content_type: ContentType
   created_at: Date

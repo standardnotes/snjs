@@ -13,7 +13,6 @@ import { SNTheme } from '../../../Syncable/Theme/Theme'
 import { SNUserPrefs } from '../../../Syncable/UserPrefs/UserPrefs'
 import { FileMutator } from '../../../Syncable/File/FileMutator'
 import { MutationType } from '../Types/MutationType'
-import { ItemMutator } from '../Mutator/ItemMutator'
 import { ThemeMutator } from '../../../Syncable/Theme/ThemeMutator'
 import { UserPrefsMutator } from '../../../Syncable/UserPrefs/UserPrefsMutator'
 import { ActionsExtensionMutator } from '../../../Syncable/ActionsExtension/ActionsExtensionMutator'
@@ -29,7 +28,7 @@ type ItemClass<C extends ItemContent = ItemContent> = new (
 ) => DecryptedItem<C>
 
 type MutatorClass<C extends ItemContent = ItemContent> = new (
-  item: DecryptedItemInterface,
+  item: DecryptedItemInterface<C>,
   type: MutationType,
 ) => DecryptedItemMutator<C>
 
@@ -52,9 +51,9 @@ const ContentTypeClassMapping: Partial<Record<ContentType, MappingEntry>> = {
   [ContentType.Tag]: { itemClass: SNTag, mutatorClass: TagMutator },
   [ContentType.Theme]: { itemClass: SNTheme, mutatorClass: ThemeMutator },
   [ContentType.UserPrefs]: { itemClass: SNUserPrefs, mutatorClass: UserPrefsMutator },
-}
+} as unknown as Partial<Record<ContentType, MappingEntry>>
 
-export function CreateMutatorForItem<
+export function CreateDecryptedMutatorForItem<
   I extends DecryptedItemInterface,
   M extends DecryptedItemMutator = DecryptedItemMutator,
 >(item: I, type: MutationType): M {
@@ -62,7 +61,7 @@ export function CreateMutatorForItem<
   if (lookupValue) {
     return new lookupValue(item, type) as M
   } else {
-    return new ItemMutator(item, type) as M
+    return new DecryptedItemMutator(item, type) as M
   }
 }
 

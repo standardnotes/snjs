@@ -1,4 +1,4 @@
-import { ContentType, ProtocolVersion, Uuid } from '@standardnotes/common'
+import { ContentType, Uuid } from '@standardnotes/common'
 import { TransferPayload } from '../../TransferPayload/Interfaces/TransferPayload'
 import { PayloadFormat } from '../Types/PayloadFormat'
 import { PayloadSource } from '../Types/PayloadSource'
@@ -19,12 +19,11 @@ import { PayloadSource } from '../Types/PayloadSource'
  * Payloads also have a content format. Formats can either be
  * EncryptedString or DecryptedBareObject.
  */
-export interface PayloadInterface {
+export interface PayloadInterface<T extends TransferPayload = TransferPayload> {
   readonly source: PayloadSource
   readonly uuid: Uuid
   readonly content_type: ContentType
   readonly format: PayloadFormat
-  version: ProtocolVersion
 
   /** updated_at is set by the server only, and not the client.*/
   readonly updated_at: Date
@@ -47,12 +46,12 @@ export interface PayloadInterface {
    * generic, non-contextual consumption, such as saving to a backup file or syncing
    * with a server.
    */
-  ejected(): TransferPayload
+  ejected(): T
 
   /**
    * Returns a new payload by applying the input payload on top of the instance payload.
    */
-  mergedWith(payload: PayloadInterface): PayloadInterface
+  mergedWith(payload: this): this
 
-  copy(override?: Partial<TransferPayload>, source?: PayloadSource): PayloadInterface
+  copy(override?: Partial<T>, source?: PayloadSource): this
 }

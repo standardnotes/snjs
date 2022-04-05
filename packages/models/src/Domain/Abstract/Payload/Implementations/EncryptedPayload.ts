@@ -1,25 +1,25 @@
-import { protocolVersionFromEncryptedString } from '@standardnotes/common'
+import { ProtocolVersion, protocolVersionFromEncryptedString } from '@standardnotes/common'
 import { EncryptedTransferPayload } from '../../TransferPayload/Interfaces/EncryptedTransferPayload'
 import { EncryptedPayloadInterface } from '../Interfaces/EncryptedPayload'
 import { PayloadFormat } from '../Types/PayloadFormat'
 import { PayloadSource } from '../Types/PayloadSource'
 import { PurePayload } from './PurePayload'
 
-export class EncryptedPayload extends PurePayload implements EncryptedPayloadInterface {
+export class EncryptedPayload
+  extends PurePayload<EncryptedTransferPayload>
+  implements EncryptedPayloadInterface
+{
   readonly content: string
   readonly enc_item_key: string
   readonly items_key_id?: string
   readonly errorDecrypting?: boolean
   readonly waitingForKey?: boolean
   readonly errorDecryptingValueChanged?: boolean
-  readonly format: PayloadFormat.EncryptedString
-  readonly deleted: false
-
-  /** @deprecated */
+  readonly format: PayloadFormat.EncryptedString = PayloadFormat.EncryptedString
+  readonly deleted: false = false
   readonly auth_hash?: string
-
-  /** @deprecated */
   readonly auth_params?: unknown
+  readonly version: ProtocolVersion
 
   constructor(rawPayload: EncryptedTransferPayload, source = PayloadSource.Constructor) {
     super(rawPayload, source)
@@ -51,26 +51,25 @@ export class EncryptedPayload extends PurePayload implements EncryptedPayloadInt
     }
   }
 
-  mergedWith(payload: EncryptedPayloadInterface): EncryptedPayloadInterface {
-    return new EncryptedPayload(
+  mergedWith(payload: EncryptedPayloadInterface): this {
+    const result = new EncryptedPayload(
       {
         ...this.ejected(),
         ...payload.ejected(),
       },
       this.source,
     )
+    return result as this
   }
 
-  copy(
-    override?: Partial<EncryptedTransferPayload>,
-    source = this.source,
-  ): EncryptedPayloadInterface {
-    return new EncryptedPayload(
+  copy(override?: Partial<EncryptedTransferPayload>, source = this.source): this {
+    const result = new EncryptedPayload(
       {
         ...this.ejected(),
         ...override,
       },
       source,
     )
+    return result as this
   }
 }

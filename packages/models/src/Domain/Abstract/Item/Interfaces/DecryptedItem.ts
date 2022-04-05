@@ -1,4 +1,4 @@
-import { Uuid } from '@standardnotes/common'
+import { ProtocolVersion, Uuid } from '@standardnotes/common'
 import { AppDataField } from '../Types/AppDataField'
 import { ComponentDataDomain, DefaultAppDomain } from '../Types/DefaultAppDomain'
 import { ContentReference } from '../../Reference/ContentReference'
@@ -21,22 +21,25 @@ export interface DecryptedItemInterface<C extends ItemContent = ItemContent>
   readonly archived: boolean
   readonly locked: boolean
   readonly userModifiedDate: Date
-  content: C
-  references: ContentReference[]
+  readonly version: ProtocolVersion
+  readonly content: C
+  readonly references: ContentReference[]
 
   getAppDomainValueWithDefault<T, D extends T>(key: AppDataField | PrefKey, defaultValue: D): T
 
-  getAppDomainValue(key: any): any
+  getAppDomainValue<T>(key: AppDataField | PrefKey): T | undefined
 
   isItemContentEqualWith(otherItem: ItemInterface<PayloadInterface>): boolean
 
-  payloadRepresentation(override?: Partial<DecryptedPayloadInterface<C>>): DecryptedPayloadInterface<C>
+  payloadRepresentation(
+    override?: Partial<DecryptedPayloadInterface<C>>,
+  ): DecryptedPayloadInterface<C>
 
   hasRelationshipWithItem(item: ItemInterface<PayloadInterface>): boolean
 
   getDomainData(
     domain: typeof ComponentDataDomain | typeof DefaultAppDomain,
-  ): undefined | Record<string, any>
+  ): undefined | Record<string, unknown>
 
   contentKeysToIgnoreWhenCheckingEquality<C extends ItemContent = ItemContent>(): (keyof C)[]
 

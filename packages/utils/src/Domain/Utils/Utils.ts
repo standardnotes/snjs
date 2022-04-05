@@ -78,18 +78,6 @@ export function searchArray<T>(
 }
 
 /**
- * Searches array of objects for first object where object[key] === value
- * @returns Matching object or null if not found
- */
-export function concatArrays(...args: any[]) {
-  let result: any[] = []
-  for (const array of args) {
-    result = result.concat(array)
-  }
-  return result
-}
-
-/**
  * @returns Whether the value is a function or object
  */
 export function isObject(value: unknown): value is object {

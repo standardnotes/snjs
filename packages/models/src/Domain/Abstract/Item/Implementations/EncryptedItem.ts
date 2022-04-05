@@ -11,6 +11,10 @@ export class EncryptedItem
     super(payload)
   }
 
+  get version() {
+    return this.payload.version
+  }
+
   public payloadRepresentation(
     override?: Partial<EncryptedTransferPayload>,
   ): EncryptedPayloadInterface {
@@ -33,12 +37,10 @@ export class EncryptedItem
     return this.payload.content
   }
 
-  /** @deprecated */
   get auth_hash() {
     return this.payload.auth_hash
   }
 
-  /** @deprecated */
   get auth_params() {
     return this.payload.auth_params
   }

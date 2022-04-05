@@ -1,20 +1,21 @@
 {
   "compilerOptions": {
-    "target": "es6",
+    "alwaysStrict": true,
+    "declaration": true,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
     "module": "commonjs",
     "moduleResolution": "node",
     "noImplicitAny": true,
-    "noUnusedLocals": true,
-    "noImplicitThis": true,
-    "noUnusedParameters": true,
     "noImplicitReturns": true,
-    "strictNullChecks": true,
-    "alwaysStrict": true,
-    "emitDecoratorMetadata": true,
-    "experimentalDecorators": true,
-    "declaration": true,
+    "noImplicitThis": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
     "removeComments": false,
-    "skipLibCheck": false
+    "skipLibCheck": false,
+    "strict": true,
+    "strictNullChecks": true,
+    "target": "es6"
   },
   "exclude": ["**/*.spec.ts", "dist"]
 }

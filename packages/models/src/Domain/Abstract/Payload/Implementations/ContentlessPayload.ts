@@ -4,8 +4,11 @@ import { PayloadFormat } from '../Types/PayloadFormat'
 import { PayloadSource } from '../Types/PayloadSource'
 import { PurePayload } from './PurePayload'
 
-export class ContentlessPayload extends PurePayload implements ContentlessPayloadInterface {
-  readonly format: PayloadFormat.Deleted
+export class ContentlessPayload
+  extends PurePayload<ContentlessTransferPayload>
+  implements ContentlessPayloadInterface
+{
+  readonly format: PayloadFormat.Deleted = PayloadFormat.Deleted
   readonly content: undefined
 
   constructor(rawPayload: ContentlessTransferPayload, source = PayloadSource.Constructor) {
@@ -23,26 +26,25 @@ export class ContentlessPayload extends PurePayload implements ContentlessPayloa
     }
   }
 
-  mergedWith(payload: ContentlessPayloadInterface): ContentlessPayloadInterface {
-    return new ContentlessPayload(
+  mergedWith(payload: this): this {
+    const result = new ContentlessPayload(
       {
         ...this.ejected(),
         ...payload.ejected(),
       },
       this.source,
     )
+    return result as this
   }
 
-  copy(
-    override?: Partial<ContentlessTransferPayload>,
-    source = this.source,
-  ): ContentlessPayloadInterface {
-    return new ContentlessPayload(
+  copy(override?: Partial<ContentlessTransferPayload>, source = this.source): this {
+    const result = new ContentlessPayload(
       {
         ...this.ejected(),
         ...override,
       },
       source,
     )
+    return result as this
   }
 }

@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "allowJs": true,
+    "alwaysStrict": true,
     "baseUrl": ".",
     "declaration": true,
     "declarationDir": "../dist/@types",
@@ -9,9 +9,14 @@
     "isolatedModules": true,
     "moduleResolution": "node",
     "newLine": "lf",
+    "noImplicitAny": true,
+    "noImplicitReturns": true,
+    "noImplicitThis": true,
+    "noUnusedLocals": true,
     "noUnusedParameters": true,
     "outDir": "../dist/@types",
     "strict": true,
+    "strictNullChecks": true,
     "target": "esnext",
     "paths": {
       "@Lib/*": ["*"],

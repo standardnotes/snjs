@@ -160,8 +160,8 @@ describe('item manager', function () {
     const observed = []
     this.itemManager.addObserver(
       ContentType.Any,
-      (changed, inserted, discarded, ignored, source, sourceKey) => {
-        observed.push({ changed, inserted, discarded, source, sourceKey })
+      (changed, inserted, removed, ignored, source, sourceKey) => {
+        observed.push({ changed, inserted, removed, source, sourceKey })
       },
     )
     const note = await this.createNote()
@@ -379,8 +379,8 @@ describe('item manager', function () {
 
   it('remove all items from memory', async function () {
     const observed = []
-    this.itemManager.addObserver(ContentType.Any, (changed, inserted, discarded, ignored) => {
-      observed.push({ changed, inserted, discarded, ignored })
+    this.itemManager.addObserver(ContentType.Any, (changed, inserted, removed, ignored) => {
+      observed.push({ changed, inserted, removed, ignored })
     })
     await this.createNote()
     await this.itemManager.removeAllItemsFromMemory()
@@ -392,8 +392,8 @@ describe('item manager', function () {
 
   it('remove item locally', async function () {
     const observed = []
-    this.itemManager.addObserver(ContentType.Any, (changed, inserted, discarded, ignored) => {
-      observed.push({ changed, inserted, discarded, ignored })
+    this.itemManager.addObserver(ContentType.Any, (changed, inserted, removed, ignored) => {
+      observed.push({ changed, inserted, removed, ignored })
     })
     const note = await this.createNote()
     await this.itemManager.removeItemLocally(note)

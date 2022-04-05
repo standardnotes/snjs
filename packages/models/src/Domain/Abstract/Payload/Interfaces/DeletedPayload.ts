@@ -1,9 +1,8 @@
 import { DeletedTransferPayload } from '../../TransferPayload'
 import { PayloadFormat } from '../Types/PayloadFormat'
-import { PayloadSource } from '../Types/PayloadSource'
 import { PayloadInterface } from './PayloadInterface'
 
-export interface DeletedPayloadInterface extends PayloadInterface {
+export interface DeletedPayloadInterface extends PayloadInterface<DeletedTransferPayload> {
   readonly deleted: true
   readonly content: undefined
   readonly format: PayloadFormat.Deleted
@@ -13,6 +12,4 @@ export interface DeletedPayloadInterface extends PayloadInterface {
    * This value is true if a payload is marked as deleted and not dirty.
    */
   discardable: boolean | undefined
-
-  copy(override?: Partial<DeletedTransferPayload>, source?: PayloadSource): DeletedPayloadInterface
 }
