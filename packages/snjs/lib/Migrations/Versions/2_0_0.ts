@@ -103,7 +103,7 @@ export class Migration2_0_0 extends Migration {
   private async migrateStorageStructureForWebDesktop() {
     const deviceInterface = this.services.deviceInterface
     const newStorageRawStructure: Services.StorageValuesObject = {
-      [Services.ValueModesKeys.Wrapped]: {},
+      [Services.ValueModesKeys.Wrapped]: {} as EncryptedTransferPayload,
       [Services.ValueModesKeys.Unwrapped]: {},
       [Services.ValueModesKeys.Nonwrapped]: {},
     }
@@ -130,7 +130,7 @@ export class Migration2_0_0 extends Migration {
       newStorageRawStructure.nonwrapped[Services.StorageKey.RootKeyWrapperKeyParams] =
         passcodeParams.getPortableValue()
 
-      const rawStorageValueStore = Utils.Copy(decryptedStoragePayload.contentObject.storage)
+      const rawStorageValueStore = Utils.Copy(decryptedStoragePayload.content.storage)
       const storageValueStore: Record<string, any> =
         Utils.jsonParseEmbeddedKeys(rawStorageValueStore)
       /** Store previously encrypted auth_params into new nonwrapped value key */

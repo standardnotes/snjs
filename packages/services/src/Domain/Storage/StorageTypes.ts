@@ -1,3 +1,5 @@
+import { DecryptedTransferPayload, EncryptedTransferPayload } from '@standardnotes/models'
+
 export enum StoragePersistencePolicies {
   Default = 1,
   Ephemeral = 2,
@@ -26,8 +28,10 @@ export enum ValueModesKeys {
 
 export type ValuesObjectRecord = Record<string, unknown>
 
+export type WrappedStorageValue = EncryptedTransferPayload | DecryptedTransferPayload
+
 export type StorageValuesObject = {
-  [ValueModesKeys.Wrapped]: ValuesObjectRecord
+  [ValueModesKeys.Wrapped]: WrappedStorageValue
   [ValueModesKeys.Unwrapped]: ValuesObjectRecord
   [ValueModesKeys.Nonwrapped]: ValuesObjectRecord
 }
