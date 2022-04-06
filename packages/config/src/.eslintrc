@@ -35,7 +35,6 @@
     "no-duplicate-imports": "error",
     "no-self-compare": "error",
     "no-unmodified-loop-condition": "error",
-    "no-unreachable-loop": "error",
     "no-unused-private-class-members": "error",
     "object-curly-spacing": ["error", "always"],
     "quotes": ["error", "single"],

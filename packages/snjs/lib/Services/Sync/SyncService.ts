@@ -21,7 +21,7 @@ import { SortPayloadsByRecentAndContentPriority } from '@Lib/Services/Sync/Utils
 import { SyncClientInterface } from './SyncClientInterface'
 import { SyncMode, SyncOptions, SyncPromise, SyncQueueStrategy } from './Types'
 import { SyncOpStatus } from '@Lib/Services/Sync/SyncOpStatus'
-import { SyncResponse } from '@Lib/Services/Sync/Response'
+import { ServerSyncResponse } from '@Lib/Services/Sync/Account/Response'
 import { SyncResponseResolver } from '@Lib/Services/Sync/Account/ResponseResolver'
 import { SyncSignal, SyncStats } from '@Lib/Services/Sync/Signals'
 import { UuidString } from '../../Types/UuidString'
@@ -44,6 +44,14 @@ import {
   ItemsKeyContent,
   ConcretePayload,
   DeletedPayloadInterface,
+  DecryptedPayload,
+  CreateEncryptedServerSyncPushPayload,
+  ServerSyncPushContextualPayload,
+  isDeletedItem,
+  DeletedItemInterface,
+  DecryptedItemInterface,
+  CreatePayloadSplit,
+  CreateDeletedServerSyncPushPayload,
 } from '@standardnotes/models'
 import * as Services from '@standardnotes/services'
 
@@ -62,7 +70,7 @@ const INVALID_SESSION_RESPONSE_STATUS = 401
 export class SNSyncService
   extends Services.AbstractService<
     Services.SyncEvent,
-    SyncResponse | { source: Services.SyncSource }
+    ServerSyncResponse | { source: Services.SyncSource }
   >
   implements Services.InternalEventHandlerInterface, SyncClientInterface
 {
@@ -192,11 +200,12 @@ export class SNSyncService
     itemsKeysPayloads: ConcretePayload[],
   ): Promise<void> {
     const encryptedItemsKeysPayloads = itemsKeysPayloads.filter(isEncryptedPayload)
+
     const originallyDecryptedItemsKeysPayloads = itemsKeysPayloads.filter(
       isDecryptedPayload,
     ) as DecryptedPayloadInterface<ItemsKeyContent>[]
 
-    const itemsKeysSplit: Encryption.EncryptionSplitWithKey<EncryptedPayloadInterface> = {
+    const itemsKeysSplit: Encryption.KeyedDecryptionSplit = {
       usesRootKeyWithKeyLookup: {
         items: encryptedItemsKeysPayloads,
       },
@@ -230,7 +239,7 @@ export class SNSyncService
         try {
           return CreatePayload(rawPayload)
         } catch (e) {
-          console.error('Creating payload failed', e)
+          console.error('Creating payload fail+ed', e)
           return undefined
         }
       })
@@ -270,7 +279,7 @@ export class SNSyncService
         }
       }
 
-      const split: Encryption.EncryptionSplitWithKey<EncryptedPayloadInterface> = {
+      const split: Encryption.KeyedDecryptionSplit = {
         usesItemsKeyWithKeyLookup: {
           items: encrypted,
         },
@@ -336,18 +345,18 @@ export class SNSyncService
     return this.itemManager.getDirtyItems()
   }
 
-  /**
-   * Mark all items as dirty and needing sync, then persist to storage.
-   */
-  public async markAllItemsAsNeedingSync(): Promise<void> {
+  public async markAllItemsAsNeedingSyncAndPersist(): Promise<void> {
     this.log('Marking all items as needing sync')
+
     const items = this.itemManager.items
     const payloads = items.map((item) => {
-      return CreateMaxPayloadFromAnyObject(item, {
+      return new DecryptedPayload({
+        ...item.payload.ejected(),
         dirty: true,
         dirtiedDate: new Date(),
       })
     })
+
     await this.payloadManager.emitPayloads(payloads, PayloadSource.LocalChanged)
     await this.persistPayloads(payloads)
   }
@@ -408,10 +417,23 @@ export class SNSyncService
       })
   }
 
-  private payloadsByPreparingForServer(payloads: PurePayload[]): Promise<PurePayload[]> {
-    const split = Encryption.splitItemsByEncryptionType(payloads)
-    const keyLookupSplit = Encryption.createKeyLookupSplitFromSplit(split)
-    return this.protocolService.encryptSplit(keyLookupSplit, Encryption.EncryptedExportIntent.Sync)
+  private async payloadsByPreparingForServer(
+    payloads: (DecryptedPayloadInterface | DeletedPayloadInterface)[],
+  ): Promise<ServerSyncPushContextualPayload[]> {
+    const payloadSplit = CreatePayloadSplit(payloads)
+
+    const encryptionSplit = Encryption.SplitPayloadsByEncryptionType(payloadSplit.decrypted)
+
+    const keyLookupSplit = Encryption.CreateEncryptionSplitWithKeyLookup(encryptionSplit)
+
+    const encryptedResults = await this.protocolService.encryptSplit(keyLookupSplit)
+
+    const contextPayloads = [
+      ...encryptedResults.map(CreateEncryptedServerSyncPushPayload),
+      ...payloadSplit.deleted.map(CreateDeletedServerSyncPushPayload),
+    ]
+
+    return contextPayloads
   }
 
   public async downloadFirstSync(
@@ -419,6 +441,7 @@ export class SNSyncService
     otherSyncOptions?: Partial<SyncOptions>,
   ): Promise<void> {
     const maxTries = 5
+
     for (let i = 0; i < maxTries; i++) {
       await this.sync({
         mode: SyncMode.DownloadFirst,
@@ -426,12 +449,14 @@ export class SNSyncService
         source: Services.SyncSource.External,
         ...otherSyncOptions,
       }).catch(console.error)
+
       if (this.completedOnlineDownloadFirstSync) {
         return
       } else {
         await sleep(waitTimeOnFailureMs)
       }
     }
+
     console.error(`Failed downloadFirstSync after ${maxTries} tries`)
   }
 
@@ -468,9 +493,9 @@ export class SNSyncService
      * Items that have never been synced and marked as deleted should not be
      * uploaded to server, and instead deleted directly after sync completion.
      */
-    const neverSyncedDeleted = items.filter((item) => {
-      return item.neverSynced && item.deleted
-    })
+    const neverSyncedDeleted: DeletedItemInterface[] = items.filter((item) => {
+      return item.neverSynced && isDeletedItem(item)
+    }) as DeletedItemInterface[]
     subtractFromArray(items, neverSyncedDeleted)
 
     const decryptedPayloads = items.map((item) => {
@@ -539,7 +564,7 @@ export class SNSyncService
   }
 
   private async prepareForSyncExecution(
-    items: SNItem[],
+    items: DecryptedItemInterface[],
     inTimeResolveQueue: SyncPromise[],
     beginDate: Date,
   ) {
@@ -559,7 +584,7 @@ export class SNSyncService
      */
     if (items.length > 0) {
       await this.itemManager.changeItems(
-        Uuids(items),
+        items,
         (mutator) => {
           mutator.lastSyncBegan = beginDate
         },
@@ -579,7 +604,10 @@ export class SNSyncService
     return this.resolveQueue.slice()
   }
 
-  private async prepareSyncOperationPayloads(payloads: PurePayload[], options: SyncOptions) {
+  private async getSyncParameters(
+    payloads: (DecryptedPayloadInterface | DeletedPayloadInterface)[],
+    options: SyncOptions,
+  ) {
     const online = this.sessionManager.online()
     const useMode = ((tryMode) => {
       if (online && !this.completedOnlineDownloadFirstSync) {
@@ -591,7 +619,7 @@ export class SNSyncService
       }
     })(options.mode)
 
-    let uploadPayloads: PurePayload[] = []
+    let uploadPayloads: ServerSyncPushContextualPayload[] = []
     if (useMode === SyncMode.Default) {
       if (online && !this.completedOnlineDownloadFirstSync) {
         throw Error('Attempting to default mode sync without having completed initial.')
@@ -599,7 +627,10 @@ export class SNSyncService
       if (online) {
         uploadPayloads = await this.payloadsByPreparingForServer(payloads)
       } else {
-        uploadPayloads = payloads
+        const split = CreatePayloadSplit(payloads)
+        uploadPayloads = [
+          ...split.
+        ]
       }
     } else if (useMode === SyncMode.DownloadFirst) {
       uploadPayloads = []
@@ -764,7 +795,7 @@ export class SNSyncService
 
     await this.prepareForSyncExecution(items, inTimeResolveQueue, beginDate)
 
-    const { uploadPayloads, syncMode, online } = await this.prepareSyncOperationPayloads(
+    const { uploadPayloads, syncMode, online } = await this.getSyncParameters(
       decryptedPayloads,
       options,
     )
@@ -826,7 +857,7 @@ export class SNSyncService
     const paginationToken = await this.getPaginationToken()
     const operation = new AccountSyncOperation(
       payloads,
-      async (type: SyncSignal, response?: SyncResponse, stats?: SyncStats) => {
+      async (type: SyncSignal, response?: ServerSyncResponse, stats?: SyncStats) => {
         switch (type) {
           case SyncSignal.Response:
             if (this.dealloced) {
@@ -871,7 +902,7 @@ export class SNSyncService
     this.log('Syncing offline user', 'source:', source, 'mode:', mode, 'payloads:', payloads)
     const operation = new OfflineSyncOperation(
       payloads,
-      async (type: SyncSignal, response?: SyncResponse) => {
+      async (type: SyncSignal, response?: ServerSyncResponse) => {
         if (this.dealloced) {
           return
         }
@@ -883,7 +914,7 @@ export class SNSyncService
     return operation
   }
 
-  private async handleOfflineResponse(response: SyncResponse) {
+  private async handleOfflineResponse(response: ServerSyncResponse) {
     this.log('Offline Sync Response', response.rawResponse)
     const payloadsToEmit = response.savedPayloads
     if (payloadsToEmit.length > 0) {
@@ -903,7 +934,7 @@ export class SNSyncService
     await this.notifyEvent(Services.SyncEvent.SingleRoundTripSyncCompleted, response)
   }
 
-  private handleErrorServerResponse(response: SyncResponse) {
+  private handleErrorServerResponse(response: ServerSyncResponse) {
     this.log('Sync Error', response)
     if (response.status === INVALID_SESSION_RESPONSE_STATUS) {
       void this.notifyEvent(Services.SyncEvent.InvalidSession)
@@ -936,7 +967,9 @@ export class SNSyncService
       const split = Encryption.splitItemsByEncryptionType([payload])
       if (split.usesRootKey) {
         const decrypted = (
-          await this.protocolService.decryptSplit(Encryption.createKeyLookupSplitFromSplit(split))
+          await this.protocolService.decryptSplit(
+            Encryption.CreateDecryptionSplitWithKeyLookup(split),
+          )
         )[0]
         if (decrypted.content_type === ContentType.ItemsKey) {
           processedItemsKeyPayloads[decrypted.uuid] = decrypted
@@ -964,7 +997,7 @@ export class SNSyncService
 
   private async handleSuccessServerResponse(
     operation: AccountSyncOperation,
-    response: SyncResponse,
+    response: ServerSyncResponse,
   ) {
     if (this._simulate_latency) {
       await sleep(this._simulate_latency.latency)
@@ -1071,7 +1104,7 @@ export class SNSyncService
     )
 
     const split = Encryption.splitItemsByEncryptionType(encryptedPayloads)
-    const keyedSplit = Encryption.createKeyLookupSplitFromSplit(split)
+    const keyedSplit = Encryption.CreateDecryptionSplitWithKeyLookup(split)
     const decryptedPayloads = await this.protocolService.decryptSplit(keyedSplit)
 
     this.setInSync(false)

@@ -5,8 +5,8 @@ import { DeletedPayloadInterface } from './DeletedPayload'
 import { EncryptedPayloadInterface } from './EncryptedPayload'
 import { PayloadInterface } from './PayloadInterface'
 
-export type ConcretePayload =
-  | DecryptedPayloadInterface
+export type ConcretePayload<C extends ItemContent = ItemContent> =
+  | DecryptedPayloadInterface<C>
   | EncryptedPayloadInterface
   | DeletedPayloadInterface
 

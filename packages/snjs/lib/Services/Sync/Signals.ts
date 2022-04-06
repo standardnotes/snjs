@@ -1,4 +1,5 @@
-import { SyncResponse } from '@Lib/Services/Sync/Response'
+import { ServerSyncResponse } from '@Lib/Services/Sync/Account/Response'
+import { OfflineSyncResponse } from './Offline/Response'
 
 export enum SyncSignal {
   Response = 1,
@@ -10,8 +11,8 @@ export type SyncStats = {
   totalUploadCount: number
 }
 
-export type ResponseSignalReceiver = (
+export type ResponseSignalReceiver<T extends ServerSyncResponse | OfflineSyncResponse> = (
   signal: SyncSignal,
-  response?: SyncResponse,
+  response?: T,
   stats?: SyncStats,
 ) => Promise<void>

@@ -240,7 +240,7 @@ describe('online syncing', function () {
     expect(this.application.itemManager.notes.length).to.equal(1)
 
     // set item to be merged for when sign in occurs
-    await this.application.syncService.markAllItemsAsNeedingSync()
+    await this.application.syncService.markAllItemsAsNeedingSyncAndPersist()
     expect(this.application.syncService.isOutOfSync()).to.equal(false)
     expect(this.application.itemManager.getDirtyItems().length).to.equal(BASE_ITEM_COUNT + 1)
 
@@ -450,7 +450,7 @@ describe('online syncing', function () {
   it('marking an item dirty then saving to disk should retain that dirty state when restored', async function () {
     const note = await Factory.createMappedNote(this.application)
     this.expectedItemCount++
-    await this.application.syncService.markAllItemsAsNeedingSync()
+    await this.application.syncService.markAllItemsAsNeedingSyncAndPersist()
 
     this.application.itemManager.resetState()
     this.application.payloadManager.resetState()

@@ -12,7 +12,6 @@ import {
   createEncryptedLocalStorageContextPayload,
   DecryptedPayload,
   EncryptedPayload,
-  EncryptedPayloadInterface,
   isDecryptedTransferPayload,
   isDeletedPayload,
   isEncryptedTransferPayload,
@@ -156,7 +155,7 @@ export class SNStorageService
       content_type: ContentType.EncryptedStorage,
     })
 
-    const split: Encryption.EncryptionSplitWithKey<EncryptedPayloadInterface> = key
+    const split: Encryption.KeyedDecryptionSplit = key
       ? {
           usesRootKey: {
             items: [payload],
@@ -248,7 +247,7 @@ export class SNStorageService
     })
 
     if (this.encryptionProvider.hasRootKeyEncryptionSource()) {
-      const split: Encryption.EncryptionSplitWithKey<Models.DecryptedPayloadInterface> = {
+      const split: Encryption.KeyedEncryptionSplit = {
         usesRootKeyWithKeyLookup: {
           items: [payload],
         },
@@ -410,15 +409,15 @@ export class SNStorageService
 
       const encryptables: Models.DecryptedPayloadInterface[] = []
       if (encrypted) {
-        const split = Encryption.splitItemsByEncryptionType(plausiblyEncryptable)
-        if (split.usesItemsKey) {
-          extendArray(encryptables, split.usesItemsKey.items)
+        const split = Encryption.SplitPayloadsByEncryptionType(plausiblyEncryptable)
+        if (split.itemsKeyEncryption) {
+          extendArray(encryptables, split.itemsKeyEncryption)
         }
-        if (split.usesRootKey) {
+        if (split.rootKeyEncryption) {
           if (!this.encryptionProvider.hasRootKeyEncryptionSource()) {
-            extendArray(unencryptables, split.usesRootKey.items)
+            extendArray(unencryptables, split.rootKeyEncryption)
           } else {
-            extendArray(encryptables, split.usesRootKey.items)
+            extendArray(encryptables, split.rootKeyEncryption)
           }
         }
       } else {
@@ -433,8 +432,9 @@ export class SNStorageService
 
     await this.deletePayloads(discardables)
 
-    const split = Encryption.splitItemsByEncryptionType(encryptables)
-    const keyLookupSplit = Encryption.createKeyLookupSplitFromSplit(split)
+    const split = Encryption.SplitPayloadsByEncryptionType(encryptables)
+
+    const keyLookupSplit = Encryption.CreateEncryptionSplitWithKeyLookup(split)
 
     const encryptedParams = (await this.encryptionProvider.encryptSplit(keyLookupSplit)).map(
       createEncryptedLocalStorageContextPayload,

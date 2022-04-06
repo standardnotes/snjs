@@ -360,7 +360,7 @@ describe('basic auth', () => {
     expect(this.application.itemManager.items.length).to.equal(this.expectedItemCount)
     expect(this.application.payloadManager.invalidPayloads.length).to.equal(0)
 
-    await this.application.syncService.markAllItemsAsNeedingSync()
+    await this.application.syncService.markAllItemsAsNeedingSyncAndPersist()
     await this.application.syncService.sync(syncOptions)
 
     expect(this.application.itemManager.items.length).to.equal(this.expectedItemCount)
@@ -456,7 +456,7 @@ describe('basic auth', () => {
       expect(this.application.itemManager.items.length).to.equal(this.expectedItemCount)
       expect(this.application.payloadManager.invalidPayloads.length).to.equal(0)
 
-      await this.application.syncService.markAllItemsAsNeedingSync()
+      await this.application.syncService.markAllItemsAsNeedingSyncAndPersist()
       await this.application.syncService.sync(syncOptions)
       this.application = await Factory.signOutApplicationAndReturnNew(this.application)
       expect(this.application.itemManager.items.length).to.equal(BASE_ITEM_COUNT)

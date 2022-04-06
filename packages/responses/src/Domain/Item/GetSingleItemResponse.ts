@@ -1,11 +1,11 @@
-import { TransferPayload } from '@standardnotes/models'
 import { MinimalHttpResponse } from '../Http/MinimalHttpResponses'
+import { ServerItemResponse } from './ServerItemResponse'
 
 export type GetSingleItemResponse = MinimalHttpResponse & {
   data:
     | {
         success: true
-        item: TransferPayload
+        item: ServerItemResponse
       }
     | {
         success: false

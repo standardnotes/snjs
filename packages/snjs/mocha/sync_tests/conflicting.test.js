@@ -810,7 +810,7 @@ describe('online conflict handling', function () {
       password: Factory.generateUuid(),
     })
     await newApp.itemManager.emitItemsFromPayloads(priorData.map((i) => i.payload))
-    await newApp.syncService.markAllItemsAsNeedingSync()
+    await newApp.syncService.markAllItemsAsNeedingSyncAndPersist()
     await newApp.syncService.sync(syncOptions)
     expect(newApp.payloadManager.invalidPayloads.length).to.equal(0)
     await Factory.safeDeinit(newApp)

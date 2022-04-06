@@ -1,8 +1,8 @@
 import { Uuid } from '@standardnotes/common'
-import { DeletedPayloadInterface, EncryptedPayloadInterface } from '../Payload'
+import { DeletedPayloadInterface, EncryptedPayloadInterface, isDeletedPayload } from '../Payload'
 import { ContextPayload } from './ContextPayload'
 
-export interface ServerSyncContextualPayload extends ContextPayload {
+export interface ServerSyncPushContextualPayload extends ContextPayload {
   auth_hash?: string
   content?: string
   created_at_timestamp: number
@@ -15,14 +15,14 @@ export interface ServerSyncContextualPayload extends ContextPayload {
   updated_at: Date
 }
 
-export function createEncryptedSyncContextPayload(
+export function CreateEncryptedServerSyncPushPayload(
   fromPayload: EncryptedPayloadInterface,
-): ServerSyncContextualPayload {
+): ServerSyncPushContextualPayload {
   return {
     content_type: fromPayload.content_type,
     created_at_timestamp: fromPayload.created_at_timestamp,
     created_at: fromPayload.created_at,
-    deleted: fromPayload.deleted,
+    deleted: isDeletedPayload(fromPayload),
     duplicate_of: fromPayload.duplicate_of,
     updated_at_timestamp: fromPayload.updated_at_timestamp,
     updated_at: fromPayload.updated_at,
@@ -34,9 +34,9 @@ export function createEncryptedSyncContextPayload(
   }
 }
 
-export function createDeletedSyncContextPayload(
+export function CreateDeletedServerSyncPushPayload(
   fromPayload: DeletedPayloadInterface,
-): ServerSyncContextualPayload {
+): ServerSyncPushContextualPayload {
   return {
     content_type: fromPayload.content_type,
     created_at_timestamp: fromPayload.created_at_timestamp,

@@ -3,23 +3,19 @@ import {
   EncryptedPayloadInterface,
   ItemContent,
 } from '@standardnotes/models'
-import { EncryptionSplitWithKey } from './EncryptionSplit'
+import { KeyedDecryptionSplit, KeyedEncryptionSplit } from '../../Encryption/Split/EncryptionSplit'
 
 export interface EncryptionProvider {
-  encryptSplit(
-    split: EncryptionSplitWithKey<DecryptedPayloadInterface>,
-  ): Promise<EncryptedPayloadInterface[]>
+  encryptSplitSingle(split: KeyedEncryptionSplit): Promise<EncryptedPayloadInterface>
 
-  encryptSplitSingle(
-    split: EncryptionSplitWithKey<DecryptedPayloadInterface>,
-  ): Promise<EncryptedPayloadInterface>
+  encryptSplit(split: KeyedEncryptionSplit): Promise<EncryptedPayloadInterface[]>
 
   decryptSplitSingle<C extends ItemContent = ItemContent>(
-    split: EncryptionSplitWithKey<EncryptedPayloadInterface>,
+    split: KeyedDecryptionSplit,
   ): Promise<DecryptedPayloadInterface<C> | EncryptedPayloadInterface>
 
   decryptSplit<C extends ItemContent = ItemContent>(
-    split: EncryptionSplitWithKey<EncryptedPayloadInterface>,
+    split: KeyedDecryptionSplit,
   ): Promise<(DecryptedPayloadInterface<C> | EncryptedPayloadInterface)[]>
 
   hasRootKeyEncryptionSource(): boolean

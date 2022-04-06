@@ -7,7 +7,7 @@ import {
   HistoryMap,
   DeltaClassForSource,
 } from '@standardnotes/models'
-import { SyncResponse } from '@Lib/Services/Sync/Response'
+import { ServerSyncResponse } from '@Lib/Services/Sync/Account/Response'
 
 /**
  * Given a remote sync response, the resolver applies the incoming changes on top
@@ -19,7 +19,7 @@ export class SyncResponseResolver {
   private relatedCollectionSet: ImmutablePayloadCollectionSet
 
   constructor(
-    private response: SyncResponse,
+    private response: ServerSyncResponse,
     decryptedResponsePayloads: PurePayload[],
     private baseCollection: ImmutablePayloadCollection,
     payloadsSavedOrSaving: PurePayload[],

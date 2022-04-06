@@ -1,6 +1,6 @@
 import { PurePayload } from '@standardnotes/models'
 import { arrayByDifference, subtractFromArray } from '@standardnotes/utils'
-import { SyncResponse } from '@Lib/Services/Sync/Response'
+import { ServerSyncResponse } from '@Lib/Services/Sync/Account/Response'
 import { ResponseSignalReceiver, SyncSignal } from '@Lib/Services/Sync/Signals'
 import { SNApiService } from '../../Api/ApiService'
 import { RawSyncResponse } from '@standardnotes/responses'
@@ -15,7 +15,7 @@ export class AccountSyncOperation {
   public id = Math.random()
 
   private pendingPayloads: PurePayload[]
-  private responses: SyncResponse[] = []
+  private responses: ServerSyncResponse[] = []
 
   /**
    * @param payloads   An array of payloads to send to the server
@@ -61,7 +61,7 @@ export class AccountSyncOperation {
       this.paginationToken,
       this.downLimit,
     )) as RawSyncResponse
-    const response = new SyncResponse(rawResponse)
+    const response = new ServerSyncResponse(rawResponse)
 
     this.responses.push(response)
     this.lastSyncToken = response.lastSyncToken!

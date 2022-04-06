@@ -112,7 +112,7 @@ describe('model manager mapping', () => {
       payloads.push(Factory.createNotePayload())
     }
     await this.application.itemManager.emitItemsFromPayloads(payloads, PayloadSource.LocalChanged)
-    await this.application.syncService.markAllItemsAsNeedingSync()
+    await this.application.syncService.markAllItemsAsNeedingSyncAndPersist()
 
     const dirtyItems = this.application.itemManager.getDirtyItems()
     expect(dirtyItems.length).to.equal(this.expectedItemCount)

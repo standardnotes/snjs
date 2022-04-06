@@ -1,14 +1,13 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import { TransferPayload } from '@standardnotes/models'
 import { ApiEndpointParam } from './ApiEndpointParam'
 import { ConflictParams } from './ConflictParams'
+import { ServerItemResponse } from './ServerItemResponse'
 
 export type RawSyncData = {
-  error?: any
+  error?: unknown
   [ApiEndpointParam.LastSyncToken]?: string
   [ApiEndpointParam.PaginationToken]?: string
-  retrieved_items?: TransferPayload[]
-  saved_items?: TransferPayload[]
+  retrieved_items?: ServerItemResponse[]
+  saved_items?: ServerItemResponse[]
   conflicts?: ConflictParams[]
   unsaved?: ConflictParams[]
   status?: number

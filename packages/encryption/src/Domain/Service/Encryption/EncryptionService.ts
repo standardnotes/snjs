@@ -11,7 +11,13 @@ import { SNRootKey } from '../../RootKey/RootKey'
 import { SNRootKeyParams } from '../../RootKey/RootKeyParams'
 import { V001Algorithm, V002Algorithm } from '../../Algorithm'
 import * as Common from '@standardnotes/common'
-import * as EncryptionSplit from './EncryptionSplit'
+import {
+  CreateEncryptionSplitWithKeyLookup,
+  FindPayloadInDecryptionSplit,
+  FindPayloadInEncryptionSplit,
+  KeyedDecryptionSplit,
+  KeyedEncryptionSplit,
+} from '../../Encryption/Split/EncryptionSplit'
 import * as Models from '@standardnotes/models'
 import * as RootKeyEncryption from '../RootKey/RootKeyEncryption'
 import * as Services from '@standardnotes/services'
@@ -27,6 +33,7 @@ import { RootKeyEncryptedAuthenticatedData } from '../../Encryption/RootKeyEncry
 import { ItemAuthenticatedData } from '../../Encryption/ItemAuthenticatedData'
 import { LegacyAttachedData } from '../../Encryption/LegacyAttachedData'
 import { createEncryptedFileExportContextPayload, EncryptedPayload } from '@standardnotes/models'
+import { SplitPayloadsByEncryptionType } from '../../Encryption/Split/EncryptionTypeSplit'
 
 export enum EncryptionServiceEvent {
   RootKeyStatusChanged = 'RootKeyStatusChanged',
@@ -201,13 +208,13 @@ export class EncryptionService
   }
 
   public async encryptSplitSingle(
-    split: EncryptionSplit.EncryptionSplitWithKey<Models.DecryptedPayloadInterface>,
+    split: KeyedEncryptionSplit,
   ): Promise<Models.EncryptedPayloadInterface> {
     return (await this.encryptSplit(split))[0]
   }
 
   public async encryptSplit(
-    split: EncryptionSplit.EncryptionSplitWithKey<Models.DecryptedPayloadInterface>,
+    split: KeyedEncryptionSplit,
   ): Promise<Models.EncryptedPayloadInterface[]> {
     const allEncryptedParams: EncryptedParameters[] = []
 
@@ -242,7 +249,7 @@ export class EncryptionService
     }
 
     const packagedEncrypted = allEncryptedParams.map((encryptedParams) => {
-      const original = EncryptionSplit.findPayloadInSplit(encryptedParams.uuid, split)
+      const original = FindPayloadInEncryptionSplit(encryptedParams.uuid, split)
       return new EncryptedPayload({
         ...original,
         ...encryptedParams,
@@ -253,14 +260,14 @@ export class EncryptionService
   }
 
   public async decryptSplitSingle<C extends Models.ItemContent = Models.ItemContent>(
-    split: EncryptionSplit.EncryptionSplitWithKey<Models.EncryptedPayloadInterface>,
+    split: KeyedDecryptionSplit,
   ): Promise<Models.DecryptedPayloadInterface<C> | Models.EncryptedPayloadInterface> {
     const results = await this.decryptSplit<C>(split)
     return results[0]
   }
 
   public async decryptSplit<C extends Models.ItemContent = Models.ItemContent>(
-    split: EncryptionSplit.EncryptionSplitWithKey<Models.EncryptedPayloadInterface>,
+    split: KeyedDecryptionSplit,
   ): Promise<(Models.DecryptedPayloadInterface<C> | Models.EncryptedPayloadInterface)[]> {
     const resultParams: (DecryptedParameters<C> | ErrorDecryptingParameters)[] = []
 
@@ -295,7 +302,7 @@ export class EncryptionService
     }
 
     const packagedResults = resultParams.map((params) => {
-      const original = EncryptionSplit.findPayloadInSplit(params.uuid, split)
+      const original = FindPayloadInDecryptionSplit(params.uuid, split)
       if (isErrorDecryptingParameters(params)) {
         return new Models.EncryptedPayload({
           ...original.ejected(),
@@ -426,9 +433,13 @@ export class EncryptionService
 
   public async createEncryptedBackupFile(): Promise<BackupFile> {
     const payloads = this.itemManager.allItems().map((item) => item.payload)
-    const split = EncryptionSplit.splitItemsByEncryptionType(payloads)
-    const keyLookupSplit = EncryptionSplit.createKeyLookupSplitFromSplit(split)
+
+    const split = SplitPayloadsByEncryptionType(payloads)
+
+    const keyLookupSplit = CreateEncryptionSplitWithKeyLookup(split)
+
     const result = await this.encryptSplit(keyLookupSplit)
+
     const ejected = result.map((payload) => createEncryptedFileExportContextPayload(payload))
 
     const data: BackupFile = {

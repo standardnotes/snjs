@@ -89,7 +89,7 @@ export class UserService
             : Services.StoragePersistencePolicies.Default,
         )
         if (mergeLocal) {
-          await this.syncService.markAllItemsAsNeedingSync()
+          await this.syncService.markAllItemsAsNeedingSyncAndPersist()
         } else {
           await this.itemManager.removeAllItemsFromMemory()
           await this.clearDatabase()
@@ -138,7 +138,7 @@ export class UserService
             : Services.StoragePersistencePolicies.Default,
         )
         if (mergeLocal) {
-          await this.syncService.markAllItemsAsNeedingSync()
+          await this.syncService.markAllItemsAsNeedingSyncAndPersist()
         } else {
           void this.itemManager.removeAllItemsFromMemory()
           await this.clearDatabase()
