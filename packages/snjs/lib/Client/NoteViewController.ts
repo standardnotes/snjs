@@ -1,23 +1,23 @@
-import { NoteMutator, SNItem, SNNote, SNTag, NoteContent } from '@standardnotes/models'
+import {
+  NoteMutator,
+  SNNote,
+  SNTag,
+  NoteContent,
+  DecryptedItemInterface,
+} from '@standardnotes/models'
 import { removeFromArray } from '@standardnotes/utils'
 import { ContentType } from '@standardnotes/common'
 import { PayloadSource } from '@standardnotes/models'
 import { UuidString } from '@Lib/Types/UuidString'
 import { SNApplication } from '../Application/Application'
-
-export const STRING_SAVING_WHILE_DOCUMENT_HIDDEN =
-  'Attempting to save an item while the application is hidden. To protect data integrity, please refresh the application window and try again.'
-export const STRING_DELETED_NOTE =
-  'The note you are attempting to edit has been deleted, and is awaiting sync. Changes you make will be disregarded.'
-export const STRING_INVALID_NOTE =
-  // eslint-disable-next-line quotes
-  "The note you are attempting to save can not be found or has been deleted. Changes you make will not be synced. Please copy this note's text and start a new note."
-
-export const STRING_ELLIPSES = '...'
-
-const NOTE_PREVIEW_CHAR_LIMIT = 80
-const SAVE_TIMEOUT_DEBOUNCE = 350
-const SAVE_TIMEOUT_NO_DEBOUNCE = 100
+import {
+  STRING_SAVING_WHILE_DOCUMENT_HIDDEN,
+  STRING_INVALID_NOTE,
+  NOTE_PREVIEW_CHAR_LIMIT,
+  STRING_ELLIPSES,
+  SAVE_TIMEOUT_NO_DEBOUNCE,
+  SAVE_TIMEOUT_DEBOUNCE,
+} from './Types'
 
 export type EditorValues = {
   title: string
@@ -97,7 +97,7 @@ export class NoteViewController {
     }
   }
 
-  insertTemplatedNote(): Promise<SNItem> {
+  public insertTemplatedNote(): Promise<DecryptedItemInterface> {
     this.isTemplateNote = false
     return this.application.mutator.insertItem(this.note)
   }
@@ -141,11 +141,6 @@ export class NoteViewController {
 
     if (typeof document !== 'undefined' && document.hidden) {
       void this.application.alertService.alert(STRING_SAVING_WHILE_DOCUMENT_HIDDEN)
-      return
-    }
-
-    if (this.note.deleted) {
-      void this.application.alertService.alert(STRING_DELETED_NOTE)
       return
     }
 

@@ -4,7 +4,7 @@ import { Migration } from '@Lib/Migrations/Migration'
 import { MigrationServices } from '../MigrationServices'
 import { PreviousSnjsVersion2_0_0 } from '../../Version'
 import { ProtocolVersion } from '@standardnotes/common'
-import { SNRootKey, ExportIntent, CreateNewRootKey } from '@standardnotes/encryption'
+import { SNRootKey, CreateNewRootKey } from '@standardnotes/encryption'
 import { SNStorageService } from '../../Services/Storage/StorageService'
 import { StorageReader1_0_0 } from '../StorageReaders/Versions/Reader1_0_0'
 import * as Models from '@standardnotes/models'
@@ -12,6 +12,9 @@ import * as Services from '@standardnotes/services'
 import * as Utils from '@standardnotes/utils'
 import { isEnvironmentMobile, isEnvironmentWebOrDesktop } from '@Lib/Application/Platforms'
 import {
+  EncryptedPayload,
+  EncryptedPayloadInterface,
+  EncryptedTransferPayload,
   ItemContent,
   ItemsKeyContent,
   ItemsKeyContentSpecialized,
@@ -36,8 +39,6 @@ type LegacyMobileKeychainStructure =
 
 interface LegacyStorageContent extends ItemContent {
   storage: unknown
-  uuid: string
-  content_type: ContentType
 }
 
 interface LegacyRootKeyContent extends RootKeyContent {
@@ -113,11 +114,10 @@ export class Migration2_0_0 extends Migration {
     }
     const encryptedStorage = (await deviceInterface.getJsonParsedRawStorageValue(
       Services.LegacyKeys1_0_0.WebEncryptedStorageKey,
-    )) as LegacyStorageContent
+    )) as EncryptedTransferPayload
 
     if (encryptedStorage) {
-      const encryptedStoragePayload =
-        Models.CreateMaxPayloadFromAnyObject<LegacyStorageContent>(encryptedStorage)
+      const encryptedStoragePayload = new EncryptedPayload(encryptedStorage)
 
       const passcodeResult = await this.webDesktopHelperGetPasscodeKeyAndDecryptEncryptedStorage(
         encryptedStoragePayload,
@@ -211,14 +211,14 @@ export class Migration2_0_0 extends Migration {
    * Web/desktop only
    */
   private async webDesktopHelperGetPasscodeKeyAndDecryptEncryptedStorage(
-    encryptedPayload: Models.PayloadInterface<LegacyStorageContent>,
+    encryptedPayload: EncryptedPayloadInterface,
   ) {
     const rawPasscodeParams = await this.services.deviceInterface.getJsonParsedRawStorageValue(
       Services.LegacyKeys1_0_0.WebPasscodeParamsKey,
     )
     const passcodeParams = this.services.protocolService.createKeyParams(rawPasscodeParams as any)
     /** Decrypt it with the passcode */
-    let decryptedStoragePayload: Models.PayloadInterface<LegacyStorageContent> | undefined
+    let decryptedStoragePayload: Models.DecryptedPayloadInterface<LegacyStorageContent> | undefined
     let passcodeKey: SNRootKey | undefined
 
     await this.promptForPasscodeUntilCorrect(async (candidate: string) => {

@@ -11,10 +11,10 @@ import {
   CreateDecryptedItemFromPayload,
   ItemsKeyContent,
   ItemsKeyInterface,
-  CreateMaxPayloadFromAnyObject,
   FillItemContent,
-  PayloadInterface,
   ItemContent,
+  DecryptedPayload,
+  DecryptedPayloadInterface,
 } from '@standardnotes/models'
 import { SNPureCrypto } from '@standardnotes/sncrypto-common'
 import { SNRootKey } from '../../RootKey/RootKey'
@@ -24,7 +24,7 @@ import { V001Algorithm } from '../../Algorithm'
 import {
   DecryptedParameters,
   EncryptedParameters,
-  ErroredDecryptingParameters,
+  ErrorDecryptingParameters,
 } from '../../Encryption/EncryptedParameters'
 import { RootKeyEncryptedAuthenticatedData } from '../../Encryption/RootKeyEncryptedAuthenticatedData'
 import { ItemAuthenticatedData } from '../../Encryption/ItemAuthenticatedData'
@@ -68,7 +68,7 @@ export class SNProtocolOperator001 implements AsynchronousOperator {
    * The consumer must save/sync this item.
    */
   public createItemsKey(): ItemsKeyInterface {
-    const payload = CreateMaxPayloadFromAnyObject({
+    const payload = new DecryptedPayload({
       uuid: UuidGenerator.GenerateUuid(),
       content_type: ContentType.ItemsKey,
       content: this.generateNewItemsKeyContent(),
@@ -117,7 +117,7 @@ export class SNProtocolOperator001 implements AsynchronousOperator {
   }
 
   public async generateEncryptedParametersAsync(
-    payload: PayloadInterface,
+    payload: DecryptedPayloadInterface,
     key: ItemsKeyInterface | SNRootKey,
   ): Promise<EncryptedParameters> {
     /**
@@ -151,7 +151,7 @@ export class SNProtocolOperator001 implements AsynchronousOperator {
   public async generateDecryptedParametersAsync<C extends ItemContent = ItemContent>(
     encrypted: EncryptedParameters,
     key: ItemsKeyInterface | SNRootKey,
-  ): Promise<DecryptedParameters<C> | ErroredDecryptingParameters> {
+  ): Promise<DecryptedParameters<C> | ErrorDecryptingParameters> {
     if (!encrypted.enc_item_key) {
       console.error(Error('Missing item encryption key, skipping decryption.'))
       return {
@@ -186,11 +186,6 @@ export class SNProtocolOperator001 implements AsynchronousOperator {
       return {
         uuid: encrypted.uuid,
         content: JSON.parse(content),
-        items_key_id: undefined,
-        enc_item_key: undefined,
-        auth_hash: undefined,
-        errorDecrypting: false,
-        waitingForKey: false,
       }
     }
   }

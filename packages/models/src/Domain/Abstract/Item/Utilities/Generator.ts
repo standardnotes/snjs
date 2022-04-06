@@ -76,15 +76,15 @@ export function CreateDecryptedMutatorForItem<
   }
 }
 
-export function RegisterItemClass(
-  contentType: ContentType,
-  itemClass: ItemClass,
-  mutatorClass?: MutatorClass,
-) {
-  ContentTypeClassMapping[contentType] = {
+export function RegisterItemClass<
+  C extends ItemContent = ItemContent,
+  M extends DecryptedItemMutator<C> = DecryptedItemMutator<C>,
+>(contentType: ContentType, itemClass: ItemClass<C>, mutatorClass: M) {
+  const entry: MappingEntry<C> = {
     itemClass: itemClass,
-    mutatorClass: mutatorClass,
+    mutatorClass: mutatorClass as unknown as MutatorClass<C>,
   }
+  ContentTypeClassMapping[contentType] = entry as unknown as MappingEntry<ItemContent>
 }
 
 export function CreateDecryptedItemFromPayload<

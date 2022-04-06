@@ -1,15 +1,6 @@
 import { ContentType } from '@standardnotes/common'
-import {
-  EncryptedPayloadInterface,
-  createEncryptedFileExportContextPayload,
-  createEncryptedSyncContextPayload,
-  createEncryptedLocalStorageContextPayload,
-  DecryptedPayloadInterface,
-  createDecryptedFileExportContextPayload,
-  createDecryptedLocalStorageContextPayload,
-} from '@standardnotes/models'
+import { EncryptedPayloadInterface } from '@standardnotes/models'
 import { EncryptedParameters } from '../Encryption/EncryptedParameters'
-import { EncryptedExportIntent, DecryptedExportIntent } from './ExportIntent'
 
 export function ContentTypeUsesRootKeyEncryption(contentType: ContentType): boolean {
   return (
@@ -21,45 +12,6 @@ export function ContentTypeUsesRootKeyEncryption(contentType: ContentType): bool
 
 export function ItemContentTypeUsesRootKeyEncryption(contentType: ContentType): boolean {
   return contentType === ContentType.ItemsKey
-}
-
-/**
- * @returns True if the intent requires encryption.
- */
-export function intentRequiresEncryption(
-  intent: EncryptedExportIntent | EncryptedExportIntent,
-): boolean {
-  return (
-    intent === EncryptedExportIntent.Sync ||
-    intent === EncryptedExportIntent.LocalStorageEncrypted ||
-    intent === EncryptedExportIntent.FileEncrypted
-  )
-}
-
-export function CreateEncryptedContextPayload(
-  fromPayload: EncryptedPayloadInterface,
-  intent: EncryptedExportIntent,
-): EncryptedPayloadInterface {
-  switch (intent) {
-    case EncryptedExportIntent.Sync:
-      return createEncryptedSyncContextPayload(fromPayload)
-    case EncryptedExportIntent.FileEncrypted:
-      return createEncryptedFileExportContextPayload(fromPayload)
-    case EncryptedExportIntent.LocalStorageEncrypted:
-      return createEncryptedLocalStorageContextPayload(fromPayload)
-  }
-}
-
-export function CreateDecryptedContextPayload(
-  fromPayload: DecryptedPayloadInterface,
-  intent: DecryptedExportIntent,
-): DecryptedPayloadInterface {
-  switch (intent) {
-    case DecryptedExportIntent.FileDecrypted:
-      return createDecryptedFileExportContextPayload(fromPayload)
-    case DecryptedExportIntent.LocalStorageDecrypted:
-      return createDecryptedLocalStorageContextPayload(fromPayload)
-  }
 }
 
 export function encryptedParametersFromPayload(

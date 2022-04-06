@@ -1,10 +1,15 @@
 import { splitString } from '@standardnotes/utils'
-import { CreateDecryptedItemFromPayload, ItemsKeyContent, ItemsKeyInterface } from '@standardnotes/models'
+import {
+  CreateDecryptedItemFromPayload,
+  DecryptedPayload,
+  ItemsKeyContent,
+  ItemsKeyInterface,
+  FillItemContent,
+} from '@standardnotes/models'
 import { SNRootKey } from '../../RootKey/RootKey'
 import { V003Algorithm } from '../../Algorithm'
 import { Create003KeyParams } from '../../RootKey/KeyParams'
 import { SNProtocolOperator002 } from '../002/Operator002'
-import { CreateMaxPayloadFromAnyObject, FillItemContent } from '@standardnotes/models'
 import { ContentType, KeyParamsOrigination, ProtocolVersion } from '@standardnotes/common'
 import { UuidGenerator } from '@standardnotes/utils'
 import { SNRootKeyParams } from '../../RootKey/RootKeyParams'
@@ -39,7 +44,7 @@ export class SNProtocolOperator003 extends SNProtocolOperator002 {
    */
   public createItemsKey(): ItemsKeyInterface {
     const content = this.generateNewItemsKeyContent()
-    const payload = CreateMaxPayloadFromAnyObject({
+    const payload = new DecryptedPayload({
       uuid: UuidGenerator.GenerateUuid(),
       content_type: ContentType.ItemsKey,
       content: FillItemContent(content),

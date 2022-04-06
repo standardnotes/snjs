@@ -11,16 +11,20 @@ import { EncryptionService } from '../Service/Encryption/EncryptionService'
 import {
   PayloadFormat,
   PayloadInterface,
-  CreateFileImportPayload,
   DecryptedPayloadInterface,
   ItemsKeyContent,
   EncryptedPayloadInterface,
   isEncryptedPayload,
   isDecryptedPayload,
+  isEncryptedTransferPayload,
+  EncryptedPayload,
+  DecryptedPayload,
+  isDecryptedTransferPayload,
+  CreateDecryptedItemFromPayload,
+  ItemsKeyInterface,
 } from '@standardnotes/models'
 import { ClientDisplayableError } from '@standardnotes/responses'
 import { CreateAnyKeyParams } from '../RootKey/KeyParams'
-import { CreateDecryptedItemFromPayload, ItemsKeyInterface } from '@standardnotes/models'
 import { SNRootKeyParams } from '../RootKey/RootKeyParams'
 import { SNRootKey } from '../RootKey/RootKey'
 import { ContentTypeUsesRootKeyEncryption } from '../Intent/Functions'
@@ -31,10 +35,17 @@ export async function decryptBackupFile(
   protocolService: EncryptionService,
   password?: string,
 ) {
-  const payloads = file.items.map((rawItem) => {
-    return CreateFileImportPayload(rawItem)
-  })
-  const encrypted = payloads.filter(isEncryptedPayload) as EncryptedPayloadInterface[]
+  const payloads: (EncryptedPayloadInterface | DecryptedPayloadInterface)[] = file.items.map(
+    (item) => {
+      if (isEncryptedTransferPayload(item)) {
+        return new EncryptedPayload(item)
+      } else if (isDecryptedTransferPayload(item)) {
+        return new DecryptedPayload(item)
+      }
+      throw Error('Unhandled case in decryptBackupFile')
+    },
+  )
+  const encrypted = payloads.filter(isEncryptedPayload)
   const type = getBackupFileType(file, payloads)
 
   switch (type) {
@@ -225,12 +236,14 @@ async function decryptEncrypted(
     return payload.content_type === ContentType.ItemsKey
   })
 
-  const decryptedItemsKeysPayloads = await protocolService.decryptSplit({
-    usesRootKey: {
-      items: itemsKeysPayloads,
-      key: rootKey,
-    },
-  })
+  const decryptedItemsKeysPayloads = (
+    await protocolService.decryptSplit({
+      usesRootKey: {
+        items: itemsKeysPayloads,
+        key: rootKey,
+      },
+    })
+  ).filter(isDecryptedPayload)
 
   const results: (EncryptedPayloadInterface | DecryptedPayloadInterface)[] = []
   extendArray(results, decryptedItemsKeysPayloads)

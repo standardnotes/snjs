@@ -18,7 +18,4 @@ export interface EncryptedPayloadInterface extends PayloadInterface<EncryptedTra
 
   /** @deprecated */
   readonly auth_hash?: string
-
-  /** @deprecated */
-  readonly auth_params?: unknown
 }

@@ -90,7 +90,7 @@ export class PayloadManager
     return this.collection.nondeletedElements()
   }
 
-  public get invalidItems(): EncryptedPayloadInterface[] {
+  public get invalidPayloads(): EncryptedPayloadInterface[] {
     return this.collection.invalidElements()
   }
 

@@ -27,7 +27,6 @@ type ApplicationObserver = {
 }
 type ItemStream = (
   changedOrInserted: Models.DecryptedItemInterface[],
-  removed: (Models.EncryptedItemInterface | Models.DeletedItemInterface)[],
   source: Models.PayloadSource,
 ) => void
 type ObserverRemover = () => void
@@ -426,16 +425,16 @@ export class SNApplication implements InternalServices.ListedClientInterface {
   ): () => void {
     const observer = this.itemManager.addObserver(
       contentType,
-      (changed, inserted, removed, _ignored, source) => {
+      (changed, inserted, _discarded, _ignored, source) => {
         const all = changed.concat(inserted)
-        stream(all, removed, source)
+        stream(all, source)
       },
     )
 
     /** Push current values now */
     const matches = this.itemManager.getItems(contentType)
     if (matches.length > 0) {
-      stream(matches, [], Models.PayloadSource.InitialObserverRegistrationPush)
+      stream(matches, Models.PayloadSource.InitialObserverRegistrationPush)
     }
 
     this.streamRemovers.push(observer)

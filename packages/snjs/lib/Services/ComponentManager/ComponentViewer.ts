@@ -16,6 +16,7 @@ import {
   isNote,
   createComponentRetrievedContextPayload,
   createComponentCreatedContextPayload,
+  DecryptedPayload,
 } from '@standardnotes/models'
 import find from 'lodash/find'
 import uniq from 'lodash/uniq'
@@ -38,7 +39,7 @@ import {
   AllowedBatchContentTypes,
   IncomingComponentItemPayload,
   DeleteItemsMessageData,
-} from './types'
+} from './Types'
 import { ComponentAction, ComponentPermission } from '@standardnotes/features'
 import { ItemManager } from '@Lib/Services/Items/ItemManager'
 import { UuidString } from '@Lib/Types/UuidString'
@@ -53,6 +54,7 @@ import {
   UuidGenerator,
   Uuids,
   sureSearchArray,
+  isNotUndefined,
 } from '@standardnotes/utils'
 import { MessageData } from '..'
 
@@ -697,26 +699,30 @@ export class ComponentViewer {
           return
         }
 
-        const payloads = responsePayloads.map((responseItem) => {
+        const contextualPayloads = responsePayloads.map((responseItem) => {
           return createComponentRetrievedContextPayload(responseItem)
         })
 
-        for (const payload of payloads) {
-          const item = this.itemManager.findItem(payload.uuid)
+        for (const contextualPayload of contextualPayloads) {
+          const item = this.itemManager.findItem(contextualPayload.uuid)
           if (!item) {
+            const payload = new DecryptedPayload(contextualPayload)
             const template = CreateDecryptedItemFromPayload(payload)
             await this.itemManager.insertItem(template)
           } else {
-            if (payload.content_type !== item.content_type) {
+            if (contextualPayload.content_type !== item.content_type) {
               throw Error('Extension is trying to modify content type of item.')
             }
           }
         }
 
         await this.itemManager.changeItems(
-          uuids,
+          items.filter(isNotUndefined),
           (mutator) => {
-            const payload = sureSearchArray(payloads, { uuid: mutator.getUuid() })
+            const contextualPayload = sureSearchArray(contextualPayloads, {
+              uuid: mutator.getUuid(),
+            })
+            const payload = new DecryptedPayload(contextualPayload)
             mutator.mergePayload(payload)
 
             const responseItem = sureSearchArray(responsePayloads, {
@@ -781,7 +787,8 @@ export class ComponentViewer {
             responseItem.uuid = UuidGenerator.GenerateUuid()
           }
 
-          const payload = createComponentCreatedContextPayload(responseItem)
+          const contextualPayload = createComponentCreatedContextPayload(responseItem)
+          const payload = new DecryptedPayload(contextualPayload)
 
           const template = CreateDecryptedItemFromPayload(payload)
           const item = await this.itemManager.insertItem(template)
@@ -851,7 +858,7 @@ export class ComponentViewer {
               void this.alertService.alert('The item you are trying to delete cannot be found.')
               continue
             }
-            await this.itemManager.setItemToBeDeleted(item.uuid, PayloadSource.ComponentRetrieved)
+            await this.itemManager.setItemToBeDeleted(item, PayloadSource.ComponentRetrieved)
           }
 
           void this.syncService.sync()
@@ -873,7 +880,7 @@ export class ComponentViewer {
       this.component.uuid,
       noPermissionsRequired,
       async () => {
-        await this.itemManager.changeComponent(this.component.uuid, (mutator) => {
+        await this.itemManager.changeComponent(this.component, (mutator) => {
           mutator.componentData = message.data.componentData || {}
         })
 

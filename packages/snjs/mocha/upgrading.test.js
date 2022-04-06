@@ -120,7 +120,7 @@ describe('upgrading', () => {
     this.application = await Factory.signOutApplicationAndReturnNew(this.application)
     await this.application.signIn(this.email, this.password, undefined, undefined, undefined, true)
     expect(this.application.itemManager.notes.length).to.equal(1)
-    expect(this.application.itemManager.invalidItems).to.be.empty
+    expect(this.application.payloadManager.invalidPayloads).to.be.empty
   }).timeout(15000)
 
   it('upgrading from 003 to 004 with passcode only then reiniting app should create valid state', async function () {
@@ -154,7 +154,7 @@ describe('upgrading', () => {
     await appFirst.launch(true)
     const result = await appFirst.upgradeProtocolVersion()
     expect(result).to.deep.equal({ success: true })
-    expect(appFirst.itemManager.invalidItems).to.be.empty
+    expect(appFirst.payloadManager.invalidPayloads).to.be.empty
     await Factory.safeDeinit(appFirst)
 
     /** Recreate the once more */
@@ -165,7 +165,7 @@ describe('upgrading', () => {
       },
     })
     await appSecond.launch(true)
-    expect(appSecond.itemManager.invalidItems).to.be.empty
+    expect(appSecond.payloadManager.invalidPayloads).to.be.empty
     await Factory.safeDeinit(appSecond)
   }).timeout(15000)
 

@@ -111,6 +111,10 @@ export function isNullOrUndefined(value: unknown): value is null | undefined {
   return value === null || value === undefined
 }
 
+export function isNotUndefined<T>(val: T | undefined | null): val is T {
+  return val != undefined
+}
+
 /**
  * @returns True if the string is empty or undefined
  */

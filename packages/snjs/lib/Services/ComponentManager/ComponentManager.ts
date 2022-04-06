@@ -1,4 +1,4 @@
-import { AllowedBatchStreaming } from './types'
+import { AllowedBatchStreaming } from './Types'
 import { SNPreferencesService } from '../Preferences/PreferencesService'
 import { FindNativeFeature } from '@standardnotes/features'
 import { SNFeaturesService } from '@Lib/Services/Features/FeaturesService'
@@ -18,7 +18,7 @@ import {
   PermissionDialog,
   DesktopManagerInterface,
   AllowedBatchContentTypes,
-} from '@Lib/Services/ComponentManager/types'
+} from '@Lib/Services/ComponentManager/Types'
 import { ActionObserver, ComponentViewer } from '@Lib/Services/ComponentManager/ComponentViewer'
 import { AbstractService, InternalEventBusInterface } from '@standardnotes/services'
 
@@ -506,14 +506,14 @@ export class SNComponentManager extends AbstractService<ComponentManagerEvent, E
 
     const theme = this.findComponent(uuid) as SNTheme
     if (theme.active) {
-      await this.itemManager.changeComponent(theme.uuid, (mutator) => {
+      await this.itemManager.changeComponent(theme, (mutator) => {
         mutator.active = false
       })
     } else {
       const activeThemes = this.getActiveThemes()
 
       /* Activate current before deactivating others, so as not to flicker */
-      await this.itemManager.changeComponent(theme.uuid, (mutator) => {
+      await this.itemManager.changeComponent(theme, (mutator) => {
         mutator.active = true
       })
 
@@ -522,7 +522,7 @@ export class SNComponentManager extends AbstractService<ComponentManagerEvent, E
         await sleep(10)
         for (const candidate of activeThemes) {
           if (candidate && !candidate.isLayerable()) {
-            await this.itemManager.changeComponent(candidate.uuid, (mutator) => {
+            await this.itemManager.changeComponent(candidate, (mutator) => {
               mutator.active = false
             })
           }
@@ -534,14 +534,9 @@ export class SNComponentManager extends AbstractService<ComponentManagerEvent, E
   async toggleComponent(uuid: UuidString): Promise<void> {
     this.log('Toggling component', uuid)
     const component = this.findComponent(uuid)
-    await this.itemManager.changeComponent(component.uuid, (mutator) => {
+    await this.itemManager.changeComponent(component, (mutator) => {
       mutator.active = !(mutator.getItem() as SNComponent).active
     })
-  }
-
-  async deleteComponent(uuid: UuidString): Promise<void> {
-    await this.itemManager.setItemToBeDeleted(uuid)
-    void this.syncService.sync()
   }
 
   isComponentActive(component: SNComponent): boolean {

@@ -809,7 +809,7 @@ describe('online conflict handling', function () {
     await newApp.itemManager.emitItemsFromPayloads(priorData.map((i) => i.payload))
     await newApp.syncService.markAllItemsAsNeedingSync()
     await newApp.syncService.sync(syncOptions)
-    expect(newApp.itemManager.invalidItems.length).to.equal(0)
+    expect(newApp.payloadManager.invalidPayloads.length).to.equal(0)
     await Factory.safeDeinit(newApp)
   }).timeout(80000)
 

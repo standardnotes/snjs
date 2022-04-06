@@ -5,7 +5,7 @@ import { KeyMode } from './KeyMode'
 import { OperatorManager } from '../../Operator/OperatorManager'
 import { SNRootKey } from '../../RootKey/RootKey'
 import { SNRootKeyParams } from '../../RootKey/RootKeyParams'
-import { UuidGenerator, Uuids } from '@standardnotes/utils'
+import { UuidGenerator } from '@standardnotes/utils'
 import * as Common from '@standardnotes/common'
 import * as Models from '@standardnotes/models'
 import * as OperatorWrapper from '../../Operator/OperatorWrapper'
@@ -13,7 +13,8 @@ import * as Services from '@standardnotes/services'
 import {
   DecryptedParameters,
   EncryptedParameters,
-  ErroredDecryptingParameters,
+  ErrorDecryptingParameters,
+  isErrorDecryptingParameters,
 } from '../../Encryption/EncryptedParameters'
 import { ItemsKeyMutator } from '../../ItemsKey'
 import { CreateNewRootKey } from '../../RootKey/Functions'
@@ -267,7 +268,7 @@ export class RootKeyEncryptionService extends Services.AbstractService<RootKeySe
        */
       const wrappedKeyPayload = new Models.EncryptedPayload(wrappedRootKey)
       const decrypted = await this.decryptPayload(wrappedKeyPayload, wrappingKey)
-      return !decrypted.errorDecrypting
+      return !isErrorDecryptingParameters(decrypted)
     } else {
       throw 'Unhandled case in validateWrappingKey'
     }
@@ -326,7 +327,7 @@ export class RootKeyEncryptionService extends Services.AbstractService<RootKeySe
     const payload = new Models.EncryptedPayload(wrappedKey)
     const decrypted = await this.decryptPayload<Models.RootKeyContent>(payload, wrappingKey)
 
-    if (decrypted.errorDecrypting) {
+    if (isErrorDecryptingParameters(decrypted)) {
       throw Error('Unable to decrypt root key with provided wrapping key.')
     } else {
       const decryptedPayload = new DecryptedPayload<RootKeyContent>({
@@ -524,7 +525,7 @@ export class RootKeyEncryptionService extends Services.AbstractService<RootKeySe
 
   public async decryptPayloadWithKeyLookup(
     payload: Models.EncryptedPayloadInterface,
-  ): Promise<DecryptedParameters | ErroredDecryptingParameters> {
+  ): Promise<DecryptedParameters | ErrorDecryptingParameters> {
     const key = this.getRootKey()
 
     if (key == undefined) {
@@ -541,20 +542,20 @@ export class RootKeyEncryptionService extends Services.AbstractService<RootKeySe
   public async decryptPayload<C extends Models.ItemContent = Models.ItemContent>(
     payload: Models.EncryptedPayloadInterface,
     key: SNRootKey,
-  ): Promise<DecryptedParameters<C> | ErroredDecryptingParameters> {
+  ): Promise<DecryptedParameters<C> | ErrorDecryptingParameters> {
     return OperatorWrapper.decryptPayload(payload, key, this.operatorManager)
   }
 
   public async decryptPayloadsWithKeyLookup(
     payloads: Models.EncryptedPayloadInterface[],
-  ): Promise<(DecryptedParameters | ErroredDecryptingParameters)[]> {
+  ): Promise<(DecryptedParameters | ErrorDecryptingParameters)[]> {
     return Promise.all(payloads.map((payload) => this.decryptPayloadWithKeyLookup(payload)))
   }
 
   public async decryptPayloads(
     payloads: Models.EncryptedPayloadInterface[],
     key: SNRootKey,
-  ): Promise<(DecryptedParameters | ErroredDecryptingParameters)[]> {
+  ): Promise<(DecryptedParameters | ErrorDecryptingParameters)[]> {
     return Promise.all(payloads.map((payload) => this.decryptPayload(payload, key)))
   }
 
@@ -570,7 +571,7 @@ export class RootKeyEncryptionService extends Services.AbstractService<RootKeySe
        * Re-encrypting items keys is called by consumers who have specific flows who
        * will sync on their own timing
        */
-      await this.itemManager.setItemsDirty(Uuids(itemsKeys))
+      await this.itemManager.setItemsDirty(itemsKeys)
     }
   }
 
@@ -607,13 +608,13 @@ export class RootKeyEncryptionService extends Services.AbstractService<RootKeySe
     })
 
     for (const key of defaultKeys) {
-      await this.itemManager.changeItemsKey(key.uuid, (mutator) => {
+      await this.itemManager.changeItemsKey(key, (mutator) => {
         mutator.isDefault = false
       })
     }
 
     const itemsKey = (await this.itemManager.insertItem(itemTemplate)) as Models.ItemsKeyInterface
-    await this.itemManager.changeItemsKey(itemsKey.uuid, (mutator) => {
+    await this.itemManager.changeItemsKey(itemsKey, (mutator) => {
       mutator.isDefault = true
     })
 
@@ -625,15 +626,12 @@ export class RootKeyEncryptionService extends Services.AbstractService<RootKeySe
     const newDefaultItemsKey = await this.createNewDefaultItemsKey()
 
     const rollback = async () => {
-      await this.itemManager.setItemToBeDeleted(newDefaultItemsKey.uuid)
+      await this.itemManager.setItemToBeDeleted(newDefaultItemsKey)
 
       if (currentDefaultItemsKey) {
-        await this.itemManager.changeItem<ItemsKeyMutator>(
-          currentDefaultItemsKey.uuid,
-          (mutator) => {
-            mutator.isDefault = true
-          },
-        )
+        await this.itemManager.changeItem<ItemsKeyMutator>(currentDefaultItemsKey, (mutator) => {
+          mutator.isDefault = true
+        })
       }
     }
 

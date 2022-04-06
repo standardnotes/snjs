@@ -1,11 +1,11 @@
-import { FileImportTransferPayload } from '@standardnotes/models'
+import { FileImportContextualPayload } from '@standardnotes/models'
 import { AnyKeyParamsContent, ProtocolVersion } from '@standardnotes/common'
 
 export type BackupFile = {
   version?: ProtocolVersion
   keyParams?: AnyKeyParamsContent
   auth_params?: AnyKeyParamsContent
-  items: FileImportTransferPayload[]
+  items: FileImportContextualPayload[]
 }
 
 export enum BackupFileType {

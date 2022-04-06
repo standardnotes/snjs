@@ -8,7 +8,8 @@ import * as Services from '@standardnotes/services'
 import {
   DecryptedParameters,
   EncryptedParameters,
-  ErroredDecryptingParameters,
+  ErrorDecryptingParameters,
+  isErrorDecryptingParameters,
 } from '../../Encryption/EncryptedParameters'
 
 export class ItemsEncryptionService extends Services.AbstractService {
@@ -149,7 +150,7 @@ export class ItemsEncryptionService extends Services.AbstractService {
 
   public async decryptPayloadWithKeyLookup(
     payload: Models.EncryptedPayloadInterface,
-  ): Promise<DecryptedParameters | ErroredDecryptingParameters> {
+  ): Promise<DecryptedParameters | ErrorDecryptingParameters> {
     const key = this.keyToUseForDecryptionOfPayload(payload)
 
     if (key == undefined) {
@@ -166,7 +167,7 @@ export class ItemsEncryptionService extends Services.AbstractService {
   public async decryptPayload(
     payload: Models.EncryptedPayloadInterface,
     key: Models.ItemsKeyInterface,
-  ): Promise<DecryptedParameters | ErroredDecryptingParameters> {
+  ): Promise<DecryptedParameters | ErrorDecryptingParameters> {
     if (!payload.content) {
       return {
         uuid: payload.uuid,
@@ -179,33 +180,40 @@ export class ItemsEncryptionService extends Services.AbstractService {
 
   public async decryptPayloadsWithKeyLookup(
     payloads: Models.EncryptedPayloadInterface[],
-  ): Promise<(DecryptedParameters | ErroredDecryptingParameters)[]> {
+  ): Promise<(DecryptedParameters | ErrorDecryptingParameters)[]> {
     return Promise.all(payloads.map((payload) => this.decryptPayloadWithKeyLookup(payload)))
   }
 
   public async decryptPayloads(
     payloads: Models.EncryptedPayloadInterface[],
     key: Models.ItemsKeyInterface,
-  ): Promise<(DecryptedParameters | ErroredDecryptingParameters)[]> {
+  ): Promise<(DecryptedParameters | ErrorDecryptingParameters)[]> {
     return Promise.all(payloads.map((payload) => this.decryptPayload(payload, key)))
   }
 
   public async decryptErroredPayloads(): Promise<void> {
-    const items = this.itemManager.invalidItems.filter(
+    const payloads = this.payloadManager.invalidPayloads.filter(
       (i) => i.content_type !== ContentType.ItemsKey,
     )
-    if (items.length === 0) {
+    if (payloads.length === 0) {
       return
     }
 
-    const payloads = items.map((item) => {
-      return item.payloadRepresentation()
-    })
+    const resultParams = await this.decryptPayloadsWithKeyLookup(payloads)
 
-    const decryptedParams = await this.decryptPayloadsWithKeyLookup(payloads)
-    const decryptedPayloads = decryptedParams.map((decryptedParam) => {
-      const originalPayload = Models.sureFindPayload(decryptedParam.uuid, payloads)
-      return mergePayloadWithEncryptionParameters(originalPayload, decryptedParam)
+    const decryptedPayloads = resultParams.map((params) => {
+      const original = Models.SureFindPayload(params.uuid, payloads)
+      if (isErrorDecryptingParameters(params)) {
+        return new Models.EncryptedPayload({
+          ...original.ejected(),
+          ...params,
+        })
+      } else {
+        return new Models.DecryptedPayload({
+          ...original.ejectedBase(),
+          ...params,
+        })
+      }
     })
 
     await this.payloadManager.emitPayloads(decryptedPayloads, Models.PayloadSource.LocalChanged)

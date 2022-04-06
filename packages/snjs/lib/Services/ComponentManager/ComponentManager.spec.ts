@@ -9,7 +9,7 @@ import {
   FeatureDescription,
   FindNativeFeature,
 } from '@standardnotes/features'
-import { DesktopManagerInterface } from '@Lib/Services/ComponentManager/types'
+import { DesktopManagerInterface } from '@Lib/Services/ComponentManager/Types'
 import { FeatureIdentifier } from '@standardnotes/features'
 import { ContentType } from '@standardnotes/common'
 import { GenericItem, SNComponent } from '@standardnotes/models'

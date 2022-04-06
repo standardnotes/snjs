@@ -1,4 +1,3 @@
-import { EncryptedExportIntent } from './../../Intent/ExportIntent'
 import { BackupFile } from '../../Backups/BackupFile'
 import { CreateAnyKeyParams } from '../../RootKey/KeyParams'
 import { decryptBackupFile } from '../../Backups/BackupFileDecryptor'
@@ -17,11 +16,10 @@ import * as Models from '@standardnotes/models'
 import * as RootKeyEncryption from '../RootKey/RootKeyEncryption'
 import * as Services from '@standardnotes/services'
 import * as Utils from '@standardnotes/utils'
-import { EncryptedExportIntent } from '../../Intent/ExportIntent'
 import {
   DecryptedParameters,
   EncryptedParameters,
-  ErroredDecryptingParameters,
+  ErrorDecryptingParameters,
   isErrorDecryptingParameters,
 } from '../../Encryption/EncryptedParameters'
 import { encryptedParametersFromPayload } from '../../Intent/Functions'
@@ -264,7 +262,7 @@ export class EncryptionService
   public async decryptSplit<C extends Models.ItemContent = Models.ItemContent>(
     split: EncryptionSplit.EncryptionSplitWithKey<Models.EncryptedPayloadInterface>,
   ): Promise<(Models.DecryptedPayloadInterface<C> | Models.EncryptedPayloadInterface)[]> {
-    const resultParams: (DecryptedParameters<C> | ErroredDecryptingParameters)[] = []
+    const resultParams: (DecryptedParameters<C> | ErrorDecryptingParameters)[] = []
 
     if (split.usesRootKey) {
       const rootKeyDecrypted = await this.rootKeyEncryption.decryptPayloads(
@@ -539,9 +537,8 @@ export class EncryptionService
     return this.rootKeyEncryption.validatePasscode(passcode)
   }
 
-  /** Returns the key params attached to this key's encrypted payload */
   public getEmbeddedPayloadAuthenticatedData(
-    payload: Models.PayloadInterface,
+    payload: Models.EncryptedPayloadInterface,
   ): RootKeyEncryptedAuthenticatedData | ItemAuthenticatedData | LegacyAttachedData | undefined {
     const version = payload.version
     if (!version) {
@@ -555,11 +552,7 @@ export class EncryptionService
   }
 
   /** Returns the key params attached to this key's encrypted payload */
-  public getKeyEmbeddedKeyParams(key: Models.ItemsKeyInterface): SNRootKeyParams | undefined {
-    /** We can only look up key params for keys that are encrypted (as strings) */
-    if (key.payload.format === Models.PayloadFormat.DecryptedBareObject) {
-      return undefined
-    }
+  public getKeyEmbeddedKeyParams(key: Models.EncryptedItem): SNRootKeyParams | undefined {
     const authenticatedData = this.getEmbeddedPayloadAuthenticatedData(key.payload)
     if (!authenticatedData) {
       return undefined
@@ -656,7 +649,7 @@ export class EncryptionService
     const hasSyncedItemsKey = !Utils.isNullOrUndefined(defaultSyncedKey)
     if (hasSyncedItemsKey) {
       /** Delete all never synced keys */
-      await this.itemManager.setItemsToBeDeleted(Utils.Uuids(neverSyncedKeys))
+      await this.itemManager.setItemsToBeDeleted(neverSyncedKeys)
     } else {
       /**
        * No previous synced items key.
@@ -672,7 +665,7 @@ export class EncryptionService
           return itemsKey.keyVersion !== rootKeyParams.version
         })
         if (toDelete.length > 0) {
-          await this.itemManager.setItemsToBeDeleted(Utils.Uuids(toDelete))
+          await this.itemManager.setItemsToBeDeleted(toDelete)
         }
 
         if (this.itemsEncryption.getItemsKeys().length === 0) {
@@ -716,9 +709,9 @@ export class EncryptionService
 
     const unsyncedKeys = this.itemsEncryption
       .getItemsKeys()
-      .filter((key) => key.neverSynced && !key.dirty && !key.deleted)
+      .filter((key) => key.neverSynced && !key.dirty)
     if (unsyncedKeys.length > 0) {
-      void this.itemManager.setItemsDirty(Utils.Uuids(unsyncedKeys))
+      void this.itemManager.setItemsDirty(unsyncedKeys)
     }
   }
 }

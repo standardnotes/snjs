@@ -17,7 +17,7 @@ export type DecryptedParameters<C extends ItemContent = ItemContent> = {
   content: C
 }
 
-export type ErroredDecryptingParameters = {
+export type ErrorDecryptingParameters = {
   uuid: string
   errorDecrypting: true
   waitingForKey?: boolean
@@ -25,7 +25,7 @@ export type ErroredDecryptingParameters = {
 }
 
 export function isErrorDecryptingParameters(
-  x: EncryptedParameters | DecryptedParameters | ErroredDecryptingParameters,
-): x is ErroredDecryptingParameters {
-  return (x as ErroredDecryptingParameters).errorDecrypting
+  x: EncryptedParameters | DecryptedParameters | ErrorDecryptingParameters,
+): x is ErrorDecryptingParameters {
+  return (x as ErrorDecryptingParameters).errorDecrypting
 }

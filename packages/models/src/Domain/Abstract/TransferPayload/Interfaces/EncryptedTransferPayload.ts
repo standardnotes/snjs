@@ -11,7 +11,4 @@ export interface EncryptedTransferPayload extends TransferPayload {
 
   /** @deprecated */
   auth_hash?: string
-
-  /** @deprecated */
-  auth_params?: unknown
 }

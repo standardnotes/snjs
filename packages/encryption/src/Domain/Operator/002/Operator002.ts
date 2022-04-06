@@ -10,7 +10,7 @@ import * as Utils from '@standardnotes/utils'
 import {
   DecryptedParameters,
   EncryptedParameters,
-  ErroredDecryptingParameters,
+  ErrorDecryptingParameters,
 } from '../../Encryption/EncryptedParameters'
 import { RootKeyEncryptedAuthenticatedData } from '../../Encryption/RootKeyEncryptedAuthenticatedData'
 import { ItemAuthenticatedData } from '../../Encryption/ItemAuthenticatedData'
@@ -45,7 +45,7 @@ export class SNProtocolOperator002 extends SNProtocolOperator001 {
    * The consumer must save/sync this item.
    */
   public createItemsKey(): Models.ItemsKeyInterface {
-    const payload = Models.CreateMaxPayloadFromAnyObject({
+    const payload = new Models.DecryptedPayload({
       uuid: UuidGenerator.GenerateUuid(),
       content_type: Common.ContentType.ItemsKey,
       content: this.generateNewItemsKeyContent(),
@@ -162,7 +162,7 @@ export class SNProtocolOperator002 extends SNProtocolOperator001 {
   }
 
   public async generateEncryptedParametersAsync(
-    payload: Models.PayloadInterface,
+    payload: Models.DecryptedPayloadInterface,
     key: Models.ItemsKeyInterface | SNRootKey,
   ): Promise<EncryptedParameters> {
     /**
@@ -202,7 +202,7 @@ export class SNProtocolOperator002 extends SNProtocolOperator001 {
   public async generateDecryptedParametersAsync<C extends ItemContent = ItemContent>(
     encrypted: EncryptedParameters,
     key: Models.ItemsKeyInterface | SNRootKey,
-  ): Promise<DecryptedParameters<C> | ErroredDecryptingParameters> {
+  ): Promise<DecryptedParameters<C> | ErrorDecryptingParameters> {
     if (!encrypted.enc_item_key) {
       console.error(Error('Missing item encryption key, skipping decryption.'))
       return {
@@ -252,20 +252,9 @@ export class SNProtocolOperator002 extends SNProtocolOperator001 {
         errorDecrypting: true,
       }
     } else {
-      let keyParams
-      try {
-        keyParams = JSON.parse(this.crypto.base64Decode(itemParams.keyParams))
-        // eslint-disable-next-line no-empty
-      } catch (e) {}
       return {
         uuid: encrypted.uuid,
         content: JSON.parse(content),
-        items_key_id: undefined,
-        enc_item_key: undefined,
-        auth_hash: undefined,
-        auth_params: keyParams,
-        errorDecrypting: false,
-        waitingForKey: false,
       }
     }
   }

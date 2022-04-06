@@ -40,8 +40,4 @@ export class EncryptedItem
   get auth_hash() {
     return this.payload.auth_hash
   }
-
-  get auth_params() {
-    return this.payload.auth_params
-  }
 }

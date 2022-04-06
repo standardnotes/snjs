@@ -9,5 +9,4 @@ export interface EncryptedItemInterface extends ItemInterface<EncryptedPayloadIn
   waitingForKey?: boolean
   errorDecryptingValueChanged?: boolean
   auth_hash?: string
-  auth_params?: unknown
 }

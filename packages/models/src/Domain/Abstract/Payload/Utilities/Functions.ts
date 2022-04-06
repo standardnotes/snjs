@@ -207,6 +207,9 @@ export function isRemotePayloadAllowed(payload: PayloadInterface): boolean {
   return acceptableFormats.includes(payload.format)
 }
 
-export function sureFindPayload(uuid: Uuid, payloads: PayloadInterface[]): PayloadInterface {
-  return payloads.find((payload) => payload.uuid === uuid) as PayloadInterface
+export function SureFindPayload<P extends PayloadInterface = PayloadInterface>(
+  uuid: Uuid,
+  payloads: P[],
+): P {
+  return payloads.find((payload) => payload.uuid === uuid) as P
 }

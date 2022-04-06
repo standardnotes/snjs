@@ -18,7 +18,6 @@ export class EncryptedPayload
   readonly format: PayloadFormat.EncryptedString = PayloadFormat.EncryptedString
   readonly deleted: false = false
   readonly auth_hash?: string
-  readonly auth_params?: unknown
   readonly version: ProtocolVersion
 
   constructor(rawPayload: EncryptedTransferPayload, source = PayloadSource.Constructor) {
@@ -32,7 +31,6 @@ export class EncryptedPayload
     this.errorDecryptingValueChanged = rawPayload.errorDecryptingValueChanged
 
     this.auth_hash = rawPayload.auth_hash
-    this.auth_params = rawPayload.auth_params
 
     this.version = protocolVersionFromEncryptedString(this.content)
   }

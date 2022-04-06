@@ -22,14 +22,6 @@ describe('keys', function () {
     localStorage.clear()
   })
 
-  it('validate intentRequiresEncryption', function () {
-    expect(intentRequiresEncryption(EncryptedExportIntent.Sync)).to.equal(true)
-    expect(intentRequiresEncryption(EncryptedExportIntent.LocalStorageEncrypted)).to.equal(true)
-    expect(intentRequiresEncryption(DecryptedExportIntent.LocalStorageDecrypted)).to.equal(false)
-    expect(intentRequiresEncryption(EncryptedExportIntent.FileEncrypted)).to.equal(true)
-    expect(intentRequiresEncryption(DecryptedExportIntent.FileDecrypted)).to.equal(false)
-  })
-
   it('should not have root key by default', async function () {
     expect(await this.application.protocolService.getRootKey()).to.not.be.ok
   })
@@ -353,7 +345,7 @@ describe('keys', function () {
       version: ProtocolVersion.V003,
     })
 
-    expect(this.application.itemManager.invalidItems.length).to.equal(0)
+    expect(this.application.payloadManager.invalidPayloads.length).to.equal(0)
     expect(this.application.itemManager.itemsKeys().length).to.equal(1)
     expect(this.application.itemManager.itemsKeys()[0].dirty).to.equal(false)
 
@@ -363,7 +355,7 @@ describe('keys', function () {
 
     expect(this.application.itemManager.itemsKeys().length).to.equal(1)
     expect(this.application.itemManager.notes.length).to.equal(10)
-    expect(this.application.itemManager.invalidItems.length).to.equal(0)
+    expect(this.application.payloadManager.invalidPayloads.length).to.equal(0)
   })
 
   it('When root key changes, all items keys must be re-encrypted', async function () {

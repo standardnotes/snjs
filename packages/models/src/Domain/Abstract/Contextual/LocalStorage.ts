@@ -53,7 +53,6 @@ export function createEncryptedLocalStorageContextPayload(
 ): LocalStorageEncryptedContextualPayload {
   return {
     auth_hash: fromPayload.auth_hash,
-    auth_params: fromPayload.auth_params,
     content_type: fromPayload.content_type,
     content: fromPayload.content,
     created_at_timestamp: fromPayload.created_at_timestamp,

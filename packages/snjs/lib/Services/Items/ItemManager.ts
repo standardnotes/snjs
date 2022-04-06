@@ -7,7 +7,7 @@ import { TransactionalMutation } from './TransactionalMutation'
 import { UuidString } from '../../Types/UuidString'
 import * as Models from '@standardnotes/models'
 import * as Services from '@standardnotes/services'
-import {} from '@standardnotes/models'
+import { isNotEncryptedItem } from '@standardnotes/models'
 import { ItemsClientInterface } from './ItemsClientInterface'
 import { EmitOutPayloads } from '../Payloads'
 
@@ -223,7 +223,7 @@ export class ItemManager
   }
 
   itemsKeys(): Models.ItemsKeyInterface[] {
-    return this.collection.displayElements(ContentType.ItemsKey) as Models.ItemsKeyInterface[]
+    return this.collection.displayElements(ContentType.ItemsKey)
   }
 
   /**
@@ -236,8 +236,8 @@ export class ItemManager
   /**
    * Returns all non-deleted tags
    */
-  get tags() {
-    return this.collection.displayElements(ContentType.Tag) as Models.SNTag[]
+  get tags(): Models.SNTag[] {
+    return this.collection.displayElements(ContentType.Tag)
   }
 
   public hasTagsNeedingFoldersMigration(): boolean {
@@ -353,8 +353,8 @@ export class ItemManager
     )
 
     const delta: Models.ItemDelta = {
-      changed: changedItems,
-      inserted: insertedItems,
+      changed: changedItems.filter(isNotEncryptedItem),
+      inserted: insertedItems.filter(isNotEncryptedItem),
       discarded: discardedItems,
       ignored: ignoredItems,
     }
