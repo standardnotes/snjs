@@ -5,6 +5,11 @@ import { DeletedTransferPayload } from './DeletedTransferPayload'
 import { EncryptedTransferPayload } from './EncryptedTransferPayload'
 import { TransferPayload } from './TransferPayload'
 
+export type ConcreteTransferPayload =
+  | DecryptedTransferPayload
+  | EncryptedTransferPayload
+  | DeletedTransferPayload
+
 export function isDecryptedTransferPayload(
   payload: TransferPayload,
 ): payload is DecryptedTransferPayload {

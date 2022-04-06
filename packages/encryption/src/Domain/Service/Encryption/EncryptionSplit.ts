@@ -1,7 +1,10 @@
-import { DecryptedPayloadInterface, EncryptedPayloadInterface } from '@standardnotes/models'
+import {
+  DecryptedPayloadInterface,
+  EncryptedPayloadInterface,
+  ItemsKeyInterface,
+} from '@standardnotes/models'
 import { SNRootKey } from '../../RootKey/RootKey'
 import { ItemContentTypeUsesRootKeyEncryption } from '../../Intent/Functions'
-import { ItemsKeyInterface } from '@standardnotes/models'
 
 type EncryptedOrDecryptedPayload = EncryptedPayloadInterface | DecryptedPayloadInterface
 

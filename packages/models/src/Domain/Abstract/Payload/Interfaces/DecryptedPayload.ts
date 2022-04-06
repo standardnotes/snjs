@@ -11,6 +11,7 @@ export interface DecryptedPayloadInterface<C extends ItemContent = ItemContent>
   readonly content: C
   readonly format: PayloadFormat.DecryptedBareObject
 
+  ejected(): DecryptedTransferPayload<C>
   get references(): ContentReference[]
   getReference(uuid: Uuid): ContentReference
 }

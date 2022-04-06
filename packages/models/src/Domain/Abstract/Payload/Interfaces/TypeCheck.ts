@@ -5,6 +5,11 @@ import { DeletedPayloadInterface } from './DeletedPayload'
 import { EncryptedPayloadInterface } from './EncryptedPayload'
 import { PayloadInterface } from './PayloadInterface'
 
+export type ConcretePayload =
+  | DecryptedPayloadInterface
+  | EncryptedPayloadInterface
+  | DeletedPayloadInterface
+
 export function isDecryptedPayload<C extends ItemContent = ItemContent>(
   payload: PayloadInterface,
 ): payload is DecryptedPayloadInterface<C> {

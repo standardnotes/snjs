@@ -2,6 +2,7 @@ import { AccountSyncOperation } from '@Lib/Services/Sync/Account/Operation'
 import { ApplicationSyncOptions } from '../../Application/Options'
 import { ContentType } from '@standardnotes/common'
 import {
+  isNotUndefined,
   isNullOrUndefined,
   removeFromIndex,
   sleep,
@@ -25,10 +26,26 @@ import { SyncResponseResolver } from '@Lib/Services/Sync/Account/ResponseResolve
 import { SyncSignal, SyncStats } from '@Lib/Services/Sync/Signals'
 import { UuidString } from '../../Types/UuidString'
 import * as Encryption from '@standardnotes/encryption'
-import * as Models from '@standardnotes/models'
-import * as Payloads from '@standardnotes/models'
+import {
+  PurePayload,
+  PayloadSource,
+  MutationType,
+  CreateDecryptedItemFromPayload,
+  filterDisallowedRemotePayloads,
+  PayloadInterface,
+  DeltaOutOfSync,
+  ImmutablePayloadCollection,
+  CreatePayload,
+  ConcreteTransferPayload,
+  isEncryptedPayload,
+  isDecryptedPayload,
+  EncryptedPayloadInterface,
+  DecryptedPayloadInterface,
+  ItemsKeyContent,
+  ConcretePayload,
+  DeletedPayloadInterface,
+} from '@standardnotes/models'
 import * as Services from '@standardnotes/services'
-import { ItemsKeyInterface } from '@standardnotes/models'
 
 const DEFAULT_MAJOR_CHANGE_THRESHOLD = 15
 const INVALID_SESSION_RESPONSE_STATUS = 401
@@ -164,11 +181,32 @@ export class SNSyncService
   /**
    * Used in tandem with `loadDatabasePayloads`
    */
-  public async getDatabasePayloads(): Promise<Payloads.RawPayload[]> {
+  public async getDatabasePayloads(): Promise<ConcreteTransferPayload[]> {
     return this.storageService.getAllRawPayloads().catch((error) => {
       void this.notifyEvent(Services.SyncEvent.DatabaseReadError, error)
       throw error
-    }) as Promise<Payloads.RawPayload[]>
+    })
+  }
+
+  private async processItemsKeysFirstDuringDatabaseLoad(
+    itemsKeysPayloads: ConcretePayload[],
+  ): Promise<void> {
+    const encryptedItemsKeysPayloads = itemsKeysPayloads.filter(isEncryptedPayload)
+    const originallyDecryptedItemsKeysPayloads = itemsKeysPayloads.filter(
+      isDecryptedPayload,
+    ) as DecryptedPayloadInterface<ItemsKeyContent>[]
+
+    const itemsKeysSplit: Encryption.EncryptionSplitWithKey<EncryptedPayloadInterface> = {
+      usesRootKeyWithKeyLookup: {
+        items: encryptedItemsKeysPayloads,
+      },
+    }
+
+    const newlyDecryptedItemsKeys = await this.protocolService.decryptSplit(itemsKeysSplit)
+    await this.payloadManager.emitPayloads(
+      [...originallyDecryptedItemsKeysPayloads, ...newlyDecryptedItemsKeys],
+      PayloadSource.LocalRetrieved,
+    )
   }
 
   /**
@@ -176,7 +214,7 @@ export class SNSyncService
    * They are fed as a parameter so that callers don't have to await the loading, but can
    * await getting the raw payloads from storage
    */
-  public async loadDatabasePayloads(rawPayloads: Payloads.RawPayload[]): Promise<void> {
+  public async loadDatabasePayloads(rawPayloads: ConcreteTransferPayload[]): Promise<void> {
     if (this.databaseLoaded) {
       throw 'Attempting to initialize already initialized local database.'
     }
@@ -190,35 +228,23 @@ export class SNSyncService
     const unsortedPayloads = rawPayloads
       .map((rawPayload) => {
         try {
-          return Payloads.CreateMaxPayloadFromAnyObject(rawPayload)
+          return CreatePayload(rawPayload)
         } catch (e) {
           console.error('Creating payload failed', e)
           return undefined
         }
       })
-      .filter((payload) => !isNullOrUndefined(payload))
+      .filter(isNotUndefined)
 
-    const payloads = SortPayloadsByRecentAndContentPriority(
-      unsortedPayloads as Payloads.PurePayload[],
-      this.localLoadPriorty,
-    )
-    /** Decrypt and map items keys first */
-    const itemsKeysPayloads = payloads.filter((payload: Payloads.PurePayload) => {
+    const payloads = SortPayloadsByRecentAndContentPriority(unsortedPayloads, this.localLoadPriorty)
+
+    const itemsKeysPayloads = payloads.filter((payload) => {
       return payload.content_type === ContentType.ItemsKey
     })
+
     subtractFromArray(payloads, itemsKeysPayloads)
 
-    const itemsKeysSplit: Encryption.EncryptionSplitWithKey<Payloads.PurePayload> = {
-      usesRootKeyWithKeyLookup: {
-        items: itemsKeysPayloads,
-      },
-    }
-
-    const decryptedItemsKeys = await this.protocolService.decryptSplit(itemsKeysSplit)
-    await this.payloadManager.emitPayloads(
-      decryptedItemsKeys,
-      Payloads.PayloadSource.LocalRetrieved,
-    )
+    await this.processItemsKeysFirstDuringDatabaseLoad(itemsKeysPayloads)
 
     /**
      * Map in batches to give interface a chance to update. Note that total decryption
@@ -229,18 +255,32 @@ export class SNSyncService
     const payloadCount = payloads.length
     const batchSize = this.options.loadBatchSize
     const numBatches = Math.ceil(payloadCount / batchSize)
+
     for (let batchIndex = 0; batchIndex < numBatches; batchIndex++) {
       const currentPosition = batchIndex * batchSize
       const batch = payloads.slice(currentPosition, currentPosition + batchSize)
+      const encrypted: EncryptedPayloadInterface[] = []
+      const nonencrypted: (DecryptedPayloadInterface | DeletedPayloadInterface)[] = []
 
-      const split: Encryption.EncryptionSplitWithKey<Payloads.PurePayload> = {
+      for (const payload of batch) {
+        if (isEncryptedPayload(payload)) {
+          encrypted.push(payload)
+        } else {
+          nonencrypted.push(payload)
+        }
+      }
+
+      const split: Encryption.EncryptionSplitWithKey<EncryptedPayloadInterface> = {
         usesItemsKeyWithKeyLookup: {
-          items: batch,
+          items: encrypted,
         },
       }
       const decrypted = await this.protocolService.decryptSplit(split)
 
-      await this.payloadManager.emitPayloads(decrypted, Payloads.PayloadSource.LocalRetrieved)
+      await this.payloadManager.emitPayloads(
+        [...nonencrypted, ...decrypted],
+        PayloadSource.LocalRetrieved,
+      )
 
       void this.notifyEvent(Services.SyncEvent.LocalDataIncrementalLoad)
 
@@ -303,12 +343,12 @@ export class SNSyncService
     this.log('Marking all items as needing sync')
     const items = this.itemManager.items
     const payloads = items.map((item) => {
-      return Payloads.CreateMaxPayloadFromAnyObject(item, {
+      return CreateMaxPayloadFromAnyObject(item, {
         dirty: true,
         dirtiedDate: new Date(),
       })
     })
-    await this.payloadManager.emitPayloads(payloads, Payloads.PayloadSource.LocalChanged)
+    await this.payloadManager.emitPayloads(payloads, PayloadSource.LocalChanged)
     await this.persistPayloads(payloads)
   }
 
@@ -317,7 +357,7 @@ export class SNSyncService
    * This way, if the application is closed before a sync request completes,
    * pending data will be saved to disk, and synced the next time the app opens.
    */
-  private popPayloadsNeedingPreSyncSave(from: Payloads.PurePayload[]) {
+  private popPayloadsNeedingPreSyncSave(from: PurePayload[]) {
     const lastPreSyncSave = this.lastPreSyncSave
     if (!lastPreSyncSave) {
       return from
@@ -368,9 +408,7 @@ export class SNSyncService
       })
   }
 
-  private payloadsByPreparingForServer(
-    payloads: Payloads.PurePayload[],
-  ): Promise<Payloads.PurePayload[]> {
+  private payloadsByPreparingForServer(payloads: PurePayload[]): Promise<PurePayload[]> {
     const split = Encryption.splitItemsByEncryptionType(payloads)
     const keyLookupSplit = Encryption.createKeyLookupSplitFromSplit(split)
     return this.protocolService.encryptSplit(keyLookupSplit, Encryption.EncryptedExportIntent.Sync)
@@ -501,7 +539,7 @@ export class SNSyncService
   }
 
   private async prepareForSyncExecution(
-    items: Models.SNItem[],
+    items: SNItem[],
     inTimeResolveQueue: SyncPromise[],
     beginDate: Date,
   ) {
@@ -525,8 +563,8 @@ export class SNSyncService
         (mutator) => {
           mutator.lastSyncBegan = beginDate
         },
-        Models.MutationType.NonDirtying,
-        Payloads.PayloadSource.PreSyncSave,
+        MutationType.NonDirtying,
+        PayloadSource.PreSyncSave,
       )
     }
   }
@@ -541,10 +579,7 @@ export class SNSyncService
     return this.resolveQueue.slice()
   }
 
-  private async prepareSyncOperationPayloads(
-    payloads: Payloads.PurePayload[],
-    options: SyncOptions,
-  ) {
+  private async prepareSyncOperationPayloads(payloads: PurePayload[], options: SyncOptions) {
     const online = this.sessionManager.online()
     const useMode = ((tryMode) => {
       if (online && !this.completedOnlineDownloadFirstSync) {
@@ -556,7 +591,7 @@ export class SNSyncService
       }
     })(options.mode)
 
-    let uploadPayloads: Payloads.PurePayload[] = []
+    let uploadPayloads: PurePayload[] = []
     if (useMode === SyncMode.Default) {
       if (online && !this.completedOnlineDownloadFirstSync) {
         throw Error('Attempting to default mode sync without having completed initial.')
@@ -574,7 +609,7 @@ export class SNSyncService
   }
 
   private async createSyncOperation(
-    payloads: Payloads.PurePayload[],
+    payloads: PurePayload[],
     options: SyncOptions,
     syncMode: SyncMode,
   ) {
@@ -596,7 +631,7 @@ export class SNSyncService
   private async handleSyncOperationFinish(
     operation: AccountSyncOperation | OfflineSyncOperation,
     options: SyncOptions,
-    neverSyncedDeleted: Models.SNItem[],
+    neverSyncedDeleted: SNItem[],
     syncMode: SyncMode,
   ) {
     this.opStatus.setDidEnd()
@@ -782,7 +817,7 @@ export class SNSyncService
   }
 
   private async syncOnlineOperation(
-    payloads: Payloads.PurePayload[],
+    payloads: PurePayload[],
     checkIntegrity: boolean,
     source: Services.SyncSource,
     mode: SyncMode,
@@ -829,7 +864,7 @@ export class SNSyncService
   }
 
   private syncOfflineOperation(
-    payloads: Payloads.PurePayload[],
+    payloads: PurePayload[],
     source: Services.SyncSource,
     mode: SyncMode,
   ) {
@@ -852,10 +887,8 @@ export class SNSyncService
     this.log('Offline Sync Response', response.rawResponse)
     const payloadsToEmit = response.savedPayloads
     if (payloadsToEmit.length > 0) {
-      await this.payloadManager.emitPayloads(payloadsToEmit, Payloads.PayloadSource.LocalSaved)
-      const payloadsToPersist = this.payloadManager.find(
-        Uuids(payloadsToEmit),
-      ) as Payloads.PurePayload[]
+      await this.payloadManager.emitPayloads(payloadsToEmit, PayloadSource.LocalSaved)
+      const payloadsToPersist = this.payloadManager.find(Uuids(payloadsToEmit)) as PurePayload[]
       await this.persistPayloads(payloadsToPersist)
     }
 
@@ -880,12 +913,12 @@ export class SNSyncService
     void this.notifyEvent(Services.SyncEvent.SyncError, response.error)
   }
 
-  private async processServerSuccessPayloads(payloads: Payloads.PurePayload[]) {
-    const decryptedPayloads: Payloads.PurePayload[] = []
-    const processedItemsKeyPayloads: Record<UuidString, Payloads.PurePayload> = {}
+  private async processServerSuccessPayloads(payloads: PurePayload[]) {
+    const decryptedPayloads: PurePayload[] = []
+    const processedItemsKeyPayloads: Record<UuidString, PurePayload> = {}
 
     for (const payload of payloads) {
-      if (payload.deleted || !payload.fields.includes(Payloads.PayloadField.Content)) {
+      if (payload.deleted || !payload.fields.includes(PayloadField.Content)) {
         /**
          * Deleted payloads, and some payload types
          * do not contiain content (like remote saved)
@@ -893,11 +926,11 @@ export class SNSyncService
         continue
       }
 
-      const itemsKeyPayload: Payloads.PurePayload | undefined =
+      const itemsKeyPayload: PurePayload | undefined =
         processedItemsKeyPayloads[payload.items_key_id as string]
 
       const itemsKey = itemsKeyPayload
-        ? Models.CreateDecryptedItemFromPayload<ItemsKeyInterface>(itemsKeyPayload)
+        ? CreateDecryptedItemFromPayload<ItemsKeyInterface>(itemsKeyPayload)
         : undefined
 
       const split = Encryption.splitItemsByEncryptionType([payload])
@@ -910,7 +943,7 @@ export class SNSyncService
         }
         decryptedPayloads.push(decrypted)
       } else {
-        const keyedSplit: Encryption.EncryptionSplitWithKey<Payloads.PurePayload> = {}
+        const keyedSplit: Encryption.EncryptionSplitWithKey<PurePayload> = {}
         if (itemsKey) {
           keyedSplit.usesItemsKey = {
             items: [payload],
@@ -976,20 +1009,20 @@ export class SNSyncService
    * Items that have never been synced and marked as deleted should be cleared
    * as dirty, mapped, then removed from storage.
    */
-  private async handleNeverSyncedDeleted(items: Models.SNItem[]) {
+  private async handleNeverSyncedDeleted(items: SNItem[]) {
     const payloads = items.map((item) => {
       return item.payloadRepresentation({
         dirty: false,
       })
     })
-    await this.payloadManager.emitPayloads(payloads, Payloads.PayloadSource.LocalChanged)
+    await this.payloadManager.emitPayloads(payloads, PayloadSource.LocalChanged)
     await this.persistPayloads(payloads)
   }
 
   /**
    * @param payloads The decrypted payloads to persist
    */
-  public async persistPayloads(payloads: Payloads.PurePayload[]) {
+  public async persistPayloads(payloads: PurePayload[]) {
     if (payloads.length === 0 || this.dealloced) {
       return
     }
@@ -999,7 +1032,7 @@ export class SNSyncService
     })
   }
 
-  private async deletePayloads(payloads: Payloads.PurePayload[]) {
+  private async deletePayloads(payloads: PurePayload[]) {
     return this.persistPayloads(payloads)
   }
 
@@ -1031,12 +1064,9 @@ export class SNSyncService
       return
     }
 
-    const encryptedPayloads = Payloads.filterDisallowedRemotePayloads(
-      rawPayloads.map((rawPayload: Payloads.RawPayload) => {
-        return Payloads.CreateSourcedPayloadFromObject(
-          rawPayload,
-          Payloads.PayloadSource.RemoteRetrieved,
-        )
+    const encryptedPayloads = filterDisallowedRemotePayloads(
+      rawPayloads.map((rawPayload: RawPayload) => {
+        return CreateSourcedPayloadFromObject(rawPayload, PayloadSource.RemoteRetrieved)
       }),
     )
 
@@ -1057,13 +1087,10 @@ export class SNSyncService
     })
   }
 
-  private async emitOutOfSyncRemotemPayloads(payloads: Payloads.PayloadInterface[]) {
-    const delta = new Models.DeltaOutOfSync(
+  private async emitOutOfSyncRemotemPayloads(payloads: PayloadInterface[]) {
+    const delta = new DeltaOutOfSync(
       this.payloadManager.getMasterCollection(),
-      Payloads.ImmutablePayloadCollection.WithPayloads(
-        payloads,
-        Payloads.PayloadSource.RemoteRetrieved,
-      ),
+      ImmutablePayloadCollection.WithPayloads(payloads, PayloadSource.RemoteRetrieved),
       undefined,
       this.historyService.getHistoryMapCopy(),
     )
