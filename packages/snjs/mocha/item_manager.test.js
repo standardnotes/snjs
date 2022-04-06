@@ -213,7 +213,8 @@ describe('item manager', function () {
 
   it('dirty items should not include errored items', async function () {
     const note = await this.itemManager.setItemDirty(await this.createNote())
-    const errorred = CreateMaxPayloadFromAnyObject(note.payload, {
+    const errorred = new EncryptedPayload({
+      ...note.payload,
       errorDecrypting: true,
     })
     await this.itemManager.emitItemsFromPayloads([errorred], PayloadSource.LocalChanged)
@@ -223,7 +224,8 @@ describe('item manager', function () {
 
   it('dirty items should include errored items if they are being deleted', async function () {
     const note = await this.itemManager.setItemDirty(await this.createNote())
-    const errorred = CreateMaxPayloadFromAnyObject(note.payload, {
+    const errorred = new EncryptedPayload({
+      ...note.payload,
       errorDecrypting: true,
       deleted: true,
     })

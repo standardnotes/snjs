@@ -30,5 +30,6 @@ module.exports = {
     'jest.e2e.config.ts',
     'babel.config.js',
     'webpack.*',
+    'mocha/**/*',
   ],
 }

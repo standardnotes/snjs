@@ -24,10 +24,21 @@
     ],
     "@typescript-eslint/no-explicit-any": ["error", { "ignoreRestArgs": true }],
     "@typescript-eslint/no-floating-promises": ["error"],
-    "semi": ["error", "never"],
-    "quotes": ["error", "single"],
-    "object-curly-spacing": ["error", "always"],
+    "block-scoped-var": "error",
     "comma-dangle": ["error", "always-multiline"],
-    "curly": ["error", "all"]
+    "curly": ["error", "all"],
+    "no-confusing-arrow": "error",
+    "no-inline-comments": "warn",
+    "no-invalid-this": "error",
+    "no-return-assign": "warn",
+    "no-constructor-return": "error",
+    "no-duplicate-imports": "error",
+    "no-self-compare": "error",
+    "no-unmodified-loop-condition": "error",
+    "no-unreachable-loop": "error",
+    "no-unused-private-class-members": "error",
+    "object-curly-spacing": ["error", "always"],
+    "quotes": ["error", "single"],
+    "semi": ["error", "never"]
   }
 }

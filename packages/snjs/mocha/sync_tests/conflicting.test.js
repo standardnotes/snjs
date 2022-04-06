@@ -56,7 +56,8 @@ describe('online conflict handling', function () {
         foo: 'bar',
       },
     }
-    const payload = CreateMaxPayloadFromAnyObject(params, {
+    const payload = new DeletedPayload({
+      ...params,
       dirty: true,
       dirtiedDate: new Date(),
     })
@@ -429,7 +430,8 @@ describe('online conflict handling', function () {
     // client B
     await this.application.syncService.clearSyncPositionTokens()
     // Add the item back and say it's not deleted
-    const mutatedPayload = CreateMaxPayloadFromAnyObject(originalPayload, {
+    const mutatedPayload = new DecryptedPayload({
+      ...originalPayload,
       deleted: false,
       updated_at: Factory.yesterday(),
     })
@@ -755,7 +757,8 @@ describe('online conflict handling', function () {
     /**
      * Mark the item as dirty and errored
      */
-    const errorred = CreateMaxPayloadFromAnyObject(note.payload, {
+    const errorred = new EncryptedPayload({
+      ...note.payload,
       errorDecrypting: true,
       dirty: true,
     })

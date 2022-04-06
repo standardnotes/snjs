@@ -51,7 +51,6 @@ export async function decryptPayload<C extends Models.ItemContent = Models.ItemC
     return {
       uuid: payload.uuid,
       errorDecrypting: true,
-      errorDecryptingValueChanged: !payload.errorDecrypting,
     }
   }
 }

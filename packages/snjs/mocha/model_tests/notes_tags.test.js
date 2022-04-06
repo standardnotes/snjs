@@ -52,13 +52,15 @@ describe('notes and tags', () => {
     const notePayload = pair[0]
     const tagPayload = pair[1]
 
-    const mutatedTag = CreateMaxPayloadFromAnyObject(tagPayload, {
+    const mutatedTag = new DecryptedPayload({
+      ...tagPayload,
       content: {
         ...tagPayload.content,
         references: null,
       },
     })
-    const mutatedNote = CreateMaxPayloadFromAnyObject(notePayload, {
+    const mutatedNote = new DecryptedPayload({
+      ...notePayload,
       content: {
         references: [
           {
@@ -138,7 +140,8 @@ describe('notes and tags', () => {
 
     await this.application.syncService.sync(syncOptions)
 
-    const mutatedTag = CreateMaxPayloadFromAnyObject(tagPayload, {
+    const mutatedTag = new DecryptedPayload({
+      ...tagPayload,
       dirty: false,
       content: {
         ...tagPayload.content,

@@ -21,12 +21,11 @@ describe('singletons', function () {
         foo: 'bar',
       },
     }
-    return CreateMaxPayloadFromAnyObject(params)
+    return new DecryptedPayload(params)
   }
 
   function findOrCreatePrefsSingleton(application) {
-    return application.singletonManager.findOrCreateSingleton(
-      new Predicate('content_type', '=', ContentType.UserPrefs),
+    return application.singletonManager.findOrCreateContentTypeSingleton(
       ContentType.UserPrefs,
       FillItemContent({}),
     )
@@ -134,11 +133,8 @@ describe('singletons', function () {
         mode: SyncMode.DownloadFirst,
       })
     })
-    const userPreferences = await this.application.singletonManager.findOrCreateSingleton(
-      predicate,
-      contentType,
-      {},
-    )
+    const userPreferences =
+      await this.application.singletonManager.findOrCreateContentTypeSingleton(contentType, {})
 
     expect(userPreferences).to.be.ok
     const refreshedUserPrefs = this.application.items.findItem(userPreferences.uuid)
@@ -213,9 +209,7 @@ describe('singletons', function () {
     /** After signing in, the instance retrieved from the server should be the one kept */
     const latestPrefs = await findOrCreatePrefsSingleton(this.application)
     expect(latestPrefs.uuid).to.equal(ogPrefs.uuid)
-    const allPrefs = this.application.itemManager.getItems(
-      ogPrefs.content_type,
-    )
+    const allPrefs = this.application.itemManager.getItems(ogPrefs.content_type)
     expect(allPrefs.length).to.equal(1)
   })
 
@@ -236,9 +230,7 @@ describe('singletons', function () {
     /** After signing in, the instance retrieved from the server should be the one kept */
     const latestPrefs = await findOrCreatePrefsSingleton(this.application)
     expect(latestPrefs.uuid).to.equal(ogPrefs.uuid)
-    const allPrefs = this.application.itemManager.getItems(
-      ogPrefs.content_type,
-    )
+    const allPrefs = this.application.itemManager.getItems(ogPrefs.content_type)
     expect(allPrefs.length).to.equal(1)
   })
 
@@ -246,14 +238,14 @@ describe('singletons', function () {
     const item = this.application.itemManager.items.find(
       (item) => item.content_type === ContentType.UserPrefs,
     )
-    throw Error('@TESTTODO: errorDecrypting no longer exists on mutator')
-    // await this.application.itemManager.changeItem(item.uuid, (mutator) => {
-    //   mutator.errorDecrypting = true
-    // })
 
-    const predicate = new Predicate('content_type', '=', item.content_type)
-    const resolvedItem = await this.application.singletonManager.findOrCreateSingleton(
-      predicate,
+    const erroredPayload = new EncryptedPayload({
+      ...item.payload.ejected(),
+      errorDecrypting: true,
+    })
+    await this.application.payloadManager.emitPayload(erroredPayload)
+
+    const resolvedItem = await this.application.singletonManager.findOrCreateContentTypeSingleton(
       item.content_type,
       item.content,
     )
@@ -298,9 +290,8 @@ describe('singletons', function () {
     this.expectedItemCount += 1
     await this.application.sync.sync(syncOptions)
     /** Now mark errored as not errorDecrypting and sync */
-    const notErrored = CreateMaxPayloadFromAnyObject(errored, {
+    const notErrored = new DecryptedPayload(errored, {
       errorDecrypting: false,
-      errorDecryptingValueChanged: true,
     })
     await this.application.payloadManager.emitPayload(notErrored)
     /** Item will get decrypted on current tick, so wait one before syncing */
@@ -321,16 +312,14 @@ describe('singletons', function () {
     )
     await this.application.syncService.sync(syncOptions)
     const predicate = new Predicate('content_type', '=', item.content_type)
-    let resolvedItem = await this.application.singletonManager.findOrCreateSingleton(
-      predicate,
+    let resolvedItem = await this.application.singletonManager.findOrCreateContentTypeSingleton(
       payload.content_type,
       payload.content,
     )
     const originalUuid = resolvedItem.uuid
     await Factory.alternateUuidForItem(this.application, resolvedItem.uuid)
     await this.application.syncService.sync(syncOptions)
-    const resolvedItem2 = await this.application.singletonManager.findOrCreateSingleton(
-      predicate,
+    const resolvedItem2 = await this.application.singletonManager.findOrCreateContentTypeSingleton(
       payload.content_type,
       payload.content,
     )

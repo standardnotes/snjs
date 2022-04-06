@@ -719,3 +719,9 @@ export function log(instance: any, message: string, ...args: unknown[]): void {
     console.log(string, message)
   }
 }
+
+export function assert(value: unknown): asserts value {
+  if (value === undefined) {
+    throw new Error('Assertion failed; value must be defined')
+  }
+}

@@ -108,16 +108,16 @@ describe('storage manager', function () {
   it('storage with no account and no passcode should not be encrypted', async function () {
     await this.application.storageService.setValueAndAwaitPersist('foo', 'bar')
     const wrappedValue = this.application.storageService.values[ValueModesKeys.Wrapped]
-    const payload = CreateMaxPayloadFromAnyObject(wrappedValue)
-    expect(payload.format).to.equal(PayloadFormat.DecryptedBareObject)
+    const payload = new DecryptedPayload(wrappedValue)
+    expect(payload.content).to.be.an.instanceof(Object)
   })
 
   it('storage aftering adding passcode should be encrypted', async function () {
     await this.application.storageService.setValueAndAwaitPersist('foo', 'bar')
     await this.application.addPasscode('123')
     const wrappedValue = this.application.storageService.values[ValueModesKeys.Wrapped]
-    const payload = CreateMaxPayloadFromAnyObject(wrappedValue)
-    expect(payload.format).to.equal(PayloadFormat.EncryptedString)
+    const payload = new EncryptedPayload(wrappedValue)
+    expect(payload.content).to.be.a('string')
   })
 
   it('storage after adding passcode then removing passcode should not be encrypted', async function () {
@@ -128,8 +128,8 @@ describe('storage manager', function () {
     await this.application.storageService.setValueAndAwaitPersist('bar', 'foo')
     await this.application.removePasscode()
     const wrappedValue = this.application.storageService.values[ValueModesKeys.Wrapped]
-    const payload = CreateMaxPayloadFromAnyObject(wrappedValue)
-    expect(payload.format).to.equal(PayloadFormat.DecryptedBareObject)
+    const payload = new DecryptedPayload(wrappedValue)
+    expect(payload.content).to.be.an.instanceof(Object)
   })
 
   it('storage aftering adding passcode/removing passcode w/account should be encrypted', async function () {
@@ -167,8 +167,8 @@ describe('storage manager', function () {
     ).to.be.ok
 
     const wrappedValue = this.application.storageService.values[ValueModesKeys.Wrapped]
-    const payload = CreateMaxPayloadFromAnyObject(wrappedValue)
-    expect(payload.format).to.equal(PayloadFormat.EncryptedString)
+    const payload = new EncryptedPayload(wrappedValue)
+    expect(payload.content).to.be.a('string')
   })
 
   it('adding account should encrypt storage with account keys', async function () {
@@ -194,8 +194,8 @@ describe('storage manager', function () {
     this.application = await Factory.signOutApplicationAndReturnNew(this.application)
     await this.application.storageService.setValueAndAwaitPersist('bar', 'foo')
     const wrappedValue = this.application.storageService.values[ValueModesKeys.Wrapped]
-    const payload = CreateMaxPayloadFromAnyObject(wrappedValue)
-    expect(payload.format).to.equal(PayloadFormat.DecryptedBareObject)
+    const payload = new DecryptedPayload(wrappedValue)
+    expect(payload.content).to.be.an.instanceof(Object)
   })
 
   it('adding account then passcode should encrypt storage with account keys', async function () {
@@ -226,15 +226,14 @@ describe('storage manager', function () {
     const wrappedRootKey =
       await this.application.protocolService.rootKeyEncryption.getWrappedRootKey()
     /** Expect that we can decrypt wrapped root key with passcode key */
-    const payload = CreateMaxPayloadFromAnyObject(wrappedRootKey)
+    const payload = new EncryptedPayload(wrappedRootKey)
     const decrypted = await this.application.protocolService.decryptSplitSingle({
       usesRootKey: {
         items: [payload],
         key: passcodeKey,
       },
     })
-    expect(decrypted.errorDecrypting).to.equal(false)
-    expect(decrypted.format).to.equal(PayloadFormat.DecryptedBareObject)
+    expect(decrypted.content).to.be.an.instanceof(Object)
   })
 
   it('disabling storage encryption should store items without encryption', async function () {

@@ -241,13 +241,13 @@ export class EncryptionService
       Utils.extendArray(allEncryptedParams, itemsKeyEncrypted)
     }
 
-    const packagedEncrypted = allEncryptedParams.map(
-      (encryptedParams) =>
-        new EncryptedPayload({
-          ...EncryptionSplit.findPayloadInSplit(encryptedParams.uuid, split),
-          ...encryptedParams,
-        }),
-    )
+    const packagedEncrypted = allEncryptedParams.map((encryptedParams) => {
+      const original = EncryptionSplit.findPayloadInSplit(encryptedParams.uuid, split)
+      return new EncryptedPayload({
+        ...original,
+        ...encryptedParams,
+      })
+    })
 
     return packagedEncrypted
   }
@@ -552,8 +552,10 @@ export class EncryptionService
   }
 
   /** Returns the key params attached to this key's encrypted payload */
-  public getKeyEmbeddedKeyParams(key: Models.EncryptedItem): SNRootKeyParams | undefined {
-    const authenticatedData = this.getEmbeddedPayloadAuthenticatedData(key.payload)
+  public getKeyEmbeddedKeyParams(
+    key: Models.EncryptedPayloadInterface,
+  ): SNRootKeyParams | undefined {
+    const authenticatedData = this.getEmbeddedPayloadAuthenticatedData(key)
     if (!authenticatedData) {
       return undefined
     }

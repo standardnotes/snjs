@@ -7,6 +7,5 @@ export interface EncryptedItemInterface extends ItemInterface<EncryptedPayloadIn
   version: ProtocolVersion
   errorDecrypting?: boolean
   waitingForKey?: boolean
-  errorDecryptingValueChanged?: boolean
   auth_hash?: string
 }

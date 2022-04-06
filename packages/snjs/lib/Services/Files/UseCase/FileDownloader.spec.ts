@@ -1,4 +1,4 @@
-import { RemoteFileInterface, EncryptedFileInterface } from '../types'
+import { RemoteFileInterface, EncryptedFileInterface } from '../Types'
 import { FilesServerInterface } from '../FilesServerInterface'
 import { FileDownloader } from './FileDownloader'
 
@@ -41,6 +41,7 @@ describe('file downloader', () => {
   it('should pass back bytes as they are received', async () => {
     let receivedBytes = new Uint8Array()
 
+    // eslint-disable-next-line @typescript-eslint/require-await
     downloader = new FileDownloader(file, 'api-token', apiService, async (encryptedBytes) => {
       receivedBytes = new Uint8Array([...receivedBytes, ...encryptedBytes])
     })

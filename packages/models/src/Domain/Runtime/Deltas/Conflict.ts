@@ -9,7 +9,7 @@ import { PayloadSource } from '../../Abstract/Payload/Types/PayloadSource'
 import { PayloadInterface } from '../../Abstract/Payload'
 import {
   isDecryptedPayload,
-  isEncryptedErroredPayload,
+  isErrorDecryptingPayload,
 } from '../../Abstract/Payload/Interfaces/TypeCheck'
 
 export class ConflictDelta {
@@ -24,8 +24,8 @@ export class ConflictDelta {
   public async resultingCollection(): Promise<ImmutablePayloadCollection> {
     let strategy: ConflictStrategy | undefined = undefined
     if (
-      isEncryptedErroredPayload(this.basePayload) ||
-      isEncryptedErroredPayload(this.applyPayload)
+      isErrorDecryptingPayload(this.basePayload) ||
+      isErrorDecryptingPayload(this.applyPayload)
     ) {
       strategy = ConflictStrategy.KeepLeftDuplicateRight
     } else if (isDecryptedPayload(this.basePayload) && isDecryptedPayload(this.applyPayload)) {

@@ -29,10 +29,6 @@ export class EncryptedItem
     return this.payload.waitingForKey
   }
 
-  get errorDecryptingValueChanged() {
-    return this.payload.errorDecryptingValueChanged
-  }
-
   get content() {
     return this.payload.content
   }

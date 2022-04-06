@@ -13,7 +13,7 @@ describe('payload manager', () => {
   beforeEach(async function () {
     this.payloadManager = new PayloadManager()
     this.createNotePayload = async () => {
-      return CreateMaxPayloadFromAnyObject({
+      return new DecryptedPayload({
         uuid: Factory.generateUuidish(),
         content_type: ContentType.Note,
         content: {

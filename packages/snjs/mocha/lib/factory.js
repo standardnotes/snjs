@@ -304,19 +304,19 @@ export async function registerOldUser({ application, email, password, version })
 }
 
 export function createStorageItemPayload(contentType) {
-  return CreateMaxPayloadFromAnyObject(createItemParams(contentType))
+  return new DecryptedPayload(createItemParams(contentType))
 }
 
 export function createNotePayload(title, text = undefined, dirty = true) {
-  return CreateMaxPayloadFromAnyObject(createNoteParams({ title, text, dirty }))
+  return new DecryptedPayload(createNoteParams({ title, text, dirty }))
 }
 
 export function createStorageItemTagPayload(tagParams = {}) {
-  return CreateMaxPayloadFromAnyObject(createTagParams(tagParams))
+  return new DecryptedPayload(createTagParams(tagParams))
 }
 
 export function itemToStoragePayload(item) {
-  return CreateMaxPayloadFromAnyObject(item)
+  return new DecryptedPayload(item)
 }
 
 export function createMappedNote(application, title, text, dirty = true) {
@@ -346,7 +346,7 @@ export async function getStoragePayloadsOfType(application, type) {
   return rawPayloads
     .filter((rp) => rp.content_type === type)
     .map((rp) => {
-      return CreateMaxPayloadFromAnyObject(rp)
+      return new EncryptedPayload(rp)
     })
 }
 
@@ -479,7 +479,7 @@ export function createRelatedNoteTagPairPayload({
     },
   ]
   noteParams.content.references = []
-  return [CreateMaxPayloadFromAnyObject(noteParams), CreateMaxPayloadFromAnyObject(tagParams)]
+  return [new DecryptedPayload(noteParams), new DecryptedPayload(tagParams)]
 }
 
 export async function createSyncedNoteWithTag(application) {
@@ -633,14 +633,14 @@ export async function insertItemWithOverride(
   if (errorDecrypting) {
     item = await application.itemManager.emitItemFromPayload(
       new EncryptedPayload({
-        ...item.payload.copy(),
+        ...item.payload.ejected(),
         errorDecrypting,
       }),
     )
   } else {
     item = await application.itemManager.emitItemFromPayload(
       new DecryptedPayload({
-        ...item.payload.copy(),
+        ...item.payload.ejected(),
       }),
     )
   }
@@ -650,7 +650,7 @@ export async function insertItemWithOverride(
 
 export async function alternateUuidForItem(application, uuid) {
   const item = application.itemManager.findItem(uuid)
-  const payload = CreateMaxPayloadFromAnyObject(item)
+  const payload = new DecryptedPayload(item)
   const results = await PayloadsByAlternatingUuid(
     payload,
     application.payloadManager.getMasterCollection(),

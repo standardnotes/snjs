@@ -1,7 +1,6 @@
-import { NoteContent, SNNote } from '@standardnotes/models'
+import { NoteContent, SNNote, FillItemContent, DecryptedPayload } from '@standardnotes/models'
 import { EncryptionService } from '@standardnotes/encryption'
 import { ContentType } from '@standardnotes/common'
-import { FillItemContent } from '@standardnotes/models'
 import { InternalEventBusInterface } from '@standardnotes/services'
 import {
   ChallengeService,
@@ -52,7 +51,7 @@ describe('mutator service', () => {
 
   const insertNote = (title: string) => {
     const note = new SNNote(
-      CreateMaxPayloadFromAnyObject({
+      new DecryptedPayload({
         uuid: String(Math.random()),
         content_type: ContentType.Note,
         content: FillItemContent<NoteContent>({

@@ -14,7 +14,9 @@ export interface DeviceInterface {
   removeRawStorageValue(key: string): Promise<void>
   removeAllRawStorageValues(): Promise<void>
   openDatabase(identifier: ApplicationIdentifier): Promise<{ isNewDatabase?: boolean } | undefined>
-  getAllRawDatabasePayloads(identifier: ApplicationIdentifier): Promise<TransferPayload[]>
+  getAllRawDatabasePayloads<T extends TransferPayload = TransferPayload>(
+    identifier: ApplicationIdentifier,
+  ): Promise<T[]>
   saveRawDatabasePayload(payload: any, identifier: ApplicationIdentifier): Promise<void>
   saveRawDatabasePayloads(payloads: any[], identifier: ApplicationIdentifier): Promise<void>
   removeRawDatabasePayloadWithId(id: string, identifier: ApplicationIdentifier): Promise<void>

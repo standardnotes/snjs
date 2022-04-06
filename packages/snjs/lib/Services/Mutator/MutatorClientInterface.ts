@@ -1,7 +1,6 @@
 import { ContentType } from '@standardnotes/common'
 import { SyncOptions } from '../Sync'
 import { TransactionalMutation } from '../Items'
-import { UuidString } from '@Lib/Types/UuidString'
 import * as Models from '@standardnotes/models'
 import { ClientDisplayableError } from '@standardnotes/responses'
 import { BackupFile } from '@standardnotes/encryption'

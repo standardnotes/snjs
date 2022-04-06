@@ -10,10 +10,10 @@ import {
   ItemsServerInterface,
   StorageKey,
 } from '@standardnotes/services'
-import { IntegrityPayload, PurePayload } from '@standardnotes/models'
+import { EncryptedPayloadInterface, IntegrityPayload, SNFeatureRepo } from '@standardnotes/models'
 import * as Responses from '@standardnotes/responses'
 import { API_MESSAGE_FAILED_OFFLINE_ACTIVATION } from '@Lib/Services/Api/Messages'
-import { EncryptedFileInterface } from '../Files/types'
+import { EncryptedFileInterface } from '../Files/Types'
 import { HttpParams, HttpRequest, HttpVerb, SNHttpService } from './HttpService'
 import { FilesServerInterface } from '../Files/FilesServerInterface'
 import { isUrlFirstParty, TRUSTED_FEATURE_HOSTS } from '@Lib/Hosts'
@@ -29,7 +29,6 @@ import merge from 'lodash/merge'
 import { SettingsServerInterface } from '../Settings/SettingsServerInterface'
 import { Strings } from '@Lib/Strings'
 import { SNRootKeyParams } from '@standardnotes/encryption'
-import { SNFeatureRepo } from '@standardnotes/models'
 import {
   ApiEndpointParam,
   ClientDisplayableError,
@@ -372,7 +371,7 @@ export class SNApiService
   }
 
   async sync(
-    payloads: PurePayload[],
+    payloads: EncryptedPayloadInterface[],
     lastSyncToken: string,
     paginationToken: string,
     limit: number,
@@ -929,6 +928,8 @@ export class SNApiService
         onBytesReceived,
       )
     }
+
+    return undefined
   }
 
   async checkIntegrity(

@@ -7,7 +7,6 @@ export interface EncryptedTransferPayload extends TransferPayload {
 
   errorDecrypting?: boolean
   waitingForKey?: boolean
-  errorDecryptingValueChanged?: boolean
 
   /** @deprecated */
   auth_hash?: string

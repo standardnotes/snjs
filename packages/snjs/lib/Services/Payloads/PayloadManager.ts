@@ -12,7 +12,7 @@ import { removeFromArray, Uuids } from '@standardnotes/utils'
 import {
   DeltaFileImport,
   isDeletedPayload,
-  isEncryptedErroredPayload,
+  isErrorDecryptingPayload,
   PayloadInterface,
   ImmutablePayloadCollection,
   IntegrityPayload,
@@ -22,6 +22,7 @@ import {
   DecryptedPayloadInterface,
   PayloadCollection,
   MergePayloads,
+  DeletedPayload,
 } from '@standardnotes/models'
 import * as Services from '@standardnotes/services'
 
@@ -102,7 +103,7 @@ export class PayloadManager
    */
   public async emitPayload<P extends EmitInPayloads = EmitInPayloads>(
     payload: P,
-    source: PayloadSource,
+    source: PayloadSource = PayloadSource.LocalChanged,
     sourceKey?: string,
   ): Promise<P[]> {
     return this.emitPayloads([payload], source, sourceKey)
@@ -116,7 +117,7 @@ export class PayloadManager
    */
   public async emitPayloads<P extends EmitInPayloads = EmitInPayloads>(
     payloads: P[],
-    source: PayloadSource,
+    source: PayloadSource = PayloadSource.LocalChanged,
     sourceKey?: string,
   ): Promise<P[]> {
     if (payloads.length === 0) {
@@ -170,9 +171,9 @@ export class PayloadManager
 
       if (
         OverwriteProtectedTypes.includes(payload.content_type) &&
-        isEncryptedErroredPayload(payload) &&
+        isErrorDecryptingPayload(payload) &&
         masterPayload &&
-        !isEncryptedErroredPayload(masterPayload)
+        !isErrorDecryptingPayload(masterPayload)
       ) {
         ignored.push(payload)
         continue
@@ -281,5 +282,27 @@ export class PayloadManager
 
   public removePayloadLocally(payload: EmitOutPayloads) {
     this.collection.discard(payload)
+  }
+
+  public erroredPayloadsForContentType(contentType: ContentType): EncryptedPayloadInterface[] {
+    return this.collection.invalidElements().filter((p) => p.content_type === contentType)
+  }
+
+  public async deleteErroredPayloads(payloads: EncryptedPayloadInterface[]): Promise<void> {
+    const deleted = payloads.map(
+      (payload) =>
+        new DeletedPayload(
+          {
+            ...payload.ejected(),
+            deleted: true,
+            content: undefined,
+            dirty: true,
+            dirtiedDate: new Date(),
+          },
+          payload.source,
+        ),
+    )
+
+    await this.emitPayloads(deleted, PayloadSource.LocalChanged)
   }
 }

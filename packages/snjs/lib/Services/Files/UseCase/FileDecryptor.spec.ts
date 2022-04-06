@@ -1,6 +1,7 @@
 import { FileDecryptor } from './FileDecryptor'
 import { SNPureCrypto, StreamEncryptor } from '@standardnotes/sncrypto-common'
-import { EncryptedFileInterface } from '../types'
+import { EncryptedFileInterface } from '../Types'
+import { assert } from '@standardnotes/utils'
 
 describe('file decryptor', () => {
   let decryptor: FileDecryptor
@@ -42,12 +43,14 @@ describe('file decryptor', () => {
     const encryptedBytes = new Uint8Array([0xaa])
     const result = decryptor.decryptBytes(encryptedBytes)
 
+    assert(result)
+
     expect(crypto.xchacha20StreamDecryptorPush).toHaveBeenCalledWith(
       expect.any(Object),
       encryptedBytes,
       file.remoteIdentifier,
     )
 
-    expect(result!.decryptedBytes.length).toEqual(1)
+    expect(result.decryptedBytes.length).toEqual(1)
   })
 })

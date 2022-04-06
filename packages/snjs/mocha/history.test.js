@@ -26,7 +26,7 @@ describe('history manager', () => {
       this.historyManager = this.application.historyManager
       this.payloadManager = this.application.payloadManager
       /** Automatically optimize after every revision by setting this to 0 */
-      this.historyManager.setSessionItemRevisionThreshold(0)
+      this.historyManager.itemRevisionThreshold = 0
     })
 
     afterEach(async function () {
@@ -68,23 +68,6 @@ describe('history manager', () => {
         syncOptions,
       )
       expect(this.historyManager.sessionHistoryForItem(item).length).to.equal(1)
-
-      this.historyManager.clearHistoryForItem(item)
-      expect(this.historyManager.sessionHistoryForItem(item).length).to.equal(0)
-
-      await Factory.markDirtyAndSyncItem(this.application, item)
-      await this.application.mutator.changeAndSaveItem(
-        item,
-        (mutator) => {
-          mutator.title = Math.random()
-        },
-        undefined,
-        undefined,
-        syncOptions,
-      )
-
-      this.historyManager.clearAllHistory()
-      expect(this.historyManager.sessionHistoryForItem(item).length).to.equal(0)
     })
 
     it('first change should create revision with previous value', async function () {
@@ -191,7 +174,7 @@ describe('history manager', () => {
     })
 
     it('should keep the entry right before a large deletion, regardless of its delta', async function () {
-      const payload = CreateMaxPayloadFromAnyObject(
+      const payload = new DecryptedPayload(
         Factory.createNoteParams({
           text: Factory.randomString(100),
         }),
@@ -231,7 +214,7 @@ describe('history manager', () => {
     })
 
     it('entries should be ordered from newest to oldest', async function () {
-      const payload = CreateMaxPayloadFromAnyObject(
+      const payload = new DecryptedPayload(
         Factory.createNoteParams({
           text: Factory.randomString(200),
         }),
@@ -380,7 +363,7 @@ describe('history manager', () => {
       expect(itemHistory.length).to.equal(2)
 
       const oldestEntry = lastElement(itemHistory)
-      let revisionFromServer = await this.historyManager.fetchRemoteRevision(item.uuid, oldestEntry)
+      let revisionFromServer = await this.historyManager.fetchRemoteRevision(item, oldestEntry)
       expect(revisionFromServer).to.be.ok
 
       let payloadFromServer = revisionFromServer.payload
@@ -399,7 +382,7 @@ describe('history manager', () => {
       await Factory.markDirtyAndSyncItem(this.application, dupe)
 
       const dupeHistory = await this.historyManager.remoteHistoryForItem(dupe)
-      const dupeRevision = await this.historyManager.fetchRemoteRevision(dupe.uuid, dupeHistory[0])
+      const dupeRevision = await this.historyManager.fetchRemoteRevision(dupe, dupeHistory[0])
       expect(dupeRevision.payload.uuid).to.equal(dupe.uuid)
     })
 

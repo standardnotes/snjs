@@ -219,7 +219,7 @@ describe('keys', function () {
     expect(note.errorDecrypting).to.equal(true)
     expect(note.waitingForKey).to.equal(true)
 
-    const keyPayload = CreateMaxPayloadFromAnyObject(itemsKey)
+    const keyPayload = new DecryptedPayload(itemsKey.payload.ejected())
     await this.application.itemManager.emitItemsFromPayloads(
       [keyPayload],
       PayloadSource.LocalChanged,
@@ -279,8 +279,8 @@ describe('keys', function () {
     const itemsKey = this.application.itemManager.itemsKeys()[0]
     const rawPayloads = await this.application.storageService.getAllRawPayloads()
     const itemsKeyRawPayload = rawPayloads.find((p) => p.uuid === itemsKey.uuid)
-    const itemsKeyPayload = CreateMaxPayloadFromAnyObject(itemsKeyRawPayload)
-    expect(itemsKeyPayload.format).to.equal(PayloadFormat.EncryptedString)
+    const itemsKeyPayload = new EncryptedPayload(itemsKeyRawPayload)
+    expect(itemsKeyPayload.enc_item_key).to.be.ok
   })
 
   it('items key encrypted payload should contain root key params', async function () {
@@ -288,7 +288,7 @@ describe('keys', function () {
     const itemsKey = this.application.itemManager.itemsKeys()[0]
     const rawPayloads = await this.application.storageService.getAllRawPayloads()
     const itemsKeyRawPayload = rawPayloads.find((p) => p.uuid === itemsKey.uuid)
-    const itemsKeyPayload = CreateMaxPayloadFromAnyObject(itemsKeyRawPayload)
+    const itemsKeyPayload = new EncryptedPayload(itemsKeyRawPayload)
     const operator = this.application.protocolService.operatorManager.operatorForVersion(
       ProtocolVersion.V004,
     )
@@ -370,7 +370,7 @@ describe('keys', function () {
     /** Expect that we can decrypt raw payload with current root key */
     const rawPayloads = await this.application.storageService.getAllRawPayloads()
     const itemsKeyRawPayload = rawPayloads.find((p) => p.uuid === originalItemsKey.uuid)
-    const itemsKeyPayload = CreateMaxPayloadFromAnyObject(itemsKeyRawPayload)
+    const itemsKeyPayload = new EncryptedPayload(itemsKeyRawPayload)
     const decrypted = await this.application.protocolService.decryptSplitSingle({
       usesRootKey: {
         items: [itemsKeyPayload],
@@ -397,7 +397,7 @@ describe('keys', function () {
     const itemsKeyRawPayload2 = rawPayloads2.find((p) => p.uuid === originalItemsKey.uuid)
     expect(itemsKeyRawPayload2.content).to.not.equal(itemsKeyRawPayload.content)
 
-    const itemsKeyPayload2 = CreateMaxPayloadFromAnyObject(itemsKeyRawPayload2)
+    const itemsKeyPayload2 = new EncryptedPayload(itemsKeyRawPayload2)
     const decrypted2 = await this.application.protocolService.decryptSplitSingle({
       usesRootKey: {
         items: [itemsKeyPayload2],

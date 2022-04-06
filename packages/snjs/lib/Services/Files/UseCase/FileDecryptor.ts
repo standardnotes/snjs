@@ -1,5 +1,5 @@
 import { SNPureCrypto, StreamDecryptor, SodiumConstant } from '@standardnotes/sncrypto-common'
-import { EncryptedFileInterface } from '../types'
+import { EncryptedFileInterface } from '../Types'
 
 export class FileDecryptor {
   private decryptor!: StreamDecryptor

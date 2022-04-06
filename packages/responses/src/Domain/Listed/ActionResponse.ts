@@ -1,12 +1,13 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
+import { AnyKeyParamsContent, ContentType } from '@standardnotes/common'
+import { Action, EncryptedTransferPayload } from '@standardnotes/models'
 import { HttpResponse } from '../Http/HttpResponse'
 
 export type ActionResponse = HttpResponse & {
   description: string
-  supported_types: string[]
+  supported_types: ContentType[]
   deprecation?: string
-  actions: any[]
-  item?: any
-  keyParams?: any
-  auth_params?: any
+  actions: Action[]
+  item?: EncryptedTransferPayload
+  keyParams?: AnyKeyParamsContent
+  auth_params?: AnyKeyParamsContent
 }

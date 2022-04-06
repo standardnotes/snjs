@@ -7,7 +7,7 @@ import { PayloadInterface } from '../../../Abstract/Payload/Interfaces/PayloadIn
 import { IntegrityPayload } from '../../../Abstract/Payload/IntegrityPayload'
 import {
   isDecryptedPayload,
-  isEncryptedErroredPayload,
+  isErrorDecryptingPayload,
   isEncryptedPayload,
 } from '../../../Abstract/Payload/Interfaces/TypeCheck'
 import { ItemContent } from '../../../Abstract/Item'
@@ -116,7 +116,7 @@ export class PayloadCollection<
 
     for (const element of elements) {
       if (
-        isEncryptedErroredPayload(element) &&
+        isErrorDecryptingPayload(element) &&
         (element.errorDecrypting || element.waitingForKey)
       ) {
         this.invalidsIndex.add(element.uuid)

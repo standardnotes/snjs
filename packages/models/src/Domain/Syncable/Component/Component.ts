@@ -16,7 +16,7 @@ import { AppDataField } from '../../Abstract/Item/Types/AppDataField'
 import { ItemContent } from '../../Abstract/Item/Interfaces/ItemContent'
 import { HistoryEntryInterface } from '../../Runtime/History'
 import { DecryptedPayloadInterface } from '../../Abstract/Payload/Interfaces/DecryptedPayload'
-import { ItemInterface } from '../../Abstract/Item'
+import { DecryptedItemInterface, ItemInterface } from '../../Abstract/Item'
 
 export const isComponent = (x: ItemInterface): x is SNComponent =>
   x.content_type === ContentType.Component
@@ -85,7 +85,7 @@ export class SNComponent extends DecryptedItem<ComponentContent> implements Comp
 
   /** Do not duplicate components under most circumstances. Always keep original */
   public strategyWhenConflictingWithItem(
-    _item: DecryptedItem,
+    _item: DecryptedItemInterface,
     _previousRevision?: HistoryEntryInterface,
   ): ConflictStrategy {
     return ConflictStrategy.KeepLeft

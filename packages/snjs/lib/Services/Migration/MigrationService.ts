@@ -1,15 +1,18 @@
-import { AbstractService } from '@standardnotes/services'
 import { ApplicationEvent } from '../../Application/Event'
-import { ApplicationStage } from '@standardnotes/services'
 import { BaseMigration } from '@Lib/Migrations/Base'
 import { compareSemVersions } from '@Lib/Version'
 import { lastElement } from '@standardnotes/utils'
 import { Migration } from '@Lib/Migrations/Migration'
 import { MigrationServices } from '../../Migrations/MigrationServices'
-import { RawStorageKey, namespacedKey } from '@standardnotes/services'
+import {
+  RawStorageKey,
+  namespacedKey,
+  ApplicationStage,
+  AbstractService,
+} from '@standardnotes/services'
 import { SnjsVersion, isRightVersionGreaterThanLeft } from '../../Version'
 import { SNLog } from '@Lib/Log'
-import * as MigrationVersions from '@Lib/Migrations/Versions'
+import { MigrationClasses } from '@Lib/Migrations/Versions'
 
 /**
  * The migration service orchestrates the execution of multi-stage migrations.
@@ -28,20 +31,24 @@ export class SNMigrationService extends AbstractService {
   }
 
   public deinit(): void {
-    ;(this.services as any) = undefined
+    ;(this.services as unknown) = undefined
+
     if (this.activeMigrations) {
       this.activeMigrations.length = 0
     }
+
     super.deinit()
   }
 
   public async initialize(): Promise<void> {
     await this.runBaseMigrationPreRun()
 
-    const requiredMigrations = await SNMigrationService.getRequiredMigrations(
+    const requiredMigrations = SNMigrationService.getRequiredMigrations(
       await this.getStoredSnjsVersion(),
     )
+
     this.activeMigrations = this.instantiateMigrationClasses(requiredMigrations)
+
     if (this.activeMigrations.length > 0) {
       const lastMigration = lastElement(this.activeMigrations) as Migration
       lastMigration.onDone(async () => {
@@ -86,7 +93,7 @@ export class SNMigrationService extends AbstractService {
   }
 
   public async hasPendingMigrations(): Promise<boolean> {
-    const requiredMigrations = await SNMigrationService.getRequiredMigrations(
+    const requiredMigrations = SNMigrationService.getRequiredMigrations(
       await this.getStoredSnjsVersion(),
     )
     return requiredMigrations.length > 0 || (await this.baseMigration.needsKeychainRepair())
@@ -102,16 +109,12 @@ export class SNMigrationService extends AbstractService {
     return version
   }
 
-  private static async getRequiredMigrations(storedVersion: string) {
+  private static getRequiredMigrations(storedVersion: string) {
     const resultingClasses = []
-    const migrationClasses = Object.keys(MigrationVersions)
-      .map((key) => {
-        return (MigrationVersions as any)[key]
-      })
-      .sort((a, b) => {
-        return compareSemVersions(a.version(), b.version())
-      })
-    for (const migrationClass of migrationClasses) {
+    const sortedClasses = MigrationClasses.sort((a, b) => {
+      return compareSemVersions(a.version(), b.version())
+    })
+    for (const migrationClass of sortedClasses) {
       const migrationVersion = migrationClass.version()
       if (migrationVersion === storedVersion) {
         continue
@@ -123,7 +126,7 @@ export class SNMigrationService extends AbstractService {
     return resultingClasses
   }
 
-  private instantiateMigrationClasses(classes: any[]): Migration[] {
+  private instantiateMigrationClasses(classes: typeof MigrationClasses): Migration[] {
     return classes.map((migrationClass) => {
       return new migrationClass(this.services)
     })

@@ -34,7 +34,7 @@ const LongTextPredicate = Models.predicateFromJson<Models.SNTag>({
 describe('itemManager', () => {
   let payloadManager: PayloadManager
   let itemManager: ItemManager
-  let items: Models.SNItem[]
+  let items: Models.DecryptedItemInterface[]
   let internalEventBus: InternalEventBusInterface
 
   const createService = () => {
@@ -49,11 +49,13 @@ describe('itemManager', () => {
 
     payloadManager = new PayloadManager(internalEventBus)
 
-    items = [] as jest.Mocked<Models.SNItem[]>
+    items = [] as jest.Mocked<Models.DecryptedItemInterface[]>
     itemManager = {} as jest.Mocked<ItemManager>
     itemManager.getItems = jest.fn().mockReturnValue(items)
     itemManager.createItem = jest.fn()
-    itemManager.changeComponent = jest.fn().mockReturnValue({} as jest.Mocked<Models.SNItem>)
+    itemManager.changeComponent = jest
+      .fn()
+      .mockReturnValue({} as jest.Mocked<Models.DecryptedItemInterface>)
     itemManager.setItemsToBeDeleted = jest.fn()
     itemManager.addObserver = jest.fn()
     itemManager.changeItem = jest.fn()
@@ -62,7 +64,7 @@ describe('itemManager', () => {
 
   const createTag = (title: string) => {
     return new Models.SNTag(
-      Models.CreateMaxPayloadFromAnyObject({
+      new Models.DecryptedPayload({
         uuid: String(Math.random()),
         content_type: ContentType.Tag,
         content: Models.FillItemContent<Models.TagContent>({
@@ -74,7 +76,7 @@ describe('itemManager', () => {
 
   const createNote = (title: string) => {
     return new Models.SNNote(
-      Models.CreateMaxPayloadFromAnyObject({
+      new Models.DecryptedPayload({
         uuid: String(Math.random()),
         content_type: ContentType.Note,
         content: Models.FillItemContent<Models.NoteContent>({
@@ -86,7 +88,7 @@ describe('itemManager', () => {
 
   const createFile = (name: string) => {
     return new Models.SNFile(
-      Models.CreateMaxPayloadFromAnyObject({
+      new Models.DecryptedPayload({
         uuid: String(Math.random()),
         content_type: ContentType.File,
         content: Models.FillItemContent<Models.FileContent>({

@@ -596,7 +596,7 @@ export class RootKeyEncryptionService extends Services.AbstractService<RootKeySe
           version: operatorVersion,
         }),
       })
-      itemTemplate = Models.CreateDecryptedItemFromPayload(payload) as Models.ItemsKeyInterface
+      itemTemplate = Models.CreateDecryptedItemFromPayload(payload)
     } else {
       /** Create independent items key */
       itemTemplate = this.operatorManager.operatorForVersion(operatorVersion).createItemsKey()

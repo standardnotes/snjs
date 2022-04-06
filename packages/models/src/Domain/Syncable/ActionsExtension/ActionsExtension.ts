@@ -1,5 +1,5 @@
 import { FeatureDescription, ThirdPartyFeatureDescription } from '@standardnotes/features'
-import { DecryptedItem } from '../../Abstract/Item'
+import { DecryptedItem, DecryptedItemInterface } from '../../Abstract/Item'
 import { ItemContent } from '../../Abstract/Item/Interfaces/ItemContent'
 import { ConflictStrategy } from '../../Abstract/Item/Types/ConflictStrategy'
 import { DecryptedPayloadInterface } from '../../Abstract/Payload/Interfaces/DecryptedPayload'
@@ -50,7 +50,7 @@ export class SNActionsExtension extends DecryptedItem<ActionExtensionContent> {
     return (this.package_info.identifier as string) === 'org.standardnotes.listed'
   }
 
-  actionsWithContextForItem(item: DecryptedItem): Action[] {
+  actionsWithContextForItem(item: DecryptedItemInterface): Action[] {
     return this.actions.filter((action) => {
       return action.context === item.content_type || action.context === 'Item'
     })
@@ -58,7 +58,7 @@ export class SNActionsExtension extends DecryptedItem<ActionExtensionContent> {
 
   /** Do not duplicate. Always keep original */
   strategyWhenConflictingWithItem(
-    _item: DecryptedItem,
+    _item: DecryptedItemInterface,
     _previousRevision?: HistoryEntryInterface,
   ): ConflictStrategy {
     return ConflictStrategy.KeepLeft

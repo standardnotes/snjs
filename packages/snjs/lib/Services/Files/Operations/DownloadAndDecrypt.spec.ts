@@ -1,6 +1,6 @@
 import { sleep } from '@standardnotes/utils'
 import { SNPureCrypto, StreamEncryptor } from '@standardnotes/sncrypto-common'
-import { RemoteFileInterface, EncryptedFileInterface } from '../types'
+import { RemoteFileInterface, EncryptedFileInterface } from '../Types'
 import { FilesServerInterface } from '../FilesServerInterface'
 import { DownloadAndDecryptFileOperation } from './DownloadAndDecrypt'
 
@@ -70,6 +70,7 @@ describe('download and decrypt', () => {
       crypto,
       apiService,
       'api-token',
+      // eslint-disable-next-line @typescript-eslint/require-await
       async (decryptedBytes) => {
         if (decryptedBytes) {
           receivedBytes = new Uint8Array([...receivedBytes, ...decryptedBytes])

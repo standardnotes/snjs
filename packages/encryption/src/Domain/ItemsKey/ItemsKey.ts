@@ -3,6 +3,7 @@ import {
   ItemsKeyContent,
   DecryptedItem,
   DecryptedPayloadInterface,
+  DecryptedItemInterface,
 } from '@standardnotes/models'
 import { ProtocolVersion } from '@standardnotes/common'
 import { HistoryEntryInterface, ItemsKeyInterface } from '@standardnotes/models'
@@ -28,7 +29,7 @@ export class SNItemsKey extends DecryptedItem<ItemsKeyContent> implements ItemsK
 
   /** Do not duplicate items keys. Always keep original */
   strategyWhenConflictingWithItem(
-    _item: DecryptedItem,
+    _item: DecryptedItemInterface,
     _previousRevision?: HistoryEntryInterface,
   ): ConflictStrategy {
     return ConflictStrategy.KeepLeft

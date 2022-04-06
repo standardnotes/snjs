@@ -77,7 +77,9 @@ export abstract class AbstractDevice implements DeviceInterface {
     identifier: ApplicationIdentifier,
   ): Promise<{ isNewDatabase?: boolean } | undefined>
 
-  abstract getAllRawDatabasePayloads(identifier: ApplicationIdentifier): Promise<TransferPayload[]>
+  abstract getAllRawDatabasePayloads<T extends TransferPayload = TransferPayload>(
+    identifier: ApplicationIdentifier,
+  ): Promise<T[]>
 
   abstract saveRawDatabasePayload(payload: any, identifier: ApplicationIdentifier): Promise<void>
 

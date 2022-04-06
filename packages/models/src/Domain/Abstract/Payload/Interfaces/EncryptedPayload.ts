@@ -12,7 +12,6 @@ export interface EncryptedPayloadInterface extends PayloadInterface<EncryptedTra
 
   readonly errorDecrypting?: boolean
   readonly waitingForKey?: boolean
-  readonly errorDecryptingValueChanged?: boolean
 
   readonly version: ProtocolVersion
 

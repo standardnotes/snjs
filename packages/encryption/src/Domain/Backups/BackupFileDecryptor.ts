@@ -187,7 +187,6 @@ async function decryptWithItemsKeys(
         decryptedPayloads.push(
           encryptedPayload.copy({
             errorDecrypting: true,
-            errorDecryptingValueChanged: !encryptedPayload.errorDecrypting,
           }),
         )
         continue
@@ -214,7 +213,6 @@ async function decryptWithItemsKeys(
       decryptedPayloads.push(
         encryptedPayload.copy({
           errorDecrypting: true,
-          errorDecryptingValueChanged: !encryptedPayload.errorDecrypting,
         }),
       )
       console.error('Error decrypting payload', encryptedPayload, e)

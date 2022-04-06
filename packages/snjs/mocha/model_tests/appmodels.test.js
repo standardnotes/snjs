@@ -55,7 +55,8 @@ describe('app models', () => {
     const params1 = Factory.createNotePayload()
     const params2 = Factory.createNotePayload()
 
-    const mutated = CreateMaxPayloadFromAnyObject(params1, {
+    const mutated = new DecryptedPayload({
+      ...params1,
       content: {
         ...params1.content,
         references: [
@@ -82,7 +83,8 @@ describe('app models', () => {
 
   it('mapping an item twice shouldnt cause problems', async function () {
     const payload = Factory.createNotePayload()
-    const mutated = CreateMaxPayloadFromAnyObject(payload, {
+    const mutated = new DecryptedPayload({
+      ...payload,
       content: {
         ...payload.content,
         foo: 'bar',
@@ -340,9 +342,7 @@ describe('app models', () => {
     expect(refreshedAltItem1.content.references[0].uuid).to.equal(alternatedItem2.uuid)
     expect(alternatedItem2.content.references.length).to.equal(0)
 
-    expect(this.application.itemManager.itemsReferencingItem(alternatedItem2).length).to.equal(
-      1,
-    )
+    expect(this.application.itemManager.itemsReferencingItem(alternatedItem2).length).to.equal(1)
 
     expect(refreshedAltItem1.hasRelationshipWithItem(alternatedItem2)).to.equal(true)
     expect(alternatedItem2.hasRelationshipWithItem(refreshedAltItem1)).to.equal(false)

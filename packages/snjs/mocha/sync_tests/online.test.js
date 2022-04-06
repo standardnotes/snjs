@@ -282,7 +282,8 @@ describe('online syncing', function () {
       },
       EncryptedExportIntent.Sync,
     )
-    const errorred = CreateMaxPayloadFromAnyObject(encrypted, {
+    const errorred = new EncryptedPayload({
+      ...encrypted,
       errorDecrypting: true,
     })
     const items = await this.application.itemManager.emitItemsFromPayloads(
@@ -459,7 +460,7 @@ describe('online syncing', function () {
 
     const rawPayloads = await this.application.storageService.getAllRawPayloads()
     const encryptedPayloads = rawPayloads.map((rawPayload) => {
-      return CreateMaxPayloadFromAnyObject(rawPayload)
+      return new EncryptedPayload(rawPayload)
     })
     const payloads = []
     for (const payload of encryptedPayloads) {
@@ -883,11 +884,7 @@ describe('online syncing', function () {
   it('should not allow receiving decrypted payloads from server', async function () {
     const masterCollection = this.application.payloadManager.getMasterCollection()
     const historyMap = this.application.historyManager.getHistoryMapCopy()
-    const payload = CreateMaxPayloadFromAnyObject(
-      Factory.createNotePayload(),
-      undefined,
-      PayloadSource.RemoteRetrieved,
-    )
+    const payload = new DecryptedPayload(Factory.createNotePayload(), PayloadSource.RemoteRetrieved)
     const response = new SyncResponse({
       data: {
         retrieved_items: [payload],
@@ -916,7 +913,7 @@ describe('online syncing', function () {
      * When a client tries to sync an item with a server-unrecognized content type, it will
      * be returned by the server as an error conflict.
      */
-    const payload = CreateMaxPayloadFromAnyObject({
+    const payload = new DecryptedPayload({
       uuid: Factory.generateUuid(),
       content_type: 'Foo',
       dirty: true,

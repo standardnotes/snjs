@@ -11,7 +11,7 @@ export class DeleteItemMutator<
     const dirtying = this.type !== MutationType.NonDirtying
     const result = new DeletedPayload(
       {
-        ...this.payload,
+        ...this.payload.ejected(),
         deleted: true,
         content: undefined,
         dirty: dirtying ? true : this.payload.dirty,

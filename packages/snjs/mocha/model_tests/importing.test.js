@@ -103,7 +103,8 @@ describe('importing', function () {
     const notePayload = Factory.createNotePayload()
     await application.itemManager.emitItemFromPayload(notePayload, PayloadSource.LocalSaved)
     expectedItemCount++
-    const mutatedNote = CreateMaxPayloadFromAnyObject(notePayload, {
+    const mutatedNote = new DecryptedPayload({
+      ...notePayload,
       content: {
         ...notePayload.content,
         title: `${Math.random()}`,
@@ -126,7 +127,8 @@ describe('importing', function () {
     const pair = Factory.createRelatedNoteTagPairPayload()
     const tagPayload = pair[1]
     await application.itemManager.emitItemsFromPayloads(pair, PayloadSource.LocalChanged)
-    const mutatedTag = CreateMaxPayloadFromAnyObject(tagPayload, {
+    const mutatedTag = new DecryptedPayload({
+      ...tagPayload,
       content: {
         ...tagPayload.content,
         references: [],
@@ -151,13 +153,15 @@ describe('importing', function () {
     expectedItemCount += 2
     const note = application.itemManager.notes[0]
     const tag = application.itemManager.tags[0]
-    const mutatedNote = CreateMaxPayloadFromAnyObject(notePayload, {
+    const mutatedNote = new DecryptedPayload({
+      ...notePayload,
       content: {
         ...notePayload.content,
         title: `${Math.random()}`,
       },
     })
-    const mutatedTag = CreateMaxPayloadFromAnyObject(tagPayload, {
+    const mutatedTag = new DecryptedPayload({
+      ...tagPayload,
       content: {
         ...tagPayload.content,
         title: `${Math.random()}`,

@@ -18,7 +18,6 @@ export type MigrationServices = {
   singletonManager: SNSingletonManager
   featuresService: SNFeaturesService
   environment: Environment
-  /** The application identifier */
   identifier: ApplicationIdentifier
   internalEventBus: InternalEventBusInterface
 }

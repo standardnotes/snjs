@@ -103,7 +103,7 @@ describe('upgrading', () => {
 
     const wrappedRootKey =
       await this.application.protocolService.rootKeyEncryption.getWrappedRootKey()
-    const payload = CreateMaxPayloadFromAnyObject(wrappedRootKey)
+    const payload = new EncryptedPayload(wrappedRootKey)
     expect(payload.version).to.equal(newVersion)
 
     expect(

@@ -2,7 +2,7 @@ import { FilesServerInterface } from './FilesServerInterface'
 import { ClientDisplayableError } from '@standardnotes/responses'
 import { ContentType } from '@standardnotes/common'
 import { DownloadAndDecryptFileOperation } from './Operations/DownloadAndDecrypt'
-import { DecryptedFileInterface } from './types'
+import { DecryptedFileInterface } from './Types'
 import { EncryptAndUploadFileOperation } from './Operations/EncryptAndUpload'
 import {
   SNFile,
@@ -88,6 +88,8 @@ export class SNFileService extends AbstractService implements FilesClientInterfa
     if (!success) {
       return new ClientDisplayableError('Failed to push file bytes to server')
     }
+
+    return undefined
   }
 
   public async finishUpload(
@@ -160,7 +162,9 @@ export class SNFileService extends AbstractService implements FilesClientInterfa
       return ClientDisplayableError.FromError(result.error)
     }
 
-    await this.itemManager.setItemToBeDeleted(file.uuid)
+    await this.itemManager.setItemToBeDeleted(file)
     await this.syncService.sync()
+
+    return undefined
   }
 }

@@ -17,6 +17,7 @@ export class Migration2_36_0 extends Migration {
   private async removeServerExtensionsLocally(): Promise<void> {
     const contentType = 'SF|Extension' as ContentType
     const items = this.services.itemManager.getItems(contentType)
+
     for (const item of items) {
       this.services.itemManager.removeItemLocally(item)
       await this.services.storageService.deletePayloadWithId(item.uuid)

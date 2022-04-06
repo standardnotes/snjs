@@ -26,7 +26,7 @@ export class DeltaRemoteSaved extends PayloadsDelta<
       if (deletedState) {
         const result = new DeletedPayload(
           {
-            ...payload,
+            ...payload.ejected(),
             deleted: true,
             content: undefined,
           },

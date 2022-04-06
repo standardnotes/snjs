@@ -23,7 +23,8 @@ describe('model manager mapping', () => {
   })
 
   it('mapping nonexistent deleted item doesnt create it', async function () {
-    const payload = CreateMaxPayloadFromAnyObject(Factory.createNoteParams(), {
+    const payload = new DeletedPayload({
+      ...Factory.createNoteParams(),
       dirty: false,
       deleted: true,
     })
@@ -49,7 +50,8 @@ describe('model manager mapping', () => {
     this.expectedItemCount++
     expect(this.application.itemManager.items.length).to.equal(this.expectedItemCount)
 
-    const changedParams = CreateMaxPayloadFromAnyObject(payload, {
+    const changedParams = new DeletedPayload({
+      ...payload,
       dirty: false,
       deleted: true,
     })
@@ -70,7 +72,7 @@ describe('model manager mapping', () => {
     item = await this.application.itemManager.changeItem(item, (mutator) => {
       mutator.setDeleted()
     })
-    const payload2 = CreateMaxPayloadFromAnyObject(item)
+    const payload2 = new DecryptedPayload(item.payload.ejected())
     await this.application.itemManager.emitItemsFromPayloads([payload2], PayloadSource.LocalChanged)
     expect(this.application.itemManager.items.length).to.equal(this.expectedItemCount)
   })
@@ -80,7 +82,8 @@ describe('model manager mapping', () => {
     await this.application.itemManager.emitItemsFromPayloads([payload], PayloadSource.LocalChanged)
 
     const newTitle = 'updated title'
-    const mutated = CreateMaxPayloadFromAnyObject(payload, {
+    const mutated = new DecryptedPayload({
+      ...payload,
       content: {
         ...payload.content,
         title: newTitle,

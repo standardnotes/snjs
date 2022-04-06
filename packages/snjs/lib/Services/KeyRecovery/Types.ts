@@ -1,11 +1,13 @@
 import { SNRootKey, SNRootKeyParams } from '@standardnotes/encryption'
-import { ItemsKeyInterface } from '@standardnotes/models'
-import { RawPayload } from '@standardnotes/models'
+import { EncryptedTransferPayload, EncryptedPayloadInterface } from '@standardnotes/models'
 import { UuidString } from '@Lib/Types'
 
-export type UndecryptableItemsStorage = Record<UuidString, RawPayload>
+export type UndecryptableItemsStorage = Record<UuidString, EncryptedTransferPayload>
 
-export type DecryptionCallback = (key: ItemsKeyInterface, result: DecryptionResponse) => void
+export type DecryptionCallback = (
+  key: EncryptedPayloadInterface,
+  result: DecryptionResponse,
+) => void
 
 export type DecryptionResponse = {
   success: boolean
@@ -13,7 +15,7 @@ export type DecryptionResponse = {
 }
 
 export type DecryptionQueueItem = {
-  key: ItemsKeyInterface
+  key: EncryptedPayloadInterface
   keyParams: SNRootKeyParams
   callback?: DecryptionCallback
   promise?: Promise<DecryptionResponse>

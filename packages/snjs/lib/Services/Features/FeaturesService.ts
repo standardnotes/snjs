@@ -1,26 +1,28 @@
 import { AccountEvent, UserService } from '../User/UserService'
 import { ApiServiceEvent, MetaReceivedData, SNApiService } from '../Api/ApiService'
 import { ApplicationStage } from '@standardnotes/services'
-import { arraysEqual, convertTimestampToMilliseconds, removeFromArray } from '@standardnotes/utils'
+import {
+  arraysEqual,
+  convertTimestampToMilliseconds,
+  removeFromArray,
+  Copy,
+  lastElement,
+} from '@standardnotes/utils'
 import { ButtonType, SNAlertService } from '@Lib/Services/Alert/AlertService'
-import { ClientDisplayableError } from '@standardnotes/responses'
+import { ClientDisplayableError, UserFeaturesResponse } from '@standardnotes/responses'
 import { ContentType, RoleName } from '@standardnotes/common'
-import { Copy, lastElement } from '@standardnotes/utils'
 import { FeaturesClientInterface } from './ClientInterface'
 import { FillItemContent, PayloadSource } from '@standardnotes/models'
 import { ItemManager } from '../Items/ItemManager'
 import { LEGACY_PROD_EXT_ORIGIN, PROD_OFFLINE_FEATURES_URL } from '../../Hosts'
 import { SettingName } from '@standardnotes/settings'
-import { SNComponent, SNTheme } from '@standardnotes/models'
 import { SNPureCrypto } from '@standardnotes/sncrypto-common'
 import { SNSessionManager } from '@Lib/Services/Session/SessionManager'
 import { SNSettingsService } from '../Settings'
 import { SNStorageService } from '../Storage/StorageService'
 import { SNSyncService } from '../Sync/SyncService'
 import { SNWebSocketsService, WebSocketsServiceEvent } from '../Api/WebsocketsService'
-import { StorageKey } from '@standardnotes/services'
 import { TRUSTED_CUSTOM_EXTENSIONS_HOSTS, TRUSTED_FEATURE_HOSTS } from '@Lib/Hosts'
-import { UserFeaturesResponse } from '@standardnotes/responses'
 import { UserRolesChangedEvent } from '@standardnotes/domain-events'
 import { UuidString } from '@Lib/Types/UuidString'
 import * as FeaturesImports from '@standardnotes/features'
@@ -87,10 +89,9 @@ export class SNFeaturesService
           PayloadSource.RemoteRetrieved,
           PayloadSource.FileImport,
         ]
+
         if (source && sources.includes(source)) {
-          const items = [...changed, ...inserted].filter(
-            (item) => !item.deleted,
-          ) as Models.SNFeatureRepo[]
+          const items = [...changed, ...inserted] as Models.SNFeatureRepo[]
           if (this.sessionManager.isSignedIntoFirstPartyServer()) {
             await this.migrateFeatureRepoToUserSetting(items)
           } else {
@@ -161,7 +162,7 @@ export class SNFeaturesService
     this.enabledExperimentalFeatures.push(identifier)
 
     void this.storageService.setValue(
-      StorageKey.ExperimentalFeatures,
+      Services.StorageKey.ExperimentalFeatures,
       this.enabledExperimentalFeatures,
     )
 
@@ -178,18 +179,18 @@ export class SNFeaturesService
     removeFromArray(this.enabledExperimentalFeatures, identifier)
 
     void this.storageService.setValue(
-      StorageKey.ExperimentalFeatures,
+      Services.StorageKey.ExperimentalFeatures,
       this.enabledExperimentalFeatures,
     )
 
     const component = this.itemManager
-      .getItems<SNComponent | SNTheme>([ContentType.Component, ContentType.Theme])
+      .getItems<Models.SNComponent | Models.SNTheme>([ContentType.Component, ContentType.Theme])
       .find((component) => component.identifier === identifier)
     if (!component) {
       return
     }
 
-    void this.itemManager.setItemToBeDeleted(component.uuid).then(() => {
+    void this.itemManager.setItemToBeDeleted(component).then(() => {
       void this.syncService.sync()
     })
     void this.notifyEvent(FeaturesEvent.FeaturesUpdated)
@@ -257,10 +258,10 @@ export class SNFeaturesService
   public async deleteOfflineFeatureRepo(): Promise<void> {
     const repo = this.getOfflineRepo()
     if (repo) {
-      await this.itemManager.setItemToBeDeleted(repo.uuid)
+      await this.itemManager.setItemToBeDeleted(repo)
       void this.syncService.sync()
     }
-    await this.storageService.removeValue(StorageKey.UserFeatures)
+    await this.storageService.removeValue(Services.StorageKey.UserFeatures)
   }
 
   private parseOfflineEntitlementsCode(
@@ -285,6 +286,7 @@ export class SNFeaturesService
       return result
     }
     await this.didDownloadFeatures(result.features)
+    return undefined
   }
 
   public async migrateFeatureRepoToUserSetting(
@@ -300,7 +302,7 @@ export class SNFeaturesService
         if (userKeyMatch && userKeyMatch.length > 0) {
           const userKey = userKeyMatch[0]
           await this.settingsService.updateSetting(SettingName.ExtensionKey, userKey, true)
-          await this.itemManager.changeFeatureRepo(item.uuid, (m) => {
+          await this.itemManager.changeFeatureRepo(item, (m) => {
             m.migratedToUserSetting = true
           })
         }
@@ -315,16 +317,19 @@ export class SNFeaturesService
       if (item.migratedToOfflineEntitlements) {
         continue
       }
+
       if (item.onlineUrl) {
         const repoUrl = item.onlineUrl
         const { origin } = new URL(repoUrl)
+
         if (!origin.includes(LEGACY_PROD_EXT_ORIGIN)) {
           continue
         }
+
         const userKeyMatch = repoUrl.match(/\w{32,64}/)
         if (userKeyMatch && userKeyMatch.length > 0) {
           const userKey = userKeyMatch[0]
-          const updatedRepo = await this.itemManager.changeFeatureRepo(item.uuid, (m) => {
+          const updatedRepo = await this.itemManager.changeFeatureRepo(item, (m) => {
             m.offlineFeaturesUrl = PROD_OFFLINE_FEATURES_URL
             m.offlineKey = userKey
             m.migratedToOfflineEntitlements = true
@@ -336,12 +341,12 @@ export class SNFeaturesService
   }
 
   public initializeFromDisk(): void {
-    this.roles = this.storageService.getValue<RoleName[]>(StorageKey.UserRoles, undefined, [])
+    this.roles = this.storageService.getValue<RoleName[]>(Services.StorageKey.UserRoles, undefined, [])
 
-    this.features = this.storageService.getValue(StorageKey.UserFeatures, undefined, [])
+    this.features = this.storageService.getValue(Services.StorageKey.UserFeatures, undefined, [])
 
     this.enabledExperimentalFeatures = this.storageService.getValue(
-      StorageKey.ExperimentalFeatures,
+      Services.StorageKey.ExperimentalFeatures,
       undefined,
       [],
     )
@@ -367,7 +372,7 @@ export class SNFeaturesService
     if (!arraysEqual(this.roles, roles)) {
       void this.notifyEvent(FeaturesEvent.UserRolesChanged)
     }
-    await this.storageService.setValue(StorageKey.UserRoles, this.roles)
+    await this.storageService.setValue(Services.StorageKey.UserRoles, this.roles)
   }
 
   public async didDownloadFeatures(features: FeaturesImports.FeatureDescription[]): Promise<void> {
@@ -378,7 +383,7 @@ export class SNFeaturesService
     this.features = features
     this.completedSuccessfulFeaturesRetrieval = true
     void this.notifyEvent(FeaturesEvent.FeaturesUpdated)
-    void this.storageService.setValue(StorageKey.UserFeatures, this.features)
+    void this.storageService.setValue(Services.StorageKey.UserFeatures, this.features)
 
     await this.mapRemoteNativeFeaturesToItems(features)
   }
@@ -531,20 +536,21 @@ export class SNFeaturesService
   private async mapRemoteNativeFeaturesToItems(
     features: FeaturesImports.FeatureDescription[],
   ): Promise<void> {
-    const currentItems = this.itemManager.getItems<SNComponent>([
+    const currentItems = this.itemManager.getItems<Models.SNComponent>([
       ContentType.Component,
       ContentType.Theme,
     ])
-    const itemsToDeleteUuids: UuidString[] = []
+    const itemsToDelete: Models.SNComponent[] = []
     let hasChanges = false
+
     for (const feature of features) {
-      const didChange = await this.mapNativeFeatureToItem(feature, currentItems, itemsToDeleteUuids)
+      const didChange = await this.mapNativeFeatureToItem(feature, currentItems, itemsToDelete)
       if (didChange) {
         hasChanges = true
       }
     }
 
-    await this.itemManager.setItemsToBeDeleted(itemsToDeleteUuids)
+    await this.itemManager.setItemsToBeDeleted(itemsToDelete)
     if (hasChanges) {
       void this.syncService.sync()
     }
@@ -552,8 +558,8 @@ export class SNFeaturesService
 
   private async mapNativeFeatureToItem(
     feature: FeaturesImports.FeatureDescription,
-    currentItems: SNComponent[],
-    itemsToDeleteUuids: UuidString[],
+    currentItems: Models.SNComponent[],
+    itemsToDelete: Models.SNComponent[],
   ): Promise<boolean> {
     if (!feature.content_type) {
       return false
@@ -573,12 +579,12 @@ export class SNFeaturesService
     const existingItem = currentItems.find((item) => {
       if (item.content.package_info) {
         const itemIdentifier = item.content.package_info.identifier
-        return itemIdentifier === feature.identifier && !item.deleted
+        return itemIdentifier === feature.identifier
       }
       return false
-    }) as SNComponent
+    })
 
-    let resultingItem: SNComponent | undefined = existingItem as SNComponent
+    let resultingItem: Models.SNComponent | undefined = existingItem
 
     if (existingItem) {
       const featureExpiresAt = new Date(feature.expires_at || 0)
@@ -586,7 +592,7 @@ export class SNFeaturesService
         feature.version !== existingItem.package_info.version ||
         featureExpiresAt.getTime() !== existingItem.valid_until.getTime()
       if (hasChange) {
-        resultingItem = await this.itemManager.changeComponent(existingItem.uuid, (mutator) => {
+        resultingItem = await this.itemManager.changeComponent(existingItem, (mutator) => {
           mutator.package_info = feature
           mutator.valid_until = featureExpiresAt
         })
@@ -599,13 +605,13 @@ export class SNFeaturesService
         feature.content_type,
         this.componentContentForNativeFeatureDescription(feature),
         true,
-      )) as SNComponent
+      )) as Models.SNComponent
       hasChanges = true
     }
 
     if (expired && resultingItem) {
       if (feature.content_type !== ContentType.Component) {
-        itemsToDeleteUuids.push(resultingItem.uuid)
+        itemsToDelete.push(resultingItem)
         hasChanges = true
       }
     }
@@ -613,7 +619,7 @@ export class SNFeaturesService
     return hasChanges
   }
 
-  public async downloadExternalFeature(urlOrCode: string): Promise<SNComponent | undefined> {
+  public async downloadExternalFeature(urlOrCode: string): Promise<Models.SNComponent | undefined> {
     let url = urlOrCode
     try {
       url = this.crypto.base64Decode(urlOrCode)
@@ -643,9 +649,13 @@ export class SNFeaturesService
     } catch (err) {
       void this.alertService.alert(Messages.INVALID_EXTENSION_URL)
     }
+
+    return undefined
   }
 
-  private async performDownloadExternalFeature(url: string): Promise<SNComponent | undefined> {
+  private async performDownloadExternalFeature(
+    url: string,
+  ): Promise<Models.SNComponent | undefined> {
     const response = await this.apiService.downloadFeatureUrl(url)
     if (response.error) {
       await this.alertService.alert(Messages.API_MESSAGE_FAILED_DOWNLOADING_EXTENSION)
@@ -681,7 +691,7 @@ export class SNFeaturesService
     const component = (await this.itemManager.createTemplateItem(
       rawFeature.content_type,
       content,
-    )) as SNComponent
+    )) as Models.SNComponent
     return component
   }
 

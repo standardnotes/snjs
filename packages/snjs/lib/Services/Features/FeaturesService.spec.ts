@@ -1,4 +1,4 @@
-import { SNComponent, SNFeatureRepo, SNItem } from '@standardnotes/models'
+import { ItemInterface, SNComponent, SNFeatureRepo } from '@standardnotes/models'
 import { SNSyncService } from '../Sync/SyncService'
 import { SettingName } from '@standardnotes/settings'
 import {
@@ -32,7 +32,7 @@ describe('featuresService', () => {
   let crypto: SNPureCrypto
   let roles: RoleName[]
   let features: FeatureDescription[]
-  let items: SNItem[]
+  let items: ItemInterface[]
   let now: Date
   let tomorrow_server: number
   let tomorrow_client: number
@@ -73,7 +73,7 @@ describe('featuresService', () => {
       },
     ] as jest.Mocked<FeatureDescription[]>
 
-    items = [] as jest.Mocked<SNItem[]>
+    items = [] as jest.Mocked<ItemInterface[]>
 
     storageService = {} as jest.Mocked<SNStorageService>
     storageService.setValue = jest.fn()
@@ -95,7 +95,7 @@ describe('featuresService', () => {
     itemManager.getItems = jest.fn().mockReturnValue(items)
     itemManager.createItem = jest.fn()
     itemManager.createTemplateItem = jest.fn().mockReturnValue({})
-    itemManager.changeComponent = jest.fn().mockReturnValue({} as jest.Mocked<SNItem>)
+    itemManager.changeComponent = jest.fn().mockReturnValue({} as jest.Mocked<ItemInterface>)
     itemManager.setItemsToBeDeleted = jest.fn()
     itemManager.addObserver = jest.fn()
     itemManager.changeItem = jest.fn()

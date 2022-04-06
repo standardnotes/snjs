@@ -14,7 +14,6 @@ export class EncryptedPayload
   readonly items_key_id?: string
   readonly errorDecrypting?: boolean
   readonly waitingForKey?: boolean
-  readonly errorDecryptingValueChanged?: boolean
   readonly format: PayloadFormat.EncryptedString = PayloadFormat.EncryptedString
   readonly deleted: false = false
   readonly auth_hash?: string
@@ -28,7 +27,6 @@ export class EncryptedPayload
     this.enc_item_key = rawPayload.enc_item_key
     this.errorDecrypting = rawPayload.errorDecrypting
     this.waitingForKey = rawPayload.waitingForKey
-    this.errorDecryptingValueChanged = rawPayload.errorDecryptingValueChanged
 
     this.auth_hash = rawPayload.auth_hash
 

@@ -6,7 +6,7 @@ import { ConflictDelta } from './Conflict'
 import { PayloadsDelta } from './Delta'
 import {
   isDeletedPayload,
-  isEncryptedErroredPayload,
+  isErrorDecryptingPayload,
 } from '../../Abstract/Payload/Interfaces/TypeCheck'
 
 export class DeltaRemoteRetrieved extends PayloadsDelta {
@@ -41,7 +41,7 @@ export class DeltaRemoteRetrieved extends PayloadsDelta {
       }
 
       const base = this.findBasePayload(received.uuid as string)
-      if (base?.dirty && !isEncryptedErroredPayload(base)) {
+      if (base?.dirty && !isErrorDecryptingPayload(base)) {
         conflicted.push(decrypted)
         continue
       }

@@ -21,7 +21,6 @@ export type ErrorDecryptingParameters = {
   uuid: string
   errorDecrypting: true
   waitingForKey?: boolean
-  errorDecryptingValueChanged?: boolean
 }
 
 export function isErrorDecryptingParameters(

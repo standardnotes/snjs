@@ -1,4 +1,3 @@
-import { CreateDecryptedItemFromPayload, ItemsKeyInterface } from '@standardnotes/models'
 import {
   SNRootKeyParams,
   EncryptionService,
@@ -7,13 +6,16 @@ import {
 } from '@standardnotes/encryption'
 import { UserService } from '../User/UserService'
 import {
-  PurePayload,
-  PayloadField,
-  CreateMaxPayloadFromAnyObject,
+  ItemsKeyInterface,
   PayloadSource,
+  isErrorDecryptingPayload,
+  EncryptedPayloadInterface,
+  EncryptedPayload,
+  isDecryptedPayload,
+  ItemsKeyContent,
+  DecryptedPayloadInterface,
 } from '@standardnotes/models'
 import { SNSyncService } from '../Sync/SyncService'
-import { StorageKey } from '@standardnotes/services'
 import { KeyRecoveryStrings } from '../Api/Messages'
 import { SNStorageService } from '../Storage/StorageService'
 import { PayloadManager } from '../Payloads/PayloadManager'
@@ -35,6 +37,7 @@ import {
   InternalEventBusInterface,
   StorageValueModes,
   ApplicationStage,
+  StorageKey,
 } from '@standardnotes/services'
 import {
   UndecryptableItemsStorage,
@@ -97,23 +100,21 @@ export class SNKeyRecoveryService extends AbstractService {
   ) {
     super(internalEventBus)
 
-    this.removeItemObserver = this.itemManager.addObserver(
+    this.removeItemObserver = this.payloadManager.addObserver(
       [ContentType.ItemsKey],
       (changed, inserted, _discarded, ignored, source) => {
         if (source === PayloadSource.LocalChanged) {
           return
         }
 
-        const changedOrInserted = changed
-          .concat(inserted)
-          .filter((k) => k.errorDecrypting) as ItemsKeyInterface[]
+        const changedOrInserted = changed.concat(inserted).filter(isErrorDecryptingPayload)
 
         if (changedOrInserted.length > 0) {
           void this.handleUndecryptableItemsKeys(changedOrInserted)
         }
 
         if (ignored.length > 0) {
-          void this.handleIgnoredItemsKeys(ignored as ItemsKeyInterface[])
+          void this.handleIgnoredItemsKeys(ignored)
         }
       },
     )
@@ -157,7 +158,7 @@ export class SNKeyRecoveryService extends AbstractService {
    * When the app first launches, we will query the isolated storage to see if there are any
    * keys we need to decrypt.
    */
-  private async handleIgnoredItemsKeys(keys: ItemsKeyInterface[], persistIncoming = true) {
+  private async handleIgnoredItemsKeys(keys: EncryptedPayloadInterface[], persistIncoming = true) {
     /**
      * Persist the keys locally in isolated storage, so that if we don't properly decrypt
      * them in this app session, the user has a chance to later. If there already exists
@@ -177,7 +178,7 @@ export class SNKeyRecoveryService extends AbstractService {
     await this.beginProcessingQueue()
   }
 
-  private async handleUndecryptableItemsKeys(keys: ItemsKeyInterface[]) {
+  private async handleUndecryptableItemsKeys(keys: EncryptedPayloadInterface[]) {
     this.addKeysToQueue(keys)
     await this.beginProcessingQueue()
   }
@@ -190,9 +191,7 @@ export class SNKeyRecoveryService extends AbstractService {
       return
     }
 
-    const keys = rawPayloads
-      .map((raw) => CreateMaxPayloadFromAnyObject(raw))
-      .map((p) => CreateDecryptedItemFromPayload(p)) as ItemsKeyInterface[]
+    const keys = rawPayloads.map((raw) => new EncryptedPayload(raw))
 
     return this.handleIgnoredItemsKeys(keys, false)
   }
@@ -205,25 +204,26 @@ export class SNKeyRecoveryService extends AbstractService {
     ) as Promise<UndecryptableItemsStorage>
   }
 
-  private async persistUndecryptables(record: UndecryptableItemsStorage) {
-    await this.storageService.setValue(StorageKey.KeyRecoveryUndecryptableItems, record)
+  private persistUndecryptables(record: UndecryptableItemsStorage) {
+    this.storageService.setValue(StorageKey.KeyRecoveryUndecryptableItems, record)
   }
 
-  private async saveToUndecryptables(keys: ItemsKeyInterface[]) {
-    /** Get the current persisted value */
+  private async saveToUndecryptables(keys: EncryptedPayloadInterface[]) {
     const record = await this.getUndecryptables()
-    /** Persist incoming keys */
+
     for (const key of keys) {
-      record[key.uuid] = key.payload.ejected()
+      record[key.uuid] = key.ejected()
     }
-    await this.persistUndecryptables(record)
+
+    this.persistUndecryptables(record)
   }
 
-  private async removeFromUndecryptables(key: ItemsKeyInterface) {
-    /** Get the current persisted value */
+  private async removeFromUndecryptables(key: EncryptedPayloadInterface) {
     const record = await this.getUndecryptables()
+
     delete record[key.uuid]
-    await this.persistUndecryptables(record)
+
+    this.persistUndecryptables(record)
   }
 
   private get queuePromise() {
@@ -247,14 +247,18 @@ export class SNKeyRecoveryService extends AbstractService {
       KeyRecoveryStrings.KeyRecoveryLoginFlowPrompt(keyParams),
       KeyRecoveryStrings.KeyRecoveryLoginFlowReason,
     )
+
     const challengeResponse = await this.challengeService.promptForChallengeResponse(challenge)
     if (!challengeResponse) {
       return undefined
     }
+
     this.challengeService.completeChallenge(challenge)
     const password = challengeResponse.values[0].value as string
+
     /** Generate a root key using the input */
     const rootKey = await this.protocolService.computeRootKey(password, keyParams)
+
     const signInResponse = await this.userService.correctiveSignIn(rootKey)
     if (!signInResponse.error) {
       void this.alertService.alert(KeyRecoveryStrings.KeyRecoveryRootKeyReplaced)
@@ -271,32 +275,35 @@ export class SNKeyRecoveryService extends AbstractService {
     }
     const { wrappingKey, canceled } = await this.challengeService.getWrappingKeyIfApplicable()
     if (canceled) {
-      /** Show an alert saying they must enter the correct passcode to update
-       * their root key, and try again */
       await this.alertService.alert(
         KeyRecoveryStrings.KeyRecoveryPasscodeRequiredText,
         KeyRecoveryStrings.KeyRecoveryPasscodeRequiredTitle,
       )
+
       return this.getWrappingKeyIfApplicable()
     }
     return wrappingKey
   }
 
-  private addKeysToQueue(keys: ItemsKeyInterface[], callback?: DecryptionCallback) {
+  private addKeysToQueue(keys: EncryptedPayloadInterface[], callback?: DecryptionCallback) {
     for (const key of keys) {
       const keyParams = this.protocolService.getKeyEmbeddedKeyParams(key)
       if (!keyParams) {
         continue
       }
+
       const queueItem: DecryptionQueueItem = {
         key,
         keyParams,
         callback,
       }
+
       const promise: Promise<DecryptionResponse> = new Promise((resolve) => {
         queueItem.resolve = resolve
       })
+
       queueItem.promise = promise
+
       this.decryptionQueue.push(queueItem)
     }
   }
@@ -371,6 +378,7 @@ export class SNKeyRecoveryService extends AbstractService {
     if (!queueItem.resolve) {
       throw Error('Attempting to pop queue element with no resolve function')
     }
+
     removeFromArray(this.decryptionQueue, queueItem)
     const keyParams = queueItem.keyParams
     const key = queueItem.key
@@ -381,7 +389,8 @@ export class SNKeyRecoveryService extends AbstractService {
      * and if we can validate the params based on this items key's params.
      * */
     let replacesRootKey = false
-    const clientParams = await this.getClientKeyParams()
+    const clientParams = this.getClientKeyParams()
+
     if (
       this.serverParams &&
       clientParams &&
@@ -392,13 +401,15 @@ export class SNKeyRecoveryService extends AbstractService {
       /** Get the latest items key we _can_ decrypt */
       const latest = dateSorted(
         this.itemManager.getItems<ItemsKeyInterface>(ContentType.ItemsKey),
-        PayloadField.CreatedAt,
+        'created_at',
         false,
       )[0]
+
       const hasLocalItemsKey = !isNullOrUndefined(latest)
       const isNewerThanLatest = key.created_at > latest?.created_at
       replacesRootKey = !hasLocalItemsKey || isNewerThanLatest
     }
+
     const challenge = new Challenge(
       [new ChallengePrompt(ChallengeValidation.None, undefined, undefined, true)],
       ChallengeReason.Custom,
@@ -420,9 +431,9 @@ export class SNKeyRecoveryService extends AbstractService {
     const rootKey = await this.protocolService.computeRootKey(password, keyParams)
 
     /** Attempt to decrypt this items key using the root key */
-    const decryptedPayload = await this.protocolService.decryptSplitSingle({
+    const decryptedPayload = await this.protocolService.decryptSplitSingle<ItemsKeyContent>({
       usesRootKey: {
-        items: [key.payload],
+        items: [key],
         key: rootKey,
       },
     })
@@ -431,16 +442,18 @@ export class SNKeyRecoveryService extends AbstractService {
     this.challengeService.completeChallenge(challenge)
 
     /** If it succeeds, re-emit this items key */
-    if (!decryptedPayload.errorDecrypting) {
+    if (!isErrorDecryptingPayload(decryptedPayload)) {
       /** Decrypt and remove from queue any other items keys who share these key params */
       const matching = await this.handleDecryptionOfAllKeysMatchingCorrectRootKey(
         rootKey,
         replacesRootKey,
         [decryptedPayload],
       )
+
       const result = { success: true }
       resolve(result)
       queueItem.callback?.(key, result)
+
       for (const match of matching) {
         match.resolve?.(result)
         match.callback?.(match.key, result)
@@ -456,7 +469,7 @@ export class SNKeyRecoveryService extends AbstractService {
   private async handleDecryptionOfAllKeysMatchingCorrectRootKey(
     rootKey: SNRootKey,
     replacesRootKey: boolean,
-    additionalKeys: PurePayload[] = [],
+    additionalKeys: DecryptedPayloadInterface<ItemsKeyContent>[] = [],
   ): Promise<DecryptionQueueItem[]> {
     if (replacesRootKey) {
       /** Replace our root key with the generated root key */
@@ -465,14 +478,15 @@ export class SNKeyRecoveryService extends AbstractService {
     }
 
     const matching = this.popQueueForKeyParams(rootKey.keyParams)
-    const decryptedMatching = await this.protocolService.decryptSplit({
+    const matchingResults = await this.protocolService.decryptSplit({
       usesRootKey: {
-        items: matching.map((m) => m.key.payload),
+        items: matching.map((m) => m.key),
         key: rootKey,
       },
     })
+    const decryptedMatching = matchingResults.filter(isDecryptedPayload)
 
-    const allRelevantKeyPayloads = additionalKeys.concat(decryptedMatching)
+    const allRelevantKeyPayloads = [...additionalKeys, ...decryptedMatching]
     void this.payloadManager.emitPayloads(allRelevantKeyPayloads, PayloadSource.DecryptedTransient)
 
     await this.storageService.savePayloads(allRelevantKeyPayloads)
