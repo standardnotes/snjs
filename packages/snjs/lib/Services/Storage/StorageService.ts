@@ -4,18 +4,21 @@ import { Environment } from '@Lib/Application/Platforms'
 import { SNLog } from '../../Log'
 import { isErrorDecryptingParameters, SNRootKey } from '@standardnotes/encryption'
 import * as Encryption from '@standardnotes/encryption'
-import * as Models from '@standardnotes/models'
 import * as Services from '@standardnotes/services'
 import {
   createDecryptedLocalStorageContextPayload,
   createDeletedLocalStorageContextPayload,
   createEncryptedLocalStorageContextPayload,
+  CreatePayloadSplitWithDiscardables,
   DecryptedPayload,
   EncryptedPayload,
   FullyFormedPayloadInterface,
   isDecryptedTransferPayload,
-  isDeletedPayload,
   isEncryptedTransferPayload,
+  EncryptedTransferPayload,
+  ItemContent,
+  DecryptedPayloadInterface,
+  DeletedPayloadInterface,
 } from '@standardnotes/models'
 
 /**
@@ -45,7 +48,7 @@ export class SNStorageService
     private deviceInterface: Services.DeviceInterface,
     private identifier: string,
     private environment: Environment,
-    protected internalEventBus: Services.InternalEventBusInterface,
+    protected override internalEventBus: Services.InternalEventBusInterface,
   ) {
     super(internalEventBus)
     void this.setPersistencePolicy(Services.StoragePersistencePolicies.Default)
@@ -56,14 +59,14 @@ export class SNStorageService
     this.encryptionProvider = provider
   }
 
-  public deinit() {
+  public override deinit() {
     ;(this.deviceInterface as unknown) = undefined
     ;(this.encryptionProvider as unknown) = undefined
     this.storagePersistable = false
     super.deinit()
   }
 
-  async handleApplicationStage(stage: Services.ApplicationStage) {
+  override async handleApplicationStage(stage: Services.ApplicationStage) {
     await super.handleApplicationStage(stage)
     if (stage === Services.ApplicationStage.Launched_10) {
       this.storagePersistable = true
@@ -138,10 +141,7 @@ export class SNStorageService
     return !isErrorDecryptingParameters(decryptedPayload)
   }
 
-  private async decryptWrappedValue(
-    wrappedValue: Models.EncryptedTransferPayload,
-    key?: SNRootKey,
-  ) {
+  private async decryptWrappedValue(wrappedValue: EncryptedTransferPayload, key?: SNRootKey) {
     /**
      * The read content type doesn't matter, so long as we know it responds
      * to content type. This allows a more seamless transition when both web
@@ -243,7 +243,7 @@ export class SNStorageService
 
     const payload = new DecryptedPayload({
       uuid: UuidGenerator.GenerateUuid(),
-      content: valuesToWrap as unknown as Models.ItemContent,
+      content: valuesToWrap as unknown as ItemContent,
       content_type: ContentType.EncryptedStorage,
     })
 
@@ -373,9 +373,7 @@ export class SNStorageService
     return this.deviceInterface.getAllRawDatabasePayloads(this.identifier)
   }
 
-  public async savePayload(
-    payload: Models.DecryptedPayloadInterface | Models.DeletedPayloadInterface,
-  ): Promise<void> {
+  public async savePayload(payload: FullyFormedPayloadInterface): Promise<void> {
     return this.savePayloads([payload])
   }
 
@@ -384,73 +382,58 @@ export class SNStorageService
       return
     }
 
-    const categorizePayloads = (
-      payloads: (Models.DecryptedPayloadInterface | Models.DeletedPayloadInterface)[],
-    ) => {
-      const encrypted = this.encryptionPolicy === Services.StorageEncryptionPolicy.Default
+    const { encrypted, decrypted, deleted, discardable } =
+      CreatePayloadSplitWithDiscardables(payloads)
 
-      const plausiblyEncryptable: Models.DecryptedPayloadInterface[] = []
-      const discardables: Models.DeletedPayloadInterface[] = []
-      const unencryptables: Models.DecryptedPayloadInterface[] = []
-      const deleted: Models.DeletedPayloadInterface[] = []
+    const encryptionEnabled = this.encryptionPolicy === Services.StorageEncryptionPolicy.Default
+    const rootKeyEncryptionAvailable = this.encryptionProvider.hasRootKeyEncryptionSource()
 
-      for (const payload of payloads) {
-        if (isDeletedPayload(payload)) {
-          if (payload.discardable) {
-            discardables.push(payload)
-          } else {
-            deleted.push(payload)
-          }
+    const encryptable: DecryptedPayloadInterface[] = []
+    const unencryptable: DecryptedPayloadInterface[] = []
+
+    if (encryptionEnabled) {
+      const split = Encryption.SplitPayloadsByEncryptionType(decrypted)
+
+      if (split.itemsKeyEncryption) {
+        extendArray(encryptable, split.itemsKeyEncryption)
+      }
+
+      if (split.rootKeyEncryption) {
+        if (!rootKeyEncryptionAvailable) {
+          extendArray(unencryptable, split.rootKeyEncryption)
         } else {
-          plausiblyEncryptable.push(payload)
+          extendArray(encryptable, split.rootKeyEncryption)
         }
       }
-
-      const encryptables: Models.DecryptedPayloadInterface[] = []
-      if (encrypted) {
-        const split = Encryption.SplitPayloadsByEncryptionType(plausiblyEncryptable)
-        if (split.itemsKeyEncryption) {
-          extendArray(encryptables, split.itemsKeyEncryption)
-        }
-        if (split.rootKeyEncryption) {
-          if (!this.encryptionProvider.hasRootKeyEncryptionSource()) {
-            extendArray(unencryptables, split.rootKeyEncryption)
-          } else {
-            extendArray(encryptables, split.rootKeyEncryption)
-          }
-        }
-      } else {
-        extendArray(unencryptables, plausiblyEncryptable)
-      }
-
-      return { encryptables, unencryptables, deleted, discardables }
+    } else {
+      extendArray(unencryptable, encryptable)
     }
 
-    const { encryptables, unencryptables, deleted, discardables } = categorizePayloads(payloads)
+    await this.deletePayloads(discardable)
 
-    await this.deletePayloads(discardables)
-
-    const split = Encryption.SplitPayloadsByEncryptionType(encryptables)
+    const split = Encryption.SplitPayloadsByEncryptionType(encryptable)
 
     const keyLookupSplit = Encryption.CreateEncryptionSplitWithKeyLookup(split)
 
-    const encryptedParams = (await this.encryptionProvider.encryptSplit(keyLookupSplit)).map(
+    const encryptedResults = await this.encryptionProvider.encryptSplit(keyLookupSplit)
+
+    const exportedEncrypted = [...encrypted, ...encryptedResults].map(
       createEncryptedLocalStorageContextPayload,
     )
 
-    const decryptedParams = unencryptables.map(createDecryptedLocalStorageContextPayload)
+    const exportedDecrypted = unencryptable.map(createDecryptedLocalStorageContextPayload)
 
-    const deletedParams = deleted.map(createDeletedLocalStorageContextPayload)
+    const exportedDeleted = deleted.map(createDeletedLocalStorageContextPayload)
 
     return this.executeCriticalFunction(async () => {
       return this.deviceInterface?.saveRawDatabasePayloads(
-        [...encryptedParams, ...decryptedParams, ...deletedParams],
+        [...exportedEncrypted, ...exportedDecrypted, ...exportedDeleted],
         this.identifier,
       )
     })
   }
 
-  public async deletePayloads(payloads: Models.DeletedPayloadInterface[]) {
+  public async deletePayloads(payloads: DeletedPayloadInterface[]) {
     await Promise.all(payloads.map((payload) => this.deletePayloadWithId(payload.uuid)))
   }
 
