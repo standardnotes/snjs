@@ -8,10 +8,22 @@ import {
   isDeletedPayload,
   isErrorDecryptingPayload,
 } from '../../Abstract/Payload/Interfaces/TypeCheck'
+import {
+  DecryptedPayloadInterface,
+  DeletedPayloadInterface,
+  ConcretePayload,
+  EncryptedPayloadInterface,
+} from '../../Abstract/Payload'
 
-export class DeltaRemoteRetrieved extends PayloadsDelta {
-  public async resultingCollection(): Promise<ImmutablePayloadCollection> {
-    const filtered: Array<PayloadInterface> = []
+type Return = EncryptedPayloadInterface | DecryptedPayloadInterface | DeletedPayloadInterface
+
+export class DeltaRemoteRetrieved extends PayloadsDelta<
+  ConcretePayload,
+  EncryptedPayloadInterface,
+  Return
+> {
+  public async resultingCollection(): Promise<ImmutablePayloadCollection<Return>> {
+    const filtered: Return[] = []
     const conflicted: Array<PayloadInterface> = []
 
     /**
@@ -27,11 +39,10 @@ export class DeltaRemoteRetrieved extends PayloadsDelta {
       const decrypted = this.findRelatedDecryptedTransientPayload(received.uuid as string)
       if (!decrypted) {
         /** Decrypted should only be missing in case of deleted retrieved item */
-        if (!isDeletedPayload(received)) {
-          console.error('Cannot find decrypted for non-deleted payload.')
-          continue
+        if (isDeletedPayload(received)) {
+          filtered.push(received)
         }
-        filtered.push(received)
+
         continue
       }
 
@@ -54,7 +65,7 @@ export class DeltaRemoteRetrieved extends PayloadsDelta {
      * local values, and if they differ, we create a new payload that is a copy
      * of the server payload.
      */
-    const conflictResults: Array<PayloadInterface> = []
+    const conflictResults: Return[] = []
     for (const conflict of conflicted) {
       const decrypted = this.findRelatedDecryptedTransientPayload(conflict.uuid)
       if (!decrypted) {

@@ -7,15 +7,21 @@ import { PayloadSource } from '../Types/PayloadSource'
 import { PayloadFormat } from '../Types/PayloadFormat'
 import { DecryptedPayloadInterface } from '../Interfaces/DecryptedPayload'
 import { EncryptedPayloadInterface } from '../Interfaces/EncryptedPayload'
+import { ItemContent } from '../../Item'
+import { ConcretePayload } from '../Interfaces/TypeCheck'
 
-export function PayloadsByUpdatingReferencingPayloadReferences(
-  payload: DecryptedPayloadInterface,
-  baseCollection: ImmutablePayloadCollection,
-  add: DecryptedPayloadInterface[] = [],
+export function PayloadsByUpdatingReferencingPayloadReferences<
+  C extends ItemContent = ItemContent,
+  P extends DecryptedPayloadInterface<C> = DecryptedPayloadInterface<C>,
+>(
+  payload: P,
+  baseCollection: ImmutablePayloadCollection<ConcretePayload>,
+  add: P[] = [],
   removeIds: Uuid[] = [],
-): DecryptedPayloadInterface[] {
+): P[] {
   const referencingPayloads = baseCollection.elementsReferencingElement(payload)
-  const results = []
+  const results: P[] = []
+
   for (const referencingPayload of referencingPayloads) {
     const references = referencingPayload.content.references.slice()
     const reference = referencingPayload.getReference(payload.uuid)
@@ -28,9 +34,11 @@ export function PayloadsByUpdatingReferencingPayloadReferences(
       }
       references.push(newReference)
     }
+
     for (const id of removeIds) {
       remove(references, { uuid: id })
     }
+
     const result = referencingPayload.copy({
       dirty: true,
       dirtiedDate: new Date(),
@@ -39,8 +47,10 @@ export function PayloadsByUpdatingReferencingPayloadReferences(
         references,
       },
     })
-    results.push(result)
+
+    results.push(result as P)
   }
+
   return results
 }
 

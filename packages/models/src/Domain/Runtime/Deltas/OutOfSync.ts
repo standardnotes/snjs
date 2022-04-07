@@ -1,14 +1,26 @@
+import {
+  ConcretePayload,
+  DecryptedPayloadInterface,
+  DeletedPayloadInterface,
+  EncryptedPayloadInterface,
+} from '../../Abstract/Payload'
 import { extendArray } from '@standardnotes/utils'
 import { ImmutablePayloadCollection } from '../Collection/Payload/ImmutablePayloadCollection'
-import { PayloadSource } from '../../Abstract/Payload/Types/PayloadSource'
-import { PayloadsDelta } from './Delta'
-import { PayloadsByDuplicating } from '../../Abstract/Payload/Utilities/PayloadsByDuplicating'
-import { PayloadContentsEqual } from '../../Abstract/Payload/Utilities/PayloadContentsEqual'
 import { isDecryptedPayload } from '../../Abstract/Payload/Interfaces/TypeCheck'
+import { PayloadContentsEqual } from '../../Abstract/Payload/Utilities/PayloadContentsEqual'
+import { PayloadsByDuplicating } from '../../Abstract/Payload/Utilities/PayloadsByDuplicating'
+import { PayloadsDelta } from './Delta'
+import { PayloadSource } from '../../Abstract/Payload/Types/PayloadSource'
 
-export class DeltaOutOfSync extends PayloadsDelta {
-  public async resultingCollection(): Promise<ImmutablePayloadCollection> {
-    const results = []
+type Return = EncryptedPayloadInterface | DecryptedPayloadInterface | DeletedPayloadInterface
+
+export class DeltaOutOfSync extends PayloadsDelta<
+  ConcretePayload,
+  EncryptedPayloadInterface,
+  Return
+> {
+  public async resultingCollection(): Promise<ImmutablePayloadCollection<Return>> {
+    const results: Return[] = []
 
     for (const payload of this.applyCollection.all()) {
       /**

@@ -4,26 +4,21 @@ import { PayloadSource } from '../../Abstract/Payload/Types/PayloadSource'
 import { ConflictDelta } from './Conflict'
 import { PayloadsDelta } from './Delta'
 import { DecryptedPayloadInterface } from '../../Abstract/Payload/Interfaces/DecryptedPayload'
-import { ImmutablePayloadCollectionSet } from '../Collection/Payload/ImmutablePayloadCollectionSet'
-import { HistoryMap } from '../History'
 import {
+  ConcretePayload,
   DeletedPayloadInterface,
   isDecryptedPayload,
-  PayloadInterface,
 } from '../../Abstract/Payload'
 
-export class DeltaFileImport extends PayloadsDelta {
-  constructor(
-    protected readonly baseCollection: ImmutablePayloadCollection<PayloadInterface>,
-    protected readonly applyCollection: ImmutablePayloadCollection<DecryptedPayloadInterface>,
-    protected readonly relatedCollectionSet?: ImmutablePayloadCollectionSet,
-    protected readonly historyMap?: HistoryMap,
-  ) {
-    super(baseCollection, applyCollection, relatedCollectionSet, historyMap)
-  }
+type Return = DecryptedPayloadInterface
 
-  public async resultingCollection() {
-    const results: Array<DecryptedPayloadInterface> = []
+export class DeltaFileImport extends PayloadsDelta<
+  ConcretePayload,
+  DecryptedPayloadInterface,
+  Return
+> {
+  public async resultingCollection(): Promise<ImmutablePayloadCollection<Return>> {
+    const results: Return[] = []
 
     for (const payload of this.applyCollection.all()) {
       const handled = await this.payloadsByHandlingPayload(payload, results)
@@ -41,19 +36,21 @@ export class DeltaFileImport extends PayloadsDelta {
 
   private async payloadsByHandlingPayload(
     payload: DecryptedPayloadInterface | DeletedPayloadInterface,
-    currentResults: Array<DecryptedPayloadInterface>,
+    currentResults: Return[],
   ) {
     /**
      * Check to see if we've already processed a payload for this id.
      * If so, that would be the latest value, and not what's in the base collection.
      */
+
     /*
      * Find the most recently created conflict if available, as that
      * would contain the most recent value.
      */
     let current = currentResults.find((candidate) => {
-      return candidate.content.conflict_of === payload.uuid
+      return isDecryptedPayload(candidate) && candidate.content.conflict_of === payload.uuid
     })
+
     /**
      * If no latest conflict, find by uuid directly.
      */
@@ -62,6 +59,7 @@ export class DeltaFileImport extends PayloadsDelta {
         return candidate.uuid === payload.uuid
       })
     }
+
     /**
      * If not found in current results, use the base value.
      */
@@ -71,6 +69,7 @@ export class DeltaFileImport extends PayloadsDelta {
         current = baseCurrent
       }
     }
+
     /**
      * If the current doesn't exist, we're creating a new item from payload.
      */

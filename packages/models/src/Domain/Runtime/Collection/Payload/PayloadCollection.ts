@@ -3,7 +3,6 @@ import { CollectionInterface } from '../CollectionInterface'
 import { DecryptedPayloadInterface } from '../../../Abstract/Payload/Interfaces/DecryptedPayload'
 import { isString, UuidMap } from '@standardnotes/utils'
 import { ContentType, Uuid } from '@standardnotes/common'
-import { PayloadInterface } from '../../../Abstract/Payload/Interfaces/PayloadInterface'
 import { IntegrityPayload } from '../../../Abstract/Payload/IntegrityPayload'
 import {
   isDecryptedPayload,
@@ -12,7 +11,7 @@ import {
 } from '../../../Abstract/Payload/Interfaces/TypeCheck'
 import { ItemContent } from '../../../Abstract/Item'
 import { Collection } from '../Collection'
-import { DeletedPayloadInterface } from '../../../Abstract/Payload'
+import { DeletedPayloadInterface, PayloadInterface } from '../../../Abstract/Payload'
 
 export class PayloadCollection<
     P extends PayloadInterface = PayloadInterface,
@@ -115,10 +114,7 @@ export class PayloadCollection<
     }
 
     for (const element of elements) {
-      if (
-        isErrorDecryptingPayload(element) &&
-        (element.errorDecrypting || element.waitingForKey)
-      ) {
+      if (isErrorDecryptingPayload(element) && (element.errorDecrypting || element.waitingForKey)) {
         this.invalidsIndex.add(element.uuid)
       } else {
         this.invalidsIndex.delete(element.uuid)

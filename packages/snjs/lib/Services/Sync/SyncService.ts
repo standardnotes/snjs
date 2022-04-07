@@ -22,7 +22,7 @@ import { SyncClientInterface } from './SyncClientInterface'
 import { SyncMode, SyncOptions, SyncPromise, SyncQueueStrategy } from './Types'
 import { SyncOpStatus } from '@Lib/Services/Sync/SyncOpStatus'
 import { ServerSyncResponse } from '@Lib/Services/Sync/Account/Response'
-import { SyncResponseResolver } from '@Lib/Services/Sync/Account/ResponseResolver'
+import { ServerSyncResponseResolver } from '@Lib/Services/Sync/Account/ResponseResolver'
 import { SyncSignal, SyncStats } from '@Lib/Services/Sync/Signals'
 import { UuidString } from '../../Types/UuidString'
 import * as Encryption from '@standardnotes/encryption'
@@ -1013,7 +1013,7 @@ export class SNSyncService
 
     const masterCollection = this.payloadManager.getMasterCollection()
     const historyMap = this.historyService.getHistoryMapCopy()
-    const resolver = new SyncResponseResolver(
+    const resolver = new ServerSyncResponseResolver(
       response,
       decryptedPayloads,
       masterCollection,

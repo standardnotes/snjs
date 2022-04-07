@@ -1,7 +1,6 @@
 import { ContentType } from '@standardnotes/common'
 import { UuidMap } from '@standardnotes/utils'
-import { DeletedPayloadInterface } from '../../../Abstract/Payload'
-import { PayloadInterface } from '../../../Abstract/Payload/Interfaces/PayloadInterface'
+import { DeletedPayloadInterface, PayloadInterface } from '../../../Abstract/Payload'
 import { PayloadSource } from '../../../Abstract/Payload/Types/PayloadSource'
 import { PayloadCollection } from './PayloadCollection'
 
@@ -36,6 +35,7 @@ export class ImmutablePayloadCollection<
     const typedMapCopy = Object.freeze(Object.assign({}, collection.typedMap))
     const referenceMapCopy = Object.freeze(collection.referenceMap.makeCopy()) as UuidMap
     const conflictMapCopy = Object.freeze(collection.conflictMap.makeCopy()) as UuidMap
+
     const result = new ImmutablePayloadCollection(
       true,
       mapCopy,
@@ -43,7 +43,9 @@ export class ImmutablePayloadCollection<
       referenceMapCopy,
       conflictMapCopy,
     )
+
     Object.freeze(result)
+
     return result
   }
 

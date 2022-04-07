@@ -1,14 +1,25 @@
-import { PayloadInterface } from './../../Abstract/Payload/Interfaces/PayloadInterface'
 import { extendArray, filterFromArray, Uuids } from '@standardnotes/utils'
 import { ImmutablePayloadCollection } from '../Collection/Payload/ImmutablePayloadCollection'
-import { PayloadsByAlternatingUuid } from "../../Abstract/Payload/Utilities/PayloadsByAlternatingUuid"
+import { PayloadsByAlternatingUuid } from '../../Abstract/Payload/Utilities/PayloadsByAlternatingUuid'
 import { PayloadSource } from '../../Abstract/Payload/Types/PayloadSource'
 import { ConflictDelta } from './Conflict'
 import { PayloadsDelta } from './Delta'
 import { isDecryptedPayload, isDeletedPayload } from '../../Abstract/Payload/Interfaces/TypeCheck'
+import {
+  DecryptedPayloadInterface,
+  ConcretePayload,
+  DeletedPayloadInterface,
+  EncryptedPayloadInterface,
+} from '../../Abstract/Payload'
 
-export class DeltaRemoteConflicts extends PayloadsDelta {
-  public async resultingCollection(): Promise<ImmutablePayloadCollection> {
+type Result = EncryptedPayloadInterface | DecryptedPayloadInterface | DeletedPayloadInterface
+
+export class DeltaRemoteConflicts extends PayloadsDelta<
+  ConcretePayload,
+  EncryptedPayloadInterface,
+  Result
+> {
+  public async resultingCollection(): Promise<ImmutablePayloadCollection<Result>> {
     if (this.applyCollection.source === PayloadSource.ConflictUuid) {
       return this.collectionsByHandlingUuidConflicts()
     } else if (this.applyCollection.source === PayloadSource.ConflictData) {
@@ -18,8 +29,8 @@ export class DeltaRemoteConflicts extends PayloadsDelta {
     }
   }
 
-  private async collectionsByHandlingDataConflicts() {
-    const results = []
+  private async collectionsByHandlingDataConflicts(): Promise<ImmutablePayloadCollection<Result>> {
+    const results: Result[] = []
     for (const payload of this.applyCollection.all()) {
       const current = this.findBasePayload(payload.uuid)
 
@@ -47,6 +58,7 @@ export class DeltaRemoteConflicts extends PayloadsDelta {
       const payloads = deltaCollection.all()
       extendArray(results, payloads)
     }
+
     return ImmutablePayloadCollection.WithPayloads(results, PayloadSource.RemoteRetrieved)
   }
 
@@ -55,9 +67,10 @@ export class DeltaRemoteConflicts extends PayloadsDelta {
    * backup with uuids from the old account into a new account.
    * In uuid_conflict, we receive the value we attmpted to save.
    */
-  private async collectionsByHandlingUuidConflicts() {
-    const results: Array<PayloadInterface> = []
-    const collection = this.baseCollection.mutableCopy()
+  private async collectionsByHandlingUuidConflicts(): Promise<ImmutablePayloadCollection<Result>> {
+    const results: Result[] = []
+    const baseCollectionCopy = this.baseCollection.mutableCopy()
+
     for (const payload of this.applyCollection.all()) {
       /**
        * The payload in question may have been modified as part of alternating a uuid for
@@ -67,16 +80,21 @@ export class DeltaRemoteConflicts extends PayloadsDelta {
        */
       const moreRecent = results.find((r) => r.uuid === payload.uuid)
       const decrypted = moreRecent || this.findRelatedDecryptedTransientPayload(payload.uuid)
+
       if (!decrypted || !isDecryptedPayload(decrypted)) {
         console.error('Unable to find decrypted counterpart for payload', payload)
         continue
       }
+
       const alternateResults = await PayloadsByAlternatingUuid(
         decrypted,
-        ImmutablePayloadCollection.FromCollection(collection),
+        ImmutablePayloadCollection.FromCollection(baseCollectionCopy),
       )
-      collection.set(alternateResults)
+
+      baseCollectionCopy.set(alternateResults)
+
       filterFromArray(results, (r) => Uuids(alternateResults).includes(r.uuid))
+
       extendArray(results, alternateResults)
     }
 

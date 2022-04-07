@@ -10,7 +10,12 @@ import {
   ItemsServerInterface,
   StorageKey,
 } from '@standardnotes/services'
-import { EncryptedPayloadInterface, IntegrityPayload, SNFeatureRepo } from '@standardnotes/models'
+import {
+  DeletedTransferPayload,
+  EncryptedTransferPayload,
+  IntegrityPayload,
+  SNFeatureRepo,
+} from '@standardnotes/models'
 import * as Responses from '@standardnotes/responses'
 import { API_MESSAGE_FAILED_OFFLINE_ACTIVATION } from '@Lib/Services/Api/Messages'
 import { EncryptedFileInterface } from '../Files/Types'
@@ -21,7 +26,6 @@ import { Paths } from './Paths'
 import { Session } from '../Session/Sessions/Session'
 import { TokenSession } from '../Session/Sessions/TokenSession'
 import { SNStorageService } from '../Storage/StorageService'
-
 import { UserServerInterface } from '../User/UserServerInterface'
 import { UuidString } from '../../Types/UuidString'
 import * as messages from '@Lib/Services/Api/Messages'
@@ -371,7 +375,7 @@ export class SNApiService
   }
 
   async sync(
-    payloads: EncryptedPayloadInterface[],
+    payloads: (EncryptedTransferPayload | DeletedTransferPayload)[],
     lastSyncToken: string,
     paginationToken: string,
     limit: number,
@@ -382,7 +386,7 @@ export class SNApiService
     }
     const url = joinPaths(this.host, Paths.v1.sync)
     const params = this.params({
-      [ApiEndpointParam.SyncPayloads]: payloads.map((p) => p.ejected()),
+      [ApiEndpointParam.SyncPayloads]: payloads,
       [ApiEndpointParam.LastSyncToken]: lastSyncToken,
       [ApiEndpointParam.PaginationToken]: paginationToken,
       [ApiEndpointParam.SyncDlLimit]: limit,

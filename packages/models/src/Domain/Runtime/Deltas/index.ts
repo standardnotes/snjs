@@ -1,7 +1,6 @@
 export * from './Conflict'
 export * from './Delta'
 export * from './FileImport'
-export * from './Generator'
 export * from './OutOfSync'
 export * from './RemoteConflicts'
 export * from './RemoteRetrieved'

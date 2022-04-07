@@ -14,14 +14,14 @@
     "noImplicitThis": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
+    "noImplicitOverride": true,
     "outDir": "../dist/@types",
     "strict": true,
     "strictNullChecks": true,
     "target": "esnext",
     "paths": {
       "@Lib/*": ["*"],
-      "@Services/*": ["Services/*"],
-      "@Payloads/*": ["Protocol/payloads/*"]
+      "@Services/*": ["Services/*"]
     }
   },
   "exclude": ["../package.json"]

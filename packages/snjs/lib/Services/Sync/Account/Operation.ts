@@ -1,4 +1,4 @@
-import { PurePayload } from '@standardnotes/models'
+import { DeletedPayloadInterface, EncryptedPayloadInterface } from '@standardnotes/models'
 import { arrayByDifference, subtractFromArray } from '@standardnotes/utils'
 import { ServerSyncResponse } from '@Lib/Services/Sync/Account/Response'
 import { ResponseSignalReceiver, SyncSignal } from '@Lib/Services/Sync/Signals'
@@ -14,7 +14,7 @@ export const SyncUpDownLimit = 150
 export class AccountSyncOperation {
   public id = Math.random()
 
-  private pendingPayloads: PurePayload[]
+  private pendingPayloads: (EncryptedPayloadInterface | DeletedPayloadInterface)[]
   private responses: ServerSyncResponse[] = []
 
   /**
@@ -22,8 +22,8 @@ export class AccountSyncOperation {
    * @param receiver   A function that receives callback multiple times during the operation
    */
   constructor(
-    private payloads: PurePayload[],
-    private receiver: ResponseSignalReceiver,
+    private payloads: (EncryptedPayloadInterface | DeletedPayloadInterface)[],
+    private receiver: ResponseSignalReceiver<ServerSyncResponse>,
     private lastSyncToken: string,
     private paginationToken: string,
     private apiService: SNApiService,
@@ -55,17 +55,19 @@ export class AccountSyncOperation {
       totalUploadCount: this.totalUploadCount,
     })
     const payloads = this.popPayloads(this.upLimit)
+
     const rawResponse = (await this.apiService.sync(
-      payloads,
+      payloads.map((p) => p.ejected()),
       this.lastSyncToken,
       this.paginationToken,
       this.downLimit,
     )) as RawSyncResponse
-    const response = new ServerSyncResponse(rawResponse)
 
+    const response = new ServerSyncResponse(rawResponse)
     this.responses.push(response)
-    this.lastSyncToken = response.lastSyncToken!
-    this.paginationToken = response.paginationToken!
+
+    this.lastSyncToken = response.lastSyncToken as string
+    this.paginationToken = response.paginationToken as string
 
     try {
       await this.receiver(SyncSignal.Response, response)

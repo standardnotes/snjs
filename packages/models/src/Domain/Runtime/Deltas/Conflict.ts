@@ -23,10 +23,7 @@ export class ConflictDelta {
 
   public async resultingCollection(): Promise<ImmutablePayloadCollection> {
     let strategy: ConflictStrategy | undefined = undefined
-    if (
-      isErrorDecryptingPayload(this.basePayload) ||
-      isErrorDecryptingPayload(this.applyPayload)
-    ) {
+    if (isErrorDecryptingPayload(this.basePayload) || isErrorDecryptingPayload(this.applyPayload)) {
       strategy = ConflictStrategy.KeepLeftDuplicateRight
     } else if (isDecryptedPayload(this.basePayload) && isDecryptedPayload(this.applyPayload)) {
       /**

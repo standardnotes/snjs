@@ -6,15 +6,19 @@ import { isDeletedPayload } from '../../Abstract/Payload/Interfaces/TypeCheck'
 import {
   ContentlessPayloadInterface,
   DeletedPayloadInterface,
-  PayloadInterface,
+  ConcretePayload,
 } from '../../Abstract/Payload'
 
+type Return = ContentlessPayloadInterface | DeletedPayloadInterface
+
 export class DeltaRemoteSaved extends PayloadsDelta<
-  PayloadInterface,
-  ContentlessPayloadInterface | DeletedPayloadInterface
+  ConcretePayload,
+  ContentlessPayloadInterface,
+  Return
 > {
-  public async resultingCollection() {
-    const processed = []
+  public async resultingCollection(): Promise<ImmutablePayloadCollection<Return>> {
+    const processed: Return[] = []
+
     for (const payload of this.applyCollection.all()) {
       const current = this.findBasePayload(payload.uuid)
 
@@ -24,7 +28,7 @@ export class DeltaRemoteSaved extends PayloadsDelta<
        */
       const deletedState = current ? isDeletedPayload(current) : isDeletedPayload(payload)
       if (deletedState) {
-        const result = new DeletedPayload(
+        const result: DeletedPayloadInterface = new DeletedPayload(
           {
             ...payload.ejected(),
             deleted: true,

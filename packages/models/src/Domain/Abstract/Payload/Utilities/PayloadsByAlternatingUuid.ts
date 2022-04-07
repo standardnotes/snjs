@@ -2,11 +2,11 @@ import { DeletedPayload } from './../Implementations/DeletedPayload'
 import { ContentType } from '@standardnotes/common'
 import { extendArray, UuidGenerator } from '@standardnotes/utils'
 import { ImmutablePayloadCollection } from '../../../Runtime/Collection/Payload/ImmutablePayloadCollection'
-import { PayloadInterface } from '../Interfaces/PayloadInterface'
 import { DecryptedPayloadInterface } from '../Interfaces/DecryptedPayload'
-import { isEncryptedPayload } from '../Interfaces/TypeCheck'
+import { ConcretePayload, isEncryptedPayload } from '../Interfaces/TypeCheck'
 import { EncryptedPayloadInterface } from '../Interfaces/EncryptedPayload'
 import { PayloadsByUpdatingReferencingPayloadReferences } from './Functions'
+import { DeletedPayloadInterface } from '../Interfaces/DeletedPayload'
 
 /**
  * Return the payloads that result if you alternated the uuid for the payload.
@@ -15,11 +15,17 @@ import { PayloadsByUpdatingReferencingPayloadReferences } from './Functions'
  * @returns An array of payloads that have changed as a result of copying.
  */
 
-export async function PayloadsByAlternatingUuid(
-  payload: DecryptedPayloadInterface,
-  baseCollection: ImmutablePayloadCollection,
-): Promise<PayloadInterface[]> {
-  const results: PayloadInterface[] = []
+export async function PayloadsByAlternatingUuid<
+  P extends DecryptedPayloadInterface = DecryptedPayloadInterface,
+>(
+  payload: P,
+  baseCollection: ImmutablePayloadCollection<ConcretePayload>,
+): Promise<(DecryptedPayloadInterface | DeletedPayloadInterface | EncryptedPayloadInterface)[]> {
+  const results: (
+    | DecryptedPayloadInterface
+    | DeletedPayloadInterface
+    | EncryptedPayloadInterface
+  )[] = []
   /**
    * We need to clone payload and give it a new uuid,
    * then delete item with old uuid from db (cannot modify uuids in our IndexedDB setup)
