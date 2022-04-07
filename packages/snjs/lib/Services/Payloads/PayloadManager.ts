@@ -5,8 +5,6 @@ import {
   OverwriteProtectedTypes,
   PayloadsChangeObserverCallback,
   EmitQueue,
-  EmitInPayloads,
-  EmitOutPayloads,
 } from './Types'
 import { removeFromArray, Uuids } from '@standardnotes/utils'
 import {
@@ -23,6 +21,7 @@ import {
   PayloadCollection,
   MergePayloads,
   DeletedPayload,
+  FullyFormedPayloadInterface,
 } from '@standardnotes/models'
 import * as Services from '@standardnotes/services'
 
@@ -41,10 +40,10 @@ export class PayloadManager
   implements Services.PayloadManagerInterface
 {
   private changeObservers: PayloadsChangeObserver[] = []
-  public collection: PayloadCollection<EmitOutPayloads>
+  public collection: PayloadCollection<FullyFormedPayloadInterface>
   private emitQueue: EmitQueue = []
 
-  constructor(protected internalEventBus: Services.InternalEventBusInterface) {
+  constructor(protected override internalEventBus: Services.InternalEventBusInterface) {
     super(internalEventBus)
     this.collection = new PayloadCollection()
   }
@@ -58,7 +57,7 @@ export class PayloadManager
     return ImmutablePayloadCollection.FromCollection(this.collection)
   }
 
-  public deinit() {
+  public override deinit() {
     super.deinit()
     this.changeObservers.length = 0
     this.resetState()
@@ -76,7 +75,10 @@ export class PayloadManager
    * One of many mapping helpers available.
    * This function maps a collection of payloads.
    */
-  public async emitCollection(collection: ImmutablePayloadCollection, sourceKey?: string) {
+  public async emitCollection(
+    collection: ImmutablePayloadCollection<FullyFormedPayloadInterface>,
+    sourceKey?: string,
+  ) {
     return this.emitPayloads(collection.all(), collection.source!, sourceKey)
   }
 
@@ -101,7 +103,7 @@ export class PayloadManager
    * @returns every paylod altered as a result of this operation, to be
    * saved to storage by the caller
    */
-  public async emitPayload<P extends EmitInPayloads = EmitInPayloads>(
+  public async emitPayload<P extends FullyFormedPayloadInterface = FullyFormedPayloadInterface>(
     payload: P,
     source: PayloadSource = PayloadSource.LocalChanged,
     sourceKey?: string,
@@ -115,7 +117,7 @@ export class PayloadManager
    * @returns every paylod altered as a result of this operation, to be
    * saved to storage by the caller
    */
-  public async emitPayloads<P extends EmitInPayloads = EmitInPayloads>(
+  public async emitPayloads<P extends FullyFormedPayloadInterface = FullyFormedPayloadInterface>(
     payloads: P[],
     source: PayloadSource = PayloadSource.LocalChanged,
     sourceKey?: string,
@@ -148,16 +150,16 @@ export class PayloadManager
 
     removeFromArray(this.emitQueue, first)
 
-    first.resolve(changed.concat(inserted, discarded))
+    first.resolve([...changed, ...inserted, ...discarded])
 
     if (this.emitQueue.length > 0) {
       void this.popQueue()
     }
   }
 
-  private mergePayloadsOntoMaster(payloads: EmitInPayloads[]) {
-    const changed: EmitOutPayloads[] = []
-    const inserted: EmitOutPayloads[] = []
+  private mergePayloadsOntoMaster(payloads: FullyFormedPayloadInterface[]) {
+    const changed: FullyFormedPayloadInterface[] = []
+    const inserted: FullyFormedPayloadInterface[] = []
     const discarded: DeletedPayloadInterface[] = []
     const ignored: EncryptedPayloadInterface[] = []
 
@@ -181,7 +183,7 @@ export class PayloadManager
 
       const newPayload = masterPayload
         ? MergePayloads(masterPayload, payload)
-        : (payload as EmitOutPayloads)
+        : (payload as FullyFormedPayloadInterface)
       if (isDeletedPayload(newPayload) && newPayload.discardable) {
         /** The item has been deleted and synced,
          * and can thus be removed from our local record */
@@ -229,8 +231,8 @@ export class PayloadManager
    * explicitely understand what they are doing (want to propagate model state without mapping)
    */
   public notifyChangeObservers(
-    changed: EmitOutPayloads[],
-    inserted: EmitOutPayloads[],
+    changed: FullyFormedPayloadInterface[],
+    inserted: FullyFormedPayloadInterface[],
     discarded: DeletedPayloadInterface[],
     ignored: EncryptedPayloadInterface[],
     source: PayloadSource,
@@ -241,7 +243,7 @@ export class PayloadManager
       return a.priority < b.priority ? -1 : 1
     })
 
-    const filter = <P extends EmitOutPayloads = EmitOutPayloads>(
+    const filter = <P extends FullyFormedPayloadInterface = FullyFormedPayloadInterface>(
       payloads: P[],
       types: ContentType[],
     ) => {
@@ -280,7 +282,7 @@ export class PayloadManager
     return Uuids(collection.payloads)
   }
 
-  public removePayloadLocally(payload: EmitOutPayloads) {
+  public removePayloadLocally(payload: FullyFormedPayloadInterface) {
     this.collection.discard(payload)
   }
 

@@ -1,10 +1,10 @@
 import { CreatePayload } from './CreatePayload'
 import { DecryptedPayloadInterface } from '../Interfaces/DecryptedPayload'
 import { ItemContent } from '../../Item'
-import { ConcreteTransferPayload, DecryptedTransferPayload } from '../../TransferPayload'
-import { ConcretePayload } from '../Interfaces/TypeCheck'
+import { DecryptedTransferPayload, AnyTransferPayload } from '../../TransferPayload'
+import { AnyPayloadInterface } from '../Interfaces/UnionTypes'
 
-export function CopyPayload<T extends ConcreteTransferPayload, P extends ConcretePayload>(
+export function CopyPayload<T extends AnyTransferPayload, P extends AnyPayloadInterface>(
   payload: P,
   override?: Partial<T>,
   source = payload.source,

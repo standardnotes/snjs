@@ -487,7 +487,10 @@ export class SNKeyRecoveryService extends AbstractService {
     const decryptedMatching = matchingResults.filter(isDecryptedPayload)
 
     const allRelevantKeyPayloads = [...additionalKeys, ...decryptedMatching]
-    void this.payloadManager.emitPayloads(allRelevantKeyPayloads, PayloadSource.DecryptedTransient)
+    void this.payloadManager.emitPayloads(
+      allRelevantKeyPayloads,
+      PayloadSource.PossiblyDecryptedSyncPostProcessed,
+    )
 
     await this.storageService.savePayloads(allRelevantKeyPayloads)
 

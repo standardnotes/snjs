@@ -1,5 +1,5 @@
 import {
-  ConcretePayload,
+  FullyFormedPayloadInterface,
   DecryptedPayloadInterface,
   DeletedPayloadInterface,
   EncryptedPayloadInterface,
@@ -15,9 +15,9 @@ import { PayloadSource } from '../../Abstract/Payload/Types/PayloadSource'
 type Return = EncryptedPayloadInterface | DecryptedPayloadInterface | DeletedPayloadInterface
 
 export class DeltaOutOfSync extends PayloadsDelta<
-  ConcretePayload,
-  EncryptedPayloadInterface,
-  Return
+  FullyFormedPayloadInterface,
+  EncryptedPayloadInterface | DecryptedPayloadInterface | DeletedPayloadInterface,
+  EncryptedPayloadInterface | DecryptedPayloadInterface | DeletedPayloadInterface
 > {
   public async resultingCollection(): Promise<ImmutablePayloadCollection<Return>> {
     const results: Return[] = []

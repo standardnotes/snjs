@@ -27,7 +27,7 @@ export enum PayloadSource {
    of consumers who can only work with decrypted formats. The
    decrypted payloads exist in transient, ephemeral space, and
    are not used in anyway. */
-  DecryptedTransient = 13,
+  PossiblyDecryptedSyncPostProcessed = 13,
   ConflictUuid = 14,
   ConflictData = 15,
   SessionHistory = 16,

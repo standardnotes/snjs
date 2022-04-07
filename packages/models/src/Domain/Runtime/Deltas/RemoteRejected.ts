@@ -2,28 +2,29 @@ import { ImmutablePayloadCollection } from '../Collection/Payload/ImmutablePaylo
 import { PayloadSource } from '../../Abstract/Payload/Types/PayloadSource'
 import { PayloadsDelta } from './Delta'
 import {
-  ConcretePayload,
-  DecryptedPayloadInterface,
+  FullyFormedPayloadInterface,
+  DeletedPayloadInterface,
   EncryptedPayloadInterface,
 } from '../../Abstract/Payload'
 
-type Result = DecryptedPayloadInterface
+type Return = FullyFormedPayloadInterface
 
 export class DeltaRemoteRejected extends PayloadsDelta<
-  ConcretePayload,
-  EncryptedPayloadInterface,
-  Result
+  FullyFormedPayloadInterface,
+  EncryptedPayloadInterface | DeletedPayloadInterface,
+  FullyFormedPayloadInterface
 > {
-  public async resultingCollection(): Promise<ImmutablePayloadCollection<Result>> {
-    const results: Result[] = []
+  public async resultingCollection(): Promise<ImmutablePayloadCollection<Return>> {
+    const results: Return[] = []
 
-    for (const payload of this.applyCollection.all()) {
-      const decrypted = this.findRelatedDecryptedTransientPayload(payload.uuid)
-      if (!decrypted) {
-        throw 'Unable to find decrypted counterpart for rejected payload.'
+    for (const apply of this.applyCollection.all()) {
+      const postProcessedCounterpart = this.findRelatedPostProcessedPayload(apply.uuid)
+
+      if (!postProcessedCounterpart) {
+        throw 'Unable to find postprocessed counterpart for rejected payload.'
       }
 
-      const result = decrypted.copy(
+      const result = postProcessedCounterpart.copy(
         {
           lastSyncEnd: new Date(),
           dirty: false,

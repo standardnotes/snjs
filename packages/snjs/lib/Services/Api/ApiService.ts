@@ -11,9 +11,8 @@ import {
   StorageKey,
 } from '@standardnotes/services'
 import {
-  DeletedTransferPayload,
-  EncryptedTransferPayload,
   IntegrityPayload,
+  ServerSyncPushContextualPayload,
   SNFeatureRepo,
 } from '@standardnotes/models'
 import * as Responses from '@standardnotes/responses'
@@ -75,13 +74,12 @@ export class SNApiService
     private httpService: SNHttpService,
     private storageService: SNStorageService,
     private host: string,
-    protected internalEventBus: InternalEventBusInterface,
+    protected override internalEventBus: InternalEventBusInterface,
   ) {
     super(internalEventBus)
   }
 
-  /** @override */
-  deinit(): void {
+  override deinit(): void {
     ;(this.httpService as unknown) = undefined
     ;(this.storageService as unknown) = undefined
     this.invalidSessionObserver = undefined
@@ -375,7 +373,7 @@ export class SNApiService
   }
 
   async sync(
-    payloads: (EncryptedTransferPayload | DeletedTransferPayload)[],
+    payloads: ServerSyncPushContextualPayload[],
     lastSyncToken: string,
     paginationToken: string,
     limit: number,

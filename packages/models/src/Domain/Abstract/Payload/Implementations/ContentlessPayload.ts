@@ -9,13 +9,17 @@ export class ContentlessPayload
   implements ContentlessPayloadInterface
 {
   readonly format: PayloadFormat.Deleted = PayloadFormat.Deleted
+  readonly deleted?: boolean
 
   constructor(rawPayload: ContentlessTransferPayload, source = PayloadSource.Constructor) {
     super(rawPayload, source)
+    this.deleted = rawPayload.deleted
   }
 
   ejected(): ContentlessTransferPayload {
-    const values = {}
+    const values = {
+      deleted: this.deleted,
+    }
 
     return {
       ...super.ejected(),

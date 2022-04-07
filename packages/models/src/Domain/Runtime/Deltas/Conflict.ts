@@ -6,7 +6,7 @@ import { ConflictStrategy } from '../../Abstract/Item/Types/ConflictStrategy'
 import { PayloadsByDuplicating } from '../../Abstract/Payload/Utilities/PayloadsByDuplicating'
 import { PayloadContentsEqual } from '../../Abstract/Payload/Utilities/PayloadContentsEqual'
 import { PayloadSource } from '../../Abstract/Payload/Types/PayloadSource'
-import { PayloadInterface } from '../../Abstract/Payload'
+import { PayloadInterface, FullyFormedPayloadInterface } from '../../Abstract/Payload'
 import {
   isDecryptedPayload,
   isErrorDecryptingPayload,
@@ -14,7 +14,7 @@ import {
 
 export class ConflictDelta {
   constructor(
-    protected readonly baseCollection: ImmutablePayloadCollection,
+    protected readonly baseCollection: ImmutablePayloadCollection<FullyFormedPayloadInterface>,
     protected readonly basePayload: PayloadInterface,
     protected readonly applyPayload: PayloadInterface,
     protected readonly source: PayloadSource,

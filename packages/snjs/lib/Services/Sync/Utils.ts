@@ -1,5 +1,5 @@
 import { ContentType } from '@standardnotes/common'
-import { ConcretePayload } from '@standardnotes/models'
+import { FullyFormedPayloadInterface } from '@standardnotes/models'
 
 /**
  * Sorts payloads according by most recently modified first, according to the priority,
@@ -7,9 +7,9 @@ import { ConcretePayload } from '@standardnotes/models'
  * the earlier it will appear in the resulting sorted array.
  */
 export function SortPayloadsByRecentAndContentPriority(
-  payloads: ConcretePayload[],
+  payloads: FullyFormedPayloadInterface[],
   priorityList: ContentType[],
-): ConcretePayload[] {
+): FullyFormedPayloadInterface[] {
   return payloads.sort((a, b) => {
     const dateResult = new Date(b.serverUpdatedAt).getTime() - new Date(a.serverUpdatedAt).getTime()
 

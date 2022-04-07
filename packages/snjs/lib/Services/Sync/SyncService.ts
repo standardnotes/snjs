@@ -7,7 +7,6 @@ import {
   removeFromIndex,
   sleep,
   subtractFromArray,
-  Uuids,
 } from '@standardnotes/utils'
 import { ItemManager } from '@Lib/Services/Items/ItemManager'
 import { OfflineSyncOperation } from '@Lib/Services/Sync/Offline/Operation'
@@ -27,22 +26,19 @@ import { SyncSignal, SyncStats } from '@Lib/Services/Sync/Signals'
 import { UuidString } from '../../Types/UuidString'
 import * as Encryption from '@standardnotes/encryption'
 import {
-  PurePayload,
   PayloadSource,
-  MutationType,
   CreateDecryptedItemFromPayload,
   filterDisallowedRemotePayloads,
-  PayloadInterface,
   DeltaOutOfSync,
   ImmutablePayloadCollection,
   CreatePayload,
-  ConcreteTransferPayload,
+  FullyFormedTransferPayload,
   isEncryptedPayload,
   isDecryptedPayload,
   EncryptedPayloadInterface,
   DecryptedPayloadInterface,
   ItemsKeyContent,
-  ConcretePayload,
+  FullyFormedPayloadInterface,
   DeletedPayloadInterface,
   DecryptedPayload,
   CreateEncryptedServerSyncPushPayload,
@@ -52,8 +48,15 @@ import {
   DecryptedItemInterface,
   CreatePayloadSplit,
   CreateDeletedServerSyncPushPayload,
+  ItemsKeyInterface,
+  CreateNonDecryptedPayloadSplit,
+  AnyNonDecryptedPayloadInterface,
+  DeltaOfflineSaved,
 } from '@standardnotes/models'
 import * as Services from '@standardnotes/services'
+import { OfflineSyncResponse } from './Offline/Response'
+import { isItemsKey, SplitPayloadsByEncryptionType } from '@standardnotes/encryption'
+import { CreatePayloadFromRawServerItem } from './Account/Utilities'
 
 const DEFAULT_MAJOR_CHANGE_THRESHOLD = 15
 const INVALID_SESSION_RESPONSE_STATUS = 401
@@ -70,7 +73,7 @@ const INVALID_SESSION_RESPONSE_STATUS = 401
 export class SNSyncService
   extends Services.AbstractService<
     Services.SyncEvent,
-    ServerSyncResponse | { source: Services.SyncSource }
+    ServerSyncResponse | OfflineSyncResponse | { source: Services.SyncSource }
   >
   implements Services.InternalEventHandlerInterface, SyncClientInterface
 {
@@ -116,7 +119,7 @@ export class SNSyncService
     private apiService: SNApiService,
     private historyService: SNHistoryManager,
     private readonly options: ApplicationSyncOptions,
-    protected internalEventBus: Services.InternalEventBusInterface,
+    protected override internalEventBus: Services.InternalEventBusInterface,
   ) {
     super(internalEventBus)
     this.opStatus = this.initializeStatus()
@@ -132,7 +135,7 @@ export class SNSyncService
     }
   }
 
-  public deinit(): void {
+  public override deinit(): void {
     this.dealloced = true
     ;(this.sessionManager as unknown) = undefined
     ;(this.itemManager as unknown) = undefined
@@ -189,7 +192,7 @@ export class SNSyncService
   /**
    * Used in tandem with `loadDatabasePayloads`
    */
-  public async getDatabasePayloads(): Promise<ConcreteTransferPayload[]> {
+  public async getDatabasePayloads(): Promise<FullyFormedTransferPayload[]> {
     return this.storageService.getAllRawPayloads().catch((error) => {
       void this.notifyEvent(Services.SyncEvent.DatabaseReadError, error)
       throw error
@@ -197,7 +200,7 @@ export class SNSyncService
   }
 
   private async processItemsKeysFirstDuringDatabaseLoad(
-    itemsKeysPayloads: ConcretePayload[],
+    itemsKeysPayloads: FullyFormedPayloadInterface[],
   ): Promise<void> {
     const encryptedItemsKeysPayloads = itemsKeysPayloads.filter(isEncryptedPayload)
 
@@ -223,7 +226,7 @@ export class SNSyncService
    * They are fed as a parameter so that callers don't have to await the loading, but can
    * await getting the raw payloads from storage
    */
-  public async loadDatabasePayloads(rawPayloads: ConcreteTransferPayload[]): Promise<void> {
+  public async loadDatabasePayloads(rawPayloads: FullyFormedTransferPayload[]): Promise<void> {
     if (this.databaseLoaded) {
       throw 'Attempting to initialize already initialized local database.'
     }
@@ -366,16 +369,21 @@ export class SNSyncService
    * This way, if the application is closed before a sync request completes,
    * pending data will be saved to disk, and synced the next time the app opens.
    */
-  private popPayloadsNeedingPreSyncSave(from: PurePayload[]) {
+  private popPayloadsNeedingPreSyncSave(
+    from: (DecryptedPayloadInterface | DeletedPayloadInterface)[],
+  ) {
     const lastPreSyncSave = this.lastPreSyncSave
     if (!lastPreSyncSave) {
       return from
     }
+
     /** dirtiedDate can be null if the payload was created as dirty */
     const payloads = from.filter((candidate) => {
       return !candidate.dirtiedDate || candidate.dirtiedDate > lastPreSyncSave
     })
+
     this.lastPreSyncSave = new Date()
+
     return payloads
   }
 
@@ -564,7 +572,7 @@ export class SNSyncService
   }
 
   private async prepareForSyncExecution(
-    items: DecryptedItemInterface[],
+    items: (DecryptedItemInterface | DeletedItemInterface)[],
     inTimeResolveQueue: SyncPromise[],
     beginDate: Date,
   ) {
@@ -583,14 +591,7 @@ export class SNSyncService
      * Setting this value means the item was 100% sent to the server.
      */
     if (items.length > 0) {
-      await this.itemManager.changeItems(
-        items,
-        (mutator) => {
-          mutator.lastSyncBegan = beginDate
-        },
-        MutationType.NonDirtying,
-        PayloadSource.PreSyncSave,
-      )
+      await this.itemManager.setLastSyncBeganForItems(items, beginDate)
     }
   }
 
@@ -604,65 +605,343 @@ export class SNSyncService
     return this.resolveQueue.slice()
   }
 
-  private async getSyncParameters(
+  private getOfflineSyncParameters(
     payloads: (DecryptedPayloadInterface | DeletedPayloadInterface)[],
-    options: SyncOptions,
-  ) {
-    const online = this.sessionManager.online()
-    const useMode = ((tryMode) => {
-      if (online && !this.completedOnlineDownloadFirstSync) {
-        return SyncMode.DownloadFirst
-      } else if (tryMode != undefined) {
-        return tryMode
-      } else {
-        return SyncMode.Default
-      }
-    })(options.mode)
+    mode: SyncMode = SyncMode.Default,
+  ): {
+    uploadPayloads: (DecryptedPayloadInterface | DeletedPayloadInterface)[]
+  } {
+    const uploadPayloads: (DecryptedPayloadInterface | DeletedPayloadInterface)[] =
+      mode === SyncMode.Default ? payloads : []
 
-    let uploadPayloads: ServerSyncPushContextualPayload[] = []
-    if (useMode === SyncMode.Default) {
-      if (online && !this.completedOnlineDownloadFirstSync) {
-        throw Error('Attempting to default mode sync without having completed initial.')
+    return { uploadPayloads }
+  }
+
+  private createOfflineSyncOperation(
+    payloads: (DeletedPayloadInterface | DecryptedPayloadInterface)[],
+    source: Services.SyncSource,
+    mode: SyncMode = SyncMode.Default,
+  ) {
+    this.log('Syncing offline user', 'source:', source, 'mode:', mode, 'payloads:', payloads)
+
+    const operation = new OfflineSyncOperation(payloads, async (type, response) => {
+      if (this.dealloced) {
+        return
       }
-      if (online) {
-        uploadPayloads = await this.payloadsByPreparingForServer(payloads)
-      } else {
-        const split = CreatePayloadSplit(payloads)
-        uploadPayloads = [
-          ...split.
-        ]
+      if (type === SyncSignal.Response && response) {
+        await this.handleOfflineResponse(response)
       }
-    } else if (useMode === SyncMode.DownloadFirst) {
-      uploadPayloads = []
+    })
+
+    return operation
+  }
+
+  private async getOnlineSyncParameters(
+    payloads: (DecryptedPayloadInterface | DeletedPayloadInterface)[],
+    mode: SyncMode = SyncMode.Default,
+  ): Promise<{
+    uploadPayloads: ServerSyncPushContextualPayload[]
+    syncMode: SyncMode
+  }> {
+    const useMode = !this.completedOnlineDownloadFirstSync ? SyncMode.DownloadFirst : mode
+
+    if (useMode === SyncMode.Default && !this.completedOnlineDownloadFirstSync) {
+      throw Error('Attempting to default mode sync without having completed initial.')
     }
 
-    return { uploadPayloads, syncMode: useMode, online }
+    const uploadPayloads: ServerSyncPushContextualPayload[] =
+      useMode === SyncMode.Default ? await this.payloadsByPreparingForServer(payloads) : []
+
+    return { uploadPayloads, syncMode: useMode }
+  }
+
+  private async createServerSyncOperation(
+    payloads: ServerSyncPushContextualPayload[],
+    checkIntegrity: boolean,
+    source: Services.SyncSource,
+    mode: SyncMode = SyncMode.Default,
+  ) {
+    const syncToken = await this.getLastSyncToken()
+    const paginationToken = await this.getPaginationToken()
+
+    const operation = new AccountSyncOperation(
+      payloads,
+      async (type: SyncSignal, response?: ServerSyncResponse, stats?: SyncStats) => {
+        switch (type) {
+          case SyncSignal.Response:
+            if (this.dealloced) {
+              return
+            }
+            if (response?.hasError) {
+              this.handleErrorServerResponse(response)
+            } else if (response) {
+              await this.handleSuccessServerResponse(operation, response)
+            }
+            break
+          case SyncSignal.StatusChanged:
+            if (stats) {
+              this.opStatus.setUploadStatus(stats.completedUploadCount, stats.totalUploadCount)
+            }
+            break
+        }
+      },
+      syncToken,
+      paginationToken,
+      this.apiService,
+    )
+
+    this.log(
+      'Syncing online user',
+      `source: ${Services.SyncSource[source]}`,
+      `operation id: ${operation.id}`,
+      `integrity check: ${checkIntegrity}`,
+      `mode: ${mode}`,
+      `syncToken: ${syncToken}`,
+      `cursorToken: ${paginationToken}`,
+      'payloads:',
+      payloads,
+    )
+
+    return operation
   }
 
   private async createSyncOperation(
-    payloads: PurePayload[],
+    payloads: (DecryptedPayloadInterface | DeletedPayloadInterface)[],
+    online: boolean,
     options: SyncOptions,
-    syncMode: SyncMode,
-  ) {
-    let operation: AccountSyncOperation | OfflineSyncOperation
-    if (this.sessionManager.online()) {
-      operation = await this.syncOnlineOperation(
+  ): Promise<{ operation: AccountSyncOperation | OfflineSyncOperation; mode: SyncMode }> {
+    if (online) {
+      const { uploadPayloads, syncMode } = await this.getOnlineSyncParameters(
         payloads,
-        options.checkIntegrity ? true : false,
-        options.source,
-        syncMode,
+        options.mode,
       )
+
+      return {
+        operation: await this.createServerSyncOperation(
+          uploadPayloads,
+          options.checkIntegrity || false,
+          options.source,
+          syncMode,
+        ),
+        mode: syncMode,
+      }
     } else {
-      operation = this.syncOfflineOperation(payloads, options.source, syncMode)
+      const { uploadPayloads } = this.getOfflineSyncParameters(payloads, options.mode)
+
+      return {
+        operation: this.createOfflineSyncOperation(uploadPayloads, options.source, options.mode),
+        mode: options.mode || SyncMode.Default,
+      }
+    }
+  }
+
+  private async performSync(options: SyncOptions): Promise<unknown> {
+    const { shouldExecuteSync, releaseLock } = this.configureSyncLock()
+
+    const { items, beginDate, decryptedPayloads, neverSyncedDeleted } = await this.prepareForSync(
+      options,
+    )
+
+    const inTimeResolveQueue = this.getPendingRequestsMadeInTimeToPiggyBackOnCurrentRequest()
+
+    if (!shouldExecuteSync) {
+      return this.deferSyncRequest(options)
     }
 
-    return operation
+    if (this.dealloced) {
+      return
+    }
+
+    await this.prepareForSyncExecution(items, inTimeResolveQueue, beginDate)
+
+    const online = this.sessionManager.online()
+
+    const { operation, mode: syncMode } = await this.createSyncOperation(
+      decryptedPayloads,
+      online,
+      options,
+    )
+
+    const operationPromise = operation.run()
+
+    this.currentSyncRequestPromise = operationPromise
+
+    await operationPromise
+
+    if (this.dealloced) {
+      return
+    }
+
+    releaseLock()
+
+    const { hasError } = await this.handleSyncOperationFinish(
+      operation,
+      options,
+      neverSyncedDeleted,
+      syncMode,
+    )
+    if (hasError) {
+      return
+    }
+
+    const didSyncAgain = await this.potentiallySyncAgainAfterSyncCompletion(
+      syncMode,
+      options,
+      inTimeResolveQueue,
+      online,
+    )
+    if (didSyncAgain) {
+      return
+    }
+
+    if (options.checkIntegrity) {
+      await this.notifyEventSync(Services.SyncEvent.SyncRequestsIntegrityCheck, {
+        source: options.source as Services.SyncSource,
+      })
+    }
+
+    await this.notifyEventSync(Services.SyncEvent.SyncCompletedWithAllItemsUploadedAndDownloaded, {
+      source: options.source,
+    })
+
+    this.resolvePendingSyncRequestsThatMadeItInTimeOfCurrentRequest(inTimeResolveQueue)
+
+    return undefined
+  }
+
+  private async handleOfflineResponse(response: OfflineSyncResponse) {
+    this.log('Offline Sync Response', response)
+
+    const masterCollection = this.payloadManager.getMasterCollection()
+    const delta = new DeltaOfflineSaved(masterCollection, response.responseCollection)
+    const collection = await delta.resultingCollection()
+
+    const payloadsToPersist = await this.payloadManager.emitCollection(collection)
+    await this.persistPayloads(payloadsToPersist)
+
+    const deletedPayloads = response.discardablePayloads
+    if (deletedPayloads.length > 0) {
+      await this.deletePayloads(deletedPayloads)
+    }
+
+    this.opStatus.clearError()
+
+    await this.notifyEvent(Services.SyncEvent.SingleRoundTripSyncCompleted, response)
+  }
+
+  private handleErrorServerResponse(response: ServerSyncResponse) {
+    this.log('Sync Error', response)
+
+    if (response.status === INVALID_SESSION_RESPONSE_STATUS) {
+      void this.notifyEvent(Services.SyncEvent.InvalidSession)
+    }
+
+    this.opStatus?.setError(response.error)
+
+    void this.notifyEvent(Services.SyncEvent.SyncError, response)
+  }
+
+  private async processServerPayloads(
+    payloads: AnyNonDecryptedPayloadInterface[],
+  ): Promise<FullyFormedPayloadInterface[]> {
+    const payloadSplit = CreateNonDecryptedPayloadSplit(payloads)
+
+    const results: FullyFormedPayloadInterface[] = [...payloadSplit.deleted]
+
+    const processedItemsKeyPayloads: Record<
+      UuidString,
+      DecryptedPayloadInterface<ItemsKeyContent>
+    > = {}
+
+    for (const encrypted of payloadSplit.encrypted) {
+      const previouslyProcessedItemsKeyPayload:
+        | DecryptedPayloadInterface<ItemsKeyContent>
+        | undefined = processedItemsKeyPayloads[encrypted.items_key_id as string]
+
+      const itemsKey = previouslyProcessedItemsKeyPayload
+        ? CreateDecryptedItemFromPayload(previouslyProcessedItemsKeyPayload)
+        : undefined
+
+      const split = SplitPayloadsByEncryptionType([encrypted])
+
+      if (split.rootKeyEncryption) {
+        const result = await this.protocolService.decryptSplitSingle(
+          Encryption.CreateDecryptionSplitWithKeyLookup(split),
+        )
+
+        results.push(result)
+
+        if (isDecryptedPayload<ItemsKeyInterface>(result) && isItemsKey(result)) {
+          processedItemsKeyPayloads[result.uuid] = result
+        }
+      } else {
+        const keyedSplit: Encryption.KeyedDecryptionSplit = {}
+        if (itemsKey) {
+          keyedSplit.usesItemsKey = {
+            items: [encrypted],
+            key: itemsKey as ItemsKeyInterface,
+          }
+        } else {
+          keyedSplit.usesItemsKeyWithKeyLookup = {
+            items: [encrypted],
+          }
+        }
+
+        const result = await this.protocolService.decryptSplitSingle(keyedSplit)
+        results.push(result)
+      }
+    }
+
+    return results
+  }
+
+  private async handleSuccessServerResponse(
+    operation: AccountSyncOperation,
+    response: ServerSyncResponse,
+  ) {
+    if (this._simulate_latency) {
+      await sleep(this._simulate_latency.latency)
+    }
+    this.log('Online Sync Response', 'operation id', operation.id, response.rawResponse)
+
+    this.opStatus.clearError()
+
+    this.opStatus.setDownloadStatus(response.retrievedPayloads.length)
+
+    const processedPayloads = await this.processServerPayloads(response.allProcessedPayloads)
+
+    const masterCollection = this.payloadManager.getMasterCollection()
+    const historyMap = this.historyService.getHistoryMapCopy()
+    const resolver = new ServerSyncResponseResolver(
+      response,
+      processedPayloads,
+      masterCollection,
+      operation.payloadsSavedOrSaving.map(CreatePayload),
+      historyMap,
+    )
+
+    const collections = await resolver.collectionsByProcessingResponse()
+    for (const collection of collections) {
+      const payloadsToPersist = await this.payloadManager.emitCollection(collection)
+      await this.persistPayloads(payloadsToPersist)
+    }
+
+    const deletedPayloads = response.discardablePayloads
+    if (deletedPayloads.length > 0) {
+      await this.deletePayloads(deletedPayloads)
+    }
+
+    await Promise.all([
+      this.setLastSyncToken(response.lastSyncToken as string),
+      this.setPaginationToken(response.paginationToken as string),
+      this.notifyEvent(Services.SyncEvent.SingleRoundTripSyncCompleted, response),
+    ])
   }
 
   private async handleSyncOperationFinish(
     operation: AccountSyncOperation | OfflineSyncOperation,
     options: SyncOptions,
-    neverSyncedDeleted: SNItem[],
+    neverSyncedDeleted: DeletedItemInterface[],
     syncMode: SyncMode,
   ) {
     this.opStatus.setDidEnd()
@@ -776,296 +1055,33 @@ export class SNSyncService
     return false
   }
 
-  private async performSync(options: SyncOptions): Promise<unknown> {
-    const { shouldExecuteSync, releaseLock } = this.configureSyncLock()
-
-    const { items, beginDate, decryptedPayloads, neverSyncedDeleted } = await this.prepareForSync(
-      options,
-    )
-
-    const inTimeResolveQueue = this.getPendingRequestsMadeInTimeToPiggyBackOnCurrentRequest()
-
-    if (!shouldExecuteSync) {
-      return this.deferSyncRequest(options)
-    }
-
-    if (this.dealloced) {
-      return
-    }
-
-    await this.prepareForSyncExecution(items, inTimeResolveQueue, beginDate)
-
-    const { uploadPayloads, syncMode, online } = await this.getSyncParameters(
-      decryptedPayloads,
-      options,
-    )
-
-    const operation = await this.createSyncOperation(uploadPayloads, options, syncMode)
-
-    const operationPromise = operation.run()
-
-    this.currentSyncRequestPromise = operationPromise
-
-    await operationPromise
-
-    if (this.dealloced) {
-      return
-    }
-
-    releaseLock()
-
-    const { hasError } = await this.handleSyncOperationFinish(
-      operation,
-      options,
-      neverSyncedDeleted,
-      syncMode,
-    )
-    if (hasError) {
-      return
-    }
-
-    const didSyncAgain = await this.potentiallySyncAgainAfterSyncCompletion(
-      syncMode,
-      options,
-      inTimeResolveQueue,
-      online,
-    )
-    if (didSyncAgain) {
-      return
-    }
-
-    if (options.checkIntegrity) {
-      await this.notifyEventSync(Services.SyncEvent.SyncRequestsIntegrityCheck, {
-        source: options.source as Services.SyncSource,
-      })
-    }
-
-    await this.notifyEventSync(Services.SyncEvent.SyncCompletedWithAllItemsUploadedAndDownloaded, {
-      source: options.source,
-    })
-
-    this.resolvePendingSyncRequestsThatMadeItInTimeOfCurrentRequest(inTimeResolveQueue)
-  }
-
-  private async syncOnlineOperation(
-    payloads: PurePayload[],
-    checkIntegrity: boolean,
-    source: Services.SyncSource,
-    mode: SyncMode,
-  ) {
-    const syncToken = await this.getLastSyncToken()
-    const paginationToken = await this.getPaginationToken()
-    const operation = new AccountSyncOperation(
-      payloads,
-      async (type: SyncSignal, response?: ServerSyncResponse, stats?: SyncStats) => {
-        switch (type) {
-          case SyncSignal.Response:
-            if (this.dealloced) {
-              return
-            }
-            if (response?.hasError) {
-              this.handleErrorServerResponse(response)
-            } else if (response) {
-              await this.handleSuccessServerResponse(operation, response)
-            }
-            break
-          case SyncSignal.StatusChanged:
-            if (stats) {
-              this.opStatus.setUploadStatus(stats.completedUploadCount, stats.totalUploadCount)
-            }
-            break
-        }
-      },
-      syncToken,
-      paginationToken,
-      this.apiService,
-    )
-    this.log(
-      'Syncing online user',
-      `source: ${Services.SyncSource[source]}`,
-      `operation id: ${operation.id}`,
-      `integrity check: ${checkIntegrity}`,
-      `mode: ${mode}`,
-      `syncToken: ${syncToken}`,
-      `cursorToken: ${paginationToken}`,
-      'payloads:',
-      payloads,
-    )
-    return operation
-  }
-
-  private syncOfflineOperation(
-    payloads: PurePayload[],
-    source: Services.SyncSource,
-    mode: SyncMode,
-  ) {
-    this.log('Syncing offline user', 'source:', source, 'mode:', mode, 'payloads:', payloads)
-    const operation = new OfflineSyncOperation(
-      payloads,
-      async (type: SyncSignal, response?: ServerSyncResponse) => {
-        if (this.dealloced) {
-          return
-        }
-        if (type === SyncSignal.Response && response) {
-          await this.handleOfflineResponse(response)
-        }
-      },
-    )
-    return operation
-  }
-
-  private async handleOfflineResponse(response: ServerSyncResponse) {
-    this.log('Offline Sync Response', response.rawResponse)
-    const payloadsToEmit = response.savedPayloads
-    if (payloadsToEmit.length > 0) {
-      await this.payloadManager.emitPayloads(payloadsToEmit, PayloadSource.LocalSaved)
-      const payloadsToPersist = this.payloadManager.find(Uuids(payloadsToEmit)) as PurePayload[]
-      await this.persistPayloads(payloadsToPersist)
-    }
-
-    const deletedPayloads = response.deletedPayloads
-    if (deletedPayloads.length > 0) {
-      await this.deletePayloads(deletedPayloads)
-    }
-
-    this.opStatus.clearError()
-    this.opStatus.setDownloadStatus(response.retrievedPayloads.length)
-
-    await this.notifyEvent(Services.SyncEvent.SingleRoundTripSyncCompleted, response)
-  }
-
-  private handleErrorServerResponse(response: ServerSyncResponse) {
-    this.log('Sync Error', response)
-    if (response.status === INVALID_SESSION_RESPONSE_STATUS) {
-      void this.notifyEvent(Services.SyncEvent.InvalidSession)
-    }
-
-    this.opStatus?.setError(response.error)
-    void this.notifyEvent(Services.SyncEvent.SyncError, response.error)
-  }
-
-  private async processServerSuccessPayloads(payloads: PurePayload[]) {
-    const decryptedPayloads: PurePayload[] = []
-    const processedItemsKeyPayloads: Record<UuidString, PurePayload> = {}
-
-    for (const payload of payloads) {
-      if (payload.deleted || !payload.fields.includes(PayloadField.Content)) {
-        /**
-         * Deleted payloads, and some payload types
-         * do not contiain content (like remote saved)
-         */
-        continue
-      }
-
-      const itemsKeyPayload: PurePayload | undefined =
-        processedItemsKeyPayloads[payload.items_key_id as string]
-
-      const itemsKey = itemsKeyPayload
-        ? CreateDecryptedItemFromPayload<ItemsKeyInterface>(itemsKeyPayload)
-        : undefined
-
-      const split = Encryption.splitItemsByEncryptionType([payload])
-      if (split.usesRootKey) {
-        const decrypted = (
-          await this.protocolService.decryptSplit(
-            Encryption.CreateDecryptionSplitWithKeyLookup(split),
-          )
-        )[0]
-        if (decrypted.content_type === ContentType.ItemsKey) {
-          processedItemsKeyPayloads[decrypted.uuid] = decrypted
-        }
-        decryptedPayloads.push(decrypted)
-      } else {
-        const keyedSplit: Encryption.EncryptionSplitWithKey<PurePayload> = {}
-        if (itemsKey) {
-          keyedSplit.usesItemsKey = {
-            items: [payload],
-            key: itemsKey,
-          }
-        } else {
-          keyedSplit.usesItemsKeyWithKeyLookup = {
-            items: [payload],
-          }
-        }
-        const decrypted = (await this.protocolService.decryptSplit(keyedSplit))[0]
-        decryptedPayloads.push(decrypted)
-      }
-    }
-
-    return { decryptedPayloads }
-  }
-
-  private async handleSuccessServerResponse(
-    operation: AccountSyncOperation,
-    response: ServerSyncResponse,
-  ) {
-    if (this._simulate_latency) {
-      await sleep(this._simulate_latency.latency)
-    }
-    this.log('Online Sync Response', 'operation id', operation.id, response.rawResponse)
-
-    this.opStatus.clearError()
-    this.opStatus.setDownloadStatus(response.retrievedPayloads.length)
-
-    const { decryptedPayloads } = await this.processServerSuccessPayloads(
-      response.allProcessedPayloads,
-    )
-
-    const masterCollection = this.payloadManager.getMasterCollection()
-    const historyMap = this.historyService.getHistoryMapCopy()
-    const resolver = new ServerSyncResponseResolver(
-      response,
-      decryptedPayloads,
-      masterCollection,
-      operation.payloadsSavedOrSaving,
-      historyMap,
-    )
-
-    const collections = await resolver.collectionsByProcessingResponse()
-    for (const collection of collections) {
-      const payloadsToPersist = await this.payloadManager.emitCollection(collection)
-      await this.persistPayloads(payloadsToPersist)
-    }
-    const deletedPayloads = response.deletedPayloads
-    if (deletedPayloads.length > 0) {
-      await this.deletePayloads(deletedPayloads)
-    }
-
-    await Promise.all([
-      this.setLastSyncToken(response.lastSyncToken as string),
-      this.setPaginationToken(response.paginationToken as string),
-      this.notifyEvent(Services.SyncEvent.SingleRoundTripSyncCompleted, response),
-    ])
-  }
-
   /**
    * Items that have never been synced and marked as deleted should be cleared
    * as dirty, mapped, then removed from storage.
    */
-  private async handleNeverSyncedDeleted(items: SNItem[]) {
+  private async handleNeverSyncedDeleted(items: DeletedItemInterface[]) {
     const payloads = items.map((item) => {
       return item.payloadRepresentation({
         dirty: false,
       })
     })
+
     await this.payloadManager.emitPayloads(payloads, PayloadSource.LocalChanged)
     await this.persistPayloads(payloads)
   }
 
-  /**
-   * @param payloads The decrypted payloads to persist
-   */
-  public async persistPayloads(payloads: PurePayload[]) {
+  public async persistPayloads(payloads: FullyFormedPayloadInterface[]) {
     if (payloads.length === 0 || this.dealloced) {
       return
     }
+
     return this.storageService.savePayloads(payloads).catch((error) => {
       void this.notifyEvent(Services.SyncEvent.DatabaseWriteError, error)
       SNLog.error(error)
     })
   }
 
-  private async deletePayloads(payloads: PurePayload[]) {
+  private async deletePayloads(payloads: DeletedPayloadInterface[]) {
     return this.persistPayloads(payloads)
   }
 
@@ -1097,19 +1113,23 @@ export class SNSyncService
       return
     }
 
-    const encryptedPayloads = filterDisallowedRemotePayloads(
-      rawPayloads.map((rawPayload: RawPayload) => {
-        return CreateSourcedPayloadFromObject(rawPayload, PayloadSource.RemoteRetrieved)
+    const receivedPayloads = filterDisallowedRemotePayloads(
+      rawPayloads.map((rawPayload) => {
+        return CreatePayloadFromRawServerItem(rawPayload, PayloadSource.RemoteRetrieved)
       }),
     )
 
-    const split = Encryption.splitItemsByEncryptionType(encryptedPayloads)
-    const keyedSplit = Encryption.CreateDecryptionSplitWithKeyLookup(split)
-    const decryptedPayloads = await this.protocolService.decryptSplit(keyedSplit)
+    const payloadSplit = CreateNonDecryptedPayloadSplit(receivedPayloads)
+
+    const encryptionSplit = Encryption.SplitPayloadsByEncryptionType(payloadSplit.encrypted)
+
+    const keyedSplit = Encryption.CreateDecryptionSplitWithKeyLookup(encryptionSplit)
+
+    const decryptionResults = await this.protocolService.decryptSplit(keyedSplit)
 
     this.setInSync(false)
 
-    await this.emitOutOfSyncRemotemPayloads(decryptedPayloads)
+    await this.emitOutOfSyncRemotemPayloads([...decryptionResults, ...payloadSplit.deleted])
 
     const shouldCheckIntegrityAgainAfterSync =
       eventPayload.source !== Services.SyncSource.ResolveOutOfSync
@@ -1120,7 +1140,7 @@ export class SNSyncService
     })
   }
 
-  private async emitOutOfSyncRemotemPayloads(payloads: PayloadInterface[]) {
+  private async emitOutOfSyncRemotemPayloads(payloads: FullyFormedPayloadInterface[]) {
     const delta = new DeltaOutOfSync(
       this.payloadManager.getMasterCollection(),
       ImmutablePayloadCollection.WithPayloads(payloads, PayloadSource.RemoteRetrieved),

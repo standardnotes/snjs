@@ -3,9 +3,10 @@ import { ContentType } from '@standardnotes/common'
 import { extendArray, UuidGenerator } from '@standardnotes/utils'
 import { ImmutablePayloadCollection } from '../../../Runtime/Collection/Payload/ImmutablePayloadCollection'
 import { DecryptedPayloadInterface } from '../Interfaces/DecryptedPayload'
-import { ConcretePayload, isEncryptedPayload } from '../Interfaces/TypeCheck'
+import { isEncryptedPayload } from '../Interfaces/TypeCheck'
+import { FullyFormedPayloadInterface } from '../Interfaces/UnionTypes'
 import { EncryptedPayloadInterface } from '../Interfaces/EncryptedPayload'
-import { PayloadsByUpdatingReferencingPayloadReferences } from './Functions'
+import { PayloadsByUpdatingReferencingPayloadReferences } from './PayloadsByUpdatingReferencingPayloadReferences'
 import { DeletedPayloadInterface } from '../Interfaces/DeletedPayload'
 
 /**
@@ -19,7 +20,7 @@ export async function PayloadsByAlternatingUuid<
   P extends DecryptedPayloadInterface = DecryptedPayloadInterface,
 >(
   payload: P,
-  baseCollection: ImmutablePayloadCollection<ConcretePayload>,
+  baseCollection: ImmutablePayloadCollection<FullyFormedPayloadInterface>,
 ): Promise<(DecryptedPayloadInterface | DeletedPayloadInterface | EncryptedPayloadInterface)[]> {
   const results: (
     | DecryptedPayloadInterface

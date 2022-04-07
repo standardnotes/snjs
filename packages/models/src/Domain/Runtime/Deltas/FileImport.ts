@@ -5,7 +5,7 @@ import { ConflictDelta } from './Conflict'
 import { PayloadsDelta } from './Delta'
 import { DecryptedPayloadInterface } from '../../Abstract/Payload/Interfaces/DecryptedPayload'
 import {
-  ConcretePayload,
+  FullyFormedPayloadInterface,
   DeletedPayloadInterface,
   isDecryptedPayload,
 } from '../../Abstract/Payload'
@@ -13,9 +13,9 @@ import {
 type Return = DecryptedPayloadInterface
 
 export class DeltaFileImport extends PayloadsDelta<
-  ConcretePayload,
+  FullyFormedPayloadInterface,
   DecryptedPayloadInterface,
-  Return
+  DecryptedPayloadInterface
 > {
   public async resultingCollection(): Promise<ImmutablePayloadCollection<Return>> {
     const results: Return[] = []

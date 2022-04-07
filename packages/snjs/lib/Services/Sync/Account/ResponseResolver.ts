@@ -2,22 +2,21 @@ import {
   ImmutablePayloadCollectionSet,
   ImmutablePayloadCollection,
   PayloadSource,
-  filterDisallowedRemotePayloads,
   CopyPayload,
   HistoryMap,
   DecryptedPayloadInterface,
   DeletedPayloadInterface,
   EncryptedPayloadInterface,
   ContentlessPayloadInterface,
-  PayloadInterface,
   isDeletedPayload,
   DeltaRemoteRetrieved,
   DeltaRemoteSaved,
   DeltaRemoteConflicts,
+  AnyPayloadInterface,
+  FullyFormedPayloadInterface,
 } from '@standardnotes/models'
 import { ServerSyncResponse } from '@Lib/Services/Sync/Account/Response'
 import { DeltaRemoteRejected } from '@Lib/../../models/dist/Domain/Runtime/Deltas/RemoteRejected'
-import { EmitOutPayloads } from '@Lib/Services/Payloads'
 
 /**
  * Given a remote sync response, the resolver applies the incoming changes on top
@@ -26,45 +25,44 @@ import { EmitOutPayloads } from '@Lib/Services/Payloads'
  * offers the 'recommended' new global state given a sync response and a current base state.
  */
 export class ServerSyncResponseResolver {
-  private relatedCollectionSet: ImmutablePayloadCollectionSet
+  private relatedCollectionSet: ImmutablePayloadCollectionSet<FullyFormedPayloadInterface>
 
   constructor(
     private response: ServerSyncResponse,
-    decryptedResponsePayloads: DecryptedPayloadInterface[],
-    private baseCollection: ImmutablePayloadCollection<EmitOutPayloads, DeletedPayloadInterface>,
+    postProcessedRelated: FullyFormedPayloadInterface[],
+    private baseCollection: ImmutablePayloadCollection<
+      FullyFormedPayloadInterface,
+      DeletedPayloadInterface
+    >,
     payloadsSavedOrSaving: (EncryptedPayloadInterface | DeletedPayloadInterface)[],
     private historyMap: HistoryMap,
   ) {
     this.relatedCollectionSet = new ImmutablePayloadCollectionSet([
       ImmutablePayloadCollection.WithPayloads(
-        decryptedResponsePayloads,
-        PayloadSource.DecryptedTransient,
+        postProcessedRelated,
+        PayloadSource.PossiblyDecryptedSyncPostProcessed,
       ),
       ImmutablePayloadCollection.WithPayloads(payloadsSavedOrSaving, PayloadSource.SavedOrSaving),
     ])
   }
 
-  public async collectionsByProcessingResponse(): Promise<ImmutablePayloadCollection[]> {
+  public async collectionsByProcessingResponse(): Promise<
+    ImmutablePayloadCollection<FullyFormedPayloadInterface>[]
+  > {
     const collections = []
 
-    const collectionRetrieved = await this.collectionByProcessingPayloads(
-      this.response.retrievedPayloads,
-      PayloadSource.RemoteRetrieved,
-    )
+    const collectionRetrieved = await this.processRetrievedPayloads(this.response.retrievedPayloads)
     if (collectionRetrieved.all().length > 0) {
       collections.push(collectionRetrieved)
     }
 
-    const collectionSaved = await this.collectionByProcessingPayloads(
-      this.response.savedPayloads,
-      PayloadSource.RemoteSaved,
-    )
+    const collectionSaved = await this.processSavedPayloads(this.response.savedPayloads)
     if (collectionSaved.all().length > 0) {
       collections.push(collectionSaved)
     }
 
     if (this.response.uuidConflictPayloads.length > 0) {
-      const collectionUuidConflicts = await this.collectionByProcessingPayloads(
+      const collectionUuidConflicts = await this.processConflictPayloads(
         this.response.uuidConflictPayloads,
         PayloadSource.ConflictUuid,
       )
@@ -74,7 +72,7 @@ export class ServerSyncResponseResolver {
     }
 
     if (this.response.dataConflictPayloads.length > 0) {
-      const collectionDataConflicts = await this.collectionByProcessingPayloads(
+      const collectionDataConflicts = await this.processConflictPayloads(
         this.response.dataConflictPayloads,
         PayloadSource.ConflictData,
       )
@@ -84,10 +82,7 @@ export class ServerSyncResponseResolver {
     }
 
     if (this.response.rejectedPayloads.length > 0) {
-      const collectionRejected = await this.collectionByProcessingPayloads(
-        this.response.rejectedPayloads,
-        PayloadSource.RemoteRejected,
-      )
+      const collectionRejected = await this.processRejectedPayloads(this.response.rejectedPayloads)
       if (collectionRejected.all().length > 0) {
         collections.push(collectionRejected)
       }
@@ -96,20 +91,101 @@ export class ServerSyncResponseResolver {
     return collections
   }
 
-  private async collectionByProcessingPayloads(
-    payloads: (EncryptedPayloadInterface | DeletedPayloadInterface | ContentlessPayloadInterface)[],
-    source: PayloadSource,
-  ): Promise<ImmutablePayloadCollection> {
-    const collection = ImmutablePayloadCollection.WithPayloads(
-      filterDisallowedRemotePayloads(payloads),
-      source,
+  private async processSavedPayloads(
+    payloads: (DeletedPayloadInterface | ContentlessPayloadInterface)[],
+  ): Promise<
+    ImmutablePayloadCollection<
+      DecryptedPayloadInterface | EncryptedPayloadInterface | DeletedPayloadInterface
+    >
+  > {
+    const collection = ImmutablePayloadCollection.WithPayloads(payloads, PayloadSource.RemoteSaved)
+
+    const delta = new DeltaRemoteSaved(
+      this.baseCollection,
+      collection,
+      this.relatedCollectionSet,
+      this.historyMap,
     )
 
-    const delta = this.createDelta(collection, source)
+    const result = await delta.resultingCollection()
 
-    const resultCollection = await delta.resultingCollection()
+    return this.applyFinalDirtyState(result)
+  }
 
-    const updatedDirtyPayloads = resultCollection.all().map((payload) => {
+  private async processRetrievedPayloads(
+    payloads: (EncryptedPayloadInterface | DeletedPayloadInterface)[],
+  ): Promise<
+    ImmutablePayloadCollection<
+      DecryptedPayloadInterface | EncryptedPayloadInterface | DeletedPayloadInterface
+    >
+  > {
+    const collection = ImmutablePayloadCollection.WithPayloads(
+      payloads,
+      PayloadSource.RemoteRetrieved,
+    )
+
+    const delta = new DeltaRemoteRetrieved(
+      this.baseCollection,
+      collection,
+      this.relatedCollectionSet,
+      this.historyMap,
+    )
+
+    const result = await delta.resultingCollection()
+
+    return this.applyFinalDirtyState(result)
+  }
+
+  private async processConflictPayloads(
+    payloads: (EncryptedPayloadInterface | DeletedPayloadInterface)[],
+    source: PayloadSource.ConflictUuid | PayloadSource.ConflictData,
+  ): Promise<
+    ImmutablePayloadCollection<
+      DecryptedPayloadInterface | EncryptedPayloadInterface | DeletedPayloadInterface
+    >
+  > {
+    const collection = ImmutablePayloadCollection.WithPayloads(payloads, source)
+
+    const delta = new DeltaRemoteConflicts(
+      this.baseCollection,
+      collection,
+      this.relatedCollectionSet,
+      this.historyMap,
+    )
+
+    const result = await delta.resultingCollection()
+
+    return this.applyFinalDirtyState(result)
+  }
+
+  private async processRejectedPayloads(
+    payloads: (EncryptedPayloadInterface | DeletedPayloadInterface)[],
+  ): Promise<
+    ImmutablePayloadCollection<
+      DecryptedPayloadInterface | EncryptedPayloadInterface | DeletedPayloadInterface
+    >
+  > {
+    const collection = ImmutablePayloadCollection.WithPayloads(
+      payloads,
+      PayloadSource.RemoteRejected,
+    )
+
+    const delta = new DeltaRemoteRejected(
+      this.baseCollection,
+      collection,
+      this.relatedCollectionSet,
+      this.historyMap,
+    )
+
+    const result = await delta.resultingCollection()
+
+    return this.applyFinalDirtyState(result)
+  }
+
+  private applyFinalDirtyState<P extends FullyFormedPayloadInterface>(
+    collection: ImmutablePayloadCollection<P>,
+  ): ImmutablePayloadCollection<P> {
+    const updatedDirtyPayloads = collection.all().map((payload) => {
       const stillDirty = this.finalDirtyStateForPayload(payload)
       return CopyPayload(payload, {
         dirty: stillDirty,
@@ -117,50 +193,15 @@ export class ServerSyncResponseResolver {
       })
     })
 
-    return ImmutablePayloadCollection.WithPayloads(updatedDirtyPayloads, source)
+    return ImmutablePayloadCollection.WithPayloads(
+      updatedDirtyPayloads,
+      collection.source,
+    ) as ImmutablePayloadCollection<P>
   }
 
-  private createDelta(
-    collection: ImmutablePayloadCollection<
-      EncryptedPayloadInterface | ContentlessPayloadInterface,
-      DeletedPayloadInterface
-    >,
-    source: PayloadSource,
-  ) {
-    if (source === PayloadSource.RemoteRetrieved) {
-      return new DeltaRemoteRetrieved(
-        this.baseCollection,
-        collection,
-        this.relatedCollectionSet,
-        this.historyMap,
-      )
-    } else if (source === PayloadSource.RemoteSaved) {
-      return new DeltaRemoteSaved(
-        this.baseCollection,
-        collection,
-        this.relatedCollectionSet,
-        this.historyMap,
-      )
-    } else if (source === PayloadSource.ConflictData || source === PayloadSource.ConflictUuid) {
-      return new DeltaRemoteConflicts(
-        this.baseCollection,
-        collection,
-        this.relatedCollectionSet,
-        this.historyMap,
-      )
-    } else if (source === PayloadSource.RemoteRejected) {
-      return new DeltaRemoteRejected(
-        this.baseCollection,
-        collection,
-        this.relatedCollectionSet,
-        this.historyMap,
-      )
-    } else {
-      throw `No delta class found for source ${PayloadSource[source]}`
-    }
-  }
-
-  private finalDirtyStateForPayload(payload: PayloadInterface): boolean | undefined {
+  private finalDirtyStateForPayload<P extends AnyPayloadInterface>(
+    payload: P,
+  ): boolean | undefined {
     const current = this.baseCollection.find(payload.uuid)
     /**
      * `current` can be null in the case of new
@@ -180,10 +221,10 @@ export class ServerSyncResponseResolver {
           /** If a payload is discardable, do not set as dirty no matter what.
            * This occurs when alternating a uuid for a payload */
           stillDirty = false
-        } else {
+        } else if (current.lastSyncBegan) {
           /** Marking items dirty after or within the same millisecond cycle of lastSyncBegan
            * should cause them to sync again. */
-          stillDirty = current.dirtiedDate >= current.lastSyncBegan!
+          stillDirty = current.dirtiedDate >= current.lastSyncBegan
         }
       }
     } else {

@@ -9,7 +9,7 @@ import {
 import {
   EncryptedPayloadInterface,
   DeletedPayloadInterface,
-  TransferPayload,
+  filterDisallowedRemotePayloads,
   PayloadSource,
   ContentlessPayload,
   ContentlessPayloadInterface,
@@ -25,50 +25,50 @@ export class ServerSyncResponse {
   public readonly uuidConflictPayloads: (EncryptedPayloadInterface | DeletedPayloadInterface)[]
   public readonly dataConflictPayloads: (EncryptedPayloadInterface | DeletedPayloadInterface)[]
   public readonly rejectedPayloads: (EncryptedPayloadInterface | DeletedPayloadInterface)[]
-  public readonly deletedPayloads: DeletedPayloadInterface[]
+  public readonly discardablePayloads: DeletedPayloadInterface[]
 
   constructor(rawResponse: RawSyncResponse) {
     this.rawResponse = rawResponse
 
-    this.savedPayloads = this.filterRejectedItems(rawResponse.data?.saved_items).map((rawItem) => {
-      return new ContentlessPayload(rawItem, PayloadSource.RemoteSaved)
-    })
-
-    this.retrievedPayloads = this.filterRejectedItems(rawResponse.data?.retrieved_items).map(
+    this.savedPayloads = filterDisallowedRemotePayloads(rawResponse.data?.saved_items || []).map(
       (rawItem) => {
-        return CreatePayloadFromRawServerItem(rawItem, PayloadSource.RemoteRetrieved)
+        return new ContentlessPayload(rawItem, PayloadSource.RemoteSaved)
       },
     )
 
-    this.dataConflictPayloads = this.filterRejectedItems(this.rawDataConflictItems).map(
+    this.retrievedPayloads = filterDisallowedRemotePayloads(
+      rawResponse.data?.retrieved_items || [],
+    ).map((rawItem) => {
+      return CreatePayloadFromRawServerItem(rawItem, PayloadSource.RemoteRetrieved)
+    })
+
+    this.dataConflictPayloads = filterDisallowedRemotePayloads(this.rawDataConflictItems).map(
       (rawItem) => {
         return CreatePayloadFromRawServerItem(rawItem, PayloadSource.ConflictData)
       },
     )
 
-    this.uuidConflictPayloads = this.filterRejectedItems(this.rawUuidConflictItems).map(
+    this.uuidConflictPayloads = filterDisallowedRemotePayloads(this.rawUuidConflictItems).map(
       (rawItem) => {
         return CreatePayloadFromRawServerItem(rawItem, PayloadSource.ConflictUuid)
       },
     )
 
-    this.rejectedPayloads = this.filterRejectedItems(this.rawRejectedPayloads).map((rawItem) => {
-      return CreatePayloadFromRawServerItem(rawItem, PayloadSource.RemoteRejected)
-    })
+    this.rejectedPayloads = filterDisallowedRemotePayloads(this.rawRejectedPayloads).map(
+      (rawItem) => {
+        return CreatePayloadFromRawServerItem(rawItem, PayloadSource.RemoteRejected)
+      },
+    )
 
     /**
      * Items may be deleted from a combination of sources, such as from RemoteSaved,
      * or if a conflict handler decides to delete a payload.
      */
-    this.deletedPayloads = this.allProcessedPayloads.filter(isDeletedPayload).filter((payload) => {
+    this.discardablePayloads = this.allProcessedPayloads.filter(isDeletedPayload).filter((payload) => {
       return payload.discardable
     })
 
     deepFreeze(this)
-  }
-
-  private filterRejectedItems<T extends TransferPayload>(rawItems: T[] = []): T[] {
-    return rawItems.filter((rawItem) => rawItem.uuid != undefined)
   }
 
   public get error(): Error | undefined {

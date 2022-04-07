@@ -28,7 +28,9 @@ export class OfflineSyncOperation {
         lastSyncEnd: new Date(),
       })
     })
+
     const response = new OfflineSyncResponse(responsePayloads)
+
     await this.receiver(SyncSignal.Response, response)
   }
 }

@@ -1,26 +1,29 @@
-import * as Payloads from '@standardnotes/models'
-import { isDeletedTransferPayload, OfflineSyncSavedContextualPayload } from '@standardnotes/models'
+import {
+  ContentlessPayload,
+  DeletedPayloadInterface,
+  ImmutablePayloadCollection,
+  isDeletedPayload,
+  OfflineSyncSavedContextualPayload,
+  PayloadSource,
+} from '@standardnotes/models'
 import { deepFreeze } from '@standardnotes/utils'
 
 export class OfflineSyncResponse {
-  public readonly savedPayloads: Payloads.OfflineSyncSavedContextualPayload[]
-  public readonly deletedPayloads: Payloads.OfflineSyncSavedContextualPayload[]
-  constructor(saved: OfflineSyncSavedContextualPayload[]) {
-    this.savedPayloads = saved
+  public readonly discardablePayloads: DeletedPayloadInterface[]
+  public readonly responseCollection: ImmutablePayloadCollection
 
-    this.deletedPayloads = saved.filter((payload) => {
-      return isDeletedTransferPayload(payload) && !payload.dirty
-    })
+  constructor(saved: OfflineSyncSavedContextualPayload[]) {
+    this.responseCollection = ImmutablePayloadCollection.WithPayloads(
+      saved.map((p) => new ContentlessPayload(p)),
+      PayloadSource.LocalSaved,
+    )
+
+    this.discardablePayloads = this.responseCollection.payloads
+      .filter(isDeletedPayload)
+      .filter((payload) => {
+        return !payload.dirty
+      })
 
     deepFreeze(this)
-  }
-
-  public get numberOfItemsInvolved() {
-    return this.allProcessedPayloads.length
-  }
-
-  public get allProcessedPayloads() {
-    const allPayloads = this.savedPayloads
-    return allPayloads
   }
 }

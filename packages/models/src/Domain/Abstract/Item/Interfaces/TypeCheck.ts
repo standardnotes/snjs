@@ -2,13 +2,14 @@ import { EncryptedItemInterface } from './EncryptedItem'
 import { DeletedItemInterface } from './DeletedItem'
 import { ItemInterface } from './ItemInterface'
 import { DecryptedItemInterface } from './DecryptedItem'
+import { isDecryptedPayload, isDeletedPayload, isEncryptedPayload } from '../../Payload'
 
 export function isDecryptedItem(item: ItemInterface): item is DecryptedItemInterface {
-  return 'references' in item
+  return isDecryptedPayload(item.payload)
 }
 
 export function isEncryptedItem(item: ItemInterface): item is EncryptedItemInterface {
-  return 'errorDecrypting' in item
+  return isEncryptedPayload(item.payload)
 }
 
 export function isNotEncryptedItem(
@@ -18,7 +19,7 @@ export function isNotEncryptedItem(
 }
 
 export function isDeletedItem(item: ItemInterface): item is DeletedItemInterface {
-  return 'deleted' in item
+  return isDeletedPayload(item.payload)
 }
 
 export function isEncryptedErroredItem(item: ItemInterface): boolean {

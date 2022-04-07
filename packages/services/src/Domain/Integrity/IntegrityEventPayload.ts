@@ -1,7 +1,7 @@
-import { TransferPayload } from '@standardnotes/models'
+import { ServerItemResponse } from '@standardnotes/responses'
 import { SyncSource } from '../Sync/SyncSource'
 
 export type IntegrityEventPayload = {
-  rawPayloads: TransferPayload[]
+  rawPayloads: ServerItemResponse[]
   source: SyncSource
 }

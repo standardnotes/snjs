@@ -13,9 +13,9 @@ import {
 
 type Return = EncryptedPayloadInterface | DecryptedPayloadInterface | DeletedPayloadInterface
 
-export class DeltaRemoteSaved extends PayloadsDelta<
+export class DeltaOfflineSaved extends PayloadsDelta<
   FullyFormedPayloadInterface,
-  ContentlessPayloadInterface | DeletedPayloadInterface,
+  ContentlessPayloadInterface,
   EncryptedPayloadInterface | DecryptedPayloadInterface | DeletedPayloadInterface
 > {
   public async resultingCollection(): Promise<ImmutablePayloadCollection<Return>> {
@@ -36,7 +36,7 @@ export class DeltaRemoteSaved extends PayloadsDelta<
             deleted: true,
             content: undefined,
           },
-          PayloadSource.RemoteSaved,
+          PayloadSource.LocalSaved,
         )
         processed.push(result)
       } else if (base) {
@@ -46,7 +46,7 @@ export class DeltaRemoteSaved extends PayloadsDelta<
             lastSyncEnd: new Date(),
             dirty: deleted,
           },
-          PayloadSource.RemoteSaved,
+          PayloadSource.LocalSaved,
         )
         processed.push(result)
       }

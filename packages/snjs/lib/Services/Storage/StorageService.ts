@@ -12,6 +12,7 @@ import {
   createEncryptedLocalStorageContextPayload,
   DecryptedPayload,
   EncryptedPayload,
+  FullyFormedPayloadInterface,
   isDecryptedTransferPayload,
   isDeletedPayload,
   isEncryptedTransferPayload,
@@ -378,9 +379,7 @@ export class SNStorageService
     return this.savePayloads([payload])
   }
 
-  public async savePayloads(
-    decryptedPayloads: (Models.DecryptedPayloadInterface | Models.DeletedPayloadInterface)[],
-  ): Promise<void> {
+  public async savePayloads(payloads: FullyFormedPayloadInterface[]): Promise<void> {
     if (this.persistencePolicy === Services.StoragePersistencePolicies.Ephemeral) {
       return
     }
@@ -427,8 +426,7 @@ export class SNStorageService
       return { encryptables, unencryptables, deleted, discardables }
     }
 
-    const { encryptables, unencryptables, deleted, discardables } =
-      categorizePayloads(decryptedPayloads)
+    const { encryptables, unencryptables, deleted, discardables } = categorizePayloads(payloads)
 
     await this.deletePayloads(discardables)
 

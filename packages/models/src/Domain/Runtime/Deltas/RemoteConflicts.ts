@@ -7,19 +7,19 @@ import { PayloadsDelta } from './Delta'
 import { isDecryptedPayload, isDeletedPayload } from '../../Abstract/Payload/Interfaces/TypeCheck'
 import {
   DecryptedPayloadInterface,
-  ConcretePayload,
+  FullyFormedPayloadInterface,
   DeletedPayloadInterface,
   EncryptedPayloadInterface,
 } from '../../Abstract/Payload'
 
-type Result = EncryptedPayloadInterface | DecryptedPayloadInterface | DeletedPayloadInterface
+type Return = EncryptedPayloadInterface | DecryptedPayloadInterface | DeletedPayloadInterface
 
 export class DeltaRemoteConflicts extends PayloadsDelta<
-  ConcretePayload,
-  EncryptedPayloadInterface,
-  Result
+  FullyFormedPayloadInterface,
+  EncryptedPayloadInterface | DeletedPayloadInterface,
+  EncryptedPayloadInterface | DecryptedPayloadInterface | DeletedPayloadInterface
 > {
-  public async resultingCollection(): Promise<ImmutablePayloadCollection<Result>> {
+  public async resultingCollection(): Promise<ImmutablePayloadCollection<Return>> {
     if (this.applyCollection.source === PayloadSource.ConflictUuid) {
       return this.collectionsByHandlingUuidConflicts()
     } else if (this.applyCollection.source === PayloadSource.ConflictData) {
@@ -29,8 +29,8 @@ export class DeltaRemoteConflicts extends PayloadsDelta<
     }
   }
 
-  private async collectionsByHandlingDataConflicts(): Promise<ImmutablePayloadCollection<Result>> {
-    const results: Result[] = []
+  private async collectionsByHandlingDataConflicts(): Promise<ImmutablePayloadCollection<Return>> {
+    const results: Return[] = []
     for (const payload of this.applyCollection.all()) {
       const current = this.findBasePayload(payload.uuid)
 
@@ -40,8 +40,8 @@ export class DeltaRemoteConflicts extends PayloadsDelta<
         continue
       }
 
-      const decrypted = this.findRelatedDecryptedTransientPayload(payload.uuid)
-      if (!decrypted && !isDeletedPayload(payload)) {
+      const postProcessedCounterpart = this.findRelatedPostProcessedPayload(payload.uuid)
+      if (!postProcessedCounterpart && !isDeletedPayload(payload)) {
         /** Decrypted should only be missing in case of deleted payload */
         throw 'Unable to find decrypted counterpart for data conflict.'
       }
@@ -49,7 +49,7 @@ export class DeltaRemoteConflicts extends PayloadsDelta<
       const delta = new ConflictDelta(
         this.baseCollection,
         current,
-        decrypted || payload,
+        postProcessedCounterpart || payload,
         PayloadSource.ConflictData,
         this.historyMap,
       )
@@ -67,8 +67,8 @@ export class DeltaRemoteConflicts extends PayloadsDelta<
    * backup with uuids from the old account into a new account.
    * In uuid_conflict, we receive the value we attmpted to save.
    */
-  private async collectionsByHandlingUuidConflicts(): Promise<ImmutablePayloadCollection<Result>> {
-    const results: Result[] = []
+  private async collectionsByHandlingUuidConflicts(): Promise<ImmutablePayloadCollection<Return>> {
+    const results: Return[] = []
     const baseCollectionCopy = this.baseCollection.mutableCopy()
 
     for (const payload of this.applyCollection.all()) {
@@ -79,7 +79,7 @@ export class DeltaRemoteConflicts extends PayloadsDelta<
        * of this.applyCollection. In this case we'd prefer the most recently modified value.
        */
       const moreRecent = results.find((r) => r.uuid === payload.uuid)
-      const decrypted = moreRecent || this.findRelatedDecryptedTransientPayload(payload.uuid)
+      const decrypted = moreRecent || this.findRelatedPostProcessedPayload(payload.uuid)
 
       if (!decrypted || !isDecryptedPayload(decrypted)) {
         console.error('Unable to find decrypted counterpart for payload', payload)

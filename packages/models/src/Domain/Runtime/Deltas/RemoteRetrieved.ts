@@ -11,17 +11,25 @@ import {
 import {
   DecryptedPayloadInterface,
   DeletedPayloadInterface,
-  ConcretePayload,
+  FullyFormedPayloadInterface,
   EncryptedPayloadInterface,
 } from '../../Abstract/Payload'
+import { Uuid } from '@standardnotes/common'
 
 type Return = EncryptedPayloadInterface | DecryptedPayloadInterface | DeletedPayloadInterface
 
 export class DeltaRemoteRetrieved extends PayloadsDelta<
-  ConcretePayload,
-  EncryptedPayloadInterface,
-  Return
+  FullyFormedPayloadInterface,
+  EncryptedPayloadInterface | DeletedPayloadInterface,
+  EncryptedPayloadInterface | DecryptedPayloadInterface | DeletedPayloadInterface
 > {
+  private findRelatedSavedOrSavingPayload(
+    uuid: Uuid,
+  ): PayloadInterface | DeletedPayloadInterface | undefined {
+    const collection = this.relatedCollectionSet?.collectionForSource(PayloadSource.SavedOrSaving)
+    return collection?.find(uuid)
+  }
+
   public async resultingCollection(): Promise<ImmutablePayloadCollection<Return>> {
     const filtered: Return[] = []
     const conflicted: Array<PayloadInterface> = []
@@ -31,14 +39,11 @@ export class DeltaRemoteRetrieved extends PayloadsDelta<
      * or if the item is locally dirty, filter it out of retrieved_items, and add to potential conflicts.
      */
     for (const received of this.applyCollection.all()) {
-      const savedOrSaving = this.findRelatedPayload(
-        received.uuid as string,
-        PayloadSource.SavedOrSaving,
-      )
+      const savedOrSaving = this.findRelatedSavedOrSavingPayload(received.uuid)
 
-      const decrypted = this.findRelatedDecryptedTransientPayload(received.uuid as string)
-      if (!decrypted) {
-        /** Decrypted should only be missing in case of deleted retrieved item */
+      const postProcessedCounterpart = this.findRelatedPostProcessedPayload(received.uuid)
+      if (!postProcessedCounterpart) {
+        /** Should only be missing in case of deleted retrieved item */
         if (isDeletedPayload(received)) {
           filtered.push(received)
         }
@@ -47,17 +52,17 @@ export class DeltaRemoteRetrieved extends PayloadsDelta<
       }
 
       if (savedOrSaving) {
-        conflicted.push(decrypted)
+        conflicted.push(postProcessedCounterpart)
         continue
       }
 
-      const base = this.findBasePayload(received.uuid as string)
+      const base = this.findBasePayload(received.uuid)
       if (base?.dirty && !isErrorDecryptingPayload(base)) {
-        conflicted.push(decrypted)
+        conflicted.push(postProcessedCounterpart)
         continue
       }
 
-      filtered.push(decrypted)
+      filtered.push(postProcessedCounterpart as Return)
     }
 
     /**
@@ -67,7 +72,7 @@ export class DeltaRemoteRetrieved extends PayloadsDelta<
      */
     const conflictResults: Return[] = []
     for (const conflict of conflicted) {
-      const decrypted = this.findRelatedDecryptedTransientPayload(conflict.uuid)
+      const decrypted = this.findRelatedPostProcessedPayload(conflict.uuid)
       if (!decrypted) {
         continue
       }

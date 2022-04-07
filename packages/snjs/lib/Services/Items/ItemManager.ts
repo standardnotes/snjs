@@ -7,9 +7,8 @@ import { TransactionalMutation } from './TransactionalMutation'
 import { UuidString } from '../../Types/UuidString'
 import * as Models from '@standardnotes/models'
 import * as Services from '@standardnotes/services'
-import { isNotEncryptedItem } from '@standardnotes/models'
 import { ItemsClientInterface } from './ItemsClientInterface'
-import { EmitOutPayloads } from '../Payloads'
+import { FullyFormedPayloadInterface } from '../Payloads'
 
 type ItemsChangeObserver = {
   contentType: ContentType[]
@@ -39,7 +38,7 @@ export class ItemManager
 
   constructor(
     private payloadManager: PayloadManager,
-    protected internalEventBus: Services.InternalEventBusInterface,
+    protected override internalEventBus: Services.InternalEventBusInterface,
   ) {
     super(internalEventBus)
     this.payloadManager = payloadManager
@@ -159,7 +158,7 @@ export class ItemManager
     return this.notesCollection.displayElements()
   }
 
-  public deinit(): void {
+  public override deinit(): void {
     this.unsubChangeObserver()
     ;(this.unsubChangeObserver as unknown) = undefined
     ;(this.payloadManager as unknown) = undefined
@@ -331,14 +330,14 @@ export class ItemManager
   }
 
   private setPayloads(
-    changedPayloads: EmitOutPayloads[],
-    insertedPayloads: EmitOutPayloads[],
+    changedPayloads: FullyFormedPayloadInterface[],
+    insertedPayloads: FullyFormedPayloadInterface[],
     discardedPayloads: Models.DeletedPayloadInterface[],
     ignoredPayloads: Models.EncryptedPayloadInterface[],
     source: Models.PayloadSource,
     sourceKey?: string,
   ) {
-    const createItem = (payload: EmitOutPayloads) => Models.CreateItemFromPayload(payload)
+    const createItem = (payload: FullyFormedPayloadInterface) => Models.CreateItemFromPayload(payload)
 
     const changedItems = changedPayloads.map(createItem)
 
@@ -353,8 +352,8 @@ export class ItemManager
     )
 
     const delta: Models.ItemDelta = {
-      changed: changedItems.filter(isNotEncryptedItem),
-      inserted: insertedItems.filter(isNotEncryptedItem),
+      changed: changedItems.filter(Models.isNotEncryptedItem),
+      inserted: insertedItems.filter(Models.isNotEncryptedItem),
       discarded: discardedItems,
       ignored: ignoredItems,
     }
@@ -450,7 +449,8 @@ export class ItemManager
     payloadSourceKey?: string,
   ): Promise<I[]> {
     const items = this.findItemsIncludingBlanks(Uuids(itemsToLookupUuidsFor))
-    const payloads = []
+    const payloads: Models.DecryptedPayloadInterface[] = []
+
     for (const item of items) {
       if (!item) {
         throw Error('Attempting to change non-existant item')
@@ -462,6 +462,7 @@ export class ItemManager
       const payload = mutator.getResult()
       payloads.push(payload)
     }
+
     await this.payloadManager.emitPayloads(payloads, payloadSource, payloadSourceKey)
     const results = this.findItems(payloads.map((p) => p.uuid)) as I[]
     return results
@@ -1255,5 +1256,24 @@ export class ItemManager
     return this.changeItem<Models.FileMutator, Models.SNFile>(file, (mutator) => {
       mutator.name = name
     })
+  }
+
+  public async setLastSyncBeganForItems(
+    itemsToLookupUuidsFor: (Models.DecryptedItemInterface | Models.DeletedItemInterface)[],
+    date: Date,
+  ): Promise<void> {
+    const items = this.collection.findAll(Uuids(itemsToLookupUuidsFor))
+    const payloads: (Models.DecryptedPayloadInterface | Models.DeletedPayloadInterface)[] = []
+
+    for (const item of items) {
+      const mutator = new Models.ItemMutator<
+        Models.DecryptedPayloadInterface | Models.DeletedPayloadInterface
+      >(item, Models.MutationType.NonDirtying)
+      mutator.lastSyncBegan = date
+      const payload = mutator.getResult()
+      payloads.push(payload)
+    }
+
+    await this.payloadManager.emitPayloads(payloads, Models.PayloadSource.PreSyncSave)
   }
 }

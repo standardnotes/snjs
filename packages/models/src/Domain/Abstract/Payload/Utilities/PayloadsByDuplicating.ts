@@ -3,9 +3,10 @@ import { extendArray, UuidGenerator } from '@standardnotes/utils'
 import { ImmutablePayloadCollection } from '../../../Runtime/Collection/Payload/ImmutablePayloadCollection'
 import { ItemContent } from '../../Item/Interfaces/ItemContent'
 import { AffectorMapping } from './AffectorFunction'
-import { PayloadsByUpdatingReferencingPayloadReferences } from './Functions'
+import { PayloadsByUpdatingReferencingPayloadReferences } from './PayloadsByUpdatingReferencingPayloadReferences'
 import { PayloadInterface } from '../Interfaces/PayloadInterface'
 import { isDecryptedPayload } from '../Interfaces/TypeCheck'
+import { FullyFormedPayloadInterface } from '../Interfaces/UnionTypes'
 import { DecryptedTransferPayload } from '../../TransferPayload/Interfaces/DecryptedTransferPayload'
 
 /**
@@ -14,7 +15,7 @@ import { DecryptedTransferPayload } from '../../TransferPayload/Interfaces/Decry
  */
 export async function PayloadsByDuplicating<C extends ItemContent = ItemContent>(
   payload: PayloadInterface,
-  baseCollection: ImmutablePayloadCollection,
+  baseCollection: ImmutablePayloadCollection<FullyFormedPayloadInterface>,
   isConflict: boolean,
   additionalContent?: Partial<C>,
 ): Promise<PayloadInterface[]> {

@@ -1,5 +1,9 @@
-import { DeletedPayloadInterface, EncryptedPayloadInterface } from '@standardnotes/models'
-import { arrayByDifference, subtractFromArray } from '@standardnotes/utils'
+import { ServerSyncPushContextualPayload } from '@standardnotes/models'
+import {
+  arrayByDifference,
+  nonSecureRandomIdentifier,
+  subtractFromArray,
+} from '@standardnotes/utils'
 import { ServerSyncResponse } from '@Lib/Services/Sync/Account/Response'
 import { ResponseSignalReceiver, SyncSignal } from '@Lib/Services/Sync/Signals'
 import { SNApiService } from '../../Api/ApiService'
@@ -12,9 +16,9 @@ export const SyncUpDownLimit = 150
  * emitting a stream of values that should be acted upon in real time.
  */
 export class AccountSyncOperation {
-  public id = Math.random()
+  public readonly id = nonSecureRandomIdentifier()
 
-  private pendingPayloads: (EncryptedPayloadInterface | DeletedPayloadInterface)[]
+  private pendingPayloads: ServerSyncPushContextualPayload[]
   private responses: ServerSyncResponse[] = []
 
   /**
@@ -22,7 +26,7 @@ export class AccountSyncOperation {
    * @param receiver   A function that receives callback multiple times during the operation
    */
   constructor(
-    private payloads: (EncryptedPayloadInterface | DeletedPayloadInterface)[],
+    private payloads: ServerSyncPushContextualPayload[],
     private receiver: ResponseSignalReceiver<ServerSyncResponse>,
     private lastSyncToken: string,
     private paginationToken: string,
@@ -39,7 +43,7 @@ export class AccountSyncOperation {
   /**
    * Read the payloads that have been saved, or are currently in flight.
    */
-  get payloadsSavedOrSaving() {
+  get payloadsSavedOrSaving(): ServerSyncPushContextualPayload[] {
     return arrayByDifference(this.payloads, this.pendingPayloads)
   }
 
@@ -57,7 +61,7 @@ export class AccountSyncOperation {
     const payloads = this.popPayloads(this.upLimit)
 
     const rawResponse = (await this.apiService.sync(
-      payloads.map((p) => p.ejected()),
+      payloads,
       this.lastSyncToken,
       this.paginationToken,
       this.downLimit,
