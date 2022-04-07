@@ -23,7 +23,7 @@ export class DeleteItemMutator<
     return result
   }
 
-  public getResult(): DeletedPayloadInterface {
+  public override getResult(): PayloadInterface {
     throw Error('Must use getDeletedResult')
   }
 }

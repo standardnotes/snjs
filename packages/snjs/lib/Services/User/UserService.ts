@@ -43,12 +43,12 @@ export class UserService
     private challengeService: ChallengeService,
     private protectionService: SNProtectionService,
     private apiService: SNApiService,
-    protected internalEventBus: Services.InternalEventBusInterface,
+    protected override internalEventBus: Services.InternalEventBusInterface,
   ) {
     super(internalEventBus)
   }
 
-  public deinit(): void {
+  public override deinit(): void {
     super.deinit()
     ;(this.sessionManager as unknown) = undefined
     ;(this.syncService as unknown) = undefined
@@ -435,10 +435,10 @@ export class UserService
    * but not from working memory See:
    * https://github.com/standardnotes/desktop/issues/131
    */
-  private async rewriteItemsKeys() {
+  private async rewriteItemsKeys(): Promise<void> {
     const itemsKeys = this.itemManager.itemsKeys()
     const payloads = itemsKeys.map((key) => key.payloadRepresentation())
-    await this.storageService.deletePayloads(payloads)
+    await this.storageService.forceDeletePayloads(payloads)
     await this.syncService.persistPayloads(payloads)
   }
 

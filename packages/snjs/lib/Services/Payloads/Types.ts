@@ -3,11 +3,10 @@ import {
   DeletedPayloadInterface,
   EncryptedPayloadInterface,
   FullyFormedPayloadInterface,
-  PayloadInterface,
   PayloadSource,
 } from '@standardnotes/models'
 
-export type EmitQueue<P extends PayloadInterface = PayloadInterface> = QueueElement<P>[]
+export type EmitQueue<P extends FullyFormedPayloadInterface> = QueueElement<P>[]
 
 export type PayloadsChangeObserverCallback = (
   /** The items are pre-existing but have been changed */

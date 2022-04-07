@@ -8,7 +8,6 @@ import { UuidString } from '../../Types/UuidString'
 import * as Models from '@standardnotes/models'
 import * as Services from '@standardnotes/services'
 import { ItemsClientInterface } from './ItemsClientInterface'
-import { FullyFormedPayloadInterface } from '../Payloads'
 
 type ItemsChangeObserver = {
   contentType: ContentType[]
@@ -330,14 +329,15 @@ export class ItemManager
   }
 
   private setPayloads(
-    changedPayloads: FullyFormedPayloadInterface[],
-    insertedPayloads: FullyFormedPayloadInterface[],
+    changedPayloads: Models.FullyFormedPayloadInterface[],
+    insertedPayloads: Models.FullyFormedPayloadInterface[],
     discardedPayloads: Models.DeletedPayloadInterface[],
     ignoredPayloads: Models.EncryptedPayloadInterface[],
     source: Models.PayloadSource,
     sourceKey?: string,
   ) {
-    const createItem = (payload: FullyFormedPayloadInterface) => Models.CreateItemFromPayload(payload)
+    const createItem = (payload: Models.FullyFormedPayloadInterface) =>
+      Models.CreateItemFromPayload(payload)
 
     const changedItems = changedPayloads.map(createItem)
 
@@ -676,6 +676,7 @@ export class ItemManager
       isConflict,
       additionalContent,
     )
+
     await this.payloadManager.emitPayloads(resultingPayloads, Models.PayloadSource.LocalChanged)
     const duplicate = this.findSureItem<T>(resultingPayloads[0].uuid)
     return duplicate

@@ -30,7 +30,7 @@ export class SNMigrationService extends AbstractService {
     super(services.internalEventBus)
   }
 
-  public deinit(): void {
+  override deinit(): void {
     ;(this.services as unknown) = undefined
 
     if (this.activeMigrations) {
@@ -78,7 +78,7 @@ export class SNMigrationService extends AbstractService {
    * Application instances will call this function directly when they arrive
    * at a certain migratory state.
    */
-  public async handleApplicationStage(stage: ApplicationStage): Promise<void> {
+  public override async handleApplicationStage(stage: ApplicationStage): Promise<void> {
     await super.handleApplicationStage(stage)
     await this.handleStage(stage)
   }

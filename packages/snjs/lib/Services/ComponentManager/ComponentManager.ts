@@ -1,16 +1,25 @@
 import { AllowedBatchStreaming } from './Types'
 import { SNPreferencesService } from '../Preferences/PreferencesService'
-import { FindNativeFeature } from '@standardnotes/features'
 import { SNFeaturesService } from '@Lib/Services/Features/FeaturesService'
 import { ContentType, DisplayStringForContentType } from '@standardnotes/common'
-import { PayloadSource } from '@standardnotes/models'
 import { ItemManager } from '@Lib/Services/Items/ItemManager'
-import { SNNote, SNTheme, SNComponent, ComponentMutator } from '@standardnotes/models'
+import {
+  SNNote,
+  SNTheme,
+  SNComponent,
+  ComponentMutator,
+  PayloadSource,
+} from '@standardnotes/models'
 import { SNAlertService } from '@Lib/Services/Alert/AlertService'
 import { SNSyncService } from '@Lib/Services/Sync/SyncService'
 import find from 'lodash/find'
 import uniq from 'lodash/uniq'
-import { ComponentArea, ComponentAction, ComponentPermission } from '@standardnotes/features'
+import {
+  ComponentArea,
+  ComponentAction,
+  ComponentPermission,
+  FindNativeFeature,
+} from '@standardnotes/features'
 import { Copy, filterFromArray, removeFromArray, sleep } from '@standardnotes/utils'
 import { Environment, Platform } from '@Lib/Application/Platforms'
 import { UuidString } from '@Lib/Types/UuidString'
@@ -62,7 +71,7 @@ export class SNComponentManager extends AbstractService<ComponentManagerEvent, E
     protected alertService: SNAlertService,
     private environment: Environment,
     private platform: Platform,
-    protected internalEventBus: InternalEventBusInterface,
+    protected override internalEventBus: InternalEventBusInterface,
   ) {
     super(internalEventBus)
     this.loggingEnabled = false
@@ -90,8 +99,7 @@ export class SNComponentManager extends AbstractService<ComponentManagerEvent, E
     })
   }
 
-  /** @override */
-  deinit(): void {
+  override deinit(): void {
     super.deinit()
     for (const viewer of this.viewers) {
       viewer.destroy()

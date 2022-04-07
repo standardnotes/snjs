@@ -57,7 +57,7 @@ export class SNActionsExtension extends DecryptedItem<ActionExtensionContent> {
   }
 
   /** Do not duplicate. Always keep original */
-  strategyWhenConflictingWithItem(
+  override strategyWhenConflictingWithItem(
     _item: DecryptedItemInterface,
     _previousRevision?: HistoryEntryInterface,
   ): ConflictStrategy {

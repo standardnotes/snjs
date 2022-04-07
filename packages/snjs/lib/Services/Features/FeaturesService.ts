@@ -65,7 +65,7 @@ export class SNFeaturesService
     private alertService: SNAlertService,
     private sessionManager: SNSessionManager,
     private crypto: SNPureCrypto,
-    protected internalEventBus: Services.InternalEventBusInterface,
+    protected override internalEventBus: Services.InternalEventBusInterface,
   ) {
     super(internalEventBus)
 
@@ -141,7 +141,7 @@ export class SNFeaturesService
     }
   }
 
-  async handleApplicationStage(stage: ApplicationStage): Promise<void> {
+  override async handleApplicationStage(stage: ApplicationStage): Promise<void> {
     await super.handleApplicationStage(stage)
     if (stage === ApplicationStage.FullSyncCompleted_13) {
       if (!this.hasOnlineSubscription()) {
@@ -341,7 +341,11 @@ export class SNFeaturesService
   }
 
   public initializeFromDisk(): void {
-    this.roles = this.storageService.getValue<RoleName[]>(Services.StorageKey.UserRoles, undefined, [])
+    this.roles = this.storageService.getValue<RoleName[]>(
+      Services.StorageKey.UserRoles,
+      undefined,
+      [],
+    )
 
     this.features = this.storageService.getValue(Services.StorageKey.UserFeatures, undefined, [])
 
@@ -695,7 +699,7 @@ export class SNFeaturesService
     return component
   }
 
-  deinit(): void {
+  override deinit(): void {
     super.deinit()
     this.removeSignInObserver()
     ;(this.removeSignInObserver as unknown) = undefined

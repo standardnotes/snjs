@@ -61,6 +61,7 @@ export abstract class AbstractService<EventName = string, EventData = undefined>
    */
   public deinit(): void {
     this.eventObservers.length = 0
+    ;(this.internalEventBus as unknown) = undefined
   }
 
   /**

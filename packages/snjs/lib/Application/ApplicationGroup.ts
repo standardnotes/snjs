@@ -1,5 +1,3 @@
-import { RawStorageKey } from '@standardnotes/services'
-import { removeFromArray } from '@standardnotes/utils'
 import { UuidString, DeinitSource } from '../Types'
 import { SNApplication } from './Application'
 import {
@@ -7,8 +5,9 @@ import {
   DeviceInterface,
   InternalEventBus,
   InternalEventBusInterface,
+  RawStorageKey,
 } from '@standardnotes/services'
-import { UuidGenerator } from '@standardnotes/utils'
+import { UuidGenerator, removeFromArray } from '@standardnotes/utils'
 
 export type ApplicationDescriptor = {
   identifier: string | UuidString
@@ -46,7 +45,7 @@ export class SNApplicationGroup extends AbstractService {
     super(internalEventBus)
   }
 
-  deinit() {
+  override deinit() {
     super.deinit()
     this.deviceInterface.deinit()
     ;(this.deviceInterface as unknown) = undefined

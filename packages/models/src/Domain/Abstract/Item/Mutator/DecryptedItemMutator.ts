@@ -22,7 +22,7 @@ export class DecryptedItemMutator<C extends ItemContent = ItemContent> extends I
     this.content = mutableCopy
   }
 
-  public getResult() {
+  public override getResult() {
     if (this.type === MutationType.NonDirtying) {
       return this.payload.copy({
         content: this.content,
@@ -56,7 +56,7 @@ export class DecryptedItemMutator<C extends ItemContent = ItemContent> extends I
     this.content = mutableContent
   }
 
-  public set lastSyncBegan(began: Date) {
+  public override set lastSyncBegan(began: Date) {
     this.payload = this.payload.copy({
       content: this.content,
       lastSyncBegan: began,

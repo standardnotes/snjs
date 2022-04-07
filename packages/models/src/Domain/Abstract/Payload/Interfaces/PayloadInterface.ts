@@ -1,6 +1,5 @@
 import { ContentType, Uuid } from '@standardnotes/common'
 import { TransferPayload } from '../../TransferPayload/Interfaces/TransferPayload'
-import { PayloadFormat } from '../Types/PayloadFormat'
 import { PayloadSource } from '../Types/PayloadSource'
 
 /**
@@ -23,7 +22,6 @@ export interface PayloadInterface<T extends TransferPayload = TransferPayload> {
   readonly source: PayloadSource
   readonly uuid: Uuid
   readonly content_type: ContentType
-  readonly format: PayloadFormat
 
   /** updated_at is set by the server only, and not the client.*/
   readonly updated_at: Date

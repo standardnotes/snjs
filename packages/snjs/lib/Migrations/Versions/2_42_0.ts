@@ -7,7 +7,7 @@ import { SNTheme } from '@standardnotes/models'
 const NoDistractionIdentifier = 'org.standardnotes.theme-no-distraction' as FeatureIdentifier
 
 export class Migration2_42_0 extends Migration {
-  static version(): string {
+  static override version(): string {
     return '2.42.0'
   }
 

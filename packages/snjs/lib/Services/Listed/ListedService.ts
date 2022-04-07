@@ -21,9 +21,17 @@ export class ListedService extends AbstractService implements ListedClientInterf
     private itemManager: ItemManager,
     private settingsService: SNSettingsService,
     private httpSerivce: SNHttpService,
-    protected internalEventBus: InternalEventBusInterface,
+    protected override internalEventBus: InternalEventBusInterface,
   ) {
     super(internalEventBus)
+  }
+
+  override deinit() {
+    ;(this.itemManager as unknown) = undefined
+    ;(this.settingsService as unknown) = undefined
+    ;(this.apiService as unknown) = undefined
+    ;(this.httpSerivce as unknown) = undefined
+    super.deinit()
   }
 
   public canRegisterNewListedAccount(): boolean {

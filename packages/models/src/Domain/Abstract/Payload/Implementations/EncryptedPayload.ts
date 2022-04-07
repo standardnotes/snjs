@@ -1,7 +1,6 @@
 import { ProtocolVersion, protocolVersionFromEncryptedString } from '@standardnotes/common'
 import { EncryptedTransferPayload } from '../../TransferPayload/Interfaces/EncryptedTransferPayload'
 import { EncryptedPayloadInterface } from '../Interfaces/EncryptedPayload'
-import { PayloadFormat } from '../Types/PayloadFormat'
 import { PayloadSource } from '../Types/PayloadSource'
 import { PurePayload } from './PurePayload'
 
@@ -14,7 +13,6 @@ export class EncryptedPayload
   readonly items_key_id?: string
   readonly errorDecrypting?: boolean
   readonly waitingForKey?: boolean
-  readonly format: PayloadFormat.EncryptedString = PayloadFormat.EncryptedString
   readonly deleted: false = false
   readonly auth_hash?: string
   readonly version: ProtocolVersion
@@ -33,7 +31,7 @@ export class EncryptedPayload
     this.version = protocolVersionFromEncryptedString(this.content)
   }
 
-  ejected(): EncryptedTransferPayload {
+  override ejected(): EncryptedTransferPayload {
     const values = {
       content: this.content,
       enc_item_key: this.enc_item_key,

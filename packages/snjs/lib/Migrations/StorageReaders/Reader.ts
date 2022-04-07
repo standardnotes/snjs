@@ -6,7 +6,6 @@ import { DeviceInterface } from '@standardnotes/services'
  * A storage reader reads storage via a device interface
  * given a specific version of SNJS
  */
-
 export abstract class StorageReader {
   constructor(
     protected deviceInterface: DeviceInterface,

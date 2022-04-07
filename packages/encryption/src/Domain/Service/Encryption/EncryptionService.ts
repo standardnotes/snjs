@@ -1,6 +1,6 @@
 import { BackupFile } from '../../Backups/BackupFile'
 import { CreateAnyKeyParams } from '../../RootKey/KeyParams'
-import { decryptBackupFile } from '../../Backups/BackupFileDecryptor'
+import { DecryptBackupFile } from '../../Backups/BackupFileDecryptor'
 import { EncryptionProvider } from './EncryptionProvider'
 import { findDefaultItemsKey } from '../Functions'
 import { ItemsEncryptionService } from '../Items/ItemsEncryption'
@@ -34,6 +34,7 @@ import { ItemAuthenticatedData } from '../../Encryption/ItemAuthenticatedData'
 import { LegacyAttachedData } from '../../Encryption/LegacyAttachedData'
 import { createEncryptedFileExportContextPayload, EncryptedPayload } from '@standardnotes/models'
 import { SplitPayloadsByEncryptionType } from '../../Encryption/Split/EncryptionTypeSplit'
+import { ClientDisplayableError } from '@standardnotes/responses'
 
 export enum EncryptionServiceEvent {
   RootKeyStatusChanged = 'RootKeyStatusChanged',
@@ -82,7 +83,7 @@ export class EncryptionService
     private storageService: Services.StorageServiceInterface,
     private identifier: Common.ApplicationIdentifier,
     public crypto: SNPureCrypto,
-    protected internalEventBus: Services.InternalEventBusInterface,
+    protected override internalEventBus: Services.InternalEventBusInterface,
   ) {
     super(internalEventBus)
     this.crypto = crypto
@@ -115,8 +116,7 @@ export class EncryptionService
     Utils.UuidGenerator.SetGenerator(this.crypto.generateUUID)
   }
 
-  /** @override */
-  public deinit(): void {
+  public override deinit(): void {
     ;(this.itemManager as unknown) = undefined
     ;(this.payloadManager as unknown) = undefined
     ;(this.deviceInterface as unknown) = undefined
@@ -356,10 +356,7 @@ export class EncryptionService
     }
   }
 
-  /**
-   * @returns The versions that this library supports.
-   */
-  public supportedVersions() {
+  public supportedVersions(): Common.ProtocolVersion[] {
     return [
       Common.ProtocolVersion.V001,
       Common.ProtocolVersion.V002,
@@ -414,12 +411,14 @@ export class EncryptionService
     return this.rootKeyEncryption.createRootKey(identifier, password, origination, version)
   }
 
-  /**
-   * Decrypts a backup file using user-inputted password
-   * @param password - The raw user password associated with this backup file
-   */
-  public async payloadsByDecryptingBackupFile(file: BackupFile, password?: string) {
-    const result = await decryptBackupFile(file, this, password)
+  public async decryptBackupFile(
+    file: BackupFile,
+    password?: string,
+  ): Promise<
+    | ClientDisplayableError
+    | (Models.EncryptedPayloadInterface | Models.DecryptedPayloadInterface<Models.ItemContent>)[]
+  > {
+    const result = await DecryptBackupFile(file, this, password)
     return result
   }
 

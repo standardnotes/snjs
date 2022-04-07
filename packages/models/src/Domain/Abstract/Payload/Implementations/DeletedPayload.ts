@@ -1,6 +1,5 @@
 import { DeletedTransferPayload } from './../../TransferPayload/Interfaces/DeletedTransferPayload'
 import { DeletedPayloadInterface } from '../Interfaces/DeletedPayload'
-import { PayloadFormat } from '../Types/PayloadFormat'
 import { PayloadSource } from '../Types/PayloadSource'
 import { PurePayload } from './PurePayload'
 
@@ -10,7 +9,6 @@ export class DeletedPayload
 {
   readonly deleted: true = true
   readonly content: undefined
-  readonly format: PayloadFormat.Deleted = PayloadFormat.Deleted
 
   constructor(rawPayload: DeletedTransferPayload, source = PayloadSource.Constructor) {
     super(rawPayload, source)
@@ -20,7 +18,7 @@ export class DeletedPayload
     return !this.dirty
   }
 
-  ejected(): DeletedTransferPayload {
+  override ejected(): DeletedTransferPayload {
     const values = {
       deleted: this.deleted,
       content: this.content,

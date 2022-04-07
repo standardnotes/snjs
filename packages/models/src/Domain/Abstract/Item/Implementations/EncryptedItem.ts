@@ -15,7 +15,7 @@ export class EncryptedItem
     return this.payload.version
   }
 
-  public payloadRepresentation(
+  public override payloadRepresentation(
     override?: Partial<EncryptedTransferPayload>,
   ): EncryptedPayloadInterface {
     return this.payload.copy(override)

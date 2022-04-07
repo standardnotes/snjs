@@ -22,7 +22,7 @@ export class NoteHistoryEntry extends HistoryEntry {
     }
   }
 
-  public isDiscardable(): boolean {
+  public override isDiscardable(): boolean {
     return isEmpty(this.payload.content.text)
   }
 }

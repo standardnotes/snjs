@@ -11,6 +11,7 @@ import {
   ErrorDecryptingParameters,
   isErrorDecryptingParameters,
 } from '../../Encryption/EncryptedParameters'
+import { isEncryptedPayload } from '@standardnotes/models'
 
 export class ItemsEncryptionService extends Services.AbstractService {
   private removeItemsObserver!: () => void
@@ -21,7 +22,7 @@ export class ItemsEncryptionService extends Services.AbstractService {
     private payloadManager: Services.PayloadManagerInterface,
     private storageService: Services.StorageServiceInterface,
     private operatorManager: OperatorManager,
-    protected internalEventBus: Services.InternalEventBusInterface,
+    protected override internalEventBus: Services.InternalEventBusInterface,
   ) {
     super(internalEventBus)
 
@@ -35,7 +36,7 @@ export class ItemsEncryptionService extends Services.AbstractService {
     )
   }
 
-  public deinit(): void {
+  public override deinit(): void {
     ;(this.itemManager as unknown) = undefined
     ;(this.payloadManager as unknown) = undefined
     ;(this.storageService as unknown) = undefined
@@ -122,7 +123,7 @@ export class ItemsEncryptionService extends Services.AbstractService {
     payload: Models.DecryptedPayloadInterface,
     key: Models.ItemsKeyInterface,
   ): Promise<EncryptedParameters> {
-    if (payload.format !== Models.PayloadFormat.DecryptedBareObject) {
+    if (isEncryptedPayload(payload)) {
       throw Error('Attempting to encrypt already encrypted payload.')
     }
     if (!payload.content) {

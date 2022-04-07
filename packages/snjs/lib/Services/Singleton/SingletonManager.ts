@@ -1,13 +1,14 @@
 import { PayloadManager } from './../Payloads/PayloadManager'
 import { ContentType } from '@standardnotes/common'
 import { ItemManager } from '@Lib/Services/Items/ItemManager'
-import { DecryptedItemInterface, DecryptedPayload, SingletonStrategy } from '@standardnotes/models'
 import {
-  arrayByRemovingFromIndex,
-  extendArray,
-  UuidGenerator,
-} from '@standardnotes/utils'
-import { ItemContent, PredicateInterface } from '@standardnotes/models'
+  DecryptedItemInterface,
+  DecryptedPayload,
+  SingletonStrategy,
+  ItemContent,
+  PredicateInterface,
+} from '@standardnotes/models'
+import { arrayByRemovingFromIndex, extendArray, UuidGenerator } from '@standardnotes/utils'
 import { SNSyncService } from '../Sync/SyncService'
 import { AbstractService, InternalEventBusInterface, SyncEvent } from '@standardnotes/services'
 
@@ -32,13 +33,13 @@ export class SNSingletonManager extends AbstractService {
     private itemManager: ItemManager,
     private payloadManager: PayloadManager,
     private syncService: SNSyncService,
-    protected internalEventBus: InternalEventBusInterface,
+    protected override internalEventBus: InternalEventBusInterface,
   ) {
     super(internalEventBus)
     this.addObservers()
   }
 
-  public deinit(): void {
+  public override deinit(): void {
     ;(this.syncService as unknown) = undefined
     ;(this.itemManager as unknown) = undefined
     ;(this.payloadManager as unknown) = undefined

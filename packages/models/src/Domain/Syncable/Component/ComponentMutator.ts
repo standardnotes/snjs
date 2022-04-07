@@ -1,6 +1,6 @@
 import { addIfUnique, removeFromArray } from '@standardnotes/utils'
 import { Uuid } from '@standardnotes/common'
-import { ComponentPermission } from '@standardnotes/features'
+import { ComponentPermission, FeatureDescription } from '@standardnotes/features'
 import { AppDataField } from '../../Abstract/Item/Types/AppDataField'
 import { ComponentContent } from './ComponentContent'
 import { DecryptedItemMutator } from '../../Abstract/Item/Mutator/DecryptedItemMutator'
@@ -18,11 +18,11 @@ export class ComponentMutator extends DecryptedItemMutator<ComponentContent> {
     this.setAppDataItem(AppDataField.DefaultEditor, defaultEditor)
   }
 
-  set componentData(componentData: Record<string, any>) {
+  set componentData(componentData: Record<string, unknown>) {
     this.content.componentData = componentData
   }
 
-  set package_info(package_info: any) {
+  set package_info(package_info: FeatureDescription) {
     this.content.package_info = package_info
   }
 

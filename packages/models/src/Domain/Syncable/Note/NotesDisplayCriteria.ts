@@ -89,8 +89,9 @@ export class NotesDisplayCriteria {
       filters.push((note) => !note.archived)
     }
 
-    if (this.searchQuery != undefined) {
-      filters.push((note) => noteMatchesQuery(note, this.searchQuery!, collection))
+    if (this.searchQuery) {
+      const query = this.searchQuery
+      filters.push((note) => noteMatchesQuery(note, query, collection))
     }
 
     return filters

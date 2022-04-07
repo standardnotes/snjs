@@ -34,7 +34,7 @@ export class SNHttpService extends AbstractService {
   constructor(
     private readonly environment: Environment,
     private readonly appVersion: string,
-    protected internalEventBus: InternalEventBusInterface,
+    protected override internalEventBus: InternalEventBusInterface,
   ) {
     super(internalEventBus)
   }

@@ -103,7 +103,7 @@ export class PayloadCollection<
     return filtered
   }
 
-  public set(elements: P | P[]): void {
+  public override set(elements: P | P[]): void {
     super.set(elements)
 
     elements = Array.isArray(elements) ? elements : [elements]
@@ -134,7 +134,7 @@ export class PayloadCollection<
     }
   }
 
-  public discard(elements: (P | D) | (P | D)[]): void {
+  public override discard(elements: (P | D) | (P | D)[]): void {
     super.discard(elements)
     elements = Array.isArray(elements) ? elements : [elements]
     for (const element of elements) {

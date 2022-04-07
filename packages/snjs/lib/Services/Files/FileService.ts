@@ -26,12 +26,12 @@ export class SNFileService extends AbstractService implements FilesClientInterfa
     private syncService: SNSyncService,
     private alertService: SNAlertService,
     private crypto: SNPureCrypto,
-    protected internalEventBus: InternalEventBusInterface,
+    protected override internalEventBus: InternalEventBusInterface,
   ) {
     super(internalEventBus)
   }
 
-  deinit(): void {
+  override deinit(): void {
     super.deinit()
     ;(this.api as unknown) = undefined
     ;(this.itemManager as unknown) = undefined

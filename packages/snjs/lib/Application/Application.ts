@@ -252,7 +252,6 @@ export class SNApplication implements InternalServices.ListedClientInterface {
     this.webSocketsService.loadWebSocketUrl()
     await this.sessionManager.initializeFromDisk()
 
-    void this.historyManager.initializeFromDisk()
     this.settingsService.initializeFromDisk()
 
     this.featuresService.initializeFromDisk()
@@ -1211,6 +1210,7 @@ export class SNApplication implements InternalServices.ListedClientInterface {
   private createSingletonManager() {
     this.singletonManager = new InternalServices.SNSingletonManager(
       this.itemManager,
+      this.payloadManager,
       this.syncService,
       this.internalEventBus,
     )

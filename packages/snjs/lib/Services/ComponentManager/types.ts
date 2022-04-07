@@ -5,10 +5,9 @@ import {
   FeatureIdentifier,
   LegacyFileSafeIdentifier,
 } from '@standardnotes/features'
-import { ItemContent, SNComponent } from '@standardnotes/models'
+import { ItemContent, SNComponent, DecryptedTransferPayload } from '@standardnotes/models'
 import { UuidString } from '@Lib/Types/UuidString'
 import { ContentType } from '@standardnotes/common'
-import { DecryptedTransferPayload } from '@standardnotes/models'
 
 export interface DesktopManagerInterface {
   syncComponentsInstallation(components: SNComponent[]): void

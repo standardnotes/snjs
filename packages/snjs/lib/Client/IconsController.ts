@@ -2,12 +2,6 @@ import { FeatureIdentifier } from '@standardnotes/features'
 import { IconType } from '@Lib/Types/IconType'
 
 export class IconsController {
-  // eslint-disable-next-line @typescript-eslint/no-empty-function
-  constructor() {}
-
-  // eslint-disable-next-line @typescript-eslint/no-empty-function
-  public deinit(): void {}
-
   getIconForFileType(type: string): IconType {
     let iconType: IconType = 'file-other'
 

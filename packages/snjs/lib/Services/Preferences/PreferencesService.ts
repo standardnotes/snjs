@@ -4,14 +4,18 @@ import {
   PrefValue,
   UserPrefsMutator,
   ItemContent,
+  FillItemContent,
 } from '@standardnotes/models'
 import { ContentType } from '@standardnotes/common'
 import { ItemManager } from '../Items/ItemManager'
 import { SNSingletonManager } from '../Singleton/SingletonManager'
 import { SNSyncService } from '../Sync/SyncService'
-import { ApplicationStage } from '@standardnotes/services'
-import { AbstractService, InternalEventBusInterface, SyncEvent } from '@standardnotes/services'
-import { FillItemContent } from '@standardnotes/models'
+import {
+  AbstractService,
+  InternalEventBusInterface,
+  SyncEvent,
+  ApplicationStage,
+} from '@standardnotes/services'
 
 const preferencesChangedEvent = 'preferencesChanged'
 type PreferencesChangedEvent = typeof preferencesChangedEvent
@@ -27,7 +31,7 @@ export class SNPreferencesService extends AbstractService<PreferencesChangedEven
     private singletonManager: SNSingletonManager,
     private itemManager: ItemManager,
     private syncService: SNSyncService,
-    protected internalEventBus: InternalEventBusInterface,
+    protected override internalEventBus: InternalEventBusInterface,
   ) {
     super(internalEventBus)
 
@@ -42,7 +46,7 @@ export class SNPreferencesService extends AbstractService<PreferencesChangedEven
     })
   }
 
-  deinit(): void {
+  override deinit(): void {
     this.removeItemObserver?.()
     this.removeSyncObserver?.()
     ;(this.singletonManager as unknown) = undefined
@@ -51,7 +55,7 @@ export class SNPreferencesService extends AbstractService<PreferencesChangedEven
     super.deinit()
   }
 
-  public async handleApplicationStage(stage: ApplicationStage): Promise<void> {
+  public override async handleApplicationStage(stage: ApplicationStage): Promise<void> {
     await super.handleApplicationStage(stage)
 
     if (stage === ApplicationStage.LoadedDatabase_12) {

@@ -61,14 +61,13 @@ export class SNActionsService extends AbstractService {
     private syncService: SNSyncService,
     private challengeService: ChallengeService,
     private listedService: ListedService,
-    protected internalEventBus: InternalEventBusInterface,
+    protected override internalEventBus: InternalEventBusInterface,
   ) {
     super(internalEventBus)
     this.previousPasswords = []
   }
 
-  /** @override */
-  public deinit(): void {
+  public override deinit(): void {
     ;(this.itemManager as unknown) = undefined
     ;(this.alertService as unknown) = undefined
     ;(this.deviceInterface as unknown) = undefined

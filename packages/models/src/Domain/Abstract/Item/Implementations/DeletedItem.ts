@@ -14,7 +14,7 @@ export class DeletedItem
     super(payload)
   }
 
-  public payloadRepresentation(
+  public override payloadRepresentation(
     override?: Partial<DeletedTransferPayload>,
   ): DeletedPayloadInterface {
     return this.payload.copy(override)

@@ -15,7 +15,7 @@ export class SNWebSocketsService extends AbstractService<
   constructor(
     private storageService: SNStorageService,
     private webSocketUrl: string | undefined,
-    protected internalEventBus: InternalEventBusInterface,
+    protected override internalEventBus: InternalEventBusInterface,
   ) {
     super(internalEventBus)
   }
@@ -62,7 +62,7 @@ export class SNWebSocketsService extends AbstractService<
     this.webSocket = undefined
   }
 
-  deinit(): void {
+  override deinit(): void {
     super.deinit()
     ;(this.storageService as unknown) = undefined
     this.closeWebSocketConnection()

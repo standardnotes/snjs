@@ -1,11 +1,10 @@
-import { CompoundPredicate, Predicate } from '@standardnotes/models'
-import { SNComponent } from '@standardnotes/models'
+import { CompoundPredicate, Predicate, SNComponent } from '@standardnotes/models'
 import { Migration } from '@Lib/Migrations/Migration'
 import { ContentType } from '@standardnotes/common'
 import { ApplicationStage } from '@standardnotes/services'
 
 export class Migration2_7_0 extends Migration {
-  static version(): string {
+  static override version(): string {
     return '2.7.0'
   }
 

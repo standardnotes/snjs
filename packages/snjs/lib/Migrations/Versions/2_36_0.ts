@@ -3,7 +3,7 @@ import { ContentType } from '@standardnotes/common'
 import { ApplicationStage } from '@standardnotes/services'
 
 export class Migration2_36_0 extends Migration {
-  static version(): string {
+  static override version(): string {
     return '2.36.0'
   }
 

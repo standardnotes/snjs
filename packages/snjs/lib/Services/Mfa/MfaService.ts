@@ -12,7 +12,7 @@ export class SNMfaService extends AbstractService {
     private settingsService: SNSettingsService,
     private crypto: SNPureCrypto,
     private featuresService: SNFeaturesService,
-    protected internalEventBus: InternalEventBusInterface,
+    protected override internalEventBus: InternalEventBusInterface,
   ) {
     super(internalEventBus)
   }
@@ -61,7 +61,7 @@ export class SNMfaService extends AbstractService {
     return feature.no_expire === true || (feature.expires_at ?? 0) > Date.now()
   }
 
-  deinit(): void {
+  override deinit(): void {
     ;(this.settingsService as unknown) = undefined
     ;(this.crypto as unknown) = undefined
     ;(this.featuresService as unknown) = undefined

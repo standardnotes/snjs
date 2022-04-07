@@ -1,6 +1,5 @@
 import { ContentlessTransferPayload } from '../../TransferPayload/Interfaces/ContentlessTransferPayload'
 import { ContentlessPayloadInterface } from '../Interfaces/ContentLessPayload'
-import { PayloadFormat } from '../Types/PayloadFormat'
 import { PayloadSource } from '../Types/PayloadSource'
 import { PurePayload } from './PurePayload'
 
@@ -8,7 +7,6 @@ export class ContentlessPayload
   extends PurePayload<ContentlessTransferPayload>
   implements ContentlessPayloadInterface
 {
-  readonly format: PayloadFormat.Deleted = PayloadFormat.Deleted
   readonly deleted?: boolean
 
   constructor(rawPayload: ContentlessTransferPayload, source = PayloadSource.Constructor) {
@@ -16,7 +14,7 @@ export class ContentlessPayload
     this.deleted = rawPayload.deleted
   }
 
-  ejected(): ContentlessTransferPayload {
+  override ejected(): ContentlessTransferPayload {
     const values = {
       deleted: this.deleted,
     }

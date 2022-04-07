@@ -96,7 +96,7 @@ export class SNKeyRecoveryService extends AbstractService {
     private storageService: SNStorageService,
     private syncService: SNSyncService,
     private userService: UserService,
-    protected internalEventBus: InternalEventBusInterface,
+    protected override internalEventBus: InternalEventBusInterface,
   ) {
     super(internalEventBus)
 
@@ -120,7 +120,7 @@ export class SNKeyRecoveryService extends AbstractService {
     )
   }
 
-  public deinit(): void {
+  public override deinit(): void {
     ;(this.itemManager as unknown) = undefined
     ;(this.payloadManager as unknown) = undefined
     ;(this.apiService as unknown) = undefined
@@ -136,7 +136,7 @@ export class SNKeyRecoveryService extends AbstractService {
   }
 
   // eslint-disable-next-line @typescript-eslint/require-await
-  async handleApplicationStage(stage: ApplicationStage) {
+  override async handleApplicationStage(stage: ApplicationStage): Promise<void> {
     void super.handleApplicationStage(stage)
     if (stage === ApplicationStage.LoadedDatabase_12) {
       void this.processPersistedUndecryptables()

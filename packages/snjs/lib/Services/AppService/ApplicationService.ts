@@ -7,13 +7,13 @@ export class ApplicationService extends AbstractService {
 
   constructor(
     protected application: SNApplication,
-    protected internalEventBus: InternalEventBusInterface,
+    protected override internalEventBus: InternalEventBusInterface,
   ) {
     super(internalEventBus)
     this.addAppEventObserverAfterSubclassesFinishConstructing()
   }
 
-  deinit() {
+  override deinit() {
     ;(this.application as unknown) = undefined
 
     this.unsubApp()

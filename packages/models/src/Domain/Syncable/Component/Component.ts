@@ -30,7 +30,7 @@ export const isComponentOrTheme = (x: ItemInterface): x is SNComponent =>
  * only by its url.
  */
 export class SNComponent extends DecryptedItem<ComponentContent> implements ComponentInterface {
-  public readonly componentData: Record<string, any>
+  public readonly componentData: Record<string, unknown>
   /** Items that have requested a component to be disabled in its context */
   public readonly disassociatedItemIds: string[]
   /** Items that have requested a component to be enabled in its context */
@@ -84,18 +84,18 @@ export class SNComponent extends DecryptedItem<ComponentContent> implements Comp
   }
 
   /** Do not duplicate components under most circumstances. Always keep original */
-  public strategyWhenConflictingWithItem(
+  public override strategyWhenConflictingWithItem(
     _item: DecryptedItemInterface,
     _previousRevision?: HistoryEntryInterface,
   ): ConflictStrategy {
     return ConflictStrategy.KeepLeft
   }
 
-  get isSingleton(): boolean {
+  override get isSingleton(): boolean {
     return true
   }
 
-  public singletonPredicate(): Predicate<SNComponent> {
+  public override singletonPredicate(): Predicate<SNComponent> {
     const uniqueIdentifierPredicate = new Predicate<SNComponent>('identifier', '=', this.identifier)
     return uniqueIdentifierPredicate
   }
@@ -112,7 +112,7 @@ export class SNComponent extends DecryptedItem<ComponentContent> implements Comp
     return this.getAppDomainValue(AppDataField.DefaultEditor) === true
   }
 
-  public getLastSize(): any {
+  public getLastSize(): unknown {
     return this.getAppDomainValue(AppDataField.LastSize)
   }
 
@@ -132,7 +132,7 @@ export class SNComponent extends DecryptedItem<ComponentContent> implements Comp
     return (this.hosted_url || this.legacy_url) != undefined
   }
 
-  public contentKeysToIgnoreWhenCheckingEquality(): (keyof ItemContent)[] {
+  public override contentKeysToIgnoreWhenCheckingEquality(): (keyof ItemContent)[] {
     const componentKeys: (keyof ComponentContent)[] = [
       'active',
       'disassociatedItemIds',

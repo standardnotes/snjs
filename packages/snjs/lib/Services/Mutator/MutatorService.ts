@@ -1,5 +1,5 @@
 import { AbstractService, InternalEventBusInterface } from '@standardnotes/services'
-import { BackupFile, EncryptionService } from '@standardnotes/encryption'
+import { BackupFile, EncryptionProvider } from '@standardnotes/encryption'
 import { ClientDisplayableError } from '@standardnotes/responses'
 import { ContentType, ProtocolVersion, compareVersions } from '@standardnotes/common'
 import { ItemManager, TransactionalMutation } from '../Items'
@@ -18,17 +18,18 @@ import {
   ChallengeReason,
   ChallengeService,
 } from '../Challenge'
+import { isDecryptedPayload } from '@standardnotes/models'
 
 export class MutatorService extends AbstractService implements MutatorClientInterface {
   constructor(
     private itemManager: ItemManager,
     private syncService: SNSyncService,
     private protectionService: SNProtectionService,
-    private protocolService: EncryptionService,
+    private encryption: EncryptionProvider,
     private payloadManager: PayloadManager,
     private challengeService: ChallengeService,
     private componentManager: SNComponentManager,
-    protected internalEventBus: InternalEventBusInterface,
+    protected override internalEventBus: InternalEventBusInterface,
   ) {
     super(internalEventBus)
   }
@@ -294,12 +295,12 @@ export class MutatorService extends AbstractService implements MutatorClientInte
        */
       const version = data.version as ProtocolVersion
 
-      const supportedVersions = this.protocolService.supportedVersions()
+      const supportedVersions = this.encryption.supportedVersions()
       if (!supportedVersions.includes(version)) {
         return { error: new ClientDisplayableError(Strings.Info.UnsupportedBackupFileVersion) }
       }
 
-      const userVersion = this.protocolService.getUserVersion()
+      const userVersion = this.encryption.getUserVersion()
       if (userVersion && compareVersions(version, userVersion) === 1) {
         /** File was made with a greater version than the user's account */
         return { error: new ClientDisplayableError(Strings.Info.BackupFileMoreRecentThanAccount) }
@@ -335,34 +336,27 @@ export class MutatorService extends AbstractService implements MutatorClientInte
       return { error: new ClientDisplayableError('Import aborted') }
     }
 
-    const decryptedPayloadsOrError = await this.protocolService.payloadsByDecryptingBackupFile(
-      data,
-      password,
-    )
+    const decryptedPayloadsOrError = await this.encryption.decryptBackupFile(data, password)
 
     if (decryptedPayloadsOrError instanceof ClientDisplayableError) {
       return { error: decryptedPayloadsOrError }
     }
 
-    const validPayloads = decryptedPayloadsOrError
-      .filter((payload) => {
-        return !payload.errorDecrypting && payload.format !== Models.PayloadFormat.EncryptedString
-      })
-      .map((payload) => {
-        /* Don't want to activate any components during import process in
-         * case of exceptions breaking up the import proccess */
-        if (
-          payload.content_type === ContentType.Component &&
-          (payload.content as Models.ComponentContent).active
-        ) {
-          const typedContent = payload as Models.DecryptedPayloadInterface<Models.ComponentContent>
-          return Models.CopyPayloadWithContentOverride(typedContent, {
-            active: false,
-          })
-        } else {
-          return payload
-        }
-      })
+    const validPayloads = decryptedPayloadsOrError.filter(isDecryptedPayload).map((payload) => {
+      /* Don't want to activate any components during import process in
+       * case of exceptions breaking up the import proccess */
+      if (
+        payload.content_type === ContentType.Component &&
+        (payload.content as Models.ComponentContent).active
+      ) {
+        const typedContent = payload as Models.DecryptedPayloadInterface<Models.ComponentContent>
+        return Models.CopyPayloadWithContentOverride(typedContent, {
+          active: false,
+        })
+      } else {
+        return payload
+      }
+    })
 
     const affectedUuids = await this.payloadManager.importPayloads(validPayloads)
     const promise = this.syncService.sync()

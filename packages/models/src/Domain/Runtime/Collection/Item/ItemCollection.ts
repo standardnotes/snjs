@@ -1,7 +1,6 @@
-import { CollectionSortDirection } from '../CollectionSort'
+import { CollectionSortDirection, CollectionSort } from '../CollectionSort'
 import { ContentType, Uuid } from '@standardnotes/common'
 import { compareValues, isNullOrUndefined, uniqueArrayByKey, UuidMap } from '@standardnotes/utils'
-import { CollectionSort } from '../CollectionSort'
 import { SNIndex } from '../../Index/SNIndex'
 import { ItemDelta } from '../../Index/ItemDelta'
 import { isDeletedItem, isEncryptedErroredItem } from '../../../Abstract/Item/Interfaces/TypeCheck'
@@ -59,7 +58,7 @@ export class ItemCollection
     }
   }
 
-  public set(elements: (DecryptedItemInterface | DeletedItemInterface)[]): void {
+  public override set(elements: (DecryptedItemInterface | DeletedItemInterface)[]): void {
     super.set(elements)
 
     elements = uniqueArrayByKey(Array.isArray(elements) ? elements : [elements], 'uuid')
@@ -78,7 +77,7 @@ export class ItemCollection
     this.filterSortElements(elements)
   }
 
-  public discard(elements: (DecryptedItemInterface | DeletedItemInterface)[]): void {
+  public override discard(elements: (DecryptedItemInterface | DeletedItemInterface)[]): void {
     super.discard(elements)
 
     elements = Array.isArray(elements) ? elements : [elements]

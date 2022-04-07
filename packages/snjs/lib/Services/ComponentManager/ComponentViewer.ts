@@ -1,7 +1,6 @@
 import { SNPreferencesService } from '../Preferences/PreferencesService'
 import { FeatureStatus, FeaturesEvent } from '@Lib/Services/Features'
 import { SNFeaturesService } from '@Lib/Services'
-import { ComponentArea, FindNativeFeature } from '@standardnotes/features'
 import {
   SNComponent,
   PrefKey,
@@ -17,6 +16,9 @@ import {
   createComponentRetrievedContextPayload,
   createComponentCreatedContextPayload,
   DecryptedPayload,
+  ItemContent,
+  PayloadSource,
+  ComponentDataDomain,
 } from '@standardnotes/models'
 import find from 'lodash/find'
 import uniq from 'lodash/uniq'
@@ -29,7 +31,6 @@ import {
   Platform,
   platformToString,
 } from '@Lib/Application/Platforms'
-import { ItemContent, PayloadSource, ComponentDataDomain } from '@standardnotes/models'
 import {
   ComponentMessage,
   MessageReplyData,
@@ -40,7 +41,12 @@ import {
   IncomingComponentItemPayload,
   DeleteItemsMessageData,
 } from './Types'
-import { ComponentAction, ComponentPermission } from '@standardnotes/features'
+import {
+  ComponentAction,
+  ComponentPermission,
+  ComponentArea,
+  FindNativeFeature,
+} from '@standardnotes/features'
 import { ItemManager } from '@Lib/Services/Items/ItemManager'
 import { UuidString } from '@Lib/Types/UuidString'
 import { ContentType } from '@standardnotes/common'

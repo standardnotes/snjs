@@ -2,14 +2,12 @@ import { ContentType } from '@standardnotes/common'
 import { deepFreeze } from '@standardnotes/utils'
 import { PayloadInterface } from '../Interfaces/PayloadInterface'
 import { PayloadSource } from '../Types/PayloadSource'
-import { PayloadFormat } from '../Types/PayloadFormat'
 import { TransferPayload } from '../../TransferPayload/Interfaces/TransferPayload'
 
 export abstract class PurePayload<T extends TransferPayload> implements PayloadInterface<T> {
   readonly source: PayloadSource
   readonly uuid: string
   readonly content_type: ContentType
-  abstract readonly format: PayloadFormat
 
   readonly created_at: Date
   readonly updated_at: Date

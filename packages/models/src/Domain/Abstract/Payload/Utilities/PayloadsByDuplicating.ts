@@ -4,7 +4,6 @@ import { ImmutablePayloadCollection } from '../../../Runtime/Collection/Payload/
 import { ItemContent } from '../../Item/Interfaces/ItemContent'
 import { AffectorMapping } from './AffectorFunction'
 import { PayloadsByUpdatingReferencingPayloadReferences } from './PayloadsByUpdatingReferencingPayloadReferences'
-import { PayloadInterface } from '../Interfaces/PayloadInterface'
 import { isDecryptedPayload } from '../Interfaces/TypeCheck'
 import { FullyFormedPayloadInterface } from '../Interfaces/UnionTypes'
 import { DecryptedTransferPayload } from '../../TransferPayload/Interfaces/DecryptedTransferPayload'
@@ -14,12 +13,12 @@ import { DecryptedTransferPayload } from '../../TransferPayload/Interfaces/Decry
  * @returns An array of payloads that have changed as a result of copying.
  */
 export async function PayloadsByDuplicating<C extends ItemContent = ItemContent>(
-  payload: PayloadInterface,
+  payload: FullyFormedPayloadInterface,
   baseCollection: ImmutablePayloadCollection<FullyFormedPayloadInterface>,
   isConflict: boolean,
   additionalContent?: Partial<C>,
-): Promise<PayloadInterface[]> {
-  const results: PayloadInterface[] = []
+): Promise<FullyFormedPayloadInterface[]> {
+  const results: FullyFormedPayloadInterface[] = []
 
   const override: Partial<TransferPayload> = {
     uuid: UuidGenerator.GenerateUuid(),

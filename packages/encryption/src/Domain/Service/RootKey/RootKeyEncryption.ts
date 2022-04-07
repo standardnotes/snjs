@@ -41,12 +41,12 @@ export class RootKeyEncryptionService extends Services.AbstractService<RootKeySe
     public deviceInterface: Services.DeviceInterface,
     private storageService: Services.StorageServiceInterface,
     private identifier: Common.ApplicationIdentifier,
-    protected internalEventBus: Services.InternalEventBusInterface,
+    protected override internalEventBus: Services.InternalEventBusInterface,
   ) {
     super(internalEventBus)
   }
 
-  public deinit(): void {
+  public override deinit(): void {
     ;(this.itemManager as unknown) = undefined
     this.rootKey = undefined
     this.memoizedRootKeyParams = undefined

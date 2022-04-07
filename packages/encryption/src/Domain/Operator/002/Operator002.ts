@@ -24,11 +24,11 @@ import { ItemContent } from '@standardnotes/models'
  * A legacy operator no longer used to generate new accounts.
  */
 export class SNProtocolOperator002 extends SNProtocolOperator001 {
-  get version(): Common.ProtocolVersion {
+  override get version(): Common.ProtocolVersion {
     return Common.ProtocolVersion.V002
   }
 
-  protected generateNewItemsKeyContent(): Models.ItemsKeyContent {
+  protected override generateNewItemsKeyContent(): Models.ItemsKeyContent {
     const keyLength = V002Algorithm.EncryptionKeyLength
     const itemsKey = this.crypto.generateRandomKey(keyLength)
     const authKey = this.crypto.generateRandomKey(keyLength)
@@ -44,7 +44,7 @@ export class SNProtocolOperator002 extends SNProtocolOperator001 {
    * Creates a new random items key to use for item encryption.
    * The consumer must save/sync this item.
    */
-  public createItemsKey(): Models.ItemsKeyInterface {
+  public override createItemsKey(): Models.ItemsKeyInterface {
     const payload = new Models.DecryptedPayload({
       uuid: UuidGenerator.GenerateUuid(),
       content_type: Common.ContentType.ItemsKey,
@@ -53,7 +53,7 @@ export class SNProtocolOperator002 extends SNProtocolOperator001 {
     return Models.CreateDecryptedItemFromPayload(payload)
   }
 
-  public async createRootKey(
+  public override async createRootKey(
     identifier: string,
     password: string,
     origination: Common.KeyParamsOrigination,
@@ -80,7 +80,10 @@ export class SNProtocolOperator002 extends SNProtocolOperator001 {
    * may have had costs of 5000, and others of 101000. Therefore, when computing
    * the root key, we must use the value returned by the server.
    */
-  public async computeRootKey(password: string, keyParams: SNRootKeyParams): Promise<SNRootKey> {
+  public override async computeRootKey(
+    password: string,
+    keyParams: SNRootKeyParams,
+  ): Promise<SNRootKey> {
     return this.deriveKey(password, keyParams)
   }
 
@@ -144,7 +147,7 @@ export class SNProtocolOperator002 extends SNProtocolOperator001 {
     return this.decryptString002(contentCiphertext, encryptionKey, iv)
   }
 
-  public getPayloadAuthenticatedData(
+  public override getPayloadAuthenticatedData(
     encrypted: EncryptedParameters,
   ): RootKeyEncryptedAuthenticatedData | ItemAuthenticatedData | LegacyAttachedData | undefined {
     const itemKeyComponents = this.encryptionComponentsFromString002(encrypted.enc_item_key)
@@ -161,7 +164,7 @@ export class SNProtocolOperator002 extends SNProtocolOperator001 {
     return data
   }
 
-  public async generateEncryptedParametersAsync(
+  public override async generateEncryptedParametersAsync(
     payload: Models.DecryptedPayloadInterface,
     key: Models.ItemsKeyInterface | SNRootKey,
   ): Promise<EncryptedParameters> {
@@ -199,7 +202,7 @@ export class SNProtocolOperator002 extends SNProtocolOperator001 {
     }
   }
 
-  public async generateDecryptedParametersAsync<C extends ItemContent = ItemContent>(
+  public override async generateDecryptedParametersAsync<C extends ItemContent = ItemContent>(
     encrypted: EncryptedParameters,
     key: Models.ItemsKeyInterface | SNRootKey,
   ): Promise<DecryptedParameters<C> | ErrorDecryptingParameters> {
@@ -259,7 +262,10 @@ export class SNProtocolOperator002 extends SNProtocolOperator001 {
     }
   }
 
-  protected async deriveKey(password: string, keyParams: SNRootKeyParams): Promise<SNRootKey> {
+  protected override async deriveKey(
+    password: string,
+    keyParams: SNRootKeyParams,
+  ): Promise<SNRootKey> {
     const derivedKey = await this.crypto.pbkdf2(
       password,
       keyParams.content002.pw_salt,

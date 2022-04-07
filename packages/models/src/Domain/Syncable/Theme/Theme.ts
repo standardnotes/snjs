@@ -9,14 +9,14 @@ import { ContentType } from '@standardnotes/common'
 export const isTheme = (x: ItemInterface): x is SNTheme => x.content_type === ContentType.Theme
 
 export class SNTheme extends SNComponent {
-  public area: ComponentArea = ComponentArea.Themes
+  public override area: ComponentArea = ComponentArea.Themes
 
   isLayerable(): boolean {
     return (this.package_info && this.package_info.layerable) || false
   }
 
   /** Do not duplicate under most circumstances. Always keep original */
-  strategyWhenConflictingWithItem(
+  override strategyWhenConflictingWithItem(
     _item: DecryptedItemInterface,
     _previousRevision?: HistoryEntryInterface,
   ): ConflictStrategy {

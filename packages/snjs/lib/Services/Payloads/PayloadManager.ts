@@ -11,7 +11,6 @@ import {
   DeltaFileImport,
   isDeletedPayload,
   isErrorDecryptingPayload,
-  PayloadInterface,
   ImmutablePayloadCollection,
   IntegrityPayload,
   EncryptedPayloadInterface,
@@ -41,7 +40,7 @@ export class PayloadManager
 {
   private changeObservers: PayloadsChangeObserver[] = []
   public collection: PayloadCollection<FullyFormedPayloadInterface>
-  private emitQueue: EmitQueue = []
+  private emitQueue: EmitQueue<FullyFormedPayloadInterface> = []
 
   constructor(protected override internalEventBus: Services.InternalEventBusInterface) {
     super(internalEventBus)
@@ -79,7 +78,7 @@ export class PayloadManager
     collection: ImmutablePayloadCollection<FullyFormedPayloadInterface>,
     sourceKey?: string,
   ) {
-    return this.emitPayloads(collection.all(), collection.source!, sourceKey)
+    return this.emitPayloads(collection.all(), collection.source, sourceKey)
   }
 
   public get integrityPayloads(): IntegrityPayload[] {
@@ -133,7 +132,7 @@ export class PayloadManager
         resolve,
       }
 
-      this.emitQueue.push(element as unknown as QueueElement<PayloadInterface>)
+      this.emitQueue.push(element as unknown as QueueElement<FullyFormedPayloadInterface>)
 
       if (this.emitQueue.length === 1) {
         void this.popQueue()

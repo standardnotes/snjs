@@ -6,11 +6,11 @@ import { PrefKey, PrefValue } from './PrefKey'
 export class SNUserPrefs extends DecryptedItem {
   static singletonPredicate = new Predicate('content_type', '=', ContentType.UserPrefs)
 
-  get isSingleton(): true {
+  override get isSingleton(): true {
     return true
   }
 
-  singletonPredicate(): Predicate<SNUserPrefs> {
+  override singletonPredicate(): Predicate<SNUserPrefs> {
     return SNUserPrefs.singletonPredicate
   }
 

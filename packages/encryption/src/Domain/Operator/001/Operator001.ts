@@ -5,7 +5,12 @@ import {
   ProtocolVersionLength,
 } from '@standardnotes/common'
 import { Create001KeyParams } from '../../RootKey/KeyParams'
-import { firstHalfOfString, secondHalfOfString, splitString } from '@standardnotes/utils'
+import {
+  firstHalfOfString,
+  secondHalfOfString,
+  splitString,
+  UuidGenerator,
+} from '@standardnotes/utils'
 import { AsynchronousOperator } from '../Operator'
 import {
   CreateDecryptedItemFromPayload,
@@ -19,7 +24,6 @@ import {
 import { SNPureCrypto } from '@standardnotes/sncrypto-common'
 import { SNRootKey } from '../../RootKey/RootKey'
 import { SNRootKeyParams } from '../../RootKey/RootKeyParams'
-import { UuidGenerator } from '@standardnotes/utils'
 import { V001Algorithm } from '../../Algorithm'
 import {
   DecryptedParameters,

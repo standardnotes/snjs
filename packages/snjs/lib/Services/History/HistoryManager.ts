@@ -50,7 +50,7 @@ export class SNHistoryManager extends Services.AbstractService {
     private apiService: SNApiService,
     private protocolService: EncryptionService,
     public deviceInterface: Services.DeviceInterface,
-    protected internalEventBus: Services.InternalEventBusInterface,
+    protected override internalEventBus: Services.InternalEventBusInterface,
   ) {
     super(internalEventBus)
     this.removeChangeObserver = this.itemManager.addObserver(
@@ -61,7 +61,7 @@ export class SNHistoryManager extends Services.AbstractService {
     )
   }
 
-  public deinit(): void {
+  public override deinit(): void {
     ;(this.itemManager as unknown) = undefined
     ;(this.storageService as unknown) = undefined
     ;(this.history as unknown) = undefined

@@ -4,9 +4,10 @@ import {
   DecryptedItem,
   DecryptedPayloadInterface,
   DecryptedItemInterface,
+  HistoryEntryInterface,
+  ItemsKeyInterface,
 } from '@standardnotes/models'
 import { ProtocolVersion } from '@standardnotes/common'
-import { HistoryEntryInterface, ItemsKeyInterface } from '@standardnotes/models'
 
 export function isItemsKey(x: unknown): x is ItemsKeyInterface {
   return x instanceof SNItemsKey
@@ -28,7 +29,7 @@ export class SNItemsKey extends DecryptedItem<ItemsKeyContent> implements ItemsK
   }
 
   /** Do not duplicate items keys. Always keep original */
-  strategyWhenConflictingWithItem(
+  override strategyWhenConflictingWithItem(
     _item: DecryptedItemInterface,
     _previousRevision?: HistoryEntryInterface,
   ): ConflictStrategy {

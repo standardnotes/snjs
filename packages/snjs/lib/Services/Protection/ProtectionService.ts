@@ -9,13 +9,13 @@ import { SNLog } from '@Lib/Log'
 import { SNFile, SNNote } from '@standardnotes/models'
 import { EncryptionService } from '@standardnotes/encryption'
 import { SNStorageService } from '@Lib/Services/Storage/StorageService'
-import { StorageKey } from '@standardnotes/services'
 import { isNullOrUndefined } from '@standardnotes/utils'
-import { ApplicationStage } from '@standardnotes/services'
 import {
   AbstractService,
   InternalEventBusInterface,
   StorageValueModes,
+  ApplicationStage,
+  StorageKey,
 } from '@standardnotes/services'
 import { ProtectionsClientInterface } from './ClientInterface'
 
@@ -73,12 +73,12 @@ export class SNProtectionService
     private protocolService: EncryptionService,
     private challengeService: ChallengeService,
     private storageService: SNStorageService,
-    protected internalEventBus: InternalEventBusInterface,
+    protected override internalEventBus: InternalEventBusInterface,
   ) {
     super(internalEventBus)
   }
 
-  public deinit(): void {
+  public override deinit(): void {
     clearTimeout(this.sessionExpiryTimeout)
     ;(this.protocolService as unknown) = undefined
     ;(this.challengeService as unknown) = undefined
@@ -86,7 +86,7 @@ export class SNProtectionService
     super.deinit()
   }
 
-  handleApplicationStage(stage: ApplicationStage): Promise<void> {
+  override handleApplicationStage(stage: ApplicationStage): Promise<void> {
     if (stage === ApplicationStage.LoadedDatabase_12) {
       this.updateSessionExpiryTimer(this.getSessionExpiryDate())
     }

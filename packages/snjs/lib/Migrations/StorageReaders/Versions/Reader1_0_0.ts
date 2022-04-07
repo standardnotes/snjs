@@ -5,7 +5,7 @@ import { LegacyKeys1_0_0 } from '@standardnotes/services'
 import { StorageReader } from '../Reader'
 
 export class StorageReader1_0_0 extends StorageReader {
-  static version() {
+  static override version() {
     return PreviousSnjsVersion1_0_0
   }
 

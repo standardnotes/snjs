@@ -6,7 +6,7 @@ import { ConflictStrategy } from '../../Abstract/Item/Types/ConflictStrategy'
 import { PayloadsByDuplicating } from '../../Abstract/Payload/Utilities/PayloadsByDuplicating'
 import { PayloadContentsEqual } from '../../Abstract/Payload/Utilities/PayloadContentsEqual'
 import { PayloadSource } from '../../Abstract/Payload/Types/PayloadSource'
-import { PayloadInterface, FullyFormedPayloadInterface } from '../../Abstract/Payload'
+import { FullyFormedPayloadInterface } from '../../Abstract/Payload'
 import {
   isDecryptedPayload,
   isErrorDecryptingPayload,
@@ -15,8 +15,8 @@ import {
 export class ConflictDelta {
   constructor(
     protected readonly baseCollection: ImmutablePayloadCollection<FullyFormedPayloadInterface>,
-    protected readonly basePayload: PayloadInterface,
-    protected readonly applyPayload: PayloadInterface,
+    protected readonly basePayload: FullyFormedPayloadInterface,
+    protected readonly applyPayload: FullyFormedPayloadInterface,
     protected readonly source: PayloadSource,
     protected readonly historyMap?: HistoryMap,
   ) {}
@@ -105,6 +105,7 @@ export class ConflictDelta {
         this.baseCollection,
         true,
       )
+
       return [leftPayload].concat(rightPayloads)
     }
 
@@ -114,6 +115,7 @@ export class ConflictDelta {
         lastSyncBegan: this.basePayload.lastSyncBegan,
         lastSyncEnd: new Date(),
       })
+
       return leftPayloads.concat([rightPayload])
     }
 
@@ -127,14 +129,17 @@ export class ConflictDelta {
         this.applyPayload.content.references,
         ['uuid', 'content_type'],
       )
+
       const updatedAt = greaterOfTwoDates(
         this.basePayload.serverUpdatedAt,
         this.applyPayload.serverUpdatedAt,
       )
+
       const updatedAtTimestamp = Math.max(
         this.basePayload.updated_at_timestamp,
         this.applyPayload.updated_at_timestamp,
       )
+
       const payload = this.basePayload.copy({
         updated_at: updatedAt,
         updated_at_timestamp: updatedAtTimestamp,

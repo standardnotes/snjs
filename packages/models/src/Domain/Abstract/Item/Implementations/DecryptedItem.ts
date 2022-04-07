@@ -101,7 +101,7 @@ export class DecryptedItem<C extends ItemContent = ItemContent>
     return (appData?.[key] as T) || defaultValue
   }
 
-  public payloadRepresentation(
+  public override payloadRepresentation(
     override?: Partial<DecryptedTransferPayload<C>>,
   ): DecryptedPayloadInterface<C> {
     return this.payload.copy(override)

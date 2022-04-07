@@ -1,4 +1,4 @@
-import { ContentType } from '@standardnotes/common'
+import { ContentType, Uuid } from '@standardnotes/common'
 import { Copy, extendArray, UuidGenerator } from '@standardnotes/utils'
 import { Environment } from '@Lib/Application/Platforms'
 import { SNLog } from '../../Log'
@@ -437,9 +437,13 @@ export class SNStorageService
     await Promise.all(payloads.map((payload) => this.deletePayloadWithId(payload.uuid)))
   }
 
-  public async deletePayloadWithId(id: string) {
+  public async forceDeletePayloads(payloads: FullyFormedPayloadInterface[]) {
+    await Promise.all(payloads.map((payload) => this.deletePayloadWithId(payload.uuid)))
+  }
+
+  public async deletePayloadWithId(uuid: Uuid) {
     return this.executeCriticalFunction(async () => {
-      return this.deviceInterface.removeRawDatabasePayloadWithId(id, this.identifier)
+      return this.deviceInterface.removeRawDatabasePayloadWithId(uuid, this.identifier)
     })
   }
 

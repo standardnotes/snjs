@@ -3,7 +3,6 @@ import { FillItemContent, ItemContent } from '../../Item'
 import { ContentReference } from '../../Reference/ContentReference'
 import { DecryptedTransferPayload } from '../../TransferPayload/Interfaces/DecryptedTransferPayload'
 import { DecryptedPayloadInterface } from '../Interfaces/DecryptedPayload'
-import { PayloadFormat } from '../Types/PayloadFormat'
 import { PayloadSource } from '../Types/PayloadSource'
 import { PurePayload } from './PurePayload'
 
@@ -15,7 +14,6 @@ export class DecryptedPayload<
   implements DecryptedPayloadInterface<C>
 {
   readonly content: C
-  readonly format: PayloadFormat.DecryptedBareObject = PayloadFormat.DecryptedBareObject
   readonly version: ProtocolVersion
 
   constructor(rawPayload: T, source = PayloadSource.Constructor) {
@@ -39,7 +37,7 @@ export class DecryptedPayload<
     return result
   }
 
-  ejected(): T {
+  override ejected(): T {
     const values = {
       content: this.content,
     }

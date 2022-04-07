@@ -17,12 +17,9 @@ export type TagContent = TagInterface & ItemContent
 
 export const isTag = (x: ItemInterface): x is SNTag => x.content_type === ContentType.Tag
 
-/**
- * Allows organization of notes into groups.
- * A tag can have many notes, and a note can have many tags.
- */
 export class SNTag extends DecryptedItem<TagContent> implements TagInterface {
   public readonly title: string
+
   /** Whether to render child tags in view hierarchy. Opposite of collapsed. */
   public readonly expanded: boolean
 
