@@ -3,7 +3,7 @@ import { CollectionInterface } from '../CollectionInterface'
 import { DecryptedPayloadInterface } from '../../../Abstract/Payload/Interfaces/DecryptedPayload'
 import { isString, UuidMap } from '@standardnotes/utils'
 import { ContentType, Uuid } from '@standardnotes/common'
-import { IntegrityPayload } from '../../../Abstract/Payload/IntegrityPayload'
+import { IntegrityPayload } from '@standardnotes/responses'
 import {
   isDecryptedPayload,
   isErrorDecryptingPayload,

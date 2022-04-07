@@ -5,6 +5,7 @@ import { isTag, SNTag } from '.'
 import { SNIndex } from '../../Runtime/Index/SNIndex'
 import { ItemCollection } from '../../Runtime/Collection/Item/ItemCollection'
 import { ItemDelta } from '../../Runtime/Index/ItemDelta'
+import { isDecryptedItem } from '../../Abstract/Item'
 
 /** tagUuid undefined signifies all notes count change */
 export type TagNoteCountChangeObserver = (tagUuid: Uuid | undefined) => void
@@ -46,8 +47,8 @@ export class TagNotesIndex implements SNIndex {
 
   public onChange(delta: ItemDelta): void {
     const changedOrInserted = delta.changed.concat(delta.inserted)
-    const notes = changedOrInserted.filter(isNote)
-    const tags = changedOrInserted.filter(isTag)
+    const notes = changedOrInserted.filter(isDecryptedItem).filter(isNote) as SNNote[]
+    const tags = changedOrInserted.filter(isDecryptedItem).filter(isTag) as SNTag[]
 
     this.receiveNoteChanges(notes)
     this.receiveTagChanges(tags)

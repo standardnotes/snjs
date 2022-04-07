@@ -1,22 +1,23 @@
+import { ServerItemResponse } from '@standardnotes/responses'
 import {
   ImmutablePayloadCollectionSet,
   ImmutablePayloadCollection,
   PayloadSource,
-  CopyPayload,
   HistoryMap,
   DecryptedPayloadInterface,
   DeletedPayloadInterface,
   EncryptedPayloadInterface,
-  ContentlessPayloadInterface,
   isDeletedPayload,
   DeltaRemoteRetrieved,
   DeltaRemoteSaved,
   DeltaRemoteConflicts,
-  AnyPayloadInterface,
   FullyFormedPayloadInterface,
+  ServerSyncPushContextualPayload,
+  ServerSyncSavedContextualPayload,
 } from '@standardnotes/models'
 import { ServerSyncResponse } from '@Lib/Services/Sync/Account/Response'
 import { DeltaRemoteRejected } from '@Lib/../../models/dist/Domain/Runtime/Deltas/RemoteRejected'
+import { CreatePayloadFromRawServerItem } from './Utilities'
 
 /**
  * Given a remote sync response, the resolver applies the incoming changes on top
@@ -34,7 +35,7 @@ export class ServerSyncResponseResolver {
       FullyFormedPayloadInterface,
       DeletedPayloadInterface
     >,
-    payloadsSavedOrSaving: (EncryptedPayloadInterface | DeletedPayloadInterface)[],
+    private payloadsSavedOrSaving: ServerSyncPushContextualPayload[],
     private historyMap: HistoryMap,
   ) {
     this.relatedCollectionSet = new ImmutablePayloadCollectionSet([
@@ -42,7 +43,6 @@ export class ServerSyncResponseResolver {
         postProcessedRelated,
         PayloadSource.PossiblyDecryptedSyncPostProcessed,
       ),
-      ImmutablePayloadCollection.WithPayloads(payloadsSavedOrSaving, PayloadSource.SavedOrSaving),
     ])
   }
 
@@ -92,20 +92,13 @@ export class ServerSyncResponseResolver {
   }
 
   private async processSavedPayloads(
-    payloads: (DeletedPayloadInterface | ContentlessPayloadInterface)[],
+    payloads: ServerSyncSavedContextualPayload[],
   ): Promise<
     ImmutablePayloadCollection<
       DecryptedPayloadInterface | EncryptedPayloadInterface | DeletedPayloadInterface
     >
   > {
-    const collection = ImmutablePayloadCollection.WithPayloads(payloads, PayloadSource.RemoteSaved)
-
-    const delta = new DeltaRemoteSaved(
-      this.baseCollection,
-      collection,
-      this.relatedCollectionSet,
-      this.historyMap,
-    )
+    const delta = new DeltaRemoteSaved(this.baseCollection, payloads)
 
     const result = await delta.resultingCollection()
 
@@ -113,20 +106,21 @@ export class ServerSyncResponseResolver {
   }
 
   private async processRetrievedPayloads(
-    payloads: (EncryptedPayloadInterface | DeletedPayloadInterface)[],
+    items: ServerItemResponse[],
   ): Promise<
     ImmutablePayloadCollection<
       DecryptedPayloadInterface | EncryptedPayloadInterface | DeletedPayloadInterface
     >
   > {
     const collection = ImmutablePayloadCollection.WithPayloads(
-      payloads,
+      items.map(CreatePayloadFromRawServerItem),
       PayloadSource.RemoteRetrieved,
     )
 
     const delta = new DeltaRemoteRetrieved(
       this.baseCollection,
       collection,
+      this.payloadsSavedOrSaving,
       this.relatedCollectionSet,
       this.historyMap,
     )
@@ -137,14 +131,17 @@ export class ServerSyncResponseResolver {
   }
 
   private async processConflictPayloads(
-    payloads: (EncryptedPayloadInterface | DeletedPayloadInterface)[],
+    items: ServerItemResponse[],
     source: PayloadSource.ConflictUuid | PayloadSource.ConflictData,
   ): Promise<
     ImmutablePayloadCollection<
       DecryptedPayloadInterface | EncryptedPayloadInterface | DeletedPayloadInterface
     >
   > {
-    const collection = ImmutablePayloadCollection.WithPayloads(payloads, source)
+    const collection = ImmutablePayloadCollection.WithPayloads(
+      items.map(CreatePayloadFromRawServerItem),
+      source,
+    )
 
     const delta = new DeltaRemoteConflicts(
       this.baseCollection,
@@ -159,14 +156,14 @@ export class ServerSyncResponseResolver {
   }
 
   private async processRejectedPayloads(
-    payloads: (EncryptedPayloadInterface | DeletedPayloadInterface)[],
+    items: ServerItemResponse[],
   ): Promise<
     ImmutablePayloadCollection<
       DecryptedPayloadInterface | EncryptedPayloadInterface | DeletedPayloadInterface
     >
   > {
     const collection = ImmutablePayloadCollection.WithPayloads(
-      payloads,
+      items.map(CreatePayloadFromRawServerItem),
       PayloadSource.RemoteRejected,
     )
 
@@ -187,7 +184,7 @@ export class ServerSyncResponseResolver {
   ): ImmutablePayloadCollection<P> {
     const updatedDirtyPayloads = collection.all().map((payload) => {
       const stillDirty = this.finalDirtyStateForPayload(payload)
-      return CopyPayload(payload, {
+      return payload.copy({
         dirty: stillDirty,
         dirtiedDate: stillDirty ? new Date() : undefined,
       })
@@ -199,7 +196,7 @@ export class ServerSyncResponseResolver {
     ) as ImmutablePayloadCollection<P>
   }
 
-  private finalDirtyStateForPayload<P extends AnyPayloadInterface>(
+  private finalDirtyStateForPayload<P extends FullyFormedPayloadInterface>(
     payload: P,
   ): boolean | undefined {
     const current = this.baseCollection.find(payload.uuid)

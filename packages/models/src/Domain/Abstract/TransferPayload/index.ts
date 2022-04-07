@@ -1,4 +1,3 @@
-export * from './Interfaces/ContentlessTransferPayload'
 export * from './Interfaces/DecryptedTransferPayload'
 export * from './Interfaces/DeletedTransferPayload'
 export * from './Interfaces/EncryptedTransferPayload'

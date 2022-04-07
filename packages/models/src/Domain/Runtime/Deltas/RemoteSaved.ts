@@ -1,38 +1,36 @@
+import { ServerSyncSavedContextualPayload } from './../../Abstract/Contextual/ServerSyncSaved'
 import { DeletedPayload } from './../../Abstract/Payload/Implementations/DeletedPayload'
 import { ImmutablePayloadCollection } from '../Collection/Payload/ImmutablePayloadCollection'
 import { PayloadSource } from '../../Abstract/Payload/Types/PayloadSource'
-import { PayloadsDelta } from './Delta'
 import { isDeletedPayload } from '../../Abstract/Payload/Interfaces/TypeCheck'
-import {
-  ContentlessPayloadInterface,
-  DecryptedPayloadInterface,
-  DeletedPayloadInterface,
-  EncryptedPayloadInterface,
-  FullyFormedPayloadInterface,
-} from '../../Abstract/Payload'
+import { FullyFormedPayloadInterface } from '../../Abstract/Payload'
+import { CustomApplyDelta } from './CustomApplyDelta'
 
-type Return = EncryptedPayloadInterface | DecryptedPayloadInterface | DeletedPayloadInterface
+type Return = FullyFormedPayloadInterface
 
-export class DeltaRemoteSaved extends PayloadsDelta<
-  FullyFormedPayloadInterface,
-  ContentlessPayloadInterface | DeletedPayloadInterface,
-  EncryptedPayloadInterface | DecryptedPayloadInterface | DeletedPayloadInterface
-> {
+export class DeltaRemoteSaved extends CustomApplyDelta {
+  constructor(
+    baseCollection: ImmutablePayloadCollection<FullyFormedPayloadInterface>,
+    private readonly applyContextualPayloads: ServerSyncSavedContextualPayload[],
+  ) {
+    super(baseCollection)
+  }
+
   public async resultingCollection(): Promise<ImmutablePayloadCollection<Return>> {
     const processed: Return[] = []
 
-    for (const apply of this.applyCollection.all()) {
+    for (const apply of this.applyContextualPayloads) {
       const base = this.findBasePayload(apply.uuid)
 
       /**
        * If we save an item, but while in transit it is deleted locally, we want to keep
        * local deletion status, and not old deleted value that was sent to server.
        */
-      const deleted = base ? isDeletedPayload(base) : isDeletedPayload(apply)
-      if ((base && isDeletedPayload(base)) || isDeletedPayload(apply)) {
+      const deleted = base ? isDeletedPayload(base) : apply.deleted
+      if ((base && isDeletedPayload(base)) || apply.deleted) {
         const result = new DeletedPayload(
           {
-            ...apply.ejected(),
+            ...apply,
             deleted: true,
             content: undefined,
           },
@@ -43,6 +41,7 @@ export class DeltaRemoteSaved extends PayloadsDelta<
         const result = base.copy(
           {
             ...apply,
+            deleted: false,
             lastSyncEnd: new Date(),
             dirty: deleted,
           },

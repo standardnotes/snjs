@@ -10,7 +10,7 @@ import { ItemContentsEqual } from '../Utilities/Functions'
 import { ItemInterface } from '../Interfaces/ItemInterface'
 import { PrefKey } from '../../../Syncable/UserPrefs/PrefKey'
 import { ContentReference } from '../../Reference/ContentReference'
-import { dateToLocalizedString } from '@standardnotes/utils'
+import { dateToLocalizedString, useBoolean } from '@standardnotes/utils'
 
 export class DecryptedItem<C extends ItemContent = ItemContent>
   extends GenericItem<DecryptedPayloadInterface<C>>
@@ -33,8 +33,8 @@ export class DecryptedItem<C extends ItemContent = ItemContent>
     )
     this.userModifiedDate = new Date(userModVal as number | Date)
     this.updatedAtString = dateToLocalizedString(this.userModifiedDate)
-    this.protected = this.payload.content.protected || false
-    this.trashed = this.payload.content.trashed || false
+    this.protected = useBoolean(this.payload.content.protected, false)
+    this.trashed = useBoolean(this.payload.content.trashed, false)
     this.pinned = this.getAppDomainValueWithDefault(AppDataField.Pinned, false)
     this.archived = this.getAppDomainValueWithDefault(AppDataField.Archived, false)
     this.locked = this.getAppDomainValueWithDefault(AppDataField.Locked, false)

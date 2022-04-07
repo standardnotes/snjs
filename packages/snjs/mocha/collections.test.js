@@ -14,7 +14,7 @@ describe('payload collections', () => {
   })
 
   const copyPayload = (payload, timestamp, changeUuid) => {
-    return CopyPayload(payload, {
+    return payload.copy({
       uuid: changeUuid ? Factory.generateUuidish() : payload.uuid,
       created_at: timestamp ? new Date(timestamp) : new Date(),
     })
@@ -50,7 +50,7 @@ describe('payload collections', () => {
     const payload = Factory.createNotePayload()
     const collection = new ItemCollection()
     collection.set([payload])
-    const conflict = CopyPayload(payload, {
+    const conflict = payload.copy({
       content: {
         conflict_of: payload.uuid,
         ...payload.content,
@@ -71,7 +71,7 @@ describe('payload collections', () => {
     collection.setDisplayOptions(ContentType.Note, CollectionSort.CreatedAt, 'asc')
     const payload = Factory.createNotePayload()
 
-    const copy = CopyPayload(payload)
+    const copy = payload.copy()
     collection.set([payload, copy])
     collection.set([payload])
     collection.set([payload, copy])
@@ -84,11 +84,11 @@ describe('payload collections', () => {
     const collection = new ItemCollection()
     collection.setDisplayOptions(ContentType.Note, CollectionSort.CreatedAt, 'asc')
     const present = Factory.createNotePayload()
-    const oldest = CopyPayload(present, {
+    const oldest = present.copy({
       uuid: Factory.generateUuidish(),
       created_at: Factory.yesterday(),
     })
-    const newest = CopyPayload(present, {
+    const newest = present.copy({
       uuid: Factory.generateUuidish(),
       created_at: Factory.tomorrow(),
     })
@@ -104,11 +104,11 @@ describe('payload collections', () => {
     const collection = new ItemCollection()
     collection.setDisplayOptions(ContentType.Note, CollectionSort.CreatedAt, 'dsc')
     const present = Factory.createNotePayload()
-    const oldest = CopyPayload(present, {
+    const oldest = present.copy({
       uuid: Factory.generateUuidish(),
       created_at: Factory.yesterday(),
     })
-    const newest = CopyPayload(present, {
+    const newest = present.copy({
       uuid: Factory.generateUuidish(),
       created_at: Factory.tomorrow(),
     })
@@ -147,7 +147,7 @@ describe('payload collections', () => {
     expect(collection.all(ContentType.Note).length).to.equal(1)
     expect(collection.displayElements(ContentType.Note).length).to.equal(1)
 
-    const deleted = CopyPayload(present, {
+    const deleted = present.copy({
       deleted: true,
     })
     collection.set([deleted])
@@ -195,7 +195,7 @@ describe('payload collections', () => {
     expect(sorted[1].uuid).to.equal(unpinned2.uuid)
 
     const pinned2 = CreateDecryptedItemFromPayload(
-      CopyPayload(unpinned2.payload, {
+      unpinned2.payload.copy({
         content: {
           ...unpinned1.content,
           appData: {
@@ -215,10 +215,14 @@ describe('payload collections', () => {
 
   it('setDisplayOptions should not fail for encrypted items', async () => {
     const collection = new ItemCollection()
-    const regularPayload1 = CreateDecryptedItemFromPayload(Factory.createNotePayload('foo', 'noteText'))
-    const regularPayload2 = CreateDecryptedItemFromPayload(Factory.createNotePayload('foo', 'noteText2'))
+    const regularPayload1 = CreateDecryptedItemFromPayload(
+      Factory.createNotePayload('foo', 'noteText'),
+    )
+    const regularPayload2 = CreateDecryptedItemFromPayload(
+      Factory.createNotePayload('foo', 'noteText2'),
+    )
     const encryptedPayloadUpdated = CreateDecryptedItemFromPayload(
-      CopyPayload(regularPayload1.payload, {
+      regularPayload1.payload.copy({
         ...regularPayload1.payload,
         errorDecrypting: true,
         content: '004:123',

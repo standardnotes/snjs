@@ -13,6 +13,7 @@ import { UuidString, DeinitSource, ApplicationEventPayload } from '../Types'
 import { ApplicationEvent, applicationEventForSyncEvent } from '@Lib/Application/Event'
 import { Environment, Platform } from './Platforms'
 import { SNLog } from '../Log'
+import { useBoolean } from '@standardnotes/utils'
 
 /** How often to automatically sync, in milliseconds */
 const DEFAULT_AUTO_SYNC_INTERVAL = 30_000
@@ -195,7 +196,7 @@ export class SNApplication implements InternalServices.ListedClientInterface {
         return undefined
       })
 
-    this.createdNewDatabase = databaseResult?.isNewDatabase || false
+    this.createdNewDatabase = useBoolean(databaseResult?.isNewDatabase, false)
 
     await this.migrationService.initialize()
 

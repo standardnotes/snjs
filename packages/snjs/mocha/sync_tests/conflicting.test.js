@@ -124,7 +124,7 @@ describe('online conflict handling', function () {
     const note = await Factory.createSyncedNote(this.application)
     this.expectedItemCount++
     const basePayload = createDirtyPayload(ContentType.Component)
-    const payload = CopyPayload(basePayload, {
+    const payload = basePayload.copy({
       content: {
         ...basePayload.content,
         area: ComponentArea.Editor,
@@ -897,7 +897,7 @@ describe('online conflict handling', function () {
      * set to new value. Then send to server. If the server conflicts, it means it's incorrectly ignoring
      * updated_at_timestamp and looking at updated_at.
      */
-    const modified = CopyPayload(note.payload, {
+    const modified = note.payload.copy({
       updated_at: new Date(0),
       content: {
         ...note.content,
@@ -920,7 +920,7 @@ describe('online conflict handling', function () {
     await this.application.mutator.changeItem(note, (mutator) => {
       mutator.title = `${Math.random()}`
     })
-    const modified = CopyPayload(note.payload, {
+    const modified = note.payload.copy({
       updated_at_timestamp: note.payload.updated_at_timestamp - 1,
       content: {
         ...note.content,

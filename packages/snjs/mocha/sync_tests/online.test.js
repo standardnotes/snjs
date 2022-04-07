@@ -829,7 +829,7 @@ describe('online syncing', function () {
           actualSaveCount++
         } else if (source === PayloadSource.PreSyncSave && !didPerformMutatation) {
           didPerformMutatation = true
-          const mutated = CopyPayload(changed[0].payload, {
+          const mutated = changed[0].payload.copy({
             content: { ...note.payload.content, text: newText },
             dirty: true,
             dirtiedDate: changed[0].lastSyncBegan,
@@ -869,7 +869,7 @@ describe('online syncing', function () {
       },
       EncryptedExportIntent.Sync,
     )
-    const errored = CopyPayload(encrypted, {
+    const errored = encrypted.copy({
       errorDecrypting: true,
       dirty: true,
     })

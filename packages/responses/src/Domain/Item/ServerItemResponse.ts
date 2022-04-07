@@ -5,7 +5,7 @@ export interface ServerItemResponse {
   content: string | undefined
   created_at_timestamp: number
   created_at: Date
-  deleted?: boolean
+  deleted: boolean
   duplicate_of?: Uuid
   enc_item_key: string
   items_key_id?: string

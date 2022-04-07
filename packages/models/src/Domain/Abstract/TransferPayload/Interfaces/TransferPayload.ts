@@ -1,8 +1,11 @@
 import { ContentType, Uuid } from '@standardnotes/common'
+import { ItemContent } from '../../Item'
 
-export interface TransferPayload {
+export interface TransferPayload<C extends ItemContent = ItemContent> {
   uuid: Uuid
   content_type: ContentType
+  content: C | string | undefined
+  deleted?: boolean
 
   updated_at?: Date
   created_at?: Date

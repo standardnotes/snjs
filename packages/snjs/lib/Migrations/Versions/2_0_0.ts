@@ -284,7 +284,7 @@ export class Migration2_0_0 extends Migration {
     const wrapped = await this.services.protocolService.encryptSplitSingle({
       usesRootKey: {
         items: [
-          Models.CopyPayload(decryptedStoragePayload, {
+          decryptedStoragePayload.copy({
             content_type: ContentType.EncryptedStorage,
             content: storageValueStore as unknown as Models.ItemContent,
           }),
@@ -454,7 +454,7 @@ export class Migration2_0_0 extends Migration {
           rawAccountKeyParams?.version ||
           (await this.getFallbackRootKeyVersion())
 
-        const newAccountKey = Models.CopyPayload(unwrappedAccountKey, {
+        const newAccountKey = unwrappedAccountKey.copy({
           content: Models.FillItemContent<LegacyRootKeyContent>({
             masterKey: accountKeyContent.mk,
             dataAuthenticationKey: accountKeyContent.ak,

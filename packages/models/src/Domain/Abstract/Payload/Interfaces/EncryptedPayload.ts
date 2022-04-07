@@ -4,6 +4,7 @@ import { PayloadInterface } from './PayloadInterface'
 
 export interface EncryptedPayloadInterface extends PayloadInterface<EncryptedTransferPayload> {
   readonly content: string
+  deleted: false
   readonly enc_item_key: string
   readonly items_key_id?: string
 

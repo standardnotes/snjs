@@ -7,7 +7,7 @@ import { isDeletedItem, isEncryptedErroredItem } from '../../../Abstract/Item/In
 import { isNote } from '../../../Syncable/Note'
 import { DecryptedItemInterface } from '../../../Abstract/Item/Interfaces/DecryptedItem'
 import { CollectionInterface } from '../CollectionInterface'
-import { DeletedItemInterface } from '../../../Abstract/Item'
+import { DeletedItemInterface, ItemContent } from '../../../Abstract/Item'
 import { Collection } from '../Collection'
 
 export class ItemCollection
@@ -107,10 +107,10 @@ export class ItemCollection
     return this.referenceMap.getInverseRelationships(uuid)
   }
 
-  public elementsReferencingElement(
-    element: DecryptedItemInterface,
-    contentType?: ContentType,
-  ): DecryptedItemInterface[] {
+  public elementsReferencingElement<
+    C extends ItemContent = ItemContent,
+    E extends DecryptedItemInterface<C> = DecryptedItemInterface<C>,
+  >(element: E, contentType?: ContentType): DecryptedItemInterface[] {
     const uuids = this.uuidsThatReferenceUuid(element.uuid)
     const items = this.findAllNondeleted(uuids)
 

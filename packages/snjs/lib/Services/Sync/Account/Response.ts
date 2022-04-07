@@ -7,66 +7,36 @@ import {
   ServerItemResponse,
 } from '@standardnotes/responses'
 import {
-  EncryptedPayloadInterface,
-  DeletedPayloadInterface,
   filterDisallowedRemotePayloads,
-  PayloadSource,
-  ContentlessPayload,
-  ContentlessPayloadInterface,
-  isDeletedPayload,
+  CreateServerSyncSavedPayload,
+  ServerSyncSavedContextualPayload,
 } from '@standardnotes/models'
 import { deepFreeze, isNullOrUndefined } from '@standardnotes/utils'
-import { CreatePayloadFromRawServerItem } from './Utilities'
 
 export class ServerSyncResponse {
   public readonly rawResponse: RawSyncResponse
-  public readonly savedPayloads: ContentlessPayloadInterface[]
-  public readonly retrievedPayloads: (EncryptedPayloadInterface | DeletedPayloadInterface)[]
-  public readonly uuidConflictPayloads: (EncryptedPayloadInterface | DeletedPayloadInterface)[]
-  public readonly dataConflictPayloads: (EncryptedPayloadInterface | DeletedPayloadInterface)[]
-  public readonly rejectedPayloads: (EncryptedPayloadInterface | DeletedPayloadInterface)[]
-  public readonly discardablePayloads: DeletedPayloadInterface[]
+  public readonly savedPayloads: ServerSyncSavedContextualPayload[]
+  public readonly retrievedPayloads: ServerItemResponse[]
+  public readonly uuidConflictPayloads: ServerItemResponse[]
+  public readonly dataConflictPayloads: ServerItemResponse[]
+  public readonly rejectedPayloads: ServerItemResponse[]
 
   constructor(rawResponse: RawSyncResponse) {
     this.rawResponse = rawResponse
 
     this.savedPayloads = filterDisallowedRemotePayloads(rawResponse.data?.saved_items || []).map(
       (rawItem) => {
-        return new ContentlessPayload(rawItem, PayloadSource.RemoteSaved)
+        return CreateServerSyncSavedPayload(rawItem as ServerItemResponse)
       },
     )
 
-    this.retrievedPayloads = filterDisallowedRemotePayloads(
-      rawResponse.data?.retrieved_items || [],
-    ).map((rawItem) => {
-      return CreatePayloadFromRawServerItem(rawItem, PayloadSource.RemoteRetrieved)
-    })
+    this.retrievedPayloads = filterDisallowedRemotePayloads(rawResponse.data?.retrieved_items || [])
 
-    this.dataConflictPayloads = filterDisallowedRemotePayloads(this.rawDataConflictItems).map(
-      (rawItem) => {
-        return CreatePayloadFromRawServerItem(rawItem, PayloadSource.ConflictData)
-      },
-    )
+    this.dataConflictPayloads = filterDisallowedRemotePayloads(this.rawDataConflictItems)
 
-    this.uuidConflictPayloads = filterDisallowedRemotePayloads(this.rawUuidConflictItems).map(
-      (rawItem) => {
-        return CreatePayloadFromRawServerItem(rawItem, PayloadSource.ConflictUuid)
-      },
-    )
+    this.uuidConflictPayloads = filterDisallowedRemotePayloads(this.rawUuidConflictItems)
 
-    this.rejectedPayloads = filterDisallowedRemotePayloads(this.rawRejectedPayloads).map(
-      (rawItem) => {
-        return CreatePayloadFromRawServerItem(rawItem, PayloadSource.RemoteRejected)
-      },
-    )
-
-    /**
-     * Items may be deleted from a combination of sources, such as from RemoteSaved,
-     * or if a conflict handler decides to delete a payload.
-     */
-    this.discardablePayloads = this.allProcessedPayloads.filter(isDeletedPayload).filter((payload) => {
-      return payload.discardable
-    })
+    this.rejectedPayloads = filterDisallowedRemotePayloads(this.rawRejectedPayloads)
 
     deepFreeze(this)
   }
@@ -88,16 +58,11 @@ export class ServerSyncResponse {
   }
 
   public get numberOfItemsInvolved(): number {
-    return this.allProcessedPayloads.length
+    return this.allFullyFormedPayloads.length
   }
 
-  public get allProcessedPayloads(): (
-    | ContentlessPayloadInterface
-    | EncryptedPayloadInterface
-    | DeletedPayloadInterface
-  )[] {
+  public get allFullyFormedPayloads(): ServerItemResponse[] {
     return [
-      ...this.savedPayloads,
       ...this.retrievedPayloads,
       ...this.dataConflictPayloads,
       ...this.uuidConflictPayloads,

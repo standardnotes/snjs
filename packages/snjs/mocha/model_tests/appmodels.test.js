@@ -140,7 +140,7 @@ describe('app models', () => {
     expect(refreshedItem1.content.references.length).to.equal(1)
     expect(refreshedItem2.content.references.length).to.equal(1)
 
-    const damagedPayload = CopyPayload(refreshedItem1.payload, {
+    const damagedPayload = refreshedItem1.payload.copy({
       content: {
         ...refreshedItem1.content,
         // damage references of one object
@@ -296,7 +296,7 @@ describe('app models', () => {
       },
       EncryptedExportIntent.Sync,
     )
-    const errored = CopyPayload(encrypted, {
+    const errored = encrypted.copy({
       errorDecrypting: true,
       waitingForKey: true,
     })

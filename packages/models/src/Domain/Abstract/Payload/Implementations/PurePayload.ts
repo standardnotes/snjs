@@ -1,13 +1,18 @@
 import { ContentType } from '@standardnotes/common'
-import { deepFreeze } from '@standardnotes/utils'
+import { deepFreeze, useBoolean } from '@standardnotes/utils'
 import { PayloadInterface } from '../Interfaces/PayloadInterface'
 import { PayloadSource } from '../Types/PayloadSource'
 import { TransferPayload } from '../../TransferPayload/Interfaces/TransferPayload'
+import { ItemContent } from '../../Item'
 
-export abstract class PurePayload<T extends TransferPayload> implements PayloadInterface<T> {
+export abstract class PurePayload<T extends TransferPayload<C>, C extends ItemContent = ItemContent>
+  implements PayloadInterface<T>
+{
   readonly source: PayloadSource
   readonly uuid: string
   readonly content_type: ContentType
+  readonly deleted: boolean
+  readonly content: C | string | undefined
 
   readonly created_at: Date
   readonly updated_at: Date
@@ -32,7 +37,9 @@ export abstract class PurePayload<T extends TransferPayload> implements PayloadI
       )
     }
 
+    this.content = rawPayload.content
     this.content_type = rawPayload.content_type
+    this.deleted = useBoolean(rawPayload.deleted, false)
     this.dirty = rawPayload.dirty
     this.duplicate_of = rawPayload.duplicate_of
 
@@ -63,6 +70,8 @@ export abstract class PurePayload<T extends TransferPayload> implements PayloadI
   ejectedBase(): TransferPayload {
     return {
       uuid: this.uuid,
+      content: this.content,
+      deleted: this.deleted,
       content_type: this.content_type,
       created_at: this.created_at,
       updated_at: this.updated_at,

@@ -3,11 +3,8 @@ import { ImmutablePayloadCollectionSet } from '../Collection/Payload/ImmutablePa
 import { HistoryMap } from '../History/HistoryMap'
 import { PayloadSource } from '../../Abstract/Payload/Types/PayloadSource'
 import { Uuid } from '@standardnotes/common'
-import {
-  FullyFormedPayloadInterface,
-  DeletedPayloadInterface,
-  AnyPayloadInterface,
-} from '../../Abstract/Payload'
+import { FullyFormedPayloadInterface, DeletedPayloadInterface } from '../../Abstract/Payload'
+import { DeltaInterface } from './DeltaInterface'
 /**
  * A payload delta is a class that defines instructions that process an incoming collection
  * of payloads, applies some set of operations on those payloads wrt to the current base state,
@@ -26,9 +23,10 @@ import {
  */
 export abstract class PayloadsDelta<
   Base extends FullyFormedPayloadInterface,
-  Apply extends AnyPayloadInterface,
+  Apply extends FullyFormedPayloadInterface,
   Result extends FullyFormedPayloadInterface,
-> {
+> implements DeltaInterface<Base, Result>
+{
   /**
    * @param baseCollection The authoratitive collection on top of which to compute changes.
    * @param applyCollection The collection of payloads to apply, from one given source only.
@@ -36,7 +34,7 @@ export abstract class PayloadsDelta<
    *                             that may be neccessary to carry out computation.
    */
   constructor(
-    protected readonly baseCollection: ImmutablePayloadCollection<Base>,
+    readonly baseCollection: ImmutablePayloadCollection<Base>,
     protected readonly applyCollection: ImmutablePayloadCollection<Apply>,
     protected readonly relatedCollectionSet?: ImmutablePayloadCollectionSet<FullyFormedPayloadInterface>,
     protected readonly historyMap?: HistoryMap,
@@ -44,7 +42,7 @@ export abstract class PayloadsDelta<
 
   public abstract resultingCollection(): Promise<ImmutablePayloadCollection<Result>>
 
-  protected findBasePayload(uuid: Uuid): DeletedPayloadInterface | Base | undefined {
+  findBasePayload(uuid: Uuid): DeletedPayloadInterface | Base | undefined {
     return this.baseCollection.find(uuid)
   }
 

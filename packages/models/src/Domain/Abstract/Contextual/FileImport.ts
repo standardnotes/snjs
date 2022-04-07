@@ -28,6 +28,7 @@ export function createFileImportContextPayload(
     content: fromPayload.content,
     created_at_timestamp: fromPayload.created_at_timestamp,
     created_at: fromPayload.created_at,
+    deleted: false,
     duplicate_of: fromPayload.duplicate_of,
     updated_at_timestamp: fromPayload.updated_at_timestamp,
     updated_at: fromPayload.updated_at,

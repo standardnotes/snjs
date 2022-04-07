@@ -2,13 +2,12 @@ import {
   DecryptedItemInterface,
   DeletedItemInterface,
   EncryptedItemInterface,
+  ItemContent,
 } from '../../Abstract/Item'
 
-export type DecryptedOrDeletedItem = DecryptedItemInterface | DeletedItemInterface
-
-export interface ItemDelta {
-  changed: DecryptedOrDeletedItem[]
-  inserted: DecryptedOrDeletedItem[]
+export interface ItemDelta<C extends ItemContent = ItemContent> {
+  changed: (DecryptedItemInterface<C> | DeletedItemInterface)[]
+  inserted: (DecryptedItemInterface<C> | DeletedItemInterface)[]
   discarded: DeletedItemInterface[]
   ignored: EncryptedItemInterface[]
 }

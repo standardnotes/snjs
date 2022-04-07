@@ -20,9 +20,6 @@ export enum PayloadSource {
   FileImport = 9,
   RemoteConflict = 10,
   ImportConflict = 11,
-  /** Payloads that are saved or saving in the
-   current sync request */
-  SavedOrSaving = 12,
   /** Payloads that have been decrypted for the convenience
    of consumers who can only work with decrypted formats. The
    decrypted payloads exist in transient, ephemeral space, and

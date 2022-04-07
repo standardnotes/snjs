@@ -1,13 +1,12 @@
 import { Uuid } from '@standardnotes/common'
-import { DeletedPayloadInterface, EncryptedPayloadInterface, isDeletedPayload } from '../Payload'
+import { DeletedPayloadInterface, EncryptedPayloadInterface } from '../Payload'
 import { ContextPayload } from './ContextPayload'
 
 export interface ServerSyncPushContextualPayload extends ContextPayload {
   auth_hash?: string
-  content?: string
+  content: string | undefined
   created_at_timestamp: number
   created_at: Date
-  deleted: boolean
   duplicate_of?: Uuid
   enc_item_key?: string
   items_key_id?: string
@@ -22,7 +21,7 @@ export function CreateEncryptedServerSyncPushPayload(
     content_type: fromPayload.content_type,
     created_at_timestamp: fromPayload.created_at_timestamp,
     created_at: fromPayload.created_at,
-    deleted: isDeletedPayload(fromPayload),
+    deleted: false,
     duplicate_of: fromPayload.duplicate_of,
     updated_at_timestamp: fromPayload.updated_at_timestamp,
     updated_at: fromPayload.updated_at,
@@ -41,7 +40,7 @@ export function CreateDeletedServerSyncPushPayload(
     content_type: fromPayload.content_type,
     created_at_timestamp: fromPayload.created_at_timestamp,
     created_at: fromPayload.created_at,
-    deleted: fromPayload.deleted,
+    deleted: true,
     duplicate_of: fromPayload.duplicate_of,
     updated_at_timestamp: fromPayload.updated_at_timestamp,
     updated_at: fromPayload.updated_at,

@@ -421,7 +421,7 @@ describe('item manager', function () {
       const all = changed.concat(inserted)
       if (!didEmit) {
         didEmit = true
-        const changedPayload = CopyPayload(payload, {
+        const changedPayload = payload.copy({
           content: {
             ...payload.content,
             title: changedTitle,

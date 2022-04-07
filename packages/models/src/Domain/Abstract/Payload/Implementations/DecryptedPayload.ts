@@ -13,7 +13,8 @@ export class DecryptedPayload<
   extends PurePayload<T>
   implements DecryptedPayloadInterface<C>
 {
-  readonly content: C
+  override readonly content: C
+  override readonly deleted: false = false
   readonly version: ProtocolVersion
 
   constructor(rawPayload: T, source = PayloadSource.Constructor) {
@@ -38,13 +39,9 @@ export class DecryptedPayload<
   }
 
   override ejected(): T {
-    const values = {
-      content: this.content,
-    }
-
     return {
       ...super.ejected(),
-      ...values,
+      content: this.content,
     }
   }
 

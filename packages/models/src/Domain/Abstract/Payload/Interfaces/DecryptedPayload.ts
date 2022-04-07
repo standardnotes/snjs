@@ -8,6 +8,7 @@ export interface DecryptedPayloadInterface<C extends ItemContent = ItemContent>
   extends PayloadInterface<DecryptedTransferPayload> {
   readonly version: ProtocolVersion
   readonly content: C
+  deleted: false
 
   ejected(): DecryptedTransferPayload<C>
   get references(): ContentReference[]

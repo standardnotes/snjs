@@ -1,6 +1,6 @@
+import { ImmutablePayloadCollection } from './../Collection/Payload/ImmutablePayloadCollection'
 import { PayloadInterface } from './../../Abstract/Payload/Interfaces/PayloadInterface'
 import { extendArray } from '@standardnotes/utils'
-import { ImmutablePayloadCollection } from '../Collection/Payload/ImmutablePayloadCollection'
 import { PayloadSource } from '../../Abstract/Payload/Types/PayloadSource'
 import { ConflictDelta } from './Conflict'
 import { PayloadsDelta } from './Delta'
@@ -15,6 +15,9 @@ import {
   EncryptedPayloadInterface,
 } from '../../Abstract/Payload'
 import { Uuid } from '@standardnotes/common'
+import { ImmutablePayloadCollectionSet } from '../Collection/Payload/ImmutablePayloadCollectionSet'
+import { HistoryMap } from '../History'
+import { ServerSyncPushContextualPayload } from '../../Abstract/Contextual/ServerSyncPush'
 
 type Return = EncryptedPayloadInterface | DecryptedPayloadInterface | DeletedPayloadInterface
 
@@ -23,11 +26,20 @@ export class DeltaRemoteRetrieved extends PayloadsDelta<
   EncryptedPayloadInterface | DeletedPayloadInterface,
   EncryptedPayloadInterface | DecryptedPayloadInterface | DeletedPayloadInterface
 > {
-  private findRelatedSavedOrSavingPayload(
-    uuid: Uuid,
-  ): PayloadInterface | DeletedPayloadInterface | undefined {
-    const collection = this.relatedCollectionSet?.collectionForSource(PayloadSource.SavedOrSaving)
-    return collection?.find(uuid)
+  constructor(
+    baseCollection: ImmutablePayloadCollection<FullyFormedPayloadInterface>,
+    applyCollection: ImmutablePayloadCollection<
+      EncryptedPayloadInterface | DeletedPayloadInterface
+    >,
+    private itemsSavedOrSaving: ServerSyncPushContextualPayload[],
+    relatedCollectionSet?: ImmutablePayloadCollectionSet<FullyFormedPayloadInterface>,
+    historyMap?: HistoryMap,
+  ) {
+    super(baseCollection, applyCollection, relatedCollectionSet, historyMap)
+  }
+
+  private isUuidOfPayloadCurrentlySavingOrSaved(uuid: Uuid): boolean {
+    return this.itemsSavedOrSaving.find((i) => i.uuid === uuid) != undefined
   }
 
   public async resultingCollection(): Promise<ImmutablePayloadCollection<Return>> {
@@ -39,7 +51,7 @@ export class DeltaRemoteRetrieved extends PayloadsDelta<
      * or if the item is locally dirty, filter it out of retrieved_items, and add to potential conflicts.
      */
     for (const received of this.applyCollection.all()) {
-      const savedOrSaving = this.findRelatedSavedOrSavingPayload(received.uuid)
+      const savedOrSaving = this.isUuidOfPayloadCurrentlySavingOrSaved(received.uuid)
 
       const postProcessedCounterpart = this.findRelatedPostProcessedPayload(received.uuid)
       if (!postProcessedCounterpart) {

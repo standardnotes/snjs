@@ -353,7 +353,7 @@ describe('key recovery service', function () {
       EncryptedExportIntent.Sync,
     )
     await application.payloadManager.emitPayload(
-      CopyPayload(encrypted, {
+      encrypted.copy({
         errorDecrypting: true,
       }),
       PayloadSource.Constructor,
@@ -401,7 +401,7 @@ describe('key recovery service', function () {
     )
     const newUpdated = new Date()
     await application.payloadManager.emitPayload(
-      CopyPayload(encrypted, {
+      encrypted.copy({
         errorDecrypting: true,
         updated_at: newUpdated,
       }),
@@ -462,7 +462,7 @@ describe('key recovery service', function () {
     )
 
     await application.payloadManager.emitPayload(
-      CopyPayload(encrypted, {
+      encrypted.copy({
         errorDecrypting: true,
       }),
       PayloadSource.Constructor,
@@ -633,7 +633,7 @@ describe('key recovery service', function () {
 
     /** Insert foreign items key into appA, which shouldn't be able to decrypt it yet */
     await appA.payloadManager.emitPayload(
-      CopyPayload(encrypted, {
+      encrypted.copy({
         errorDecrypting: true,
       }),
       PayloadSource.Constructor,

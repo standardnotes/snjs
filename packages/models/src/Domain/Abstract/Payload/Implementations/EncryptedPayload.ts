@@ -8,12 +8,12 @@ export class EncryptedPayload
   extends PurePayload<EncryptedTransferPayload>
   implements EncryptedPayloadInterface
 {
-  readonly content: string
+  override readonly content: string
   readonly enc_item_key: string
   readonly items_key_id?: string
   readonly errorDecrypting?: boolean
   readonly waitingForKey?: boolean
-  readonly deleted: false = false
+  override readonly deleted: false = false
   readonly auth_hash?: string
   readonly version: ProtocolVersion
 
@@ -32,16 +32,11 @@ export class EncryptedPayload
   }
 
   override ejected(): EncryptedTransferPayload {
-    const values = {
-      content: this.content,
+    return {
+      ...super.ejected(),
       enc_item_key: this.enc_item_key,
       items_key_id: this.items_key_id,
       auth_hash: this.auth_hash,
-    }
-
-    return {
-      ...super.ejected(),
-      ...values,
     }
   }
 

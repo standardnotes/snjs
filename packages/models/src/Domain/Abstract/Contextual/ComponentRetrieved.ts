@@ -19,6 +19,7 @@ export function createComponentRetrievedContextPayload(
     content_type: fromPayload.content_type,
     content: fromPayload.content,
     created_at: fromPayload.created_at,
+    deleted: false,
     uuid: fromPayload.uuid,
   }
 }

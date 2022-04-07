@@ -1,4 +1,3 @@
-import { TransferPayload } from './../../TransferPayload/Interfaces/TransferPayload'
 import { extendArray, UuidGenerator } from '@standardnotes/utils'
 import { ImmutablePayloadCollection } from '../../../Runtime/Collection/Payload/ImmutablePayloadCollection'
 import { ItemContent } from '../../Item/Interfaces/ItemContent'
@@ -6,21 +5,19 @@ import { AffectorMapping } from './AffectorFunction'
 import { PayloadsByUpdatingReferencingPayloadReferences } from './PayloadsByUpdatingReferencingPayloadReferences'
 import { isDecryptedPayload } from '../Interfaces/TypeCheck'
 import { FullyFormedPayloadInterface } from '../Interfaces/UnionTypes'
-import { DecryptedTransferPayload } from '../../TransferPayload/Interfaces/DecryptedTransferPayload'
-
 /**
  * Copies payload and assigns it a new uuid.
  * @returns An array of payloads that have changed as a result of copying.
  */
 export async function PayloadsByDuplicating<C extends ItemContent = ItemContent>(
-  payload: FullyFormedPayloadInterface,
+  payload: FullyFormedPayloadInterface<C>,
   baseCollection: ImmutablePayloadCollection<FullyFormedPayloadInterface>,
   isConflict: boolean,
   additionalContent?: Partial<C>,
 ): Promise<FullyFormedPayloadInterface[]> {
   const results: FullyFormedPayloadInterface[] = []
 
-  const override: Partial<TransferPayload> = {
+  const baseOverride = {
     uuid: UuidGenerator.GenerateUuid(),
     dirty: true,
     dirtiedDate: new Date(),
@@ -29,19 +26,29 @@ export async function PayloadsByDuplicating<C extends ItemContent = ItemContent>
     duplicate_of: payload.uuid,
   }
 
+  let copy: FullyFormedPayloadInterface
+
   if (isDecryptedPayload(payload)) {
-    const decryptedOverride = override as DecryptedTransferPayload
-    decryptedOverride.content = {
+    const contentOverride: C = {
       ...payload.content,
       ...additionalContent,
     }
 
     if (isConflict) {
-      decryptedOverride.content.conflict_of = payload.uuid
+      contentOverride.conflict_of = payload.uuid
     }
+
+    copy = payload.copy({
+      ...baseOverride,
+      content: contentOverride,
+      deleted: false,
+    })
+  } else {
+    copy = payload.copy({
+      ...baseOverride,
+    })
   }
 
-  const copy = payload.copy(override)
   results.push(copy)
 
   if (isDecryptedPayload(payload) && isDecryptedPayload(copy)) {

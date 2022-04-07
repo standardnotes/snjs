@@ -1,4 +1,3 @@
-import { ContentlessPayloadInterface } from './../Interfaces/ContentlessPayload'
 import { ItemContent } from '../../Item'
 import { DecryptedPayloadInterface } from '../Interfaces/DecryptedPayload'
 import { DeletedPayloadInterface } from '../Interfaces/DeletedPayload'
@@ -78,7 +77,7 @@ export function CreatePayloadSplitWithDiscardables<C extends ItemContent = ItemC
 }
 
 export function CreateNonDecryptedPayloadSplit(
-  payloads: (EncryptedPayloadInterface | DeletedPayloadInterface | ContentlessPayloadInterface)[],
+  payloads: (EncryptedPayloadInterface | DeletedPayloadInterface)[],
 ): NonDecryptedPayloadSplit {
   const split: NonDecryptedPayloadSplit = {
     encrypted: [],

@@ -1,3 +1,4 @@
+import { useBoolean } from '@standardnotes/utils'
 import { DecryptedItem } from '../../Abstract/Item/Implementations/DecryptedItem'
 import { ItemContent } from '../../Abstract/Item/Interfaces/ItemContent'
 
@@ -11,11 +12,11 @@ export interface FeatureRepoContent extends ItemContent {
 
 export class SNFeatureRepo extends DecryptedItem<FeatureRepoContent> {
   public get migratedToUserSetting(): boolean {
-    return this.payload.content.migratedToUserSetting || false
+    return useBoolean(this.payload.content.migratedToUserSetting, false)
   }
 
   public get migratedToOfflineEntitlements(): boolean {
-    return this.payload.content.migratedToOfflineEntitlements || false
+    return useBoolean(this.payload.content.migratedToOfflineEntitlements, false)
   }
 
   public get onlineUrl(): string | undefined {

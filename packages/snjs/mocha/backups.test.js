@@ -159,7 +159,7 @@ describe('backups', function () {
       },
       EncryptedExportIntent.FileEncrypted,
     )
-    const errored = CopyPayload(encrypted, {
+    const errored = encrypted.copy({
       errorDecrypting: true,
     })
     const erroredItem = await this.application.itemManager.emitItemFromPayload(errored)

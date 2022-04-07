@@ -167,7 +167,7 @@ export class SNHistoryManager extends Services.AbstractService {
     const embeddedParams = this.protocolService.getEmbeddedPayloadAuthenticatedData(serverPayload)
     const sourceItemUuid = embeddedParams?.u as Uuid | undefined
 
-    const payload = Models.CopyPayload(serverPayload, {
+    const payload = serverPayload.copy({
       uuid: sourceItemUuid || revision.item_uuid,
     })
 

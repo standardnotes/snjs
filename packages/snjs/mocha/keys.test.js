@@ -122,7 +122,7 @@ describe('keys', function () {
     expect(itemsKeys.length).to.equal(1)
     const notePayload = Factory.createNotePayload()
 
-    const dirtied = CopyPayload(notePayload, {
+    const dirtied = notePayload.copy({
       dirty: true,
       dirtiedDate: new Date(),
     })
@@ -243,7 +243,7 @@ describe('keys', function () {
     const itemsKey = await this.application.protocolService.getSureDefaultItemsKey()
     expect(itemsKey.errorDecrypting).to.not.be.ok
 
-    const errored = CopyPayload(itemsKey.payload, {
+    const errored = itemsKey.payload.copy({
       content: {
         foo: 'bar',
       },
@@ -775,7 +775,7 @@ describe('keys', function () {
     const protocol003 = new SNProtocolOperator003(new SNWebCrypto())
     const key = await protocol003.createItemsKey()
     await this.application.itemManager.emitItemFromPayload(
-      CopyPayload(key.payload, {
+      key.payload.copy({
         content: {
           ...key.payload.content,
           isDefault: true,
@@ -797,7 +797,7 @@ describe('keys', function () {
     await Factory.registerUserToApplication({ application: this.application })
     const itemsKey = this.application.itemManager.itemsKeys()[0]
     await this.application.itemManager.emitItemFromPayload(
-      CopyPayload(itemsKey.payload, {
+      itemsKey.payload.copy({
         dirty: false,
         updated_at: new Date(0),
         deleted: false,

@@ -725,3 +725,7 @@ export function assert(value: unknown): asserts value {
     throw new Error('Assertion failed; value must be defined')
   }
 }
+
+export function useBoolean(value: boolean | undefined, defaultValue: boolean): boolean {
+  return value != undefined ? value : defaultValue
+}

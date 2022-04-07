@@ -1,3 +1,4 @@
+import { ServerItemResponse } from '@standardnotes/responses'
 import { AccountSyncOperation } from '@Lib/Services/Sync/Account/Operation'
 import { ApplicationSyncOptions } from '../../Application/Options'
 import { ContentType } from '@standardnotes/common'
@@ -7,6 +8,7 @@ import {
   removeFromIndex,
   sleep,
   subtractFromArray,
+  useBoolean,
 } from '@standardnotes/utils'
 import { ItemManager } from '@Lib/Services/Items/ItemManager'
 import { OfflineSyncOperation } from '@Lib/Services/Sync/Offline/Operation'
@@ -50,7 +52,6 @@ import {
   CreateDeletedServerSyncPushPayload,
   ItemsKeyInterface,
   CreateNonDecryptedPayloadSplit,
-  AnyNonDecryptedPayloadInterface,
   DeltaOfflineSaved,
 } from '@standardnotes/models'
 import * as Services from '@standardnotes/services'
@@ -719,7 +720,7 @@ export class SNSyncService
       return {
         operation: await this.createServerSyncOperation(
           uploadPayloads,
-          options.checkIntegrity || false,
+          useBoolean(options.checkIntegrity, false),
           options.source,
           syncMode,
         ),
@@ -813,16 +814,11 @@ export class SNSyncService
     this.log('Offline Sync Response', response)
 
     const masterCollection = this.payloadManager.getMasterCollection()
-    const delta = new DeltaOfflineSaved(masterCollection, response.responseCollection)
+    const delta = new DeltaOfflineSaved(masterCollection, response.savedPayloads)
     const collection = await delta.resultingCollection()
 
     const payloadsToPersist = await this.payloadManager.emitCollection(collection)
     await this.persistPayloads(payloadsToPersist)
-
-    const deletedPayloads = response.discardablePayloads
-    if (deletedPayloads.length > 0) {
-      await this.deletePayloads(deletedPayloads)
-    }
 
     this.opStatus.clearError()
 
@@ -842,55 +838,59 @@ export class SNSyncService
   }
 
   private async processServerPayloads(
-    payloads: AnyNonDecryptedPayloadInterface[],
+    items: ServerItemResponse[],
   ): Promise<FullyFormedPayloadInterface[]> {
-    const payloadSplit = CreateNonDecryptedPayloadSplit(payloads)
+    const payloads = items.map(CreatePayloadFromRawServerItem)
 
-    const results: FullyFormedPayloadInterface[] = [...payloadSplit.deleted]
+    const { encrypted, deleted } = CreateNonDecryptedPayloadSplit(payloads)
+
+    const results: FullyFormedPayloadInterface[] = [...deleted]
 
     const processedItemsKeyPayloads: Record<
       UuidString,
       DecryptedPayloadInterface<ItemsKeyContent>
     > = {}
 
-    for (const encrypted of payloadSplit.encrypted) {
-      const previouslyProcessedItemsKeyPayload:
-        | DecryptedPayloadInterface<ItemsKeyContent>
-        | undefined = processedItemsKeyPayloads[encrypted.items_key_id as string]
+    await Promise.all(
+      encrypted.map(async (encryptedPayload) => {
+        const previouslyProcessedItemsKeyPayload:
+          | DecryptedPayloadInterface<ItemsKeyContent>
+          | undefined = processedItemsKeyPayloads[encryptedPayload.items_key_id as string]
 
-      const itemsKey = previouslyProcessedItemsKeyPayload
-        ? CreateDecryptedItemFromPayload(previouslyProcessedItemsKeyPayload)
-        : undefined
+        const itemsKey = previouslyProcessedItemsKeyPayload
+          ? CreateDecryptedItemFromPayload(previouslyProcessedItemsKeyPayload)
+          : undefined
 
-      const split = SplitPayloadsByEncryptionType([encrypted])
+        const split = SplitPayloadsByEncryptionType([encryptedPayload])
 
-      if (split.rootKeyEncryption) {
-        const result = await this.protocolService.decryptSplitSingle(
-          Encryption.CreateDecryptionSplitWithKeyLookup(split),
-        )
+        if (split.rootKeyEncryption) {
+          const result = await this.protocolService.decryptSplitSingle(
+            Encryption.CreateDecryptionSplitWithKeyLookup(split),
+          )
 
-        results.push(result)
+          results.push(result)
 
-        if (isDecryptedPayload<ItemsKeyInterface>(result) && isItemsKey(result)) {
-          processedItemsKeyPayloads[result.uuid] = result
-        }
-      } else {
-        const keyedSplit: Encryption.KeyedDecryptionSplit = {}
-        if (itemsKey) {
-          keyedSplit.usesItemsKey = {
-            items: [encrypted],
-            key: itemsKey as ItemsKeyInterface,
+          if (isDecryptedPayload<ItemsKeyInterface>(result) && isItemsKey(result)) {
+            processedItemsKeyPayloads[result.uuid] = result
           }
         } else {
-          keyedSplit.usesItemsKeyWithKeyLookup = {
-            items: [encrypted],
+          const keyedSplit: Encryption.KeyedDecryptionSplit = {}
+          if (itemsKey) {
+            keyedSplit.usesItemsKey = {
+              items: [encryptedPayload],
+              key: itemsKey as ItemsKeyInterface,
+            }
+          } else {
+            keyedSplit.usesItemsKeyWithKeyLookup = {
+              items: [encryptedPayload],
+            }
           }
-        }
 
-        const result = await this.protocolService.decryptSplitSingle(keyedSplit)
-        results.push(result)
-      }
-    }
+          const result = await this.protocolService.decryptSplitSingle(keyedSplit)
+          results.push(result)
+        }
+      }),
+    )
 
     return results
   }
@@ -908,7 +908,7 @@ export class SNSyncService
 
     this.opStatus.setDownloadStatus(response.retrievedPayloads.length)
 
-    const processedPayloads = await this.processServerPayloads(response.allProcessedPayloads)
+    const processedPayloads = await this.processServerPayloads(response.allFullyFormedPayloads)
 
     const masterCollection = this.payloadManager.getMasterCollection()
     const historyMap = this.historyService.getHistoryMapCopy()
@@ -916,7 +916,7 @@ export class SNSyncService
       response,
       processedPayloads,
       masterCollection,
-      operation.payloadsSavedOrSaving.map(CreatePayload),
+      operation.payloadsSavedOrSaving,
       historyMap,
     )
 
@@ -924,11 +924,6 @@ export class SNSyncService
     for (const collection of collections) {
       const payloadsToPersist = await this.payloadManager.emitCollection(collection)
       await this.persistPayloads(payloadsToPersist)
-    }
-
-    const deletedPayloads = response.discardablePayloads
-    if (deletedPayloads.length > 0) {
-      await this.deletePayloads(deletedPayloads)
     }
 
     await Promise.all([
@@ -1079,10 +1074,6 @@ export class SNSyncService
       void this.notifyEvent(Services.SyncEvent.DatabaseWriteError, error)
       SNLog.error(error)
     })
-  }
-
-  private async deletePayloads(payloads: DeletedPayloadInterface[]) {
-    return this.persistPayloads(payloads)
   }
 
   setInSync(isInSync: boolean): void {

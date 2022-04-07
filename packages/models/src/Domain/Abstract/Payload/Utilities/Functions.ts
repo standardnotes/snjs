@@ -2,12 +2,12 @@ import { Uuid } from '@standardnotes/common'
 import { PayloadInterface } from '../Interfaces/PayloadInterface'
 import { PayloadSource } from '../Types/PayloadSource'
 import {
-  isContentlessTransferPayload,
-  isDeletedAndContentlessTransferPayload,
-  isDeletedTransferPayload,
+  isCorrupTransferPayload,
   isEncryptedTransferPayload,
   TransferPayload,
 } from '../../TransferPayload'
+import { ContextPayload } from '../../Contextual/ContextPayload'
+import { ServerItemResponse } from '@standardnotes/responses'
 
 /**
  * Whether the changed payload represents only an internal change that shouldn't
@@ -25,16 +25,20 @@ export function isPayloadSourceRetrieved(source: PayloadSource): boolean {
   ].includes(source)
 }
 
-export function filterDisallowedRemotePayloads<P extends TransferPayload>(payloads: P[]): P[] {
+export function filterDisallowedRemotePayloads<
+  P extends TransferPayload | ContextPayload | ServerItemResponse,
+>(payloads: P[]): P[] {
   return payloads.filter(isRemotePayloadAllowed)
 }
 
-export function isRemotePayloadAllowed(payload: TransferPayload): boolean {
-  if (isDeletedTransferPayload(payload)) {
-    return isDeletedAndContentlessTransferPayload(payload)
+export function isRemotePayloadAllowed(
+  payload: TransferPayload | ContextPayload | ServerItemResponse,
+): boolean {
+  if (isCorrupTransferPayload(payload)) {
+    return false
   }
 
-  return isEncryptedTransferPayload(payload) || isContentlessTransferPayload(payload)
+  return isEncryptedTransferPayload(payload) || payload.content == undefined
 }
 
 export function SureFindPayload<P extends PayloadInterface = PayloadInterface>(

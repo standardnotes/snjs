@@ -9,7 +9,7 @@ import { ContextPayload } from './ContextPayload'
  */
 export interface OfflineSyncSavedContextualPayload extends ContextPayload {
   created_at_timestamp: number
-  deleted?: boolean
+  content: undefined
   dirty?: boolean
   lastSyncEnd?: Date
   updated_at_timestamp?: number
@@ -20,6 +20,7 @@ export function CreateOfflineSyncSavedPayload(
   fromPayload: DecryptedPayloadInterface | DeletedPayloadInterface,
 ): OfflineSyncSavedContextualPayload {
   return {
+    content: undefined,
     content_type: fromPayload.content_type,
     created_at_timestamp: fromPayload.created_at_timestamp,
     deleted: isDeletedPayload(fromPayload),

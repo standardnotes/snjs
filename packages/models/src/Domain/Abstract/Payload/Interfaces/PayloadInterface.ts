@@ -1,4 +1,5 @@
 import { ContentType, Uuid } from '@standardnotes/common'
+import { ItemContent } from '../../Item'
 import { TransferPayload } from '../../TransferPayload/Interfaces/TransferPayload'
 import { PayloadSource } from '../Types/PayloadSource'
 
@@ -18,10 +19,15 @@ import { PayloadSource } from '../Types/PayloadSource'
  * Payloads also have a content format. Formats can either be
  * EncryptedString or DecryptedBareObject.
  */
-export interface PayloadInterface<T extends TransferPayload = TransferPayload> {
+export interface PayloadInterface<
+  T extends TransferPayload = TransferPayload,
+  C extends ItemContent = ItemContent,
+> {
   readonly source: PayloadSource
   readonly uuid: Uuid
   readonly content_type: ContentType
+  content: C | string | undefined
+  deleted: boolean
 
   /** updated_at is set by the server only, and not the client.*/
   readonly updated_at: Date

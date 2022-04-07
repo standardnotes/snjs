@@ -7,8 +7,8 @@ export class DeletedPayload
   extends PurePayload<DeletedTransferPayload>
   implements DeletedPayloadInterface
 {
-  readonly deleted: true = true
-  readonly content: undefined
+  override readonly deleted: true = true
+  override readonly content: undefined
 
   constructor(rawPayload: DeletedTransferPayload, source = PayloadSource.Constructor) {
     super(rawPayload, source)
@@ -19,14 +19,10 @@ export class DeletedPayload
   }
 
   override ejected(): DeletedTransferPayload {
-    const values = {
-      deleted: this.deleted,
-      content: this.content,
-    }
-
     return {
       ...super.ejected(),
-      ...values,
+      deleted: this.deleted,
+      content: this.content,
     }
   }
 
