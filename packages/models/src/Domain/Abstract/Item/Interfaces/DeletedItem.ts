@@ -2,5 +2,6 @@ import { DeletedPayloadInterface } from './../../Payload/Interfaces/DeletedPaylo
 import { ItemInterface } from './ItemInterface'
 
 export interface DeletedItemInterface extends ItemInterface<DeletedPayloadInterface> {
-  deleted: true
+  readonly deleted: true
+  readonly content: undefined
 }

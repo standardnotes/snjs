@@ -26,6 +26,12 @@ export function isDeletedItem(item: ItemInterface): item is DeletedItemInterface
   return isDeletedPayload(item.payload)
 }
 
+export function isDecryptedOrDeletedItem(
+  item: ItemInterface,
+): item is DecryptedItemInterface | DeletedItemInterface {
+  return isDecryptedItem(item) || isDeletedItem(item)
+}
+
 export function isEncryptedErroredItem(item: ItemInterface): boolean {
   return isEncryptedItem(item) && item.errorDecrypting === true
 }

@@ -9,12 +9,7 @@ import { PredicateInterface } from '../../../Runtime/Predicate/Interface'
 import { SingletonStrategy } from '../Types/SingletonStrategy'
 import { PayloadInterface } from '../../Payload/Interfaces/PayloadInterface'
 import { HistoryEntryInterface } from '../../../Runtime/History/HistoryEntryInterface'
-import {
-  isDecryptedItem,
-  isDeletedItem,
-  isEncryptedErroredItem,
-  isEncryptedItem,
-} from '../Interfaces/TypeCheck'
+import { isDecryptedItem, isDeletedItem, isEncryptedErroredItem } from '../Interfaces/TypeCheck'
 
 export abstract class GenericItem<P extends PayloadInterface = PayloadInterface>
   implements ItemInterface<P>
@@ -111,18 +106,6 @@ export abstract class GenericItem<P extends PayloadInterface = PayloadInterface>
 
   public get singletonStrategy(): SingletonStrategy {
     return SingletonStrategy.KeepEarliest
-  }
-
-  /**
-   * An item is syncable if it not errored. If it is, it is only syncable if it is being deleted.
-   * Otherwise, we don't want to save corrupted content locally or send it to the server.
-   */
-  public get isSyncable(): boolean {
-    return (
-      isDecryptedItem(this) ||
-      isDeletedItem(this) ||
-      (isEncryptedItem(this) && !this.errorDecrypting)
-    )
   }
 
   /**

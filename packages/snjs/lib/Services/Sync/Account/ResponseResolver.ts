@@ -31,10 +31,7 @@ export class ServerSyncResponseResolver {
   constructor(
     private response: ServerSyncResponse,
     postProcessedRelated: FullyFormedPayloadInterface[],
-    private baseCollection: ImmutablePayloadCollection<
-      FullyFormedPayloadInterface,
-      DeletedPayloadInterface
-    >,
+    private baseCollection: ImmutablePayloadCollection<FullyFormedPayloadInterface>,
     private payloadsSavedOrSaving: ServerSyncPushContextualPayload[],
     private historyMap: HistoryMap,
   ) {

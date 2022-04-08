@@ -6,9 +6,9 @@ import { isErrorDecryptingParameters, SNRootKey } from '@standardnotes/encryptio
 import * as Encryption from '@standardnotes/encryption'
 import * as Services from '@standardnotes/services'
 import {
-  createDecryptedLocalStorageContextPayload,
-  createDeletedLocalStorageContextPayload,
-  createEncryptedLocalStorageContextPayload,
+  CreateDecryptedLocalStorageContextPayload,
+  CreateDeletedLocalStorageContextPayload,
+  CreateEncryptedLocalStorageContextPayload,
   CreatePayloadSplitWithDiscardables,
   DecryptedPayload,
   EncryptedPayload,
@@ -269,10 +269,10 @@ export class SNStorageService
       const encryptedPayload = await this.encryptionProvider.encryptSplitSingle(split)
 
       rawContent[Services.ValueModesKeys.Wrapped] =
-        createEncryptedLocalStorageContextPayload(encryptedPayload)
+        CreateEncryptedLocalStorageContextPayload(encryptedPayload)
     } else {
       rawContent[Services.ValueModesKeys.Wrapped] =
-        createDecryptedLocalStorageContextPayload(payload)
+        CreateDecryptedLocalStorageContextPayload(payload)
     }
 
     return rawContent as Services.StorageValuesObject
@@ -433,12 +433,12 @@ export class SNStorageService
     const encryptedResults = await this.encryptionProvider.encryptSplit(keyLookupSplit)
 
     const exportedEncrypted = [...encrypted, ...encryptedResults].map(
-      createEncryptedLocalStorageContextPayload,
+      CreateEncryptedLocalStorageContextPayload,
     )
 
-    const exportedDecrypted = unencryptable.map(createDecryptedLocalStorageContextPayload)
+    const exportedDecrypted = unencryptable.map(CreateDecryptedLocalStorageContextPayload)
 
-    const exportedDeleted = deleted.map(createDeletedLocalStorageContextPayload)
+    const exportedDeleted = deleted.map(CreateDeletedLocalStorageContextPayload)
 
     return this.executeCriticalFunction(async () => {
       return this.deviceInterface?.saveRawDatabasePayloads(

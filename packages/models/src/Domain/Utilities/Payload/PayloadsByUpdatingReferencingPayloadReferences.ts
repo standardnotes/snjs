@@ -5,6 +5,7 @@ import { ContentReference } from '../../Abstract/Reference/ContentReference'
 import { DecryptedPayloadInterface } from '../../Abstract/Payload/Interfaces/DecryptedPayload'
 import { ItemContent } from '../../Abstract/Content/ItemContent'
 import { FullyFormedPayloadInterface } from '../../Abstract/Payload/Interfaces/UnionTypes'
+import { isDecryptedPayload } from '../../Abstract/Payload'
 
 export function PayloadsByUpdatingReferencingPayloadReferences<
   C extends ItemContent = ItemContent,
@@ -15,7 +16,9 @@ export function PayloadsByUpdatingReferencingPayloadReferences<
   add: P[] = [],
   removeIds: Uuid[] = [],
 ): P[] {
-  const referencingPayloads = baseCollection.elementsReferencingElement(payload)
+  const referencingPayloads = baseCollection
+    .elementsReferencingElement(payload)
+    .filter(isDecryptedPayload)
   const results: P[] = []
 
   for (const referencingPayload of referencingPayloads) {

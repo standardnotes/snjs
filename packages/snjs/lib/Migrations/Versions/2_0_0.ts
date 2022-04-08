@@ -267,7 +267,7 @@ export class Migration2_0_0 extends Migration {
     })
     return {
       accountKey: accountKey,
-      wrappedKey: Models.createEncryptedLocalStorageContextPayload(encryptedAccountKey),
+      wrappedKey: Models.CreateEncryptedLocalStorageContextPayload(encryptedAccountKey),
     }
   }
 
@@ -293,7 +293,7 @@ export class Migration2_0_0 extends Migration {
       },
     })
 
-    return Models.createEncryptedLocalStorageContextPayload(wrapped)
+    return Models.CreateEncryptedLocalStorageContextPayload(wrapped)
   }
 
   /**
@@ -471,7 +471,7 @@ export class Migration2_0_0 extends Migration {
           },
         })
         rawStructure.nonwrapped[Services.StorageKey.WrappedRootKey] =
-          Models.createEncryptedLocalStorageContextPayload(newWrappedAccountKey)
+          Models.CreateEncryptedLocalStorageContextPayload(newWrappedAccountKey)
 
         if (accountKeyContent.jwt) {
           /** Move the jwt to raw storage so that it can be migrated in `migrateSessionStorage` */
@@ -497,7 +497,7 @@ export class Migration2_0_0 extends Migration {
             key: passcodeKey,
           },
         })
-        rawStructure.wrapped = Models.createEncryptedLocalStorageContextPayload(wrapped)
+        rawStructure.wrapped = Models.CreateEncryptedLocalStorageContextPayload(wrapped)
 
         await this.services.deviceInterface.clearRawKeychainValue()
       }

@@ -5,7 +5,7 @@ import { ItemInterface } from './ItemInterface'
 export interface EncryptedItemInterface extends ItemInterface<EncryptedPayloadInterface> {
   content: string
   version: ProtocolVersion
-  errorDecrypting?: boolean
+  errorDecrypting: boolean
   waitingForKey?: boolean
   auth_hash?: string
 }

@@ -1,3 +1,4 @@
+import { DecryptedPayloadInterface } from './../../Abstract/Payload/Interfaces/DecryptedPayload'
 import { ComponentContent } from '../../Syncable/Component/ComponentContent'
 import { ComponentArea } from '@standardnotes/features'
 import { ContentType } from '@standardnotes/common'
@@ -6,6 +7,7 @@ import { CreateDecryptedItemFromPayload } from '../Item/ItemGenerator'
 import { ImmutablePayloadCollection } from '../../Runtime/Collection/Payload/ImmutablePayloadCollection'
 import { MutationType } from '../../Abstract/Item/Types/MutationType'
 import { FullyFormedPayloadInterface } from '../../Abstract/Payload/Interfaces/UnionTypes'
+import { isDecryptedPayload } from '../../Abstract/Payload'
 
 export type AffectorFunction = (
   basePayload: FullyFormedPayloadInterface,
@@ -20,9 +22,12 @@ const NoteDuplicationAffectedPayloads: AffectorFunction = (
 ) => {
   /** If note has editor, maintain editor relationship in duplicate note */
   const components = baseCollection
-    .allDecrypted<ComponentContent>(ContentType.Component)
+    .all(ContentType.Component)
+    .filter(isDecryptedPayload)
     .map((payload) => {
-      return CreateDecryptedItemFromPayload<ComponentContent, SNComponent>(payload)
+      return CreateDecryptedItemFromPayload<ComponentContent, SNComponent>(
+        payload as DecryptedPayloadInterface<ComponentContent>,
+      )
     })
 
   const editor = components

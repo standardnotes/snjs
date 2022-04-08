@@ -175,7 +175,7 @@ export class ItemManager
   findItem<T extends Models.DecryptedItemInterface = Models.DecryptedItemInterface>(
     uuid: UuidString,
   ): T | undefined {
-    const itemFromCollection = this.collection.findNondeleted<T>(uuid)
+    const itemFromCollection = this.collection.findDecrypted<T>(uuid)
 
     if (itemFromCollection) {
       return itemFromCollection
@@ -200,7 +200,7 @@ export class ItemManager
    * Returns all items matching given ids
    */
   findItems<T extends Models.DecryptedItemInterface>(uuids: UuidString[]): T[] {
-    return this.collection.findAllNondeleted(uuids)
+    return this.collection.findAllDecrypted(uuids) as T[]
   }
 
   /**
@@ -210,14 +210,14 @@ export class ItemManager
   findItemsIncludingBlanks<T extends Models.DecryptedItemInterface>(
     uuids: UuidString[],
   ): (T | undefined)[] {
-    return this.collection.findAllNondeletedIncludingBlanks(uuids)
+    return this.collection.findAllDecryptedWithBlanks(uuids) as (T | undefined)[]
   }
 
   /**
    * Returns a detached array of all items
    */
   public get items(): Models.DecryptedItemInterface[] {
-    return this.collection.nondeletedElements()
+    return this.collection.nondeletedElements().filter(Models.isDecryptedItem)
   }
 
   itemsKeys(): Models.ItemsKeyInterface[] {
@@ -353,7 +353,7 @@ export class ItemManager
 
     const delta: Models.ItemDelta = {
       changed: changedItems,
-      inserted: insertedItems.filter(Models.isNotEncryptedItem),
+      inserted: insertedItems,
       discarded: discardedItems,
       ignored: ignoredItems,
     }
@@ -653,10 +653,7 @@ export class ItemManager
    * Returns an array of items that need to be synced.
    */
   public getDirtyItems(): (Models.DecryptedItemInterface | Models.DeletedItemInterface)[] {
-    const dirty = this.collection.dirtyElements()
-    return dirty.filter((item) => {
-      return item.isSyncable
-    })
+    return this.collection.dirtyElements().filter(Models.isDecryptedOrDeletedItem)
   }
 
   /**
@@ -797,7 +794,7 @@ export class ItemManager
   public getItems<T extends Models.DecryptedItemInterface>(
     contentType: ContentType | ContentType[],
   ): T[] {
-    return this.collection.allNondeleted<T>(contentType)
+    return this.collection.allDecrypted<T>(contentType)
   }
 
   /**
@@ -1263,7 +1260,9 @@ export class ItemManager
     itemsToLookupUuidsFor: (Models.DecryptedItemInterface | Models.DeletedItemInterface)[],
     date: Date,
   ): Promise<void> {
-    const items = this.collection.findAll(Uuids(itemsToLookupUuidsFor))
+    const items = this.collection
+      .findAll(Uuids(itemsToLookupUuidsFor))
+      .filter(Models.isDecryptedOrDeletedItem)
     const payloads: (Models.DecryptedPayloadInterface | Models.DeletedPayloadInterface)[] = []
 
     for (const item of items) {

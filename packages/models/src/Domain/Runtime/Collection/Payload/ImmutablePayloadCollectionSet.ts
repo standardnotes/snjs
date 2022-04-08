@@ -1,8 +1,10 @@
-import { PayloadInterface } from '../../../Abstract/Payload'
+import { FullyFormedPayloadInterface } from './../../../Abstract/Payload/Interfaces/UnionTypes'
 import { PayloadSource } from '../../../Abstract/Payload/Types/PayloadSource'
 import { ImmutablePayloadCollection } from './ImmutablePayloadCollection'
 
-export class ImmutablePayloadCollectionSet<P extends PayloadInterface = PayloadInterface> {
+export class ImmutablePayloadCollectionSet<
+  P extends FullyFormedPayloadInterface = FullyFormedPayloadInterface,
+> {
   readonly collections: Array<ImmutablePayloadCollection<P>>
 
   /**

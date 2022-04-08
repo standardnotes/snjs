@@ -42,7 +42,7 @@ describe('mutator', () => {
 
   it('mutate set domain data key', function () {
     const item = this.createNote()
-    const mutator = new ItemMutator(item)
+    const mutator = new DecryptedItemMutator(item)
     mutator.setDomainDataKey('somekey', 'somevalue', 'somedomain')
     const payload = mutator.getResult()
 
@@ -51,7 +51,7 @@ describe('mutator', () => {
 
   it('mutate set pinned', function () {
     const item = this.createNote()
-    const mutator = new ItemMutator(item)
+    const mutator = new DecryptedItemMutator(item)
     mutator.pinned = true
     const payload = mutator.getResult()
 
@@ -60,7 +60,7 @@ describe('mutator', () => {
 
   it('mutate set archived', function () {
     const item = this.createNote()
-    const mutator = new ItemMutator(item)
+    const mutator = new DecryptedItemMutator(item)
     mutator.archived = true
     const payload = mutator.getResult()
 
@@ -69,7 +69,7 @@ describe('mutator', () => {
 
   it('mutate set locked', function () {
     const item = this.createNote()
-    const mutator = new ItemMutator(item)
+    const mutator = new DecryptedItemMutator(item)
     mutator.locked = true
     const payload = mutator.getResult()
 
@@ -78,7 +78,7 @@ describe('mutator', () => {
 
   it('mutate set protected', function () {
     const item = this.createNote()
-    const mutator = new ItemMutator(item)
+    const mutator = new DecryptedItemMutator(item)
     mutator.protected = true
     const payload = mutator.getResult()
 
@@ -87,7 +87,7 @@ describe('mutator', () => {
 
   it('mutate set trashed', function () {
     const item = this.createNote()
-    const mutator = new ItemMutator(item)
+    const mutator = new DecryptedItemMutator(item)
     mutator.trashed = true
     const payload = mutator.getResult()
 
@@ -96,7 +96,7 @@ describe('mutator', () => {
 
   it('calling get result should set us dirty', function () {
     const item = this.createNote()
-    const mutator = new ItemMutator(item)
+    const mutator = new DecryptedItemMutator(item)
     const payload = mutator.getResult()
 
     expect(payload.dirty).to.equal(true)
@@ -104,7 +104,7 @@ describe('mutator', () => {
 
   it('get result should always have userModifiedDate', function () {
     const item = this.createNote()
-    const mutator = new ItemMutator(item)
+    const mutator = new DecryptedItemMutator(item)
     const payload = mutator.getResult()
     const resultItem = CreateDecryptedItemFromPayload(payload)
     expect(resultItem.userModifiedDate).to.be.ok
@@ -112,9 +112,8 @@ describe('mutator', () => {
 
   it('mutate set deleted', function () {
     const item = this.createNote()
-    const mutator = new ItemMutator(item)
-    mutator.setDeleted()
-    const payload = mutator.getResult()
+    const mutator = new DeleteItemMutator(item)
+    const payload = mutator.getDeletedResult()
 
     expect(payload.content).to.not.be.ok
     expect(payload.deleted).to.equal(true)
@@ -123,7 +122,7 @@ describe('mutator', () => {
 
   it('mutate app data', function () {
     const item = this.createNote()
-    const mutator = new ItemMutator(item, MutationType.UpdateUserTimestamps)
+    const mutator = new DecryptedItemMutator(item, MutationType.UpdateUserTimestamps)
     mutator.setAppDataItem('foo', 'bar')
     mutator.setAppDataItem('bar', 'foo')
     const payload = mutator.getResult()
@@ -134,7 +133,7 @@ describe('mutator', () => {
   it('mutate add item as relationship', function () {
     const note = this.createNote()
     const tag = this.createTag()
-    const mutator = new ItemMutator(tag)
+    const mutator = new DecryptedItemMutator(tag)
     mutator.addItemAsRelationship(note)
     const payload = mutator.getResult()
 
@@ -145,7 +144,7 @@ describe('mutator', () => {
   it('mutate remove item as relationship', function () {
     const note = this.createNote()
     const tag = this.createTag([note])
-    const mutator = new ItemMutator(tag)
+    const mutator = new DecryptedItemMutator(tag)
     mutator.removeItemAsRelationship(note)
     const payload = mutator.getResult()
 

@@ -1,35 +1,43 @@
+import { ItemContent } from './../../../Abstract/Content/ItemContent'
+import { EncryptedItemInterface } from './../../../Abstract/Item/Interfaces/EncryptedItem'
 import { CollectionSortDirection, CollectionSort } from '../CollectionSort'
 import { ContentType, Uuid } from '@standardnotes/common'
-import { compareValues, isNullOrUndefined, uniqueArrayByKey, UuidMap } from '@standardnotes/utils'
+import { compareValues, isNullOrUndefined, uniqueArrayByKey } from '@standardnotes/utils'
 import { SNIndex } from '../../Index/SNIndex'
 import { ItemDelta } from '../../Index/ItemDelta'
-import { isDeletedItem, isEncryptedErroredItem } from '../../../Abstract/Item/Interfaces/TypeCheck'
+import {
+  isDeletedItem,
+  isDecryptedItem,
+  isEncryptedErroredItem,
+  isDecryptedOrDeletedItem,
+} from '../../../Abstract/Item/Interfaces/TypeCheck'
 import { isNote } from '../../../Syncable/Note'
 import { DecryptedItemInterface } from '../../../Abstract/Item/Interfaces/DecryptedItem'
 import { CollectionInterface } from '../CollectionInterface'
 import { DeletedItemInterface } from '../../../Abstract/Item'
 import { Collection } from '../Collection'
-import { ItemContent } from '../../../Abstract/Content/ItemContent'
+
+type DisplaySortBy = Partial<
+  Record<
+    ContentType,
+    {
+      key: keyof DecryptedItemInterface
+      dir: CollectionSortDirection
+    }
+  >
+>
+
+type AnyItem = DecryptedItemInterface | EncryptedItemInterface | DeletedItemInterface
 
 export class ItemCollection
-  extends Collection<DecryptedItemInterface, DeletedItemInterface>
+  extends Collection<AnyItem, DecryptedItemInterface, EncryptedItemInterface, DeletedItemInterface>
   implements SNIndex, CollectionInterface
 {
-  private displaySortBy: Partial<
-    Record<
-      ContentType,
-      {
-        key: keyof DecryptedItemInterface
-        dir: CollectionSortDirection
-      }
-    >
-  > = {}
+  private displaySortBy: DisplaySortBy = {}
 
   private displayFilter: Partial<
     Record<ContentType, (element: DecryptedItemInterface) => boolean>
   > = {}
-
-  readonly referenceMap: UuidMap
 
   /**
    * A display ready map of uuids-to-position in sorted array. i.e filteredMap[contentType]
@@ -45,49 +53,20 @@ export class ItemCollection
    */
   private sortedMap: Partial<Record<ContentType, DecryptedItemInterface[]>> = {}
 
-  constructor(
-    copy = false,
-    mapCopy?: Partial<Record<Uuid, DecryptedItemInterface>>,
-    typedMapCopy?: Partial<Record<ContentType, DecryptedItemInterface[]>>,
-    referenceMapCopy?: UuidMap,
-  ) {
-    super(copy, mapCopy, typedMapCopy)
-    if (copy) {
-      this.referenceMap = referenceMapCopy!
-    } else {
-      this.referenceMap = new UuidMap()
-    }
-  }
-
-  public override set(elements: (DecryptedItemInterface | DeletedItemInterface)[]): void {
-    super.set(elements)
-
+  public override set(elements: AnyItem | AnyItem[]): void {
     elements = uniqueArrayByKey(Array.isArray(elements) ? elements : [elements], 'uuid')
 
-    for (const element of elements) {
-      if (isDeletedItem(element)) {
-        this.referenceMap.removeFromMap(element.uuid)
-      } else {
-        this.referenceMap.setAllRelationships(
-          element.uuid,
-          element.references.map((r) => r.uuid),
-        )
-      }
-    }
+    super.set(elements)
 
-    this.filterSortElements(elements)
+    this.filterSortElements(elements.filter(isDecryptedOrDeletedItem))
   }
 
-  public override discard(elements: (DecryptedItemInterface | DeletedItemInterface)[]): void {
+  public override discard(elements: AnyItem | AnyItem[]): void {
     super.discard(elements)
 
     elements = Array.isArray(elements) ? elements : [elements]
 
-    for (const element of elements) {
-      this.referenceMap.removeFromMap(element.uuid)
-    }
-
-    this.filterSortElements(elements)
+    this.filterSortElements(elements.filter(isDecryptedOrDeletedItem))
   }
 
   public onChange(delta: ItemDelta): void {
@@ -100,26 +79,49 @@ export class ItemCollection
     this.discard(delta.discarded)
   }
 
-  public uuidReferencesForUuid(uuid: Uuid): Uuid[] {
-    return this.referenceMap.getDirectRelationships(uuid)
-  }
+  public findDecrypted<T extends DecryptedItemInterface = DecryptedItemInterface>(
+    uuid: Uuid,
+  ): T | undefined {
+    const result = this.find(uuid)
 
-  public uuidsThatReferenceUuid(uuid: Uuid): Uuid[] {
-    return this.referenceMap.getInverseRelationships(uuid)
-  }
-
-  public elementsReferencingElement<
-    C extends ItemContent = ItemContent,
-    E extends DecryptedItemInterface<C> = DecryptedItemInterface<C>,
-  >(element: E, contentType?: ContentType): DecryptedItemInterface[] {
-    const uuids = this.uuidsThatReferenceUuid(element.uuid)
-    const items = this.findAllNondeleted(uuids)
-
-    if (!contentType) {
-      return items
+    if (!result) {
+      return undefined
     }
 
-    return items.filter((item) => item.content_type === contentType)
+    return isDecryptedItem(result) ? (result as T) : undefined
+  }
+
+  public findAllDecrypted<T extends DecryptedItemInterface = DecryptedItemInterface>(
+    uuids: Uuid[],
+  ): T[] {
+    return this.findAll(uuids).filter(isDecryptedItem) as T[]
+  }
+
+  public findAllDecryptedWithBlanks<C extends ItemContent = ItemContent>(
+    uuids: Uuid[],
+  ): (DecryptedItemInterface<C> | undefined)[] {
+    const results = this.findAllIncludingBlanks(uuids)
+    const mapped = results.map((i) => {
+      if (i == undefined || isDecryptedItem(i)) {
+        return i
+      }
+
+      return undefined
+    })
+
+    return mapped as (DecryptedItemInterface<C> | undefined)[]
+  }
+
+  public allDecrypted<T extends DecryptedItemInterface>(
+    contentType: ContentType | ContentType[],
+  ): T[] {
+    return this.all(contentType).filter(isDecryptedItem) as T[]
+  }
+
+  private allDecryptedAndDeleted(
+    contentType: ContentType,
+  ): (DecryptedItemInterface | DeletedItemInterface)[] {
+    return this.all(contentType).filter(isDecryptedOrDeletedItem)
   }
 
   /**
@@ -157,7 +159,7 @@ export class ItemCollection
     this.filteredMap[contentType] = {}
     this.sortedMap[contentType] = []
 
-    const elements = this.all(contentType)
+    const elements = this.allDecryptedAndDeleted(contentType)
     if (elements.length > 0) {
       this.filterSortElements(elements)
     }

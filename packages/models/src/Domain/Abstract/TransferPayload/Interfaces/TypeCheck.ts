@@ -21,6 +21,12 @@ export function isEncryptedTransferPayload(
   return 'content' in payload && isString(payload.content)
 }
 
+export function isErrorDecryptingTransferPayload(
+  payload: TransferPayload,
+): payload is EncryptedTransferPayload {
+  return isEncryptedTransferPayload(payload) && payload.errorDecrypting === true
+}
+
 export function isDeletedTransferPayload(
   payload: TransferPayload,
 ): payload is DeletedTransferPayload {

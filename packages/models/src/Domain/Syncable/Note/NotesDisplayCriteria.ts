@@ -10,7 +10,6 @@ import { SNNote } from '.'
 import { SmartView } from '../SmartView'
 import { ItemCollection } from '../../Runtime/Collection/Item/ItemCollection'
 import { CompoundPredicate } from '../../Runtime/Predicate/CompoundPredicate'
-import { NoteContent } from './NoteContent'
 
 export type SearchQuery = {
   query: string
@@ -61,7 +60,7 @@ export class NotesDisplayCriteria {
         if (compoundPredicate.keypathIncludesString('tags')) {
           const noteWithTags = NoteWithTags.Create(
             note.payload,
-            collection.elementsReferencingElement<NoteContent>(note, ContentType.Tag) as SNTag[],
+            collection.elementsReferencingElement(note, ContentType.Tag) as SNTag[],
           )
           return compoundPredicate.matchesItem(noteWithTags)
         } else {
@@ -133,10 +132,7 @@ export function noteMatchesQuery(
   searchQuery: SearchQuery,
   collection: ItemCollection,
 ): boolean {
-  const noteTags = collection.elementsReferencingElement<NoteContent>(
-    noteToMatch,
-    ContentType.Tag,
-  ) as SNTag[]
+  const noteTags = collection.elementsReferencingElement(noteToMatch, ContentType.Tag) as SNTag[]
   const someTagsMatches = noteTags.some(
     (tag) => matchTypeForTagAndStringQuery(tag, searchQuery.query) !== Match.None,
   )

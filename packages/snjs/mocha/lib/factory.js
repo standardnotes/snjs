@@ -314,6 +314,10 @@ export function createNotePayload(title, text = undefined, dirty = true) {
   return new DecryptedPayload(createNoteParams({ title, text, dirty }))
 }
 
+export function createNote(title, text = undefined, dirty = true) {
+  return new SNNote(new DecryptedPayload(createNoteParams({ title, text, dirty })))
+}
+
 export function createStorageItemTagPayload(tagParams = {}) {
   return new DecryptedPayload(createTagParams(tagParams))
 }

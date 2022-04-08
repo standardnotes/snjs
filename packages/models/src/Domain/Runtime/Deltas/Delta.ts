@@ -3,7 +3,7 @@ import { ImmutablePayloadCollectionSet } from '../Collection/Payload/ImmutablePa
 import { HistoryMap } from '../History/HistoryMap'
 import { PayloadSource } from '../../Abstract/Payload/Types/PayloadSource'
 import { Uuid } from '@standardnotes/common'
-import { FullyFormedPayloadInterface, DeletedPayloadInterface } from '../../Abstract/Payload'
+import { FullyFormedPayloadInterface } from '../../Abstract/Payload'
 import { DeltaInterface } from './DeltaInterface'
 /**
  * A payload delta is a class that defines instructions that process an incoming collection
@@ -42,7 +42,7 @@ export abstract class PayloadsDelta<
 
   public abstract resultingCollection(): Promise<ImmutablePayloadCollection<Result>>
 
-  findBasePayload(uuid: Uuid): DeletedPayloadInterface | Base | undefined {
+  findBasePayload(uuid: Uuid): Base | undefined {
     return this.baseCollection.find(uuid)
   }
 

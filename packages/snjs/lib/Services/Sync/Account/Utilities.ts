@@ -17,8 +17,11 @@ export function CreatePayloadFromRawServerItem(
     return new EncryptedPayload(
       {
         ...rawItem,
+        items_key_id: rawItem.items_key_id,
         content: rawItem.content,
         deleted: false,
+        errorDecrypting: false,
+        waitingForKey: false,
       },
       source,
     )

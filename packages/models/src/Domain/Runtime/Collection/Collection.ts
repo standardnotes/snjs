@@ -1,6 +1,13 @@
-import { extendArray } from '@standardnotes/utils'
+import { extendArray, UuidMap } from '@standardnotes/utils'
 import { ContentType, Uuid } from '@standardnotes/common'
 import { remove } from 'lodash'
+import {
+  isDecryptedTransferPayload,
+  isDeletedTransferPayload,
+  isErrorDecryptingTransferPayload,
+} from '../../Abstract/TransferPayload'
+import { ItemContent } from '../../Abstract/Content/ItemContent'
+import { ContentReference } from '../../Abstract/Item'
 
 export interface CollectionElement {
   uuid: Uuid
@@ -9,16 +16,30 @@ export interface CollectionElement {
   deleted?: boolean
 }
 
+export interface DecryptedCollectionElement<C extends ItemContent = ItemContent>
+  extends CollectionElement {
+  content: C
+  references: ContentReference[]
+}
+
 export interface DeletedCollectionElement extends CollectionElement {
+  content: undefined
   deleted: true
 }
 
+export interface EncryptedCollectionElement extends CollectionElement {
+  content: string
+  errorDecrypting: boolean
+}
+
 export abstract class Collection<
-  Element extends CollectionElement,
-  DeletedElement extends DeletedCollectionElement,
+  Element extends Decrypted | Encrypted | Deleted,
+  Decrypted extends DecryptedCollectionElement,
+  Encrypted extends EncryptedCollectionElement,
+  Deleted extends DeletedCollectionElement,
 > {
-  readonly map: Partial<Record<Uuid, Element | DeletedElement>> = {}
-  readonly typedMap: Partial<Record<ContentType, (Element | DeletedElement)[]>> = {}
+  readonly map: Partial<Record<Uuid, Element>> = {}
+  readonly typedMap: Partial<Record<ContentType, Element[]>> = {}
 
   /** An array of uuids of items that are dirty */
   dirtyIndex: Set<Uuid> = new Set()
@@ -26,22 +47,43 @@ export abstract class Collection<
   /** An array of uuids of items that are not marked as deleted */
   nondeletedIndex: Set<Uuid> = new Set()
 
-  isNonDeletedElement = (e: Element | DeletedElement): e is Element => {
-    return !this.isDeletedElement(e)
+  /** An array of uuids of items that are errorDecrypting or waitingForKey */
+  invalidsIndex: Set<Uuid> = new Set()
+
+  readonly referenceMap: UuidMap
+
+  /** Maintains an index for each item uuid where the value is an array of uuids that are
+   * conflicts of that item. So if Note B and C are conflicts of Note A,
+   * conflictMap[A.uuid] == [B.uuid, C.uuid] */
+  readonly conflictMap: UuidMap
+
+  isDecryptedElement = (e: Decrypted | Encrypted | Deleted): e is Decrypted => {
+    return isDecryptedTransferPayload(e)
   }
 
-  isDeletedElement = (e: Element | DeletedElement): e is DeletedElement => {
-    return (e as DeletedCollectionElement).deleted === true
+  isDeletedElement = (e: Decrypted | Encrypted | Deleted): e is Deleted => {
+    return isDeletedTransferPayload(e)
+  }
+
+  isNonDeletedElement = (e: Decrypted | Encrypted | Deleted): e is Decrypted | Encrypted => {
+    return !isDeletedTransferPayload(e)
   }
 
   constructor(
     copy = false,
-    mapCopy?: Partial<Record<Uuid, Element | DeletedElement>>,
-    typedMapCopy?: Partial<Record<ContentType, (Element | DeletedElement)[]>>,
+    mapCopy?: Partial<Record<Uuid, Element>>,
+    typedMapCopy?: Partial<Record<ContentType, Element[]>>,
+    referenceMapCopy?: UuidMap,
+    conflictMapCopy?: UuidMap,
   ) {
     if (copy) {
       this.map = mapCopy!
       this.typedMap = typedMapCopy!
+      this.referenceMap = referenceMapCopy!
+      this.conflictMap = conflictMapCopy!
+    } else {
+      this.referenceMap = new UuidMap()
+      this.conflictMap = new UuidMap()
     }
   }
 
@@ -49,10 +91,10 @@ export abstract class Collection<
     return Object.keys(this.map)
   }
 
-  public all(contentType?: ContentType | ContentType[]): (Element | DeletedElement)[] {
+  public all(contentType?: ContentType | ContentType[]): Element[] {
     if (contentType) {
       if (Array.isArray(contentType)) {
-        const elements: (Element | DeletedElement)[] = []
+        const elements: Element[] = []
         for (const type of contentType) {
           extendArray(elements, this.typedMap[type] || [])
         }
@@ -63,32 +105,8 @@ export abstract class Collection<
     } else {
       return Object.keys(this.map).map((uuid: Uuid) => {
         return this.map[uuid]
-      }) as (Element | DeletedElement)[]
+      }) as Element[]
     }
-  }
-
-  public allNondeleted<E extends Element>(contentType?: ContentType | ContentType[]): E[] {
-    const all = this.all(contentType)
-    const filtered = all.filter(this.isNonDeletedElement) as E[]
-    return filtered
-  }
-
-  public find(uuid: Uuid): Element | DeletedElement | undefined {
-    return this.map[uuid]
-  }
-
-  public findNondeleted<E extends Element>(uuid: Uuid): E | undefined {
-    const result = this.map[uuid]
-    if (result && this.isNonDeletedElement(result)) {
-      return result as E
-    }
-    return undefined
-  }
-
-  /** Returns all elements that are marked as dirty */
-  public dirtyElements(): (Element | DeletedElement)[] {
-    const uuids = Array.from(this.dirtyIndex)
-    return this.findAll(uuids)
   }
 
   /** Returns all elements that are not marked as deleted */
@@ -97,8 +115,20 @@ export abstract class Collection<
     return this.findAll(uuids).filter(this.isNonDeletedElement)
   }
 
-  public findAll(uuids: Uuid[]): (Element | DeletedElement)[] {
-    const results: (Element | DeletedElement)[] = []
+  /** Returns all elements that are errorDecrypting or waitingForKey */
+  public invalidElements(): Encrypted[] {
+    const uuids = Array.from(this.invalidsIndex)
+    return this.findAll(uuids) as Encrypted[]
+  }
+
+  /** Returns all elements that are marked as dirty */
+  public dirtyElements(): Element[] {
+    const uuids = Array.from(this.dirtyIndex)
+    return this.findAll(uuids)
+  }
+
+  public findAll(uuids: Uuid[]): Element[] {
+    const results: Element[] = []
 
     for (const id of uuids) {
       const element = this.map[id]
@@ -110,52 +140,26 @@ export abstract class Collection<
     return results
   }
 
-  public findAllNondeleted<E extends Element>(uuids: Uuid[]): E[] {
-    const results: E[] = []
-
-    for (const id of uuids) {
-      const element = this.map[id]
-      if (element && this.isNonDeletedElement(element)) {
-        results.push(element as E)
-      }
-    }
-
-    return results
-  }
-
-  public findAllNondeletedIncludingBlanks<E extends Element>(uuids: Uuid[]): (E | undefined)[] {
-    const results: (E | undefined)[] = []
-
-    for (const id of uuids) {
-      const element = this.map[id]
-      if (!element || this.isDeletedElement(element)) {
-        results.push(undefined)
-      } else {
-        results.push(element as E)
-      }
-    }
-
-    return results
+  public find(uuid: Uuid): Element | undefined {
+    return this.map[uuid]
   }
 
   /**
    * If an item is not found, an `undefined` element
    * will be inserted into the array.
    */
-  public findAllIncludingBlanks<E extends Element>(
-    uuids: Uuid[],
-  ): (E | DeletedElement | undefined)[] {
-    const results: (E | DeletedElement | undefined)[] = []
+  public findAllIncludingBlanks<E extends Element>(uuids: Uuid[]): (E | Deleted | undefined)[] {
+    const results: (E | Deleted | undefined)[] = []
 
     for (const id of uuids) {
-      const element = this.map[id] as E | DeletedElement | undefined
+      const element = this.map[id] as E | Deleted | undefined
       results.push(element)
     }
 
     return results
   }
 
-  public set(elements: Element | DeletedElement | (Element | DeletedElement)[]): void {
+  public set(elements: Element | Element[]): void {
     elements = Array.isArray(elements) ? elements : [elements]
 
     if (elements.length === 0) {
@@ -166,6 +170,24 @@ export abstract class Collection<
     for (const element of elements) {
       this.map[element.uuid] = element
       this.setToTypedMap(element)
+
+      if (isErrorDecryptingTransferPayload(element)) {
+        this.invalidsIndex.add(element.uuid)
+      } else {
+        this.invalidsIndex.delete(element.uuid)
+      }
+
+      if (this.isDecryptedElement(element)) {
+        const conflictOf = element.content.conflict_of
+        if (conflictOf) {
+          this.conflictMap.establishRelationship(conflictOf, element.uuid)
+        }
+
+        this.referenceMap.setAllRelationships(
+          element.uuid,
+          element.references.map((r) => r.uuid),
+        )
+      }
 
       if (element.dirty) {
         this.dirtyIndex.add(element.uuid)
@@ -181,22 +203,53 @@ export abstract class Collection<
     }
   }
 
-  public discard(elements: Element | DeletedElement | (Element | DeletedElement)[]): void {
+  public discard(elements: Element | Element[]): void {
     elements = Array.isArray(elements) ? elements : [elements]
     for (const element of elements) {
       this.deleteFromTypedMap(element)
       delete this.map[element.uuid]
+      this.conflictMap.removeFromMap(element.uuid)
+      this.referenceMap.removeFromMap(element.uuid)
     }
   }
 
-  private setToTypedMap(element: Element | DeletedElement): void {
+  public uuidReferencesForUuid(uuid: Uuid): Uuid[] {
+    return this.referenceMap.getDirectRelationships(uuid)
+  }
+
+  public uuidsThatReferenceUuid(uuid: Uuid): Uuid[] {
+    return this.referenceMap.getInverseRelationships(uuid)
+  }
+
+  public referencesForElement(element: Decrypted): Element[] {
+    const uuids = this.referenceMap.getDirectRelationships(element.uuid)
+    return this.findAll(uuids)
+  }
+
+  public conflictsOf(uuid: Uuid): Element[] {
+    const uuids = this.conflictMap.getDirectRelationships(uuid)
+    return this.findAll(uuids)
+  }
+
+  public elementsReferencingElement(element: Decrypted, contentType?: ContentType): Element[] {
+    const uuids = this.uuidsThatReferenceUuid(element.uuid)
+    const items = this.findAll(uuids)
+
+    if (!contentType) {
+      return items
+    }
+
+    return items.filter((item) => item.content_type === contentType)
+  }
+
+  private setToTypedMap(element: Element): void {
     const array = this.typedMap[element.content_type] || []
     remove(array, { uuid: element.uuid as never })
     array.push(element)
     this.typedMap[element.content_type] = array
   }
 
-  private deleteFromTypedMap(element: Element | DeletedElement): void {
+  private deleteFromTypedMap(element: Element): void {
     const array = this.typedMap[element.content_type] || []
     remove(array, { uuid: element.uuid as never })
     this.typedMap[element.content_type] = array

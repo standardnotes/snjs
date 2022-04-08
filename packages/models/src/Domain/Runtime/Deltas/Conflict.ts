@@ -36,7 +36,11 @@ export class ConflictDelta {
        * already conflicted this item.
        */
       const existingConflict = this.baseCollection.conflictsOf(this.applyPayload.uuid)[0]
-      if (existingConflict && PayloadContentsEqual(existingConflict, this.applyPayload)) {
+      if (
+        existingConflict &&
+        isDecryptedPayload(existingConflict) &&
+        PayloadContentsEqual(existingConflict, this.applyPayload)
+      ) {
         /** Conflict exists and its contents are the same as incoming value, do not make duplicate */
         strategy = ConflictStrategy.KeepLeft
       } else {

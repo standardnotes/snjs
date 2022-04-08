@@ -19,11 +19,11 @@ export interface LocalStorageEncryptedContextualPayload extends ContextPayload {
   dirty: boolean
   duplicate_of: Uuid | undefined
   enc_item_key: string
-  errorDecrypting: boolean | undefined
+  errorDecrypting: boolean
   items_key_id: string | undefined
   updated_at_timestamp: number | undefined
   updated_at: Date | undefined
-  waitingForKey: boolean | undefined
+  waitingForKey: boolean
 }
 
 export interface LocalStorageDecryptedContextualPayload<C extends ItemContent = ItemContent>
@@ -51,7 +51,7 @@ export interface LocalStorageDeletedContextualPayload extends ContextPayload {
   updated_at: Date | undefined
 }
 
-export function createEncryptedLocalStorageContextPayload(
+export function CreateEncryptedLocalStorageContextPayload(
   fromPayload: EncryptedPayloadInterface,
 ): LocalStorageEncryptedContextualPayload {
   return {
@@ -74,7 +74,7 @@ export function createEncryptedLocalStorageContextPayload(
   }
 }
 
-export function createDecryptedLocalStorageContextPayload(
+export function CreateDecryptedLocalStorageContextPayload(
   fromPayload: DecryptedPayloadInterface,
 ): LocalStorageDecryptedContextualPayload {
   return {
@@ -92,7 +92,7 @@ export function createDecryptedLocalStorageContextPayload(
   }
 }
 
-export function createDeletedLocalStorageContextPayload(
+export function CreateDeletedLocalStorageContextPayload(
   fromPayload: DeletedPayloadInterface,
 ): LocalStorageDeletedContextualPayload {
   return {

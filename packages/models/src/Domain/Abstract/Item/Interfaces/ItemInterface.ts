@@ -27,7 +27,6 @@ export interface ItemInterface<P extends PayloadInterface = PayloadInterface> {
   duplicate_of: string | undefined
   neverSynced: boolean
   isSingleton: boolean
-  isSyncable: boolean
   updated_at: Date | undefined
 
   singletonPredicate<T extends ItemInterface>(): PredicateInterface<T>

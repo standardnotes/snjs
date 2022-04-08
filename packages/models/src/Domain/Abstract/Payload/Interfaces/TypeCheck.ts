@@ -3,6 +3,7 @@ import {
   isDecryptedTransferPayload,
   isDeletedTransferPayload,
   isEncryptedTransferPayload,
+  isErrorDecryptingTransferPayload,
 } from '../../TransferPayload'
 import { DecryptedPayloadInterface } from './DecryptedPayload'
 import { DeletedPayloadInterface } from './DeletedPayload'
@@ -28,5 +29,5 @@ export function isDeletedPayload(payload: PayloadInterface): payload is DeletedP
 export function isErrorDecryptingPayload(
   payload: PayloadInterface,
 ): payload is EncryptedPayloadInterface {
-  return isEncryptedPayload(payload) && payload.errorDecrypting === true
+  return isErrorDecryptingTransferPayload(payload)
 }

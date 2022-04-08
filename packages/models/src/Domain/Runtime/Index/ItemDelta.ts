@@ -6,8 +6,8 @@ import {
 } from '../../Abstract/Item'
 
 export interface ItemDelta<C extends ItemContent = ItemContent> {
-  changed: (DecryptedItemInterface<C> | DeletedItemInterface)[]
-  inserted: (DecryptedItemInterface<C> | DeletedItemInterface)[]
+  changed: (DecryptedItemInterface<C> | EncryptedItemInterface | DeletedItemInterface)[]
+  inserted: (DecryptedItemInterface<C> | EncryptedItemInterface | DeletedItemInterface)[]
   discarded: DeletedItemInterface[]
   ignored: EncryptedItemInterface[]
 }

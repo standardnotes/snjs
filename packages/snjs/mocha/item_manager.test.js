@@ -4,7 +4,7 @@ import * as Factory from './lib/factory.js'
 chai.use(chaiAsPromised)
 const expect = chai.expect
 
-describe.only('item manager', function () {
+describe('item manager', function () {
   before(async function () {
     const crypto = new SNWebCrypto()
     UuidGenerator.SetGenerator(crypto.generateUUID)
@@ -111,7 +111,7 @@ describe.only('item manager', function () {
     await this.itemManager.setItemToBeDeleted(note)
 
     expect(this.itemManager.collection.referenceMap.directMap[tag.uuid]).to.eql([])
-    expect(this.itemManager.collection.referenceMap.inverseMap[note.uuid]).to.not.be.ok
+    expect(this.itemManager.collection.referenceMap.inverseMap[note.uuid].length).to.equal(0)
   })
 
   it('deleting referenced item should update referencing item references', async function () {
@@ -215,7 +215,7 @@ describe.only('item manager', function () {
     expect(dirtyItems[0].dirty).to.equal(true)
   })
 
-  it.only('dirty items should not include errored items', async function () {
+  it('dirty items should not include errored items', async function () {
     const note = await this.itemManager.setItemDirty(await this.createNote())
     const errorred = new EncryptedPayload({
       ...note.payload,
@@ -224,6 +224,7 @@ describe.only('item manager', function () {
     })
 
     await this.itemManager.emitItemsFromPayloads([errorred], PayloadSource.LocalChanged)
+
     const dirtyItems = this.itemManager.getDirtyItems()
 
     expect(dirtyItems.length).to.equal(0)
@@ -231,13 +232,17 @@ describe.only('item manager', function () {
 
   it('dirty items should include errored items if they are being deleted', async function () {
     const note = await this.itemManager.setItemDirty(await this.createNote())
-    const errorred = new EncryptedPayload({
+    const errorred = new DeletedPayload({
       ...note.payload,
+      content: undefined,
       errorDecrypting: true,
       deleted: true,
     })
+
     await this.itemManager.emitItemsFromPayloads([errorred], PayloadSource.LocalChanged)
+
     const dirtyItems = this.itemManager.getDirtyItems()
+
     expect(dirtyItems.length).to.equal(1)
   })
 
@@ -329,13 +334,13 @@ describe.only('item manager', function () {
     /** Items should never be mutated directly */
     expect(note.deleted).to.not.be.ok
 
-    const latestVersion = this.itemManager.findItem(note.uuid)
+    const latestVersion = this.payloadManager.findOne(note.uuid)
     expect(latestVersion.deleted).to.equal(true)
     expect(latestVersion.dirty).to.equal(true)
     expect(latestVersion.content).to.not.be.ok
-    /** Deleted items stick around until they are synced */
-    expect(this.itemManager.items.length).to.equal(1)
-    /** Deleted items do not show up in particular arrays (.notes, .tags, .components, etc) */
+
+    /** Deleted items do not show up in item manager's public interface */
+    expect(this.itemManager.items.length).to.equal(0)
     expect(this.itemManager.notes.length).to.equal(0)
   })
 
@@ -381,7 +386,7 @@ describe.only('item manager', function () {
     expect(this.itemManager.trashedItems.length).to.equal(1)
 
     await this.itemManager.emptyTrash()
-    const versionThree = this.itemManager.findItem(note.uuid)
+    const versionThree = this.payloadManager.findOne(note.uuid)
     expect(versionThree.deleted).to.equal(true)
     expect(this.itemManager.trashedItems.length).to.equal(0)
   })
@@ -395,7 +400,7 @@ describe.only('item manager', function () {
     await this.itemManager.removeAllItemsFromMemory()
 
     const deletionEvent = observed[1]
-    expect(deletionEvent.discarded[0].deleted).to.equal(true)
+    expect(deletionEvent.removed[0].deleted).to.equal(true)
     expect(this.itemManager.items.length).to.equal(0)
   })
 
