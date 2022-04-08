@@ -15,14 +15,12 @@ type ItemsChangeObserver = {
 }
 
 /**
- * The item manager is backed by the Payload Manager. Think of the item manager as a
- * more user-friendly or item-specific interface to creating and updating data.
- * The item manager listens for change events from the global payload manager, and
- * converts any payloads to SNItems, then propagates those items to listeners on the
- * item  manager. When the item manager makes a change to an item, it will modify items
- * using a  mutator, then emit those payloads to the payload manager. The payload manager
- * will then notify  its observers (which is us), we'll convert the payloads to items,
- * and then  we'll propagate them to our listeners.
+ * The item manager is backed by the payload manager. It listens for change events from the
+ * global payload manager, and converts any payloads to items, then propagates those items to
+ * listeners on the item manager. When the item manager makes a change to an item, it will modify
+ * items using a mutator, then emit those payloads to the payload manager. The payload manager
+ * will then notify its observers (which is us), we'll convert the payloads to items,
+ * and then we'll propagate them to our listeners.
  */
 export class ItemManager
   extends Services.AbstractService
@@ -757,20 +755,21 @@ export class ItemManager
     itemToLookupUuidFor: Models.DecryptedItemInterface,
     source: Models.PayloadSource = Models.PayloadSource.LocalChanged,
   ): Promise<void> {
-    /** Capture referencing ids before we delete the item below, otherwise
-     * the index may be updated before we get a chance to act on it */
-    const referencingIds = this.collection.uuidsThatReferenceUuid(itemToLookupUuidFor.uuid)
+    const referencingIdsCapturedBeforeChanges = this.collection.uuidsThatReferenceUuid(
+      itemToLookupUuidFor.uuid,
+    )
 
     const item = this.findSureItem(itemToLookupUuidFor.uuid)
+
     const mutator = new Models.DeleteItemMutator(item, Models.MutationType.UpdateUserTimestamps)
+
     const deletedPayload = mutator.getDeletedResult()
 
     await this.payloadManager.emitPayload(deletedPayload, source)
 
-    /** Handle indirect relationships.
-     * (Direct relationships are cleared by clearing content above) */
-    for (const referencingId of referencingIds) {
+    for (const referencingId of referencingIdsCapturedBeforeChanges) {
       const referencingItem = this.findItem(referencingId)
+
       if (referencingItem) {
         await this.changeItem(referencingItem, (mutator) => {
           mutator.removeItemAsRelationship(item)
@@ -779,27 +778,18 @@ export class ItemManager
     }
   }
 
-  /**
-   * Like `setItemToBeDeleted`, but acts on an array of items.
-   */
   public async setItemsToBeDeleted(
     itemsToLookupUuidsFor: Models.DecryptedItemInterface[],
   ): Promise<void> {
     await Promise.all(itemsToLookupUuidsFor.map((item) => this.setItemToBeDeleted(item)))
   }
 
-  /**
-   * Returns all items of a certain type
-   */
   public getItems<T extends Models.DecryptedItemInterface>(
     contentType: ContentType | ContentType[],
   ): T[] {
     return this.collection.allDecrypted<T>(contentType)
   }
 
-  /**
-   * Returns all items matching a given predicate
-   */
   public itemsMatchingPredicate<T extends Models.DecryptedItemInterface>(
     contentType: ContentType,
     predicate: Models.PredicateInterface<T>,
@@ -807,9 +797,6 @@ export class ItemManager
     return this.itemsMatchingPredicates(contentType, [predicate])
   }
 
-  /**
-   * Returns all items matching an array of predicates
-   */
   public itemsMatchingPredicates<T extends Models.DecryptedItemInterface>(
     contentType: ContentType,
     predicates: Models.PredicateInterface<T>[],
@@ -818,10 +805,6 @@ export class ItemManager
     return this.subItemsMatchingPredicates(subItems, predicates)
   }
 
-  /**
-   * Performs actual predicate filtering for public methods above.
-   * Does not return deleted items.
-   */
   public subItemsMatchingPredicates<T extends Models.DecryptedItemInterface>(
     items: T[],
     predicates: Models.PredicateInterface<T>[],
@@ -841,9 +824,6 @@ export class ItemManager
     return this.tags.filter((tag) => tag.parentId === undefined)
   }
 
-  /**
-   * Finds the first tag matching a given title
-   */
   public findTagByTitle(title: string): Models.SNTag | undefined {
     const lowerCaseTitle = title.toLowerCase()
     return this.tags.find((tag) => tag.title?.toLowerCase() === lowerCaseTitle)

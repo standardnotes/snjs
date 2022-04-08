@@ -56,6 +56,6 @@ export class DeltaOfflineSaved extends CustomApplyDelta {
       }
     }
 
-    return ImmutablePayloadCollection.WithPayloads(processed, PayloadSource.RemoteSaved)
+    return ImmutablePayloadCollection.WithPayloads(processed, PayloadSource.LocalSaved)
   }
 }

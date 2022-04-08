@@ -15,7 +15,7 @@ export class DecryptedPayload<
   implements DecryptedPayloadInterface<C>
 {
   override readonly content: C
-  override readonly deleted: false = false
+  override readonly deleted: false
   readonly version: ProtocolVersion
 
   constructor(rawPayload: T, source = PayloadSource.Constructor) {
@@ -23,6 +23,7 @@ export class DecryptedPayload<
 
     this.content = Copy(FillItemContent<C>(rawPayload.content))
     this.version = this.content.version || ProtocolVersion.V001
+    this.deleted = false
   }
 
   get references(): ContentReference[] {

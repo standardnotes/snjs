@@ -9,26 +9,25 @@ export class EncryptedPayload
   implements EncryptedPayloadInterface
 {
   override readonly content: string
-  readonly enc_item_key: string
-  readonly items_key_id: string | undefined
-  readonly errorDecrypting: boolean
-  readonly waitingForKey: boolean
-  override readonly deleted: false = false
+  override readonly deleted: false
   readonly auth_hash?: string
+  readonly enc_item_key: string
+  readonly errorDecrypting: boolean
+  readonly items_key_id: string | undefined
   readonly version: ProtocolVersion
+  readonly waitingForKey: boolean
 
   constructor(rawPayload: EncryptedTransferPayload, source = PayloadSource.Constructor) {
     super(rawPayload, source)
 
+    this.auth_hash = rawPayload.auth_hash
     this.content = rawPayload.content
-    this.items_key_id = rawPayload.items_key_id
+    this.deleted = false
     this.enc_item_key = rawPayload.enc_item_key
     this.errorDecrypting = rawPayload.errorDecrypting
-    this.waitingForKey = rawPayload.waitingForKey
-
-    this.auth_hash = rawPayload.auth_hash
-
+    this.items_key_id = rawPayload.items_key_id
     this.version = protocolVersionFromEncryptedString(this.content)
+    this.waitingForKey = rawPayload.waitingForKey
   }
 
   override ejected(): EncryptedTransferPayload {
