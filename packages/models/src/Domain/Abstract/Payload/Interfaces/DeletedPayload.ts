@@ -10,4 +10,6 @@ export interface DeletedPayloadInterface extends PayloadInterface<DeletedTransfe
    * This value is true if a payload is marked as deleted and not dirty.
    */
   discardable: boolean | undefined
+
+  ejected(): DeletedTransferPayload
 }

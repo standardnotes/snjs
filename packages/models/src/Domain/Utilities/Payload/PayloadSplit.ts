@@ -2,7 +2,11 @@ import { ItemContent } from '../../Abstract/Content/ItemContent'
 import { DecryptedPayloadInterface } from '../../Abstract/Payload/Interfaces/DecryptedPayload'
 import { DeletedPayloadInterface } from '../../Abstract/Payload/Interfaces/DeletedPayload'
 import { EncryptedPayloadInterface } from '../../Abstract/Payload/Interfaces/EncryptedPayload'
-import { isDecryptedPayload, isDeletedPayload, isEncryptedPayload } from '../../Abstract/Payload/Interfaces/TypeCheck'
+import {
+  isDecryptedPayload,
+  isDeletedPayload,
+  isEncryptedPayload,
+} from '../../Abstract/Payload/Interfaces/TypeCheck'
 import { FullyFormedPayloadInterface } from '../../Abstract/Payload/Interfaces/UnionTypes'
 
 export interface PayloadSplit<C extends ItemContent = ItemContent> {
@@ -39,9 +43,9 @@ export function CreatePayloadSplit<C extends ItemContent = ItemContent>(
       split.encrypted.push(payload)
     } else if (isDeletedPayload(payload)) {
       split.deleted.push(payload)
+    } else {
+      throw Error('Unhandled case in CreatePayloadSplit')
     }
-
-    throw Error('Unhandled case in CreatePayloadSplit')
   }
 
   return split
@@ -68,9 +72,9 @@ export function CreatePayloadSplitWithDiscardables<C extends ItemContent = ItemC
       } else {
         split.deleted.push(payload)
       }
+    } else {
+      throw Error('Unhandled case in CreatePayloadSplitWithDiscardables')
     }
-
-    throw Error('Unhandled case in CreatePayloadSplitWithDiscardables')
   }
 
   return split
@@ -89,9 +93,9 @@ export function CreateNonDecryptedPayloadSplit(
       split.encrypted.push(payload)
     } else if (isDeletedPayload(payload)) {
       split.deleted.push(payload)
+    } else {
+      throw Error('Unhandled case in CreateNonDecryptedPayloadSplit')
     }
-
-    throw Error('Unhandled case in CreateNonDecryptedPayloadSplit')
   }
 
   return split

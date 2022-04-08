@@ -27,7 +27,7 @@ export function isDeletedTransferPayload(
   return 'deleted' in payload && payload.deleted === true
 }
 
-export function isCorrupTransferPayload(payload: TransferPayload): boolean {
+export function isCorruptTransferPayload(payload: TransferPayload): boolean {
   const invalidDeletedState = payload.deleted === true && payload.content != undefined
   return payload.uuid == undefined || invalidDeletedState
 }

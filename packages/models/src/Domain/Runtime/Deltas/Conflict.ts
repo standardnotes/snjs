@@ -21,7 +21,9 @@ export class ConflictDelta {
     protected readonly historyMap?: HistoryMap,
   ) {}
 
-  public async resultingCollection(): Promise<ImmutablePayloadCollection> {
+  public async resultingCollection(): Promise<
+    ImmutablePayloadCollection<FullyFormedPayloadInterface>
+  > {
     let strategy: ConflictStrategy | undefined = undefined
     if (isErrorDecryptingPayload(this.basePayload) || isErrorDecryptingPayload(this.applyPayload)) {
       strategy = ConflictStrategy.KeepLeftDuplicateRight

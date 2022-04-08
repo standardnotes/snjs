@@ -258,6 +258,8 @@ export class EncryptionService
       return new EncryptedPayload({
         ...original,
         ...encryptedParams,
+        waitingForKey: false,
+        errorDecrypting: false,
       })
     })
 
@@ -315,7 +317,7 @@ export class EncryptionService
         })
       } else {
         return new Models.DecryptedPayload<C>({
-          ...original.ejectedBase(),
+          ...original.ejected(),
           ...params,
         })
       }

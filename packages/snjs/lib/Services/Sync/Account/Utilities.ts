@@ -22,7 +22,7 @@ export function CreatePayloadFromRawServerItem(
       },
       source,
     )
+  } else {
+    throw Error('Unhandled case in createPayloadFromRawItem')
   }
-
-  throw Error('Unhandled case in createPayloadFromRawItem')
 }

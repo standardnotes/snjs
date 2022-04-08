@@ -54,20 +54,13 @@ export abstract class PurePayload<T extends TransferPayload<C>, C extends ItemCo
       this.dirtiedDate = new Date(rawPayload.dirtiedDate)
     }
 
-    this.freezeAfterSubclassesFinishConstructing()
-  }
-
-  private freezeAfterSubclassesFinishConstructing() {
+    const timeToAllowSubclassesToFinishConstruction = 0
     setTimeout(() => {
       deepFreeze(this)
-    }, 0)
+    }, timeToAllowSubclassesToFinishConstruction)
   }
 
-  ejected(): T {
-    return this.ejectedBase() as T
-  }
-
-  ejectedBase(): TransferPayload {
+  ejected(): TransferPayload {
     return {
       uuid: this.uuid,
       content: this.content,

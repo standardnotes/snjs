@@ -4,7 +4,7 @@ import { ItemContent } from '@standardnotes/models'
 export type EncryptedParameters = {
   uuid: string
   content: string
-  items_key_id?: string | undefined
+  items_key_id: string | undefined
   enc_item_key: string
   version: ProtocolVersion
 

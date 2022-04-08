@@ -1,4 +1,5 @@
 import { ProtocolVersion, Uuid } from '@standardnotes/common'
+import { Copy } from '@standardnotes/utils'
 import { FillItemContent, ItemContent } from '../../Content/ItemContent'
 import { ContentReference } from '../../Reference/ContentReference'
 import { DecryptedTransferPayload } from '../../TransferPayload/Interfaces/DecryptedTransferPayload'
@@ -20,7 +21,7 @@ export class DecryptedPayload<
   constructor(rawPayload: T, source = PayloadSource.Constructor) {
     super(rawPayload, source)
 
-    this.content = FillItemContent<C>(rawPayload.content)
+    this.content = Copy(FillItemContent<C>(rawPayload.content))
     this.version = this.content.version || ProtocolVersion.V001
   }
 
@@ -38,7 +39,7 @@ export class DecryptedPayload<
     return result
   }
 
-  override ejected(): T {
+  override ejected(): DecryptedTransferPayload<C> {
     return {
       ...super.ejected(),
       content: this.content,

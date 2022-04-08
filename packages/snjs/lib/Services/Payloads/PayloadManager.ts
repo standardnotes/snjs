@@ -66,8 +66,12 @@ export class PayloadManager
     this.collection = new PayloadCollection()
   }
 
-  public find(uuids: Uuid[]) {
+  public find(uuids: Uuid[]): FullyFormedPayloadInterface[] {
     return this.collection.findAll(uuids)
+  }
+
+  public findOne(uuid: Uuid): FullyFormedPayloadInterface | undefined {
+    return this.collection.findAll([uuid])[0]
   }
 
   /**
@@ -183,6 +187,7 @@ export class PayloadManager
       const newPayload = masterPayload
         ? MergePayloads(masterPayload, payload)
         : (payload as FullyFormedPayloadInterface)
+
       if (isDeletedPayload(newPayload) && newPayload.discardable) {
         /** The item has been deleted and synced,
          * and can thus be removed from our local record */
@@ -276,8 +281,11 @@ export class PayloadManager
       ImmutablePayloadCollection.WithPayloads(payloads, PayloadSource.FileImport),
       undefined,
     )
+
     const collection = await delta.resultingCollection()
+
     await this.emitCollection(collection)
+
     return Uuids(collection.payloads)
   }
 

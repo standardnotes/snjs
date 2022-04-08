@@ -109,7 +109,7 @@ export function CreateItemFromPayload<
     return new EncryptedItem(payload)
   } else if (isDeletedPayload(payload)) {
     return new DeletedItem(payload)
+  } else {
+    throw Error('Unhandled case in CreateItemFromPayload')
   }
-
-  throw Error('Unhandled case in CreateItemFromPayload')
 }

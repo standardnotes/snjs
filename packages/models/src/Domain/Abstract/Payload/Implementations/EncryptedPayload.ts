@@ -10,9 +10,9 @@ export class EncryptedPayload
 {
   override readonly content: string
   readonly enc_item_key: string
-  readonly items_key_id?: string
-  readonly errorDecrypting?: boolean
-  readonly waitingForKey?: boolean
+  readonly items_key_id: string | undefined
+  readonly errorDecrypting: boolean
+  readonly waitingForKey: boolean
   override readonly deleted: false = false
   readonly auth_hash?: string
   readonly version: ProtocolVersion
@@ -37,6 +37,9 @@ export class EncryptedPayload
       enc_item_key: this.enc_item_key,
       items_key_id: this.items_key_id,
       auth_hash: this.auth_hash,
+      errorDecrypting: this.errorDecrypting,
+      waitingForKey: this.waitingForKey,
+      content: this.content,
     }
   }
 

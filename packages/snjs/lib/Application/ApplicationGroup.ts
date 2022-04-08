@@ -214,8 +214,8 @@ export class SNApplicationGroup extends AbstractService {
     return this.descriptorRecord[application.identifier]
   }
 
-  public async addNewApplication(label?: string) {
-    const identifier = await UuidGenerator.GenerateUuid()
+  public async addNewApplication(label?: string): Promise<SNApplication> {
+    const identifier = UuidGenerator.GenerateUuid()
     const index = this.getDescriptors().length + 1
     const descriptor: ApplicationDescriptor = {
       identifier: identifier,
@@ -224,9 +224,13 @@ export class SNApplicationGroup extends AbstractService {
     }
     const application = this.buildApplication(descriptor)
     this.applications.push(application)
+
     this.descriptorRecord[identifier] = descriptor
+
     await this.setPrimaryApplication(application)
-    await this.persistDescriptors()
+    this.persistDescriptors()
+
+    return application
   }
 
   private applicationForDescriptor(descriptor: ApplicationDescriptor) {

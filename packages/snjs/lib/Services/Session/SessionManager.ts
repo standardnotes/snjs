@@ -673,7 +673,7 @@ export class SNSessionManager
 
     this.setUser(user)
 
-    await this.storageService.setValue(StorageKey.User, user)
+    this.storageService.setValue(StorageKey.User, user)
 
     void this.apiService.setHost(host)
 

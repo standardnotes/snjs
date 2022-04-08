@@ -9,13 +9,6 @@ describe('payload encryption', function () {
     this.timeout(Factory.TenSecondTimeout)
     localStorage.clear()
     this.application = await Factory.createInitAppWithFakeCrypto()
-    this.email = UuidGenerator.GenerateUuid()
-    this.password = UuidGenerator.GenerateUuid()
-    await Factory.registerUserToApplication({
-      application: this.application,
-      email: this.email,
-      password: this.password,
-    })
   })
 
   afterEach(async function () {
@@ -46,19 +39,18 @@ describe('payload encryption', function () {
       lastSyncBegan: new Date(),
     })
 
-    const encryptedPayload = await this.application.protocolService.encryptSplitSingle(
-      {
-        usesItemsKeyWithKeyLookup: {
-          items: [notePayload],
-        },
+    const encryptedPayload = await this.application.protocolService.encryptSplitSingle({
+      usesItemsKeyWithKeyLookup: {
+        items: [notePayload],
       },
-      EncryptedExportIntent.Sync,
-    )
+    })
 
-    expect(encryptedPayload.dirty).to.not.be.ok
-    expect(encryptedPayload.errorDecrypting).to.not.be.ok
-    expect(encryptedPayload.waitingForKey).to.not.be.ok
-    expect(encryptedPayload.lastSyncBegan).to.not.be.ok
+    const syncPayload = CreateEncryptedServerSyncPushPayload(encryptedPayload)
+
+    expect(syncPayload.dirty).to.not.be.ok
+    expect(syncPayload.errorDecrypting).to.not.be.ok
+    expect(syncPayload.waitingForKey).to.not.be.ok
+    expect(syncPayload.lastSyncBegan).to.not.be.ok
   })
 
   it('creating payload with override properties', function () {
@@ -187,21 +179,17 @@ describe('payload encryption', function () {
     const payload = Factory.createNotePayload()
     const mutatedPayload = new EncryptedPayload({
       ...payload,
+      content: '004:...',
       enc_item_key: 'foo',
       errorDecrypting: true,
     })
-    const encryptedPayload = await this.application.protocolService.encryptSplitSingle(
-      {
-        usesItemsKeyWithKeyLookup: {
-          items: [mutatedPayload],
-        },
-      },
-      EncryptedExportIntent.Sync,
-    )
-    expect(encryptedPayload.content).to.eql(payload.content)
-    expect(encryptedPayload.enc_item_key).to.be.ok
-    expect(encryptedPayload.uuid).to.be.ok
-    expect(encryptedPayload.content_type).to.be.ok
-    expect(encryptedPayload.created_at).to.be.ok
+
+    const syncPayload = CreateEncryptedServerSyncPushPayload(mutatedPayload)
+
+    expect(syncPayload.content).to.eql(mutatedPayload.content)
+    expect(syncPayload.enc_item_key).to.be.ok
+    expect(syncPayload.uuid).to.be.ok
+    expect(syncPayload.content_type).to.be.ok
+    expect(syncPayload.created_at).to.be.ok
   })
 })

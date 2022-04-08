@@ -113,15 +113,18 @@ export class SNActionsService extends AbstractService {
       content_type: item.content_type,
       item_uuid: item.uuid,
     }
+
     const response = (await this.httpService
       .getAbsolute(extension.url, params)
       .catch((response) => {
         console.error('Error loading extension', response)
-        return null
+        return undefined
       })) as ActionResponse
+
     if (!response) {
       return
     }
+
     const description = response.description || extension.description
     const supported_types = response.supported_types || extension.supported_types
     const actions = (response.actions || []) as Action[]
@@ -133,6 +136,7 @@ export class SNActionsService extends AbstractService {
     mutator.actions = actions
 
     const payloadResult = mutator.getResult()
+
     return CreateDecryptedItemFromPayload(payloadResult) as SNActionsExtension
   }
 

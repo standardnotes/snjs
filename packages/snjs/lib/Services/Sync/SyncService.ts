@@ -288,10 +288,11 @@ export class SNSyncService
           items: encrypted,
         },
       }
-      const decrypted = await this.protocolService.decryptSplit(split)
+
+      const results = await this.protocolService.decryptSplit(split)
 
       await this.payloadManager.emitPayloads(
-        [...nonencrypted, ...decrypted],
+        [...nonencrypted, ...results],
         PayloadSource.LocalRetrieved,
       )
 

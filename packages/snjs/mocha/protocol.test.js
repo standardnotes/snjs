@@ -92,15 +92,19 @@ describe('protocol', function () {
     expect(isProtocolVersionExpired(ProtocolVersion.V004)).to.equal(false)
   })
 
-  it('decrypting already decrypted payload should return same payload', async function () {
+  it('decrypting already decrypted payload should throw', async function () {
     const payload = Factory.createNotePayload()
-    const result = await this.application.protocolService.decryptSplitSingle({
-      usesItemsKeyWithKeyLookup: {
-        items: [payload],
-      },
-    })
-    expect(payload).to.equal(result)
-    expect(result.errorDecrypting).to.not.be.ok
+    let error
+    try {
+      await this.application.protocolService.decryptSplitSingle({
+        usesItemsKeyWithKeyLookup: {
+          items: [payload],
+        },
+      })
+    } catch (e) {
+      error = e
+    }
+    expect(error).to.be.ok
   })
 
   it('ejected payload should not have meta fields', async function () {

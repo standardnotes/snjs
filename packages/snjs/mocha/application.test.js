@@ -98,8 +98,11 @@ describe('application instances', () => {
   it('signing out application should delete snjs_version', async () => {
     const identifier = 'app'
     const app = await Factory.createAndInitializeApplication(identifier)
+
     expect(localStorage.getItem(`${identifier}-snjs_version`)).to.be.ok
+
     await app.user.signOut()
+
     expect(localStorage.getItem(`${identifier}-snjs_version`)).to.not.be.ok
   })
 

@@ -33,7 +33,7 @@ describe('app models', () => {
   })
 
   it('item should be defined', () => {
-    expect(SNItem).to.be.ok
+    expect(GenericItem).to.be.ok
   })
 
   it('item content should be assigned', () => {
@@ -287,15 +287,13 @@ describe('app models', () => {
   it('alterating itemskey uuid should update errored items encrypted with that key', async function () {
     const item1 = await Factory.createMappedNote(this.application)
     const itemsKey = this.application.itemManager.itemsKeys()[0]
+
     /** Encrypt item1 and emit as errored so it persists with items_key_id */
-    const encrypted = await this.application.protocolService.encryptSplitSingle(
-      {
-        usesItemsKeyWithKeyLookup: {
-          items: [item1.payload],
-        },
+    const encrypted = await this.application.protocolService.encryptSplitSingle({
+      usesItemsKeyWithKeyLookup: {
+        items: [item1.payload],
       },
-      EncryptedExportIntent.Sync,
-    )
+    })
     const errored = encrypted.copy({
       errorDecrypting: true,
       waitingForKey: true,
@@ -303,8 +301,8 @@ describe('app models', () => {
 
     await this.application.itemManager.emitItemFromPayload(errored)
 
-    expect(this.application.items.findItem(item1.uuid).errorDecrypting).to.equal(true)
-    expect(this.application.items.findItem(item1.uuid).payload.items_key_id).to.equal(itemsKey.uuid)
+    expect(this.application.payloadManager.findOne(item1.uuid).errorDecrypting).to.equal(true)
+    expect(this.application.payloadManager.findOne(item1.uuid).items_key_id).to.equal(itemsKey.uuid)
 
     sinon
       .stub(this.application.protocolService.itemsEncryption, 'decryptErroredPayloads')
@@ -313,9 +311,9 @@ describe('app models', () => {
       })
 
     const alternatedKey = await Factory.alternateUuidForItem(this.application, itemsKey.uuid)
-    const updatedItem = this.application.items.findItem(item1.uuid)
+    const updatedPayload = this.application.payloadManager.findOne(item1.uuid)
 
-    expect(updatedItem.payload.items_key_id).to.equal(alternatedKey.uuid)
+    expect(updatedPayload.items_key_id).to.equal(alternatedKey.uuid)
   })
 
   it('properly handles mutli item uuid alternation', async function () {
@@ -372,7 +370,7 @@ describe('app models', () => {
 
   it('maintains editor reference when duplicating note', async function () {
     const note = await Factory.createMappedNote(this.application)
-    const editor = await this.application.itemManager.insertItem(
+    const editor = await this.application.itemManager.createItem(
       ContentType.Component,
       { area: ComponentArea.Editor },
       true,

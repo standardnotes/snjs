@@ -1,6 +1,6 @@
-import { ContextPayload } from './ContextPayload'
 import { useBoolean } from '@standardnotes/utils'
 import { FilteredServerItem } from './FilteredServerItem'
+import { ContentType } from '@standardnotes/common'
 
 /**
  * The saved sync item payload represents the payload we want to map
@@ -8,18 +8,19 @@ import { FilteredServerItem } from './FilteredServerItem'
  * updated_at value the server returns for the item, and basically
  * nothing else.
  */
-export interface ServerSyncSavedContextualPayload extends ContextPayload {
-  content: undefined
+export interface ServerSyncSavedContextualPayload {
+  deleted: boolean
   created_at_timestamp: number
-  updated_at_timestamp?: number
+  updated_at_timestamp: number
   updated_at: Date
+  content_type: ContentType
+  uuid: string
 }
 
 export function CreateServerSyncSavedPayload(
   from: FilteredServerItem,
 ): ServerSyncSavedContextualPayload {
   return {
-    content: undefined,
     content_type: from.content_type,
     created_at_timestamp: from.created_at_timestamp,
     deleted: useBoolean(from.deleted, false),

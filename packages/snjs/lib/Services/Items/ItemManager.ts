@@ -352,7 +352,7 @@ export class ItemManager
     )
 
     const delta: Models.ItemDelta = {
-      changed: changedItems.filter(Models.isNotEncryptedItem),
+      changed: changedItems,
       inserted: insertedItems.filter(Models.isNotEncryptedItem),
       discarded: discardedItems,
       ignored: ignoredItems,

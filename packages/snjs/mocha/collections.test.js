@@ -199,7 +199,7 @@ describe('payload collections', () => {
         content: {
           ...unpinned1.content,
           appData: {
-            [SNItem.DefaultAppDomain()]: {
+            [DecryptedItem.DefaultAppDomain()]: {
               pinned: true,
             },
           },

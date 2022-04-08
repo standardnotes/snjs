@@ -20,7 +20,7 @@ export function CreatePayload<T extends FullyFormedTransferPayload>(
     return new EncryptedPayload(from, source) as unknown as ConditionalPayloadType<T>
   } else if (isDeletedTransferPayload(from)) {
     return new DeletedPayload(from, source) as unknown as ConditionalPayloadType<T>
+  } else {
+    throw Error('Unhandled case in MergePayloads')
   }
-
-  throw Error('Unhandled case in MergePayloads')
 }

@@ -68,6 +68,7 @@ export class SNStorageService
 
   override async handleApplicationStage(stage: Services.ApplicationStage) {
     await super.handleApplicationStage(stage)
+
     if (stage === Services.ApplicationStage.Launched_10) {
       this.storagePersistable = true
       if (this.needsPersist) {
@@ -97,7 +98,9 @@ export class SNStorageService
     ) {
       throw Error('Disabling storage encryption is only available on mobile.')
     }
+
     this.encryptionPolicy = encryptionPolicy
+
     if (persist) {
       this.setValue(Services.StorageKey.StorageEncryptionPolicy, encryptionPolicy)
     }
@@ -110,6 +113,7 @@ export class SNStorageService
   public async initializeFromDisk() {
     const value = await this.deviceInterface.getRawStorageValue(this.getPersistenceKey())
     const values = value ? JSON.parse(value as string) : undefined
+
     this.setInitialValues(values)
   }
 
@@ -129,14 +133,17 @@ export class SNStorageService
 
   public isStorageWrapped(): boolean {
     const wrappedValue = this.values[Services.ValueModesKeys.Wrapped]
+
     return wrappedValue != undefined && isEncryptedTransferPayload(wrappedValue)
   }
 
   public async canDecryptWithKey(key: SNRootKey): Promise<boolean> {
     const wrappedValue = this.values[Services.ValueModesKeys.Wrapped]
+
     if (isDecryptedTransferPayload(wrappedValue)) {
       throw Error('Attempting to decrypt non decrypted storage value')
     }
+
     const decryptedPayload = await this.decryptWrappedValue(wrappedValue, key)
     return !isErrorDecryptingParameters(decryptedPayload)
   }
@@ -169,15 +176,18 @@ export class SNStorageService
           },
         }
 
-    const decryptedPayload = (await this.encryptionProvider.decryptSplit(split))[0]
+    const decryptedPayload = await this.encryptionProvider.decryptSplitSingle(split)
+
     return decryptedPayload
   }
 
   public async decryptStorage() {
     const wrappedValue = this.values[Services.ValueModesKeys.Wrapped]
+
     if (isDecryptedTransferPayload(wrappedValue)) {
       throw Error('Attempting to decrypt already decrypted storage')
     }
+
     const decryptedPayload = await this.decryptWrappedValue(wrappedValue)
 
     if (isErrorDecryptingParameters(decryptedPayload)) {
@@ -201,7 +211,9 @@ export class SNStorageService
     await this.currentPersistPromise
 
     this.needsPersist = false
+
     const values = await this.immediatelyPersistValuesToDisk()
+
     /** Save the persisted value so we have access to it in memory (for unit tests afawk) */
     this.values[Services.ValueModesKeys.Wrapped] = values[Services.ValueModesKeys.Wrapped]
   }
@@ -236,7 +248,7 @@ export class SNStorageService
    * either as a plain object, or an encrypted item.
    */
   private async generatePersistableValues() {
-    const rawContent = Object.assign({}, this.values) as Partial<Services.StorageValuesObject>
+    const rawContent = Copy(this.values) as Partial<Services.StorageValuesObject>
 
     const valuesToWrap = rawContent[Services.ValueModesKeys.Unwrapped]
     rawContent[Services.ValueModesKeys.Unwrapped] = undefined
@@ -268,6 +280,7 @@ export class SNStorageService
 
   public setValue(key: string, value: unknown, mode = Services.StorageValueModes.Default): void {
     this.setValueWithNoPersist(key, value, mode)
+
     void this.persistValuesToDisk()
   }
 
@@ -277,6 +290,7 @@ export class SNStorageService
     mode = Services.StorageValueModes.Default,
   ): Promise<void> {
     this.setValueWithNoPersist(key, value, mode)
+
     await this.persistValuesToDisk()
   }
 
@@ -290,7 +304,8 @@ export class SNStorageService
     }
 
     const domainKey = this.domainKeyForMode(mode)
-    this.values[domainKey][key] = value
+    const domainStorage = this.values[domainKey]
+    domainStorage[key] = value
   }
 
   public getValue<T>(key: string, mode = Services.StorageValueModes.Default, defaultValue?: T): T {
@@ -336,10 +351,10 @@ export class SNStorageService
     unwrapped?: Services.ValuesObjectRecord,
     nonwrapped?: Services.ValuesObjectRecord,
   ) {
-    return SNStorageService.defaultValuesObject(wrapped, unwrapped, nonwrapped)
+    return SNStorageService.DefaultValuesObject(wrapped, unwrapped, nonwrapped)
   }
 
-  public static defaultValuesObject(
+  public static DefaultValuesObject(
     wrapped: Services.WrappedStorageValue = {} as Services.WrappedStorageValue,
     unwrapped: Services.ValuesObjectRecord = {},
     nonwrapped: Services.ValuesObjectRecord = {},

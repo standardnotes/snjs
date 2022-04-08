@@ -32,13 +32,10 @@ export abstract class GenericItem<P extends PayloadInterface = PayloadInterface>
     this.userModifiedDate = this.serverUpdatedAt || new Date()
     this.updatedAtString = dateToLocalizedString(this.userModifiedDate)
 
-    this.freezeAfterSubclassesFinishConstructing()
-  }
-
-  private freezeAfterSubclassesFinishConstructing() {
+    const timeToAllowSubclassesToFinishConstruction = 0
     setTimeout(() => {
       deepFreeze(this)
-    }, 0)
+    }, timeToAllowSubclassesToFinishConstruction)
   }
 
   get uuid() {

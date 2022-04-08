@@ -26,11 +26,11 @@ export abstract class Collection<
   /** An array of uuids of items that are not marked as deleted */
   nondeletedIndex: Set<Uuid> = new Set()
 
-  isNonDeletedElement(e: Element | DeletedElement): e is Element {
+  isNonDeletedElement = (e: Element | DeletedElement): e is Element => {
     return !this.isDeletedElement(e)
   }
 
-  isDeletedElement(e: Element | DeletedElement): e is DeletedElement {
+  isDeletedElement = (e: Element | DeletedElement): e is DeletedElement => {
     return (e as DeletedCollectionElement).deleted === true
   }
 

@@ -6,13 +6,13 @@ export interface EncryptedPayloadInterface extends PayloadInterface<EncryptedTra
   readonly content: string
   deleted: false
   readonly enc_item_key: string
-  readonly items_key_id?: string
-
-  readonly errorDecrypting?: boolean
-  readonly waitingForKey?: boolean
-
+  readonly items_key_id: string | undefined
+  readonly errorDecrypting: boolean
+  readonly waitingForKey: boolean
   readonly version: ProtocolVersion
 
   /** @deprecated */
   readonly auth_hash?: string
+
+  ejected(): EncryptedTransferPayload
 }

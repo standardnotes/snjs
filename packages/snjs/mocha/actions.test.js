@@ -86,7 +86,7 @@ describe('actions service', () => {
       /http:\/\/my-extension.sn.org\/get_actions\/(.*)/,
       (request, params) => {
         const urlParams = new URLSearchParams(params)
-        const extension = this.actionsExtension
+        const extension = Copy(this.actionsExtension)
 
         if (urlParams.has('item_uuid')) {
           extension.actions.push({
@@ -112,7 +112,7 @@ describe('actions service', () => {
       },
     )
 
-    const payload = new PurePayload({
+    const payload = new DecryptedPayload({
       uuid: Factory.generateUuid(),
       content_type: ContentType.Note,
       content: {
@@ -153,7 +153,7 @@ describe('actions service', () => {
     this.fakeServer.respondWith(
       'POST',
       /http:\/\/my-extension.sn.org\/action_[4,6]\/(.*)/,
-      (request, params) => {
+      (request) => {
         const requestBody = JSON.parse(request.requestBody)
 
         const response = {
@@ -166,7 +166,7 @@ describe('actions service', () => {
     )
 
     this.fakeServer.respondWith('GET', 'http://my-extension.sn.org/action_5/', (request) => {
-      const encryptedPayloadClone = JSON.parse(JSON.stringify(encryptedPayload))
+      const encryptedPayloadClone = Copy(encryptedPayload)
 
       encryptedPayloadClone.items_key_id = undefined
       encryptedPayloadClone.content = '003:somenonsense'

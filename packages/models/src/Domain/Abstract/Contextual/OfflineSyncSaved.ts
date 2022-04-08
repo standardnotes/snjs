@@ -1,5 +1,5 @@
+import { ContentType } from '@standardnotes/common'
 import { DecryptedPayloadInterface, DeletedPayloadInterface, isDeletedPayload } from '../Payload'
-import { ContextPayload } from './ContextPayload'
 
 /**
  * The saved sync item payload represents the payload we want to map
@@ -7,20 +7,19 @@ import { ContextPayload } from './ContextPayload'
  * updated_at value the server returns for the item, and basically
  * nothing else.
  */
-export interface OfflineSyncSavedContextualPayload extends ContextPayload {
+export interface OfflineSyncSavedContextualPayload {
+  content_type: ContentType
   created_at_timestamp: number
-  content: undefined
-  dirty?: boolean
-  lastSyncEnd?: Date
+  deleted: boolean
   updated_at_timestamp?: number
   updated_at: Date
+  uuid: string
 }
 
 export function CreateOfflineSyncSavedPayload(
   fromPayload: DecryptedPayloadInterface | DeletedPayloadInterface,
 ): OfflineSyncSavedContextualPayload {
   return {
-    content: undefined,
     content_type: fromPayload.content_type,
     created_at_timestamp: fromPayload.created_at_timestamp,
     deleted: isDeletedPayload(fromPayload),

@@ -5,38 +5,41 @@ import { ComponentMutator, SNComponent } from '../../Syncable/Component'
 import { CreateDecryptedItemFromPayload } from '../Item/ItemGenerator'
 import { ImmutablePayloadCollection } from '../../Runtime/Collection/Payload/ImmutablePayloadCollection'
 import { MutationType } from '../../Abstract/Item/Types/MutationType'
-import { PayloadInterface } from '../../Abstract/Payload/Interfaces/PayloadInterface'
+import { FullyFormedPayloadInterface } from '../../Abstract/Payload/Interfaces/UnionTypes'
 
 export type AffectorFunction = (
-  basePayload: PayloadInterface,
-  duplicatePayload: PayloadInterface,
-  baseCollection: ImmutablePayloadCollection,
-) => PayloadInterface[]
+  basePayload: FullyFormedPayloadInterface,
+  duplicatePayload: FullyFormedPayloadInterface,
+  baseCollection: ImmutablePayloadCollection<FullyFormedPayloadInterface>,
+) => FullyFormedPayloadInterface[]
 
-function NoteDuplicationAffectedPayloads(
-  basePayload: PayloadInterface,
-  duplicatePayload: PayloadInterface,
-  baseCollection: ImmutablePayloadCollection,
-) {
+const NoteDuplicationAffectedPayloads: AffectorFunction = (
+  basePayload: FullyFormedPayloadInterface,
+  duplicatePayload: FullyFormedPayloadInterface,
+  baseCollection: ImmutablePayloadCollection<FullyFormedPayloadInterface>,
+) => {
   /** If note has editor, maintain editor relationship in duplicate note */
   const components = baseCollection
     .allDecrypted<ComponentContent>(ContentType.Component)
     .map((payload) => {
       return CreateDecryptedItemFromPayload<ComponentContent, SNComponent>(payload)
     })
+
   const editor = components
     .filter((c) => c.area === ComponentArea.Editor)
     .find((e) => {
       return e.isExplicitlyEnabledForItem(basePayload.uuid)
     })
+
   if (!editor) {
-    return undefined
+    return []
   }
+
   /** Modify the editor to include new note */
   const mutator = new ComponentMutator(editor, MutationType.NoUpdateUserTimestamps)
   mutator.associateWithItem(duplicatePayload.uuid)
   const result = mutator.getResult()
-  return [result]
+  return [result] as FullyFormedPayloadInterface[]
 }
 
 export const AffectorMapping = {

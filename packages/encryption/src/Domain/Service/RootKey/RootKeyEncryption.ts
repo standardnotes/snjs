@@ -304,6 +304,8 @@ export class RootKeyEncryptionService extends Services.AbstractService<RootKeySe
     const wrappedKeyPayload = new Models.EncryptedPayload({
       ...payload.ejected(),
       ...wrappedKey,
+      errorDecrypting: false,
+      waitingForKey: false,
     })
 
     this.storageService.setValue(

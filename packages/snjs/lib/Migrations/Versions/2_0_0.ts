@@ -183,7 +183,7 @@ export class Migration2_0_0 extends Migration {
    * All platforms
    */
   private async allPlatformHelperSetStorageStructure(rawStructure: Services.StorageValuesObject) {
-    const newStructure = SNStorageService.defaultValuesObject(
+    const newStructure = SNStorageService.DefaultValuesObject(
       rawStructure.wrapped,
       rawStructure.unwrapped,
       rawStructure.nonwrapped,

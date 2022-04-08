@@ -44,7 +44,7 @@ describe('keys', function () {
       },
       EncryptedExportIntent.LocalStorageEncrypted,
     )
-    expect(processedPayload.format).to.equal(PayloadFormat.EncryptedString)
+    expect(isEncryptedPayload(processedPayload)).to.equal(true)
   })
 
   it('has root key and one items key after registering user', async function () {

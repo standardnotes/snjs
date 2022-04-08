@@ -211,7 +211,7 @@ export class ItemsEncryptionService extends Services.AbstractService {
         })
       } else {
         return new Models.DecryptedPayload({
-          ...original.ejectedBase(),
+          ...original.ejected(),
           ...params,
         })
       }

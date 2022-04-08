@@ -1,5 +1,5 @@
 import { ServerItemResponse } from '@standardnotes/responses'
-import { isCorrupTransferPayload, isEncryptedTransferPayload } from '../TransferPayload'
+import { isCorruptTransferPayload, isEncryptedTransferPayload } from '../TransferPayload'
 
 export interface FilteredServerItem extends ServerItemResponse {
   __passed_filter__: true
@@ -19,7 +19,7 @@ export function filterDisallowedRemotePayloads(
 }
 
 export function isRemotePayloadAllowed(payload: ServerItemResponse): boolean {
-  if (isCorrupTransferPayload(payload)) {
+  if (isCorruptTransferPayload(payload)) {
     return false
   }
 

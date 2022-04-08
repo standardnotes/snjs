@@ -20,5 +20,5 @@
     "strictNullChecks": true,
     "target": "es6"
   },
-  "exclude": ["**/*.spec.ts", "dist"]
+  "exclude": ["**/*.spec.ts", "dist", "coverage"]
 }

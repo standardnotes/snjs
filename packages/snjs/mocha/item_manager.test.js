@@ -4,7 +4,7 @@ import * as Factory from './lib/factory.js'
 chai.use(chaiAsPromised)
 const expect = chai.expect
 
-describe('item manager', function () {
+describe.only('item manager', function () {
   before(async function () {
     const crypto = new SNWebCrypto()
     UuidGenerator.SetGenerator(crypto.generateUUID)
@@ -46,7 +46,7 @@ describe('item manager', function () {
     const item = await this.itemManager.emitItemFromPayload(payload, PayloadSource.LocalChanged)
     const result = await this.itemManager.setItemDirty(item)
     const appData = result.payload.content.appData
-    expect(appData[SNItem.DefaultAppDomain()][AppDataField.UserModifiedDate]).to.be.ok
+    expect(appData[DecryptedItem.DefaultAppDomain()][AppDataField.UserModifiedDate]).to.be.ok
   })
 
   it('find items with valid uuid', async function () {
@@ -58,14 +58,13 @@ describe('item manager', function () {
   })
 
   it('find items with invalid uuid no blanks', async function () {
-    const includeBlanks = false
-    const results = await this.itemManager.findItems([Factory.generateUuidish()], includeBlanks)
+    const results = await this.itemManager.findItems([Factory.generateUuidish()])
     expect(results.length).to.equal(0)
   })
 
   it('find items with invalid uuid include blanks', async function () {
     const includeBlanks = true
-    const results = await this.itemManager.findItems([Factory.generateUuidish()], includeBlanks)
+    const results = await this.itemManager.findItemsIncludingBlanks([Factory.generateUuidish()])
     expect(results.length).to.equal(1)
     expect(results[0]).to.not.be.ok
   })
@@ -137,13 +136,18 @@ describe('item manager', function () {
 
   it('emitting discardable payload should remove it from our collection', async function () {
     const note = await this.createNote()
-    const payload = note.payloadRepresentation({
+
+    const payload = new DeletedPayload({
+      ...note.payload.ejected(),
+      content: undefined,
       deleted: true,
       dirty: false,
     })
-    await this.itemManager.emitItemFromPayload(payload)
 
     expect(payload.discardable).to.equal(true)
+
+    await this.itemManager.emitItemFromPayload(payload)
+
     expect(this.itemManager.findItem(note.uuid)).to.not.be.ok
   })
 
@@ -151,7 +155,7 @@ describe('item manager', function () {
     const note = await this.createNote()
     const tag = await this.createTag([note])
 
-    const itemsThatReference = this.itemManager.itemsReferencingItem(note.uuid)
+    const itemsThatReference = this.itemManager.itemsReferencingItem(note)
     expect(itemsThatReference.length).to.equal(1)
     expect(itemsThatReference[0]).to.equal(tag)
   })
@@ -211,14 +215,17 @@ describe('item manager', function () {
     expect(dirtyItems[0].dirty).to.equal(true)
   })
 
-  it('dirty items should not include errored items', async function () {
+  it.only('dirty items should not include errored items', async function () {
     const note = await this.itemManager.setItemDirty(await this.createNote())
     const errorred = new EncryptedPayload({
       ...note.payload,
+      content: '004:...',
       errorDecrypting: true,
     })
+
     await this.itemManager.emitItemsFromPayloads([errorred], PayloadSource.LocalChanged)
     const dirtyItems = this.itemManager.getDirtyItems()
+
     expect(dirtyItems.length).to.equal(0)
   })
 

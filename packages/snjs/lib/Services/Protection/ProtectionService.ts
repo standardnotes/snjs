@@ -329,8 +329,8 @@ export class SNProtectionService
     return this.notifyEvent(ProtectionEvent.UnprotectedSessionExpired)
   }
 
-  private async setSessionExpiryDate(date: Date) {
-    await this.storageService.setValue(StorageKey.ProtectionExpirey, date)
+  private setSessionExpiryDate(date: Date) {
+    this.storageService.setValue(StorageKey.ProtectionExpirey, date)
   }
 
   private getLastSessionLength(): UnprotectedAccessSecondsDuration | undefined {
@@ -338,7 +338,7 @@ export class SNProtectionService
   }
 
   private async setSessionLength(length: UnprotectedAccessSecondsDuration): Promise<void> {
-    await this.storageService.setValue(StorageKey.ProtectionSessionLength, length)
+    this.storageService.setValue(StorageKey.ProtectionSessionLength, length)
     const expiresAt = new Date()
     expiresAt.setSeconds(expiresAt.getSeconds() + length)
     await this.setSessionExpiryDate(expiresAt)

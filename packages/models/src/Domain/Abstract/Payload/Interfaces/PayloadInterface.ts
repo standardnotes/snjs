@@ -50,10 +50,7 @@ export interface PayloadInterface<
    * generic, non-contextual consumption, such as saving to a backup file or syncing
    * with a server.
    */
-  ejected(): T
-
-  /** Returns only base parameters common to all payloads */
-  ejectedBase(): TransferPayload
+  ejected(): TransferPayload
 
   /**
    * Returns a new payload by applying the input payload on top of the instance payload.

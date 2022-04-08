@@ -40,8 +40,9 @@ export async function DecryptBackupFile(
         return new EncryptedPayload(item)
       } else if (isDecryptedTransferPayload(item)) {
         return new DecryptedPayload(item)
+      } else {
+        throw Error('Unhandled case in decryptBackupFile')
       }
-      throw Error('Unhandled case in decryptBackupFile')
     },
   )
 

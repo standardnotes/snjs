@@ -132,6 +132,9 @@ export async function safeDeinit(application) {
     )
     return
   }
+
+  await application.storageService.awaitPersist()
+
   /** Limit waiting to 1s */
   await Promise.race([sleep(1), application.syncService?.awaitCurrentSyncs()])
   await application.prepareForDeinit()
@@ -438,11 +441,10 @@ export function createNoteParams({ title, text, dirty = true } = {}) {
     uuid: generateUuid(),
     content_type: ContentType.Note,
     dirty: dirty,
-    content: {
+    content: FillItemContent({
       title: title || 'hello',
       text: text || 'world',
-      references: [],
-    },
+    }),
   }
   return params
 }
@@ -452,10 +454,9 @@ export function createTagParams({ title, dirty = true, uuid = undefined } = {}) 
     uuid: uuid || generateUuid(),
     content_type: ContentType.Tag,
     dirty: dirty,
-    content: {
+    content: FillItemContent({
       title: title || 'thoughts',
-      references: [],
-    },
+    }),
   }
   return params
 }
