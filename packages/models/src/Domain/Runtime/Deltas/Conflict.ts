@@ -1,10 +1,10 @@
 import { greaterOfTwoDates, uniqCombineObjArrays } from '@standardnotes/utils'
 import { ImmutablePayloadCollection } from '../Collection/Payload/ImmutablePayloadCollection'
-import { CreateDecryptedItemFromPayload } from '../../Abstract/Item/Utilities/Generator'
+import { CreateDecryptedItemFromPayload } from '../../Utilities/Item/ItemGenerator'
 import { HistoryMap, historyMapFunctions } from '../History/HistoryMap'
 import { ConflictStrategy } from '../../Abstract/Item/Types/ConflictStrategy'
-import { PayloadsByDuplicating } from '../../Utilities/PayloadsByDuplicating'
-import { PayloadContentsEqual } from '../../Utilities/PayloadContentsEqual'
+import { PayloadsByDuplicating } from '../../Utilities/Payload/PayloadsByDuplicating'
+import { PayloadContentsEqual } from '../../Utilities/Payload/PayloadContentsEqual'
 import { PayloadSource } from '../../Abstract/Payload/Types/PayloadSource'
 import { FullyFormedPayloadInterface } from '../../Abstract/Payload'
 import {

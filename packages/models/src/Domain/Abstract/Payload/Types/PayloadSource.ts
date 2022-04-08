@@ -41,3 +41,19 @@ export enum PayloadSource {
   /** Payloads which have been rejected and unwilling to be saved by the server */
   RemoteRejected = 21,
 }
+
+/**
+ * Whether the changed payload represents only an internal change that shouldn't
+ * require a UI refresh
+ */
+export function isPayloadSourceInternalChange(source: PayloadSource): boolean {
+  return [PayloadSource.RemoteSaved, PayloadSource.PreSyncSave].includes(source)
+}
+
+export function isPayloadSourceRetrieved(source: PayloadSource): boolean {
+  return [
+    PayloadSource.RemoteRetrieved,
+    PayloadSource.ComponentRetrieved,
+    PayloadSource.RemoteActionRetrieved,
+  ].includes(source)
+}

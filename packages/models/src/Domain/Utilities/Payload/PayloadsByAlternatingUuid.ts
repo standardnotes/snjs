@@ -1,13 +1,13 @@
-import { DeletedPayload } from '../Abstract/Payload/Implementations/DeletedPayload'
+import { DeletedPayload } from '../../Abstract/Payload/Implementations/DeletedPayload'
 import { ContentType } from '@standardnotes/common'
 import { extendArray, UuidGenerator } from '@standardnotes/utils'
-import { ImmutablePayloadCollection } from '../Runtime/Collection/Payload/ImmutablePayloadCollection'
-import { DecryptedPayloadInterface } from '../Abstract/Payload/Interfaces/DecryptedPayload'
-import { isEncryptedPayload } from '../Abstract/Payload/Interfaces/TypeCheck'
-import { FullyFormedPayloadInterface } from '../Abstract/Payload/Interfaces/UnionTypes'
-import { EncryptedPayloadInterface } from '../Abstract/Payload/Interfaces/EncryptedPayload'
+import { ImmutablePayloadCollection } from '../../Runtime/Collection/Payload/ImmutablePayloadCollection'
+import { DecryptedPayloadInterface } from '../../Abstract/Payload/Interfaces/DecryptedPayload'
+import { isEncryptedPayload } from '../../Abstract/Payload/Interfaces/TypeCheck'
+import { FullyFormedPayloadInterface } from '../../Abstract/Payload/Interfaces/UnionTypes'
+import { EncryptedPayloadInterface } from '../../Abstract/Payload/Interfaces/EncryptedPayload'
 import { PayloadsByUpdatingReferencingPayloadReferences } from './PayloadsByUpdatingReferencingPayloadReferences'
-import { DeletedPayloadInterface } from '../Abstract/Payload/Interfaces/DeletedPayload'
+import { DeletedPayloadInterface } from '../../Abstract/Payload/Interfaces/DeletedPayload'
 
 /**
  * Return the payloads that result if you alternated the uuid for the payload.

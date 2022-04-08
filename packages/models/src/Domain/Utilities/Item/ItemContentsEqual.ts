@@ -1,7 +1,7 @@
 import { omitInPlace, sortedCopy } from '@standardnotes/utils';
-import { ItemContent } from '../../Content/ItemContent';
-import { DefaultAppDomain } from '../Types/DefaultAppDomain';
-import { AppDataField } from '../Types/AppDataField';
+import { ItemContent } from '../../Abstract/Content/ItemContent';
+import { DefaultAppDomain } from '../../Abstract/Item/Types/DefaultAppDomain';
+import { AppDataField } from '../../Abstract/Item/Types/AppDataField';
 
 
 export function ItemContentsEqual<C extends ItemContent = ItemContent>(

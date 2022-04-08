@@ -1,7 +1,7 @@
 import { DecryptedItemInterface } from './../../Abstract/Item/Interfaces/DecryptedItem'
 import { DecryptedPayloadInterface } from './../../Abstract/Payload/Interfaces/DecryptedPayload'
 import { isNullOrUndefined } from '@standardnotes/utils'
-import { CreateDecryptedItemFromPayload } from '../../Abstract/Item/Utilities/Generator'
+import { CreateDecryptedItemFromPayload } from '../../Utilities/Item/ItemGenerator'
 import { NoteContent } from '../../Syncable/Note'
 import { HistoryEntryInterface } from './HistoryEntryInterface'
 

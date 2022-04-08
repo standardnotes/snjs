@@ -7,7 +7,7 @@ import { DecryptedItemInterface } from '../Interfaces/DecryptedItem'
 import { DecryptedPayloadInterface } from '../../Payload/Interfaces/DecryptedPayload'
 import { GenericItem } from './GenericItem'
 import { ItemContent } from '../../Content/ItemContent'
-import { ItemContentsEqual } from "../Utilities/ItemContentsEqual"
+import { ItemContentsEqual } from "../../../Utilities/Item/ItemContentsEqual"
 import { PrefKey } from '../../../Syncable/UserPrefs/PrefKey'
 import { ContentReference } from '../../Reference/ContentReference'
 

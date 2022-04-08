@@ -7,8 +7,8 @@ import {
 import { extendArray } from '@standardnotes/utils'
 import { ImmutablePayloadCollection } from '../Collection/Payload/ImmutablePayloadCollection'
 import { isDecryptedPayload } from '../../Abstract/Payload/Interfaces/TypeCheck'
-import { PayloadContentsEqual } from '../../Utilities/PayloadContentsEqual'
-import { PayloadsByDuplicating } from '../../Utilities/PayloadsByDuplicating'
+import { PayloadContentsEqual } from '../../Utilities/Payload/PayloadContentsEqual'
+import { PayloadsByDuplicating } from '../../Utilities/Payload/PayloadsByDuplicating'
 import { PayloadsDelta } from './Delta'
 import { PayloadSource } from '../../Abstract/Payload/Types/PayloadSource'
 

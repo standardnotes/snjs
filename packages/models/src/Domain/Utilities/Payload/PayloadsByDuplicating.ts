@@ -1,10 +1,10 @@
 import { extendArray, UuidGenerator } from '@standardnotes/utils'
-import { ImmutablePayloadCollection } from '../Runtime/Collection/Payload/ImmutablePayloadCollection'
-import { ItemContent } from '../Abstract/Content/ItemContent'
+import { ImmutablePayloadCollection } from '../../Runtime/Collection/Payload/ImmutablePayloadCollection'
+import { ItemContent } from '../../Abstract/Content/ItemContent'
 import { AffectorMapping } from './AffectorFunction'
 import { PayloadsByUpdatingReferencingPayloadReferences } from './PayloadsByUpdatingReferencingPayloadReferences'
-import { isDecryptedPayload } from '../Abstract/Payload/Interfaces/TypeCheck'
-import { FullyFormedPayloadInterface } from '../Abstract/Payload/Interfaces/UnionTypes'
+import { isDecryptedPayload } from '../../Abstract/Payload/Interfaces/TypeCheck'
+import { FullyFormedPayloadInterface } from '../../Abstract/Payload/Interfaces/UnionTypes'
 /**
  * Copies payload and assigns it a new uuid.
  * @returns An array of payloads that have changed as a result of copying.
