@@ -5,7 +5,7 @@ import WebDeviceInterface from './lib/web_device_interface.js'
 chai.use(chaiAsPromised)
 const expect = chai.expect
 
-describe('singletons', function () {
+describe.only('singletons', function () {
   this.timeout(Factory.TenSecondTimeout)
 
   const syncOptions = {
@@ -44,9 +44,11 @@ describe('singletons', function () {
         password: this.password,
       })
     }
+
     this.signOut = async () => {
       this.application = await Factory.signOutApplicationAndReturnNew(this.application)
     }
+
     this.signIn = async () => {
       await this.application.signIn(
         this.email,
@@ -57,13 +59,16 @@ describe('singletons', function () {
         true,
       )
     }
+
     this.extManagerId = 'org.standardnotes.extensions-manager'
+
     this.extPred = new CompoundPredicate('and', [
       new Predicate('content_type', '=', ContentType.Component),
       new Predicate('package_info.identifier', '=', this.extManagerId),
     ])
+
     this.createExtMgr = () => {
-      return this.application.itemManager.insertItem(
+      return this.application.itemManager.createItem(
         ContentType.Component,
         {
           package_info: {
@@ -79,9 +84,12 @@ describe('singletons', function () {
   afterEach(async function () {
     expect(this.application.syncService.isOutOfSync()).to.equal(false)
     expect(this.application.itemManager.items.length).to.equal(this.expectedItemCount)
+
     const rawPayloads = await this.application.storageService.getAllRawPayloads()
     expect(rawPayloads.length).to.equal(this.expectedItemCount)
+
     await Factory.safeDeinit(this.application)
+
     localStorage.clear()
   })
 
@@ -95,7 +103,7 @@ describe('singletons', function () {
       [prefs1, prefs2, prefs3],
       PayloadSource.LocalChanged,
     )
-    await this.application.itemManager.setItemsDirty(Uuids(items))
+    await this.application.itemManager.setItemsDirty(items)
     await this.application.syncService.sync(syncOptions)
     expect(this.application.itemManager.items.length).to.equal(this.expectedItemCount)
   })
@@ -110,9 +118,13 @@ describe('singletons', function () {
     await this.createExtMgr()
 
     expect(extManager).to.be.ok
+
     const refreshedExtMgr = this.application.items.findItem(extManager.uuid)
+
     expect(refreshedExtMgr).to.be.ok
+
     await this.application.sync.sync(syncOptions)
+
     expect(
       this.application.itemManager.itemsMatchingPredicate(ContentType.Component, this.extPred)
         .length,
@@ -145,23 +157,34 @@ describe('singletons', function () {
     ).to.equal(1)
   })
 
-  it('resolves registered predicate with signing in/out', async function () {
+  it.skip('resolves registered predicate with signing in/out', async function () {
     await this.registerUser()
+
     await this.signOut()
+
     this.email = UuidGenerator.GenerateUuid()
     this.password = UuidGenerator.GenerateUuid()
+
     await this.createExtMgr()
+
     this.expectedItemCount += 1
+
     await Factory.registerUserToApplication({
       application: this.application,
       email: this.email,
       password: this.password,
     })
+
     await this.signOut()
+
     await this.createExtMgr()
+
     await this.application.sync.sync(syncOptions)
+
     const extraSync = this.application.sync.sync(syncOptions)
+
     await this.signIn()
+
     await extraSync
   }).timeout(15000)
 
@@ -193,12 +216,14 @@ describe('singletons', function () {
     expect(didCompleteRelevantSync).to.equal(true)
   }).timeout(10000)
 
-  it('signing into account and retrieving singleton shouldnt put us in deadlock', async function () {
+  it.only('signing into account and retrieving singleton shouldnt put us in deadlock', async function () {
     await this.registerUser()
+
     /** Create prefs */
     const ogPrefs = await findOrCreatePrefsSingleton(this.application)
     await this.application.sync.sync(syncOptions)
     this.application = await Factory.signOutApplicationAndReturnNew(this.application)
+
     /** Create another instance while signed out */
     await findOrCreatePrefsSingleton(this.application)
     await Factory.loginToApplication({
@@ -206,9 +231,11 @@ describe('singletons', function () {
       email: this.email,
       password: this.password,
     })
+
     /** After signing in, the instance retrieved from the server should be the one kept */
     const latestPrefs = await findOrCreatePrefsSingleton(this.application)
     expect(latestPrefs.uuid).to.equal(ogPrefs.uuid)
+
     const allPrefs = this.application.itemManager.getItems(ogPrefs.content_type)
     expect(allPrefs.length).to.equal(1)
   })
@@ -275,7 +302,7 @@ describe('singletons', function () {
       false,
     )
 
-    const errored = await this.application.itemManager.insertItem(
+    const errored = await this.application.itemManager.createItem(
       ContentType.Component,
       {
         package_info: {
@@ -283,7 +310,6 @@ describe('singletons', function () {
           identifier: this.extManagerId,
         },
       },
-      true,
       true,
     )
 

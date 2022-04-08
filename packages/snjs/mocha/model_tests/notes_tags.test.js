@@ -107,22 +107,25 @@ describe('notes and tags', () => {
     expect(tag.hasRelationshipWithItem(note)).to.equal(true)
 
     expect(this.application.itemManager.itemsReferencingItem(note).length).to.equal(1)
-    expect(note.payload.safeReferences.length).to.equal(0)
+    expect(note.payload.references.length).to.equal(0)
     expect(tag.noteCount).to.equal(1)
 
-    note = await this.application.itemManager.setItemToBeDeleted(note)
+    await this.application.itemManager.setItemToBeDeleted(note)
+
     tag = this.application.itemManager.tags[0]
 
-    expect(note.dirty).to.be.true
+    const deletedNotePayload = this.application.payloadManager.findOne(note.uuid)
+    expect(deletedNotePayload.dirty).to.be.true
     expect(tag.dirty).to.be.true
+
     await this.application.syncService.sync(syncOptions)
+
     expect(tag.content.references.length).to.equal(0)
     expect(this.application.itemManager.itemsReferencingItem(note).length).to.equal(0)
     expect(tag.noteCount).to.equal(0)
 
-    note = this.application.itemManager.notes[0]
     tag = this.application.itemManager.tags[0]
-    expect(note).to.not.be.ok
+    expect(this.application.itemManager.notes.length).to.equal(0)
     expect(tag.dirty).to.be.false
   })
 
@@ -271,7 +274,7 @@ describe('notes and tags', () => {
 
     await this.application.itemManager.setItemToBeDeleted(tag)
     tag = this.application.itemManager.findItem(tag.uuid)
-    expect(tag.content).to.not.be.ok
+    expect(tag).to.not.be.ok
   })
 
   it('modifying item content should not modify payload content', async function () {
@@ -312,9 +315,8 @@ describe('notes and tags', () => {
     await this.application.itemManager.setItemToBeDeleted(tag)
 
     note = this.application.itemManager.findItem(note.uuid)
-    tag = this.application.itemManager.findItem(tag.uuid)
+    this.application.itemManager.findItem(tag.uuid)
 
-    expect(tag.dirty).to.equal(true)
     expect(note.dirty).to.not.be.ok
   })
 
@@ -409,7 +411,7 @@ describe('notes and tags', () => {
       )
       const displayedNotes = this.application.items.getDisplayableNotes()
       expect(displayedNotes.length).to.equal(1)
-      expect(displayedNotes[0].uuid).to.equal(taggedNote)
+      expect(displayedNotes[0].uuid).to.equal(taggedNote.uuid)
     })
 
     it('should sort notes when displaying tag', async function () {

@@ -79,6 +79,7 @@ export class SNSingletonManager extends AbstractService {
         }
       },
     )
+
     this.removeSyncObserver = this.syncService.addEventObserver(async (eventName) => {
       if (
         eventName === SyncEvent.DownloadFirstSyncCompleted ||
@@ -97,6 +98,10 @@ export class SNSingletonManager extends AbstractService {
   }
 
   private async resolveSingletonsForItems(items: DecryptedItemInterface[], eventSource: SyncEvent) {
+    if (items.length === 0) {
+      return
+    }
+
     const handled: DecryptedItemInterface[] = []
 
     for (const item of items) {
@@ -108,6 +113,7 @@ export class SNSingletonManager extends AbstractService {
         item.content_type,
         item.singletonPredicate(),
       )
+
       extendArray(handled, matchingItems || [])
 
       if (!matchingItems || matchingItems.length <= 1) {
@@ -157,6 +163,7 @@ export class SNSingletonManager extends AbstractService {
     T extends DecryptedItemInterface<C> = DecryptedItemInterface<C>,
   >(contentType: ContentType, createContent: ItemContent): Promise<T> {
     const existingItems = this.itemManager.getItems<T>(contentType)
+
     if (existingItems.length > 0) {
       return existingItems[0]
     }
@@ -168,9 +175,11 @@ export class SNSingletonManager extends AbstractService {
        * the item we're looking for ends up resolving early or in the middle.
        */
       let matchingItem: DecryptedItemInterface | undefined
+
       const removeObserver = this.itemManager.addObserver(contentType, (_, inserted) => {
         if (inserted.length > 0) {
           const matchingItems = inserted.filter((i) => i.content_type === contentType)
+
           if (matchingItems.length > 0) {
             matchingItem = matchingItems[0]
           }
@@ -209,7 +218,9 @@ export class SNSingletonManager extends AbstractService {
     })
 
     const item = await this.itemManager.emitItemFromPayload(dirtyPayload)
+
     void this.syncService.sync()
+
     return item as T
   }
 }

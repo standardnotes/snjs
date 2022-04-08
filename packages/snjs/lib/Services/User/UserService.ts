@@ -122,29 +122,39 @@ export class UserService
     if (this.protocolService.hasAccount()) {
       throw Error('Tried to sign in when an account already exists.')
     }
+
     if (this.signingIn) {
       throw Error('Already signing in.')
     }
+
     this.signingIn = true
+
     try {
       /** Prevent a timed sync from occuring while signing in. */
       this.lockSyncing()
+
       const result = await this.sessionManager.signIn(email, password, strict, ephemeral)
+
       if (!result.response.error) {
         this.syncService.resetSyncState()
+
         await this.storageService.setPersistencePolicy(
           ephemeral
             ? Services.StoragePersistencePolicies.Ephemeral
             : Services.StoragePersistencePolicies.Default,
         )
+
         if (mergeLocal) {
           await this.syncService.markAllItemsAsNeedingSyncAndPersist()
         } else {
           void this.itemManager.removeAllItemsFromMemory()
           await this.clearDatabase()
         }
+
         await this.notifyEvent(AccountEvent.SignedInOrRegistered)
+
         this.unlockSyncing()
+
         const syncPromise = this.syncService
           .downloadFirstSync(1_000, {
             checkIntegrity: true,
@@ -155,13 +165,16 @@ export class UserService
               void this.protocolService.decryptErroredPayloads()
             }
           })
+
         if (awaitSync) {
           await syncPromise
+
           await this.protocolService.decryptErroredPayloads()
         }
       } else {
         this.unlockSyncing()
       }
+
       return result.response
     } finally {
       this.signingIn = false

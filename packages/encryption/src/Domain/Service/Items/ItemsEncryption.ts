@@ -50,9 +50,9 @@ export class ItemsEncryptionService extends Services.AbstractService {
    * can be disabled), consumers may call this function to repersist all items to
    * disk using latest encryption status.
    */
-  async repersistAllItems() {
+  async repersistAllItems(): Promise<void> {
     const items = this.itemManager.allItems()
-    const payloads = items.map((item) => new Models.DecryptedPayload(item.payload.ejected()))
+    const payloads = items.map((item) => item.payload)
     return this.storageService.savePayloads(payloads)
   }
 

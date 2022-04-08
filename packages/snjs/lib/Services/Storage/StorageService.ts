@@ -91,7 +91,10 @@ export class SNStorageService
     }
   }
 
-  public setEncryptionPolicy(encryptionPolicy: Services.StorageEncryptionPolicy, persist = true) {
+  public setEncryptionPolicy(
+    encryptionPolicy: Services.StorageEncryptionPolicy,
+    persist = true,
+  ): void {
     if (
       encryptionPolicy === Services.StorageEncryptionPolicy.Disabled &&
       this.environment !== Environment.Mobile
@@ -422,6 +425,7 @@ export class SNStorageService
       }
     } else {
       extendArray(unencryptable, encryptable)
+      extendArray(unencryptable, decrypted)
     }
 
     await this.deletePayloads(discardable)

@@ -95,27 +95,26 @@ export class SNSessionManager
     this.apiService.setUser(user)
   }
 
-  public async initializeFromDisk() {
-    this.setUser(await this.storageService.getValue(StorageKey.User))
+  public initializeFromDisk() {
+    this.setUser(this.storageService.getValue(StorageKey.User))
 
     if (!this.user) {
-      /** @legacy Check for uuid. */
-      const uuid = await this.storageService.getValue<string>(StorageKey.LegacyUuid)
-      if (uuid) {
-        this.setUser({ uuid: uuid, email: uuid })
+      const legacyUuidLookup = this.storageService.getValue<string>(StorageKey.LegacyUuid)
+      if (legacyUuidLookup) {
+        this.setUser({ uuid: legacyUuidLookup, email: legacyUuidLookup })
       }
     }
 
-    const rawSession = await this.storageService.getValue<RawStorageValue>(StorageKey.Session)
+    const rawSession = this.storageService.getValue<RawStorageValue>(StorageKey.Session)
     if (rawSession) {
       const session = SessionFromRawStorageValue(rawSession)
-      await this.setSession(session, false)
+      this.setSession(session, false)
       this.webSocketsService.startWebSocketConnection(session.authorizationValue)
     }
   }
 
-  private async setSession(session: Session, persist = true) {
-    await this.apiService.setSession(session, persist)
+  private setSession(session: Session, persist = true): void {
+    this.apiService.setSession(session, persist)
   }
 
   public online() {

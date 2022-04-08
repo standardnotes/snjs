@@ -209,7 +209,7 @@ describe('features', () => {
         // eslint-disable-next-line @typescript-eslint/no-empty-function
         .callsFake(() => {})
       const extensionKey = UuidGenerator.GenerateUuid().split('-').join('')
-      await application.itemManager.insertItem(
+      await application.itemManager.createItem(
         ContentType.ExtensionRepo,
         FillItemContent({
           url: `https://extensions.standardnotes.org/${extensionKey}`,
@@ -242,7 +242,7 @@ describe('features', () => {
         return false
       })
       const extensionKey = UuidGenerator.GenerateUuid().split('-').join('')
-      await application.itemManager.insertItem(
+      await application.itemManager.createItem(
         ContentType.ExtensionRepo,
         FillItemContent({
           url: `https://extensions.standardnotes.org/${extensionKey}`,
@@ -293,7 +293,7 @@ describe('features', () => {
     it('previous extension repo should be migrated to offline feature repo', async () => {
       application = await Factory.signOutApplicationAndReturnNew(application)
       const extensionKey = UuidGenerator.GenerateUuid().split('-').join('')
-      await application.itemManager.insertItem(
+      await application.itemManager.createItem(
         ContentType.ExtensionRepo,
         FillItemContent({
           url: `https://extensions.standardnotes.org/${extensionKey}`,

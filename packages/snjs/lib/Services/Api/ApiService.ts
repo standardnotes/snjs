@@ -132,10 +132,10 @@ export class SNApiService
     return this.filesHost
   }
 
-  public async setSession(session: Session, persist = true): Promise<void> {
+  public setSession(session: Session, persist = true): void {
     this.session = session
     if (persist) {
-      await this.storageService.setValue(StorageKey.Session, session)
+      this.storageService.setValue(StorageKey.Session, session)
     }
   }
 

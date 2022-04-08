@@ -168,7 +168,8 @@ export class PayloadManager
 
     for (const payload of payloads) {
       if (!payload.uuid || !payload.content_type) {
-        console.error('Payload is corrupt:', payload)
+        console.error('Payload is corrupt', payload)
+
         continue
       }
 
@@ -181,20 +182,19 @@ export class PayloadManager
         !isErrorDecryptingPayload(masterPayload)
       ) {
         ignored.push(payload)
+
         continue
       }
 
-      const newPayload = masterPayload
-        ? MergePayloads(masterPayload, payload)
-        : (payload as FullyFormedPayloadInterface)
+      const newPayload = masterPayload ? MergePayloads(masterPayload, payload) : payload
 
       if (isDeletedPayload(newPayload) && newPayload.discardable) {
-        /** The item has been deleted and synced,
-         * and can thus be removed from our local record */
         this.collection.discard(newPayload)
+
         discarded.push(newPayload)
       } else {
         this.collection.set(newPayload)
+
         if (!masterPayload) {
           inserted.push(newPayload)
         } else {
@@ -202,6 +202,7 @@ export class PayloadManager
         }
       }
     }
+
     return { changed, inserted, discarded, ignored }
   }
 

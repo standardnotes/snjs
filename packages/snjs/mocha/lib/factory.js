@@ -150,7 +150,7 @@ export function getDefaultMockedEventServiceUrl() {
 }
 
 export function getDefaultWebSocketUrl() {
-  return 'ws://localhost'
+  return undefined
 }
 
 function getAppVersion() {
@@ -372,9 +372,11 @@ export async function loginToApplication({
   email,
   password,
   ephemeral,
+  strict = false,
   mergeLocal = true,
+  awaitSync = true,
 }) {
-  return application.signIn(email, password, undefined, ephemeral, mergeLocal, true)
+  return application.signIn(email, password, strict, ephemeral, mergeLocal, awaitSync)
 }
 
 export async function awaitFunctionInvokation(object, functionName) {
@@ -634,7 +636,7 @@ export async function insertItemWithOverride(
   needsSync = false,
   errorDecrypting,
 ) {
-  let item = await application.itemManager.insertItem(contentType, content, needsSync)
+  let item = await application.itemManager.createItem(contentType, content, needsSync)
   if (errorDecrypting) {
     item = await application.itemManager.emitItemFromPayload(
       new EncryptedPayload({
@@ -673,5 +675,5 @@ export async function markDirtyAndSyncItem(application, itemToLookupUuidFor) {
   if (!item.dirty) {
     await application.itemManager.changeItem(item, undefined, MutationType.NoUpdateUserTimestamps)
   }
-  await application.sync.syncService.sync()
+  await application.sync.sync()
 }

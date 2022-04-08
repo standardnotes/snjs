@@ -685,16 +685,15 @@ export class ItemManager
     T extends Models.DecryptedItemInterface,
     C extends Models.ItemContent = Models.ItemContent,
   >(contentType: ContentType, content: C, needsSync = false): Promise<T> {
-    if (!contentType) {
-      throw 'Attempting to create item with no contentType'
-    }
     const payload = new Models.DecryptedPayload<C>({
       uuid: UuidGenerator.GenerateUuid(),
       content_type: contentType,
       content: Models.FillItemContent<C>(content),
       dirty: needsSync,
     })
+
     await this.payloadManager.emitPayload(payload, Models.PayloadSource.Constructor)
+
     return this.findSureItem<T>(payload.uuid)
   }
 
@@ -817,6 +816,7 @@ export class ItemManager
       }
       return true
     })
+
     return results
   }
 

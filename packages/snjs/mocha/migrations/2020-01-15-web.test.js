@@ -54,7 +54,7 @@ describe('2020-01-15 web migration', () => {
       /** Legacy versions would store json strings inside of embedded storage */
       auth_params: JSON.stringify(accountKey.keyParams.getPortableValue()),
     }
-    const storagePayload = new DeryptedPayload({
+    const storagePayload = new DecryptedPayload({
       uuid: await operator003.crypto.generateUUID(),
       content_type: ContentType.EncryptedStorage,
       content: {

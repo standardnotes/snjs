@@ -367,7 +367,7 @@ describe('history manager', () => {
       expect(revisionFromServer).to.be.ok
 
       let payloadFromServer = revisionFromServer.payload
-      expect(payloadFromServer.errorDecrypting).to.be.false
+      expect(payloadFromServer.errorDecrypting).to.be.undefined
       expect(payloadFromServer.uuid).to.eq(item.payload.uuid)
       expect(payloadFromServer.content).to.eql(item.payload.content)
 
