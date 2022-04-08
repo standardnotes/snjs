@@ -1,5 +1,5 @@
 import { ContentType, Uuid } from '@standardnotes/common'
-import { ItemContent } from '../../Item'
+import { ItemContent } from '../../Content/ItemContent'
 import { TransferPayload } from '../../TransferPayload/Interfaces/TransferPayload'
 import { PayloadSource } from '../Types/PayloadSource'
 

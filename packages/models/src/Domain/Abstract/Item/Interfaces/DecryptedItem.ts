@@ -3,11 +3,11 @@ import { AppDataField } from '../Types/AppDataField'
 import { ComponentDataDomain, DefaultAppDomain } from '../Types/DefaultAppDomain'
 import { ContentReference } from '../../Reference/ContentReference'
 import { PrefKey } from '../../../Syncable/UserPrefs/PrefKey'
-import { ItemContent } from './ItemContent'
+import { ItemContent } from '../../Content/ItemContent'
 import { DecryptedPayloadInterface } from '../../Payload/Interfaces/DecryptedPayload'
 import { ItemInterface } from './ItemInterface'
 import { SortableItem } from '../../../Runtime/Collection/CollectionSort'
-import { DecryptedTransferPayload } from '../../TransferPayload'
+import { DecryptedTransferPayload } from '../../TransferPayload/Interfaces/DecryptedTransferPayload'
 
 export interface DecryptedItemInterface<C extends ItemContent = ItemContent>
   extends ItemInterface<DecryptedPayloadInterface<C>>,

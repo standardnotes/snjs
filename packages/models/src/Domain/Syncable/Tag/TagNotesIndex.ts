@@ -1,7 +1,7 @@
 import { removeFromArray } from '@standardnotes/utils'
 import { Uuid } from '@standardnotes/common'
 import { isNote, SNNote } from '../Note'
-import { isTag, SNTag } from '.'
+import { isTag, SNTag } from './Tag'
 import { SNIndex } from '../../Runtime/Index/SNIndex'
 import { ItemCollection } from '../../Runtime/Collection/Item/ItemCollection'
 import { ItemDelta } from '../../Runtime/Index/ItemDelta'

@@ -1,11 +1,10 @@
 import { DecryptedPayload } from './../../Abstract/Payload/Implementations/DecryptedPayload'
 import { SNNote } from '../Note/Note'
-import { SmartViewContent } from './SmartView'
+import { SmartViewContent, SmartView, SystemViewId } from './SmartView'
 import { NoteWithTags } from '../Note/NoteWithTags'
 import { ContentType } from '@standardnotes/common'
 import { NotesDisplayCriteria } from '../Note/NotesDisplayCriteria'
-import { SmartView, SystemViewId } from '.'
-import { FillItemContent } from '../../Abstract/Item/Interfaces/ItemContent'
+import { FillItemContent } from '../../Abstract/Content/ItemContent'
 import { Predicate } from '../../Runtime/Predicate/Predicate'
 import { CompoundPredicate } from '../../Runtime/Predicate/CompoundPredicate'
 

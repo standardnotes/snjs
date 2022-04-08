@@ -3,7 +3,7 @@ import { deepFreeze, useBoolean } from '@standardnotes/utils'
 import { PayloadInterface } from '../Interfaces/PayloadInterface'
 import { PayloadSource } from '../Types/PayloadSource'
 import { TransferPayload } from '../../TransferPayload/Interfaces/TransferPayload'
-import { ItemContent } from '../../Item'
+import { ItemContent } from '../../Content/ItemContent'
 
 export abstract class PurePayload<T extends TransferPayload<C>, C extends ItemContent = ItemContent>
   implements PayloadInterface<T>

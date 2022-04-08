@@ -1,5 +1,5 @@
 import { ContentType, Uuid } from '@standardnotes/common'
-import { ItemContent } from '../../Item'
+import { ItemContent } from '../../Content/ItemContent'
 
 export interface TransferPayload<C extends ItemContent = ItemContent> {
   uuid: Uuid

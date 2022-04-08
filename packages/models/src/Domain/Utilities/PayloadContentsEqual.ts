@@ -1,5 +1,5 @@
-import { DecryptedPayloadInterface } from './../Interfaces/DecryptedPayload'
-import { CreateDecryptedItemFromPayload } from '../../Item/Utilities/Generator'
+import { DecryptedPayloadInterface } from '../Abstract/Payload/Interfaces/DecryptedPayload'
+import { CreateDecryptedItemFromPayload } from '../Abstract/Item/Utilities/Generator'
 
 /**
  * Compares the .content fields for equality, creating new SNItem objects

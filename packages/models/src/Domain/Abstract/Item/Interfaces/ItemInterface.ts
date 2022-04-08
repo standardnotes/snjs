@@ -1,5 +1,5 @@
-import { TransferPayload } from './../../TransferPayload/Interfaces/TransferPayload'
 import { Uuid, ContentType } from '@standardnotes/common'
+import { TransferPayload } from './../../TransferPayload/Interfaces/TransferPayload'
 import { PayloadInterface } from '../../Payload/Interfaces/PayloadInterface'
 import { PredicateInterface } from '../../../Runtime/Predicate/Interface'
 import { HistoryEntryInterface } from '../../../Runtime/History'

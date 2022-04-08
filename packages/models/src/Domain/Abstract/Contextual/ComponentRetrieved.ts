@@ -1,4 +1,4 @@
-import { ItemContent } from '../Item/Interfaces/ItemContent'
+import { ItemContent } from '../Content/ItemContent'
 import { DecryptedTransferPayload } from '../TransferPayload'
 import { ContextPayload } from './ContextPayload'
 

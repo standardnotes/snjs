@@ -1,6 +1,6 @@
 import { CreatePayload } from './CreatePayload'
 import { DecryptedPayloadInterface } from '../Interfaces/DecryptedPayload'
-import { ItemContent } from '../../Item'
+import { ItemContent } from '../../Content/ItemContent'
 import { DecryptedTransferPayload } from '../../TransferPayload'
 
 export function CopyPayloadWithContentOverride<C extends ItemContent = ItemContent>(

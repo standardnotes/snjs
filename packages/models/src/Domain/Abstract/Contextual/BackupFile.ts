@@ -1,7 +1,7 @@
 import { Uuid } from '@standardnotes/common'
-import { ItemContent } from '../Item'
 import { ContextPayload } from './ContextPayload'
 import { DecryptedPayloadInterface, EncryptedPayloadInterface } from '../Payload'
+import { ItemContent } from '../Content/ItemContent'
 
 export interface BackupFileEncryptedContextualPayload extends ContextPayload {
   auth_hash?: string

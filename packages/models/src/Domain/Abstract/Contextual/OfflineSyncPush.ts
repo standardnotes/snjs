@@ -1,5 +1,5 @@
 import { Uuid } from '@standardnotes/common'
-import { ItemContent } from '../Item'
+import { ItemContent } from '../Content/ItemContent'
 import { DecryptedPayloadInterface, DeletedPayloadInterface, isDecryptedPayload } from '../Payload'
 import { ContextPayload } from './ContextPayload'
 

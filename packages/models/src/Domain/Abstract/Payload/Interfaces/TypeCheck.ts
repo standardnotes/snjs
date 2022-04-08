@@ -1,4 +1,4 @@
-import { ItemContent } from '../../Item'
+import { ItemContent } from '../../Content/ItemContent'
 import {
   isDecryptedTransferPayload,
   isDeletedTransferPayload,

@@ -3,8 +3,8 @@ import { ImmutablePayloadCollection } from '../Collection/Payload/ImmutablePaylo
 import { CreateDecryptedItemFromPayload } from '../../Abstract/Item/Utilities/Generator'
 import { HistoryMap, historyMapFunctions } from '../History/HistoryMap'
 import { ConflictStrategy } from '../../Abstract/Item/Types/ConflictStrategy'
-import { PayloadsByDuplicating } from '../../Abstract/Payload/Utilities/PayloadsByDuplicating'
-import { PayloadContentsEqual } from '../../Abstract/Payload/Utilities/PayloadContentsEqual'
+import { PayloadsByDuplicating } from '../../Utilities/PayloadsByDuplicating'
+import { PayloadContentsEqual } from '../../Utilities/PayloadContentsEqual'
 import { PayloadSource } from '../../Abstract/Payload/Types/PayloadSource'
 import { FullyFormedPayloadInterface } from '../../Abstract/Payload'
 import {

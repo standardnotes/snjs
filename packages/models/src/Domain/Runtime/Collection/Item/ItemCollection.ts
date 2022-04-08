@@ -7,8 +7,9 @@ import { isDeletedItem, isEncryptedErroredItem } from '../../../Abstract/Item/In
 import { isNote } from '../../../Syncable/Note'
 import { DecryptedItemInterface } from '../../../Abstract/Item/Interfaces/DecryptedItem'
 import { CollectionInterface } from '../CollectionInterface'
-import { DeletedItemInterface, ItemContent } from '../../../Abstract/Item'
+import { DeletedItemInterface } from '../../../Abstract/Item'
 import { Collection } from '../Collection'
+import { ItemContent } from '../../../Abstract/Content/ItemContent'
 
 export class ItemCollection
   extends Collection<DecryptedItemInterface, DeletedItemInterface>

@@ -1,6 +1,6 @@
-import { TransferPayload } from './../../TransferPayload/Interfaces/TransferPayload'
 import { ContentType, Uuid } from '@standardnotes/common'
 import { dateToLocalizedString, deepFreeze } from '@standardnotes/utils'
+import { TransferPayload } from './../../TransferPayload/Interfaces/TransferPayload'
 import { ItemContentsDiffer } from '../Utilities/Functions'
 import { ItemInterface } from '../Interfaces/ItemInterface'
 import { PayloadSource } from '../../Payload/Types/PayloadSource'

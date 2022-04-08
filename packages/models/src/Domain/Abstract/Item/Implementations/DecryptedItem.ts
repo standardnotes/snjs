@@ -1,15 +1,15 @@
-import { DecryptedTransferPayload } from './../../TransferPayload/Interfaces/DecryptedTransferPayload'
+import { dateToLocalizedString, useBoolean } from '@standardnotes/utils'
 import { Uuid } from '@standardnotes/common'
+import { DecryptedTransferPayload } from './../../TransferPayload/Interfaces/DecryptedTransferPayload'
 import { AppDataField } from '../Types/AppDataField'
 import { ComponentDataDomain, DefaultAppDomain } from '../Types/DefaultAppDomain'
 import { DecryptedItemInterface } from '../Interfaces/DecryptedItem'
 import { DecryptedPayloadInterface } from '../../Payload/Interfaces/DecryptedPayload'
 import { GenericItem } from './GenericItem'
-import { ItemContent } from '../Interfaces/ItemContent'
+import { ItemContent } from '../../Content/ItemContent'
 import { ItemContentsEqual } from '../Utilities/Functions'
 import { PrefKey } from '../../../Syncable/UserPrefs/PrefKey'
 import { ContentReference } from '../../Reference/ContentReference'
-import { dateToLocalizedString, useBoolean } from '@standardnotes/utils'
 
 export class DecryptedItem<C extends ItemContent = ItemContent>
   extends GenericItem<DecryptedPayloadInterface<C>>

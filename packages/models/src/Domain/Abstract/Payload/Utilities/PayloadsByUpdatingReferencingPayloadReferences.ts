@@ -3,7 +3,7 @@ import { remove } from 'lodash'
 import { ImmutablePayloadCollection } from '../../../Runtime/Collection/Payload/ImmutablePayloadCollection'
 import { ContentReference } from '../../Reference/ContentReference'
 import { DecryptedPayloadInterface } from '../Interfaces/DecryptedPayload'
-import { ItemContent } from '../../Item'
+import { ItemContent } from '../../Content/ItemContent'
 import { FullyFormedPayloadInterface } from '../Interfaces/UnionTypes'
 
 export function PayloadsByUpdatingReferencingPayloadReferences<

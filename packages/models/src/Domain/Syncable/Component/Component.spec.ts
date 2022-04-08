@@ -1,7 +1,7 @@
 import { PayloadSource } from './../../Abstract/Payload/Types/PayloadSource'
 import { DecryptedPayload } from './../../Abstract/Payload/Implementations/DecryptedPayload'
 import { ContentType } from '@standardnotes/common'
-import { FillItemContent } from '../../Abstract/Item/Interfaces/ItemContent'
+import { FillItemContent } from '../../Abstract/Content/ItemContent'
 import { SNComponent } from './Component'
 import { ComponentContent } from './ComponentContent'
 

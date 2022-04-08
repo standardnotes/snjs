@@ -1,6 +1,6 @@
 import { useBoolean } from '@standardnotes/utils'
 import { DecryptedItem } from '../../Abstract/Item/Implementations/DecryptedItem'
-import { ItemContent } from '../../Abstract/Item/Interfaces/ItemContent'
+import { ItemContent } from '../../Abstract/Content/ItemContent'
 
 export interface FeatureRepoContent extends ItemContent {
   migratedToUserSetting?: boolean

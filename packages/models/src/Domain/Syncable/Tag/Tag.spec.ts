@@ -2,7 +2,7 @@ import { PayloadSource } from './../../Abstract/Payload/Types/PayloadSource'
 import { DecryptedPayload } from './../../Abstract/Payload/Implementations/DecryptedPayload'
 import { SNTag, TagContent } from './Tag'
 import { ContentType } from '@standardnotes/common'
-import { FillItemContent } from '../../Abstract/Item/Interfaces/ItemContent'
+import { FillItemContent } from '../../Abstract/Content/ItemContent'
 import { ContentReference } from '../../Abstract/Reference/ContentReference'
 
 const randUuid = () => String(Math.random())

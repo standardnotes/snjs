@@ -10,7 +10,7 @@ import { SNNote } from '.'
 import { SmartView } from '../SmartView'
 import { ItemCollection } from '../../Runtime/Collection/Item/ItemCollection'
 import { CompoundPredicate } from '../../Runtime/Predicate/CompoundPredicate'
-import { NoteContent } from './Note'
+import { NoteContent } from './NoteContent'
 
 export type SearchQuery = {
   query: string

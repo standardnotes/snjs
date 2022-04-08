@@ -1,5 +1,5 @@
 import { omitInPlace, sortedCopy } from '@standardnotes/utils'
-import { ItemContent } from '../Interfaces/ItemContent'
+import { ItemContent } from '../../Content/ItemContent'
 import { DefaultAppDomain } from '../Types/DefaultAppDomain'
 import { AppDataField } from '../Types/AppDataField'
 import { DecryptedItemInterface } from '../Interfaces/DecryptedItem'

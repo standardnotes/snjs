@@ -1,6 +1,7 @@
 import { DecryptedPayloadInterface } from '../../Abstract/Payload/Interfaces/DecryptedPayload'
 import { SNTag } from '../Tag'
-import { NoteContent, SNNote } from './Note'
+import { SNNote } from './Note'
+import { NoteContent } from './NoteContent'
 
 interface NoteWithTagsContent extends NoteContent {
   tags: SNTag[]

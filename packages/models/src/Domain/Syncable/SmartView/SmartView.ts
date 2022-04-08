@@ -1,7 +1,7 @@
 import { DecryptedItem } from '../../Abstract/Item/Implementations/DecryptedItem'
 import { PredicateInterface, PredicateJsonForm } from '../../Runtime/Predicate/Interface'
 import { predicateFromJson } from '../../Runtime/Predicate/Generators'
-import { ItemContent } from '../../Abstract/Item/Interfaces/ItemContent'
+import { ItemContent } from '../../Abstract/Content/ItemContent'
 import { DecryptedPayloadInterface } from '../../Abstract/Payload/Interfaces/DecryptedPayload'
 
 export const SMART_TAG_DSL_PREFIX = '!['

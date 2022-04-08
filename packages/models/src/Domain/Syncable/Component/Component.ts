@@ -1,6 +1,4 @@
-import { ComponentContent, ComponentInterface } from './ComponentContent'
 import { isValidUrl } from '@standardnotes/utils'
-import { DecryptedItem } from '../../Abstract/Item/Implementations/DecryptedItem'
 import { ContentType, Uuid } from '@standardnotes/common'
 import {
   FeatureIdentifier,
@@ -10,13 +8,16 @@ import {
   FeatureDescription,
   ComponentPermission,
 } from '@standardnotes/features'
-import { ConflictStrategy } from '../../Abstract/Item/Types/ConflictStrategy'
-import { Predicate } from '../../Runtime/Predicate/Predicate'
 import { AppDataField } from '../../Abstract/Item/Types/AppDataField'
-import { ItemContent } from '../../Abstract/Item/Interfaces/ItemContent'
-import { HistoryEntryInterface } from '../../Runtime/History'
+import { ComponentContent, ComponentInterface } from './ComponentContent'
+import { ConflictStrategy } from '../../Abstract/Item/Types/ConflictStrategy'
+import { DecryptedItem } from '../../Abstract/Item/Implementations/DecryptedItem'
 import { DecryptedPayloadInterface } from '../../Abstract/Payload/Interfaces/DecryptedPayload'
-import { DecryptedItemInterface, ItemInterface } from '../../Abstract/Item'
+import { HistoryEntryInterface } from '../../Runtime/History'
+import { ItemContent } from '../../Abstract/Content/ItemContent'
+import { Predicate } from '../../Runtime/Predicate/Predicate'
+import { ItemInterface } from '../../Abstract/Item/Interfaces/ItemInterface'
+import { DecryptedItemInterface } from './../../Abstract/Item/Interfaces/DecryptedItem'
 
 export const isComponent = (x: ItemInterface): x is SNComponent =>
   x.content_type === ContentType.Component

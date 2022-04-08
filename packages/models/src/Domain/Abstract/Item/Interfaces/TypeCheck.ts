@@ -2,7 +2,11 @@ import { EncryptedItemInterface } from './EncryptedItem'
 import { DeletedItemInterface } from './DeletedItem'
 import { ItemInterface } from './ItemInterface'
 import { DecryptedItemInterface } from './DecryptedItem'
-import { isDecryptedPayload, isDeletedPayload, isEncryptedPayload } from '../../Payload'
+import {
+  isDecryptedPayload,
+  isDeletedPayload,
+  isEncryptedPayload,
+} from '../../Payload/Interfaces/TypeCheck'
 
 export function isDecryptedItem(item: ItemInterface): item is DecryptedItemInterface {
   return isDecryptedPayload(item.payload)

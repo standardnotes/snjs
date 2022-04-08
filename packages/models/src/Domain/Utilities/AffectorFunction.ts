@@ -1,11 +1,11 @@
-import { ComponentContent } from './../../../Syncable/Component/ComponentContent'
+import { ComponentContent } from '../Syncable/Component/ComponentContent'
 import { ComponentArea } from '@standardnotes/features'
 import { ContentType } from '@standardnotes/common'
-import { ComponentMutator, SNComponent } from '../../../Syncable/Component'
-import { CreateDecryptedItemFromPayload } from '../../Item/Utilities/Generator'
-import { ImmutablePayloadCollection } from '../../../Runtime/Collection/Payload/ImmutablePayloadCollection'
-import { MutationType } from '../../Item/Types/MutationType'
-import { PayloadInterface } from '../Interfaces/PayloadInterface'
+import { ComponentMutator, SNComponent } from '../Syncable/Component'
+import { CreateDecryptedItemFromPayload } from '../Abstract/Item/Utilities/Generator'
+import { ImmutablePayloadCollection } from '../Runtime/Collection/Payload/ImmutablePayloadCollection'
+import { MutationType } from '../Abstract/Item/Types/MutationType'
+import { PayloadInterface } from '../Abstract/Payload/Interfaces/PayloadInterface'
 
 export type AffectorFunction = (
   basePayload: PayloadInterface,

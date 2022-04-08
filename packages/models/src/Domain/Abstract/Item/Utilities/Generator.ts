@@ -1,8 +1,8 @@
+import { ContentType } from '@standardnotes/common'
 import { EncryptedItem } from './../Implementations/EncryptedItem'
 import { DecryptedPayloadInterface } from './../../Payload/Interfaces/DecryptedPayload'
 import { SNFile } from '../../../Syncable/File/File'
 import { SNFeatureRepo } from '../../../Syncable/FeatureRepo/FeatureRepo'
-import { ContentType } from '@standardnotes/common'
 import { SNActionsExtension } from '../../../Syncable/ActionsExtension/ActionsExtension'
 import { SNComponent } from '../../../Syncable/Component/Component'
 import { SNEditor } from '../../../Syncable/Editor/Editor'
@@ -21,7 +21,7 @@ import { ComponentMutator } from '../../../Syncable/Component/ComponentMutator'
 import { TagMutator } from '../../../Syncable/Tag/TagMutator'
 import { NoteMutator } from '../../../Syncable/Note/NoteMutator'
 import { DecryptedItemInterface } from '../Interfaces/DecryptedItem'
-import { ItemContent } from '../Interfaces/ItemContent'
+import { ItemContent } from '../../Content/ItemContent'
 import { DecryptedItemMutator } from '../Mutator/DecryptedItemMutator'
 import {
   DeletedPayloadInterface,

@@ -1,5 +1,5 @@
 import { DecryptedItem } from '../../Abstract/Item/Implementations/DecryptedItem'
-import { ItemContent } from '../../Abstract/Item/Interfaces/ItemContent'
+import { ItemContent } from '../../Abstract/Content/ItemContent'
 import { DecryptedPayloadInterface } from '../../Abstract/Payload/Interfaces/DecryptedPayload'
 import { FileMetadata } from './FileMetadata'
 import { FileProtocolV1 } from './FileProtocolV1'

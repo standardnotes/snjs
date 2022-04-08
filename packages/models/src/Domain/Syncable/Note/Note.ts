@@ -1,21 +1,9 @@
 import { ContentType } from '@standardnotes/common'
 import { DecryptedItem } from '../../Abstract/Item/Implementations/DecryptedItem'
 import { ItemInterface } from '../../Abstract/Item/Interfaces/ItemInterface'
-import { ItemContent } from '../../Abstract/Item/Interfaces/ItemContent'
 import { AppDataField } from '../../Abstract/Item/Types/AppDataField'
 import { DecryptedPayloadInterface } from '../../Abstract/Payload/Interfaces/DecryptedPayload'
-
-export interface NoteInterface {
-  title: string
-  text: string
-  mobilePrefersPlainEditor?: boolean
-  hidePreview?: boolean
-  preview_plain?: string
-  preview_html?: string
-  spellcheck?: boolean
-}
-
-export type NoteContent = NoteInterface & ItemContent
+import { NoteContent, NoteInterface } from './NoteContent'
 
 export const isNote = (x: ItemInterface): x is SNNote => x.content_type === ContentType.Note
 

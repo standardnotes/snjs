@@ -9,7 +9,7 @@ import {
   isErrorDecryptingPayload,
   isEncryptedPayload,
 } from '../../../Abstract/Payload/Interfaces/TypeCheck'
-import { ItemContent } from '../../../Abstract/Item'
+import { ItemContent } from '../../../Abstract/Content/ItemContent'
 import { Collection } from '../Collection'
 import { DeletedPayloadInterface, PayloadInterface } from '../../../Abstract/Payload'
 
