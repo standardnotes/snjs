@@ -296,10 +296,10 @@ describe('featuresService', () => {
       storageService.getValue = jest.fn().mockReturnValue(roles)
       itemManager.getItems = jest.fn().mockReturnValue([existingItem])
       const featuresService = createService()
-      await featuresService.initializeFromDisk()
+      featuresService.initializeFromDisk()
       await featuresService.updateRolesAndFetchFeatures('123', newRoles)
 
-      expect(itemManager.changeComponent).toHaveBeenCalledWith('789', expect.any(Function))
+      expect(itemManager.changeComponent).toHaveBeenCalledWith(existingItem, expect.any(Function))
     })
 
     it('creates items for expired components if they do not exist', async () => {
@@ -371,7 +371,7 @@ describe('featuresService', () => {
       const featuresService = createService()
       await featuresService.initializeFromDisk()
       await featuresService.updateRolesAndFetchFeatures('123', newRoles)
-      expect(itemManager.setItemsToBeDeleted).toHaveBeenCalledWith(['456'])
+      expect(itemManager.setItemsToBeDeleted).toHaveBeenCalledWith([existingItem])
     })
 
     it('does not create an item for a feature without content type', async () => {

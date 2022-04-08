@@ -32,8 +32,8 @@ describe('folders component to hierarchy', () => {
     expect(findOrCreateTagParentChainCalls[1][0]).toEqual(['a', 'b'])
 
     expect(changeItemCalls.length).toEqual(2)
-    expect(changeItemCalls[0][0]).toEqual('a.b')
-    expect(changeItemCalls[1][0]).toEqual('a.b.c')
+    expect(changeItemCalls[0][0].uuid).toEqual('a.b')
+    expect(changeItemCalls[1][0].uuid).toEqual('a.b.c')
   })
 
   it('should not touch flat hierarchies', async () => {
@@ -64,8 +64,8 @@ describe('folders component to hierarchy', () => {
     expect(findOrCreateTagParentChainCalls[1][0]).toEqual(['a'])
 
     expect(changeItemCalls.length).toEqual(2)
-    expect(changeItemCalls[0][0]).toEqual('a.b')
-    expect(changeItemCalls[0][0]).toEqual('a.b')
+    expect(changeItemCalls[0][0].uuid).toEqual('a.b')
+    expect(changeItemCalls[0][0].uuid).toEqual('a.b')
   })
 
   it('should produce a valid hierarchy cases with  missing intermediate tags or unordered', async () => {
@@ -82,8 +82,8 @@ describe('folders component to hierarchy', () => {
     expect(findOrCreateTagParentChainCalls[1][0]).toEqual(['y'])
 
     expect(changeItemCalls.length).toEqual(2)
-    expect(changeItemCalls[0][0]).toEqual('w.3')
-    expect(changeItemCalls[1][0]).toEqual('y.2')
+    expect(changeItemCalls[0][0].uuid).toEqual('w.3')
+    expect(changeItemCalls[1][0].uuid).toEqual('y.2')
   })
 
   it('skip prefixed names', async () => {
@@ -119,6 +119,6 @@ describe('folders component to hierarchy', () => {
     expect(findOrCreateTagParentChainCalls[0][0]).toEqual(['a', 'b'])
 
     expect(changeItemCalls.length).toEqual(1)
-    expect(changeItemCalls[0][0]).toEqual('a.b.c')
+    expect(changeItemCalls[0][0].uuid).toEqual('a.b.c')
   })
 })
