@@ -1,10 +1,10 @@
 import { Uuid } from '@standardnotes/common'
 import { remove } from 'lodash'
-import { ImmutablePayloadCollection } from '../../../Runtime/Collection/Payload/ImmutablePayloadCollection'
-import { ContentReference } from '../../Reference/ContentReference'
-import { DecryptedPayloadInterface } from '../Interfaces/DecryptedPayload'
-import { ItemContent } from '../../Content/ItemContent'
-import { FullyFormedPayloadInterface } from '../Interfaces/UnionTypes'
+import { ImmutablePayloadCollection } from '../Runtime/Collection/Payload/ImmutablePayloadCollection'
+import { ContentReference } from '../Abstract/Reference/ContentReference'
+import { DecryptedPayloadInterface } from '../Abstract/Payload/Interfaces/DecryptedPayload'
+import { ItemContent } from '../Abstract/Content/ItemContent'
+import { FullyFormedPayloadInterface } from '../Abstract/Payload/Interfaces/UnionTypes'
 
 export function PayloadsByUpdatingReferencingPayloadReferences<
   C extends ItemContent = ItemContent,

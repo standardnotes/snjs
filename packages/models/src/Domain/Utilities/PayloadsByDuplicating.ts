@@ -2,7 +2,7 @@ import { extendArray, UuidGenerator } from '@standardnotes/utils'
 import { ImmutablePayloadCollection } from '../Runtime/Collection/Payload/ImmutablePayloadCollection'
 import { ItemContent } from '../Abstract/Content/ItemContent'
 import { AffectorMapping } from './AffectorFunction'
-import { PayloadsByUpdatingReferencingPayloadReferences } from '../Abstract/Payload/Utilities/PayloadsByUpdatingReferencingPayloadReferences'
+import { PayloadsByUpdatingReferencingPayloadReferences } from './PayloadsByUpdatingReferencingPayloadReferences'
 import { isDecryptedPayload } from '../Abstract/Payload/Interfaces/TypeCheck'
 import { FullyFormedPayloadInterface } from '../Abstract/Payload/Interfaces/UnionTypes'
 /**

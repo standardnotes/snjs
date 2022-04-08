@@ -1,11 +1,11 @@
-import { DecryptedPayloadInterface } from './../Interfaces/DecryptedPayload'
-import { DeletedPayloadInterface } from '../Interfaces/DeletedPayload'
-import { EncryptedPayloadInterface } from '../Interfaces/EncryptedPayload'
+import { DecryptedPayloadInterface } from '../Abstract/Payload/Interfaces/DecryptedPayload'
+import { DeletedPayloadInterface } from '../Abstract/Payload/Interfaces/DeletedPayload'
+import { EncryptedPayloadInterface } from '../Abstract/Payload/Interfaces/EncryptedPayload'
 import {
   DecryptedTransferPayload,
   DeletedTransferPayload,
   EncryptedTransferPayload,
-} from '../../TransferPayload'
+} from '../Abstract/TransferPayload'
 
 export type ConditionalPayloadType<T> = T extends DecryptedTransferPayload<infer C>
   ? DecryptedPayloadInterface<C>

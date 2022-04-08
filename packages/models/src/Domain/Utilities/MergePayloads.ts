@@ -1,10 +1,10 @@
-import { DecryptedPayloadInterface } from './../Interfaces/DecryptedPayload'
-import { isDecryptedPayload, isDeletedPayload, isEncryptedPayload } from '../Interfaces/TypeCheck'
-import { DeletedPayloadInterface } from '../Interfaces/DeletedPayload'
-import { EncryptedPayloadInterface } from '../Interfaces/EncryptedPayload'
-import { EncryptedPayload } from '../Implementations/EncryptedPayload'
-import { DeletedPayload } from '../Implementations/DeletedPayload'
-import { DecryptedPayload } from '../Implementations/DecryptedPayload'
+import { DecryptedPayloadInterface } from '../Abstract/Payload/Interfaces/DecryptedPayload'
+import { isDecryptedPayload, isDeletedPayload, isEncryptedPayload } from '../Abstract/Payload/Interfaces/TypeCheck'
+import { DeletedPayloadInterface } from '../Abstract/Payload/Interfaces/DeletedPayload'
+import { EncryptedPayloadInterface } from '../Abstract/Payload/Interfaces/EncryptedPayload'
+import { EncryptedPayload } from '../Abstract/Payload/Implementations/EncryptedPayload'
+import { DeletedPayload } from '../Abstract/Payload/Implementations/DeletedPayload'
+import { DecryptedPayload } from '../Abstract/Payload/Implementations/DecryptedPayload'
 
 export function MergePayloads(
   base: DecryptedPayloadInterface | EncryptedPayloadInterface | DeletedPayloadInterface,

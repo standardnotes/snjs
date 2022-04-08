@@ -1,13 +1,13 @@
-import { EncryptedPayload } from '../Implementations/EncryptedPayload'
-import { DeletedPayload } from '../Implementations/DeletedPayload'
-import { DecryptedPayload } from '../Implementations/DecryptedPayload'
+import { EncryptedPayload } from '../Abstract/Payload/Implementations/EncryptedPayload'
+import { DeletedPayload } from '../Abstract/Payload/Implementations/DeletedPayload'
+import { DecryptedPayload } from '../Abstract/Payload/Implementations/DecryptedPayload'
 import {
   FullyFormedTransferPayload,
   isDecryptedTransferPayload,
   isDeletedTransferPayload,
   isEncryptedTransferPayload,
-} from '../../TransferPayload'
-import { PayloadSource } from '../Types/PayloadSource'
+} from '../Abstract/TransferPayload'
+import { PayloadSource } from '../Abstract/Payload/Types/PayloadSource'
 import { ConditionalPayloadType } from './ConditionalPayloadType'
 
 export function CreatePayload<T extends FullyFormedTransferPayload>(

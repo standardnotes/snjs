@@ -1,6 +1,6 @@
 import { Uuid } from '@standardnotes/common'
-import { PayloadInterface } from '../Interfaces/PayloadInterface'
-import { PayloadSource } from '../Types/PayloadSource'
+import { PayloadInterface } from '../Abstract/Payload/Interfaces/PayloadInterface'
+import { PayloadSource } from '../Abstract/Payload/Types/PayloadSource'
 
 /**
  * Whether the changed payload represents only an internal change that shouldn't
