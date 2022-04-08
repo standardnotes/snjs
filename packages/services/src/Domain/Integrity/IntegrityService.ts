@@ -19,7 +19,7 @@ export class IntegrityService
     private integrityApi: IntegrityApiInterface,
     private itemApi: ItemsServerInterface,
     private payloadManager: PayloadManagerInterface,
-    protected internalEventBus: InternalEventBusInterface,
+    protected override internalEventBus: InternalEventBusInterface,
   ) {
     super(internalEventBus)
   }

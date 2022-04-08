@@ -3,7 +3,7 @@ import { ItemContent } from '../Item'
 import { ContextPayload } from './ContextPayload'
 import { DecryptedPayloadInterface, EncryptedPayloadInterface } from '../Payload'
 
-export interface FileEncryptedExportContextualPayload extends ContextPayload {
+export interface BackupFileEncryptedContextualPayload extends ContextPayload {
   auth_hash?: string
   content: string
   created_at_timestamp?: number
@@ -15,7 +15,7 @@ export interface FileEncryptedExportContextualPayload extends ContextPayload {
   updated_at_timestamp?: number
 }
 
-export interface FileDecryptedExportContextualPayload<C extends ItemContent = ItemContent>
+export interface BackupFileDecryptedContextualPayload<C extends ItemContent = ItemContent>
   extends ContextPayload {
   content: C
   created_at_timestamp?: number
@@ -25,9 +25,9 @@ export interface FileDecryptedExportContextualPayload<C extends ItemContent = It
   updated_at_timestamp?: number
 }
 
-export function createEncryptedFileExportContextPayload(
+export function CreateEncryptedBackupFileContextPayload(
   fromPayload: EncryptedPayloadInterface,
-): FileEncryptedExportContextualPayload {
+): BackupFileEncryptedContextualPayload {
   return {
     auth_hash: fromPayload.auth_hash,
     content_type: fromPayload.content_type,
@@ -44,9 +44,9 @@ export function createEncryptedFileExportContextPayload(
   }
 }
 
-export function createDecryptedFileExportContextPayload(
+export function CreateDecryptedBackupFileContextPayload(
   fromPayload: DecryptedPayloadInterface,
-): FileDecryptedExportContextualPayload {
+): BackupFileDecryptedContextualPayload {
   return {
     content_type: fromPayload.content_type,
     content: fromPayload.content,

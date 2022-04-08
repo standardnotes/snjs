@@ -1,6 +1,6 @@
-import { ServerItemResponse } from '@standardnotes/responses'
 import { ContextPayload } from './ContextPayload'
 import { useBoolean } from '@standardnotes/utils'
+import { FilteredServerItem } from './FilteredServerItem'
 
 /**
  * The saved sync item payload represents the payload we want to map
@@ -16,7 +16,7 @@ export interface ServerSyncSavedContextualPayload extends ContextPayload {
 }
 
 export function CreateServerSyncSavedPayload(
-  from: ServerItemResponse,
+  from: FilteredServerItem,
 ): ServerSyncSavedContextualPayload {
   return {
     content: undefined,

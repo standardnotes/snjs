@@ -32,9 +32,14 @@ import { encryptedParametersFromPayload } from '../../Intent/Functions'
 import { RootKeyEncryptedAuthenticatedData } from '../../Encryption/RootKeyEncryptedAuthenticatedData'
 import { ItemAuthenticatedData } from '../../Encryption/ItemAuthenticatedData'
 import { LegacyAttachedData } from '../../Encryption/LegacyAttachedData'
-import { createEncryptedFileExportContextPayload, EncryptedPayload } from '@standardnotes/models'
+import {
+  CreateDecryptedBackupFileContextPayload,
+  CreateEncryptedBackupFileContextPayload,
+  EncryptedPayload,
+} from '@standardnotes/models'
 import { SplitPayloadsByEncryptionType } from '../../Encryption/Split/EncryptionTypeSplit'
 import { ClientDisplayableError } from '@standardnotes/responses'
+import { isNotUndefined } from '@standardnotes/utils'
 
 export enum EncryptionServiceEvent {
   RootKeyStatusChanged = 'RootKeyStatusChanged',
@@ -439,7 +444,7 @@ export class EncryptionService
 
     const result = await this.encryptSplit(keyLookupSplit)
 
-    const ejected = result.map((payload) => createEncryptedFileExportContextPayload(payload))
+    const ejected = result.map((payload) => CreateEncryptedBackupFileContextPayload(payload))
 
     const data: BackupFile = {
       version: Common.ProtocolVersionLatest,
@@ -458,9 +463,11 @@ export class EncryptionService
 
     const data: BackupFile = {
       version: Common.ProtocolVersionLatest,
-      items: items.map((item) => {
-        return item.payload.ejected()
-      }),
+      items: items
+        .map((item) => {
+          return CreateDecryptedBackupFileContextPayload(item.payload)
+        })
+        .filter(isNotUndefined),
     }
 
     return data

@@ -1,4 +1,3 @@
-import { ServerItemResponse } from '@standardnotes/responses'
 import { AccountSyncOperation } from '@Lib/Services/Sync/Account/Operation'
 import { ApplicationSyncOptions } from '../../Application/Options'
 import { ContentType } from '@standardnotes/common'
@@ -53,6 +52,7 @@ import {
   ItemsKeyInterface,
   CreateNonDecryptedPayloadSplit,
   DeltaOfflineSaved,
+  FilteredServerItem,
 } from '@standardnotes/models'
 import * as Services from '@standardnotes/services'
 import { OfflineSyncResponse } from './Offline/Response'
@@ -838,7 +838,7 @@ export class SNSyncService
   }
 
   private async processServerPayloads(
-    items: ServerItemResponse[],
+    items: FilteredServerItem[],
   ): Promise<FullyFormedPayloadInterface[]> {
     const payloads = items.map(CreatePayloadFromRawServerItem)
 
@@ -1104,11 +1104,9 @@ export class SNSyncService
       return
     }
 
-    const receivedPayloads = filterDisallowedRemotePayloads(
-      rawPayloads.map((rawPayload) => {
-        return CreatePayloadFromRawServerItem(rawPayload, PayloadSource.RemoteRetrieved)
-      }),
-    )
+    const receivedPayloads = filterDisallowedRemotePayloads(rawPayloads).map((rawPayload) => {
+      return CreatePayloadFromRawServerItem(rawPayload, PayloadSource.RemoteRetrieved)
+    })
 
     const payloadSplit = CreateNonDecryptedPayloadSplit(receivedPayloads)
 

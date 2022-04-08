@@ -17,7 +17,7 @@ import {
 } from '../Interfaces/TypeCheck'
 
 export abstract class GenericItem<P extends PayloadInterface = PayloadInterface>
-  implements ItemInterface<PayloadInterface>
+  implements ItemInterface<P>
 {
   payload: P
   public readonly duplicateOf?: Uuid
@@ -90,7 +90,7 @@ export abstract class GenericItem<P extends PayloadInterface = PayloadInterface>
     return this.payload.duplicate_of
   }
 
-  public payloadRepresentation(override?: Partial<TransferPayload>): PayloadInterface {
+  public payloadRepresentation(override?: Partial<TransferPayload>): P {
     return this.payload.copy(override)
   }
 

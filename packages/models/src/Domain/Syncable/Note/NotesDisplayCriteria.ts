@@ -17,6 +17,8 @@ export type SearchQuery = {
   includeProtectedNoteText: boolean
 }
 
+type NoteFilter = (note: SNNote) => boolean
+
 export class NotesDisplayCriteria {
   public searchQuery?: SearchQuery
   public tags: SNTag[] = []
@@ -98,8 +100,6 @@ export class NotesDisplayCriteria {
     return filters
   }
 }
-
-type NoteFilter = (note: SNNote) => boolean
 
 export function criteriaForSmartView(view: SmartView): NotesDisplayCriteria {
   const criteria = NotesDisplayCriteria.Create({

@@ -22,7 +22,8 @@ import {
   ActionExtensionContent,
   EncryptedPayload,
   isErrorDecryptingPayload,
-  createEncryptedFileExportContextPayload,
+  CreateEncryptedBackupFileContextPayload,
+  EncryptedTransferPayload,
 } from '@standardnotes/models'
 import { SNSyncService } from '../Sync/SyncService'
 import { PayloadManager } from '../Payloads/PayloadManager'
@@ -123,7 +124,7 @@ export class SNActionsService extends AbstractService {
     }
     const description = response.description || extension.description
     const supported_types = response.supported_types || extension.supported_types
-    const actions = response.actions || []
+    const actions = (response.actions || []) as Action[]
     const mutator = new ActionsExtensionMutator(extension, MutationType.UpdateUserTimestamps)
 
     mutator.deprecation = response.deprecation
@@ -189,10 +190,11 @@ export class SNActionsService extends AbstractService {
     rootKey?: SNRootKey,
     triedPasswords: string[] = [],
   ): Promise<DecryptedPayloadInterface<ActionExtensionContent> | undefined> {
-    if (!response.item) {
+    if (!response.item || response.item.deleted || response.item.content == undefined) {
       return undefined
     }
-    const payload = new EncryptedPayload(response.item)
+
+    const payload = new EncryptedPayload(response.item as EncryptedTransferPayload)
 
     if (!payload.enc_item_key) {
       void this.alertService.alert('This revision is missing its key and cannot be recovered.')
@@ -331,6 +333,6 @@ export class SNActionsService extends AbstractService {
       usesItemsKeyWithKeyLookup: { items: [item.payload] },
     })
 
-    return createEncryptedFileExportContextPayload(encrypted)
+    return CreateEncryptedBackupFileContextPayload(encrypted)
   }
 }

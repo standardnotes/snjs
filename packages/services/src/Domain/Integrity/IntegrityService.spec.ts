@@ -1,4 +1,4 @@
-import { IntegrityPayload, TransferPayload } from '@standardnotes/models'
+import { TransferPayload } from '@standardnotes/models'
 import { SyncEvent } from '../Event/SyncEvent'
 
 import { InternalEventBusInterface } from '../Internal/InternalEventBusInterface'
@@ -7,6 +7,7 @@ import { SyncSource } from '../Sync/SyncSource'
 import { IntegrityApiInterface } from './IntegrityApiInterface'
 import { IntegrityService } from './IntegrityService'
 import { PayloadManagerInterface } from '../Payloads/PayloadManagerInterface'
+import { IntegrityPayload } from '@standardnotes/responses'
 
 describe('IntegrityService', () => {
   let integrityApi: IntegrityApiInterface

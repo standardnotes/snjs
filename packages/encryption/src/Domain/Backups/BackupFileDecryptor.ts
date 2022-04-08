@@ -44,6 +44,7 @@ export async function DecryptBackupFile(
       throw Error('Unhandled case in decryptBackupFile')
     },
   )
+
   const encrypted = payloads.filter(isEncryptedPayload)
   const type = getBackupFileType(file, payloads)
 

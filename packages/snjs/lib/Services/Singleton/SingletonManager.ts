@@ -207,6 +207,7 @@ export class SNSingletonManager extends AbstractService {
       dirty: true,
       dirtiedDate: new Date(),
     })
+
     const item = await this.itemManager.emitItemFromPayload(dirtyPayload)
     void this.syncService.sync()
     return item as T

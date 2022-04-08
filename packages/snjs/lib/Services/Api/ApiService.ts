@@ -10,11 +10,7 @@ import {
   ItemsServerInterface,
   StorageKey,
 } from '@standardnotes/services'
-import {
-  IntegrityPayload,
-  ServerSyncPushContextualPayload,
-  SNFeatureRepo,
-} from '@standardnotes/models'
+import { ServerSyncPushContextualPayload, SNFeatureRepo } from '@standardnotes/models'
 import * as Responses from '@standardnotes/responses'
 import { API_MESSAGE_FAILED_OFFLINE_ACTIVATION } from '@Lib/Services/Api/Messages'
 import { EncryptedFileInterface } from '../Files/Types'
@@ -935,7 +931,7 @@ export class SNApiService
   }
 
   async checkIntegrity(
-    integrityPayloads: IntegrityPayload[],
+    integrityPayloads: Responses.IntegrityPayload[],
   ): Promise<Responses.CheckIntegrityResponse> {
     return await this.tokenRefreshableRequest<Responses.CheckIntegrityResponse>({
       verb: HttpVerb.Post,

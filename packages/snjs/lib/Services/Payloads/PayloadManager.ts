@@ -12,7 +12,6 @@ import {
   isDeletedPayload,
   isErrorDecryptingPayload,
   ImmutablePayloadCollection,
-  IntegrityPayload,
   EncryptedPayloadInterface,
   PayloadSource,
   DeletedPayloadInterface,
@@ -23,6 +22,7 @@ import {
   FullyFormedPayloadInterface,
 } from '@standardnotes/models'
 import * as Services from '@standardnotes/services'
+import { IntegrityPayload } from '@standardnotes/responses'
 
 /**
  * The payload manager is responsible for keeping state regarding what items exist in the

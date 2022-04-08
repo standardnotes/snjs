@@ -7,7 +7,6 @@ import { DecryptedPayloadInterface } from '../../Payload/Interfaces/DecryptedPay
 import { GenericItem } from './GenericItem'
 import { ItemContent } from '../Interfaces/ItemContent'
 import { ItemContentsEqual } from '../Utilities/Functions'
-import { ItemInterface } from '../Interfaces/ItemInterface'
 import { PrefKey } from '../../../Syncable/UserPrefs/PrefKey'
 import { ContentReference } from '../../Reference/ContentReference'
 import { dateToLocalizedString, useBoolean } from '@standardnotes/utils'
@@ -31,6 +30,7 @@ export class DecryptedItem<C extends ItemContent = ItemContent>
       AppDataField.UserModifiedDate,
       this.serverUpdatedAt || 0,
     )
+
     this.userModifiedDate = new Date(userModVal as number | Date)
     this.updatedAtString = dateToLocalizedString(this.userModifiedDate)
     this.protected = useBoolean(this.payload.content.protected, false)
@@ -56,7 +56,7 @@ export class DecryptedItem<C extends ItemContent = ItemContent>
     return this.payload.content.references || []
   }
 
-  public hasRelationshipWithItem(item: ItemInterface): boolean {
+  public hasRelationshipWithItem(item: DecryptedItemInterface): boolean {
     const target = this.references?.find((r) => {
       return r.uuid === item.uuid
     })
@@ -128,7 +128,7 @@ export class DecryptedItem<C extends ItemContent = ItemContent>
     return JSON.parse(JSON.stringify(this.content))
   }
 
-  public isItemContentEqualWith(otherItem: DecryptedItem) {
+  public isItemContentEqualWith(otherItem: DecryptedItemInterface) {
     return ItemContentsEqual(
       this.payload.content,
       otherItem.payload.content,

@@ -1,9 +1,5 @@
-import {
-  PayloadSource,
-  PayloadInterface,
-  IntegrityPayload,
-  EncryptedPayloadInterface,
-} from '@standardnotes/models'
+import { PayloadSource, PayloadInterface, EncryptedPayloadInterface } from '@standardnotes/models'
+import { IntegrityPayload } from '@standardnotes/responses'
 
 export interface PayloadManagerInterface {
   emitPayloads(

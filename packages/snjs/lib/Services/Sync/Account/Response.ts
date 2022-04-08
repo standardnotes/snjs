@@ -10,23 +10,24 @@ import {
   filterDisallowedRemotePayloads,
   CreateServerSyncSavedPayload,
   ServerSyncSavedContextualPayload,
+  FilteredServerItem,
 } from '@standardnotes/models'
 import { deepFreeze, isNullOrUndefined } from '@standardnotes/utils'
 
 export class ServerSyncResponse {
   public readonly rawResponse: RawSyncResponse
   public readonly savedPayloads: ServerSyncSavedContextualPayload[]
-  public readonly retrievedPayloads: ServerItemResponse[]
-  public readonly uuidConflictPayloads: ServerItemResponse[]
-  public readonly dataConflictPayloads: ServerItemResponse[]
-  public readonly rejectedPayloads: ServerItemResponse[]
+  public readonly retrievedPayloads: FilteredServerItem[]
+  public readonly uuidConflictPayloads: FilteredServerItem[]
+  public readonly dataConflictPayloads: FilteredServerItem[]
+  public readonly rejectedPayloads: FilteredServerItem[]
 
   constructor(rawResponse: RawSyncResponse) {
     this.rawResponse = rawResponse
 
     this.savedPayloads = filterDisallowedRemotePayloads(rawResponse.data?.saved_items || []).map(
       (rawItem) => {
-        return CreateServerSyncSavedPayload(rawItem as ServerItemResponse)
+        return CreateServerSyncSavedPayload(rawItem)
       },
     )
 
@@ -61,7 +62,7 @@ export class ServerSyncResponse {
     return this.allFullyFormedPayloads.length
   }
 
-  public get allFullyFormedPayloads(): ServerItemResponse[] {
+  public get allFullyFormedPayloads(): FilteredServerItem[] {
     return [
       ...this.retrievedPayloads,
       ...this.dataConflictPayloads,

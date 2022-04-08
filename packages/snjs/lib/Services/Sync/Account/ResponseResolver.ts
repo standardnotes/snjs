@@ -1,4 +1,3 @@
-import { ServerItemResponse } from '@standardnotes/responses'
 import {
   ImmutablePayloadCollectionSet,
   ImmutablePayloadCollection,
@@ -14,6 +13,7 @@ import {
   FullyFormedPayloadInterface,
   ServerSyncPushContextualPayload,
   ServerSyncSavedContextualPayload,
+  FilteredServerItem,
 } from '@standardnotes/models'
 import { ServerSyncResponse } from '@Lib/Services/Sync/Account/Response'
 import { DeltaRemoteRejected } from '@Lib/../../models/dist/Domain/Runtime/Deltas/RemoteRejected'
@@ -106,7 +106,7 @@ export class ServerSyncResponseResolver {
   }
 
   private async processRetrievedPayloads(
-    items: ServerItemResponse[],
+    items: FilteredServerItem[],
   ): Promise<
     ImmutablePayloadCollection<
       DecryptedPayloadInterface | EncryptedPayloadInterface | DeletedPayloadInterface
@@ -131,7 +131,7 @@ export class ServerSyncResponseResolver {
   }
 
   private async processConflictPayloads(
-    items: ServerItemResponse[],
+    items: FilteredServerItem[],
     source: PayloadSource.ConflictUuid | PayloadSource.ConflictData,
   ): Promise<
     ImmutablePayloadCollection<
@@ -156,7 +156,7 @@ export class ServerSyncResponseResolver {
   }
 
   private async processRejectedPayloads(
-    items: ServerItemResponse[],
+    items: FilteredServerItem[],
   ): Promise<
     ImmutablePayloadCollection<
       DecryptedPayloadInterface | EncryptedPayloadInterface | DeletedPayloadInterface

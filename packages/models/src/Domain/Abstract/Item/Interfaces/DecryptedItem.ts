@@ -7,12 +7,12 @@ import { ItemContent } from './ItemContent'
 import { DecryptedPayloadInterface } from '../../Payload/Interfaces/DecryptedPayload'
 import { ItemInterface } from './ItemInterface'
 import { SortableItem } from '../../../Runtime/Collection/CollectionSort'
-import { PayloadInterface } from '../../Payload'
+import { DecryptedTransferPayload } from '../../TransferPayload'
 
 export interface DecryptedItemInterface<C extends ItemContent = ItemContent>
-  extends ItemInterface<DecryptedPayloadInterface>,
+  extends ItemInterface<DecryptedPayloadInterface<C>>,
     SortableItem {
-  readonly payload: DecryptedPayloadInterface<C>
+  readonly content: C
   readonly conflictOf?: Uuid
   readonly duplicateOf?: Uuid
   readonly protected: boolean
@@ -22,20 +22,19 @@ export interface DecryptedItemInterface<C extends ItemContent = ItemContent>
   readonly locked: boolean
   readonly userModifiedDate: Date
   readonly version: ProtocolVersion
-  readonly content: C
   readonly references: ContentReference[]
 
   getAppDomainValueWithDefault<T, D extends T>(key: AppDataField | PrefKey, defaultValue: D): T
 
   getAppDomainValue<T>(key: AppDataField | PrefKey): T | undefined
 
-  isItemContentEqualWith(otherItem: ItemInterface<PayloadInterface>): boolean
+  isItemContentEqualWith(otherItem: DecryptedItemInterface): boolean
 
   payloadRepresentation(
-    override?: Partial<DecryptedPayloadInterface<C>>,
+    override?: Partial<DecryptedTransferPayload<C>>,
   ): DecryptedPayloadInterface<C>
 
-  hasRelationshipWithItem(item: ItemInterface<PayloadInterface>): boolean
+  hasRelationshipWithItem(item: DecryptedItemInterface): boolean
 
   getDomainData(
     domain: typeof ComponentDataDomain | typeof DefaultAppDomain,

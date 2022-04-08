@@ -1,14 +1,14 @@
-import { ServerItemResponse } from '@standardnotes/responses'
 import {
   EncryptedPayloadInterface,
   DeletedPayloadInterface,
   PayloadSource,
   DeletedPayload,
   EncryptedPayload,
+  FilteredServerItem,
 } from '@standardnotes/models'
 
 export function CreatePayloadFromRawServerItem(
-  rawItem: ServerItemResponse,
+  rawItem: FilteredServerItem,
   source: PayloadSource,
 ): EncryptedPayloadInterface | DeletedPayloadInterface {
   if (rawItem.deleted) {
