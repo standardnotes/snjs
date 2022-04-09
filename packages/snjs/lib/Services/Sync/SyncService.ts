@@ -823,10 +823,13 @@ export class SNSyncService
     this.log('Offline Sync Response', response)
 
     const masterCollection = this.payloadManager.getMasterCollection()
+
     const delta = new DeltaOfflineSaved(masterCollection, response.savedPayloads)
+
     const collection = await delta.resultingCollection()
 
     const payloadsToPersist = await this.payloadManager.emitCollection(collection)
+
     await this.persistPayloads(payloadsToPersist)
 
     this.opStatus.clearError()

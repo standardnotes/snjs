@@ -39,6 +39,7 @@ export class EncryptedPayload
       errorDecrypting: this.errorDecrypting,
       waitingForKey: this.waitingForKey,
       content: this.content,
+      deleted: this.deleted,
     }
   }
 

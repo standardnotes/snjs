@@ -1253,14 +1253,18 @@ export class ItemManager
     const items = this.collection
       .findAll(Uuids(itemsToLookupUuidsFor))
       .filter(Models.isDecryptedOrDeletedItem)
+
     const payloads: (Models.DecryptedPayloadInterface | Models.DeletedPayloadInterface)[] = []
 
     for (const item of items) {
       const mutator = new Models.ItemMutator<
         Models.DecryptedPayloadInterface | Models.DeletedPayloadInterface
       >(item, Models.MutationType.NonDirtying)
+
       mutator.lastSyncBegan = date
+
       const payload = mutator.getResult()
+
       payloads.push(payload)
     }
 

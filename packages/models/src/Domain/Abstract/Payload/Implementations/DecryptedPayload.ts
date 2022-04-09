@@ -44,6 +44,7 @@ export class DecryptedPayload<
     return {
       ...super.ejected(),
       content: this.content,
+      deleted: this.deleted,
     }
   }
 

@@ -33,28 +33,33 @@ describe('offline syncing', () => {
   it('should sync item with no passcode', async function () {
     let note = await Factory.createMappedNote(this.application)
     expect(this.application.itemManager.getDirtyItems().length).to.equal(1)
+
     const rawPayloads1 = await this.application.storageService.getAllRawPayloads()
     expect(rawPayloads1.length).to.equal(this.expectedItemCount)
 
     await this.application.syncService.sync(syncOptions)
+
     note = this.application.items.findItem(note.uuid)
+
     /** In rare cases a sync can complete so fast that the dates are equal; this is ok. */
     expect(note.lastSyncEnd).to.be.at.least(note.lastSyncBegan)
     this.expectedItemCount++
 
     expect(this.application.itemManager.getDirtyItems().length).to.equal(0)
+
     const rawPayloads2 = await this.application.storageService.getAllRawPayloads()
     expect(rawPayloads2.length).to.equal(this.expectedItemCount)
 
-    const itemsKeyRP = (
+    const itemsKeyRaw = (
       await Factory.getStoragePayloadsOfType(this.application, ContentType.ItemsKey)
     )[0]
-    const noteRP = (await Factory.getStoragePayloadsOfType(this.application, ContentType.Note))[0]
+    const noteRaw = (await Factory.getStoragePayloadsOfType(this.application, ContentType.Note))[0]
 
     /** Encrypts with default items key */
-    expect(typeof noteRP.content).to.equal('string')
+    expect(typeof noteRaw.content).to.equal('string')
+
     /** Not encrypted as no passcode/root key */
-    expect(typeof itemsKeyRP.content).to.equal('object')
+    expect(typeof itemsKeyRaw.content).to.equal('object')
   })
 
   it('should sync item encrypted with passcode', async function () {

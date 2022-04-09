@@ -5,6 +5,12 @@ import { PayloadSource } from '../Types/PayloadSource'
 import { TransferPayload } from '../../TransferPayload/Interfaces/TransferPayload'
 import { ItemContent } from '../../Content/ItemContent'
 
+type RequiredKeepUndefined<T> = { [K in keyof T]-?: [T[K]] } extends infer U
+  ? U extends Record<keyof U, [unknown]>
+    ? { [K in keyof U]: U[K][0] }
+    : never
+  : never
+
 export abstract class PurePayload<T extends TransferPayload<C>, C extends ItemContent = ItemContent>
   implements PayloadInterface<T>
 {
@@ -63,7 +69,7 @@ export abstract class PurePayload<T extends TransferPayload<C>, C extends ItemCo
   }
 
   ejected(): TransferPayload {
-    return {
+    const comprehensive: RequiredKeepUndefined<TransferPayload> = {
       uuid: this.uuid,
       content: this.content,
       deleted: this.deleted,
@@ -74,7 +80,12 @@ export abstract class PurePayload<T extends TransferPayload<C>, C extends ItemCo
       updated_at_timestamp: this.updated_at_timestamp,
       dirty: this.dirty,
       duplicate_of: this.duplicate_of,
+      dirtiedDate: this.dirtiedDate,
+      lastSyncBegan: this.lastSyncBegan,
+      lastSyncEnd: this.lastSyncEnd,
     }
+
+    return comprehensive
   }
 
   public get serverUpdatedAt(): Date {

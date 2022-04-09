@@ -353,7 +353,7 @@ export async function getStoragePayloadsOfType(application, type) {
   return rawPayloads
     .filter((rp) => rp.content_type === type)
     .map((rp) => {
-      return new EncryptedPayload(rp)
+      return new CreatePayload(rp)
     })
 }
 
