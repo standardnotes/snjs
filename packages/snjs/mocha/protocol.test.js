@@ -110,30 +110,27 @@ describe('protocol', function () {
   it('ejected payload should not have meta fields', async function () {
     await this.application.addPasscode('123')
     const payload = Factory.createNotePayload()
-    const result = await this.application.protocolService.encryptSplitSingle(
-      {
+    const result = CreateEncryptedServerSyncPushPayload(
+      await this.application.protocolService.encryptSplitSingle({
         usesItemsKeyWithKeyLookup: {
           items: [payload],
         },
-      },
-      EncryptedExportIntent.Sync,
+      }),
     )
-    const ejected = result.ejected()
-    expect(ejected.fields).to.not.be.ok
-    expect(ejected.source).to.not.be.ok
-    expect(ejected.format).to.not.be.ok
-    expect(ejected.dirtiedDate).to.not.be.ok
+    expect(result.fields).to.not.be.ok
+    expect(result.source).to.not.be.ok
+    expect(result.format).to.not.be.ok
+    expect(result.dirtiedDate).to.not.be.ok
   })
 
   it('encrypted payload for server should include duplicate_of field', async function () {
     const payload = Factory.createNotePayload('Test')
-    const encryptedPayload = await this.application.protocolService.encryptSplitSingle(
-      {
+    const encryptedPayload = CreateEncryptedServerSyncPushPayload(
+      await this.application.protocolService.encryptSplitSingle({
         usesItemsKeyWithKeyLookup: {
           items: [payload],
         },
-      },
-      EncryptedExportIntent.Sync,
+      }),
     )
     expect(encryptedPayload).to.be.ok
     expect(encryptedPayload).to.contain.keys('duplicate_of')
@@ -141,28 +138,25 @@ describe('protocol', function () {
 
   it('ejected payload for server should include duplicate_of field', async function () {
     const payload = Factory.createNotePayload('Test')
-    const encryptedPayload = await this.application.protocolService.encryptSplitSingle(
-      {
+    const encryptedPayload = CreateEncryptedServerSyncPushPayload(
+      await this.application.protocolService.encryptSplitSingle({
         usesItemsKeyWithKeyLookup: {
           items: [payload],
         },
-      },
-      EncryptedExportIntent.Sync,
+      }),
     )
-    const ejected = encryptedPayload.ejected()
-    expect(ejected).to.be.ok
-    expect(ejected).to.contain.keys('duplicate_of')
+    expect(encryptedPayload).to.be.ok
+    expect(encryptedPayload).to.contain.keys('duplicate_of')
   })
 
   it('encrypted payload for storage should include duplicate_of field', async function () {
     const payload = Factory.createNotePayload('Test')
-    const encryptedPayload = await this.application.protocolService.encryptSplitSingle(
-      {
+    const encryptedPayload = CreateEncryptedLocalStorageContextPayload(
+      await this.application.protocolService.encryptSplitSingle({
         usesItemsKeyWithKeyLookup: {
           items: [payload],
         },
-      },
-      EncryptedExportIntent.LocalStorageEncrypted,
+      }),
     )
     expect(encryptedPayload).to.be.ok
     expect(encryptedPayload).to.contain.keys('duplicate_of')
@@ -170,28 +164,25 @@ describe('protocol', function () {
 
   it('ejected payload for storage should include duplicate_of field', async function () {
     const payload = Factory.createNotePayload('Test')
-    const encryptedPayload = await this.application.protocolService.encryptSplitSingle(
-      {
+    const encryptedPayload = CreateEncryptedLocalStorageContextPayload(
+      await this.application.protocolService.encryptSplitSingle({
         usesItemsKeyWithKeyLookup: {
           items: [payload],
         },
-      },
-      EncryptedExportIntent.LocalStorageEncrypted,
+      }),
     )
-    const ejected = encryptedPayload.ejected()
-    expect(ejected).to.be.ok
-    expect(ejected).to.contain.keys('duplicate_of')
+    expect(encryptedPayload).to.be.ok
+    expect(encryptedPayload).to.contain.keys('duplicate_of')
   })
 
   it('encrypted payload for file should include duplicate_of field', async function () {
     const payload = Factory.createNotePayload('Test')
-    const encryptedPayload = await this.application.protocolService.encryptSplitSingle(
-      {
+    const encryptedPayload = CreateEncryptedBackupFileContextPayload(
+      await this.application.protocolService.encryptSplitSingle({
         usesItemsKeyWithKeyLookup: {
           items: [payload],
         },
-      },
-      EncryptedExportIntent.FileEncrypted,
+      }),
     )
     expect(encryptedPayload).to.be.ok
     expect(encryptedPayload).to.contain.keys('duplicate_of')
@@ -199,16 +190,14 @@ describe('protocol', function () {
 
   it('ejected payload for file should include duplicate_of field', async function () {
     const payload = Factory.createNotePayload('Test')
-    const encryptedPayload = await this.application.protocolService.encryptSplitSingle(
-      {
+    const encryptedPayload = CreateEncryptedBackupFileContextPayload(
+      await this.application.protocolService.encryptSplitSingle({
         usesItemsKeyWithKeyLookup: {
           items: [payload],
         },
-      },
-      EncryptedExportIntent.FileEncrypted,
+      }),
     )
-    const ejected = encryptedPayload.ejected()
-    expect(ejected).to.be.ok
-    expect(ejected).to.contain.keys('duplicate_of')
+    expect(encryptedPayload).to.be.ok
+    expect(encryptedPayload).to.contain.keys('duplicate_of')
   })
 })

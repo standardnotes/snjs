@@ -214,7 +214,7 @@ describe('upgrading', () => {
     /** After change, note should now be encrypted with latest protocol version */
 
     const note = this.application.itemManager.notes[0]
-    await Factory.markDirtyAndSyncItem(this.application, note.uuid)
+    await Factory.markDirtyAndSyncItem(this.application, note)
 
     const refreshedNotePayloads = await Factory.getStoragePayloadsOfType(
       this.application,

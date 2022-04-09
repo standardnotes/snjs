@@ -678,3 +678,25 @@ export async function markDirtyAndSyncItem(application, itemToLookupUuidFor) {
   }
   await application.sync.sync()
 }
+
+export async function changePayloadTimeStampAndSync(
+  application,
+  payload,
+  timestamp,
+  contentOverride,
+  syncOptions,
+) {
+  const changedPayload = new DecryptedPayload({
+    ...payload,
+    dirty: true,
+    dirtiedDate: new Date(),
+    content: {
+      ...payload.content,
+      ...contentOverride,
+    },
+    updated_at_timestamp: timestamp,
+  })
+
+  await application.itemManager.emitItemFromPayload(changedPayload)
+  await application.sync.sync(syncOptions)
+}

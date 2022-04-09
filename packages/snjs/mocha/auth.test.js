@@ -4,7 +4,9 @@ import * as Factory from './lib/factory.js'
 chai.use(chaiAsPromised)
 const expect = chai.expect
 
-describe('basic auth', () => {
+describe('basic auth', function () {
+  this.timeout(Factory.TenSecondTimeout)
+
   const BASE_ITEM_COUNT = 2 /** Default items key, user preferences */
 
   const syncOptions = {
@@ -29,22 +31,25 @@ describe('basic auth', () => {
     const response = await this.application.register(this.email, this.password)
     expect(response).to.be.ok
     expect(await this.application.protocolService.getRootKey()).to.be.ok
-  }).timeout(5000)
+  })
 
   it('fails register new account with short password', async function () {
     const password = '123456'
     const response = await this.application.register(this.email, password)
     expect(response.error).to.be.ok
     expect(await this.application.protocolService.getRootKey()).to.not.be.ok
-  }).timeout(5000)
+  })
 
   it('successfully signs out of account', async function () {
     await this.application.register(this.email, this.password)
 
     expect(await this.application.protocolService.getRootKey()).to.be.ok
+
     this.application = await Factory.signOutApplicationAndReturnNew(this.application)
+
     expect(await this.application.protocolService.getRootKey()).to.not.be.ok
     expect(this.application.protocolService.rootKeyEncryption.keyMode).to.equal(KeyMode.RootKeyNone)
+
     const rawPayloads = await this.application.storageService.getAllRawPayloads()
     expect(rawPayloads.length).to.equal(BASE_ITEM_COUNT)
   })
@@ -343,14 +348,18 @@ describe('basic auth', () => {
     await this.application.register(this.email, this.password)
 
     const noteCount = 10
+
     await Factory.createManyMappedNotes(this.application, noteCount)
+
     this.expectedItemCount += noteCount
+
     await this.application.syncService.sync(syncOptions)
 
     expect(this.application.itemManager.items.length).to.equal(this.expectedItemCount)
 
     const newPassword = 'newpassword'
     const response = await this.application.changePassword(this.password, newPassword)
+
     /** New items key */
     this.expectedItemCount++
 
@@ -366,25 +375,28 @@ describe('basic auth', () => {
     expect(this.application.itemManager.items.length).to.equal(this.expectedItemCount)
 
     const note = this.application.itemManager.notes[0]
-    /** Create conflict for a note */
-    /** First modify the item without saving so that
-     * our local contents digress from the server's */
+
+    /**
+     * Create conflict for a note. First modify the item without saving so that
+     * our local contents digress from the server's
+     */
     await this.application.mutator.changeItem(note, (mutator) => {
       mutator.title = `${Math.random()}`
     })
-    await this.application.mutator.changeAndSaveItem(
-      note,
-      (mutator) => {
-        mutator.title = `${Math.random()}`
-        mutator.updated_at_timestamp = Factory.dateToMicroseconds(Factory.yesterday())
+
+    await Factory.changePayloadTimeStampAndSync(
+      this.application,
+      note.payload,
+      Factory.dateToMicroseconds(Factory.yesterday()),
+      {
+        title: `${Math.random()}`,
       },
-      undefined,
-      undefined,
       syncOptions,
     )
     this.expectedItemCount++
 
     this.application = await Factory.signOutApplicationAndReturnNew(this.application)
+
     /** Should login with new password */
     const signinResponse = await this.application.signIn(
       this.email,
@@ -397,12 +409,14 @@ describe('basic auth', () => {
 
     expect(signinResponse).to.be.ok
     expect(signinResponse.error).to.not.be.ok
+
     expect(await this.application.protocolService.getRootKey()).to.be.ok
+
     expect(this.application.itemManager.items.length).to.equal(this.expectedItemCount)
     expect(this.application.payloadManager.invalidPayloads.length).to.equal(0)
   }
 
-  it('successfully changes password', changePassword).timeout(20000)
+  it('successfully changes password', changePassword).timeout(40000)
 
   it.skip('successfully changes password when passcode is set', async function () {
     const passcode = 'passcode'
@@ -442,11 +456,13 @@ describe('basic auth', () => {
     this.expectedItemCount += noteCount
     await this.application.syncService.sync(syncOptions)
 
-    const numTimesToChangePw = 5
+    const numTimesToChangePw = 3
     let newPassword = Factory.randomString()
     let currentPassword = this.password
+
     for (let i = 0; i < numTimesToChangePw; i++) {
       await this.application.changePassword(currentPassword, newPassword)
+
       /** New items key */
       this.expectedItemCount++
 
@@ -458,7 +474,9 @@ describe('basic auth', () => {
 
       await this.application.syncService.markAllItemsAsNeedingSyncAndPersist()
       await this.application.syncService.sync(syncOptions)
+
       this.application = await Factory.signOutApplicationAndReturnNew(this.application)
+
       expect(this.application.itemManager.items.length).to.equal(BASE_ITEM_COUNT)
       expect(this.application.payloadManager.invalidPayloads.length).to.equal(0)
 
@@ -471,11 +489,12 @@ describe('basic auth', () => {
         undefined,
         true,
       )
+
       expect(signinResponse).to.be.ok
       expect(signinResponse.error).to.not.be.ok
       expect(await this.application.protocolService.getRootKey()).to.be.ok
     }
-  }).timeout(60000)
+  }).timeout(80000)
 
   it('signing in with a clean email string should only try once', async function () {
     await Factory.registerUserToApplication({

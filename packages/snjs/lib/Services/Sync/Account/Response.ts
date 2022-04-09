@@ -7,7 +7,7 @@ import {
   ServerItemResponse,
 } from '@standardnotes/responses'
 import {
-  filterDisallowedRemotePayloads,
+  FilterDisallowedRemotePayloadsAndMap,
   CreateServerSyncSavedPayload,
   ServerSyncSavedContextualPayload,
   FilteredServerItem,
@@ -25,19 +25,19 @@ export class ServerSyncResponse {
   constructor(rawResponse: RawSyncResponse) {
     this.rawResponse = rawResponse
 
-    this.savedPayloads = filterDisallowedRemotePayloads(rawResponse.data?.saved_items || []).map(
+    this.savedPayloads = FilterDisallowedRemotePayloadsAndMap(rawResponse.data?.saved_items || []).map(
       (rawItem) => {
         return CreateServerSyncSavedPayload(rawItem)
       },
     )
 
-    this.retrievedPayloads = filterDisallowedRemotePayloads(rawResponse.data?.retrieved_items || [])
+    this.retrievedPayloads = FilterDisallowedRemotePayloadsAndMap(rawResponse.data?.retrieved_items || [])
 
-    this.dataConflictPayloads = filterDisallowedRemotePayloads(this.rawDataConflictItems)
+    this.dataConflictPayloads = FilterDisallowedRemotePayloadsAndMap(this.rawDataConflictItems)
 
-    this.uuidConflictPayloads = filterDisallowedRemotePayloads(this.rawUuidConflictItems)
+    this.uuidConflictPayloads = FilterDisallowedRemotePayloadsAndMap(this.rawUuidConflictItems)
 
-    this.rejectedPayloads = filterDisallowedRemotePayloads(this.rawRejectedPayloads)
+    this.rejectedPayloads = FilterDisallowedRemotePayloadsAndMap(this.rawRejectedPayloads)
 
     deepFreeze(this)
   }

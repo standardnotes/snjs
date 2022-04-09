@@ -112,13 +112,12 @@ describe('payload encryption', function () {
 
   it('returns valid encrypted params for syncing', async function () {
     const payload = Factory.createNotePayload()
-    const encryptedPayload = await this.application.protocolService.encryptSplitSingle(
-      {
+    const encryptedPayload = CreateEncryptedServerSyncPushPayload(
+      await this.application.protocolService.encryptSplitSingle({
         usesItemsKeyWithKeyLookup: {
           items: [payload],
         },
-      },
-      EncryptedExportIntent.Sync,
+      }),
     )
     expect(encryptedPayload.enc_item_key).to.be.ok
     expect(encryptedPayload.uuid).to.be.ok
@@ -133,13 +132,12 @@ describe('payload encryption', function () {
   it('returns additional fields for local storage', async function () {
     const payload = Factory.createNotePayload()
 
-    const encryptedPayload = await this.application.protocolService.encryptSplitSingle(
-      {
+    const encryptedPayload = CreateEncryptedLocalStorageContextPayload(
+      await this.application.protocolService.encryptSplitSingle({
         usesItemsKeyWithKeyLookup: {
           items: [payload],
         },
-      },
-      EncryptedExportIntent.LocalStorageEncrypted,
+      }),
     )
 
     expect(encryptedPayload.enc_item_key).to.be.ok
@@ -157,14 +155,14 @@ describe('payload encryption', function () {
 
   it('omits deleted for export file', async function () {
     const payload = Factory.createNotePayload()
-    const encryptedPayload = await this.application.protocolService.encryptSplitSingle(
-      {
+    const encryptedPayload = CreateEncryptedBackupFileContextPayload(
+      await this.application.protocolService.encryptSplitSingle({
         usesItemsKeyWithKeyLookup: {
           items: [payload],
         },
-      },
-      EncryptedExportIntent.FileEncrypted,
+      }),
     )
+
     expect(encryptedPayload.enc_item_key).to.be.ok
     expect(encryptedPayload.uuid).to.be.ok
     expect(encryptedPayload.content_type).to.be.ok

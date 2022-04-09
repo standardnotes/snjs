@@ -5,9 +5,9 @@ import * as Models from '@standardnotes/models'
 import {
   DecryptedParameters,
   EncryptedParameters,
+  encryptedParametersFromPayload,
   ErrorDecryptingParameters,
 } from '../Encryption/EncryptedParameters'
-import { encryptedParametersFromPayload } from '../Intent/Functions'
 
 export async function encryptPayload(
   payload: Models.DecryptedPayloadInterface,

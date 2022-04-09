@@ -30,7 +30,7 @@ import * as Encryption from '@standardnotes/encryption'
 import {
   PayloadSource,
   CreateDecryptedItemFromPayload,
-  filterDisallowedRemotePayloads,
+  FilterDisallowedRemotePayloadsAndMap,
   DeltaOutOfSync,
   ImmutablePayloadCollection,
   CreatePayload,
@@ -1148,7 +1148,7 @@ export class SNSyncService
       return
     }
 
-    const receivedPayloads = filterDisallowedRemotePayloads(rawPayloads).map((rawPayload) => {
+    const receivedPayloads = FilterDisallowedRemotePayloadsAndMap(rawPayloads).map((rawPayload) => {
       return CreatePayloadFromRawServerItem(rawPayload, PayloadSource.RemoteRetrieved)
     })
 

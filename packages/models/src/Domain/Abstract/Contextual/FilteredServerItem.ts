@@ -12,7 +12,7 @@ export function CreateFilteredServerItem(item: ServerItemResponse): FilteredServ
   }
 }
 
-export function filterDisallowedRemotePayloads(
+export function FilterDisallowedRemotePayloadsAndMap(
   payloads: ServerItemResponse[],
 ): FilteredServerItem[] {
   return payloads.filter(isRemotePayloadAllowed).map(CreateFilteredServerItem)

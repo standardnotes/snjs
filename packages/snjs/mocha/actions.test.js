@@ -120,13 +120,12 @@ describe('actions service', () => {
       },
     })
 
-    const encryptedPayload = await this.application.protocolService.encryptSplitSingle(
-      {
+    const encryptedPayload = CreateEncryptedServerSyncPushPayload(
+      await this.application.protocolService.encryptSplitSingle({
         usesItemsKeyWithKeyLookup: {
           items: [payload],
         },
-      },
-      EncryptedExportIntent.Sync,
+      }),
     )
 
     this.fakeServer.respondWith(

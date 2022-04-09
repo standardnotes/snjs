@@ -27,8 +27,8 @@ import {
   EncryptedParameters,
   ErrorDecryptingParameters,
   isErrorDecryptingParameters,
+  encryptedParametersFromPayload,
 } from '../../Encryption/EncryptedParameters'
-import { encryptedParametersFromPayload } from '../../Intent/Functions'
 import { RootKeyEncryptedAuthenticatedData } from '../../Encryption/RootKeyEncryptedAuthenticatedData'
 import { ItemAuthenticatedData } from '../../Encryption/ItemAuthenticatedData'
 import { LegacyAttachedData } from '../../Encryption/LegacyAttachedData'

@@ -27,7 +27,21 @@ export class DeltaRemoteSaved extends CustomApplyDelta {
        * local deletion status, and not old deleted value that was sent to server.
        */
       const deleted = base ? isDeletedPayload(base) : apply.deleted
-      if ((base && isDeletedPayload(base)) || apply.deleted) {
+
+      const payloadWasDeletedAfterThisRequest = base && isDeletedPayload(base) && !apply.deleted
+      if (payloadWasDeletedAfterThisRequest) {
+        const result = new DeletedPayload(
+          {
+            ...apply,
+            deleted: true,
+            content: undefined,
+            dirty: true,
+            dirtiedDate: new Date(),
+          },
+          PayloadSource.RemoteSaved,
+        )
+        processed.push(result)
+      } else if (apply.deleted || (base && isDeletedPayload(base))) {
         const result = new DeletedPayload(
           {
             ...apply,

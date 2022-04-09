@@ -135,16 +135,17 @@ describe('notes + tags syncing', function () {
     expect(this.application.itemManager.notes.length).to.equal(1)
     expect(this.application.itemManager.tags.length).to.equal(1)
 
-    tag = await this.application.mutator.changeAndSaveItem(
-      tag,
-      (mutator) => {
-        mutator.title = `${Math.random()}`
-        mutator.updated_at_timestamp = Factory.dateToMicroseconds(Factory.yesterday())
+    await Factory.changePayloadTimeStampAndSync(
+      this.application,
+      tag.payload,
+      Factory.dateToMicroseconds(Factory.yesterday()),
+      {
+        title: `${Math.random()}`,
       },
-      undefined,
-      undefined,
       syncOptions,
     )
+
+    tag = this.application.itemManager.findItem(tag.uuid)
 
     // tag should now be conflicted and a copy created
     expect(this.application.itemManager.notes.length).to.equal(1)

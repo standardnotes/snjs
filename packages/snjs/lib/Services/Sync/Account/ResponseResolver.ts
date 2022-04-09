@@ -196,35 +196,45 @@ export class ServerSyncResponseResolver {
   private finalDirtyStateForPayload<P extends FullyFormedPayloadInterface>(
     payload: P,
   ): boolean | undefined {
-    const current = this.baseCollection.find(payload.uuid)
+    const base = this.baseCollection.find(payload.uuid)
     /**
      * `current` can be null in the case of new
      * items that haven't yet been mapped
      */
     let stillDirty
-    if (current) {
-      if (
-        !current.dirtiedDate ||
-        (payload.dirtiedDate && payload.dirtiedDate > current.dirtiedDate)
-      ) {
-        /** The payload was dirtied as part of handling deltas, and not because it was
-         * dirtied by a client. We keep the payload dirty state here. */
+
+    if (base) {
+      const baseNotDirtied = !base.dirtiedDate
+
+      const payloadDirtiedAfterBase =
+        base.dirtiedDate && payload.dirtiedDate && payload.dirtiedDate > base.dirtiedDate
+
+      if (baseNotDirtied || payloadDirtiedAfterBase) {
+        /**
+         * The payload was dirtied as part of handling deltas, and not because it was
+         * dirtied by a client. We keep the payload dirty state here.
+         */
         stillDirty = payload.dirty
       } else {
         if (isDeletedPayload(payload) && payload.discardable) {
-          /** If a payload is discardable, do not set as dirty no matter what.
-           * This occurs when alternating a uuid for a payload */
+          /**
+           * If a payload is discardable, do not set as dirty no matter what.
+           * This occurs when alternating a uuid for a payload
+           */
           stillDirty = false
-        } else if (current.lastSyncBegan) {
-          /** Marking items dirty after or within the same millisecond cycle of lastSyncBegan
-           * should cause them to sync again. */
-          stillDirty = current.dirtiedDate >= current.lastSyncBegan
+        } else if (base.lastSyncBegan) {
+          /**
+           * Marking items dirty after or within the same millisecond cycle of lastSyncBegan
+           * should cause them to sync again.
+           */
+          stillDirty = base.dirtiedDate >= base.lastSyncBegan
         }
       }
     } else {
       /** Forward whatever value any delta resolver may have set */
       stillDirty = payload.dirty
     }
+
     return stillDirty
   }
 }

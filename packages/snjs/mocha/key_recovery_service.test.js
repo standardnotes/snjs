@@ -51,14 +51,13 @@ describe('key recovery service', function () {
     const randomItemsKey = await application.protocolService.operatorManager
       .defaultOperator()
       .createItemsKey()
-    const encrypted = await application.protocolService.encryptSplitSingle(
-      {
+    const encrypted = CreateEncryptedServerSyncPushPayload(
+      await application.protocolService.encryptSplitSingle({
         usesRootKey: {
           items: [randomItemsKey.payload],
           key: randomRootKey,
         },
-      },
-      EncryptedExportIntent.Sync,
+      }),
     )
 
     /** Attempt decryption and insert into rotation in errored state  */
@@ -119,15 +118,14 @@ describe('key recovery service', function () {
     const randomItemsKey2 = await application.protocolService.operatorManager
       .defaultOperator()
       .createItemsKey()
-    const encrypted = await application.protocolService.encryptSplit(
-      {
+    const encrypted = (
+      await application.protocolService.encryptSplit({
         usesRootKey: {
           items: [randomItemsKey.payload, randomItemsKey2.payload],
           key: randomRootKey,
         },
-      },
-      EncryptedExportIntent.Sync,
-    )
+      })
+    ).map(CreateEncryptedServerSyncPushPayload)
 
     /** Attempt decryption and insert into rotation in errored state  */
     const decrypted = await application.protocolService.decryptSplit({
@@ -343,14 +341,13 @@ describe('key recovery service', function () {
     const correctItemsKey = await application.protocolService.operatorManager
       .defaultOperator()
       .createItemsKey()
-    const encrypted = await application.protocolService.encryptSplitSingle(
-      {
+    const encrypted = CreateEncryptedServerSyncPushPayload(
+      await application.protocolService.encryptSplitSingle({
         usesRootKey: {
           items: [correctItemsKey.payload],
           key: randomRootKey,
         },
-      },
-      EncryptedExportIntent.Sync,
+      }),
     )
     await application.payloadManager.emitPayload(
       encrypted.copy({
@@ -391,13 +388,12 @@ describe('key recovery service', function () {
 
     /** Create and emit errored encrypted items key payload */
     const itemsKey = await application.protocolService.getSureDefaultItemsKey()
-    const encrypted = await application.protocolService.encryptSplitSingle(
-      {
+    const encrypted = CreateEncryptedServerSyncPushPayload(
+      await application.protocolService.encryptSplitSingle({
         usesRootKeyWithKeyLookup: {
           items: [itemsKey.payload],
         },
-      },
-      EncryptedExportIntent.Sync,
+      }),
     )
     const newUpdated = new Date()
     await application.payloadManager.emitPayload(
@@ -452,13 +448,12 @@ describe('key recovery service', function () {
 
     /** Create and emit errored encrypted items key payload */
     const itemsKey = await application.protocolService.getSureDefaultItemsKey()
-    const encrypted = await application.protocolService.encryptSplitSingle(
-      {
+    const encrypted = CreateEncryptedServerSyncPushPayload(
+      await application.protocolService.encryptSplitSingle({
         usesRootKeyWithKeyLookup: {
           items: [itemsKey.payload],
         },
-      },
-      EncryptedExportIntent.Sync,
+      }),
     )
 
     await application.payloadManager.emitPayload(
@@ -536,14 +531,13 @@ describe('key recovery service', function () {
     const randomItemsKey = await application.protocolService.operatorManager
       .operatorForVersion(ProtocolVersion.V003)
       .createItemsKey()
-    const encrypted = await application.protocolService.encryptSplitSingle(
-      {
+    const encrypted = CreateEncryptedServerSyncPushPayload(
+      await application.protocolService.encryptSplitSingle({
         usesRootKey: {
           items: [randomItemsKey.payload],
           key: randomRootKey,
         },
-      },
-      EncryptedExportIntent.Sync,
+      }),
     )
 
     /** Attempt decryption and insert into rotation in errored state  */
@@ -622,13 +616,12 @@ describe('key recovery service', function () {
 
     const newDefaultKey = appB.protocolService.getSureDefaultItemsKey()
 
-    const encrypted = await appB.protocolService.encryptSplitSingle(
-      {
+    const encrypted = CreateEncryptedServerSyncPushPayload(
+      await appB.protocolService.encryptSplitSingle({
         usesRootKeyWithKeyLookup: {
           items: [newDefaultKey.payload],
         },
-      },
-      EncryptedExportIntent.Sync,
+      }),
     )
 
     /** Insert foreign items key into appA, which shouldn't be able to decrypt it yet */

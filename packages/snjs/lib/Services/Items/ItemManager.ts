@@ -219,6 +219,10 @@ export class ItemManager
     return this.collection.nondeletedElements().filter(Models.isDecryptedItem)
   }
 
+  allTrackedItems(): Models.ItemInterface[] {
+    return this.collection.all()
+  }
+
   itemsKeys(): Models.ItemsKeyInterface[] {
     return this.collection.displayElements(ContentType.ItemsKey)
   }
