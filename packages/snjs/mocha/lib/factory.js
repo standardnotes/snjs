@@ -686,6 +686,7 @@ export async function changePayloadTimeStampAndSync(
   contentOverride,
   syncOptions,
 ) {
+  payload = application.payloadManager.collection.find(payload.uuid)
   const changedPayload = new DecryptedPayload({
     ...payload,
     dirty: true,
@@ -694,6 +695,46 @@ export async function changePayloadTimeStampAndSync(
       ...payload.content,
       ...contentOverride,
     },
+    updated_at_timestamp: timestamp,
+  })
+
+  await application.itemManager.emitItemFromPayload(changedPayload)
+  await application.sync.sync(syncOptions)
+
+  return application.itemManager.findAnyItem(payload.uuid)
+}
+
+export async function changePayloadTimeStamp(application, payload, timestamp, contentOverride) {
+  const latestPayload = application.payloadManager.collection.find(payload.uuid)
+  const changedPayload = new DecryptedPayload({
+    ...latestPayload,
+    dirty: true,
+    dirtiedDate: new Date(),
+    content: {
+      ...latestPayload.content,
+      ...contentOverride,
+    },
+    updated_at_timestamp: timestamp,
+  })
+
+  await application.itemManager.emitItemFromPayload(changedPayload)
+
+  return application.itemManager.findAnyItem(payload.uuid)
+}
+
+export async function changePayloadTimeStampDeleteAndSync(
+  application,
+  payload,
+  timestamp,
+  syncOptions,
+) {
+  payload = application.payloadManager.collection.find(payload.uuid)
+  const changedPayload = new DeletedPayload({
+    ...payload,
+    content: undefined,
+    dirty: true,
+    dirtiedDate: new Date(),
+    deleted: true,
     updated_at_timestamp: timestamp,
   })
 

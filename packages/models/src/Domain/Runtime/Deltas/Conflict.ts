@@ -13,6 +13,7 @@ import { FullyFormedPayloadInterface } from '../../Abstract/Payload'
 import {
   isDecryptedPayload,
   isErrorDecryptingPayload,
+  isDeletedPayload,
 } from '../../Abstract/Payload/Interfaces/TypeCheck'
 
 export class ConflictDelta {
@@ -56,6 +57,14 @@ export class ConflictDelta {
         const previousRevision = historyMapFunctions.getNewestRevision(historyEntries)
 
         strategy = tmpBaseItem.strategyWhenConflictingWithItem(tmpApplyItem, previousRevision)
+      }
+    } else if (isDeletedPayload(this.basePayload) || isDeletedPayload(this.applyPayload)) {
+      const baseDeleted = isDeletedPayload(this.basePayload)
+      const applyDeleted = isDeletedPayload(this.applyPayload)
+      if (baseDeleted && applyDeleted) {
+        strategy = ConflictStrategy.KeepRight
+      } else {
+        strategy = ConflictStrategy.KeepRight
       }
     }
 

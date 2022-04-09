@@ -56,7 +56,7 @@ describe('online conflict handling', function () {
         foo: 'bar',
       },
     }
-    const payload = new DeletedPayload({
+    const payload = new DecryptedPayload({
       ...params,
       dirty: true,
       dirtiedDate: new Date(),
@@ -66,28 +66,31 @@ describe('online conflict handling', function () {
 
   it('components should not be duplicated under any circumstances', async function () {
     const payload = createDirtyPayload(ContentType.Component)
+
     const item = await this.application.itemManager.emitItemFromPayload(
       payload,
       PayloadSource.LocalChanged,
     )
+
     this.expectedItemCount++
+
     await this.application.syncService.sync(syncOptions)
-    /** First modify the item without saving so that
-     * our local contents digress from the server's */
+
+    /** First modify the item without saving so that our local contents digress from the server's */
     await this.application.mutator.changeItem(item, (mutator) => {
       mutator.content.foo = `${Math.random()}`
     })
-    await this.application.mutator.changeAndSaveItem(
-      item,
-      (mutator) => {
-        /** Conflict the item */
-        mutator.content.foo = 'zar'
-        mutator.updated_at_timestamp = Factory.dateToMicroseconds(Factory.yesterday())
+
+    await Factory.changePayloadTimeStampAndSync(
+      this.application,
+      item.payload,
+      Factory.dateToMicroseconds(Factory.yesterday()),
+      {
+        foo: 'zar',
       },
-      undefined,
-      undefined,
       syncOptions,
     )
+
     expect(this.application.itemManager.items.length).to.equal(this.expectedItemCount)
     await this.sharedFinalAssertions()
   })
@@ -105,17 +108,17 @@ describe('online conflict handling', function () {
     await this.application.mutator.changeItem(item, (mutator) => {
       mutator.title = `${Math.random()}`
     })
-    await this.application.mutator.changeAndSaveItem(
-      item,
-      (mutator) => {
-        /** Conflict the item */
-        mutator.content.foo = 'zar'
-        mutator.updated_at_timestamp = Factory.dateToMicroseconds(Factory.yesterday())
+
+    await Factory.changePayloadTimeStampAndSync(
+      this.application,
+      item.payload,
+      Factory.dateToMicroseconds(Factory.yesterday()),
+      {
+        foo: 'zar',
       },
-      undefined,
-      undefined,
       syncOptions,
     )
+
     expect(this.application.itemManager.items.length).to.equal(this.expectedItemCount)
     await this.sharedFinalAssertions()
   })
@@ -155,16 +158,17 @@ describe('online conflict handling', function () {
     await this.application.mutator.changeItem(note, (mutator) => {
       mutator.title = `${Math.random()}`
     })
-    await this.application.mutator.changeAndSaveItem(
-      note,
-      (mutator) => {
-        mutator.content.title = 'zar'
-        mutator.updated_at_timestamp = Factory.dateToMicroseconds(Factory.yesterday())
+
+    await Factory.changePayloadTimeStampAndSync(
+      this.application,
+      note.payload,
+      Factory.dateToMicroseconds(Factory.yesterday()),
+      {
+        title: 'zar',
       },
-      undefined,
-      undefined,
       syncOptions,
     )
+
     this.expectedItemCount++
 
     const duplicate = this.application.itemManager.notes.find((n) => {
@@ -235,15 +239,14 @@ describe('online conflict handling', function () {
     await this.application.mutator.changeItem(note, (mutator) => {
       mutator.title = `${Math.random()}`
     })
-    await this.application.mutator.changeAndSaveItem(
-      note,
-      (mutator) => {
-        // modify this item to have stale values
-        mutator.title = `${Math.random()}`
-        mutator.updated_at_timestamp = Factory.dateToMicroseconds(Factory.yesterday())
+
+    await Factory.changePayloadTimeStampAndSync(
+      this.application,
+      note.payload,
+      Factory.dateToMicroseconds(Factory.yesterday()),
+      {
+        title: `${Math.random()}`,
       },
-      undefined,
-      undefined,
       syncOptions,
     )
 
@@ -267,15 +270,14 @@ describe('online conflict handling', function () {
     await this.application.mutator.changeItem(note, (mutator) => {
       mutator.title = `${Math.random()}`
     })
-    await this.application.mutator.changeAndSaveItem(
-      note,
-      (mutator) => {
-        /** Create conflict for a note */
-        mutator.title = `${Math.random()}`
-        mutator.updated_at_timestamp = Factory.dateToMicroseconds(Factory.yesterday())
+
+    await Factory.changePayloadTimeStampAndSync(
+      this.application,
+      note.payload,
+      Factory.dateToMicroseconds(Factory.yesterday()),
+      {
+        title: `${Math.random()}`,
       },
-      undefined,
-      undefined,
       syncOptions,
     )
 
@@ -305,11 +307,16 @@ describe('online conflict handling', function () {
     await this.application.mutator.changeItem(note, (mutator) => {
       mutator.title = `${Math.random()}`
     })
-    await this.application.itemManager.changeItem(note, (mutator) => {
-      // modify this item to have stale values
-      mutator.title = newTitle
-      mutator.updated_at_timestamp = Factory.dateToMicroseconds(Factory.yesterday())
-    })
+
+    await Factory.changePayloadTimeStampAndSync(
+      this.application,
+      note.payload,
+      Factory.dateToMicroseconds(Factory.yesterday()),
+      {
+        title: newTitle,
+      },
+      syncOptions,
+    )
 
     // We expect this item to be duplicated
     this.expectedItemCount++
@@ -399,17 +406,19 @@ describe('online conflict handling', function () {
     })
     // client B
     await this.application.syncService.clearSyncPositionTokens()
-    await this.application.mutator.changeAndSaveItem(
-      note,
-      (mutator) => {
-        mutator.content.foo = 'bar'
-        mutator.updated_at_timestamp = Factory.dateToMicroseconds(Factory.yesterday())
+
+    await Factory.changePayloadTimeStampAndSync(
+      this.application,
+      note.payload,
+      Factory.dateToMicroseconds(Factory.yesterday()),
+      {
+        foo: 'bar',
       },
-      undefined,
-      undefined,
       syncOptions,
     )
+
     this.expectedItemCount++
+
     await this.sharedFinalAssertions()
   })
 
@@ -463,14 +472,10 @@ describe('online conflict handling', function () {
 
     // This client says this item is deleted, but the server is saying its not deleted.
     // In this case, we want to keep the server copy.
-    await this.application.mutator.changeAndSaveItem(
-      note,
-      (mutator) => {
-        mutator.setDeleted()
-        mutator.updated_at_timestamp = Factory.dateToMicroseconds(Factory.yesterday())
-      },
-      undefined,
-      undefined,
+    await Factory.changePayloadTimeStampDeleteAndSync(
+      this.application,
+      note.payload,
+      Factory.dateToMicroseconds(Factory.yesterday()),
       syncOptions,
     )
 
@@ -491,16 +496,17 @@ describe('online conflict handling', function () {
     await this.application.mutator.changeItem(note, (mutator) => {
       mutator.title = `${Math.random()}`
     })
-    note = await this.application.mutator.changeAndSaveItem(
-      note,
-      (mutator) => {
-        mutator.text = 'Stale text'
-        mutator.updated_at_timestamp = Factory.dateToMicroseconds(Factory.yesterday())
+
+    note = await Factory.changePayloadTimeStampAndSync(
+      this.application,
+      note.payload,
+      Factory.dateToMicroseconds(Factory.yesterday()),
+      {
+        text: 'Stale text',
       },
-      undefined,
-      undefined,
       syncOptions,
     )
+
     expect(note.dirty).to.equal(false)
 
     // We expect now that the item was conflicted
@@ -521,13 +527,11 @@ describe('online conflict handling', function () {
 
     await this.application.syncService.sync(syncOptions)
 
-    await this.application.mutator.changeAndSaveItem(
-      note,
-      (mutator) => {
-        mutator.updated_at_timestamp = Factory.dateToMicroseconds(Factory.yesterday())
-      },
-      undefined,
-      undefined,
+    await Factory.changePayloadTimeStampAndSync(
+      this.application,
+      note.payload,
+      Factory.dateToMicroseconds(Factory.yesterday()),
+      {},
       syncOptions,
     )
 
@@ -563,10 +567,16 @@ describe('online conflict handling', function () {
       await this.application.itemManager.changeItem(note, (mutator) => {
         mutator.text = '1'
       })
-      await this.application.itemManager.changeItem(note, (mutator) => {
-        mutator.text = '2'
-        mutator.updated_at_timestamp = Factory.dateToMicroseconds(yesterday)
-      })
+
+      await Factory.changePayloadTimeStamp(
+        this.application,
+        note.payload,
+        Factory.dateToMicroseconds(yesterday),
+        {
+          text: '2',
+        },
+      )
+
       // We expect all the notes to be duplicated.
       this.expectedItemCount++
     }
@@ -607,10 +617,15 @@ describe('online conflict handling', function () {
     await this.application.syncService.sync(syncOptions)
     expect(this.application.itemManager.items.length).to.equal(this.expectedItemCount)
 
-    tag = await this.application.itemManager.changeItem(tag, (mutator) => {
-      mutator.content.title = `${Math.random()}`
-      mutator.updated_at_timestamp = Factory.dateToMicroseconds(Factory.yesterday())
-    })
+    tag = await Factory.changePayloadTimeStamp(
+      this.application,
+      tag.payload,
+      Factory.dateToMicroseconds(Factory.yesterday()),
+      {
+        title: `${Math.random()}`,
+      },
+    )
+
     await this.application.syncService.sync({ ...syncOptions, awaitAll: true })
 
     // fooItem should now be conflicted and a copy created
@@ -672,27 +687,26 @@ describe('online conflict handling', function () {
     await this.application.mutator.changeItem(note, (mutator) => {
       mutator.title = `${Math.random()}`
     })
-    note = await this.application.mutator.changeAndSaveItem(
-      note,
-      (mutator) => {
-        mutator.updated_at_timestamp = Factory.dateToMicroseconds(Factory.yesterday())
-        mutator.text = newText
+
+    note = await Factory.changePayloadTimeStampAndSync(
+      this.application,
+      note.payload,
+      Factory.dateToMicroseconds(Factory.yesterday()),
+      {
+        text: newText,
       },
-      undefined,
-      undefined,
       syncOptions,
     )
 
     // conflict the tag but keep its content the same
-    tag = await this.application.mutator.changeAndSaveItem(
-      tag,
-      (mutator) => {
-        mutator.updated_at_timestamp = Factory.dateToMicroseconds(Factory.yesterday())
-      },
-      undefined,
-      undefined,
+    tag = await Factory.changePayloadTimeStampAndSync(
+      this.application,
+      tag.payload,
+      Factory.dateToMicroseconds(Factory.yesterday()),
+      {},
       syncOptions,
     )
+
     /**
      * We expect now that the total item count has went up by just 1 (the note),
      * and not 2 (the note and tag)
@@ -759,6 +773,7 @@ describe('online conflict handling', function () {
      */
     const errorred = new EncryptedPayload({
       ...note.payload,
+      content: '004:...',
       errorDecrypting: true,
       dirty: true,
     })
