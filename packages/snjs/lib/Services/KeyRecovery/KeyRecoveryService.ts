@@ -102,7 +102,7 @@ export class SNKeyRecoveryService extends AbstractService {
 
     this.removeItemObserver = this.payloadManager.addObserver(
       [ContentType.ItemsKey],
-      (changed, inserted, _discarded, ignored, source) => {
+      ({ changed, inserted, ignored, source }) => {
         if (source === PayloadSource.LocalChanged) {
           return
         }

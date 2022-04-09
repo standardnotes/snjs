@@ -82,7 +82,7 @@ export class SNFeaturesService
 
     this.removefeatureReposObserver = this.itemManager.addObserver(
       ContentType.ExtensionRepo,
-      async (changed, inserted, _discarded, _ignored, source) => {
+      async ({ changed, inserted, source }) => {
         const sources = [
           PayloadSource.Constructor,
           PayloadSource.LocalRetrieved,

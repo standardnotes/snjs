@@ -6,26 +6,33 @@ import {
   DecryptedItemInterface,
   DecryptedItemMutator,
   DecryptedPayloadInterface,
+  PayloadSource,
+  EncryptedItemInterface,
+  DeletedItemInterface,
 } from '@standardnotes/models'
-import { PayloadSource, EncryptedItemInterface, DeletedItemInterface } from '@standardnotes/models'
 import { AbstractService } from '../Service/AbstractService'
 
-export type ItemManagerChangeObserverCallback = (
+export type ItemManagerChangeData = {
   /** The items are pre-existing but have been changed */
-  changed: DecryptedItemInterface[],
+  changed: DecryptedItemInterface[]
 
   /** The items have been newly inserted */
-  inserted: DecryptedItemInterface[],
+  inserted: DecryptedItemInterface[]
 
   /** The items should no longer be displayed in the interface, either due to being deleted, or becoming error-encrypted */
-  removed: (EncryptedItemInterface | DeletedItemInterface)[],
+  removed: (EncryptedItemInterface | DeletedItemInterface)[]
 
   /** Items for which encrypted overwrite protection is enabled and enacted */
-  ignored: EncryptedItemInterface[],
+  ignored: EncryptedItemInterface[]
 
-  source: PayloadSource,
-  sourceKey?: string,
-) => void
+  /** Items which were previously error decrypting but now successfully decrypted */
+  unerrored: DecryptedItemInterface[]
+
+  source: PayloadSource
+  sourceKey?: string
+}
+
+export type ItemManagerChangeObserverCallback = (data: ItemManagerChangeData) => void
 
 export interface ItemManagerInterface extends AbstractService {
   addObserver(

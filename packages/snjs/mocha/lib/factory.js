@@ -636,23 +636,24 @@ export async function insertItemWithOverride(
   needsSync = false,
   errorDecrypting,
 ) {
-  let item = await application.itemManager.createItem(contentType, content, needsSync)
+  const item = await application.itemManager.createItem(contentType, content, needsSync)
+
   if (errorDecrypting) {
-    item = await application.itemManager.emitItemFromPayload(
-      new EncryptedPayload({
-        ...item.payload.ejected(),
-        errorDecrypting,
-      }),
-    )
+    const encrypted = new EncryptedPayload({
+      ...item.payload.ejected(),
+      content: '004:...',
+      errorDecrypting,
+    })
+
+    await application.itemManager.emitItemFromPayload(encrypted)
   } else {
-    item = await application.itemManager.emitItemFromPayload(
-      new DecryptedPayload({
-        ...item.payload.ejected(),
-      }),
-    )
+    const decrypted = new DecryptedPayload({
+      ...item.payload.ejected(),
+    })
+    await application.itemManager.emitItemFromPayload(decrypted)
   }
 
-  return item
+  return application.itemManager.findAnyItem(item.uuid)
 }
 
 export async function alternateUuidForItem(application, uuid) {

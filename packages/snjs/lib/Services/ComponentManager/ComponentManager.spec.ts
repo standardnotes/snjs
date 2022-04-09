@@ -8,9 +8,9 @@ import {
   ComponentPermission,
   FeatureDescription,
   FindNativeFeature,
+  FeatureIdentifier,
 } from '@standardnotes/features'
 import { DesktopManagerInterface } from '@Lib/Services/ComponentManager/Types'
-import { FeatureIdentifier } from '@standardnotes/features'
 import { ContentType } from '@standardnotes/common'
 import { GenericItem, SNComponent } from '@standardnotes/models'
 import { Environment, Platform } from '@Lib/Application/Platforms'

@@ -55,7 +55,7 @@ export class SNHistoryManager extends Services.AbstractService {
     super(internalEventBus)
     this.removeChangeObserver = this.itemManager.addObserver(
       ContentType.Note,
-      (changed, inserted) => {
+      ({ changed, inserted }) => {
         this.recordNewHistoryForItems(changed.concat(inserted) as SNNote[])
       },
     )

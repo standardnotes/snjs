@@ -28,7 +28,7 @@ export class ItemsEncryptionService extends Services.AbstractService {
 
     this.removeItemsObserver = this.itemManager.addObserver(
       [ContentType.ItemsKey],
-      (changed, inserted) => {
+      ({ changed, inserted }) => {
         if (changed.concat(inserted).length > 0) {
           void this.decryptErroredPayloads()
         }

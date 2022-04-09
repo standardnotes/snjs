@@ -63,7 +63,7 @@ describe('payload manager', () => {
 
   it('insertion observer', async function () {
     const observations = []
-    this.payloadManager.addObserver(ContentType.Any, (_, inserted) => {
+    this.payloadManager.addObserver(ContentType.Any, ({ inserted }) => {
       observations.push({ inserted })
     })
     const payload = await this.createNotePayload()
@@ -75,7 +75,7 @@ describe('payload manager', () => {
 
   it('change observer', async function () {
     const observations = []
-    this.payloadManager.addObserver(ContentType.Any, (changed) => {
+    this.payloadManager.addObserver(ContentType.Any, ({ changed }) => {
       if (changed.length > 0) {
         observations.push({ changed })
       }
@@ -96,7 +96,7 @@ describe('payload manager', () => {
   })
 
   it('reset state', async function () {
-    this.payloadManager.addObserver(ContentType.Any, (payloads) => {})
+    this.payloadManager.addObserver(ContentType.Any, ({}) => {})
     const payload = await this.createNotePayload()
     await this.payloadManager.emitPayload(payload)
     await this.payloadManager.resetState()

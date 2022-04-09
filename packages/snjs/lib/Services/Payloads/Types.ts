@@ -1,5 +1,6 @@
 import { ContentType } from '@standardnotes/common'
 import {
+  DecryptedPayloadInterface,
   DeletedPayloadInterface,
   EncryptedPayloadInterface,
   FullyFormedPayloadInterface,
@@ -8,22 +9,28 @@ import {
 
 export type EmitQueue<P extends FullyFormedPayloadInterface> = QueueElement<P>[]
 
-export type PayloadsChangeObserverCallback = (
-  /** The items are pre-existing but have been changed */
-  changed: FullyFormedPayloadInterface[],
+export type PayloadManagerChangeData = {
+  /** The payloads are pre-existing but have been changed */
+  changed: FullyFormedPayloadInterface[]
 
-  /** The items have been newly inserted */
-  inserted: FullyFormedPayloadInterface[],
+  /** The payloads have been newly inserted */
+  inserted: FullyFormedPayloadInterface[]
 
-  /** The items have been deleted from local state (and remote state if applicable) */
-  discarded: DeletedPayloadInterface[],
+  /** The payloads have been deleted from local state (and remote state if applicable) */
+  discarded: DeletedPayloadInterface[]
 
-  /** Items for which encrypted overwrite protection is enabled and enacted */
-  ignored: EncryptedPayloadInterface[],
+  /** Payloads for which encrypted overwrite protection is enabled and enacted */
+  ignored: EncryptedPayloadInterface[]
 
-  source: PayloadSource,
-  sourceKey?: string,
-) => void
+  /** Payloads which were previously error decrypting but now successfully decrypted */
+  unerrored: DecryptedPayloadInterface[]
+
+  source: PayloadSource
+
+  sourceKey?: string
+}
+
+export type PayloadsChangeObserverCallback = (data: PayloadManagerChangeData) => void
 
 export type PayloadsChangeObserver = {
   types: ContentType[]

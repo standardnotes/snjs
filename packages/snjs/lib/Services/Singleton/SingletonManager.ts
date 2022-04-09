@@ -73,7 +73,11 @@ export class SNSingletonManager extends AbstractService {
   private addObservers() {
     this.removeItemObserver = this.itemManager.addObserver(
       ContentType.Any,
-      (_changed, inserted) => {
+      ({ inserted, unerrored }) => {
+        if (unerrored.length > 0) {
+          this.resolveQueue = this.resolveQueue.concat(unerrored)
+        }
+
         if (inserted.length > 0) {
           this.resolveQueue = this.resolveQueue.concat(inserted)
         }
@@ -176,7 +180,7 @@ export class SNSingletonManager extends AbstractService {
        */
       let matchingItem: DecryptedItemInterface | undefined
 
-      const removeObserver = this.itemManager.addObserver(contentType, (_, inserted) => {
+      const removeObserver = this.itemManager.addObserver(contentType, ({ inserted }) => {
         if (inserted.length > 0) {
           const matchingItems = inserted.filter((i) => i.content_type === contentType)
 

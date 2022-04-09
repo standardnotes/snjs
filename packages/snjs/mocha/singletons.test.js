@@ -5,7 +5,7 @@ import WebDeviceInterface from './lib/web_device_interface.js'
 chai.use(chaiAsPromised)
 const expect = chai.expect
 
-describe.only('singletons', function () {
+describe('singletons', function () {
   this.timeout(Factory.TenSecondTimeout)
 
   const syncOptions = {
@@ -157,7 +157,7 @@ describe.only('singletons', function () {
     ).to.equal(1)
   })
 
-  it.skip('resolves registered predicate with signing in/out', async function () {
+  it('resolves registered predicate with signing in/out', async function () {
     await this.registerUser()
 
     await this.signOut()
@@ -268,15 +268,19 @@ describe.only('singletons', function () {
 
     const erroredPayload = new EncryptedPayload({
       ...item.payload.ejected(),
+      content: '004:...',
       errorDecrypting: true,
     })
+
     await this.application.payloadManager.emitPayload(erroredPayload)
 
     const resolvedItem = await this.application.singletonManager.findOrCreateContentTypeSingleton(
       item.content_type,
       item.content,
     )
+
     await this.application.sync.sync({ awaitAll: true })
+
     expect(this.application.itemManager.items.length).to.equal(this.expectedItemCount)
     expect(resolvedItem.uuid).to.not.equal(item.uuid)
     expect(resolvedItem.errorDecrypting).to.not.be.ok
@@ -290,36 +294,44 @@ describe.only('singletons', function () {
      * is then subsequently decrypted, singleton logic runs again for the item.
      */
 
-    await Factory.insertItemWithOverride(
-      ContentType.Component,
-      {
-        package_info: {
-          name: 'Extensions',
-          identifier: this.extManagerId,
-        },
+    const sharedContent = {
+      package_info: {
+        name: 'Extensions',
+        identifier: this.extManagerId,
       },
+    }
+
+    const errorDecryptingFalse = false
+    await Factory.insertItemWithOverride(
+      this.application,
+      ContentType.Component,
+      sharedContent,
       true,
-      false,
+      errorDecryptingFalse,
     )
 
-    const errored = await this.application.itemManager.createItem(
+    const errorDecryptingTrue = true
+    const errored = await Factory.insertItemWithOverride(
+      this.application,
       ContentType.Component,
-      {
-        package_info: {
-          name: 'Extensions',
-          identifier: this.extManagerId,
-        },
-      },
+      sharedContent,
       true,
+      errorDecryptingTrue,
     )
 
     this.expectedItemCount += 1
+
     await this.application.sync.sync(syncOptions)
+
     /** Now mark errored as not errorDecrypting and sync */
-    const notErrored = new DecryptedPayload(errored, {
+    const notErrored = new DecryptedPayload({
+      ...errored.payload,
+      content: sharedContent,
       errorDecrypting: false,
     })
+
     await this.application.payloadManager.emitPayload(notErrored)
+
     /** Item will get decrypted on current tick, so wait one before syncing */
     await Factory.sleep(0)
     await this.application.syncService.sync(syncOptions)

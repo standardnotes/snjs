@@ -423,13 +423,10 @@ export class SNApplication implements InternalServices.ListedClientInterface {
     contentType: Common.ContentType | Common.ContentType[],
     stream: ItemStream,
   ): () => void {
-    const observer = this.itemManager.addObserver(
-      contentType,
-      (changed, inserted, _discarded, _ignored, source) => {
-        const all = changed.concat(inserted)
-        stream(all, source)
-      },
-    )
+    const observer = this.itemManager.addObserver(contentType, ({ changed, inserted, source }) => {
+      const all = changed.concat(inserted)
+      stream(all, source)
+    })
 
     /** Push current values now */
     const matches = this.itemManager.getItems(contentType)

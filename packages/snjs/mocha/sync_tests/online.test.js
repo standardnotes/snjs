@@ -743,14 +743,11 @@ describe('online syncing', function () {
     let actualSaveCount = 0
     /** Create an item and sync it */
     let note = await Factory.createMappedNote(this.application)
-    this.application.itemManager.addObserver(
-      ContentType.Note,
-      (changed, inserted, removed, ignored, source) => {
-        if (source === PayloadSource.RemoteSaved) {
-          actualSaveCount++
-        }
-      },
-    )
+    this.application.itemManager.addObserver(ContentType.Note, ({ source }) => {
+      if (source === PayloadSource.RemoteSaved) {
+        actualSaveCount++
+      }
+    })
     this.expectedItemCount++
     this.application.syncService.ut_beginLatencySimulator(150)
     /** Dont await */
@@ -784,14 +781,11 @@ describe('online syncing', function () {
     let actualSaveCount = 0
     /** Create an item and sync it */
     let note = await Factory.createMappedNote(this.application)
-    this.application.itemManager.addObserver(
-      ContentType.Note,
-      (_changed, _inserted, _discarded, _ignored, source) => {
-        if (source === PayloadSource.RemoteSaved) {
-          actualSaveCount++
-        }
-      },
-    )
+    this.application.itemManager.addObserver(ContentType.Note, ({ source }) => {
+      if (source === PayloadSource.RemoteSaved) {
+        actualSaveCount++
+      }
+    })
     this.expectedItemCount++
     /** Dont await */
     const syncRequest = this.application.syncService.sync(syncOptions)
@@ -822,22 +816,19 @@ describe('online syncing', function () {
     let note = await Factory.createMappedNote(this.application)
     let didPerformMutatation = false
     const newText = `${Math.random()}`
-    this.application.itemManager.addObserver(
-      ContentType.Note,
-      async (changed, _inserted, _discarded, _ignored, source) => {
-        if (source === PayloadSource.RemoteSaved) {
-          actualSaveCount++
-        } else if (source === PayloadSource.PreSyncSave && !didPerformMutatation) {
-          didPerformMutatation = true
-          const mutated = changed[0].payload.copy({
-            content: { ...note.payload.content, text: newText },
-            dirty: true,
-            dirtiedDate: changed[0].lastSyncBegan,
-          })
-          await this.application.itemManager.emitItemFromPayload(mutated)
-        }
-      },
-    )
+    this.application.itemManager.addObserver(ContentType.Note, async ({ changed, source }) => {
+      if (source === PayloadSource.RemoteSaved) {
+        actualSaveCount++
+      } else if (source === PayloadSource.PreSyncSave && !didPerformMutatation) {
+        didPerformMutatation = true
+        const mutated = changed[0].payload.copy({
+          content: { ...note.payload.content, text: newText },
+          dirty: true,
+          dirtiedDate: changed[0].lastSyncBegan,
+        })
+        await this.application.itemManager.emitItemFromPayload(mutated)
+      }
+    })
     this.expectedItemCount++
     /** Dont await */
     const syncRequest = this.application.syncService.sync(syncOptions)

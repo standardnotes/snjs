@@ -20,6 +20,8 @@ import {
   MergePayloads,
   DeletedPayload,
   FullyFormedPayloadInterface,
+  isEncryptedPayload,
+  isDecryptedPayload,
 } from '@standardnotes/models'
 import * as Services from '@standardnotes/services'
 import { IntegrityPayload } from '@standardnotes/responses'
@@ -147,9 +149,19 @@ export class PayloadManager
   private popQueue() {
     const first = this.emitQueue[0]
 
-    const { changed, inserted, discarded, ignored } = this.mergePayloadsOntoMaster(first.payloads)
+    const { changed, inserted, discarded, ignored, unerrored } = this.mergePayloadsOntoMaster(
+      first.payloads,
+    )
 
-    this.notifyChangeObservers(changed, inserted, discarded, ignored, first.source, first.sourceKey)
+    this.notifyChangeObservers(
+      changed,
+      inserted,
+      discarded,
+      ignored,
+      unerrored,
+      first.source,
+      first.sourceKey,
+    )
 
     removeFromArray(this.emitQueue, first)
 
@@ -165,6 +177,7 @@ export class PayloadManager
     const inserted: FullyFormedPayloadInterface[] = []
     const discarded: DeletedPayloadInterface[] = []
     const ignored: EncryptedPayloadInterface[] = []
+    const unerrored: DecryptedPayloadInterface[] = []
 
     for (const payload of payloads) {
       if (!payload.uuid || !payload.content_type) {
@@ -188,6 +201,10 @@ export class PayloadManager
 
       const newPayload = masterPayload ? MergePayloads(masterPayload, payload) : payload
 
+      if (masterPayload && isEncryptedPayload(masterPayload) && isDecryptedPayload(payload)) {
+        unerrored.push(newPayload as DecryptedPayloadInterface)
+      }
+
       if (isDeletedPayload(newPayload) && newPayload.discardable) {
         this.collection.discard(newPayload)
 
@@ -203,7 +220,7 @@ export class PayloadManager
       }
     }
 
-    return { changed, inserted, discarded, ignored }
+    return { changed, inserted, discarded, ignored, unerrored }
   }
 
   /**
@@ -240,6 +257,7 @@ export class PayloadManager
     inserted: FullyFormedPayloadInterface[],
     discarded: DeletedPayloadInterface[],
     ignored: EncryptedPayloadInterface[],
+    unerrored: DecryptedPayloadInterface[],
     source: PayloadSource,
     sourceKey?: string,
   ) {
@@ -260,14 +278,15 @@ export class PayloadManager
     }
 
     for (const observer of observers) {
-      observer.callback(
-        filter(changed, observer.types),
-        filter(inserted, observer.types),
-        filter(discarded, observer.types),
-        filter(ignored, observer.types),
+      observer.callback({
+        changed: filter(changed, observer.types),
+        inserted: filter(inserted, observer.types),
+        discarded: filter(discarded, observer.types),
+        ignored: filter(ignored, observer.types),
+        unerrored: filter(unerrored, observer.types),
         source,
         sourceKey,
-      )
+      })
     }
   }
 

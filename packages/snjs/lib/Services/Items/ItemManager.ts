@@ -1,4 +1,4 @@
-import { ContentType } from '@standardnotes/common'
+import { ContentType, Uuid } from '@standardnotes/common'
 import { naturalSort, removeFromArray, UuidGenerator, Uuids } from '@standardnotes/utils'
 import { ItemsKeyMutator, SNItemsKey } from '@standardnotes/encryption'
 import { PayloadManager } from '../Payloads/PayloadManager'
@@ -8,6 +8,8 @@ import { UuidString } from '../../Types/UuidString'
 import * as Models from '@standardnotes/models'
 import * as Services from '@standardnotes/services'
 import { ItemsClientInterface } from './ItemsClientInterface'
+import { PayloadManagerChangeData } from '../Payloads'
+import { DecryptedItemInterface } from '@standardnotes/models'
 
 type ItemsChangeObserver = {
   contentType: ContentType[]
@@ -54,12 +56,14 @@ export class ItemManager
 
   private createCollection() {
     this.collection = new Models.ItemCollection()
+
     this.collection.setDisplayOptions(ContentType.Note, Models.CollectionSort.CreatedAt, 'dsc')
     this.collection.setDisplayOptions(ContentType.Tag, Models.CollectionSort.Title, 'dsc')
     this.collection.setDisplayOptions(ContentType.ItemsKey, Models.CollectionSort.CreatedAt, 'asc')
     this.collection.setDisplayOptions(ContentType.Component, Models.CollectionSort.CreatedAt, 'asc')
     this.collection.setDisplayOptions(ContentType.Theme, Models.CollectionSort.Title, 'asc')
     this.collection.setDisplayOptions(ContentType.SmartView, Models.CollectionSort.Title, 'dsc')
+
     this.notesCollection = new Models.NotesCollection(this.collection)
     this.tagNotesIndex = new Models.TagNotesIndex(this.collection, this.tagNotesIndex?.observers)
   }
@@ -167,25 +171,22 @@ export class ItemManager
     this.createCollection()
   }
 
-  /**
-   * Returns an item for a given id
-   */
   findItem<T extends Models.DecryptedItemInterface = Models.DecryptedItemInterface>(
     uuid: UuidString,
   ): T | undefined {
     const itemFromCollection = this.collection.findDecrypted<T>(uuid)
 
-    if (itemFromCollection) {
-      return itemFromCollection
-    }
+    return itemFromCollection || (this.findSystemSmartView(uuid) as T | undefined)
+  }
 
-    const itemFromSmartViews = this.systemSmartViews.find((tag) => tag.uuid === uuid)
+  findAnyItem(uuid: UuidString): Models.ItemInterface | undefined {
+    const itemFromCollection = this.collection.find(uuid)
 
-    if (itemFromSmartViews) {
-      return itemFromSmartViews as unknown as T
-    }
+    return itemFromCollection || this.findSystemSmartView(uuid)
+  }
 
-    return undefined
+  private findSystemSmartView(uuid: Uuid): Models.SmartView | undefined {
+    return this.systemSmartViews.find((view) => view.uuid === uuid)
   }
 
   findSureItem<T extends Models.DecryptedItemInterface = Models.DecryptedItemInterface>(
@@ -326,28 +327,25 @@ export class ItemManager
     return references
   }
 
-  private setPayloads(
-    changedPayloads: Models.FullyFormedPayloadInterface[],
-    insertedPayloads: Models.FullyFormedPayloadInterface[],
-    discardedPayloads: Models.DeletedPayloadInterface[],
-    ignoredPayloads: Models.EncryptedPayloadInterface[],
-    source: Models.PayloadSource,
-    sourceKey?: string,
-  ) {
+  private setPayloads(data: PayloadManagerChangeData) {
+    const { changed, inserted, discarded, ignored, unerrored, source, sourceKey } = data
+
     const createItem = (payload: Models.FullyFormedPayloadInterface) =>
       Models.CreateItemFromPayload(payload)
 
-    const changedItems = changedPayloads.map(createItem)
+    const changedItems = changed.map(createItem)
 
-    const insertedItems = insertedPayloads.map(createItem)
+    const insertedItems = inserted.map(createItem)
 
-    const discardedItems: Models.DeletedItemInterface[] = discardedPayloads.map(
+    const discardedItems: Models.DeletedItemInterface[] = discarded.map(
       (p) => new Models.DeletedItem(p),
     )
 
-    const ignoredItems: Models.EncryptedItemInterface[] = ignoredPayloads.map(
+    const ignoredItems: Models.EncryptedItemInterface[] = ignored.map(
       (p) => new Models.EncryptedItem(p),
     )
+
+    const unerroredItems = unerrored.map(createItem) as DecryptedItemInterface[]
 
     const delta: Models.ItemDelta = {
       changed: changedItems,
@@ -365,6 +363,7 @@ export class ItemManager
       delta.inserted.filter(Models.isDecryptedItem),
       delta.discarded,
       delta.ignored,
+      unerroredItems,
       source,
       sourceKey,
     )
@@ -375,6 +374,7 @@ export class ItemManager
     inserted: Models.DecryptedItemInterface[],
     removed: (Models.DeletedItemInterface | Models.EncryptedItemInterface)[],
     ignored: Models.EncryptedItemInterface[],
+    unerrored: Models.DecryptedItemInterface[],
     source: Models.PayloadSource,
     sourceKey?: string,
   ) {
@@ -383,28 +383,35 @@ export class ItemManager
         return types.includes(ContentType.Any) || types.includes(item.content_type)
       })
     }
+
     const observers = this.observers.slice()
+
     for (const observer of observers) {
       const filteredChanged = filter(changed, observer.contentType)
       const filteredInserted = filter(inserted, observer.contentType)
       const filteredDiscarded = filter(removed, observer.contentType)
       const filteredIgnored = filter(ignored, observer.contentType)
+      const filteredUnerrored = filter(unerrored, observer.contentType)
+
       if (
         filteredChanged.length === 0 &&
         filteredInserted.length === 0 &&
         filteredDiscarded.length === 0 &&
-        filteredIgnored.length === 0
+        filteredIgnored.length === 0 &&
+        filteredUnerrored.length === 0
       ) {
         continue
       }
-      observer.callback(
-        filteredChanged,
-        filteredInserted,
-        filteredDiscarded,
-        filteredIgnored,
+
+      observer.callback({
+        changed: filteredChanged,
+        inserted: filteredInserted,
+        removed: filteredDiscarded,
+        ignored: filteredIgnored,
+        unerrored: filteredUnerrored,
         source,
         sourceKey,
-      )
+      })
     }
   }
 
@@ -738,7 +745,8 @@ export class ItemManager
     source = Models.PayloadSource.Constructor,
   ): Promise<Models.DecryptedItemInterface> {
     await this.payloadManager.emitPayload(payload, source)
-    return this.findItem(payload.uuid) as Models.DecryptedItemInterface
+
+    return this.findSureItem(payload.uuid)
   }
 
   public async emitItemsFromPayloads(
@@ -746,7 +754,9 @@ export class ItemManager
     source = Models.PayloadSource.Constructor,
   ): Promise<Models.DecryptedItemInterface[]> {
     await this.payloadManager.emitPayloads(payloads, source)
+
     const uuids = Uuids(payloads)
+
     return this.findItems(uuids)
   }
 

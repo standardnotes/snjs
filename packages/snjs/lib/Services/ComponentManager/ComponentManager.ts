@@ -187,7 +187,7 @@ export class SNComponentManager extends AbstractService<ComponentManagerEvent, E
   addItemObserver(): void {
     this.removeItemObserver = this.itemManager.addObserver(
       [ContentType.Component, ContentType.Theme],
-      (changed, inserted, _removed, _ignored, source) => {
+      ({ changed, inserted, source }) => {
         const items = [...changed, ...inserted] as SNComponent[]
         this.handleChangedComponents(items, source)
       },

@@ -132,7 +132,7 @@ export class ComponentViewer {
   ) {
     this.removeItemObserver = this.itemManager.addObserver(
       ContentType.Any,
-      (changed, inserted, removed, _ignored, source, sourceKey) => {
+      ({ changed, inserted, removed, source, sourceKey }) => {
         const items = [...changed, ...inserted, ...removed]
         this.handleChangesInItems(items, source, sourceKey)
       },
