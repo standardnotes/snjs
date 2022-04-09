@@ -2,20 +2,33 @@ import { removeFromArray } from '@standardnotes/utils'
 import { UuidString } from '@Lib/Types/UuidString'
 import { SNApplication } from '../Application/Application'
 import { NoteViewController } from './NoteViewController'
+import { ApplicationEvent, PrefKey } from '..'
 
 type NoteControllerGroupChangeCallback = (activeController: NoteViewController) => void
 
 export class NoteGroupController {
   public noteControllers: NoteViewController[] = []
   private application: SNApplication
+  private addTagHierarchy: boolean
   changeObservers: NoteControllerGroupChangeCallback[] = []
+  eventObservers: (() => void)[] = []
 
   constructor(application: SNApplication) {
     this.application = application
+    this.addTagHierarchy = application.getPreference(PrefKey.NoteAddToParentFolders, true)
+
+    this.eventObservers.push(
+      application.addSingleEventObserver(ApplicationEvent.PreferencesChanged, async () => {
+        this.addTagHierarchy = application.getPreference(PrefKey.NoteAddToParentFolders, true)
+      }),
+    )
   }
 
   public deinit(): void {
     ;(this.application as unknown) = undefined
+    this.eventObservers.forEach((removeObserver) => {
+      removeObserver()
+    })
     for (const controller of this.noteControllers) {
       this.closeNoteView(controller, false)
     }
@@ -23,7 +36,7 @@ export class NoteGroupController {
 
   async createNoteView(noteUuid?: string, noteTitle?: string, noteTag?: UuidString): Promise<void> {
     const controller = new NoteViewController(this.application, noteUuid, noteTitle, noteTag)
-    await controller.initialize()
+    await controller.initialize(this.addTagHierarchy)
     this.noteControllers.push(controller)
     this.notifyObservers()
   }
