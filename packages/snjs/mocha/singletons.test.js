@@ -216,7 +216,7 @@ describe.only('singletons', function () {
     expect(didCompleteRelevantSync).to.equal(true)
   }).timeout(10000)
 
-  it.only('signing into account and retrieving singleton shouldnt put us in deadlock', async function () {
+  it('signing into account and retrieving singleton shouldnt put us in deadlock', async function () {
     await this.registerUser()
 
     /** Create prefs */

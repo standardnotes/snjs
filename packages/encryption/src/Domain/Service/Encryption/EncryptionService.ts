@@ -266,16 +266,18 @@ export class EncryptionService
     return packagedEncrypted
   }
 
-  public async decryptSplitSingle<C extends Models.ItemContent = Models.ItemContent>(
-    split: KeyedDecryptionSplit,
-  ): Promise<Models.DecryptedPayloadInterface<C> | Models.EncryptedPayloadInterface> {
-    const results = await this.decryptSplit<C>(split)
+  public async decryptSplitSingle<
+    C extends Models.ItemContent = Models.ItemContent,
+    P extends Models.DecryptedPayloadInterface<C> = Models.DecryptedPayloadInterface<C>,
+  >(split: KeyedDecryptionSplit): Promise<P | Models.EncryptedPayloadInterface> {
+    const results = await this.decryptSplit<C, P>(split)
     return results[0]
   }
 
-  public async decryptSplit<C extends Models.ItemContent = Models.ItemContent>(
-    split: KeyedDecryptionSplit,
-  ): Promise<(Models.DecryptedPayloadInterface<C> | Models.EncryptedPayloadInterface)[]> {
+  public async decryptSplit<
+    C extends Models.ItemContent = Models.ItemContent,
+    P extends Models.DecryptedPayloadInterface<C> = Models.DecryptedPayloadInterface<C>,
+  >(split: KeyedDecryptionSplit): Promise<(P | Models.EncryptedPayloadInterface)[]> {
     const resultParams: (DecryptedParameters<C> | ErrorDecryptingParameters)[] = []
 
     if (split.usesRootKey) {
@@ -310,6 +312,7 @@ export class EncryptionService
 
     const packagedResults = resultParams.map((params) => {
       const original = FindPayloadInDecryptionSplit(params.uuid, split)
+
       if (isErrorDecryptingParameters(params)) {
         return new Models.EncryptedPayload({
           ...original.ejected(),
@@ -319,7 +322,7 @@ export class EncryptionService
         return new Models.DecryptedPayload<C>({
           ...original.ejected(),
           ...params,
-        })
+        }) as P
       }
     })
 

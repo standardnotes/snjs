@@ -6,11 +6,12 @@ import {
   DecryptedItemInterface,
   HistoryEntryInterface,
   ItemsKeyInterface,
+  RootKeyInterface,
 } from '@standardnotes/models'
-import { ProtocolVersion } from '@standardnotes/common'
+import { ContentType, ProtocolVersion } from '@standardnotes/common'
 
-export function isItemsKey(x: unknown): x is ItemsKeyInterface {
-  return x instanceof SNItemsKey
+export function isItemsKey(x: ItemsKeyInterface | RootKeyInterface): x is ItemsKeyInterface {
+  return x.content_type === ContentType.ItemsKey
 }
 
 /**

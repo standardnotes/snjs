@@ -13,13 +13,19 @@ export interface EncryptionProvider {
 
   encryptSplit(split: KeyedEncryptionSplit): Promise<EncryptedPayloadInterface[]>
 
-  decryptSplitSingle<C extends ItemContent = ItemContent>(
+  decryptSplitSingle<
+    C extends ItemContent = ItemContent,
+    P extends DecryptedPayloadInterface<C> = DecryptedPayloadInterface<C>,
+  >(
     split: KeyedDecryptionSplit,
-  ): Promise<DecryptedPayloadInterface<C> | EncryptedPayloadInterface>
+  ): Promise<P | EncryptedPayloadInterface>
 
-  decryptSplit<C extends ItemContent = ItemContent>(
+  decryptSplit<
+    C extends ItemContent = ItemContent,
+    P extends DecryptedPayloadInterface<C> = DecryptedPayloadInterface<C>,
+  >(
     split: KeyedDecryptionSplit,
-  ): Promise<(DecryptedPayloadInterface<C> | EncryptedPayloadInterface)[]>
+  ): Promise<(P | EncryptedPayloadInterface)[]>
 
   hasRootKeyEncryptionSource(): boolean
 

@@ -1,7 +1,8 @@
 import { ProtocolVersion } from '@standardnotes/common'
+import { DecryptedItemInterface } from '../../Abstract/Item/Interfaces/DecryptedItem'
 import { RootKeyContent } from './RootKeyContent'
 
-export interface RootKeyInterface {
+export interface RootKeyInterface extends DecryptedItemInterface<RootKeyContent> {
   get keyVersion(): ProtocolVersion
   get itemsKey(): string
   get masterKey(): string
