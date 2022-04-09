@@ -23,7 +23,7 @@ export function MergePayloads(
     return mergeWithDecryptedBase(base, apply)
   } else if (isEncryptedPayload(base)) {
     return mergeWithEncryptedBase(base, apply)
-  } else if (isDeletedPayload(base) && isDeletedPayload(apply)) {
+  } else if (isDeletedPayload(base)) {
     return mergeWithDeletedBase(base, apply)
   } else {
     throw Error('Unhandled case in MergePayloads')
@@ -77,10 +77,20 @@ function mergeWithEncryptedBase(
 
 function mergeWithDeletedBase(
   base: DeletedPayloadInterface,
-  apply: DeletedPayloadInterface,
-): EncryptedPayloadInterface | DeletedPayloadInterface {
+  apply: DecryptedPayloadInterface | EncryptedPayloadInterface | DeletedPayloadInterface,
+): DecryptedPayloadInterface | EncryptedPayloadInterface | DeletedPayloadInterface {
   if (isDeletedPayload(apply)) {
     return new DeletedPayload({
+      ...base.ejected(),
+      ...apply.ejected(),
+    })
+  } else if (isDecryptedPayload(apply)) {
+    return new DecryptedPayload({
+      ...base.ejected(),
+      ...apply.ejected(),
+    })
+  } else if (isEncryptedPayload(apply)) {
+    return new EncryptedPayload({
       ...base.ejected(),
       ...apply.ejected(),
     })

@@ -31,6 +31,7 @@ export class DeltaRemoteConflicts extends PayloadsDelta<
 
   private async collectionsByHandlingDataConflicts(): Promise<ImmutablePayloadCollection<Return>> {
     const results: Return[] = []
+
     for (const payload of this.applyCollection.all()) {
       const current = this.findBasePayload(payload.uuid)
 
@@ -55,7 +56,9 @@ export class DeltaRemoteConflicts extends PayloadsDelta<
       )
 
       const deltaCollection = await delta.resultingCollection()
+
       const payloads = deltaCollection.all()
+
       extendArray(results, payloads)
     }
 

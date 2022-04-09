@@ -295,11 +295,12 @@ export class PayloadManager
    * and marks the items as dirty.
    * @returns Resulting items
    */
-  public async importPayloads(payloads: DecryptedPayloadInterface[]) {
+  public async importPayloads(payloads: DecryptedPayloadInterface[]): Promise<Uuid[]> {
+    const sourcedPayloads = payloads.map((p) => p.copy(undefined, PayloadSource.FileImport))
+
     const delta = new DeltaFileImport(
       this.getMasterCollection(),
-      ImmutablePayloadCollection.WithPayloads(payloads, PayloadSource.FileImport),
-      undefined,
+      ImmutablePayloadCollection.WithPayloads(sourcedPayloads, PayloadSource.FileImport),
     )
 
     const collection = await delta.resultingCollection()

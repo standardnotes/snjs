@@ -46,7 +46,11 @@ export class DeltaOutOfSync extends PayloadsDelta<
          * We create a copy of the local existing item and sync that up.
          * It will be a 'conflict' of itself
          */
-        const copyResults = await PayloadsByDuplicating(current, this.baseCollection, true)
+        const copyResults = await PayloadsByDuplicating({
+          payload: current,
+          baseCollection: this.baseCollection,
+          isConflict: true,
+        })
         extendArray(results, copyResults)
         continue
       }

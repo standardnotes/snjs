@@ -18,7 +18,12 @@ import {
   ChallengeReason,
   ChallengeService,
 } from '../Challenge'
-import { isDecryptedPayload } from '@standardnotes/models'
+import {
+  CreateDecryptedBackupFileContextPayload,
+  CreateEncryptedBackupFileContextPayload,
+  isDecryptedPayload,
+  isEncryptedTransferPayload,
+} from '@standardnotes/models'
 
 export class MutatorService extends AbstractService implements MutatorClientInterface {
   constructor(
@@ -336,6 +341,16 @@ export class MutatorService extends AbstractService implements MutatorClientInte
       return { error: new ClientDisplayableError('Import aborted') }
     }
 
+    data.items = data.items.map((item) => {
+      if (isEncryptedTransferPayload(item)) {
+        return CreateEncryptedBackupFileContextPayload(item)
+      } else {
+        return CreateDecryptedBackupFileContextPayload(
+          item as Models.BackupFileDecryptedContextualPayload,
+        )
+      }
+    })
+
     const decryptedPayloadsOrError = await this.encryption.decryptBackupFile(data, password)
 
     if (decryptedPayloadsOrError instanceof ClientDisplayableError) {
@@ -359,6 +374,7 @@ export class MutatorService extends AbstractService implements MutatorClientInte
     })
 
     const affectedUuids = await this.payloadManager.importPayloads(validPayloads)
+
     const promise = this.syncService.sync()
 
     if (awaitSync) {
@@ -368,6 +384,7 @@ export class MutatorService extends AbstractService implements MutatorClientInte
     const affectedItems = this.itemManager.findItems(
       affectedUuids,
     ) as Models.DecryptedItemInterface[]
+
     return {
       affectedItems: affectedItems,
       errorCount: decryptedPayloadsOrError.length - validPayloads.length,

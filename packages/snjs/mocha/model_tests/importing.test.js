@@ -254,16 +254,20 @@ describe('importing', function () {
 
   it('should import decrypted data and keep items that were previously deleted', async function () {
     await setup({ fakeCrypto: true })
+
     await Factory.registerUserToApplication({
       application: application,
       email: email,
       password: password,
     })
+
     Factory.handlePasswordChallenges(application, password)
+
     const [note, tag] = await Promise.all([
       Factory.createMappedNote(application),
       Factory.createMappedTag(application),
     ])
+
     await application.sync.sync({ awaitAll: true })
 
     await application.mutator.deleteItem(note)
@@ -278,10 +282,12 @@ describe('importing', function () {
       },
       true,
     )
+
     expect(application.itemManager.notes.length).to.equal(1)
-    expect(application.items.findItem(tag.uuid).deleted).to.be.false
+    expect(application.items.findItem(note.uuid).deleted).to.not.be.ok
+
     expect(application.itemManager.tags.length).to.equal(1)
-    expect(application.items.findItem(note.uuid).deleted).to.be.false
+    expect(application.items.findItem(tag.uuid).deleted).to.not.be.ok
   })
 
   it('should duplicate notes by alternating UUIDs when dealing with conflicts during importing', async function () {
@@ -350,11 +356,13 @@ describe('importing', function () {
 
   it('should import encrypted data and keep items that were previously deleted', async function () {
     await setup({ fakeCrypto: true })
+
     await Factory.registerUserToApplication({
       application: application,
       email: email,
       password: password,
     })
+
     const [note, tag] = await Promise.all([
       Factory.createMappedNote(application),
       Factory.createMappedTag(application),
@@ -371,10 +379,12 @@ describe('importing', function () {
     expect(application.items.findItem(tag.uuid)).to.not.exist
 
     await application.mutator.importData(backupData, true)
+
     expect(application.itemManager.notes.length).to.equal(1)
-    expect(application.items.findItem(tag.uuid).deleted).to.be.false
+    expect(application.items.findItem(note.uuid).deleted).to.not.be.ok
+
     expect(application.itemManager.tags.length).to.equal(1)
-    expect(application.items.findItem(note.uuid).deleted).to.be.false
+    expect(application.items.findItem(tag.uuid).deleted).to.not.be.ok
   })
 
   it('should import decrypted data and all items payload source should be FileImport', async function () {
@@ -400,6 +410,7 @@ describe('importing', function () {
 
     const importedNote = application.items.findItem(note.uuid)
     const importedTag = application.items.findItem(tag.uuid)
+
     expect(importedNote.payload.source).to.be.equal(PayloadSource.FileImport)
     expect(importedTag.payload.source).to.be.equal(PayloadSource.FileImport)
   })
@@ -581,6 +592,7 @@ describe('importing', function () {
 
   it('should not import data from 003 encrypted payload if an invalid password is provided', async function () {
     await setup({ fakeCrypto: true })
+
     const oldVersion = ProtocolVersion.V003
     await Factory.registerOldUser({
       application: application,
@@ -610,8 +622,10 @@ describe('importing', function () {
         application.submitValuesForChallenge(challenge, values)
       },
     })
+
     const result = await application.mutator.importData(backupData, true)
     expect(result).to.not.be.undefined
+
     expect(result.affectedItems.length).to.be.eq(0)
     expect(result.errorCount).to.be.eq(backupData.items.length)
     expect(application.itemManager.notes.length).to.equal(0)
@@ -831,13 +845,17 @@ describe('importing', function () {
     await Factory.safeDeinit(application)
   })
 
-  it('importing another accounts notes/tags should correctly keep relationships', async function () {
+  it.only('importing another accounts notes/tags should correctly keep relationships', async function () {
+    this.timeout(Factory.TwentySecondTimeout)
+
     await setup({ fakeCrypto: true })
+
     await Factory.registerUserToApplication({
       application: application,
       email: email,
       password: password,
     })
+
     Factory.handlePasswordChallenges(application, password)
 
     const pair = Factory.createRelatedNoteTagPairPayload()

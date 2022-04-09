@@ -22,12 +22,14 @@ export class DeltaFileImport extends PayloadsDelta<
 
     for (const payload of this.applyCollection.all()) {
       const handled = await this.payloadsByHandlingPayload(payload, results)
+
       const payloads = handled.map((result) => {
         return result.copy({
           dirty: true,
           dirtiedDate: new Date(),
         })
       })
+
       extendArray(results, payloads)
     }
 
@@ -37,7 +39,7 @@ export class DeltaFileImport extends PayloadsDelta<
   private async payloadsByHandlingPayload(
     payload: DecryptedPayloadInterface | DeletedPayloadInterface,
     currentResults: Return[],
-  ) {
+  ): Promise<FullyFormedPayloadInterface[]> {
     /**
      * Check to see if we've already processed a payload for this id.
      * If so, that would be the latest value, and not what's in the base collection.
@@ -78,7 +80,9 @@ export class DeltaFileImport extends PayloadsDelta<
     }
 
     const delta = new ConflictDelta(this.baseCollection, current, payload, PayloadSource.FileImport)
+
     const deltaCollection = await delta.resultingCollection()
+
     return deltaCollection.all()
   }
 }

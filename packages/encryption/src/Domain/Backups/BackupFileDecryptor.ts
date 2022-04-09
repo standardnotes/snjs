@@ -21,6 +21,7 @@ import {
   isDecryptedTransferPayload,
   CreateDecryptedItemFromPayload,
   ItemsKeyInterface,
+  CreatePayloadSplit,
 } from '@standardnotes/models'
 import { ClientDisplayableError } from '@standardnotes/responses'
 import { CreateAnyKeyParams } from '../RootKey/KeyParams'
@@ -46,7 +47,8 @@ export async function DecryptBackupFile(
     },
   )
 
-  const encrypted = payloads.filter(isEncryptedPayload)
+  const { encrypted, decrypted } = CreatePayloadSplit(payloads)
+
   const type = getBackupFileType(file, payloads)
 
   switch (type) {
@@ -56,18 +58,26 @@ export async function DecryptBackupFile(
       if (!password) {
         throw Error('Attempting to decrypt encrypted file with no password')
       }
+
       const keyParamsData = (file.keyParams || file.auth_params) as AnyKeyParamsContent
-      return decryptEncrypted(
-        password,
-        CreateAnyKeyParams(keyParamsData),
-        encrypted,
-        protocolService,
-      )
+
+      return [
+        ...decrypted,
+        ...(await decryptEncrypted(
+          password,
+          CreateAnyKeyParams(keyParamsData),
+          encrypted,
+          protocolService,
+        )),
+      ]
     }
     case BackupFileType.EncryptedWithNonEncryptedItemsKey:
-      return decryptEncryptedWithNonEncryptedItemsKey(payloads, protocolService)
+      return [
+        ...decrypted,
+        ...(await decryptEncryptedWithNonEncryptedItemsKey(payloads, protocolService)),
+      ]
     case BackupFileType.FullyDecrypted:
-      return payloads
+      return [...decrypted, ...encrypted]
   }
 }
 
@@ -225,31 +235,32 @@ async function decryptEncrypted(
   payloads: EncryptedPayloadInterface[],
   protocolService: EncryptionService,
 ): Promise<(EncryptedPayloadInterface | DecryptedPayloadInterface)[]> {
+  const results: (EncryptedPayloadInterface | DecryptedPayloadInterface)[] = []
   const rootKey = await protocolService.computeRootKey(password, keyParams)
 
   const itemsKeysPayloads = payloads.filter((payload) => {
     return payload.content_type === ContentType.ItemsKey
   })
 
-  const decryptedItemsKeysPayloads = (
-    await protocolService.decryptSplit({
-      usesRootKey: {
-        items: itemsKeysPayloads,
-        key: rootKey,
-      },
-    })
-  ).filter(isDecryptedPayload)
+  const itemsKeysDecryptionResults = await protocolService.decryptSplit({
+    usesRootKey: {
+      items: itemsKeysPayloads,
+      key: rootKey,
+    },
+  })
 
-  const results: (EncryptedPayloadInterface | DecryptedPayloadInterface)[] = []
-  extendArray(results, decryptedItemsKeysPayloads)
+  extendArray(results, itemsKeysDecryptionResults)
 
   const decryptedPayloads = await decryptWithItemsKeys(
     payloads,
-    decryptedItemsKeysPayloads.map((p) => CreateDecryptedItemFromPayload(p)),
+    itemsKeysDecryptionResults
+      .filter(isDecryptedPayload)
+      .map((p) => CreateDecryptedItemFromPayload(p)),
     protocolService,
     keyParams,
     rootKey,
   )
+
   extendArray(results, decryptedPayloads)
 
   return results

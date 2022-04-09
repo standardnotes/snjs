@@ -672,12 +672,12 @@ export class ItemManager
   ) {
     const item = this.findSureItem(itemToLookupUuidFor.uuid)
     const payload = item.payload.copy()
-    const resultingPayloads = await Models.PayloadsByDuplicating(
+    const resultingPayloads = await Models.PayloadsByDuplicating({
       payload,
-      this.payloadManager.getMasterCollection(),
+      baseCollection: this.payloadManager.getMasterCollection(),
       isConflict,
       additionalContent,
-    )
+    })
 
     await this.payloadManager.emitPayloads(resultingPayloads, Models.PayloadSource.LocalChanged)
     const duplicate = this.findSureItem<T>(resultingPayloads[0].uuid)

@@ -156,18 +156,24 @@ describe('features', () => {
         })
       })
 
-      const themeItemUuid = application.items.getItems(ContentType.Theme)[0].uuid
+      const themeItem = application.items.getItems(ContentType.Theme)[0]
 
       // Wipe roles from initial sync
       await application.featuresService.setRoles([])
+
       // Call sync intentionally to get roles again in meta
       await application.sync.sync()
+
       // Timeout since we don't await for features update
       await new Promise((resolve) => setTimeout(resolve, 1000))
-      expect(application.itemManager.setItemsToBeDeleted.calledWith([themeItemUuid])).to.be.ok
+      expect(
+        application.itemManager.setItemsToBeDeleted.calledWith([
+          sinon.match({ uuid: themeItem.uuid }),
+        ]),
+      ).to.equal(true)
 
-      const themeItem = application.items.getItems(ContentType.Theme)[0]
-      expect(themeItem).to.not.be.ok
+      const noTheme = application.items.getItems(ContentType.Theme)[0]
+      expect(noTheme).to.not.be.ok
     })
   })
 
@@ -181,7 +187,9 @@ describe('features', () => {
       sinon.stub(application.apiService, 'isThirdPartyHostUsed').callsFake(() => {
         return false
       })
-      expect(await application.settings.getDoesSensitiveSettingExist(SettingName.ExtensionKey)).to.equal(false)
+      expect(
+        await application.settings.getDoesSensitiveSettingExist(SettingName.ExtensionKey),
+      ).to.equal(false)
       const extensionKey = UuidGenerator.GenerateUuid().split('-').join('')
       const promise = new Promise((resolve) => {
         sinon
@@ -268,7 +276,9 @@ describe('features', () => {
       sinon.stub(application.apiService, 'isThirdPartyHostUsed').callsFake(() => {
         return false
       })
-      expect(await application.settings.getDoesSensitiveSettingExist(SettingName.ExtensionKey)).to.equal(false)
+      expect(
+        await application.settings.getDoesSensitiveSettingExist(SettingName.ExtensionKey),
+      ).to.equal(false)
       const extensionKey = UuidGenerator.GenerateUuid().split('-').join('')
       const promise = new Promise((resolve) => {
         application.streamItems(ContentType.ExtensionRepo, (changed) => {

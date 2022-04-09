@@ -138,7 +138,6 @@ export abstract class GenericItem<P extends PayloadInterface = PayloadInterface>
 
     if (isDeletedItem(item)) {
       if (this.payload.source === PayloadSource.FileImport) {
-        /** Imported items take precedence */
         return ConflictStrategy.KeepLeft
       }
       return ConflictStrategy.KeepRight
