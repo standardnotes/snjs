@@ -36,6 +36,8 @@ import {
   CreateDecryptedBackupFileContextPayload,
   CreateEncryptedBackupFileContextPayload,
   EncryptedPayload,
+  isDecryptedPayload,
+  isEncryptedPayload,
 } from '@standardnotes/models'
 import { SplitPayloadsByEncryptionType } from '../../Encryption/Split/EncryptionTypeSplit'
 import { ClientDisplayableError } from '@standardnotes/responses'
@@ -462,15 +464,20 @@ export class EncryptionService
   }
 
   public createDecryptedBackupFile(): BackupFile {
-    const items = this.itemManager
-      .allItems()
-      .filter((item) => item.content_type !== Common.ContentType.ItemsKey)
+    const payloads = this.payloadManager.nonDeletedItems.filter(
+      (item) => item.content_type !== Common.ContentType.ItemsKey,
+    )
 
     const data: BackupFile = {
       version: Common.ProtocolVersionLatest,
-      items: items
-        .map((item) => {
-          return CreateDecryptedBackupFileContextPayload(item.payload)
+      items: payloads
+        .map((payload) => {
+          if (isDecryptedPayload(payload)) {
+            return CreateDecryptedBackupFileContextPayload(payload)
+          } else if (isEncryptedPayload(payload)) {
+            return CreateEncryptedBackupFileContextPayload(payload)
+          }
+          return undefined
         })
         .filter(isNotUndefined),
     }

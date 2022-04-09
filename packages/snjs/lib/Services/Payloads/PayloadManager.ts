@@ -91,10 +91,7 @@ export class PayloadManager
     return this.collection.integrityPayloads()
   }
 
-  /**
-   * Returns a detached array of all items which are not deleted
-   */
-  public get nonDeletedItems() {
+  public get nonDeletedItems(): FullyFormedPayloadInterface[] {
     return this.collection.nondeletedElements()
   }
 
