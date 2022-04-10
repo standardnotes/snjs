@@ -9,7 +9,7 @@ import * as Models from '@standardnotes/models'
 import * as Services from '@standardnotes/services'
 import { ItemsClientInterface } from './ItemsClientInterface'
 import { PayloadManagerChangeData } from '../Payloads'
-import { DecryptedItemInterface } from '@standardnotes/models'
+import { DecryptedItemInterface, ItemInterface } from '@standardnotes/models'
 
 type ItemsChangeObserver = {
   contentType: ContentType[]
@@ -801,6 +801,10 @@ export class ItemManager
     contentType: ContentType | ContentType[],
   ): T[] {
     return this.collection.allDecrypted<T>(contentType)
+  }
+
+  getAnyItems(contentType: ContentType | ContentType[]): ItemInterface[] {
+    return this.collection.all(contentType)
   }
 
   public itemsMatchingPredicate<T extends Models.DecryptedItemInterface>(

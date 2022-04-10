@@ -30,16 +30,16 @@ export class DeltaOutOfSync extends PayloadsDelta<
        */
       results.push(payload)
 
-      const current = this.findBasePayload(payload.uuid)
-      if (!current) {
+      const base = this.findBasePayload(payload.uuid)
+      if (!base) {
         continue
       }
 
+      const isBaseDecrypted = isDecryptedPayload(base)
       const isApplyDecrypted = isDecryptedPayload(payload)
-      const isCurrentDecrypted = isDecryptedPayload(current)
       const needsConflict =
-        isApplyDecrypted !== isCurrentDecrypted ||
-        (isApplyDecrypted && isCurrentDecrypted && PayloadContentsEqual(payload, current))
+        isApplyDecrypted !== isBaseDecrypted ||
+        (isApplyDecrypted && isBaseDecrypted && !PayloadContentsEqual(payload, base))
 
       if (needsConflict) {
         /**
@@ -47,7 +47,7 @@ export class DeltaOutOfSync extends PayloadsDelta<
          * It will be a 'conflict' of itself
          */
         const copyResults = await PayloadsByDuplicating({
-          payload: current,
+          payload: base,
           baseCollection: this.baseCollection,
           isConflict: true,
         })

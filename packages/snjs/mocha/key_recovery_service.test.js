@@ -51,14 +51,13 @@ describe('key recovery service', function () {
     const randomItemsKey = await application.protocolService.operatorManager
       .defaultOperator()
       .createItemsKey()
-    const encrypted = CreateEncryptedServerSyncPushPayload(
-      await application.protocolService.encryptSplitSingle({
-        usesRootKey: {
-          items: [randomItemsKey.payload],
-          key: randomRootKey,
-        },
-      }),
-    )
+
+    const encrypted = await application.protocolService.encryptSplitSingle({
+      usesRootKey: {
+        items: [randomItemsKey.payload],
+        key: randomRootKey,
+      },
+    })
 
     /** Attempt decryption and insert into rotation in errored state  */
     const decrypted = await application.protocolService.decryptSplitSingle({
@@ -76,7 +75,7 @@ describe('key recovery service', function () {
     await Factory.sleep(0.3)
 
     /** Should be decrypted now */
-    expect(application.items.findItem(encrypted.uuid).errorDecrypting).to.equal(false)
+    expect(application.items.findItem(encrypted.uuid).errorDecrypting).to.not.be.ok
 
     expect(application.syncService.isOutOfSync()).to.equal(false)
     await context.deinit()
@@ -118,14 +117,13 @@ describe('key recovery service', function () {
     const randomItemsKey2 = await application.protocolService.operatorManager
       .defaultOperator()
       .createItemsKey()
-    const encrypted = (
-      await application.protocolService.encryptSplit({
-        usesRootKey: {
-          items: [randomItemsKey.payload, randomItemsKey2.payload],
-          key: randomRootKey,
-        },
-      })
-    ).map(CreateEncryptedServerSyncPushPayload)
+
+    const encrypted = await application.protocolService.encryptSplit({
+      usesRootKey: {
+        items: [randomItemsKey.payload, randomItemsKey2.payload],
+        key: randomRootKey,
+      },
+    })
 
     /** Attempt decryption and insert into rotation in errored state  */
     const decrypted = await application.protocolService.decryptSplit({
@@ -140,8 +138,8 @@ describe('key recovery service', function () {
     await Factory.sleep(1.5)
 
     /** Should be decrypted now */
-    expect(application.items.findItem(randomItemsKey.uuid).errorDecrypting).to.equal(false)
-    expect(application.items.findItem(randomItemsKey2.uuid).errorDecrypting).to.equal(false)
+    expect(application.items.findItem(randomItemsKey.uuid).errorDecrypting).not.be.ok
+    expect(application.items.findItem(randomItemsKey2.uuid).errorDecrypting).not.be.ok
 
     expect(totalPromptCount).to.equal(1)
 
@@ -159,6 +157,7 @@ describe('key recovery service', function () {
     const newPassword = `${Math.random()}`
     const contextA = await Factory.createAppContextWithFakeCrypto(namespace)
     const appA = contextA.application
+
     const receiveChallenge = (challenge) => {
       const responses = []
       for (const prompt of challenge.prompts) {
@@ -197,6 +196,7 @@ describe('key recovery service', function () {
     const appB = contextB.application
     await appB.prepareForLaunch({})
     await appB.launch(true)
+
     await Factory.loginToApplication({
       application: appB,
       email: contextA.email,
@@ -206,16 +206,23 @@ describe('key recovery service', function () {
     /** Change password on appB */
     const result = await appB.changePassword(contextA.password, newPassword)
     expect(result.error).to.not.be.ok
+
     const note = await Factory.createSyncedNote(appB)
-    expect(appB.items.getItems(ContentType.ItemsKey).length).to.equal(2)
+
+    expect(appB.items.getAnyItems(ContentType.ItemsKey).length).to.equal(2)
+
     await appB.sync.sync(syncOptions)
 
+    expect(appA.items.getAnyItems(ContentType.ItemsKey).length).to.equal(1)
+
+    appA.syncService.loggingEnabled = true
+
     /** Sync appA and expect a new items key to be downloaded and errored */
-    expect(appA.items.getItems(ContentType.ItemsKey).length).to.equal(1)
     const syncPromise = appA.sync.sync(syncOptions)
     await contextA.awaitNextSucessfulSync()
     await syncPromise
-    expect(appA.items.getItems(ContentType.ItemsKey).length).to.equal(2)
+
+    expect(appA.items.getAnyItems(ContentType.ItemsKey).length).to.equal(2)
 
     /** Same previously errored key should now no longer be errored, */
     const keys = appA.itemManager.itemsKeys()
@@ -341,14 +348,13 @@ describe('key recovery service', function () {
     const correctItemsKey = await application.protocolService.operatorManager
       .defaultOperator()
       .createItemsKey()
-    const encrypted = CreateEncryptedServerSyncPushPayload(
-      await application.protocolService.encryptSplitSingle({
-        usesRootKey: {
-          items: [correctItemsKey.payload],
-          key: randomRootKey,
-        },
-      }),
-    )
+    const encrypted = await application.protocolService.encryptSplitSingle({
+      usesRootKey: {
+        items: [correctItemsKey.payload],
+        key: randomRootKey,
+      },
+    })
+
     await application.payloadManager.emitPayload(
       encrypted.copy({
         errorDecrypting: true,
@@ -388,13 +394,11 @@ describe('key recovery service', function () {
 
     /** Create and emit errored encrypted items key payload */
     const itemsKey = await application.protocolService.getSureDefaultItemsKey()
-    const encrypted = CreateEncryptedServerSyncPushPayload(
-      await application.protocolService.encryptSplitSingle({
-        usesRootKeyWithKeyLookup: {
-          items: [itemsKey.payload],
-        },
-      }),
-    )
+    const encrypted = await application.protocolService.encryptSplitSingle({
+      usesRootKeyWithKeyLookup: {
+        items: [itemsKey.payload],
+      },
+    })
     const newUpdated = new Date()
     await application.payloadManager.emitPayload(
       encrypted.copy({
@@ -448,13 +452,11 @@ describe('key recovery service', function () {
 
     /** Create and emit errored encrypted items key payload */
     const itemsKey = await application.protocolService.getSureDefaultItemsKey()
-    const encrypted = CreateEncryptedServerSyncPushPayload(
-      await application.protocolService.encryptSplitSingle({
-        usesRootKeyWithKeyLookup: {
-          items: [itemsKey.payload],
-        },
-      }),
-    )
+    const encrypted = await application.protocolService.encryptSplitSingle({
+      usesRootKeyWithKeyLookup: {
+        items: [itemsKey.payload],
+      },
+    })
 
     await application.payloadManager.emitPayload(
       encrypted.copy({
@@ -531,14 +533,13 @@ describe('key recovery service', function () {
     const randomItemsKey = await application.protocolService.operatorManager
       .operatorForVersion(ProtocolVersion.V003)
       .createItemsKey()
-    const encrypted = CreateEncryptedServerSyncPushPayload(
-      await application.protocolService.encryptSplitSingle({
-        usesRootKey: {
-          items: [randomItemsKey.payload],
-          key: randomRootKey,
-        },
-      }),
-    )
+
+    const encrypted = await application.protocolService.encryptSplitSingle({
+      usesRootKey: {
+        items: [randomItemsKey.payload],
+        key: randomRootKey,
+      },
+    })
 
     /** Attempt decryption and insert into rotation in errored state  */
     const decrypted = await application.protocolService.decryptSplitSingle({
@@ -556,7 +557,7 @@ describe('key recovery service', function () {
     await Factory.sleep(0.3)
 
     /** Should be decrypted now */
-    expect(application.items.findItem(encrypted.uuid).errorDecrypting).to.equal(false)
+    expect(application.items.findItem(encrypted.uuid).errorDecrypting).to.not.be.ok
 
     expect(application.syncService.isOutOfSync()).to.equal(false)
     await context.deinit()
@@ -616,13 +617,11 @@ describe('key recovery service', function () {
 
     const newDefaultKey = appB.protocolService.getSureDefaultItemsKey()
 
-    const encrypted = CreateEncryptedServerSyncPushPayload(
-      await appB.protocolService.encryptSplitSingle({
-        usesRootKeyWithKeyLookup: {
-          items: [newDefaultKey.payload],
-        },
-      }),
-    )
+    const encrypted = await appB.protocolService.encryptSplitSingle({
+      usesRootKeyWithKeyLookup: {
+        items: [newDefaultKey.payload],
+      },
+    })
 
     /** Insert foreign items key into appA, which shouldn't be able to decrypt it yet */
     await appA.payloadManager.emitPayload(
