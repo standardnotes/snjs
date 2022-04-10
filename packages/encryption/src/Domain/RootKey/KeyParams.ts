@@ -54,7 +54,7 @@ export function Create004KeyParams(keyParams: KeyParamsContent004) {
 }
 
 export function CreateAnyKeyParams(keyParams: AnyKeyParamsContent) {
-  if ((keyParams as any).content) {
+  if ('content' in keyParams) {
     throw Error(
       'Raw key params shouldnt have content; perhaps you passed in a SNRootKeyParams object.',
     )

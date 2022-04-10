@@ -1,19 +1,20 @@
 import { SQS } from 'aws-sdk'
 import { Consumer, SQSMessage } from 'sqs-consumer'
 
-import { DomainEventMessageHandlerInterface } from '@standardnotes/domain-events'
-import { DomainEventSubscriberFactoryInterface } from '@standardnotes/domain-events'
-import { DomainEventSubscriberInterface } from '@standardnotes/domain-events'
+import {
+  DomainEventMessageHandlerInterface,
+  DomainEventSubscriberFactoryInterface,
+  DomainEventSubscriberInterface,
+} from '@standardnotes/domain-events'
 
 export class SQSDomainEventSubscriberFactory implements DomainEventSubscriberFactoryInterface {
-  constructor (
+  constructor(
     private sqs: SQS,
     private queueUrl: string,
-    private domainEventMessageHandler: DomainEventMessageHandlerInterface
-  ) {
-  }
+    private domainEventMessageHandler: DomainEventMessageHandlerInterface,
+  ) {}
 
-  create (): DomainEventSubscriberInterface {
+  create(): DomainEventSubscriberInterface {
     const sqsConsumer = Consumer.create({
       attributeNames: ['All'],
       messageAttributeNames: ['compression', 'event'],
@@ -21,11 +22,18 @@ export class SQSDomainEventSubscriberFactory implements DomainEventSubscriberFac
       sqs: this.sqs,
       handleMessage:
         /* istanbul ignore next */
-        async (message: SQSMessage) => await this.domainEventMessageHandler.handleMessage(<string> message.Body),
+        async (message: SQSMessage) =>
+          await this.domainEventMessageHandler.handleMessage(<string>message.Body),
     })
 
-    sqsConsumer.on('error', this.domainEventMessageHandler.handleError.bind(this.domainEventMessageHandler))
-    sqsConsumer.on('processing_error', this.domainEventMessageHandler.handleError.bind(this.domainEventMessageHandler))
+    sqsConsumer.on(
+      'error',
+      this.domainEventMessageHandler.handleError.bind(this.domainEventMessageHandler),
+    )
+    sqsConsumer.on(
+      'processing_error',
+      this.domainEventMessageHandler.handleError.bind(this.domainEventMessageHandler),
+    )
 
     return sqsConsumer
   }

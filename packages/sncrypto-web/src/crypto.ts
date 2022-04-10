@@ -3,17 +3,14 @@ import {
   StreamDecryptor,
   SodiumConstant,
   StreamDecryptorResult,
-} from '@standardnotes/sncrypto-common'
-import * as Utils from './utils'
-import * as sodium from './libsodium'
-
-import {
   Base64String,
   HexString,
   SNPureCrypto,
   Utf8String,
   timingSafeEqual,
 } from '@standardnotes/sncrypto-common'
+import * as Utils from './utils'
+import * as sodium from './libsodium'
 
 enum WebCryptoAlgs {
   AesCbc = 'AES-CBC',

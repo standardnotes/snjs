@@ -1,20 +1,19 @@
-import { omitInPlace, sortedCopy } from '@standardnotes/utils';
-import { ItemContent } from '../../Abstract/Content/ItemContent';
-import { DefaultAppDomain } from '../../Abstract/Item/Types/DefaultAppDomain';
-import { AppDataField } from '../../Abstract/Item/Types/AppDataField';
-
+import { omitInPlace, sortedCopy } from '@standardnotes/utils'
+import { ItemContent } from '../../Abstract/Content/ItemContent'
+import { DefaultAppDomain } from '../../Abstract/Item/Types/DefaultAppDomain'
+import { AppDataField } from '../../Abstract/Item/Types/AppDataField'
 
 export function ItemContentsEqual<C extends ItemContent = ItemContent>(
   leftContent: C,
   rightContent: C,
   keysToIgnore: (keyof C)[],
-  appDataKeysToIgnore: AppDataField[]
+  appDataKeysToIgnore: AppDataField[],
 ) {
   /* Create copies of objects before running omit as not to modify source values directly. */
-  const leftContentCopy: Partial<C> = sortedCopy(leftContent);
+  const leftContentCopy: Partial<C> = sortedCopy(leftContent)
   if (leftContentCopy.appData) {
-    const domainData = leftContentCopy.appData[DefaultAppDomain];
-    omitInPlace(domainData, appDataKeysToIgnore);
+    const domainData = leftContentCopy.appData[DefaultAppDomain]
+    omitInPlace(domainData, appDataKeysToIgnore)
     /**
      * We don't want to disqualify comparison if one object contains an empty domain object
      * and the other doesn't contain a domain object. This can happen if you create an item
@@ -22,27 +21,27 @@ export function ItemContentsEqual<C extends ItemContent = ItemContent>(
      */
     if (domainData) {
       if (Object.keys(domainData).length === 0) {
-        delete leftContentCopy.appData;
+        delete leftContentCopy.appData
       }
     } else {
-      delete leftContentCopy.appData;
+      delete leftContentCopy.appData
     }
   }
-  omitInPlace<Partial<C>>(leftContentCopy, keysToIgnore);
+  omitInPlace<Partial<C>>(leftContentCopy, keysToIgnore)
 
-  const rightContentCopy: Partial<C> = sortedCopy(rightContent);
+  const rightContentCopy: Partial<C> = sortedCopy(rightContent)
   if (rightContentCopy.appData) {
-    const domainData = rightContentCopy.appData[DefaultAppDomain];
-    omitInPlace(domainData, appDataKeysToIgnore);
+    const domainData = rightContentCopy.appData[DefaultAppDomain]
+    omitInPlace(domainData, appDataKeysToIgnore)
     if (domainData) {
       if (Object.keys(domainData).length === 0) {
-        delete rightContentCopy.appData;
+        delete rightContentCopy.appData
       }
     } else {
-      delete rightContentCopy.appData;
+      delete rightContentCopy.appData
     }
   }
-  omitInPlace<Partial<C>>(rightContentCopy, keysToIgnore);
+  omitInPlace<Partial<C>>(rightContentCopy, keysToIgnore)
 
-  return JSON.stringify(leftContentCopy) === JSON.stringify(rightContentCopy);
+  return JSON.stringify(leftContentCopy) === JSON.stringify(rightContentCopy)
 }
