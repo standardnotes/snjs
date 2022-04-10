@@ -1,6 +1,5 @@
 {
   "compilerOptions": {
-    "allowJs": true,
     "alwaysStrict": true,
     "declaration": true,
     "emitDecoratorMetadata": true,
@@ -20,5 +19,5 @@
     "strictNullChecks": true,
     "target": "es6"
   },
-  "exclude": ["**/*.spec.ts", "dist", "coverage"]
+  "exclude": ["**/*.spec.ts", "dist"]
 }

@@ -109,7 +109,6 @@ describe('auth fringe cases', () => {
       /** Sign in and merge local data */
       await newApplication.signIn(context.email, context.password, undefined, undefined, true, true)
 
-      console.log('all payload', newApplication.payloadManager.collection.map)
       expect(newApplication.itemManager.notes.length).to.equal(2)
 
       expect(

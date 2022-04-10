@@ -47,8 +47,10 @@ async function readFile(
 
   let previousChunk: Uint8Array
 
-  const processChunk = async ({ done, value }: { done: boolean; value: never }): Promise<void> => {
-    if (done) {
+  const processChunk = async (
+    result: ReadableStreamDefaultReadResult<Uint8Array>,
+  ): Promise<void> => {
+    if (result.done) {
       await byteChunker.addBytes(previousChunk, true)
       return
     }
@@ -57,7 +59,7 @@ async function readFile(
       await byteChunker.addBytes(previousChunk, false)
     }
 
-    previousChunk = value
+    previousChunk = result.value
 
     return reader.read().then(processChunk)
   }
