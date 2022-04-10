@@ -609,23 +609,28 @@ describe('notes and tags', () => {
         email: Factory.generateUuid(),
         password: Factory.generateUuid(),
       })
+
       const recentNote = await this.application.mutator.insertItem(
         await this.application.mutator.createTemplateItem(ContentType.Note, {
           title: 'A',
         }),
       )
+
       await this.application.sync.sync()
+
       const olderNote = await this.application.mutator.insertItem(
         await this.application.mutator.createTemplateItem(ContentType.Note, {
           title: 'B',
           text: 'b',
         }),
       )
-      await this.application.mutator.changeItem(olderNote, (mutator) => {
-        const threeDays = 3 * 24 * 60 * 60 * 1000
-        throw Error('@TESTTODO updated_at no longer exists on mutator')
-        // mutator.updated_at = new Date(Date.now() - threeDays)
-      })
+
+      const threeDays = 3 * 24 * 60 * 60 * 1000
+      await Factory.changePayloadUpdatedAt(
+        this.application,
+        olderNote.payload,
+        new Date(Date.now() - threeDays),
+      )
 
       /** Create an unsynced note which shouldn't get an updated_at */
       await this.application.mutator.insertItem(
@@ -778,7 +783,7 @@ describe('notes and tags', () => {
       const displayedNotes = this.application.items.getDisplayableNotes()
       expect(displayedNotes).to.deep.equal(matches)
       expect(matches.length).to.equal(1)
-      expect(matches[0].uuid).to.equal(pinnedAndLockedNote)
+      expect(matches[0].uuid).to.equal(pinnedAndLockedNote.uuid)
     })
 
     it('"ignored", "or", [["content.protected", "=", true], ["pinned", "=", true]]', async function () {

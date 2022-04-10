@@ -153,13 +153,11 @@ describe('backups', function () {
 
     const note = await Factory.createSyncedNote(this.application)
 
-    const encrypted = CreateEncryptedBackupFileContextPayload(
-      await this.application.protocolService.encryptSplitSingle({
-        usesItemsKeyWithKeyLookup: {
-          items: [note.payload],
-        },
-      }),
-    )
+    const encrypted = await this.application.protocolService.encryptSplitSingle({
+      usesItemsKeyWithKeyLookup: {
+        items: [note.payload],
+      },
+    })
 
     const errored = encrypted.copy({
       errorDecrypting: true,

@@ -722,6 +722,20 @@ export async function changePayloadTimeStamp(application, payload, timestamp, co
   return application.itemManager.findAnyItem(payload.uuid)
 }
 
+export async function changePayloadUpdatedAt(application, payload, updatedAt) {
+  const latestPayload = application.payloadManager.collection.find(payload.uuid)
+  const changedPayload = new DecryptedPayload({
+    ...latestPayload,
+    dirty: true,
+    dirtiedDate: new Date(),
+    updated_at: updatedAt,
+  })
+
+  await application.itemManager.emitItemFromPayload(changedPayload)
+
+  return application.itemManager.findAnyItem(payload.uuid)
+}
+
 export async function changePayloadTimeStampDeleteAndSync(
   application,
   payload,
