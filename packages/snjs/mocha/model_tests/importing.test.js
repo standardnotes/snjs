@@ -845,7 +845,7 @@ describe('importing', function () {
     await Factory.safeDeinit(application)
   })
 
-  it.only('importing another accounts notes/tags should correctly keep relationships', async function () {
+  it('importing another accounts notes/tags should correctly keep relationships', async function () {
     this.timeout(Factory.TwentySecondTimeout)
 
     await setup({ fakeCrypto: true })

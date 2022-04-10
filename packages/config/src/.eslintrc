@@ -37,7 +37,7 @@
     "no-unmodified-loop-condition": "error",
     "no-unused-private-class-members": "error",
     "object-curly-spacing": ["error", "always"],
-    "quotes": ["error", "single"],
+    "quotes": ["error", "single", { "avoidEscape": true }],
     "semi": ["error", "never"]
   }
 }
