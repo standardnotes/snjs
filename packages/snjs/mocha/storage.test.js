@@ -265,7 +265,7 @@ describe('storage manager', function () {
     expect(payload.fields).to.not.be.ok
     expect(payload.source).to.not.be.ok
     expect(payload.format).to.not.be.ok
-    expect(payload.dirtiedDate).to.not.be.ok
+    expect(payload.dirtiedDate).to.be.ok
   })
 
   it('signing out should clear unwrapped value store', async function () {
