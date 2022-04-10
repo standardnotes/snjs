@@ -15,10 +15,7 @@ export class OfflineSyncOperation {
   constructor(
     private payloads: (DecryptedPayloadInterface | DeletedPayloadInterface)[],
     private receiver: ResponseSignalReceiver<OfflineSyncResponse>,
-  ) {
-    this.payloads = payloads
-    this.receiver = receiver
-  }
+  ) {}
 
   async run() {
     const responsePayloads = this.payloads.map((payload) => {

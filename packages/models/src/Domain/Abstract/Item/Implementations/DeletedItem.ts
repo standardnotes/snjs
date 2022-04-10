@@ -7,11 +7,12 @@ export class DeletedItem
   extends GenericItem<DeletedPayloadInterface>
   implements DeletedItemInterface
 {
-  deleted: true = true
+  deleted: true
   content: undefined
 
   constructor(payload: DeletedPayloadInterface) {
     super(payload)
+    this.deleted = true
   }
 
   public override payloadRepresentation(

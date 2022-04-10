@@ -22,8 +22,8 @@ export abstract class PurePayload<T extends TransferPayload<C>, C extends ItemCo
 
   readonly created_at: Date
   readonly updated_at: Date
-  readonly created_at_timestamp: number = 0
-  readonly updated_at_timestamp: number = 0
+  readonly created_at_timestamp: number
+  readonly updated_at_timestamp: number
   readonly dirtiedDate?: Date
   readonly dirty?: boolean
 
