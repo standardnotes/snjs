@@ -265,7 +265,32 @@ describe('storage manager', function () {
     expect(payload.fields).to.not.be.ok
     expect(payload.source).to.not.be.ok
     expect(payload.format).to.not.be.ok
-    expect(payload.dirtiedDate).to.be.ok
+  })
+
+  it('storing an offline synced payload should not include dirty flags', async function () {
+    await this.application.addPasscode('123')
+    await Factory.createSyncedNote(this.application)
+    const payloads = await this.application.storageService.getAllRawPayloads()
+    const payload = payloads[0]
+
+    expect(payload.dirtiedDate).to.not.be.ok
+    expect(payload.dirty).to.not.be.ok
+  })
+
+  it('storing an online synced payload should not include dirty flags', async function () {
+    await Factory.registerUserToApplication({
+      application: this.application,
+      email: this.email,
+      password: this.password,
+      ephemeral: false,
+    })
+
+    await Factory.createSyncedNote(this.application)
+    const payloads = await this.application.storageService.getAllRawPayloads()
+    const payload = payloads[0]
+
+    expect(payload.dirtiedDate).to.not.be.ok
+    expect(payload.dirty).to.not.be.ok
   })
 
   it('signing out should clear unwrapped value store', async function () {

@@ -49,6 +49,7 @@ export class DeltaOfflineSaved extends CustomApplyDelta {
             deleted: false,
             lastSyncEnd: new Date(),
             dirty: deleted,
+            dirtiedDate: deleted ? new Date() : undefined,
           },
           PayloadSource.LocalSaved,
         )
