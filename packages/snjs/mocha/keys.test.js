@@ -93,14 +93,12 @@ describe('keys', function () {
     const rootKey = await this.application.protocolService.getRootKey()
 
     /** Encrypt items key */
-    const encryptedPayload = CreateEncryptedServerSyncPushPayload(
-      await this.application.protocolService.encryptSplitSingle({
-        usesRootKey: {
-          items: [itemsKey.payloadRepresentation()],
-          key: rootKey,
-        },
-      }),
-    )
+    const encryptedPayload = await this.application.protocolService.encryptSplitSingle({
+      usesRootKey: {
+        items: [itemsKey.payloadRepresentation()],
+        key: rootKey,
+      },
+    })
 
     /** Should not have an items_key_id */
     expect(encryptedPayload.items_key_id).to.not.be.ok
@@ -152,13 +150,11 @@ describe('keys', function () {
 
   it('encrypting an item should associate an items key to it', async function () {
     const note = Factory.createNotePayload()
-    const encryptedPayload = CreateEncryptedServerSyncPushPayload(
-      await this.application.protocolService.encryptSplitSingle({
-        usesItemsKeyWithKeyLookup: {
-          items: [note],
-        },
-      }),
-    )
+    const encryptedPayload = await this.application.protocolService.encryptSplitSingle({
+      usesItemsKeyWithKeyLookup: {
+        items: [note],
+      },
+    })
 
     const itemsKey = this.application.protocolService.itemsKeyForPayload(encryptedPayload)
     expect(itemsKey).to.be.ok
@@ -167,13 +163,11 @@ describe('keys', function () {
   it('decrypt encrypted item with associated key', async function () {
     const note = Factory.createNotePayload()
     const title = note.content.title
-    const encryptedPayload = CreateEncryptedServerSyncPushPayload(
-      await this.application.protocolService.encryptSplitSingle({
-        usesItemsKeyWithKeyLookup: {
-          items: [note],
-        },
-      }),
-    )
+    const encryptedPayload = await this.application.protocolService.encryptSplitSingle({
+      usesItemsKeyWithKeyLookup: {
+        items: [note],
+      },
+    })
 
     const itemsKey = this.application.protocolService.itemsKeyForPayload(encryptedPayload)
     expect(itemsKey).to.be.ok
@@ -190,13 +184,11 @@ describe('keys', function () {
   it('decrypts items waiting for keys', async function () {
     const notePayload = Factory.createNotePayload()
     const title = notePayload.content.title
-    const encryptedPayload = CreateEncryptedServerSyncPushPayload(
-      await this.application.protocolService.encryptSplitSingle({
-        usesItemsKeyWithKeyLookup: {
-          items: [notePayload],
-        },
-      }),
-    )
+    const encryptedPayload = await this.application.protocolService.encryptSplitSingle({
+      usesItemsKeyWithKeyLookup: {
+        items: [notePayload],
+      },
+    })
 
     const itemsKey = this.application.protocolService.itemsKeyForPayload(encryptedPayload)
 
@@ -259,13 +251,11 @@ describe('keys', function () {
   it('generating export params with logged in account should produce encrypted payload', async function () {
     await Factory.registerUserToApplication({ application: this.application })
     const payload = Factory.createNotePayload()
-    const encryptedPayload = CreateEncryptedServerSyncPushPayload(
-      await this.application.protocolService.encryptSplitSingle({
-        usesItemsKeyWithKeyLookup: {
-          items: [payload],
-        },
-      }),
-    )
+    const encryptedPayload = await this.application.protocolService.encryptSplitSingle({
+      usesItemsKeyWithKeyLookup: {
+        items: [payload],
+      },
+    })
     expect(typeof encryptedPayload.content).to.equal('string')
     expect(encryptedPayload.content.substring(0, 3)).to.equal(
       this.application.protocolService.getLatestVersion(),
@@ -432,13 +422,11 @@ describe('keys', function () {
     expect(newDefaultItemsKey.uuid).to.not.equal(defaultItemsKey.uuid)
 
     const note = await Factory.createSyncedNote(this.application)
-    const payload = CreateEncryptedServerSyncPushPayload(
-      await this.application.protocolService.encryptSplitSingle({
-        usesItemsKeyWithKeyLookup: {
-          items: [note.payload],
-        },
-      }),
-    )
+    const payload = await this.application.protocolService.encryptSplitSingle({
+      usesItemsKeyWithKeyLookup: {
+        items: [note.payload],
+      },
+    })
     expect(payload.items_key_id).to.equal(newDefaultItemsKey.uuid)
   })
 
@@ -462,13 +450,11 @@ describe('keys', function () {
     expect(newDefaultItemsKey.uuid).to.not.equal(defaultItemsKey.uuid)
 
     const note = await Factory.createSyncedNote(application)
-    const payload = CreateEncryptedServerSyncPushPayload(
-      await application.protocolService.encryptSplitSingle({
-        usesItemsKeyWithKeyLookup: {
-          items: [note.payload],
-        },
-      }),
-    )
+    const payload = await application.protocolService.encryptSplitSingle({
+      usesItemsKeyWithKeyLookup: {
+        items: [note.payload],
+      },
+    })
     expect(payload.items_key_id).to.equal(newDefaultItemsKey.uuid)
   })
 
