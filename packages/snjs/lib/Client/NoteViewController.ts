@@ -44,7 +44,7 @@ export class NoteViewController {
     }
   }
 
-  async initialize(): Promise<void> {
+  async initialize(addTagHierarchy: boolean): Promise<void> {
     if (!this.note) {
       const note = this.application.mutator.createTemplateItem<NoteContent, SNNote>(
         ContentType.Note,
@@ -56,7 +56,7 @@ export class NoteViewController {
       )
       if (this.defaultTag) {
         const tag = this.application.items.findItem(this.defaultTag) as SNTag
-        await this.application.items.addTagToNote(note, tag, true)
+        await this.application.items.addTagToNote(note, tag, addTagHierarchy)
       }
       this.isTemplateNote = true
       this.note = note
