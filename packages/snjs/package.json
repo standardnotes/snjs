@@ -1,6 +1,6 @@
 {
   "name": "@standardnotes/snjs",
-  "version": "2.94.2",
+  "version": "2.94.3",
   "engines": {
     "node": ">=14.0.0 <17.0.0"
   },
@@ -28,7 +28,7 @@
   "devDependencies": {
     "@babel/core": "^7.17.5",
     "@babel/preset-env": "^7.16.11",
-    "@standardnotes/sncrypto-web": "^1.8.1",
+    "@standardnotes/sncrypto-web": "^1.8.2",
     "@types/crypto-js": "^4.1.1",
     "@types/jest": "^27.4.1",
     "@types/jsdom": "^16.2.14",
@@ -79,16 +79,16 @@
     "webpack-merge": "^5.8.0"
   },
   "dependencies": {
-    "@standardnotes/auth": "^3.18.4",
-    "@standardnotes/common": "^1.19.2",
-    "@standardnotes/domain-events": "^2.26.8",
-    "@standardnotes/encryption": "^1.2.1",
-    "@standardnotes/features": "^1.37.1",
-    "@standardnotes/models": "^1.2.1",
-    "@standardnotes/responses": "^1.6.1",
-    "@standardnotes/services": "^1.8.1",
-    "@standardnotes/settings": "^1.13.2",
-    "@standardnotes/sncrypto-common": "^1.7.4",
-    "@standardnotes/utils": "^1.4.7"
+    "@standardnotes/auth": "^3.18.5",
+    "@standardnotes/common": "^1.19.3",
+    "@standardnotes/domain-events": "^2.26.9",
+    "@standardnotes/encryption": "^1.2.2",
+    "@standardnotes/features": "^1.37.2",
+    "@standardnotes/models": "^1.2.2",
+    "@standardnotes/responses": "^1.6.2",
+    "@standardnotes/services": "^1.8.2",
+    "@standardnotes/settings": "^1.13.3",
+    "@standardnotes/sncrypto-common": "^1.7.5",
+    "@standardnotes/utils": "^1.4.8"
   }
 }
