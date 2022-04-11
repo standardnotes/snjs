@@ -42,7 +42,15 @@ export interface ItemsClientInterface {
 
   setNotesDisplayCriteria(criteria: NotesDisplayCriteria): void
 
-  getDisplayableItems<T extends DecryptedItemInterface>(contentType: ContentType): T[]
+  getDisplayableItems<T extends DecryptedItemInterface>(
+    contentType:
+      | ContentType.Tag
+      | ContentType.SmartView
+      | ContentType.Theme
+      | ContentType.Component,
+  ): T[]
+
+  getDisplayableNotes(): SNNote[]
 
   getItems<T extends DecryptedItemInterface>(contentType: ContentType | ContentType[]): T[]
 
