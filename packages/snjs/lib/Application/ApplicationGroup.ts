@@ -1,5 +1,3 @@
-import { RawStorageKey } from '@standardnotes/services'
-import { removeFromArray } from '@standardnotes/utils'
 import { UuidString, DeinitSource } from '../Types'
 import { SNApplication } from './Application'
 import {
@@ -7,8 +5,9 @@ import {
   DeviceInterface,
   InternalEventBus,
   InternalEventBusInterface,
+  RawStorageKey,
 } from '@standardnotes/services'
-import { UuidGenerator } from '@standardnotes/utils'
+import { UuidGenerator, removeFromArray } from '@standardnotes/utils'
 
 export type ApplicationDescriptor = {
   identifier: string | UuidString
@@ -46,10 +45,10 @@ export class SNApplicationGroup extends AbstractService {
     super(internalEventBus)
   }
 
-  deinit() {
+  override deinit() {
     super.deinit()
     this.deviceInterface.deinit()
-    ;(this.deviceInterface as any) = undefined
+    ;(this.deviceInterface as unknown) = undefined
   }
 
   public async initialize(callback: AppGroupCallback): Promise<void> {
@@ -69,10 +68,11 @@ export class SNApplicationGroup extends AbstractService {
 
     const application = this.buildApplication(primaryDescriptor)
     this.applications.push(application)
-    this.setPrimaryApplication(application, false)
+
+    void this.setPrimaryApplication(application, false)
   }
 
-  private async createDescriptorRecord() {
+  private createDescriptorRecord() {
     /** The identifier 'standardnotes' is used because this was the
      * database name of Standard Notes web/desktop */
     const identifier = 'standardnotes'
@@ -83,12 +83,15 @@ export class SNApplicationGroup extends AbstractService {
         primary: true,
       },
     }
-    this.deviceInterface.setRawStorageValue(
+
+    void this.deviceInterface.setRawStorageValue(
       RawStorageKey.DescriptorRecord,
       JSON.stringify(descriptorRecord),
     )
+
     this.descriptorRecord = descriptorRecord
-    this.persistDescriptors()
+
+    void this.persistDescriptors()
   }
 
   public getApplications() {
@@ -105,6 +108,7 @@ export class SNApplicationGroup extends AbstractService {
         return descriptor
       }
     }
+    return undefined
   }
 
   /** @callback */
@@ -125,15 +129,15 @@ export class SNApplicationGroup extends AbstractService {
          * create a new blank slate app */
         const descriptors = this.getDescriptors()
         if (descriptors.length === 0) {
-          return this.addNewApplication()
+          void this.addNewApplication()
         } else {
-          return this.loadApplicationForDescriptor(descriptors[0])
+          void this.loadApplicationForDescriptor(descriptors[0])
         }
       }
     } else if (source === DeinitSource.Lock && sideffects) {
       /** Recreate the same application from scratch */
       const descriptor = this.descriptorForApplication(application)
-      return this.loadApplicationForDescriptor(descriptor)
+      void this.loadApplicationForDescriptor(descriptor)
     }
   }
 
@@ -189,8 +193,8 @@ export class SNApplicationGroup extends AbstractService {
     }
   }
 
-  private async persistDescriptors() {
-    this.deviceInterface!.setRawStorageValue(
+  private persistDescriptors() {
+    void this.deviceInterface.setRawStorageValue(
       RawStorageKey.DescriptorRecord,
       JSON.stringify(this.descriptorRecord),
     )
@@ -210,8 +214,8 @@ export class SNApplicationGroup extends AbstractService {
     return this.descriptorRecord[application.identifier]
   }
 
-  public async addNewApplication(label?: string) {
-    const identifier = await UuidGenerator.GenerateUuid()
+  public async addNewApplication(label?: string): Promise<SNApplication> {
+    const identifier = UuidGenerator.GenerateUuid()
     const index = this.getDescriptors().length + 1
     const descriptor: ApplicationDescriptor = {
       identifier: identifier,
@@ -220,9 +224,13 @@ export class SNApplicationGroup extends AbstractService {
     }
     const application = this.buildApplication(descriptor)
     this.applications.push(application)
+
     this.descriptorRecord[identifier] = descriptor
+
     await this.setPrimaryApplication(application)
-    await this.persistDescriptors()
+    this.persistDescriptors()
+
+    return application
   }
 
   private applicationForDescriptor(descriptor: ApplicationDescriptor) {

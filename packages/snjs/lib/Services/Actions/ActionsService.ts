@@ -1,4 +1,4 @@
-import { EncryptionService, SNRootKey, EncryptionIntent } from '@standardnotes/encryption'
+import { EncryptionService, SNRootKey } from '@standardnotes/encryption'
 import {
   Challenge,
   ChallengeValidation,
@@ -10,15 +10,20 @@ import { ListedService } from '../Listed/ListedService'
 import { ActionResponse, HttpResponse } from '@standardnotes/responses'
 import { ContentType } from '@standardnotes/common'
 import { ItemManager } from '@Lib/Services/Items/ItemManager'
-import { PurePayload, CreateMaxPayloadFromAnyObject } from '@standardnotes/models'
 import {
   SNActionsExtension,
   Action,
   ActionAccessType,
   ActionsExtensionMutator,
-  SNItem,
   MutationType,
-  CreateItemFromPayload,
+  CreateDecryptedItemFromPayload,
+  DecryptedItemInterface,
+  DecryptedPayloadInterface,
+  ActionExtensionContent,
+  EncryptedPayload,
+  isErrorDecryptingPayload,
+  CreateEncryptedBackupFileContextPayload,
+  EncryptedTransferPayload,
 } from '@standardnotes/models'
 import { SNSyncService } from '../Sync/SyncService'
 import { PayloadManager } from '../Payloads/PayloadManager'
@@ -57,14 +62,13 @@ export class SNActionsService extends AbstractService {
     private syncService: SNSyncService,
     private challengeService: ChallengeService,
     private listedService: ListedService,
-    protected internalEventBus: InternalEventBusInterface,
+    protected override internalEventBus: InternalEventBusInterface,
   ) {
     super(internalEventBus)
     this.previousPasswords = []
   }
 
-  /** @override */
-  public deinit(): void {
+  public override deinit(): void {
     ;(this.itemManager as unknown) = undefined
     ;(this.alertService as unknown) = undefined
     ;(this.deviceInterface as unknown) = undefined
@@ -79,14 +83,14 @@ export class SNActionsService extends AbstractService {
   }
 
   public getExtensions(): SNActionsExtension[] {
-    const extensionItems = this.itemManager.nonErroredItemsForContentType<SNActionsExtension>(
+    const extensionItems = this.itemManager.getItems<SNActionsExtension>(
       ContentType.ActionsExtension,
     )
     const excludingListed = extensionItems.filter((extension) => !extension.isListedExtension)
     return excludingListed
   }
 
-  public extensionsInContextOfItem(item: SNItem) {
+  public extensionsInContextOfItem(item: DecryptedItemInterface) {
     return this.getExtensions().filter((ext) => {
       return (
         ext.supported_types.includes(item.content_type) ||
@@ -103,24 +107,27 @@ export class SNActionsService extends AbstractService {
    */
   public async loadExtensionInContextOfItem(
     extension: SNActionsExtension,
-    item: SNItem,
+    item: DecryptedItemInterface,
   ): Promise<SNActionsExtension | undefined> {
     const params = {
       content_type: item.content_type,
       item_uuid: item.uuid,
     }
+
     const response = (await this.httpService
       .getAbsolute(extension.url, params)
       .catch((response) => {
         console.error('Error loading extension', response)
-        return null
+        return undefined
       })) as ActionResponse
+
     if (!response) {
       return
     }
+
     const description = response.description || extension.description
     const supported_types = response.supported_types || extension.supported_types
-    const actions = response.actions || []
+    const actions = (response.actions || []) as Action[]
     const mutator = new ActionsExtensionMutator(extension, MutationType.UpdateUserTimestamps)
 
     mutator.deprecation = response.deprecation
@@ -129,17 +136,21 @@ export class SNActionsService extends AbstractService {
     mutator.actions = actions
 
     const payloadResult = mutator.getResult()
-    return CreateItemFromPayload(payloadResult) as SNActionsExtension
+
+    return CreateDecryptedItemFromPayload(payloadResult) as SNActionsExtension
   }
 
-  public async runAction(action: Action, item: SNItem): Promise<ActionResponse | undefined> {
+  public async runAction(
+    action: Action,
+    item: DecryptedItemInterface,
+  ): Promise<ActionResponse | undefined> {
     let result
     switch (action.verb) {
       case 'render':
         result = await this.handleRenderAction(action)
         break
       case 'show':
-        result = await this.handleShowAction(action)
+        result = this.handleShowAction(action)
         break
       case 'post':
         result = await this.handlePostAction(action, item)
@@ -150,17 +161,21 @@ export class SNActionsService extends AbstractService {
     return result
   }
 
-  private async handleRenderAction(action: Action) {
+  private async handleRenderAction(action: Action): Promise<ActionResponse | undefined> {
     const response = await this.httpService
       .getAbsolute(action.url)
       .then(async (response) => {
         const payload = await this.payloadByDecryptingResponse(response as ActionResponse)
         if (payload) {
-          const item = CreateItemFromPayload(payload)
+          const item = CreateDecryptedItemFromPayload<ActionExtensionContent, SNActionsExtension>(
+            payload,
+          )
           return {
-            ...response,
+            ...(response as ActionResponse),
             item,
-          } as ActionResponse
+          }
+        } else {
+          return undefined
         }
       })
       .catch((response) => {
@@ -178,21 +193,25 @@ export class SNActionsService extends AbstractService {
     response: ActionResponse,
     rootKey?: SNRootKey,
     triedPasswords: string[] = [],
-  ): Promise<PurePayload | undefined> {
-    const payload = CreateMaxPayloadFromAnyObject(response.item)
+  ): Promise<DecryptedPayloadInterface<ActionExtensionContent> | undefined> {
+    if (!response.item || response.item.deleted || response.item.content == undefined) {
+      return undefined
+    }
+
+    const payload = new EncryptedPayload(response.item as EncryptedTransferPayload)
 
     if (!payload.enc_item_key) {
       void this.alertService.alert('This revision is missing its key and cannot be recovered.')
       return
     }
 
-    let decryptedPayload = await this.protocolService.decryptSplitSingle({
+    let decryptedPayload = await this.protocolService.decryptSplitSingle<ActionExtensionContent>({
       usesItemsKeyWithKeyLookup: {
         items: [payload],
       },
     })
 
-    if (!decryptedPayload.errorDecrypting) {
+    if (!isErrorDecryptingPayload(decryptedPayload)) {
       return decryptedPayload
     }
 
@@ -203,20 +222,21 @@ export class SNActionsService extends AbstractService {
           key: rootKey,
         },
       })
-      if (!decryptedPayload.errorDecrypting) {
+      if (!isErrorDecryptingPayload(decryptedPayload)) {
         return decryptedPayload
       }
     }
 
     for (const itemsKey of this.itemManager.itemsKeys()) {
-      const decryptedPayload = await this.protocolService.decryptSplitSingle({
-        usesItemsKey: {
-          items: [payload],
-          key: itemsKey,
-        },
-      })
+      const decryptedPayload =
+        await this.protocolService.decryptSplitSingle<ActionExtensionContent>({
+          usesItemsKey: {
+            items: [payload],
+            key: itemsKey,
+          },
+        })
 
-      if (!decryptedPayload.errorDecrypting) {
+      if (!isErrorDecryptingPayload(decryptedPayload)) {
         return decryptedPayload
       }
     }
@@ -242,11 +262,14 @@ export class SNActionsService extends AbstractService {
       if (triedPasswords.includes(passwordCandidate)) {
         continue
       }
+
       triedPasswords.push(passwordCandidate)
+
       const key = await this.protocolService.computeRootKey(passwordCandidate, keyParams)
       if (!key) {
         continue
       }
+
       const nestedResponse = await this.payloadByDecryptingResponse(response, key, triedPasswords)
       if (nestedResponse) {
         return nestedResponse
@@ -280,7 +303,7 @@ export class SNActionsService extends AbstractService {
     return response?.getDefaultValue().value as string
   }
 
-  private async handlePostAction(action: Action, item: SNItem) {
+  private async handlePostAction(action: Action, item: DecryptedItemInterface) {
     const decrypted = action.access_type === ActionAccessType.Decrypted
     const itemParams = await this.outgoingPayloadForItem(item, decrypted)
     const params = {
@@ -305,18 +328,15 @@ export class SNActionsService extends AbstractService {
     return {} as ActionResponse
   }
 
-  private async outgoingPayloadForItem(item: SNItem, decrypted = false) {
+  private async outgoingPayloadForItem(item: DecryptedItemInterface, decrypted = false) {
     if (decrypted) {
       return item.payload.ejected()
     }
 
-    const encrypted = await this.protocolService.encryptSplitSingle(
-      {
-        usesItemsKeyWithKeyLookup: { items: [item.payload] },
-      },
-      EncryptionIntent.FileEncrypted,
-    )
+    const encrypted = await this.protocolService.encryptSplitSingle({
+      usesItemsKeyWithKeyLookup: { items: [item.payload] },
+    })
 
-    return encrypted.ejected()
+    return CreateEncryptedBackupFileContextPayload(encrypted)
   }
 }

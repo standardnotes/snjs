@@ -1,4 +1,4 @@
-import { DecryptedFileInterface } from '../types'
+import { DecryptedFileInterface } from '../Types'
 import { FilesServerInterface } from '../FilesServerInterface'
 import { FileUploader } from '../UseCase/FileUploader'
 import { SNPureCrypto } from '@standardnotes/sncrypto-common'

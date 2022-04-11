@@ -1,52 +1,42 @@
-import { ContentType } from '@standardnotes/common'
+import { AnyKeyParamsContent, ContentType, ProtocolVersion } from '@standardnotes/common'
 import { JwtSession } from '../../Services/Session/Sessions/JwtSession'
 import { Migration } from '@Lib/Migrations/Migration'
 import { MigrationServices } from '../MigrationServices'
 import { PreviousSnjsVersion2_0_0 } from '../../Version'
-import { ProtocolVersion } from '@standardnotes/common'
-import { SNRootKey, EncryptionIntent, CreateNewRootKey } from '@standardnotes/encryption'
+import { SNRootKey, CreateNewRootKey } from '@standardnotes/encryption'
 import { SNStorageService } from '../../Services/Storage/StorageService'
 import { StorageReader1_0_0 } from '../StorageReaders/Versions/Reader1_0_0'
 import * as Models from '@standardnotes/models'
 import * as Services from '@standardnotes/services'
 import * as Utils from '@standardnotes/utils'
 import { isEnvironmentMobile, isEnvironmentWebOrDesktop } from '@Lib/Application/Platforms'
-import {
-  ItemContent,
-  ItemsKeyContent,
-  ItemsKeyContentSpecialized,
-  RootKeyContent,
-} from '@standardnotes/models'
 
-type LegacyMobileKeychainStructure =
-  | {
-      offline?: {
-        timing?: any
-        pw?: string
-      }
-      encryptedAccountKeys?: any
-      mk: string
-      pw: string
-      ak: string
-      version?: string
-      jwt?: string
-    }
-  | undefined
-  | null
-
-interface LegacyStorageContent extends ItemContent {
-  storage: unknown
-  uuid: string
-  content_type: ContentType
+type LegacyMobileKeychainStructure = {
+  offline?: {
+    timing?: unknown
+    pw?: string
+  }
+  encryptedAccountKeys?: unknown
+  mk: string
+  pw: string
+  ak: string
+  version?: string
+  jwt?: string
 }
 
-interface LegacyRootKeyContent extends RootKeyContent {
-  accountKeys?: {
-    ak: string
-    mk: string
-    version: string
-    jwt: string
-  }
+interface LegacyStorageContent extends Models.ItemContent {
+  storage: unknown
+}
+
+interface LegacyAccountKeysValue {
+  ak: string
+  mk: string
+  version: string
+  jwt: string
+}
+
+interface LegacyRootKeyContent extends Models.RootKeyContent {
+  accountKeys?: LegacyAccountKeysValue
 }
 
 const LEGACY_SESSION_TOKEN_KEY = 'jwt'
@@ -63,7 +53,7 @@ export class Migration2_0_0 extends Migration {
     )
   }
 
-  static version() {
+  static override version() {
     return PreviousSnjsVersion2_0_0
   }
 
@@ -102,40 +92,42 @@ export class Migration2_0_0 extends Migration {
   private async migrateStorageStructureForWebDesktop() {
     const deviceInterface = this.services.deviceInterface
     const newStorageRawStructure: Services.StorageValuesObject = {
-      [Services.ValueModesKeys.Wrapped]: {},
+      [Services.ValueModesKeys.Wrapped]: {} as Models.EncryptedTransferPayload,
       [Services.ValueModesKeys.Unwrapped]: {},
       [Services.ValueModesKeys.Nonwrapped]: {},
     }
-    const rawAccountKeyParams = await this.legacyReader.getAccountKeyParams()
+    const rawAccountKeyParams =
+      (await this.legacyReader.getAccountKeyParams()) as AnyKeyParamsContent
     /** Could be null if no account, or if account and storage is encrypted */
     if (rawAccountKeyParams) {
       newStorageRawStructure.nonwrapped[Services.StorageKey.RootKeyParams] = rawAccountKeyParams
     }
     const encryptedStorage = (await deviceInterface.getJsonParsedRawStorageValue(
       Services.LegacyKeys1_0_0.WebEncryptedStorageKey,
-    )) as LegacyStorageContent
+    )) as Models.EncryptedTransferPayload
 
     if (encryptedStorage) {
-      const encryptedStoragePayload =
-        Models.CreateMaxPayloadFromAnyObject<LegacyStorageContent>(encryptedStorage)
+      const encryptedStoragePayload = new Models.EncryptedPayload(encryptedStorage)
 
       const passcodeResult = await this.webDesktopHelperGetPasscodeKeyAndDecryptEncryptedStorage(
         encryptedStoragePayload,
       )
 
       const passcodeKey = passcodeResult.key
-      const decryptedStoragePayload = passcodeResult.decryptedStoragePayload!
+      const decryptedStoragePayload = passcodeResult.decryptedStoragePayload
       const passcodeParams = passcodeResult.keyParams
 
       newStorageRawStructure.nonwrapped[Services.StorageKey.RootKeyWrapperKeyParams] =
         passcodeParams.getPortableValue()
 
-      const rawStorageValueStore = Utils.Copy(decryptedStoragePayload.contentObject.storage)
-      const storageValueStore: Record<string, any> =
+      const rawStorageValueStore = Utils.Copy(decryptedStoragePayload.content.storage)
+      const storageValueStore: Record<string, unknown> =
         Utils.jsonParseEmbeddedKeys(rawStorageValueStore)
       /** Store previously encrypted auth_params into new nonwrapped value key */
 
-      const accountKeyParams = storageValueStore[Services.LegacyKeys1_0_0.AllAccountKeyParamsKey]
+      const accountKeyParams = storageValueStore[
+        Services.LegacyKeys1_0_0.AllAccountKeyParamsKey
+      ] as AnyKeyParamsContent
       newStorageRawStructure.nonwrapped[Services.StorageKey.RootKeyParams] = accountKeyParams
 
       let keyToEncryptStorageWith = passcodeKey
@@ -167,14 +159,13 @@ export class Migration2_0_0 extends Migration {
       const mk = await this.services.deviceInterface.getRawStorageValue('mk')
 
       if (ak || mk) {
-        const version =
-          (rawAccountKeyParams as any)?.version || (await this.getFallbackRootKeyVersion())
+        const version = rawAccountKeyParams.version || (await this.getFallbackRootKeyVersion())
 
         const accountKey = CreateNewRootKey({
-          masterKey: mk!,
-          dataAuthenticationKey: ak!,
+          masterKey: mk as string,
+          dataAuthenticationKey: ak as string,
           version: version,
-          keyParams: rawAccountKeyParams as any,
+          keyParams: rawAccountKeyParams,
         })
         await this.services.deviceInterface.setNamespacedKeychainValue(
           accountKey.getKeychainValue(),
@@ -192,7 +183,7 @@ export class Migration2_0_0 extends Migration {
    * All platforms
    */
   private async allPlatformHelperSetStorageStructure(rawStructure: Services.StorageValuesObject) {
-    const newStructure = SNStorageService.defaultValuesObject(
+    const newStructure = SNStorageService.DefaultValuesObject(
       rawStructure.wrapped,
       rawStructure.unwrapped,
       rawStructure.nonwrapped,
@@ -211,14 +202,17 @@ export class Migration2_0_0 extends Migration {
    * Web/desktop only
    */
   private async webDesktopHelperGetPasscodeKeyAndDecryptEncryptedStorage(
-    encryptedPayload: Models.PayloadInterface<LegacyStorageContent>,
+    encryptedPayload: Models.EncryptedPayloadInterface,
   ) {
-    const rawPasscodeParams = await this.services.deviceInterface.getJsonParsedRawStorageValue(
+    const rawPasscodeParams = (await this.services.deviceInterface.getJsonParsedRawStorageValue(
       Services.LegacyKeys1_0_0.WebPasscodeParamsKey,
-    )
-    const passcodeParams = this.services.protocolService.createKeyParams(rawPasscodeParams as any)
+    )) as AnyKeyParamsContent
+    const passcodeParams = this.services.protocolService.createKeyParams(rawPasscodeParams)
+
     /** Decrypt it with the passcode */
-    let decryptedStoragePayload: Models.PayloadInterface<LegacyStorageContent> | undefined
+    let decryptedStoragePayload:
+      | Models.DecryptedPayloadInterface<LegacyStorageContent>
+      | Models.EncryptedPayloadInterface = encryptedPayload
     let passcodeKey: SNRootKey | undefined
 
     await this.promptForPasscodeUntilCorrect(async (candidate: string) => {
@@ -229,11 +223,13 @@ export class Migration2_0_0 extends Migration {
           key: passcodeKey,
         },
       })
-      return !decryptedStoragePayload.errorDecrypting
+
+      return !Models.isErrorDecryptingPayload(decryptedStoragePayload)
     })
 
     return {
-      decryptedStoragePayload,
+      decryptedStoragePayload:
+        decryptedStoragePayload as unknown as Models.DecryptedPayloadInterface<LegacyStorageContent>,
       key: passcodeKey as SNRootKey,
       keyParams: passcodeParams,
     }
@@ -245,13 +241,13 @@ export class Migration2_0_0 extends Migration {
    */
   private async webDesktopHelperExtractAndWrapAccountKeysFromValueStore(
     passcodeKey: SNRootKey,
-    accountKeyParams: any,
-    storageValueStore: Record<string, any>,
+    accountKeyParams: AnyKeyParamsContent,
+    storageValueStore: Record<string, unknown>,
   ) {
     const version = accountKeyParams?.version || (await this.getFallbackRootKeyVersion())
     const accountKey = CreateNewRootKey({
-      masterKey: storageValueStore.mk,
-      dataAuthenticationKey: storageValueStore.ak,
+      masterKey: storageValueStore.mk as string,
+      dataAuthenticationKey: storageValueStore.ak as string,
       version: version,
       keyParams: accountKeyParams,
     })
@@ -260,24 +256,18 @@ export class Migration2_0_0 extends Migration {
     delete storageValueStore.pw
     delete storageValueStore.ak
 
-    const accountKeyPayload = Models.CreateMaxPayloadFromAnyObject(accountKey)
-    let encryptedAccountKey
+    const accountKeyPayload = accountKey.payload
 
-    if (passcodeKey) {
-      /** Encrypt account key with passcode */
-      encryptedAccountKey = await this.services.protocolService.encryptSplitSingle(
-        {
-          usesRootKey: {
-            items: [accountKeyPayload],
-            key: passcodeKey,
-          },
-        },
-        EncryptionIntent.LocalStorageEncrypted,
-      )
-    }
+    /** Encrypt account key with passcode */
+    const encryptedAccountKey = await this.services.protocolService.encryptSplitSingle({
+      usesRootKey: {
+        items: [accountKeyPayload],
+        key: passcodeKey,
+      },
+    })
     return {
       accountKey: accountKey,
-      wrappedKey: encryptedAccountKey?.ejected(),
+      wrappedKey: Models.CreateEncryptedLocalStorageContextPayload(encryptedAccountKey),
     }
   }
 
@@ -288,25 +278,22 @@ export class Migration2_0_0 extends Migration {
    */
   async webDesktopHelperEncryptStorage(
     key: SNRootKey,
-    decryptedStoragePayload: Models.PurePayload,
-    storageValueStore: Record<string, any>,
+    decryptedStoragePayload: Models.DecryptedPayloadInterface,
+    storageValueStore: Record<string, unknown>,
   ) {
-    const wrapped = await this.services.protocolService.encryptSplitSingle(
-      {
-        usesRootKey: {
-          items: [
-            Models.CopyPayload(decryptedStoragePayload, {
-              content_type: ContentType.EncryptedStorage,
-              content: storageValueStore as Models.ItemContent,
-            }),
-          ],
-          key: key,
-        },
+    const wrapped = await this.services.protocolService.encryptSplitSingle({
+      usesRootKey: {
+        items: [
+          decryptedStoragePayload.copy({
+            content_type: ContentType.EncryptedStorage,
+            content: storageValueStore as unknown as Models.ItemContent,
+          }),
+        ],
+        key: key,
       },
-      EncryptionIntent.LocalStorageEncrypted,
-    )
+    })
 
-    return wrapped.ejected()
+    return Models.CreateEncryptedLocalStorageContextPayload(wrapped)
   }
 
   /**
@@ -336,14 +323,18 @@ export class Migration2_0_0 extends Migration {
   async migrateStorageStructureForMobile() {
     const keychainValue =
       (await this.services.deviceInterface.getRawKeychainValue()) as LegacyMobileKeychainStructure
-    const wrappedAccountKey =
-      (await this.services.deviceInterface.getJsonParsedRawStorageValue(
-        Services.LegacyKeys1_0_0.MobileWrappedRootKeyKey,
-      )) || keychainValue?.encryptedAccountKeys
-    const rawAccountKeyParams = (await this.legacyReader.getAccountKeyParams()) as any
-    const rawPasscodeParams = await this.services.deviceInterface.getJsonParsedRawStorageValue(
+
+    const wrappedAccountKey = ((await this.services.deviceInterface.getJsonParsedRawStorageValue(
+      Services.LegacyKeys1_0_0.MobileWrappedRootKeyKey,
+    )) || keychainValue?.encryptedAccountKeys) as Models.EncryptedTransferPayload
+
+    const rawAccountKeyParams =
+      (await this.legacyReader.getAccountKeyParams()) as AnyKeyParamsContent
+
+    const rawPasscodeParams = (await this.services.deviceInterface.getJsonParsedRawStorageValue(
       Services.LegacyKeys1_0_0.MobilePasscodeParamsKey,
-    )
+    )) as AnyKeyParamsContent
+
     const firstRunValue = await this.services.deviceInterface.getJsonParsedRawStorageValue(
       Services.NonwrappedStorageKey.MobileFirstRun,
     )
@@ -352,23 +343,23 @@ export class Migration2_0_0 extends Migration {
       [Services.ValueModesKeys.Nonwrapped]: {
         [Services.StorageKey.WrappedRootKey]: wrappedAccountKey,
         /** A 'hash' key may be present from legacy versions that should be deleted */
-        [Services.StorageKey.RootKeyWrapperKeyParams]: Utils.omitByCopy(rawPasscodeParams as any, [
-          'hash',
+        [Services.StorageKey.RootKeyWrapperKeyParams]: Utils.omitByCopy(rawPasscodeParams, [
+          'hash' as never,
         ]),
         [Services.StorageKey.RootKeyParams]: rawAccountKeyParams,
         [Services.NonwrappedStorageKey.MobileFirstRun]: firstRunValue,
       },
       [Services.ValueModesKeys.Unwrapped]: {},
-      [Services.ValueModesKeys.Wrapped]: {},
+      [Services.ValueModesKeys.Wrapped]: {} as Models.DecryptedTransferPayload,
     }
 
     const biometricPrefs = (await this.services.deviceInterface.getJsonParsedRawStorageValue(
       Services.LegacyKeys1_0_0.MobileBiometricsPrefs,
-    )) as any
+    )) as { enabled: boolean; timing: unknown }
 
     if (biometricPrefs) {
-      rawStructure.nonwrapped![Services.StorageKey.BiometricsState] = biometricPrefs.enabled
-      rawStructure.nonwrapped![Services.StorageKey.MobileBiometricsTiming] = biometricPrefs.timing
+      rawStructure.nonwrapped[Services.StorageKey.BiometricsState] = biometricPrefs.enabled
+      rawStructure.nonwrapped[Services.StorageKey.MobileBiometricsTiming] = biometricPrefs.timing
     }
 
     const passcodeKeyboardType = await this.services.deviceInterface.getRawStorageValue(
@@ -376,20 +367,22 @@ export class Migration2_0_0 extends Migration {
     )
 
     if (passcodeKeyboardType) {
-      rawStructure.nonwrapped![Services.StorageKey.MobilePasscodeKeyboardType] =
-        passcodeKeyboardType
+      rawStructure.nonwrapped[Services.StorageKey.MobilePasscodeKeyboardType] = passcodeKeyboardType
     }
 
     if (rawPasscodeParams) {
-      const passcodeParams = this.services.protocolService.createKeyParams(rawPasscodeParams as any)
+      const passcodeParams = this.services.protocolService.createKeyParams(rawPasscodeParams)
       const getPasscodeKey = async () => {
-        let passcodeKey: SNRootKey
+        let passcodeKey: SNRootKey | undefined
+
         await this.promptForPasscodeUntilCorrect(async (candidate: string) => {
           passcodeKey = await this.services.protocolService.computeRootKey(
             candidate,
             passcodeParams,
           )
+
           const pwHash = keychainValue?.offline?.pw
+
           if (pwHash) {
             return passcodeKey.serverPassword === pwHash
           } else {
@@ -401,33 +394,34 @@ export class Migration2_0_0 extends Migration {
             if (wrappedAccountKey) {
               const decryptedAcctKey = await this.services.protocolService.decryptSplitSingle({
                 usesRootKey: {
-                  items: [Models.CreateMaxPayloadFromAnyObject(wrappedAccountKey)],
+                  items: [new Models.EncryptedPayload(wrappedAccountKey)],
                   key: passcodeKey,
                 },
               })
-              return !decryptedAcctKey.errorDecrypting
+              return !Models.isErrorDecryptingPayload(decryptedAcctKey)
             } else {
               const item = (
                 await this.services.deviceInterface.getAllRawDatabasePayloads(
                   this.services.identifier,
                 )
-              )[0]
+              )[0] as Models.EncryptedTransferPayload
 
               if (!item) {
                 throw Error('Passcode only migration aborting due to missing keychain.offline.pw')
               }
 
-              const decryptedItem = await this.services.protocolService.decryptSplitSingle({
+              const decryptedPayload = await this.services.protocolService.decryptSplitSingle({
                 usesRootKey: {
-                  items: [Models.CreateMaxPayloadFromAnyObject(item)],
+                  items: [new Models.EncryptedPayload(item)],
                   key: passcodeKey,
                 },
               })
-              return !decryptedItem.errorDecrypting
+              return !Models.isErrorDecryptingPayload(decryptedPayload)
             }
           }
         })
-        return passcodeKey!
+
+        return passcodeKey as SNRootKey
       }
 
       rawStructure.nonwrapped[Services.StorageKey.MobilePasscodeTiming] =
@@ -440,42 +434,44 @@ export class Migration2_0_0 extends Migration {
          * with proper property names, wrap again, and store in new rawStructure.
          */
         const passcodeKey = await getPasscodeKey()
-        const payload =
-          Models.CreateMaxPayloadFromAnyObject<LegacyRootKeyContent>(wrappedAccountKey)
-        const unwrappedAccountKey = await this.services.protocolService.decryptSplitSingle({
-          usesRootKey: {
-            items: [payload],
-            key: passcodeKey,
-          },
-        })
+        const payload = new Models.EncryptedPayload(wrappedAccountKey)
+        const unwrappedAccountKey =
+          await this.services.protocolService.decryptSplitSingle<LegacyRootKeyContent>({
+            usesRootKey: {
+              items: [payload],
+              key: passcodeKey,
+            },
+          })
 
-        const accountKeyContent = unwrappedAccountKey.contentObject.accountKeys!
+        if (Models.isErrorDecryptingPayload(unwrappedAccountKey)) {
+          return
+        }
+
+        const accountKeyContent = unwrappedAccountKey.content.accountKeys as LegacyAccountKeysValue
 
         const version =
           accountKeyContent.version ||
           rawAccountKeyParams?.version ||
           (await this.getFallbackRootKeyVersion())
 
-        const newAccountKey = Models.CopyPayload(unwrappedAccountKey, {
-          content: {
+        const newAccountKey = unwrappedAccountKey.copy({
+          content: Models.FillItemContent<LegacyRootKeyContent>({
             masterKey: accountKeyContent.mk,
             dataAuthenticationKey: accountKeyContent.ak,
-            version: version,
-            keyParams: rawAccountKeyParams as any,
+            version: version as ProtocolVersion,
+            keyParams: rawAccountKeyParams,
             accountKeys: undefined,
-          } as unknown as Models.ItemContent,
+          }),
         })
 
-        const newWrappedAccountKey = await this.services.protocolService.encryptSplitSingle(
-          {
-            usesRootKey: {
-              items: [newAccountKey],
-              key: passcodeKey,
-            },
+        const newWrappedAccountKey = await this.services.protocolService.encryptSplitSingle({
+          usesRootKey: {
+            items: [newAccountKey],
+            key: passcodeKey,
           },
-          EncryptionIntent.LocalStorageEncrypted,
-        )
-        rawStructure.nonwrapped[Services.StorageKey.WrappedRootKey] = newWrappedAccountKey.ejected()
+        })
+        rawStructure.nonwrapped[Services.StorageKey.WrappedRootKey] =
+          Models.CreateEncryptedLocalStorageContextPayload(newWrappedAccountKey)
 
         if (accountKeyContent.jwt) {
           /** Move the jwt to raw storage so that it can be migrated in `migrateSessionStorage` */
@@ -488,23 +484,20 @@ export class Migration2_0_0 extends Migration {
       } else if (!wrappedAccountKey) {
         /** Passcode only, no account */
         const passcodeKey = await getPasscodeKey()
-        const payload = Models.CreateMaxPayloadFromAnyObject({
+        const payload = new Models.DecryptedPayload({
           uuid: Utils.UuidGenerator.GenerateUuid(),
-          content: Models.FillItemContent(rawStructure.unwrapped!),
+          content: Models.FillItemContent(rawStructure.unwrapped),
           content_type: ContentType.EncryptedStorage,
         })
 
         /** Encrypt new storage.unwrapped structure with passcode */
-        const wrapped = await this.services.protocolService.encryptSplitSingle(
-          {
-            usesRootKey: {
-              items: [payload],
-              key: passcodeKey,
-            },
+        const wrapped = await this.services.protocolService.encryptSplitSingle({
+          usesRootKey: {
+            items: [payload],
+            key: passcodeKey,
           },
-          EncryptionIntent.LocalStorageEncrypted,
-        )
-        rawStructure.wrapped = wrapped.ejected()
+        })
+        rawStructure.wrapped = Models.CreateEncryptedLocalStorageContextPayload(wrapped)
 
         await this.services.deviceInterface.clearRawKeychainValue()
       }
@@ -513,15 +506,15 @@ export class Migration2_0_0 extends Migration {
       const hasAccount = !Utils.isNullOrUndefined(keychainValue?.mk)
       if (hasAccount) {
         const accountVersion =
-          (keychainValue!.version as ProtocolVersion) ||
+          (keychainValue.version as ProtocolVersion) ||
           rawAccountKeyParams?.version ||
           (await this.getFallbackRootKeyVersion())
 
         const accountKey = CreateNewRootKey({
-          masterKey: keychainValue!.mk,
-          dataAuthenticationKey: keychainValue!.ak,
+          masterKey: keychainValue.mk,
+          dataAuthenticationKey: keychainValue.ak,
           version: accountVersion,
-          keyParams: rawAccountKeyParams as any,
+          keyParams: rawAccountKeyParams,
         })
 
         await this.services.deviceInterface.setNamespacedKeychainValue(
@@ -529,11 +522,11 @@ export class Migration2_0_0 extends Migration {
           this.services.identifier,
         )
 
-        if (keychainValue!.jwt) {
+        if (keychainValue.jwt) {
           /** Move the jwt to raw storage so that it can be migrated in `migrateSessionStorage` */
           void this.services.deviceInterface.setRawStorageValue(
             LEGACY_SESSION_TOKEN_KEY,
-            keychainValue!.jwt,
+            keychainValue.jwt,
           )
         }
       }
@@ -557,13 +550,13 @@ export class Migration2_0_0 extends Migration {
   private async getFallbackRootKeyVersion() {
     const anyItem = (
       await this.services.deviceInterface.getAllRawDatabasePayloads(this.services.identifier)
-    )[0]
+    )[0] as Models.EncryptedTransferPayload
 
     if (!anyItem) {
       return ProtocolVersion.V002
     }
 
-    const payload = Models.CreateMaxPayloadFromAnyObject(anyItem)
+    const payload = new Models.EncryptedPayload(anyItem)
     return payload.version || ProtocolVersion.V002
   }
 
@@ -575,14 +568,17 @@ export class Migration2_0_0 extends Migration {
   private async migrateArbitraryRawStorageToManagedStorageAllPlatforms() {
     const allKeyValues = await this.services.deviceInterface.getAllRawStorageKeyValues()
     const legacyKeys = Utils.objectToValueArray(Services.LegacyKeys1_0_0)
-    const tryJsonParse = (value: any) => {
+
+    const tryJsonParse = (value: string) => {
       try {
         return JSON.parse(value)
       } catch (e) {
         return value
       }
     }
+
     const applicationIdentifier = this.services.identifier
+
     for (const keyValuePair of allKeyValues) {
       const key = keyValuePair.key
       const value = keyValuePair.value
@@ -598,8 +594,8 @@ export class Migration2_0_0 extends Migration {
          * Raw values should always have been json stringified.
          * New values should always be objects/parsed.
          */
-        const newValue = tryJsonParse(value)
-        await this.services.storageService.setValue(key, newValue)
+        const newValue = tryJsonParse(value as string)
+        this.services.storageService.setValue(key, newValue)
       }
     }
   }
@@ -614,17 +610,21 @@ export class Migration2_0_0 extends Migration {
       'mk',
       'ak',
       'pw',
-      'encryptionKey' /** v1 unused key */,
-      'authKey' /** v1 unused key */,
+      /** v1 unused key */
+      'encryptionKey',
+      /** v1 unused key */
+      'authKey',
       'jwt',
       'ephemeral',
       'cachedThemes',
     ]
+
     const managedKeys = [
       ...Utils.objectToValueArray(Services.StorageKey),
       ...Utils.objectToValueArray(Services.LegacyKeys1_0_0),
       ...miscKeys,
     ]
+
     for (const key of managedKeys) {
       await this.services.deviceInterface.removeRawStorageValue(key)
     }
@@ -644,8 +644,10 @@ export class Migration2_0_0 extends Migration {
       )
     const legacyOptionsState = (await this.services.deviceInterface.getJsonParsedRawStorageValue(
       Services.LegacyKeys1_0_0.MobileOptionsState,
-    )) as any
+    )) as Record<string, unknown>
+
     let migratedOptionsState = {}
+
     if (legacyOptionsState) {
       const legacySortBy = legacyOptionsState.sortBy
       migratedOptionsState = {
@@ -734,19 +736,22 @@ export class Migration2_0_0 extends Migration {
       /** If params are missing a version, it must be 001 */
       const fallbackVersion = ProtocolVersion.V001
 
-      const payload = Models.CreateMaxPayloadFromAnyObject({
+      const payload = new Models.DecryptedPayload({
         uuid: Utils.UuidGenerator.GenerateUuid(),
         content_type: ContentType.ItemsKey,
-        content: Models.FillItemContentSpecialized<ItemsKeyContentSpecialized, ItemsKeyContent>({
+        content: Models.FillItemContentSpecialized<
+          Models.ItemsKeyContentSpecialized,
+          Models.ItemsKeyContent
+        >({
           itemsKey: rootKey.masterKey,
           dataAuthenticationKey: rootKey.dataAuthenticationKey,
-          version: rootKeyParams!.version || fallbackVersion,
+          version: rootKeyParams?.version || fallbackVersion,
         }),
         dirty: true,
         dirtiedDate: new Date(),
       })
 
-      const itemsKey = Models.CreateItemFromPayload<Models.ItemsKeyInterface>(payload)
+      const itemsKey = Models.CreateDecryptedItemFromPayload(payload)
 
       await this.services.itemManager.emitItemFromPayload(
         itemsKey.payloadRepresentation(),

@@ -1,20 +1,20 @@
-import { ItemMutator } from '../../Abstract/Item/ItemMutator'
+import { DecryptedItemMutator } from '../../Abstract/Item/Mutator/DecryptedItemMutator'
 import { FeatureRepoContent } from './FeatureRepo'
 
-export class FeatureRepoMutator extends ItemMutator<FeatureRepoContent> {
+export class FeatureRepoMutator extends DecryptedItemMutator<FeatureRepoContent> {
   set migratedToUserSetting(migratedToUserSetting: boolean) {
-    this.sureContent.migratedToUserSetting = migratedToUserSetting
+    this.content.migratedToUserSetting = migratedToUserSetting
   }
 
   set migratedToOfflineEntitlements(migratedToOfflineEntitlements: boolean) {
-    this.sureContent.migratedToOfflineEntitlements = migratedToOfflineEntitlements
+    this.content.migratedToOfflineEntitlements = migratedToOfflineEntitlements
   }
 
   set offlineFeaturesUrl(offlineFeaturesUrl: string) {
-    this.sureContent.offlineFeaturesUrl = offlineFeaturesUrl
+    this.content.offlineFeaturesUrl = offlineFeaturesUrl
   }
 
   set offlineKey(offlineKey: string) {
-    this.sureContent.offlineKey = offlineKey
+    this.content.offlineKey = offlineKey
   }
 }

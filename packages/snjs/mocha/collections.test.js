@@ -13,11 +13,13 @@ describe('payload collections', () => {
     localStorage.clear()
   })
 
-  const copyPayload = (payload, timestamp, changeUuid) => {
-    return CopyPayload(payload, {
-      uuid: changeUuid ? Factory.generateUuidish() : payload.uuid,
-      created_at: timestamp ? new Date(timestamp) : new Date(),
-    })
+  const copyNote = (note, timestamp, changeUuid) => {
+    return new SNNote(
+      note.payload.copy({
+        uuid: changeUuid ? Factory.generateUuidish() : note.payload.uuid,
+        created_at: timestamp ? new Date(timestamp) : new Date(),
+      }),
+    )
   }
 
   it('find', async () => {
@@ -48,9 +50,9 @@ describe('payload collections', () => {
 
   it('conflict map', async () => {
     const payload = Factory.createNotePayload()
-    const collection = new ItemCollection()
+    const collection = new PayloadCollection()
     collection.set([payload])
-    const conflict = CopyPayload(payload, {
+    const conflict = payload.copy({
       content: {
         conflict_of: payload.uuid,
         ...payload.content,
@@ -61,37 +63,45 @@ describe('payload collections', () => {
     expect(collection.conflictsOf(payload.uuid)).to.eql([conflict])
 
     const manualResults = collection.all().find((p) => {
-      return p.safeContent.conflict_of === payload.uuid
+      return p.content.conflict_of === payload.uuid
     })
     expect(collection.conflictsOf(payload.uuid)).to.eql([manualResults])
   })
 
   it('setting same element twice should not yield duplicates', async () => {
-    const collection = new ItemCollection()
-    collection.setDisplayOptions(ContentType.Note, CollectionSort.CreatedAt, 'asc')
+    const collection = new PayloadCollection()
     const payload = Factory.createNotePayload()
 
-    const copy = CopyPayload(payload)
+    const copy = payload.copy()
     collection.set([payload, copy])
     collection.set([payload])
     collection.set([payload, copy])
 
-    const sorted = collection.displayElements(ContentType.Note)
+    const sorted = collection.all(ContentType.Note)
     expect(sorted.length).to.equal(1)
   })
 
   it('display sort asc', async () => {
     const collection = new ItemCollection()
+
     collection.setDisplayOptions(ContentType.Note, CollectionSort.CreatedAt, 'asc')
-    const present = Factory.createNotePayload()
-    const oldest = CopyPayload(present, {
-      uuid: Factory.generateUuidish(),
-      created_at: Factory.yesterday(),
-    })
-    const newest = CopyPayload(present, {
-      uuid: Factory.generateUuidish(),
-      created_at: Factory.tomorrow(),
-    })
+
+    const present = Factory.createNote()
+
+    const oldest = new SNNote(
+      present.payload.copy({
+        uuid: Factory.generateUuidish(),
+        created_at: Factory.yesterday(),
+      }),
+    )
+
+    const newest = new SNNote(
+      present.payload.copy({
+        uuid: Factory.generateUuidish(),
+        created_at: Factory.tomorrow(),
+      }),
+    )
+
     collection.set([newest, oldest, present])
     const sorted = collection.displayElements(ContentType.Note)
 
@@ -102,16 +112,25 @@ describe('payload collections', () => {
 
   it('display sort dsc', async () => {
     const collection = new ItemCollection()
+
     collection.setDisplayOptions(ContentType.Note, CollectionSort.CreatedAt, 'dsc')
-    const present = Factory.createNotePayload()
-    const oldest = CopyPayload(present, {
-      uuid: Factory.generateUuidish(),
-      created_at: Factory.yesterday(),
-    })
-    const newest = CopyPayload(present, {
-      uuid: Factory.generateUuidish(),
-      created_at: Factory.tomorrow(),
-    })
+
+    const present = Factory.createNote()
+
+    const oldest = new SNNote(
+      present.payload.copy({
+        uuid: Factory.generateUuidish(),
+        created_at: Factory.yesterday(),
+      }),
+    )
+
+    const newest = new SNNote(
+      present.payload.copy({
+        uuid: Factory.generateUuidish(),
+        created_at: Factory.tomorrow(),
+      }),
+    )
+
     collection.set([oldest, newest, present])
     const sorted = collection.displayElements(ContentType.Note)
 
@@ -123,12 +142,14 @@ describe('payload collections', () => {
   it('display sort filter asc', async () => {
     const collection = new ItemCollection()
     const filterFor = 'fo'
+
     collection.setDisplayOptions(ContentType.Note, CollectionSort.CreatedAt, 'asc', (element) => {
       return element.content.title.includes(filterFor)
     })
-    const passes1 = Factory.createNotePayload('fo')
-    const passes2 = Factory.createNotePayload('foo')
-    const fails = Factory.createNotePayload('bar')
+
+    const passes1 = Factory.createNote('fo')
+    const passes2 = Factory.createNote('foo')
+    const fails = Factory.createNote('bar')
 
     collection.set([passes1, passes2, fails])
     const filtered = collection.displayElements(ContentType.Note)
@@ -141,15 +162,21 @@ describe('payload collections', () => {
   it('deleting should remove from displayed elements', async () => {
     const collection = new ItemCollection()
     collection.setDisplayOptions(ContentType.Note, CollectionSort.CreatedAt, 'asc')
-    const present = Factory.createNotePayload()
+
+    const present = Factory.createNote()
     collection.set([present])
 
     expect(collection.all(ContentType.Note).length).to.equal(1)
     expect(collection.displayElements(ContentType.Note).length).to.equal(1)
 
-    const deleted = CopyPayload(present, {
-      deleted: true,
-    })
+    const deleted = new DeletedItem(
+      new DeletedPayload(
+        present.payload.copy({
+          deleted: true,
+        }),
+      ),
+    )
+
     collection.set([deleted])
 
     expect(collection.all(ContentType.Note).filter((n) => !n.deleted).length).to.equal(0)
@@ -159,78 +186,90 @@ describe('payload collections', () => {
   it('changing element should update sort order', async () => {
     const collection = new ItemCollection()
     collection.setDisplayOptions(ContentType.Note, CollectionSort.CreatedAt, 'asc')
-    const base = Factory.createNotePayload()
-    const payload1 = copyPayload(base, 1000, true)
-    const payload2 = copyPayload(base, 2000, true)
-    const payload3 = copyPayload(base, 3000, true)
+    const base = Factory.createNote()
 
-    collection.set([payload2, payload1, payload3])
+    const note1 = copyNote(base, 1000, true)
+    const note2 = copyNote(base, 2000, true)
+    const note3 = copyNote(base, 3000, true)
+
+    collection.set([note2, note1, note3])
     let displayed = collection.displayElements(ContentType.Note)
 
-    expect(displayed[0].uuid).to.equal(payload1.uuid)
-    expect(displayed[1].uuid).to.equal(payload2.uuid)
-    expect(displayed[2].uuid).to.equal(payload3.uuid)
+    expect(displayed[0].uuid).to.equal(note1.uuid)
+    expect(displayed[1].uuid).to.equal(note2.uuid)
+    expect(displayed[2].uuid).to.equal(note3.uuid)
 
-    const changed2 = copyPayload(payload2, 4000, false)
+    const changed2 = copyNote(note2, 4000, false)
     collection.set([changed2])
 
     displayed = collection.displayElements(ContentType.Note)
     expect(displayed.length).to.equal(3)
 
-    expect(displayed[0].uuid).to.equal(payload1.uuid)
-    expect(displayed[1].uuid).to.equal(payload3.uuid)
-    expect(displayed[2].uuid).to.equal(payload2.uuid)
+    expect(displayed[0].uuid).to.equal(note1.uuid)
+    expect(displayed[1].uuid).to.equal(note3.uuid)
+    expect(displayed[2].uuid).to.equal(note2.uuid)
   })
 
   it('pinning note should update sort', async () => {
     const collection = new ItemCollection()
+
     collection.setDisplayOptions(ContentType.Note, CollectionSort.CreatedAt, 'asc')
-    const unpinned1 = CreateItemFromPayload(Factory.createNotePayload('fo'))
-    const unpinned2 = CreateItemFromPayload(Factory.createNotePayload('foo'))
+
+    const unpinned1 = Factory.createNote('fo')
+    const unpinned2 = Factory.createNote('foo')
 
     collection.set([unpinned1, unpinned2])
+
     const sorted = collection.displayElements(ContentType.Note)
 
     expect(sorted[0].uuid).to.equal(unpinned1.uuid)
     expect(sorted[1].uuid).to.equal(unpinned2.uuid)
 
-    const pinned2 = CreateItemFromPayload(
-      CopyPayload(unpinned2.payload, {
+    const pinned2 = new SNNote(
+      unpinned2.payload.copy({
         content: {
           ...unpinned1.content,
           appData: {
-            [SNItem.DefaultAppDomain()]: {
+            [DecryptedItem.DefaultAppDomain()]: {
               pinned: true,
             },
           },
         },
       }),
     )
+
     collection.set(pinned2)
+
     const resorted = collection.displayElements(ContentType.Note)
 
     expect(resorted[0].uuid).to.equal(unpinned2.uuid)
     expect(resorted[1].uuid).to.equal(unpinned1.uuid)
   })
 
-  it('setDisplayOptions should not fail for encrypted items', async () => {
+  it('encrypted items should not be returned in display elements', async () => {
     const collection = new ItemCollection()
-    const regularPayload1 = CreateItemFromPayload(Factory.createNotePayload('foo', 'noteText'))
-    const regularPayload2 = CreateItemFromPayload(Factory.createNotePayload('foo', 'noteText2'))
-    const encryptedPayloadUpdated = CreateItemFromPayload(
-      CopyPayload(regularPayload1.payload, {
-        ...regularPayload1.payload,
+
+    const regularNote1 = Factory.createNote('foo', 'noteText')
+
+    const regularNote2 = Factory.createNote('foo', 'noteText2')
+
+    const encryptedNote = new EncryptedItem(
+      new EncryptedPayload({
+        ...regularNote1.payload,
         errorDecrypting: true,
         content: '004:123',
         uuid: Factory.generateUuidish(),
       }),
     )
-    collection.set([regularPayload1, encryptedPayloadUpdated, regularPayload2])
+
+    collection.set([regularNote1, encryptedNote, regularNote2])
     collection.setDisplayOptions(ContentType.Note, CollectionSort.UpdatedAt, 'asc')
+
     const displayed = collection.displayElements(ContentType.Note)
-    expect(displayed.length).to.equal(3)
-    expect(displayed[0].errorDecrypting).to.equal(true)
-    expect(displayed[1].text).to.equal('noteText')
-    expect(displayed[2].text).to.equal('noteText2')
+
+    expect(displayed.length).to.equal(2)
+
+    expect(displayed[0].text).to.equal('noteText')
+    expect(displayed[1].text).to.equal('noteText2')
   })
 })

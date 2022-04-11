@@ -7,7 +7,7 @@ import * as Factory from './lib/factory.js'
 describe('payload', () => {
   beforeEach(async function () {
     this.createBarePayload = () => {
-      return new PurePayload({
+      return new DecryptedPayload({
         uuid: '123',
         content_type: ContentType.Note,
         content: {
@@ -17,7 +17,7 @@ describe('payload', () => {
     }
 
     this.createEncryptedPayload = () => {
-      return new PurePayload({
+      return new EncryptedPayload({
         uuid: '123',
         content_type: ContentType.Note,
         content: '004:foo:bar',
@@ -33,22 +33,8 @@ describe('payload', () => {
     expect(payload.content).to.be.ok
   })
 
-  it('not supplying fields should infer them', function () {
-    const payload = new PurePayload({
-      uuid: '123',
-      content_type: ContentType.Note,
-      content: {
-        title: 'hello',
-      },
-    })
-
-    const expectedFields = [PayloadField.Uuid, PayloadField.ContentType, PayloadField.Content]
-
-    expect(payload.fields).to.eql(expectedFields)
-  })
-
   it('not supplying source should default to constructor source', function () {
-    const payload = new PurePayload({
+    const payload = new DecryptedPayload({
       uuid: '123',
       content_type: ContentType.Note,
       content: {
@@ -74,19 +60,19 @@ describe('payload', () => {
   it('payload format bare', function () {
     const payload = this.createBarePayload()
 
-    expect(payload.format).to.equal(PayloadFormat.DecryptedBareObject)
+    expect(isDecryptedPayload(payload)).to.equal(true)
   })
 
   it('payload format encrypted string', function () {
     const payload = this.createEncryptedPayload()
 
-    expect(payload.format).to.equal(PayloadFormat.EncryptedString)
+    expect(isEncryptedPayload(payload)).to.equal(true)
   })
 
   it('payload with unrecognized prefix should be corrupt', async function () {
     await Factory.expectThrowsAsync(
       () =>
-        new PurePayload({
+        new EncryptedPayload({
           uuid: '123',
           content_type: ContentType.Note,
           content: '000:somebase64string',
@@ -96,13 +82,13 @@ describe('payload', () => {
   })
 
   it('payload format deleted', function () {
-    const payload = new PurePayload({
+    const payload = new DeletedPayload({
       uuid: '123',
       content_type: ContentType.Note,
       deleted: true,
     })
 
-    expect(payload.format).to.equal(PayloadFormat.Deleted)
+    expect(isDeletedPayload(payload)).to.equal(true)
   })
 
   it('payload version 004', function () {
@@ -113,14 +99,13 @@ describe('payload', () => {
 
   it('merged with absent content', function () {
     const payload = this.createBarePayload()
-    const otherPayload = new PurePayload({
+    const merged = payload.copy({
       uuid: '123',
       content_type: ContentType.Note,
       updated_at: new Date(),
       dirty: true,
       dirtiedDate: new Date(),
     })
-    const merged = PayloadByMerging(payload, otherPayload)
 
     expect(merged.content).to.eql(payload.content)
     expect(merged.uuid).to.equal(payload.uuid)
@@ -128,19 +113,8 @@ describe('payload', () => {
     expect(merged.updated_at.getTime()).to.be.above(1)
   })
 
-  it('merged with undefined content', function () {
-    const payload = this.createBarePayload()
-    const otherPayload = new PurePayload({
-      content: undefined,
-    })
-    const merged = PayloadByMerging(payload, otherPayload)
-
-    expect(merged.uuid).to.equal(payload.uuid)
-    expect(merged.content).to.not.be.ok
-  })
-
   it('deleted and not dirty should be discardable', function () {
-    const payload = new PurePayload({
+    const payload = new DeletedPayload({
       uuid: '123',
       content_type: ContentType.Note,
       deleted: true,
@@ -150,46 +124,14 @@ describe('payload', () => {
     expect(payload.discardable).to.equal(true)
   })
 
-  it('should be immutable', function () {
+  it('should be immutable', async function () {
     const payload = this.createBarePayload()
+
+    await Factory.sleep(0.1)
 
     const changeFn = () => {
       payload.foo = 'bar'
     }
     expect(changeFn).to.throw()
-  })
-
-  it('CreateIntentPayloadFromObject', function () {
-    const payload = this.createBarePayload()
-    const override = new PurePayload(
-      {
-        content: '004:...',
-      },
-      [PayloadField.Content],
-    )
-    const intentPayload = CreateIntentPayloadFromObject(
-      payload,
-      EncryptionIntent.LocalStorageEncrypted,
-      override,
-    )
-
-    expect(intentPayload.content_type).to.be.ok
-  })
-
-  it('Encryption params with override of select fields should only merge provided fields', function () {
-    const payload = this.createBarePayload()
-    const override = {
-      waitingForKey: true,
-      errorDecrypting: true,
-    }
-    const intentPayload = CreateIntentPayloadFromObject(
-      payload,
-      EncryptionIntent.LocalStorageEncrypted,
-      override,
-    )
-
-    expect(intentPayload.uuid).to.be.ok
-    expect(intentPayload.content).to.be.ok
-    expect(intentPayload.content_type).to.be.ok
   })
 })

@@ -1,21 +1,25 @@
+import { PayloadSource } from './../../Abstract/Payload/Types/PayloadSource'
+import { DecryptedPayload } from './../../Abstract/Payload/Implementations/DecryptedPayload'
 import { SNTag, TagContent } from './Tag'
 import { ContentType } from '@standardnotes/common'
-import { CreateMaxPayloadFromAnyObject } from '../../Abstract/Payload/Utilities/Functions'
-import { FillItemContent } from '../../Abstract/Item/ItemContent'
+import { FillItemContent } from '../../Abstract/Content/ItemContent'
 import { ContentReference } from '../../Abstract/Reference/ContentReference'
 
 const randUuid = () => String(Math.random())
 
 const create = (title: string, references: ContentReference[] = []): SNTag => {
   const tag = new SNTag(
-    CreateMaxPayloadFromAnyObject({
-      uuid: randUuid(),
-      content_type: ContentType.Tag,
-      content: FillItemContent({
-        title,
-        references,
-      } as TagContent),
-    }),
+    new DecryptedPayload(
+      {
+        uuid: randUuid(),
+        content_type: ContentType.Tag,
+        content: FillItemContent({
+          title,
+          references,
+        } as TagContent),
+      },
+      PayloadSource.Constructor,
+    ),
   )
 
   return tag

@@ -4,19 +4,11 @@ import { isNullOrUndefined, removeFromArray } from '@standardnotes/utils'
 import { ItemManager } from '@Lib/Services/Items/ItemManager'
 import { SNApiService } from '@Lib/Services/Api/ApiService'
 import { SNStorageService } from '@Lib/Services/Storage/StorageService'
-import { StorageKey } from '@standardnotes/services'
 import { UuidString } from '../../Types/UuidString'
 import * as Models from '@standardnotes/models'
 import * as Responses from '@standardnotes/responses'
 import * as Services from '@standardnotes/services'
-
-const PersistTimeout = 2000
-
-type PersistableHistoryEntry = {
-  payload: Models.RawPayload
-}
-
-type PersistableHistory = Record<UuidString, PersistableHistoryEntry[]>
+import { isErrorDecryptingPayload, SNNote } from '@standardnotes/models'
 
 /** The amount of revisions per item above which should call for an optimization. */
 const DefaultItemRevisionsThreshold = 20
@@ -37,10 +29,7 @@ const LargeEntryDeltaThreshold = 25
  *    retrieved per item via an API call.
  */
 export class SNHistoryManager extends Services.AbstractService {
-  private persistable = false
-  public autoOptimize = false
   private removeChangeObserver: () => void
-  private saveTimeout!: number
 
   /**
    * When no history exists for an item yet, we first put it in the staging map.
@@ -53,9 +42,6 @@ export class SNHistoryManager extends Services.AbstractService {
    */
   private historyStaging: Partial<Record<UuidString, Models.HistoryEntry>> = {}
   private history: Models.HistoryMap = {}
-  /** The content types for which to record history */
-  public readonly historyTypes: ContentType[] = [ContentType.Note]
-
   private itemRevisionThreshold = DefaultItemRevisionsThreshold
 
   constructor(
@@ -64,19 +50,18 @@ export class SNHistoryManager extends Services.AbstractService {
     private apiService: SNApiService,
     private protocolService: EncryptionService,
     public deviceInterface: Services.DeviceInterface,
-    protected internalEventBus: Services.InternalEventBusInterface,
+    protected override internalEventBus: Services.InternalEventBusInterface,
   ) {
     super(internalEventBus)
     this.removeChangeObserver = this.itemManager.addObserver(
-      this.historyTypes,
-      (changed, inserted) => {
-        this.recordNewHistoryForItems(changed.concat(inserted))
+      ContentType.Note,
+      ({ changed, inserted }) => {
+        this.recordNewHistoryForItems(changed.concat(inserted) as SNNote[])
       },
     )
   }
 
-  public deinit(): void {
-    this.cancelPendingPersist()
+  public override deinit(): void {
     ;(this.itemManager as unknown) = undefined
     ;(this.storageService as unknown) = undefined
     ;(this.history as unknown) = undefined
@@ -87,175 +72,51 @@ export class SNHistoryManager extends Services.AbstractService {
     super.deinit()
   }
 
-  /** For local session history */
-  async initializeFromDisk(): Promise<void> {
-    this.persistable = await this.storageService.getValue(StorageKey.SessionHistoryPersistable)
-    this.history = await this.getPersistedHistory()
-    this.autoOptimize = this.storageService.getValue(
-      StorageKey.SessionHistoryOptimize,
-      undefined,
-      true,
-    )
-  }
-
-  private async getPersistedHistory(): Promise<Record<UuidString, Models.HistoryEntry[]>> {
-    const historyMap: Record<UuidString, Models.HistoryEntry[]> = {}
-    const rawHistory: PersistableHistory = await this.storageService.getValue(
-      StorageKey.SessionHistoryRevisions,
-    )
-
-    if (!rawHistory) {
-      return historyMap
-    }
-
-    for (const [uuid, historyDescending] of Object.entries(rawHistory)) {
-      const historyAscending = historyDescending.slice().reverse()
-      const entries: Models.HistoryEntry[] = []
-      for (const rawEntry of historyAscending) {
-        const payload = Models.CreateSourcedPayloadFromObject(
-          rawEntry.payload,
-          Models.PayloadSource.SessionHistory,
-        ) as Models.SurePayload<Models.NoteContent>
-
-        const previousEntry = Models.historyMapFunctions.getNewestRevision(entries)
-        const entry = Models.CreateHistoryEntryForPayload(payload, previousEntry)
-        entries.unshift(entry)
-      }
-      historyMap[uuid] = entries
-    }
-    return historyMap
-  }
-
-  private recordNewHistoryForItems(items: Models.SNItem[]) {
-    let needsPersist = false
+  private recordNewHistoryForItems(items: Models.SNNote[]) {
     for (const item of items) {
-      if (!this.historyTypes.includes(item.content_type)) {
-        continue
-      }
-      const payload = item.payload
-      if (item.deleted || payload.format !== Models.PayloadFormat.DecryptedBareObject) {
-        continue
-      }
       const itemHistory = this.history[item.uuid] || []
       const latestEntry = Models.historyMapFunctions.getNewestRevision(itemHistory)
-      const historyPayload = Models.CreateSourcedPayloadFromObject(
+      const historyPayload = new Models.DecryptedPayload<Models.NoteContent>(
         item,
         Models.PayloadSource.SessionHistory,
-      ) as Models.SurePayload<Models.NoteContent>
+      )
+
       const currentValueEntry = Models.CreateHistoryEntryForPayload(historyPayload, latestEntry)
       if (currentValueEntry.isDiscardable()) {
         continue
       }
+
       /**
        * For every change that comes in, first add it to the staging area.
        * Then, only on the next subsequent change do we add this previously
        * staged entry
        */
       const stagedEntry = this.historyStaging[item.uuid]
+
       /** Add prospective to staging, and consider now adding previously staged as new revision */
       this.historyStaging[item.uuid] = currentValueEntry
+
       if (!stagedEntry) {
         continue
       }
+
       if (stagedEntry.isSameAsEntry(currentValueEntry)) {
         continue
       }
+
       if (latestEntry && stagedEntry.isSameAsEntry(latestEntry)) {
         continue
       }
+
       itemHistory.unshift(stagedEntry)
       this.history[item.uuid] = itemHistory
-      if (this.autoOptimize) {
-        this.optimizeHistoryForItem(item.uuid)
-      }
-      needsPersist = true
-    }
-    if (needsPersist) {
-      this.saveToDisk()
+
+      this.optimizeHistoryForItem(item.uuid)
     }
   }
 
-  /** For local session history */
-  isDiskEnabled(): boolean {
-    return this.persistable
-  }
-
-  /** For local session history */
-  isAutoOptimizeEnabled(): boolean {
-    return this.autoOptimize
-  }
-
-  cancelPendingPersist(): void {
-    if (this.saveTimeout) {
-      this.deviceInterface.cancelTimeout(this.saveTimeout)
-    }
-  }
-
-  /** For local session history */
-  saveToDisk(): void {
-    if (!this.persistable) {
-      return
-    }
-    this.cancelPendingPersist()
-    const persistableValue = this.persistableHistoryValue()
-    this.saveTimeout = this.deviceInterface.timeout(() => {
-      this.storageService.setValue(StorageKey.SessionHistoryRevisions, persistableValue)
-    }, PersistTimeout)
-  }
-
-  private persistableHistoryValue(): PersistableHistory {
-    const persistedObject: PersistableHistory = {}
-    for (const [uuid, historyArray] of Object.entries(this.history)) {
-      const entries = historyArray.map((entry) => {
-        return { payload: entry.payload } as PersistableHistoryEntry
-      })
-      persistedObject[uuid] = entries
-    }
-    return persistedObject
-  }
-
-  /** For local session history */
-  setSessionItemRevisionThreshold(threshold: number): void {
-    this.itemRevisionThreshold = threshold
-  }
-
-  sessionHistoryForItem(item: Models.SNItem): Models.HistoryEntry[] {
+  sessionHistoryForItem(item: Models.SNNote): Models.HistoryEntry[] {
     return this.history[item.uuid] || []
-  }
-
-  /** For local session history */
-  clearHistoryForItem(item: Models.SNItem): void {
-    delete this.history[item.uuid]
-    this.saveToDisk()
-  }
-
-  /** For local session history */
-  clearAllHistory(): Promise<void> {
-    this.history = {}
-    return this.storageService.removeValue(StorageKey.SessionHistoryRevisions)
-  }
-
-  /** For local session history */
-  toggleDiskSaving(): void {
-    this.persistable = !this.persistable
-
-    if (this.persistable) {
-      this.storageService.setValue(StorageKey.SessionHistoryPersistable, true)
-      this.saveToDisk()
-    } else {
-      this.storageService.setValue(StorageKey.SessionHistoryPersistable, false)
-      this.storageService.removeValue(StorageKey.SessionHistoryRevisions)
-    }
-  }
-
-  /** For local session history */
-  toggleAutoOptimize(): void {
-    this.autoOptimize = !this.autoOptimize
-    if (this.autoOptimize) {
-      this.storageService.setValue(StorageKey.SessionHistoryOptimize, true)
-    } else {
-      this.storageService.setValue(StorageKey.SessionHistoryOptimize, false)
-    }
   }
 
   getHistoryMapCopy(): Models.HistoryMap {
@@ -272,7 +133,7 @@ export class SNHistoryManager extends Services.AbstractService {
    * individually upon selection via `fetchRemoteRevision`.
    */
   async remoteHistoryForItem(
-    item: Models.SNItem,
+    item: Models.SNNote,
   ): Promise<Responses.RevisionListEntry[] | undefined> {
     const response = await this.apiService.getItemRevisions(item.uuid)
     if (response.error || isNullOrUndefined(response.data)) {
@@ -286,18 +147,17 @@ export class SNHistoryManager extends Services.AbstractService {
    * complete fields (including encrypted content).
    */
   async fetchRemoteRevision(
-    itemUuid: UuidString,
+    note: Models.SNNote,
     entry: Responses.RevisionListEntry,
   ): Promise<Models.HistoryEntry | undefined> {
-    const revisionResponse = await this.apiService.getRevision(entry, itemUuid)
+    const revisionResponse = await this.apiService.getRevision(entry, note.uuid)
     if (revisionResponse.error || isNullOrUndefined(revisionResponse.data)) {
       return undefined
     }
     const revision = (revisionResponse as Responses.SingleRevisionResponse).data
 
-    const serverPayload = Models.CreateMaxPayloadFromAnyObject(
-      revision as unknown as Models.RawPayload<Models.NoteContent>,
-    )
+    const serverPayload = new Models.EncryptedPayload(revision as Models.EncryptedTransferPayload)
+
     /**
      * When an item is duplicated, its revisions also carry over to the newly created item.
      * However since the new item has a different UUID than the source item, we must decrypt
@@ -307,7 +167,7 @@ export class SNHistoryManager extends Services.AbstractService {
     const embeddedParams = this.protocolService.getEmbeddedPayloadAuthenticatedData(serverPayload)
     const sourceItemUuid = embeddedParams?.u as Uuid | undefined
 
-    const payload = Models.CopyPayload(serverPayload, {
+    const payload = serverPayload.copy({
       uuid: sourceItemUuid || revision.item_uuid,
     })
 
@@ -316,24 +176,27 @@ export class SNHistoryManager extends Services.AbstractService {
       return undefined
     }
 
-    const encryptedPayload = Models.CreateSourcedPayloadFromObject(
+    const encryptedPayload = new Models.EncryptedPayload(
       payload,
       Models.PayloadSource.RemoteHistory,
     )
-    const decryptedPayload = await this.protocolService.decryptSplitSingle({
+
+    const decryptedPayload = await this.protocolService.decryptSplitSingle<Models.NoteContent>({
       usesItemsKeyWithKeyLookup: { items: [encryptedPayload] },
     })
-    if (decryptedPayload.errorDecrypting) {
+
+    if (isErrorDecryptingPayload(decryptedPayload)) {
       return undefined
     }
-    return new Models.HistoryEntry(decryptedPayload as Models.SurePayload<Models.NoteContent>)
+
+    return new Models.HistoryEntry(decryptedPayload)
   }
 
   async deleteRemoteRevision(
-    itemUuid: UuidString,
+    note: SNNote,
     entry: Responses.RevisionListEntry,
   ): Promise<Responses.MinimalHttpResponse> {
-    const response = await this.apiService.deleteRevision(itemUuid, entry)
+    const response = await this.apiService.deleteRevision(note.uuid, entry)
     return response
   }
 

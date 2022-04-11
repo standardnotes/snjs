@@ -38,7 +38,7 @@ export class TagsToFoldersMigrationApplicator {
 
       const parent = await itemManager.findOrCreateTagParentChain(parents)
 
-      await itemManager.changeItem(tag.uuid, (mutator: TagMutator) => {
+      await itemManager.changeItem(tag, (mutator: TagMutator) => {
         mutator.title = newTitle
 
         if (parent) {

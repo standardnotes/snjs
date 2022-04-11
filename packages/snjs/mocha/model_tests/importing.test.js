@@ -76,7 +76,7 @@ describe('importing', function () {
     expect(tag.noteCount).to.equal(1)
 
     expect(note.content.references.length).to.equal(0)
-    expect(application.itemManager.itemsReferencingItem(note.uuid).length).to.equal(1)
+    expect(application.itemManager.itemsReferencingItem(note).length).to.equal(1)
 
     await application.mutator.importData(
       {
@@ -91,7 +91,7 @@ describe('importing', function () {
     expect(tag.noteCount).to.equal(1)
 
     expect(note.content.references.length).to.equal(0)
-    expect(application.itemManager.itemsReferencingItem(note.uuid).length).to.equal(1)
+    expect(application.itemManager.itemsReferencingItem(note).length).to.equal(1)
   })
 
   it('importing same note many times should create only one duplicate', async function () {
@@ -103,7 +103,8 @@ describe('importing', function () {
     const notePayload = Factory.createNotePayload()
     await application.itemManager.emitItemFromPayload(notePayload, PayloadSource.LocalSaved)
     expectedItemCount++
-    const mutatedNote = CreateMaxPayloadFromAnyObject(notePayload, {
+    const mutatedNote = new DecryptedPayload({
+      ...notePayload,
       content: {
         ...notePayload.content,
         title: `${Math.random()}`,
@@ -126,9 +127,10 @@ describe('importing', function () {
     const pair = Factory.createRelatedNoteTagPairPayload()
     const tagPayload = pair[1]
     await application.itemManager.emitItemsFromPayloads(pair, PayloadSource.LocalChanged)
-    const mutatedTag = CreateMaxPayloadFromAnyObject(tagPayload, {
+    const mutatedTag = new DecryptedPayload({
+      ...tagPayload,
       content: {
-        ...tagPayload.safeContent,
+        ...tagPayload.content,
         references: [],
       },
     })
@@ -151,15 +153,17 @@ describe('importing', function () {
     expectedItemCount += 2
     const note = application.itemManager.notes[0]
     const tag = application.itemManager.tags[0]
-    const mutatedNote = CreateMaxPayloadFromAnyObject(notePayload, {
+    const mutatedNote = new DecryptedPayload({
+      ...notePayload,
       content: {
-        ...notePayload.safeContent,
+        ...notePayload.content,
         title: `${Math.random()}`,
       },
     })
-    const mutatedTag = CreateMaxPayloadFromAnyObject(tagPayload, {
+    const mutatedTag = new DecryptedPayload({
+      ...tagPayload,
       content: {
-        ...tagPayload.safeContent,
+        ...tagPayload.content,
         title: `${Math.random()}`,
       },
     })
@@ -184,13 +188,13 @@ describe('importing', function () {
 
     const refreshedNote = application.itemManager.findItem(note.uuid)
     expect(refreshedNote.content.references.length).to.equal(0)
-    expect(application.itemManager.itemsReferencingItem(refreshedNote.uuid).length).to.equal(2)
+    expect(application.itemManager.itemsReferencingItem(refreshedNote).length).to.equal(2)
 
     expect(newTag.content.references.length).to.equal(1)
     expect(newTag.noteCount).to.equal(1)
 
     expect(newNote.content.references.length).to.equal(0)
-    expect(application.itemManager.itemsReferencingItem(newNote.uuid).length).to.equal(1)
+    expect(application.itemManager.itemsReferencingItem(newNote).length).to.equal(1)
   })
 
   it('when importing items, imported values should not be used to determine if changed', async function () {
@@ -209,7 +213,7 @@ describe('importing', function () {
     const tag = await Factory.createMappedTag(application)
     expectedItemCount += 2
 
-    await application.itemManager.changeItem(tag.uuid, (mutator) => {
+    await application.itemManager.changeItem(tag, (mutator) => {
       mutator.addItemAsRelationship(note)
     })
 
@@ -250,16 +254,20 @@ describe('importing', function () {
 
   it('should import decrypted data and keep items that were previously deleted', async function () {
     await setup({ fakeCrypto: true })
+
     await Factory.registerUserToApplication({
       application: application,
       email: email,
       password: password,
     })
+
     Factory.handlePasswordChallenges(application, password)
+
     const [note, tag] = await Promise.all([
       Factory.createMappedNote(application),
       Factory.createMappedTag(application),
     ])
+
     await application.sync.sync({ awaitAll: true })
 
     await application.mutator.deleteItem(note)
@@ -274,10 +282,12 @@ describe('importing', function () {
       },
       true,
     )
+
     expect(application.itemManager.notes.length).to.equal(1)
-    expect(application.items.findItem(tag.uuid).deleted).to.be.false
+    expect(application.items.findItem(note.uuid).deleted).to.not.be.ok
+
     expect(application.itemManager.tags.length).to.equal(1)
-    expect(application.items.findItem(note.uuid).deleted).to.be.false
+    expect(application.items.findItem(tag.uuid).deleted).to.not.be.ok
   })
 
   it('should duplicate notes by alternating UUIDs when dealing with conflicts during importing', async function () {
@@ -346,11 +356,13 @@ describe('importing', function () {
 
   it('should import encrypted data and keep items that were previously deleted', async function () {
     await setup({ fakeCrypto: true })
+
     await Factory.registerUserToApplication({
       application: application,
       email: email,
       password: password,
     })
+
     const [note, tag] = await Promise.all([
       Factory.createMappedNote(application),
       Factory.createMappedTag(application),
@@ -367,10 +379,12 @@ describe('importing', function () {
     expect(application.items.findItem(tag.uuid)).to.not.exist
 
     await application.mutator.importData(backupData, true)
+
     expect(application.itemManager.notes.length).to.equal(1)
-    expect(application.items.findItem(tag.uuid).deleted).to.be.false
+    expect(application.items.findItem(note.uuid).deleted).to.not.be.ok
+
     expect(application.itemManager.tags.length).to.equal(1)
-    expect(application.items.findItem(note.uuid).deleted).to.be.false
+    expect(application.items.findItem(tag.uuid).deleted).to.not.be.ok
   })
 
   it('should import decrypted data and all items payload source should be FileImport', async function () {
@@ -396,6 +410,7 @@ describe('importing', function () {
 
     const importedNote = application.items.findItem(note.uuid)
     const importedTag = application.items.findItem(tag.uuid)
+
     expect(importedNote.payload.source).to.be.equal(PayloadSource.FileImport)
     expect(importedTag.payload.source).to.be.equal(PayloadSource.FileImport)
   })
@@ -577,6 +592,7 @@ describe('importing', function () {
 
   it('should not import data from 003 encrypted payload if an invalid password is provided', async function () {
     await setup({ fakeCrypto: true })
+
     const oldVersion = ProtocolVersion.V003
     await Factory.registerOldUser({
       application: application,
@@ -606,8 +622,10 @@ describe('importing', function () {
         application.submitValuesForChallenge(challenge, values)
       },
     })
+
     const result = await application.mutator.importData(backupData, true)
     expect(result).to.not.be.undefined
+
     expect(result.affectedItems.length).to.be.eq(0)
     expect(result.errorCount).to.be.eq(backupData.items.length)
     expect(application.itemManager.notes.length).to.equal(0)
@@ -828,12 +846,16 @@ describe('importing', function () {
   })
 
   it('importing another accounts notes/tags should correctly keep relationships', async function () {
+    this.timeout(Factory.TwentySecondTimeout)
+
     await setup({ fakeCrypto: true })
+
     await Factory.registerUserToApplication({
       application: application,
       email: email,
       password: password,
     })
+
     Factory.handlePasswordChallenges(application, password)
 
     const pair = Factory.createRelatedNoteTagPairPayload()
@@ -860,7 +882,7 @@ describe('importing', function () {
 
     const importedNote = application.itemManager.notes[0]
     const importedTag = application.itemManager.tags[0]
-    expect(application.itemManager.referencesForItem(importedTag.uuid).length).to.equal(1)
-    expect(application.itemManager.itemsReferencingItem(importedNote.uuid).length).to.equal(1)
+    expect(application.itemManager.referencesForItem(importedTag).length).to.equal(1)
+    expect(application.itemManager.itemsReferencingItem(importedNote).length).to.equal(1)
   })
 })

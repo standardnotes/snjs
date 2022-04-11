@@ -1,64 +1,75 @@
-import { ContentType, Uuid } from '@standardnotes/common'
+import { ContentType } from '@standardnotes/common'
 import {
-  SNItem,
   MutationType,
-  ItemMutator,
   ItemsKeyInterface,
   ItemsKeyMutatorInterface,
-} from '@standardnotes/models'
-import {
-  ItemInterface,
-  PayloadInterface,
-  IntegrityPayload,
+  DecryptedItemInterface,
+  DecryptedItemMutator,
+  DecryptedPayloadInterface,
   PayloadSource,
-  PurePayload,
+  EncryptedItemInterface,
+  DeletedItemInterface,
 } from '@standardnotes/models'
 import { AbstractService } from '../Service/AbstractService'
 
-export type ItemManagerChangeObserverCallback<T extends SNItem | PurePayload> = (
+export type ItemManagerChangeData<I extends DecryptedItemInterface = DecryptedItemInterface> = {
   /** The items are pre-existing but have been changed */
-  changed: T[],
+  changed: I[]
 
   /** The items have been newly inserted */
-  inserted: T[],
+  inserted: I[]
 
-  /** The items have been deleted from local state (and remote state if applicable) */
-  discarded: T[],
+  /** The items should no longer be displayed in the interface, either due to being deleted, or becoming error-encrypted */
+  removed: (EncryptedItemInterface | DeletedItemInterface)[]
 
   /** Items for which encrypted overwrite protection is enabled and enacted */
-  ignored: T[],
+  ignored: EncryptedItemInterface[]
 
-  source: PayloadSource,
-  sourceKey?: string,
-) => void
+  /** Items which were previously error decrypting but now successfully decrypted */
+  unerrored: I[]
+
+  source: PayloadSource
+  sourceKey?: string
+}
+
+export type ItemManagerChangeObserverCallback<
+  I extends DecryptedItemInterface = DecryptedItemInterface,
+> = (data: ItemManagerChangeData<I>) => void
 
 export interface ItemManagerInterface extends AbstractService {
-  addObserver(
+  addObserver<I extends DecryptedItemInterface = DecryptedItemInterface>(
     contentType: ContentType | ContentType[],
-    callback: ItemManagerChangeObserverCallback<SNItem>,
+    callback: ItemManagerChangeObserverCallback<I>,
   ): () => void
 
   /**
    * Marks the item as deleted and needing sync.
    */
-  setItemToBeDeleted(uuid: Uuid, source?: PayloadSource): Promise<SNItem | undefined>
+  setItemToBeDeleted(
+    itemToLookupUuidFor: DecryptedItemInterface,
+    source?: PayloadSource,
+  ): Promise<void>
 
-  setItemsToBeDeleted(uuids: Uuid[]): Promise<(ItemInterface | undefined)[]>
+  setItemsToBeDeleted(itemsToLookupUuidsFor: DecryptedItemInterface[]): Promise<void>
 
-  setItemsDirty(uuids: Uuid[], isUserModified?: boolean): Promise<ItemInterface[]>
+  setItemsDirty(
+    itemsToLookupUuidsFor: DecryptedItemInterface[],
+    isUserModified?: boolean,
+  ): Promise<DecryptedItemInterface[]>
 
-  allItems(): ItemInterface[]
-
-  integrityPayloads: IntegrityPayload[]
+  allItems(): DecryptedItemInterface[]
 
   /**
    * Inserts the item as-is by reading its payload value. This function will not
    * modify item in any way (such as marking it as dirty). It is up to the caller
    * to pass in a dirtied item if that is their intention.
    */
-  insertItem(item: SNItem): Promise<SNItem>
+  insertItem(item: DecryptedItemInterface): Promise<DecryptedItemInterface>
 
-  emitItemFromPayload(payload: PayloadInterface, source: PayloadSource): Promise<ItemInterface>
+  emitItemFromPayload(
+    payload: DecryptedPayloadInterface,
+    source: PayloadSource,
+  ): Promise<DecryptedItemInterface>
 
   /**
    * Returns all non-deleted items keys
@@ -66,17 +77,15 @@ export interface ItemManagerInterface extends AbstractService {
   itemsKeys(): ItemsKeyInterface[]
 
   /**
-   * Returns all items that have not been able to decrypt.
-   */
-  get invalidItems(): ItemInterface[]
-
-  /**
    * Consumers wanting to modify an item should run it through this block,
    * so that data is properly mapped through our function, and latest state
    * is properly reconciled.
    */
-  changeItem<M extends ItemMutator = ItemMutator, I extends ItemInterface = SNItem>(
-    uuid: Uuid,
+  changeItem<
+    M extends DecryptedItemMutator = DecryptedItemMutator,
+    I extends DecryptedItemInterface = DecryptedItemInterface,
+  >(
+    itemToLookupUuidFor: I,
     mutate?: (mutator: M) => void,
     mutationType?: MutationType,
     payloadSource?: PayloadSource,
@@ -84,7 +93,7 @@ export interface ItemManagerInterface extends AbstractService {
   ): Promise<I>
 
   changeItemsKey(
-    uuid: Uuid,
+    itemToLookupUuidFor: ItemsKeyInterface,
     mutate: (mutator: ItemsKeyMutatorInterface) => void,
     mutationType?: MutationType,
     payloadSource?: PayloadSource,

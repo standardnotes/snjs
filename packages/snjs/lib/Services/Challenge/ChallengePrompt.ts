@@ -6,7 +6,6 @@ import { assertUnreachable } from '@standardnotes/utils'
  * A Challenge can have many prompts. Each prompt represents a unique input,
  * such as a text field, or biometric scanner.
  */
-
 export class ChallengePrompt {
   public readonly id = Math.random()
   public readonly placeholder: string

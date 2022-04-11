@@ -47,7 +47,7 @@ describe('mapping performance', () => {
     }
 
     const payloads = Factory.shuffleArray(tags.concat(notes)).map((item) => {
-      return CreateMaxPayloadFromAnyObject(item)
+      return new DecryptedPayload(item)
     })
 
     const t0 = performance.now()
@@ -65,8 +65,8 @@ describe('mapping performance', () => {
     const expectedRunTime = 3 // seconds
     expect(seconds).to.be.at.most(expectedRunTime)
 
-    for (const note of application.itemManager.nonErroredItemsForContentType(ContentType.Note)) {
-      expect(application.itemManager.itemsReferencingItem(note.uuid).length).to.be.above(0)
+    for (const note of application.itemManager.getItems(ContentType.Note)) {
+      expect(application.itemManager.itemsReferencingItem(note).length).to.be.above(0)
     }
     await Factory.safeDeinit(application)
   }).timeout(20000)
@@ -109,7 +109,7 @@ describe('mapping performance', () => {
       notes.push(note)
     }
 
-    const payloads = [tag].concat(notes).map((item) => CreateMaxPayloadFromAnyObject(item))
+    const payloads = [tag].concat(notes).map((item) => new DecryptedPayload(item))
 
     const t0 = performance.now()
     // process items in separate batches, so as to trigger missed references
@@ -131,9 +131,9 @@ describe('mapping performance', () => {
     const MAX_RUN_TIME = 15.0 // seconds
     expect(seconds).to.be.at.most(MAX_RUN_TIME)
 
-    application.itemManager.nonErroredItemsForContentType(ContentType.Tag)[0]
-    for (const note of application.itemManager.nonErroredItemsForContentType(ContentType.Note)) {
-      expect(application.itemManager.itemsReferencingItem(note.uuid).length).to.equal(1)
+    application.itemManager.getItems(ContentType.Tag)[0]
+    for (const note of application.itemManager.getItems(ContentType.Note)) {
+      expect(application.itemManager.itemsReferencingItem(note).length).to.equal(1)
     }
     await Factory.safeDeinit(application)
   }).timeout(20000)

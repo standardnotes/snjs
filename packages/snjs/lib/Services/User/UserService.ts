@@ -43,12 +43,12 @@ export class UserService
     private challengeService: ChallengeService,
     private protectionService: SNProtectionService,
     private apiService: SNApiService,
-    protected internalEventBus: Services.InternalEventBusInterface,
+    protected override internalEventBus: Services.InternalEventBusInterface,
   ) {
     super(internalEventBus)
   }
 
-  public deinit(): void {
+  public override deinit(): void {
     super.deinit()
     ;(this.sessionManager as unknown) = undefined
     ;(this.syncService as unknown) = undefined
@@ -89,7 +89,7 @@ export class UserService
             : Services.StoragePersistencePolicies.Default,
         )
         if (mergeLocal) {
-          await this.syncService.markAllItemsAsNeedingSync()
+          await this.syncService.markAllItemsAsNeedingSyncAndPersist()
         } else {
           await this.itemManager.removeAllItemsFromMemory()
           await this.clearDatabase()
@@ -97,7 +97,7 @@ export class UserService
         await this.notifyEvent(AccountEvent.SignedInOrRegistered)
         this.unlockSyncing()
         await this.syncService.downloadFirstSync(300)
-        void this.protocolService.decryptErroredItems()
+        void this.protocolService.decryptErroredPayloads()
       } else {
         this.unlockSyncing()
       }
@@ -122,29 +122,39 @@ export class UserService
     if (this.protocolService.hasAccount()) {
       throw Error('Tried to sign in when an account already exists.')
     }
+
     if (this.signingIn) {
       throw Error('Already signing in.')
     }
+
     this.signingIn = true
+
     try {
       /** Prevent a timed sync from occuring while signing in. */
       this.lockSyncing()
+
       const result = await this.sessionManager.signIn(email, password, strict, ephemeral)
+
       if (!result.response.error) {
         this.syncService.resetSyncState()
+
         await this.storageService.setPersistencePolicy(
           ephemeral
             ? Services.StoragePersistencePolicies.Ephemeral
             : Services.StoragePersistencePolicies.Default,
         )
+
         if (mergeLocal) {
-          await this.syncService.markAllItemsAsNeedingSync()
+          await this.syncService.markAllItemsAsNeedingSyncAndPersist()
         } else {
           void this.itemManager.removeAllItemsFromMemory()
           await this.clearDatabase()
         }
+
         await this.notifyEvent(AccountEvent.SignedInOrRegistered)
+
         this.unlockSyncing()
+
         const syncPromise = this.syncService
           .downloadFirstSync(1_000, {
             checkIntegrity: true,
@@ -152,16 +162,19 @@ export class UserService
           })
           .then(() => {
             if (!awaitSync) {
-              void this.protocolService.decryptErroredItems()
+              void this.protocolService.decryptErroredPayloads()
             }
           })
+
         if (awaitSync) {
           await syncPromise
-          await this.protocolService.decryptErroredItems()
+
+          await this.protocolService.decryptErroredPayloads()
         }
       } else {
         this.unlockSyncing()
       }
+
       return result.response
     } finally {
       this.signingIn = false
@@ -218,7 +231,7 @@ export class UserService
       void this.syncService.downloadFirstSync(1_000, {
         checkIntegrity: true,
       })
-      void this.protocolService.decryptErroredItems()
+      void this.protocolService.decryptErroredPayloads()
     }
     this.unlockSyncing()
     return response
@@ -435,10 +448,10 @@ export class UserService
    * but not from working memory See:
    * https://github.com/standardnotes/desktop/issues/131
    */
-  private async rewriteItemsKeys() {
+  private async rewriteItemsKeys(): Promise<void> {
     const itemsKeys = this.itemManager.itemsKeys()
     const payloads = itemsKeys.map((key) => key.payloadRepresentation())
-    await this.storageService.deletePayloads(payloads)
+    await this.storageService.forceDeletePayloads(payloads)
     await this.syncService.persistPayloads(payloads)
   }
 

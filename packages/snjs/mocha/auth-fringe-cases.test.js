@@ -45,10 +45,13 @@ describe('auth fringe cases', () => {
       await context.application.register(context.email, context.password)
       const note = await Factory.createSyncedNote(context.application)
       clearApplicationLocalStorage()
+
       console.warn("Expecting errors 'Unable to find operator for version undefined'")
+
       const restartedApplication = await Factory.restartApplication(context.application)
-      const refreshedNote = restartedApplication.itemManager.findItem(note.uuid)
+      const refreshedNote = restartedApplication.payloadManager.findOne(note.uuid)
       expect(refreshedNote.errorDecrypting).to.equal(true)
+
       await Factory.safeDeinit(restartedApplication)
     })
 
@@ -58,10 +61,12 @@ describe('auth fringe cases', () => {
       const note = await Factory.createSyncedNote(context.application)
       clearApplicationLocalStorage()
       const restartedApplication = await Factory.restartApplication(context.application)
+
       console.warn(
         "Expecting errors 'No associated key found for item encrypted with latest protocol version.'",
         "and 'Unable to find operator for version undefined'",
       )
+
       await restartedApplication.signIn(
         context.email,
         context.password,
@@ -71,7 +76,7 @@ describe('auth fringe cases', () => {
         awaitSync,
       )
       const refreshedNote = restartedApplication.itemManager.findItem(note.uuid)
-      expect(refreshedNote.errorDecrypting).to.equal(false)
+      expect(isDecryptedItem(refreshedNote)).to.equal(true)
       expect(restartedApplication.itemManager.notes.length).to.equal(1)
       await Factory.safeDeinit(restartedApplication)
     }).timeout(10000)
@@ -81,17 +86,23 @@ describe('auth fringe cases', () => {
     it('offline item should not overwrite recently updated server item and conflict should be created', async function () {
       const context = await createContext()
       await context.application.register(context.email, context.password)
+
       const staleText = 'stale text'
+
       const firstVersionOfNote = await Factory.createSyncedNote(
         context.application,
         undefined,
         staleText,
       )
+
       const serverText = 'server text'
-      await context.application.mutator.changeAndSaveItem(firstVersionOfNote.uuid, (mutator) => {
+
+      await context.application.mutator.changeAndSaveItem(firstVersionOfNote, (mutator) => {
         mutator.text = serverText
       })
+
       const newApplication = await Factory.signOutApplicationAndReturnNew(context.application)
+
       /** Create same note but now offline */
       await newApplication.itemManager.emitItemFromPayload(firstVersionOfNote.payload)
 

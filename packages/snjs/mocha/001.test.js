@@ -70,7 +70,7 @@ describe('001 protocol operations', () => {
       '65e040f8ef6775fecbb7ee5599ec3f059faa96d728e50f2014237a802ac5bd0f',
     )
     expect(key.dataAuthenticationKey).to.not.be.ok
-    const payload = CreateMaxPayloadFromAnyObject({
+    const payload = new EncryptedPayload({
       auth_hash: '0ae7e3c9fce61f07a8d5d267accab20793a06ab266c245fe59178d49c1ad3fa6',
       content:
         '001hEIgw837WzFM7Eb5tBHHXumxxKwaWuDv5hyhmrNDTUU5qxnb5jkjo1HsRzw+Z65BMuDqIdHlZU3plW+4QpJ6iFksFPYgo8VHa++dOtfAP7Q=',
@@ -107,10 +107,7 @@ describe('001 protocol operations', () => {
   it('generating encryption params includes items_key_id', async () => {
     const payload = Factory.createNotePayload()
     const key = await protocol001.createItemsKey()
-    const params = await protocol001.generateEncryptedParametersAsync(
-      payload,
-      key,
-    )
+    const params = await protocol001.generateEncryptedParametersAsync(payload, key)
     expect(params.content).to.be.ok
     expect(params.enc_item_key).to.be.ok
     expect(params.auth_hash).to.be.ok
@@ -120,10 +117,7 @@ describe('001 protocol operations', () => {
   it('can decrypt encrypted params', async () => {
     const payload = Factory.createNotePayload()
     const key = await protocol001.createItemsKey()
-    const params = await protocol001.generateEncryptedParametersAsync(
-      payload,
-      key,
-    )
+    const params = await protocol001.generateEncryptedParametersAsync(payload, key)
     const decrypted = await protocol001.generateDecryptedParametersAsync(params, key)
     expect(decrypted.content).to.eql(payload.content)
   })
@@ -131,11 +125,9 @@ describe('001 protocol operations', () => {
   it('payloads missing enc_item_key should decrypt as errorDecrypting', async () => {
     const payload = Factory.createNotePayload()
     const key = await protocol001.createItemsKey()
-    const params = await protocol001.generateEncryptedParametersAsync(
-      payload,
-      key,
-    )
-    const modified = CreateMaxPayloadFromAnyObject(params, {
+    const params = await protocol001.generateEncryptedParametersAsync(payload, key)
+    const modified = new EncryptedPayload({
+      ...params,
       enc_item_key: undefined,
     })
     const decrypted = await protocol001.generateDecryptedParametersAsync(modified, key)

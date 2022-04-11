@@ -25,6 +25,8 @@ describe('application group', function () {
     })
     expect(group.primaryApplication).to.be.ok
     expect(group.primaryApplication.identifier).to.be.ok
+
+    await Factory.safeDeinit(group.primaryApplication)
   })
 
   it('initializing a group should result with proper descriptor setup', async function () {
@@ -36,6 +38,8 @@ describe('application group', function () {
     })
     const identifier = group.primaryApplication.identifier
     expect(group.descriptorRecord[identifier].identifier).to.equal(identifier)
+
+    await Factory.safeDeinit(group.primaryApplication)
   })
 
   it('should persist descriptor record after changes', async function () {
@@ -53,7 +57,7 @@ describe('application group', function () {
     expect(descriptorRecord[identifier].identifier).to.equal(identifier)
     expect(descriptorRecord[identifier].primary).to.equal(true)
 
-    await group.addNewApplication()
+    const application = await group.addNewApplication()
     const descriptorRecord2 = await group.deviceInterface.getJsonParsedRawStorageValue(
       RawStorageKey.DescriptorRecord,
     )
@@ -61,6 +65,8 @@ describe('application group', function () {
 
     expect(descriptorRecord2[identifier].primary).to.equal(false)
     expect(descriptorRecord2[group.primaryApplication.identifier].primary).to.equal(true)
+
+    await Factory.safeDeinit(application)
   })
 
   it('adding new application should incrememnt total descriptor count', async function () {
@@ -71,10 +77,12 @@ describe('application group', function () {
       },
     })
     const currentIdentifier = group.primaryApplication.identifier
-    await group.addNewApplication()
+    const application = await group.addNewApplication()
 
     expect(group.getDescriptors().length).to.equal(2)
     expect(group.primaryApplication.identifier).to.not.equal(currentIdentifier)
+
+    await Factory.safeDeinit(application)
   })
 
   it('signing out of application should remove from group and create new', async function () {

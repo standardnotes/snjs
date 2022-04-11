@@ -1,9 +1,24 @@
-import { PayloadSource, PurePayload } from '@standardnotes/models'
+import {
+  PayloadSource,
+  PayloadInterface,
+  EncryptedPayloadInterface,
+  FullyFormedPayloadInterface,
+} from '@standardnotes/models'
+import { IntegrityPayload } from '@standardnotes/responses'
 
 export interface PayloadManagerInterface {
   emitPayloads(
-    payloads: PurePayload[],
+    payloads: PayloadInterface[],
     source: PayloadSource,
     sourceKey?: string,
-  ): Promise<PurePayload[]>
+  ): Promise<PayloadInterface[]>
+
+  integrityPayloads: IntegrityPayload[]
+
+  get invalidPayloads(): EncryptedPayloadInterface[]
+
+  /**
+   * Returns a detached array of all items which are not deleted
+   */
+  get nonDeletedItems(): FullyFormedPayloadInterface[]
 }

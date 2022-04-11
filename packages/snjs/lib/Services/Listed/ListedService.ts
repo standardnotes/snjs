@@ -21,9 +21,17 @@ export class ListedService extends AbstractService implements ListedClientInterf
     private itemManager: ItemManager,
     private settingsService: SNSettingsService,
     private httpSerivce: SNHttpService,
-    protected internalEventBus: InternalEventBusInterface,
+    protected override internalEventBus: InternalEventBusInterface,
   ) {
     super(internalEventBus)
+  }
+
+  override deinit() {
+    ;(this.itemManager as unknown) = undefined
+    ;(this.settingsService as unknown) = undefined
+    ;(this.apiService as unknown) = undefined
+    ;(this.httpSerivce as unknown) = undefined
+    super.deinit()
   }
 
   public canRegisterNewListedAccount(): boolean {
@@ -88,7 +96,7 @@ export class ListedService extends AbstractService implements ListedClientInterf
 
   private getLegacyListedAccounts(): ListedAccount[] {
     const extensions = this.itemManager
-      .nonErroredItemsForContentType<SNActionsExtension>(ContentType.ActionsExtension)
+      .getItems<SNActionsExtension>(ContentType.ActionsExtension)
       .filter((extension) => extension.isListedExtension)
 
     const accounts: ListedAccount[] = []

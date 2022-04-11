@@ -561,28 +561,7 @@ export function GetDeprecatedFeatures(): FeatureDescription[] {
     thumbnail_url: 'https://s3.amazonaws.com/standard-notes/screenshots/models/FileSafe-banner.png',
   })
 
-  const folders: IframeComponentFeatureDescription = FillEditorComponentDefaults({
-    name: 'Folders',
-    identifier: FeatureIdentifier.DeprecatedFoldersComponent,
-    version: '1.3.8',
-    index_path: 'index.html',
-    component_permissions: [
-      {
-        name: ComponentAction.StreamItems,
-        content_types: [ContentType.Tag, ContentType.SmartView],
-      },
-    ],
-    permission_name: PermissionName.ComponentFolders,
-    area: ComponentArea.TagsList,
-    deprecated: true,
-    description: 'Create nested folders with easy drag and drop.',
-    git_repo_url: 'https://github.com/standardnotes/folders-component',
-    marketing_url: 'https://standardnotes.com/extensions/folders',
-    thumbnail_url:
-      'https://s3.amazonaws.com/standard-notes/screenshots/models/components/folders.jpg',
-  })
-
-  return [filesafe, folders]
+  return [filesafe]
 }
 
 export function FindNativeFeature(identifier: FeatureIdentifier): FeatureDescription | undefined {

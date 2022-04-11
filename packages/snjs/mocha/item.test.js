@@ -7,7 +7,7 @@ const expect = chai.expect
 describe('item', () => {
   beforeEach(async function () {
     this.createBarePayload = () => {
-      return new PurePayload({
+      return new DecryptedPayload({
         uuid: '123',
         content_type: ContentType.Note,
         content: {
@@ -17,7 +17,7 @@ describe('item', () => {
     }
 
     this.createNote = () => {
-      return new SNItem(this.createBarePayload())
+      return new DecryptedItem(this.createBarePayload())
     }
 
     this.createTag = (notes = []) => {
@@ -28,7 +28,7 @@ describe('item', () => {
         }
       })
       return new SNTag(
-        new PurePayload({
+        new DecryptedPayload({
           uuid: Factory.generateUuidish(),
           content_type: ContentType.Tag,
           content: {
@@ -41,13 +41,15 @@ describe('item', () => {
   })
 
   it('constructing without uuid should throw', function () {
-    const payload = new PurePayload({})
+    let error
 
-    const throwFn = () => {
-      const item = new SNItem(payload)
-      item
+    try {
+      new DecryptedItem({})
+    } catch (e) {
+      error = e
     }
-    expect(throwFn).to.throw()
+
+    expect(error).to.be.ok
   })
 
   it('healthy constructor', function () {
@@ -86,6 +88,6 @@ describe('item', () => {
   it('getDomainData for app domain should return object', function () {
     const note = this.createNote()
 
-    expect(note.getDomainData(SNItem.DefaultAppDomain())).to.be.ok
+    expect(note.getDomainData(DecryptedItem.DefaultAppDomain())).to.be.ok
   })
 })

@@ -15,10 +15,6 @@ export class ChallengeOperation {
   private invalidValues: ChallengeValue[] = []
   private artifacts: ChallengeArtifacts = {}
 
-  /**
-   * @param resolve the promise resolve function to be called
-   * when this challenge completes or cancels
-   */
   constructor(
     public challenge: Challenge,
     public onValidValue: ValueCallback,

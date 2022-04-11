@@ -1,5 +1,4 @@
-import { OnChunkCallback } from '../types'
-import { FileSelectionResponse } from '../types'
+import { OnChunkCallback, FileSelectionResponse } from '../types'
 
 export interface FileReaderInterface {
   selectFiles(): Promise<File[]>

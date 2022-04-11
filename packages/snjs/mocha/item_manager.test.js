@@ -43,10 +43,10 @@ describe('item manager', function () {
 
   it('emitting item through payload and marking dirty should have userModifiedDate', async function () {
     const payload = Factory.createNotePayload()
-    this.itemManager.emitItemFromPayload(payload, PayloadSource.LocalChanged)
-    const result = await this.itemManager.setItemDirty(payload.uuid)
+    const item = await this.itemManager.emitItemFromPayload(payload, PayloadSource.LocalChanged)
+    const result = await this.itemManager.setItemDirty(item)
     const appData = result.payload.content.appData
-    expect(appData[SNItem.DefaultAppDomain()][AppDataField.UserModifiedDate]).to.be.ok
+    expect(appData[DecryptedItem.DefaultAppDomain()][AppDataField.UserModifiedDate]).to.be.ok
   })
 
   it('find items with valid uuid', async function () {
@@ -58,14 +58,13 @@ describe('item manager', function () {
   })
 
   it('find items with invalid uuid no blanks', async function () {
-    const includeBlanks = false
-    const results = await this.itemManager.findItems([Factory.generateUuidish()], includeBlanks)
+    const results = await this.itemManager.findItems([Factory.generateUuidish()])
     expect(results.length).to.equal(0)
   })
 
   it('find items with invalid uuid include blanks', async function () {
     const includeBlanks = true
-    const results = await this.itemManager.findItems([Factory.generateUuidish()], includeBlanks)
+    const results = await this.itemManager.findItemsIncludingBlanks([Factory.generateUuidish()])
     expect(results.length).to.equal(1)
     expect(results[0]).to.not.be.ok
   })
@@ -101,7 +100,7 @@ describe('item manager', function () {
   it('inverse reference map should not have duplicates', async function () {
     const note = await this.createNote()
     const tag = await this.createTag([note])
-    await this.itemManager.changeItem(tag.uuid)
+    await this.itemManager.changeItem(tag)
 
     expect(this.itemManager.collection.referenceMap.inverseMap[note.uuid]).to.eql([tag.uuid])
   })
@@ -109,16 +108,16 @@ describe('item manager', function () {
   it('deleting from reference map', async function () {
     const note = await this.createNote()
     const tag = await this.createTag([note])
-    await this.itemManager.setItemToBeDeleted(note.uuid)
+    await this.itemManager.setItemToBeDeleted(note)
 
     expect(this.itemManager.collection.referenceMap.directMap[tag.uuid]).to.eql([])
-    expect(this.itemManager.collection.referenceMap.inverseMap[note.uuid]).to.not.be.ok
+    expect(this.itemManager.collection.referenceMap.inverseMap[note.uuid].length).to.equal(0)
   })
 
   it('deleting referenced item should update referencing item references', async function () {
     const note = await this.createNote()
     let tag = await this.createTag([note])
-    await this.itemManager.setItemToBeDeleted(note.uuid)
+    await this.itemManager.setItemToBeDeleted(note)
 
     tag = this.itemManager.findItem(tag.uuid)
     expect(tag.content.references.length).to.equal(0)
@@ -127,7 +126,7 @@ describe('item manager', function () {
   it('removing relationship should update reference map', async function () {
     const note = await this.createNote()
     const tag = await this.createTag([note])
-    await this.itemManager.changeItem(tag.uuid, (mutator) => {
+    await this.itemManager.changeItem(tag, (mutator) => {
       mutator.removeItemAsRelationship(note)
     })
 
@@ -137,13 +136,18 @@ describe('item manager', function () {
 
   it('emitting discardable payload should remove it from our collection', async function () {
     const note = await this.createNote()
-    const payload = note.payloadRepresentation({
+
+    const payload = new DeletedPayload({
+      ...note.payload.ejected(),
+      content: undefined,
       deleted: true,
       dirty: false,
     })
-    await this.itemManager.emitItemFromPayload(payload)
 
     expect(payload.discardable).to.equal(true)
+
+    await this.itemManager.emitItemFromPayload(payload)
+
     expect(this.itemManager.findItem(note.uuid)).to.not.be.ok
   })
 
@@ -151,7 +155,7 @@ describe('item manager', function () {
     const note = await this.createNote()
     const tag = await this.createTag([note])
 
-    const itemsThatReference = this.itemManager.itemsReferencingItem(note.uuid)
+    const itemsThatReference = this.itemManager.itemsReferencingItem(note)
     expect(itemsThatReference.length).to.equal(1)
     expect(itemsThatReference[0]).to.equal(tag)
   })
@@ -160,8 +164,8 @@ describe('item manager', function () {
     const observed = []
     this.itemManager.addObserver(
       ContentType.Any,
-      (changed, inserted, discarded, ignored, source, sourceKey) => {
-        observed.push({ changed, inserted, discarded, source, sourceKey })
+      ({ changed, inserted, removed, source, sourceKey }) => {
+        observed.push({ changed, inserted, removed, source, sourceKey })
       },
     )
     const note = await this.createNote()
@@ -178,7 +182,7 @@ describe('item manager', function () {
   it('change existing item', async function () {
     const note = await this.createNote()
     const newTitle = String(Math.random())
-    await this.itemManager.changeItem(note.uuid, (mutator) => {
+    await this.itemManager.changeItem(note, (mutator) => {
       mutator.title = newTitle
     })
 
@@ -194,7 +198,7 @@ describe('item manager', function () {
 
     const changeFn = async () => {
       const newTitle = String(Math.random())
-      return this.itemManager.changeItem(note.uuid, (mutator) => {
+      return this.itemManager.changeItem(note, (mutator) => {
         mutator.title = newTitle
       })
     }
@@ -203,7 +207,7 @@ describe('item manager', function () {
 
   it('set items dirty', async function () {
     const note = await this.createNote()
-    await this.itemManager.setItemDirty(note.uuid)
+    await this.itemManager.setItemDirty(note)
 
     const dirtyItems = this.itemManager.getDirtyItems()
     expect(dirtyItems.length).to.equal(1)
@@ -212,23 +216,33 @@ describe('item manager', function () {
   })
 
   it('dirty items should not include errored items', async function () {
-    const note = await this.itemManager.setItemDirty((await this.createNote()).uuid)
-    const errorred = CreateMaxPayloadFromAnyObject(note.payload, {
+    const note = await this.itemManager.setItemDirty(await this.createNote())
+    const errorred = new EncryptedPayload({
+      ...note.payload,
+      content: '004:...',
       errorDecrypting: true,
     })
+
     await this.itemManager.emitItemsFromPayloads([errorred], PayloadSource.LocalChanged)
+
     const dirtyItems = this.itemManager.getDirtyItems()
+
     expect(dirtyItems.length).to.equal(0)
   })
 
   it('dirty items should include errored items if they are being deleted', async function () {
-    const note = await this.itemManager.setItemDirty((await this.createNote()).uuid)
-    const errorred = CreateMaxPayloadFromAnyObject(note.payload, {
+    const note = await this.itemManager.setItemDirty(await this.createNote())
+    const errorred = new DeletedPayload({
+      ...note.payload,
+      content: undefined,
       errorDecrypting: true,
       deleted: true,
     })
+
     await this.itemManager.emitItemsFromPayloads([errorred], PayloadSource.LocalChanged)
+
     const dirtyItems = this.itemManager.getDirtyItems()
+
     expect(dirtyItems.length).to.equal(1)
   })
 
@@ -245,7 +259,7 @@ describe('item manager', function () {
 
     it('should duplicate the item and set the duplicate_of property', async function () {
       const note = await this.createNote()
-      await this.itemManager.duplicateItem(note.uuid)
+      await this.itemManager.duplicateItem(note)
       sinon.assert.calledTwice(this.emitPayloads)
 
       const originalNote = this.itemManager.notes[0]
@@ -262,7 +276,7 @@ describe('item manager', function () {
 
     it('should duplicate the item and set the duplicate_of and conflict_of properties', async function () {
       const note = await this.createNote()
-      await this.itemManager.duplicateItem(note.uuid, true)
+      await this.itemManager.duplicateItem(note, true)
       sinon.assert.calledTwice(this.emitPayloads)
 
       const originalNote = this.itemManager.notes[0]
@@ -280,7 +294,7 @@ describe('item manager', function () {
     it('duplicate item with relationships', async function () {
       const note = await this.createNote()
       const tag = await this.createTag([note])
-      const duplicate = await this.itemManager.duplicateItem(tag.uuid)
+      const duplicate = await this.itemManager.duplicateItem(tag)
 
       expect(duplicate.content.references).to.have.length(1)
       expect(this.itemManager.items).to.have.length(3)
@@ -290,7 +304,7 @@ describe('item manager', function () {
     it('adds duplicated item as a relationship to items referencing it', async function () {
       const note = await this.createNote()
       let tag = await this.createTag([note])
-      const duplicateNote = await this.itemManager.duplicateItem(note.uuid)
+      const duplicateNote = await this.itemManager.duplicateItem(note)
       expect(tag.content.references).to.have.length(1)
 
       tag = this.itemManager.findItem(tag.uuid)
@@ -304,7 +318,7 @@ describe('item manager', function () {
         title: 'hello',
         text: 'world',
       })
-      const duplicateNote = await this.itemManager.duplicateItem(note.uuid, false, {
+      const duplicateNote = await this.itemManager.duplicateItem(note, false, {
         title: 'hello (copy)',
       })
 
@@ -315,18 +329,18 @@ describe('item manager', function () {
 
   it('set item deleted', async function () {
     const note = await this.createNote()
-    await this.itemManager.setItemToBeDeleted(note.uuid)
+    await this.itemManager.setItemToBeDeleted(note)
 
     /** Items should never be mutated directly */
     expect(note.deleted).to.not.be.ok
 
-    const latestVersion = this.itemManager.findItem(note.uuid)
+    const latestVersion = this.payloadManager.findOne(note.uuid)
     expect(latestVersion.deleted).to.equal(true)
     expect(latestVersion.dirty).to.equal(true)
     expect(latestVersion.content).to.not.be.ok
-    /** Deleted items stick around until they are synced */
-    expect(this.itemManager.items.length).to.equal(1)
-    /** Deleted items do not show up in particular arrays (.notes, .tags, .components, etc) */
+
+    /** Deleted items do not show up in item manager's public interface */
+    expect(this.itemManager.items.length).to.equal(0)
     expect(this.itemManager.notes.length).to.equal(0)
   })
 
@@ -359,7 +373,7 @@ describe('item manager', function () {
 
   it('trash', async function () {
     const note = await this.createNote()
-    const versionTwo = await this.itemManager.changeItem(note.uuid, (mutator) => {
+    const versionTwo = await this.itemManager.changeItem(note, (mutator) => {
       mutator.trashed = true
     })
 
@@ -372,28 +386,28 @@ describe('item manager', function () {
     expect(this.itemManager.trashedItems.length).to.equal(1)
 
     await this.itemManager.emptyTrash()
-    const versionThree = this.itemManager.findItem(note.uuid)
+    const versionThree = this.payloadManager.findOne(note.uuid)
     expect(versionThree.deleted).to.equal(true)
     expect(this.itemManager.trashedItems.length).to.equal(0)
   })
 
   it('remove all items from memory', async function () {
     const observed = []
-    this.itemManager.addObserver(ContentType.Any, (changed, inserted, discarded, ignored) => {
-      observed.push({ changed, inserted, discarded, ignored })
+    this.itemManager.addObserver(ContentType.Any, ({ changed, inserted, removed, ignored }) => {
+      observed.push({ changed, inserted, removed, ignored })
     })
     await this.createNote()
     await this.itemManager.removeAllItemsFromMemory()
 
     const deletionEvent = observed[1]
-    expect(deletionEvent.discarded[0].deleted).to.equal(true)
+    expect(deletionEvent.removed[0].deleted).to.equal(true)
     expect(this.itemManager.items.length).to.equal(0)
   })
 
   it('remove item locally', async function () {
     const observed = []
-    this.itemManager.addObserver(ContentType.Any, (changed, inserted, discarded, ignored) => {
-      observed.push({ changed, inserted, discarded, ignored })
+    this.itemManager.addObserver(ContentType.Any, ({ changed, inserted, removed, ignored }) => {
+      observed.push({ changed, inserted, removed, ignored })
     })
     const note = await this.createNote()
     await this.itemManager.removeItemLocally(note)
@@ -415,11 +429,11 @@ describe('item manager', function () {
     const changedTitle = 'changed title'
     let didEmit = false
     let latestVersion
-    this.itemManager.addObserver(ContentType.Note, (changed, inserted, _discarded, _ignored) => {
+    this.itemManager.addObserver(ContentType.Note, ({ changed, inserted }) => {
       const all = changed.concat(inserted)
       if (!didEmit) {
         didEmit = true
-        const changedPayload = CopyPayload(payload, {
+        const changedPayload = payload.copy({
           content: {
             ...payload.content,
             title: changedTitle,
@@ -491,7 +505,7 @@ describe('item manager', function () {
       const secondTag = await this.itemManager.findOrCreateTagByTitle('tag two')
 
       const note = await this.createNote()
-      await this.itemManager.changeItem(firstTag.uuid, (mutator) => {
+      await this.itemManager.changeItem(firstTag, (mutator) => {
         mutator.addItemAsRelationship(note)
       })
 
@@ -505,7 +519,7 @@ describe('item manager', function () {
     it('all view should not include archived notes by default', async function () {
       const normal = await this.createNote()
 
-      await this.itemManager.changeItem(normal.uuid, (mutator) => {
+      await this.itemManager.changeItem(normal, (mutator) => {
         mutator.archived = true
       })
 
@@ -515,13 +529,13 @@ describe('item manager', function () {
         }),
       )
 
-      expect(this.itemManager.getDisplayableItems(ContentType.Note).length).to.equal(0)
+      expect(this.itemManager.getDisplayableNotes().length).to.equal(0)
     })
 
     it('archived view should not include trashed notes by default', async function () {
       const normal = await this.createNote()
 
-      await this.itemManager.changeItem(normal.uuid, (mutator) => {
+      await this.itemManager.changeItem(normal, (mutator) => {
         mutator.archived = true
         mutator.trashed = true
       })
@@ -532,13 +546,13 @@ describe('item manager', function () {
         }),
       )
 
-      expect(this.itemManager.getDisplayableItems(ContentType.Note).length).to.equal(0)
+      expect(this.itemManager.getDisplayableNotes().length).to.equal(0)
     })
 
     it('trashed view should include archived notes by default', async function () {
       const normal = await this.createNote()
 
-      await this.itemManager.changeItem(normal.uuid, (mutator) => {
+      await this.itemManager.changeItem(normal, (mutator) => {
         mutator.archived = true
         mutator.trashed = true
       })
@@ -549,7 +563,7 @@ describe('item manager', function () {
         }),
       )
 
-      expect(this.itemManager.getDisplayableItems(ContentType.Note).length).to.equal(1)
+      expect(this.itemManager.getDisplayableNotes().length).to.equal(1)
     })
   })
 
@@ -565,7 +579,7 @@ describe('item manager', function () {
       const note = await this.createNote()
 
       tags.map(async (tag) => {
-        await this.itemManager.changeItem(tag.uuid, (mutator) => {
+        await this.itemManager.changeItem(tag, (mutator) => {
           mutator.addItemAsRelationship(note)
         })
       })
@@ -580,7 +594,7 @@ describe('item manager', function () {
     })
   })
 
-  describe('getTagParentChain', async function () {
+  describe('getTagParentChain', function () {
     it('should return parent tags for a tag', async function () {
       const [parent, child, grandchild, _other] = await Promise.all([
         this.itemManager.findOrCreateTagByTitle('parent'),
@@ -592,7 +606,7 @@ describe('item manager', function () {
       await this.itemManager.setTagParent(parent, child)
       await this.itemManager.setTagParent(child, grandchild)
 
-      const results = this.itemManager.getTagParentChain(grandchild.uuid)
+      const results = this.itemManager.getTagParentChain(grandchild)
 
       expect(results).lengthOf(2)
       expect(results[0].uuid).to.equal(parent.uuid)

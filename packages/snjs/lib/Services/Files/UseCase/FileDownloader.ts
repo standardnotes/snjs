@@ -1,5 +1,5 @@
 import { ClientDisplayableError } from '@standardnotes/responses'
-import { EncryptedFileInterface } from '../types'
+import { EncryptedFileInterface } from '../Types'
 import { FilesServerInterface } from '../FilesServerInterface'
 
 export class FileDownloader {

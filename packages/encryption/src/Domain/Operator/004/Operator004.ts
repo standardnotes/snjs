@@ -2,7 +2,7 @@ import { ContentType, KeyParamsOrigination, ProtocolVersion } from '@standardnot
 import { Create004KeyParams } from '../../RootKey/KeyParams'
 import { SynchronousOperator } from '../Operator'
 import {
-  CreateItemFromPayload,
+  CreateDecryptedItemFromPayload,
   FillItemContent,
   ItemContent,
   ItemsKeyContent,
@@ -18,7 +18,7 @@ import { ContentTypeUsesRootKeyEncryption } from '../../Intent/Functions'
 import {
   DecryptedParameters,
   EncryptedParameters,
-  ErroredDecryptingParameters,
+  ErrorDecryptingParameters,
 } from '../../Encryption/EncryptedParameters'
 import { RootKeyEncryptedAuthenticatedData } from '../../Encryption/RootKeyEncryptedAuthenticatedData'
 import { ItemAuthenticatedData } from '../../Encryption/ItemAuthenticatedData'
@@ -57,12 +57,12 @@ export class SNProtocolOperator004 implements SynchronousOperator {
    * The consumer must save/sync this item.
    */
   public createItemsKey(): ItemsKeyInterface {
-    const payload = Models.CreateMaxPayloadFromAnyObject({
+    const payload = new Models.DecryptedPayload({
       uuid: Utils.UuidGenerator.GenerateUuid(),
       content_type: ContentType.ItemsKey,
       content: this.generateNewItemsKeyContent(),
     })
-    return CreateItemFromPayload(payload)
+    return CreateDecryptedItemFromPayload(payload)
   }
 
   /**
@@ -189,7 +189,7 @@ export class SNProtocolOperator004 implements SynchronousOperator {
    * decrypt data by regenerating the key based on the attached key params.
    */
   private generateAuthenticatedDataForPayload(
-    payload: Models.PayloadInterface,
+    payload: Models.DecryptedPayloadInterface,
     key: ItemsKeyInterface | SNRootKey,
   ): ItemAuthenticatedData | RootKeyEncryptedAuthenticatedData {
     const baseData: ItemAuthenticatedData = {
@@ -227,7 +227,7 @@ export class SNProtocolOperator004 implements SynchronousOperator {
   }
 
   public generateEncryptedParametersSync(
-    payload: Models.PayloadInterface,
+    payload: Models.DecryptedPayloadInterface,
     key: ItemsKeyInterface | SNRootKey,
   ): EncryptedParameters {
     const itemKey = this.crypto.generateRandomKey(V004Algorithm.EncryptionKeyLength)
@@ -257,7 +257,7 @@ export class SNProtocolOperator004 implements SynchronousOperator {
   public generateDecryptedParametersSync<C extends ItemContent = ItemContent>(
     encrypted: EncryptedParameters,
     key: ItemsKeyInterface | SNRootKey,
-  ): DecryptedParameters<C> | ErroredDecryptingParameters {
+  ): DecryptedParameters<C> | ErrorDecryptingParameters {
     const itemKeyComponents = this.deconstructEncryptedPayloadString(encrypted.enc_item_key)
     const authenticatedData = this.stringToAuthenticatedData(
       itemKeyComponents.rawAuthenticatedData,
@@ -300,11 +300,6 @@ export class SNProtocolOperator004 implements SynchronousOperator {
       return {
         uuid: encrypted.uuid,
         content: JSON.parse(content),
-        items_key_id: undefined,
-        enc_item_key: undefined,
-        auth_hash: undefined,
-        errorDecrypting: false,
-        waitingForKey: false,
       }
     }
   }

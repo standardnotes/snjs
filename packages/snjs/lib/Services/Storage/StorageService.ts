@@ -1,11 +1,25 @@
-import { ContentType } from '@standardnotes/common'
-import { Copy, extendArray, isNullOrUndefined, UuidGenerator } from '@standardnotes/utils'
+import { ContentType, Uuid } from '@standardnotes/common'
+import { Copy, extendArray, UuidGenerator } from '@standardnotes/utils'
 import { Environment } from '@Lib/Application/Platforms'
 import { SNLog } from '../../Log'
-import { SNRootKey } from '@standardnotes/encryption'
+import { isErrorDecryptingParameters, SNRootKey } from '@standardnotes/encryption'
 import * as Encryption from '@standardnotes/encryption'
-import * as Models from '@standardnotes/models'
 import * as Services from '@standardnotes/services'
+import {
+  CreateDecryptedLocalStorageContextPayload,
+  CreateDeletedLocalStorageContextPayload,
+  CreateEncryptedLocalStorageContextPayload,
+  CreatePayloadSplitWithDiscardables,
+  DecryptedPayload,
+  EncryptedPayload,
+  FullyFormedPayloadInterface,
+  isDecryptedTransferPayload,
+  isEncryptedTransferPayload,
+  EncryptedTransferPayload,
+  ItemContent,
+  DecryptedPayloadInterface,
+  DeletedPayloadInterface,
+} from '@standardnotes/models'
 
 /**
  * The storage service is responsible for persistence of both simple key-values, and payload
@@ -34,7 +48,7 @@ export class SNStorageService
     private deviceInterface: Services.DeviceInterface,
     private identifier: string,
     private environment: Environment,
-    protected internalEventBus: Services.InternalEventBusInterface,
+    protected override internalEventBus: Services.InternalEventBusInterface,
   ) {
     super(internalEventBus)
     void this.setPersistencePolicy(Services.StoragePersistencePolicies.Default)
@@ -45,15 +59,16 @@ export class SNStorageService
     this.encryptionProvider = provider
   }
 
-  public deinit() {
+  public override deinit() {
     ;(this.deviceInterface as unknown) = undefined
     ;(this.encryptionProvider as unknown) = undefined
     this.storagePersistable = false
     super.deinit()
   }
 
-  async handleApplicationStage(stage: Services.ApplicationStage) {
+  override async handleApplicationStage(stage: Services.ApplicationStage) {
     await super.handleApplicationStage(stage)
+
     if (stage === Services.ApplicationStage.Launched_10) {
       this.storagePersistable = true
       if (this.needsPersist) {
@@ -76,14 +91,19 @@ export class SNStorageService
     }
   }
 
-  public setEncryptionPolicy(encryptionPolicy: Services.StorageEncryptionPolicy, persist = true) {
+  public setEncryptionPolicy(
+    encryptionPolicy: Services.StorageEncryptionPolicy,
+    persist = true,
+  ): void {
     if (
       encryptionPolicy === Services.StorageEncryptionPolicy.Disabled &&
       this.environment !== Environment.Mobile
     ) {
       throw Error('Disabling storage encryption is only available on mobile.')
     }
+
     this.encryptionPolicy = encryptionPolicy
+
     if (persist) {
       this.setValue(Services.StorageKey.StorageEncryptionPolicy, encryptionPolicy)
     }
@@ -96,6 +116,7 @@ export class SNStorageService
   public async initializeFromDisk() {
     const value = await this.deviceInterface.getRawStorageValue(this.getPersistenceKey())
     const values = value ? JSON.parse(value as string) : undefined
+
     this.setInitialValues(values)
   }
 
@@ -113,18 +134,24 @@ export class SNStorageService
     this.values = sureValues
   }
 
-  public isStorageWrapped() {
+  public isStorageWrapped(): boolean {
     const wrappedValue = this.values[Services.ValueModesKeys.Wrapped]
-    return !isNullOrUndefined(wrappedValue) && Object.keys(wrappedValue).length > 0
+
+    return wrappedValue != undefined && isEncryptedTransferPayload(wrappedValue)
   }
 
   public async canDecryptWithKey(key: SNRootKey): Promise<boolean> {
-    const wrappedValue = this.values[Services.ValueModesKeys.Wrapped] as Models.RawPayload
+    const wrappedValue = this.values[Services.ValueModesKeys.Wrapped]
+
+    if (isDecryptedTransferPayload(wrappedValue)) {
+      throw Error('Attempting to decrypt non decrypted storage value')
+    }
+
     const decryptedPayload = await this.decryptWrappedValue(wrappedValue, key)
-    return !decryptedPayload.errorDecrypting
+    return !isErrorDecryptingParameters(decryptedPayload)
   }
 
-  private async decryptWrappedValue(wrappedValue: Models.RawPayload, key?: SNRootKey) {
+  private async decryptWrappedValue(wrappedValue: EncryptedTransferPayload, key?: SNRootKey) {
     /**
      * The read content type doesn't matter, so long as we know it responds
      * to content type. This allows a more seamless transition when both web
@@ -134,11 +161,12 @@ export class SNStorageService
       throw Error('Attempting to decrypt nonexistent wrapped value')
     }
 
-    const payload = Models.CreateMaxPayloadFromAnyObject(wrappedValue, {
+    const payload = new EncryptedPayload({
+      ...wrappedValue,
       content_type: ContentType.EncryptedStorage,
     })
 
-    const split: Encryption.EncryptionSplitWithKey<Models.PurePayload> = key
+    const split: Encryption.KeyedDecryptionSplit = key
       ? {
           usesRootKey: {
             items: [payload],
@@ -151,19 +179,25 @@ export class SNStorageService
           },
         }
 
-    const decryptedPayload = (await this.encryptionProvider.decryptSplit(split))[0]
+    const decryptedPayload = await this.encryptionProvider.decryptSplitSingle(split)
+
     return decryptedPayload
   }
 
   public async decryptStorage() {
-    const wrappedValue = this.values[Services.ValueModesKeys.Wrapped] as Models.RawPayload
+    const wrappedValue = this.values[Services.ValueModesKeys.Wrapped]
+
+    if (isDecryptedTransferPayload(wrappedValue)) {
+      throw Error('Attempting to decrypt already decrypted storage')
+    }
+
     const decryptedPayload = await this.decryptWrappedValue(wrappedValue)
 
-    if (decryptedPayload.errorDecrypting) {
+    if (isErrorDecryptingParameters(decryptedPayload)) {
       throw SNLog.error(Error('Unable to decrypt storage.'))
     }
 
-    this.values[Services.ValueModesKeys.Unwrapped] = Copy(decryptedPayload.contentObject)
+    this.values[Services.ValueModesKeys.Unwrapped] = Copy(decryptedPayload.content)
   }
 
   /** @todo This function should be debounced. */
@@ -180,7 +214,9 @@ export class SNStorageService
     await this.currentPersistPromise
 
     this.needsPersist = false
+
     const values = await this.immediatelyPersistValuesToDisk()
+
     /** Save the persisted value so we have access to it in memory (for unit tests afawk) */
     this.values[Services.ValueModesKeys.Wrapped] = values[Services.ValueModesKeys.Wrapped]
   }
@@ -215,36 +251,31 @@ export class SNStorageService
    * either as a plain object, or an encrypted item.
    */
   private async generatePersistableValues() {
-    const rawContent = Object.assign({}, this.values) as Partial<Services.StorageValuesObject>
+    const rawContent = Copy(this.values) as Partial<Services.StorageValuesObject>
 
     const valuesToWrap = rawContent[Services.ValueModesKeys.Unwrapped]
     rawContent[Services.ValueModesKeys.Unwrapped] = undefined
 
-    const payload = Models.CreateMaxPayloadFromAnyObject({
+    const payload = new DecryptedPayload({
       uuid: UuidGenerator.GenerateUuid(),
-      content: valuesToWrap as unknown as Models.ItemContent,
+      content: valuesToWrap as unknown as ItemContent,
       content_type: ContentType.EncryptedStorage,
     })
 
     if (this.encryptionProvider.hasRootKeyEncryptionSource()) {
-      const split: Encryption.EncryptionSplitWithKey<Models.PurePayload> = {
+      const split: Encryption.KeyedEncryptionSplit = {
         usesRootKeyWithKeyLookup: {
           items: [payload],
         },
       }
 
-      const encryptedPayload = await this.encryptionProvider.encryptSplitSingle(
-        split,
-        Encryption.EncryptionIntent.LocalStorageEncrypted,
-      )
+      const encryptedPayload = await this.encryptionProvider.encryptSplitSingle(split)
 
-      rawContent[Services.ValueModesKeys.Wrapped] = encryptedPayload.ejected()
+      rawContent[Services.ValueModesKeys.Wrapped] =
+        CreateEncryptedLocalStorageContextPayload(encryptedPayload)
     } else {
-      const packagedPayload = Encryption.CreateIntentPayloadFromObject(
-        payload,
-        Encryption.EncryptionIntent.LocalStorageDecrypted,
-      )
-      rawContent[Services.ValueModesKeys.Wrapped] = packagedPayload.ejected()
+      rawContent[Services.ValueModesKeys.Wrapped] =
+        CreateDecryptedLocalStorageContextPayload(payload)
     }
 
     return rawContent as Services.StorageValuesObject
@@ -252,6 +283,7 @@ export class SNStorageService
 
   public setValue(key: string, value: unknown, mode = Services.StorageValueModes.Default): void {
     this.setValueWithNoPersist(key, value, mode)
+
     void this.persistValuesToDisk()
   }
 
@@ -261,6 +293,7 @@ export class SNStorageService
     mode = Services.StorageValueModes.Default,
   ): Promise<void> {
     this.setValueWithNoPersist(key, value, mode)
+
     await this.persistValuesToDisk()
   }
 
@@ -274,7 +307,8 @@ export class SNStorageService
     }
 
     const domainKey = this.domainKeyForMode(mode)
-    this.values[domainKey][key] = value
+    const domainStorage = this.values[domainKey]
+    domainStorage[key] = value
   }
 
   public getValue<T>(key: string, mode = Services.StorageValueModes.Default, defaultValue?: T): T {
@@ -316,15 +350,15 @@ export class SNStorageService
   }
 
   private defaultValuesObject(
-    wrapped?: Services.ValuesObjectRecord,
+    wrapped?: Services.WrappedStorageValue,
     unwrapped?: Services.ValuesObjectRecord,
     nonwrapped?: Services.ValuesObjectRecord,
   ) {
-    return SNStorageService.defaultValuesObject(wrapped, unwrapped, nonwrapped)
+    return SNStorageService.DefaultValuesObject(wrapped, unwrapped, nonwrapped)
   }
 
-  public static defaultValuesObject(
-    wrapped: Services.ValuesObjectRecord = {},
+  public static DefaultValuesObject(
+    wrapped: Services.WrappedStorageValue = {} as Services.WrappedStorageValue,
     unwrapped: Services.ValuesObjectRecord = {},
     nonwrapped: Services.ValuesObjectRecord = {},
   ) {
@@ -357,82 +391,78 @@ export class SNStorageService
     return this.deviceInterface.getAllRawDatabasePayloads(this.identifier)
   }
 
-  public async savePayload(payload: Models.PurePayload): Promise<void> {
+  public async savePayload(payload: FullyFormedPayloadInterface): Promise<void> {
     return this.savePayloads([payload])
   }
 
-  public async savePayloads(decryptedPayloads: Models.PurePayload[]): Promise<void> {
+  public async savePayloads(payloads: FullyFormedPayloadInterface[]): Promise<void> {
     if (this.persistencePolicy === Services.StoragePersistencePolicies.Ephemeral) {
       return
     }
 
-    const categorizePayloads = (payloads: Models.PurePayload[]) => {
-      const encrypted = this.encryptionPolicy === Services.StorageEncryptionPolicy.Default
+    const { encrypted, decrypted, deleted, discardable } =
+      CreatePayloadSplitWithDiscardables(payloads)
 
-      const plausiblyEncryptable: Models.PurePayload[] = []
-      const discardables: Models.PurePayload[] = []
-      const unencryptables: Models.PurePayload[] = []
+    const encryptionEnabled = this.encryptionPolicy === Services.StorageEncryptionPolicy.Default
+    const rootKeyEncryptionAvailable = this.encryptionProvider.hasRootKeyEncryptionSource()
 
-      for (const payload of payloads) {
-        if (payload.discardable) {
-          discardables.push(payload)
+    const encryptable: DecryptedPayloadInterface[] = []
+    const unencryptable: DecryptedPayloadInterface[] = []
+
+    if (encryptionEnabled) {
+      const split = Encryption.SplitPayloadsByEncryptionType(decrypted)
+
+      if (split.itemsKeyEncryption) {
+        extendArray(encryptable, split.itemsKeyEncryption)
+      }
+
+      if (split.rootKeyEncryption) {
+        if (!rootKeyEncryptionAvailable) {
+          extendArray(unencryptable, split.rootKeyEncryption)
         } else {
-          plausiblyEncryptable.push(payload)
+          extendArray(encryptable, split.rootKeyEncryption)
         }
       }
-
-      const encryptables: Models.PurePayload[] = []
-      if (encrypted) {
-        const split = Encryption.splitItemsByEncryptionType(plausiblyEncryptable)
-        if (split.usesItemsKey) {
-          extendArray(encryptables, split.usesItemsKey.items)
-        }
-        if (split.usesRootKey) {
-          if (!this.encryptionProvider.hasRootKeyEncryptionSource()) {
-            extendArray(unencryptables, split.usesRootKey.items)
-          } else {
-            extendArray(encryptables, split.usesRootKey.items)
-          }
-        }
-      } else {
-        extendArray(unencryptables, plausiblyEncryptable)
-      }
-
-      return { encryptables, unencryptables, discardables }
+    } else {
+      extendArray(unencryptable, encryptable)
+      extendArray(unencryptable, decrypted)
     }
 
-    const { encryptables, unencryptables, discardables } = categorizePayloads(decryptedPayloads)
-    await this.deletePayloads(discardables)
+    await this.deletePayloads(discardable)
 
-    const split = Encryption.splitItemsByEncryptionType(encryptables)
-    const keyLookupSplit = Encryption.createKeyLookupSplitFromSplit(split)
-    const encryptedPayloads = await this.encryptionProvider.encryptSplit(
-      keyLookupSplit,
-      Encryption.EncryptionIntent.LocalStorageEncrypted,
+    const split = Encryption.SplitPayloadsByEncryptionType(encryptable)
+
+    const keyLookupSplit = Encryption.CreateEncryptionSplitWithKeyLookup(split)
+
+    const encryptedResults = await this.encryptionProvider.encryptSplit(keyLookupSplit)
+
+    const exportedEncrypted = [...encrypted, ...encryptedResults].map(
+      CreateEncryptedLocalStorageContextPayload,
     )
 
-    const nonEncryptedPayloads = unencryptables.map((payload) =>
-      Encryption.CreateIntentPayloadFromObject(
-        payload,
-        Encryption.EncryptionIntent.LocalStorageDecrypted,
-      ),
-    )
+    const exportedDecrypted = unencryptable.map(CreateDecryptedLocalStorageContextPayload)
 
-    const ejected = encryptedPayloads
-      .concat(nonEncryptedPayloads)
-      .map((payload) => payload.ejected())
+    const exportedDeleted = deleted.map(CreateDeletedLocalStorageContextPayload)
+
     return this.executeCriticalFunction(async () => {
-      return this.deviceInterface?.saveRawDatabasePayloads(ejected, this.identifier)
+      return this.deviceInterface?.saveRawDatabasePayloads(
+        [...exportedEncrypted, ...exportedDecrypted, ...exportedDeleted],
+        this.identifier,
+      )
     })
   }
 
-  public async deletePayloads(payloads: Models.PurePayload[]) {
+  public async deletePayloads(payloads: DeletedPayloadInterface[]) {
     await Promise.all(payloads.map((payload) => this.deletePayloadWithId(payload.uuid)))
   }
 
-  public async deletePayloadWithId(id: string) {
+  public async forceDeletePayloads(payloads: FullyFormedPayloadInterface[]) {
+    await Promise.all(payloads.map((payload) => this.deletePayloadWithId(payload.uuid)))
+  }
+
+  public async deletePayloadWithId(uuid: Uuid) {
     return this.executeCriticalFunction(async () => {
-      return this.deviceInterface.removeRawDatabasePayloadWithId(id, this.identifier)
+      return this.deviceInterface.removeRawDatabasePayloadWithId(uuid, this.identifier)
     })
   }
 
@@ -446,9 +476,11 @@ export class SNStorageService
     return this.executeCriticalFunction(async () => {
       await this.clearValues()
       await this.clearAllPayloads()
+
       await this.deviceInterface.removeRawStorageValue(
         Services.namespacedKey(this.identifier, Services.RawStorageKey.SnjsVersion),
       )
+
       await this.deviceInterface.removeRawStorageValue(this.getPersistenceKey())
     })
   }

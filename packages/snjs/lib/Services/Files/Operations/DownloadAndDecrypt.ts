@@ -1,7 +1,7 @@
 import { ClientDisplayableError } from '@standardnotes/responses'
 import { FileDownloader } from '../UseCase/FileDownloader'
 import { FileDecryptor } from '../UseCase/FileDecryptor'
-import { RemoteFileInterface, EncryptedFileInterface } from '../types'
+import { RemoteFileInterface, EncryptedFileInterface } from '../Types'
 import { FilesServerInterface } from '../FilesServerInterface'
 import { SNPureCrypto } from '@standardnotes/sncrypto-common'
 

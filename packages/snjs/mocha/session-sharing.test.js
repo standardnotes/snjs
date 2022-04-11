@@ -102,7 +102,7 @@ describe('session sharing', function () {
 
     const syncResponse = otherContext.awaitNextSyncEvent(SyncEvent.SingleRoundTripSyncCompleted)
 
-    await otherApplication.mutator.changeAndSaveItem(note.uuid, (mutator) => {
+    await otherApplication.mutator.changeAndSaveItem(note, (mutator) => {
       mutator.title = 'unauthorized change'
     })
 

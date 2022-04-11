@@ -77,16 +77,11 @@ export function searchArray<T>(
   return find(array, predicate) as T
 }
 
-/**
- * Searches array of objects for first object where object[key] === value
- * @returns Matching object or null if not found
- */
-export function concatArrays(...args: any[]) {
-  let result: any[] = []
-  for (const array of args) {
-    result = result.concat(array)
-  }
-  return result
+export function sureSearchArray<T>(
+  array: T[],
+  predicate: Partial<T>
+): T {
+  return searchArray(array, predicate) as T
 }
 
 /**
@@ -114,6 +109,10 @@ export function isFunction(value: unknown): boolean {
  */
 export function isNullOrUndefined(value: unknown): value is null | undefined {
   return value === null || value === undefined
+}
+
+export function isNotUndefined<T>(val: T | undefined | null): val is T {
+  return val != undefined
 }
 
 /**
@@ -719,4 +718,14 @@ export function log(instance: any, message: string, ...args: unknown[]): void {
   } else {
     console.log(string, message)
   }
+}
+
+export function assert(value: unknown): asserts value {
+  if (value === undefined) {
+    throw new Error('Assertion failed; value must be defined')
+  }
+}
+
+export function useBoolean(value: boolean | undefined, defaultValue: boolean): boolean {
+  return value != undefined ? value : defaultValue
 }

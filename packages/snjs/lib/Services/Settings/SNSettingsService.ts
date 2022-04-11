@@ -28,7 +28,7 @@ export class SNSettingsService extends AbstractService implements SettingsClient
   constructor(
     private readonly sessionManager: SNSessionManager,
     private readonly apiService: SNApiService,
-    protected internalEventBus: InternalEventBusInterface,
+    protected override internalEventBus: InternalEventBusInterface,
   ) {
     super(internalEventBus)
   }
@@ -70,7 +70,7 @@ export class SNSettingsService extends AbstractService implements SettingsClient
     return `${extServerUrl}/${this.cloudProviderIntegrationUrlEndpoints[cloudProviderName]}?redirect_url=${extServerUrl}/components/cloudlink?`
   }
 
-  deinit(): void {
+  override deinit(): void {
     this.provider?.deinit()
     ;(this.provider as unknown) = undefined
     ;(this.sessionManager as unknown) = undefined

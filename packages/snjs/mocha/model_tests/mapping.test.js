@@ -6,6 +6,7 @@ const expect = chai.expect
 
 describe('model manager mapping', () => {
   const BASE_ITEM_COUNT = 2 /** Default items key, user preferences */
+
   beforeEach(async function () {
     this.expectedItemCount = BASE_ITEM_COUNT
     this.application = await Factory.createInitAppWithFakeCrypto()
@@ -23,7 +24,8 @@ describe('model manager mapping', () => {
   })
 
   it('mapping nonexistent deleted item doesnt create it', async function () {
-    const payload = CreateMaxPayloadFromAnyObject(Factory.createNoteParams(), {
+    const payload = new DeletedPayload({
+      ...Factory.createNoteParams(),
       dirty: false,
       deleted: true,
     })
@@ -31,48 +33,51 @@ describe('model manager mapping', () => {
     expect(this.application.itemManager.items.length).to.equal(this.expectedItemCount)
   })
 
-  it('mapping with omitted content should preserve item content', async function () {
-    /** content is omitted to simulate handling saved_items sync success. */
-    const payload = Factory.createNotePayload()
-    await this.application.itemManager.emitItemsFromPayloads([payload], PayloadSource.LocalChanged)
-    const originalNote = this.application.itemManager.notes[0]
-    expect(originalNote.content.title).to.equal(payload.content.title)
-    const mutated = CreateSourcedPayloadFromObject(payload, PayloadSource.RemoteSaved)
-    await this.application.itemManager.emitItemsFromPayloads([mutated], PayloadSource.LocalChanged)
-    const sameNote = this.application.itemManager.notes[0]
-    expect(sameNote.content.title).to.equal(payload.content.title)
-  })
-
   it('mapping and deleting nonexistent item creates and deletes it', async function () {
     const payload = Factory.createNotePayload()
     await this.application.itemManager.emitItemsFromPayloads([payload], PayloadSource.LocalChanged)
+
     this.expectedItemCount++
+
     expect(this.application.itemManager.items.length).to.equal(this.expectedItemCount)
 
-    const changedParams = CreateMaxPayloadFromAnyObject(payload, {
+    const changedParams = new DeletedPayload({
+      ...payload,
       dirty: false,
       deleted: true,
     })
+
     this.expectedItemCount--
+
     await this.application.itemManager.emitItemsFromPayloads(
       [changedParams],
       PayloadSource.LocalChanged,
     )
+
     expect(this.application.itemManager.items.length).to.equal(this.expectedItemCount)
   })
 
   it('mapping deleted but dirty item should not delete it', async function () {
     const payload = Factory.createNotePayload()
-    await this.application.itemManager.emitItemsFromPayloads([payload], PayloadSource.LocalChanged)
+
+    const [item] = await this.application.itemManager.emitItemsFromPayloads(
+      [payload],
+      PayloadSource.LocalChanged,
+    )
+
     this.expectedItemCount++
 
-    let item = this.application.itemManager.items[0]
-    item = await this.application.itemManager.changeItem(item.uuid, (mutator) => {
-      mutator.setDeleted()
-    })
-    const payload2 = CreateMaxPayloadFromAnyObject(item)
+    await this.application.itemManager.emitItemFromPayload(
+      new DeleteItemMutator(item).getDeletedResult(),
+    )
+
+    const payload2 = new DeletedPayload(
+      this.application.payloadManager.findOne(payload.uuid).ejected(),
+    )
+
     await this.application.itemManager.emitItemsFromPayloads([payload2], PayloadSource.LocalChanged)
-    expect(this.application.itemManager.items.length).to.equal(this.expectedItemCount)
+
+    expect(this.application.payloadManager.collection.all().length).to.equal(this.expectedItemCount)
   })
 
   it('mapping existing item updates its properties', async function () {
@@ -80,9 +85,10 @@ describe('model manager mapping', () => {
     await this.application.itemManager.emitItemsFromPayloads([payload], PayloadSource.LocalChanged)
 
     const newTitle = 'updated title'
-    const mutated = CreateMaxPayloadFromAnyObject(payload, {
+    const mutated = new DecryptedPayload({
+      ...payload,
       content: {
-        ...payload.safeContent,
+        ...payload.content,
         title: newTitle,
       },
     })
@@ -96,7 +102,7 @@ describe('model manager mapping', () => {
     const payload = Factory.createNotePayload()
     await this.application.itemManager.emitItemsFromPayloads([payload], PayloadSource.LocalChanged)
     const note = this.application.itemManager.notes[0]
-    await this.application.itemManager.setItemDirty(note.uuid)
+    await this.application.itemManager.setItemDirty(note)
     const dirtyItems = this.application.itemManager.getDirtyItems()
     expect(dirtyItems.length).to.equal(1)
   })
@@ -109,7 +115,7 @@ describe('model manager mapping', () => {
       payloads.push(Factory.createNotePayload())
     }
     await this.application.itemManager.emitItemsFromPayloads(payloads, PayloadSource.LocalChanged)
-    await this.application.syncService.markAllItemsAsNeedingSync()
+    await this.application.syncService.markAllItemsAsNeedingSyncAndPersist()
 
     const dirtyItems = this.application.itemManager.getDirtyItems()
     expect(dirtyItems.length).to.equal(this.expectedItemCount)
@@ -120,13 +126,10 @@ describe('model manager mapping', () => {
     await this.application.itemManager.emitItemsFromPayloads([payload], PayloadSource.LocalChanged)
     const item = this.application.itemManager.items[0]
     return new Promise((resolve) => {
-      this.application.itemManager.addObserver(
-        ContentType.Any,
-        (changed, inserted, discarded, _ignored) => {
-          expect(changed[0].uuid === item.uuid)
-          resolve()
-        },
-      )
+      this.application.itemManager.addObserver(ContentType.Any, ({ changed }) => {
+        expect(changed[0].uuid === item.uuid)
+        resolve()
+      })
       this.application.itemManager.emitItemsFromPayloads([payload], PayloadSource.LocalChanged)
     })
   })

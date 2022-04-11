@@ -150,20 +150,25 @@ describe('backups', function () {
 
   it('downloading backup if item is error decrypting should succeed', async function () {
     await Factory.createSyncedNote(this.application)
+
     const note = await Factory.createSyncedNote(this.application)
-    const encrypted = await this.application.protocolService.encryptSplitSingle(
-      {
-        usesItemsKeyWithKeyLookup: {
-          items: [note.payload],
-        },
+
+    const encrypted = await this.application.protocolService.encryptSplitSingle({
+      usesItemsKeyWithKeyLookup: {
+        items: [note.payload],
       },
-      EncryptionIntent.FileEncrypted,
-    )
-    const errored = CopyPayload(encrypted, {
+    })
+
+    const errored = encrypted.copy({
       errorDecrypting: true,
     })
-    const erroredItem = await this.application.itemManager.emitItemFromPayload(errored)
+
+    await this.application.itemManager.emitItemFromPayload(errored)
+
+    const erroredItem = this.application.itemManager.findAnyItem(errored.uuid)
+
     expect(erroredItem.errorDecrypting).to.equal(true)
+
     const backupData = await this.application.createDecryptedBackupFile()
 
     expect(backupData.items.length).to.equal(BASE_ITEM_COUNT_DECRYPTED + 2)

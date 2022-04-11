@@ -1,19 +1,18 @@
-import {
-  CollectionSort,
-  CollectionSortDirection,
-  ItemInterface,
-  PredicateInterface,
-  PurePayload,
-} from '@standardnotes/models'
-import { AnyRecord, ContentType } from '@standardnotes/common'
+import { ContentType } from '@standardnotes/common'
 import {
   SNNote,
   SNFile,
   SNTag,
-  SNItem,
   SmartView,
   TagNoteCountChangeObserver,
   NotesDisplayCriteria,
+  DecryptedPayloadInterface,
+  CollectionSortProperty,
+  CollectionSortDirection,
+  DecryptedTransferPayload,
+  ItemInterface,
+  PredicateInterface,
+  DecryptedItemInterface,
 } from '@standardnotes/models'
 import { UuidString } from '@Lib/Types'
 
@@ -28,27 +27,32 @@ export interface ItemsClientInterface {
 
   addTagToNote(note: SNNote, tag: SNTag, addHierarchy: boolean): Promise<SNTag[]>
 
-  createItemFromPayload(payload: PurePayload): SNItem
+  createItemFromPayload(payload: DecryptedPayloadInterface): DecryptedItemInterface
 
-  createPayloadFromObject(object: AnyRecord): PurePayload
+  createPayloadFromObject(object: DecryptedTransferPayload): DecryptedPayloadInterface
 
   get trashedItems(): SNNote[]
 
   setDisplayOptions(
     contentType: ContentType,
-    sortBy?: CollectionSort,
+    sortBy?: CollectionSortProperty,
     direction?: CollectionSortDirection,
     filter?: (element: ItemInterface) => boolean,
   ): void
 
   setNotesDisplayCriteria(criteria: NotesDisplayCriteria): void
 
-  getDisplayableItems<T extends ItemInterface>(contentType: ContentType): T[]
-
-  getItems<T extends SNItem>(
-    contentType: ContentType | ContentType[],
-    nonerroredOnly?: boolean,
+  getDisplayableItems<T extends DecryptedItemInterface>(
+    contentType:
+      | ContentType.Tag
+      | ContentType.SmartView
+      | ContentType.Theme
+      | ContentType.Component,
   ): T[]
+
+  getDisplayableNotes(): SNNote[]
+
+  getItems<T extends DecryptedItemInterface>(contentType: ContentType | ContentType[]): T[]
 
   notesMatchingSmartView(view: SmartView): SNNote[]
 
@@ -66,9 +70,15 @@ export interface ItemsClientInterface {
 
   hasTagsNeedingFoldersMigration(): boolean
 
-  referencesForItem(uuid: UuidString, contentType?: ContentType): SNItem[]
+  referencesForItem(
+    itemToLookupUuidFor: DecryptedItemInterface,
+    contentType?: ContentType,
+  ): DecryptedItemInterface[]
 
-  itemsReferencingItem(uuid: UuidString, contentType?: ContentType): SNItem[]
+  itemsReferencingItem(
+    itemToLookupUuidFor: DecryptedItemInterface,
+    contentType?: ContentType,
+  ): DecryptedItemInterface[]
 
   /**
    * Finds tags with title or component starting with a search query and (optionally) not associated with a note
@@ -78,28 +88,24 @@ export interface ItemsClientInterface {
    */
   searchTags(searchQuery: string, note?: SNNote): SNTag[]
 
-  isValidTagParent(parentTagUuid: UuidString, childTagUuid: UuidString): boolean
+  isValidTagParent(parentTagToLookUpUuidFor: SNTag, childToLookUpUuidFor: SNTag): boolean
 
   /**
    * Returns the parent for a tag
-   * @param tagUuid - The tag for which parents need to be found
-   * @returns The current parent or undefined
    */
-  getTagParent(tagUuid: UuidString): SNTag | undefined
+  getTagParent(itemToLookupUuidFor: SNTag): SNTag | undefined
 
   /**
    * Returns the hierarchy of parents for a tag
-   * @param tagUuid - The tag for which parents need to be found
    * @returns Array containing all parent tags
    */
-  getTagParentChain(tagUuid: UuidString): SNTag[]
+  getTagParentChain(itemToLookupUuidFor: SNTag): SNTag[]
 
   /**
    * Returns all descendants for a tag
-   * @param tagUuid - The tag for which descendants need to be found
    * @returns Array containing all descendant tags
    */
-  getTagChildren(tagUuid: UuidString): SNTag[]
+  getTagChildren(itemToLookupUuidFor: SNTag): SNTag[]
 
   /**
    * Get tags for a note sorted in natural order
@@ -117,29 +123,33 @@ export interface ItemsClientInterface {
   /**
    * Finds an item by UUID.
    */
-  findItem(uuid: string): SNItem | undefined
-
-  /**
-   * Returns all items.
-   */
-  allItems(): SNItem[]
+  findItem<T extends DecryptedItemInterface = DecryptedItemInterface>(
+    uuid: UuidString,
+  ): T | undefined
 
   /**
    * Finds an item by predicate.
    */
-  itemsMatchingPredicate<T extends SNItem>(
+  findItems<T extends DecryptedItemInterface>(uuids: UuidString[]): T[]
+
+  findSureItem<T extends DecryptedItemInterface = DecryptedItemInterface>(uuid: UuidString): T
+
+  /**
+   * Returns all items.
+   */
+  allItems(): DecryptedItemInterface[]
+
+  /**
+   * Finds an item by predicate.
+   */
+  itemsMatchingPredicate<T extends DecryptedItemInterface>(
     contentType: ContentType,
     predicate: PredicateInterface<T>,
   ): T[]
 
   /**
-   * Finds an item by predicate.
-   */
-  findItems(uuids: UuidString[]): (SNItem | PurePayload | undefined)[]
-
-  /**
    * @param item item to be checked
    * @returns Whether the item is a template (unmanaged)
    */
-  isTemplateItem(item: SNItem): boolean
+  isTemplateItem(item: DecryptedItemInterface): boolean
 }

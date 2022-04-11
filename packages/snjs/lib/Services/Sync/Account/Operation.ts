@@ -1,6 +1,10 @@
-import { PurePayload } from '@standardnotes/models'
-import { arrayByDifference, subtractFromArray } from '@standardnotes/utils'
-import { SyncResponse } from '@Lib/Services/Sync/Response'
+import { ServerSyncPushContextualPayload } from '@standardnotes/models'
+import {
+  arrayByDifference,
+  nonSecureRandomIdentifier,
+  subtractFromArray,
+} from '@standardnotes/utils'
+import { ServerSyncResponse } from '@Lib/Services/Sync/Account/Response'
 import { ResponseSignalReceiver, SyncSignal } from '@Lib/Services/Sync/Signals'
 import { SNApiService } from '../../Api/ApiService'
 import { RawSyncResponse } from '@standardnotes/responses'
@@ -12,18 +16,18 @@ export const SyncUpDownLimit = 150
  * emitting a stream of values that should be acted upon in real time.
  */
 export class AccountSyncOperation {
-  public id = Math.random()
+  public readonly id = nonSecureRandomIdentifier()
 
-  private pendingPayloads: PurePayload[]
-  private responses: SyncResponse[] = []
+  private pendingPayloads: ServerSyncPushContextualPayload[]
+  private responses: ServerSyncResponse[] = []
 
   /**
    * @param payloads   An array of payloads to send to the server
    * @param receiver   A function that receives callback multiple times during the operation
    */
   constructor(
-    private payloads: PurePayload[],
-    private receiver: ResponseSignalReceiver,
+    private payloads: ServerSyncPushContextualPayload[],
+    private receiver: ResponseSignalReceiver<ServerSyncResponse>,
     private lastSyncToken: string,
     private paginationToken: string,
     private apiService: SNApiService,
@@ -39,7 +43,7 @@ export class AccountSyncOperation {
   /**
    * Read the payloads that have been saved, or are currently in flight.
    */
-  get payloadsSavedOrSaving() {
+  get payloadsSavedOrSaving(): ServerSyncPushContextualPayload[] {
     return arrayByDifference(this.payloads, this.pendingPayloads)
   }
 
@@ -55,17 +59,19 @@ export class AccountSyncOperation {
       totalUploadCount: this.totalUploadCount,
     })
     const payloads = this.popPayloads(this.upLimit)
+
     const rawResponse = (await this.apiService.sync(
       payloads,
       this.lastSyncToken,
       this.paginationToken,
       this.downLimit,
     )) as RawSyncResponse
-    const response = new SyncResponse(rawResponse)
 
+    const response = new ServerSyncResponse(rawResponse)
     this.responses.push(response)
-    this.lastSyncToken = response.lastSyncToken!
-    this.paginationToken = response.paginationToken!
+
+    this.lastSyncToken = response.lastSyncToken as string
+    this.paginationToken = response.paginationToken as string
 
     try {
       await this.receiver(SyncSignal.Response, response)

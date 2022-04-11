@@ -1,6 +1,7 @@
 {
   "compilerOptions": {
     "allowJs": true,
+    "alwaysStrict": true,
     "baseUrl": ".",
     "declaration": true,
     "declarationDir": "../dist/@types",
@@ -9,14 +10,20 @@
     "isolatedModules": true,
     "moduleResolution": "node",
     "newLine": "lf",
+    "noFallthroughCasesInSwitch": true,
+    "noImplicitAny": true,
+    "noImplicitOverride": true,
+    "noImplicitReturns": true,
+    "noImplicitThis": true,
+    "noUnusedLocals": true,
     "noUnusedParameters": true,
     "outDir": "../dist/@types",
     "strict": true,
+    "strictNullChecks": true,
     "target": "esnext",
     "paths": {
       "@Lib/*": ["*"],
-      "@Services/*": ["Services/*"],
-      "@Payloads/*": ["Protocol/payloads/*"]
+      "@Services/*": ["Services/*"]
     }
   },
   "exclude": ["../package.json"]

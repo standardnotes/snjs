@@ -8,9 +8,10 @@ import * as Services from '@standardnotes/services'
 import {
   DecryptedParameters,
   EncryptedParameters,
-  ErroredDecryptingParameters,
+  ErrorDecryptingParameters,
+  isErrorDecryptingParameters,
 } from '../../Encryption/EncryptedParameters'
-import { mergePayloadWithEncryptionParameters } from '../../Intent/Functions'
+import { isEncryptedPayload } from '@standardnotes/models'
 
 export class ItemsEncryptionService extends Services.AbstractService {
   private removeItemsObserver!: () => void
@@ -21,21 +22,21 @@ export class ItemsEncryptionService extends Services.AbstractService {
     private payloadManager: Services.PayloadManagerInterface,
     private storageService: Services.StorageServiceInterface,
     private operatorManager: OperatorManager,
-    protected internalEventBus: Services.InternalEventBusInterface,
+    protected override internalEventBus: Services.InternalEventBusInterface,
   ) {
     super(internalEventBus)
 
     this.removeItemsObserver = this.itemManager.addObserver(
       [ContentType.ItemsKey],
-      (changed, inserted) => {
+      ({ changed, inserted }) => {
         if (changed.concat(inserted).length > 0) {
-          void this.decryptErroredItems()
+          void this.decryptErroredPayloads()
         }
       },
     )
   }
 
-  public deinit(): void {
+  public override deinit(): void {
     ;(this.itemManager as unknown) = undefined
     ;(this.payloadManager as unknown) = undefined
     ;(this.storageService as unknown) = undefined
@@ -49,9 +50,9 @@ export class ItemsEncryptionService extends Services.AbstractService {
    * can be disabled), consumers may call this function to repersist all items to
    * disk using latest encryption status.
    */
-  async repersistAllItems() {
+  async repersistAllItems(): Promise<void> {
     const items = this.itemManager.allItems()
-    const payloads = items.map((item) => Models.CreateMaxPayloadFromAnyObject(item))
+    const payloads = items.map((item) => item.payload)
     return this.storageService.savePayloads(payloads)
   }
 
@@ -59,7 +60,9 @@ export class ItemsEncryptionService extends Services.AbstractService {
     return this.itemManager.itemsKeys()
   }
 
-  public itemsKeyForPayload(payload: Models.PurePayload): Models.ItemsKeyInterface | undefined {
+  public itemsKeyForPayload(
+    payload: Models.EncryptedPayloadInterface,
+  ): Models.ItemsKeyInterface | undefined {
     return this.getItemsKeys().find(
       (key) => key.uuid === payload.items_key_id || key.duplicateOf === payload.items_key_id,
     )
@@ -93,7 +96,7 @@ export class ItemsEncryptionService extends Services.AbstractService {
   }
 
   private keyToUseForDecryptionOfPayload(
-    payload: Models.PurePayload,
+    payload: Models.EncryptedPayloadInterface,
   ): Models.ItemsKeyInterface | undefined {
     if (payload.items_key_id) {
       const itemsKey = this.itemsKeyForPayload(payload)
@@ -104,8 +107,8 @@ export class ItemsEncryptionService extends Services.AbstractService {
     return defaultKey
   }
 
-  public async encryptSplitSingleWithKeyLookup(
-    payload: Models.PurePayload,
+  public async encryptPayloadWithKeyLookup(
+    payload: Models.DecryptedPayloadInterface,
   ): Promise<EncryptedParameters> {
     const key = this.keyToUseForItemEncryption()
 
@@ -113,14 +116,14 @@ export class ItemsEncryptionService extends Services.AbstractService {
       throw Error(key.message)
     }
 
-    return this.encryptSplitSingle(payload, key)
+    return this.encryptPayload(payload, key)
   }
 
-  public async encryptSplitSingle(
-    payload: Models.PurePayload,
+  public async encryptPayload(
+    payload: Models.DecryptedPayloadInterface,
     key: Models.ItemsKeyInterface,
   ): Promise<EncryptedParameters> {
-    if (payload.format !== Models.PayloadFormat.DecryptedBareObject) {
+    if (isEncryptedPayload(payload)) {
       throw Error('Attempting to encrypt already encrypted payload.')
     }
     if (!payload.content) {
@@ -129,29 +132,26 @@ export class ItemsEncryptionService extends Services.AbstractService {
     if (!payload.uuid) {
       throw Error('Attempting to encrypt payload with no UuidGenerator.')
     }
-    if (key.errorDecrypting || key.waitingForKey) {
-      throw Error('Attempting to encrypt payload with encrypted key.')
-    }
 
     return OperatorWrapper.encryptPayload(payload, key, this.operatorManager)
   }
 
-  public async encryptSplitSingles(
-    payloads: Models.PurePayload[],
+  public async encryptPayloads(
+    payloads: Models.DecryptedPayloadInterface[],
     key: Models.ItemsKeyInterface,
   ): Promise<EncryptedParameters[]> {
-    return Promise.all(payloads.map((payload) => this.encryptSplitSingle(payload, key)))
+    return Promise.all(payloads.map((payload) => this.encryptPayload(payload, key)))
   }
 
-  public async encryptSplitSinglesWithKeyLookup(
-    payloads: Models.PurePayload[],
+  public async encryptPayloadsWithKeyLookup(
+    payloads: Models.DecryptedPayloadInterface[],
   ): Promise<EncryptedParameters[]> {
-    return Promise.all(payloads.map((payload) => this.encryptSplitSingleWithKeyLookup(payload)))
+    return Promise.all(payloads.map((payload) => this.encryptPayloadWithKeyLookup(payload)))
   }
 
   public async decryptPayloadWithKeyLookup(
-    payload: Models.PurePayload,
-  ): Promise<DecryptedParameters | ErroredDecryptingParameters> {
+    payload: Models.EncryptedPayloadInterface,
+  ): Promise<DecryptedParameters | ErrorDecryptingParameters> {
     const key = this.keyToUseForDecryptionOfPayload(payload)
 
     if (key == undefined) {
@@ -166,20 +166,12 @@ export class ItemsEncryptionService extends Services.AbstractService {
   }
 
   public async decryptPayload(
-    payload: Models.PurePayload,
+    payload: Models.EncryptedPayloadInterface,
     key: Models.ItemsKeyInterface,
-  ): Promise<DecryptedParameters | ErroredDecryptingParameters> {
+  ): Promise<DecryptedParameters | ErrorDecryptingParameters> {
     if (!payload.content) {
       return {
         uuid: payload.uuid,
-        errorDecrypting: true,
-      }
-    }
-
-    if (key.errorDecrypting) {
-      return {
-        uuid: payload.uuid,
-        waitingForKey: true,
         errorDecrypting: true,
       }
     }
@@ -188,34 +180,41 @@ export class ItemsEncryptionService extends Services.AbstractService {
   }
 
   public async decryptPayloadsWithKeyLookup(
-    payloads: Models.PurePayload[],
-  ): Promise<(DecryptedParameters | ErroredDecryptingParameters)[]> {
+    payloads: Models.EncryptedPayloadInterface[],
+  ): Promise<(DecryptedParameters | ErrorDecryptingParameters)[]> {
     return Promise.all(payloads.map((payload) => this.decryptPayloadWithKeyLookup(payload)))
   }
 
   public async decryptPayloads(
-    payloads: Models.PurePayload[],
+    payloads: Models.EncryptedPayloadInterface[],
     key: Models.ItemsKeyInterface,
-  ): Promise<(DecryptedParameters | ErroredDecryptingParameters)[]> {
+  ): Promise<(DecryptedParameters | ErrorDecryptingParameters)[]> {
     return Promise.all(payloads.map((payload) => this.decryptPayload(payload, key)))
   }
 
-  public async decryptErroredItems(): Promise<void> {
-    const items = this.itemManager.invalidItems.filter(
+  public async decryptErroredPayloads(): Promise<void> {
+    const payloads = this.payloadManager.invalidPayloads.filter(
       (i) => i.content_type !== ContentType.ItemsKey,
     )
-    if (items.length === 0) {
+    if (payloads.length === 0) {
       return
     }
 
-    const payloads = items.map((item) => {
-      return item.payloadRepresentation()
-    })
+    const resultParams = await this.decryptPayloadsWithKeyLookup(payloads)
 
-    const decryptedParams = await this.decryptPayloadsWithKeyLookup(payloads)
-    const decryptedPayloads = decryptedParams.map((decryptedParam) => {
-      const originalPayload = Models.sureFindPayload(decryptedParam.uuid, payloads)
-      return mergePayloadWithEncryptionParameters(originalPayload, decryptedParam)
+    const decryptedPayloads = resultParams.map((params) => {
+      const original = Models.SureFindPayload(payloads, params.uuid)
+      if (isErrorDecryptingParameters(params)) {
+        return new Models.EncryptedPayload({
+          ...original.ejected(),
+          ...params,
+        })
+      } else {
+        return new Models.DecryptedPayload({
+          ...original.ejected(),
+          ...params,
+        })
+      }
     })
 
     await this.payloadManager.emitPayloads(decryptedPayloads, Models.PayloadSource.LocalChanged)

@@ -1,18 +1,17 @@
 import { SNRootKey } from './RootKey'
 import {
-  CreateMaxPayloadFromAnyObject,
+  DecryptedPayload,
   FillItemContent,
   RootKeyContent,
   RootKeyContentSpecialized,
 } from '@standardnotes/models'
 import { UuidGenerator } from '@standardnotes/utils'
-import { ContentType } from '@standardnotes/common'
-import { ProtocolVersion } from '@standardnotes/common'
+import { ContentType, ProtocolVersion } from '@standardnotes/common'
 
 export function CreateNewRootKey(content: RootKeyContentSpecialized): SNRootKey {
   const uuid = UuidGenerator.GenerateUuid()
 
-  const payload = CreateMaxPayloadFromAnyObject({
+  const payload = new DecryptedPayload<RootKeyContent>({
     uuid: uuid,
     content_type: ContentType.RootKey,
     content: FillRootKeyContent(content),

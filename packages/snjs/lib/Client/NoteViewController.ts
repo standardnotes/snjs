@@ -1,23 +1,23 @@
-import { NoteMutator, SNItem, SNNote, SNTag, NoteContent } from '@standardnotes/models'
+import {
+  NoteMutator,
+  SNNote,
+  SNTag,
+  NoteContent,
+  DecryptedItemInterface,
+  PayloadSource,
+} from '@standardnotes/models'
 import { removeFromArray } from '@standardnotes/utils'
 import { ContentType } from '@standardnotes/common'
-import { PayloadSource } from '@standardnotes/models'
 import { UuidString } from '@Lib/Types/UuidString'
 import { SNApplication } from '../Application/Application'
-
-export const STRING_SAVING_WHILE_DOCUMENT_HIDDEN =
-  'Attempting to save an item while the application is hidden. To protect data integrity, please refresh the application window and try again.'
-export const STRING_DELETED_NOTE =
-  'The note you are attempting to edit has been deleted, and is awaiting sync. Changes you make will be disregarded.'
-export const STRING_INVALID_NOTE =
-  // eslint-disable-next-line quotes
-  "The note you are attempting to save can not be found or has been deleted. Changes you make will not be synced. Please copy this note's text and start a new note."
-
-export const STRING_ELLIPSES = '...'
-
-const NOTE_PREVIEW_CHAR_LIMIT = 80
-const SAVE_TIMEOUT_DEBOUNCE = 350
-const SAVE_TIMEOUT_NO_DEBOUNCE = 100
+import {
+  STRING_SAVING_WHILE_DOCUMENT_HIDDEN,
+  STRING_INVALID_NOTE,
+  NOTE_PREVIEW_CHAR_LIMIT,
+  STRING_ELLIPSES,
+  SAVE_TIMEOUT_NO_DEBOUNCE,
+  SAVE_TIMEOUT_DEBOUNCE,
+} from './Types'
 
 export type EditorValues = {
   title: string
@@ -46,7 +46,7 @@ export class NoteViewController {
 
   async initialize(addTagHierarchy: boolean): Promise<void> {
     if (!this.note) {
-      const note = await this.application.mutator.createTemplateItem<NoteContent, SNNote>(
+      const note = this.application.mutator.createTemplateItem<NoteContent, SNNote>(
         ContentType.Note,
         {
           text: '',
@@ -72,16 +72,21 @@ export class NoteViewController {
   }
 
   private streamItems() {
-    this.removeStreamObserver = this.application.streamItems(ContentType.Note, (items, source) => {
-      this.handleNoteStream(items as SNNote[], source)
-    })
+    this.removeStreamObserver = this.application.streamItems(
+      ContentType.Note,
+      ({ changed, inserted, source }) => {
+        this.handleNoteStream(changed.concat(inserted) as SNNote[], source)
+      },
+    )
   }
 
   deinit(): void {
     this.removeStreamObserver?.()
     ;(this.removeStreamObserver as unknown) = undefined
     ;(this.application as unknown) = undefined
+
     this.innerValueChangeObservers.length = 0
+
     this.saveTimeout = undefined
   }
 
@@ -90,6 +95,7 @@ export class NoteViewController {
     const matchingNote = notes.find((item) => {
       return item.uuid === this.note.uuid
     }) as SNNote
+
     if (matchingNote) {
       this.isTemplateNote = false
       this.note = matchingNote
@@ -97,7 +103,7 @@ export class NoteViewController {
     }
   }
 
-  insertTemplatedNote(): Promise<SNItem> {
+  public insertTemplatedNote(): Promise<DecryptedItemInterface> {
     this.isTemplateNote = false
     return this.application.mutator.insertItem(this.note)
   }
@@ -144,11 +150,6 @@ export class NoteViewController {
       return
     }
 
-    if (this.note.deleted) {
-      void this.application.alertService.alert(STRING_DELETED_NOTE)
-      return
-    }
-
     if (isTemplate) {
       await this.insertTemplatedNote()
     }
@@ -159,7 +160,7 @@ export class NoteViewController {
     }
 
     await this.application.mutator.changeItem(
-      this.note.uuid,
+      this.note,
       (mutator) => {
         const noteMutator = mutator as NoteMutator
         if (dto.customMutate) {

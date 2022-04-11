@@ -1,26 +1,26 @@
-import { AppDataField } from '../../Abstract/Item/AppDataField'
-import { ItemMutator } from '../../Abstract/Item/ItemMutator'
-import { NoteContent } from './Note'
+import { AppDataField } from '../../Abstract/Item/Types/AppDataField'
+import { NoteContent } from './NoteContent'
+import { DecryptedItemMutator } from '../../Abstract/Item/Mutator/DecryptedItemMutator'
 
-export class NoteMutator extends ItemMutator<NoteContent> {
+export class NoteMutator extends DecryptedItemMutator<NoteContent> {
   set title(title: string) {
-    this.sureContent.title = title
+    this.content.title = title
   }
 
   set text(text: string) {
-    this.sureContent.text = text
+    this.content.text = text
   }
 
   set hidePreview(hidePreview: boolean) {
-    this.sureContent.hidePreview = hidePreview
+    this.content.hidePreview = hidePreview
   }
 
   set preview_plain(preview_plain: string) {
-    this.sureContent.preview_plain = preview_plain
+    this.content.preview_plain = preview_plain
   }
 
   set preview_html(preview_html: string | undefined) {
-    this.sureContent.preview_html = preview_html
+    this.content.preview_html = preview_html
   }
 
   set prefersPlainEditor(prefersPlainEditor: boolean) {
@@ -28,14 +28,14 @@ export class NoteMutator extends ItemMutator<NoteContent> {
   }
 
   set spellcheck(spellcheck: boolean) {
-    this.sureContent.spellcheck = spellcheck
+    this.content.spellcheck = spellcheck
   }
 
   toggleSpellcheck(): void {
-    if (this.sureContent.spellcheck == undefined) {
-      this.sureContent.spellcheck = false
+    if (this.content.spellcheck == undefined) {
+      this.content.spellcheck = false
     } else {
-      this.sureContent.spellcheck = !this.sureContent.spellcheck
+      this.content.spellcheck = !this.content.spellcheck
     }
   }
 }

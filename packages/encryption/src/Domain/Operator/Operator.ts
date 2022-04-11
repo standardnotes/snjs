@@ -6,7 +6,7 @@ import { KeyParamsOrigination } from '@standardnotes/common'
 import {
   DecryptedParameters,
   EncryptedParameters,
-  ErroredDecryptingParameters,
+  ErrorDecryptingParameters,
 } from '../Encryption/EncryptedParameters'
 import { RootKeyEncryptedAuthenticatedData } from '../Encryption/RootKeyEncryptedAuthenticatedData'
 import { ItemAuthenticatedData } from '../Encryption/ItemAuthenticatedData'
@@ -64,14 +64,14 @@ export interface SynchronousOperator extends OperatorCommon {
    * items keys), or an ItemsKey (if encrypted regular items)
    */
   generateEncryptedParametersSync(
-    payload: Models.PayloadInterface,
+    payload: Models.DecryptedPayloadInterface,
     key: ItemsKeyInterface | SNRootKey,
   ): EncryptedParameters
 
   generateDecryptedParametersSync<C extends Models.ItemContent = Models.ItemContent>(
     encrypted: EncryptedParameters,
     key: ItemsKeyInterface | SNRootKey,
-  ): DecryptedParameters<C> | ErroredDecryptingParameters
+  ): DecryptedParameters<C> | ErrorDecryptingParameters
 }
 
 export interface AsynchronousOperator extends OperatorCommon {
@@ -83,12 +83,12 @@ export interface AsynchronousOperator extends OperatorCommon {
    * items keys), or an ItemsKey (if encrypted regular items)
    */
   generateEncryptedParametersAsync(
-    payload: Models.PayloadInterface,
+    payload: Models.DecryptedPayloadInterface,
     key: ItemsKeyInterface | SNRootKey,
   ): Promise<EncryptedParameters>
 
   generateDecryptedParametersAsync<C extends Models.ItemContent = Models.ItemContent>(
     encrypted: EncryptedParameters,
     key: ItemsKeyInterface | SNRootKey,
-  ): Promise<DecryptedParameters<C> | ErroredDecryptingParameters>
+  ): Promise<DecryptedParameters<C> | ErrorDecryptingParameters>
 }

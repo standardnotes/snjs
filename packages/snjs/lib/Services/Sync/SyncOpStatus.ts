@@ -15,7 +15,6 @@ export class SyncOpStatus {
   private databaseLoadDone = false
   private syncing = false
   private syncStart!: Date
-  private syncEnd!: Date
   private timingMonitor?: any
 
   constructor(interval: any, receiver: SyncEventReceiver) {
@@ -67,7 +66,6 @@ export class SyncOpStatus {
 
   public setDidEnd() {
     this.syncing = false
-    this.syncEnd = new Date()
   }
 
   get syncInProgress() {
@@ -85,6 +83,7 @@ export class SyncOpStatus {
     if (this.timingMonitor) {
       this.stopTimingMonitor()
     }
+
     this.timingMonitor = this.interval(() => {
       if (this.secondsSinceSyncStart > HEALTHY_SYNC_DURATION_THRESHOLD_S) {
         this.receiver(SyncEvent.SyncTakingTooLong)

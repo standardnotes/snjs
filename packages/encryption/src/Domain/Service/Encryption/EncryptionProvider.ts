@@ -1,25 +1,47 @@
-import { ItemContent, PayloadInterface } from '@standardnotes/models'
-import { EncryptedEncryptionIntent } from '../../Intent/EncryptionIntent'
-import { EncryptionSplitWithKey } from './EncryptionSplit'
+import { ProtocolVersion } from '@standardnotes/common'
+import {
+  DecryptedPayloadInterface,
+  EncryptedPayloadInterface,
+  ItemContent,
+} from '@standardnotes/models'
+import { ClientDisplayableError } from '@standardnotes/responses'
+import { BackupFile } from '../../Backups/BackupFile'
+import { KeyedDecryptionSplit, KeyedEncryptionSplit } from '../../Encryption/Split/EncryptionSplit'
 
 export interface EncryptionProvider {
-  encryptSplit(
-    split: EncryptionSplitWithKey<PayloadInterface>,
-    intent: EncryptedEncryptionIntent,
-  ): Promise<PayloadInterface[]>
+  encryptSplitSingle(split: KeyedEncryptionSplit): Promise<EncryptedPayloadInterface>
 
-  encryptSplitSingle(
-    split: EncryptionSplitWithKey<PayloadInterface>,
-    intent: EncryptedEncryptionIntent,
-  ): Promise<PayloadInterface>
+  encryptSplit(split: KeyedEncryptionSplit): Promise<EncryptedPayloadInterface[]>
 
-  decryptSplitSingle<C extends ItemContent = ItemContent>(
-    split: EncryptionSplitWithKey<PayloadInterface<C>>,
-  ): Promise<PayloadInterface<C>>
+  decryptSplitSingle<
+    C extends ItemContent = ItemContent,
+    P extends DecryptedPayloadInterface<C> = DecryptedPayloadInterface<C>,
+  >(
+    split: KeyedDecryptionSplit,
+  ): Promise<P | EncryptedPayloadInterface>
 
-  decryptSplit<C extends ItemContent = ItemContent>(
-    split: EncryptionSplitWithKey<PayloadInterface<C>>,
-  ): Promise<PayloadInterface<C>[]>
+  decryptSplit<
+    C extends ItemContent = ItemContent,
+    P extends DecryptedPayloadInterface<C> = DecryptedPayloadInterface<C>,
+  >(
+    split: KeyedDecryptionSplit,
+  ): Promise<(P | EncryptedPayloadInterface)[]>
 
   hasRootKeyEncryptionSource(): boolean
+
+  /**
+   * @returns The versions that this library supports.
+   */
+  supportedVersions(): ProtocolVersion[]
+
+  getUserVersion(): ProtocolVersion | undefined
+
+  /**
+   * Decrypts a backup file using user-inputted password
+   * @param password - The raw user password associated with this backup file
+   */
+  decryptBackupFile(
+    file: BackupFile,
+    password?: string,
+  ): Promise<ClientDisplayableError | (EncryptedPayloadInterface | DecryptedPayloadInterface)[]>
 }

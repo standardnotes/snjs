@@ -40,13 +40,12 @@ export class ChallengeService extends AbstractService {
   constructor(
     private storageService: SNStorageService,
     private protocolService: EncryptionService,
-    protected internalEventBus: InternalEventBusInterface,
+    protected override internalEventBus: InternalEventBusInterface,
   ) {
     super(internalEventBus)
   }
 
-  /** @override */
-  public deinit() {
+  public override deinit() {
     ;(this.storageService as unknown) = undefined
     ;(this.protocolService as unknown) = undefined
     ;(this.sendChallenge as unknown) = undefined

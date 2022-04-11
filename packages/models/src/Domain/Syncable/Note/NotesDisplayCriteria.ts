@@ -1,18 +1,22 @@
+import {
+  CollectionSortDirection,
+  CollectionSortProperty,
+} from './../../Runtime/Collection/CollectionSort'
 import { ContentType } from '@standardnotes/common'
 import { NoteWithTags } from './NoteWithTags'
-import { SNItem } from '../../Abstract/Item'
+import { DecryptedItem } from '../../Abstract/Item'
 import { SNTag } from '../Tag'
 import { SNNote } from '.'
 import { SmartView } from '../SmartView'
-import { CollectionSort } from '../../Runtime/Collection/CollectionSort'
-import { CollectionSortDirection } from '../../Runtime/Collection/CollectionSortDirection'
-import { ItemCollection } from '../../Runtime/Collection/ItemCollection'
+import { ItemCollection } from '../../Runtime/Collection/Item/ItemCollection'
 import { CompoundPredicate } from '../../Runtime/Predicate/CompoundPredicate'
 
 export type SearchQuery = {
   query: string
   includeProtectedNoteText: boolean
 }
+
+type NoteFilter = (note: SNNote) => boolean
 
 export class NotesDisplayCriteria {
   public searchQuery?: SearchQuery
@@ -22,7 +26,7 @@ export class NotesDisplayCriteria {
   public includeProtected?: boolean
   public includeTrashed?: boolean
   public includeArchived?: boolean
-  public sortProperty?: CollectionSort
+  public sortProperty?: CollectionSortProperty
   public sortDirection?: CollectionSortDirection
 
   static Create(properties: Partial<NotesDisplayCriteria>): NotesDisplayCriteria {
@@ -44,7 +48,7 @@ export class NotesDisplayCriteria {
   computeFilters(collection: ItemCollection): NoteFilter[] {
     const filters: NoteFilter[] = []
 
-    let viewsPredicate: CompoundPredicate<SNItem> | undefined = undefined
+    let viewsPredicate: CompoundPredicate<DecryptedItem> | undefined = undefined
     if (this.views.length > 0) {
       const compoundPredicate = new CompoundPredicate(
         'and',
@@ -87,15 +91,14 @@ export class NotesDisplayCriteria {
       filters.push((note) => !note.archived)
     }
 
-    if (this.searchQuery != undefined) {
-      filters.push((note) => noteMatchesQuery(note, this.searchQuery!, collection))
+    if (this.searchQuery) {
+      const query = this.searchQuery
+      filters.push((note) => noteMatchesQuery(note, query, collection))
     }
 
     return filters
   }
 }
-
-type NoteFilter = (note: SNNote) => boolean
 
 export function criteriaForSmartView(view: SmartView): NotesDisplayCriteria {
   const criteria = NotesDisplayCriteria.Create({
@@ -127,12 +130,9 @@ function notePassesFilters(note: SNNote, filters: NoteFilter[]) {
 export function noteMatchesQuery(
   noteToMatch: SNNote,
   searchQuery: SearchQuery,
-  noteCollection: ItemCollection,
+  collection: ItemCollection,
 ): boolean {
-  const noteTags = noteCollection.elementsReferencingElement(
-    noteToMatch,
-    ContentType.Tag,
-  ) as SNTag[]
+  const noteTags = collection.elementsReferencingElement(noteToMatch, ContentType.Tag) as SNTag[]
   const someTagsMatches = noteTags.some(
     (tag) => matchTypeForTagAndStringQuery(tag, searchQuery.query) !== Match.None,
   )

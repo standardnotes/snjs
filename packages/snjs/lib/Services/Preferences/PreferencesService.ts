@@ -1,11 +1,21 @@
-import { SNUserPrefs, PrefKey, PrefValue, UserPrefsMutator } from '@standardnotes/models'
+import {
+  SNUserPrefs,
+  PrefKey,
+  PrefValue,
+  UserPrefsMutator,
+  ItemContent,
+  FillItemContent,
+} from '@standardnotes/models'
 import { ContentType } from '@standardnotes/common'
 import { ItemManager } from '../Items/ItemManager'
 import { SNSingletonManager } from '../Singleton/SingletonManager'
 import { SNSyncService } from '../Sync/SyncService'
-import { ApplicationStage } from '@standardnotes/services'
-import { AbstractService, InternalEventBusInterface, SyncEvent } from '@standardnotes/services'
-import { FillItemContent } from '@standardnotes/models'
+import {
+  AbstractService,
+  InternalEventBusInterface,
+  SyncEvent,
+  ApplicationStage,
+} from '@standardnotes/services'
 
 const preferencesChangedEvent = 'preferencesChanged'
 type PreferencesChangedEvent = typeof preferencesChangedEvent
@@ -21,7 +31,7 @@ export class SNPreferencesService extends AbstractService<PreferencesChangedEven
     private singletonManager: SNSingletonManager,
     private itemManager: ItemManager,
     private syncService: SNSyncService,
-    protected internalEventBus: InternalEventBusInterface,
+    protected override internalEventBus: InternalEventBusInterface,
   ) {
     super(internalEventBus)
 
@@ -36,22 +46,25 @@ export class SNPreferencesService extends AbstractService<PreferencesChangedEven
     })
   }
 
-  deinit(): void {
+  override deinit(): void {
     this.removeItemObserver?.()
     this.removeSyncObserver?.()
     ;(this.singletonManager as unknown) = undefined
     ;(this.itemManager as unknown) = undefined
+
     super.deinit()
   }
 
-  public async handleApplicationStage(stage: ApplicationStage): Promise<void> {
+  public override async handleApplicationStage(stage: ApplicationStage): Promise<void> {
     await super.handleApplicationStage(stage)
+
     if (stage === ApplicationStage.LoadedDatabase_12) {
       /** Try to read preferences singleton from storage */
       this.preferences = this.singletonManager.findSingleton<SNUserPrefs>(
         ContentType.UserPrefs,
         SNUserPrefs.singletonPredicate,
       )
+
       if (this.preferences) {
         void this.notifyEvent(preferencesChangedEvent)
       }
@@ -71,13 +84,16 @@ export class SNPreferencesService extends AbstractService<PreferencesChangedEven
     if (!this.preferences) {
       return
     }
+
     this.preferences = (await this.itemManager.changeItem<UserPrefsMutator>(
-      this.preferences.uuid,
+      this.preferences,
       (m) => {
         m.setPref(key, value)
       },
     )) as SNUserPrefs
+
     void this.notifyEvent(preferencesChangedEvent)
+
     void this.syncService.sync()
   }
 
@@ -85,20 +101,24 @@ export class SNPreferencesService extends AbstractService<PreferencesChangedEven
     if (!this.shouldReload || this.reloading) {
       return
     }
+
     this.reloading = true
+
     try {
       const previousRef = this.preferences
-      this.preferences = await this.singletonManager.findOrCreateSingleton<SNUserPrefs>(
-        SNUserPrefs.singletonPredicate,
-        ContentType.UserPrefs,
-        FillItemContent({}),
-      )
+
+      this.preferences = await this.singletonManager.findOrCreateContentTypeSingleton<
+        ItemContent,
+        SNUserPrefs
+      >(ContentType.UserPrefs, FillItemContent({}))
+
       if (
         previousRef?.uuid !== this.preferences.uuid ||
         this.preferences.userModifiedDate > previousRef.userModifiedDate
       ) {
         void this.notifyEvent('preferencesChanged')
       }
+
       this.shouldReload = false
     } finally {
       this.reloading = false

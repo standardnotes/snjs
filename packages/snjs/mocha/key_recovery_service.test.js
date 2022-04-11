@@ -51,15 +51,13 @@ describe('key recovery service', function () {
     const randomItemsKey = await application.protocolService.operatorManager
       .defaultOperator()
       .createItemsKey()
-    const encrypted = await application.protocolService.encryptSplitSingle(
-      {
-        usesRootKey: {
-          items: [randomItemsKey.payload],
-          key: randomRootKey,
-        },
+
+    const encrypted = await application.protocolService.encryptSplitSingle({
+      usesRootKey: {
+        items: [randomItemsKey.payload],
+        key: randomRootKey,
       },
-      EncryptionIntent.Sync,
-    )
+    })
 
     /** Attempt decryption and insert into rotation in errored state  */
     const decrypted = await application.protocolService.decryptSplitSingle({
@@ -77,7 +75,7 @@ describe('key recovery service', function () {
     await Factory.sleep(0.3)
 
     /** Should be decrypted now */
-    expect(application.items.findItem(encrypted.uuid).errorDecrypting).to.equal(false)
+    expect(application.items.findItem(encrypted.uuid).errorDecrypting).to.not.be.ok
 
     expect(application.syncService.isOutOfSync()).to.equal(false)
     await context.deinit()
@@ -119,15 +117,13 @@ describe('key recovery service', function () {
     const randomItemsKey2 = await application.protocolService.operatorManager
       .defaultOperator()
       .createItemsKey()
-    const encrypted = await application.protocolService.encryptSplit(
-      {
-        usesRootKey: {
-          items: [randomItemsKey.payload, randomItemsKey2.payload],
-          key: randomRootKey,
-        },
+
+    const encrypted = await application.protocolService.encryptSplit({
+      usesRootKey: {
+        items: [randomItemsKey.payload, randomItemsKey2.payload],
+        key: randomRootKey,
       },
-      EncryptionIntent.Sync,
-    )
+    })
 
     /** Attempt decryption and insert into rotation in errored state  */
     const decrypted = await application.protocolService.decryptSplit({
@@ -142,8 +138,8 @@ describe('key recovery service', function () {
     await Factory.sleep(1.5)
 
     /** Should be decrypted now */
-    expect(application.items.findItem(randomItemsKey.uuid).errorDecrypting).to.equal(false)
-    expect(application.items.findItem(randomItemsKey2.uuid).errorDecrypting).to.equal(false)
+    expect(application.items.findItem(randomItemsKey.uuid).errorDecrypting).not.be.ok
+    expect(application.items.findItem(randomItemsKey2.uuid).errorDecrypting).not.be.ok
 
     expect(totalPromptCount).to.equal(1)
 
@@ -161,6 +157,7 @@ describe('key recovery service', function () {
     const newPassword = `${Math.random()}`
     const contextA = await Factory.createAppContextWithFakeCrypto(namespace)
     const appA = contextA.application
+
     const receiveChallenge = (challenge) => {
       const responses = []
       for (const prompt of challenge.prompts) {
@@ -199,6 +196,7 @@ describe('key recovery service', function () {
     const appB = contextB.application
     await appB.prepareForLaunch({})
     await appB.launch(true)
+
     await Factory.loginToApplication({
       application: appB,
       email: contextA.email,
@@ -208,16 +206,23 @@ describe('key recovery service', function () {
     /** Change password on appB */
     const result = await appB.changePassword(contextA.password, newPassword)
     expect(result.error).to.not.be.ok
+
     const note = await Factory.createSyncedNote(appB)
-    expect(appB.items.getItems(ContentType.ItemsKey).length).to.equal(2)
+
+    expect(appB.items.getAnyItems(ContentType.ItemsKey).length).to.equal(2)
+
     await appB.sync.sync(syncOptions)
 
+    expect(appA.items.getAnyItems(ContentType.ItemsKey).length).to.equal(1)
+
+    appA.syncService.loggingEnabled = true
+
     /** Sync appA and expect a new items key to be downloaded and errored */
-    expect(appA.items.getItems(ContentType.ItemsKey).length).to.equal(1)
     const syncPromise = appA.sync.sync(syncOptions)
     await contextA.awaitNextSucessfulSync()
     await syncPromise
-    expect(appA.items.getItems(ContentType.ItemsKey).length).to.equal(2)
+
+    expect(appA.items.getAnyItems(ContentType.ItemsKey).length).to.equal(2)
 
     /** Same previously errored key should now no longer be errored, */
     const keys = appA.itemManager.itemsKeys()
@@ -343,17 +348,15 @@ describe('key recovery service', function () {
     const correctItemsKey = await application.protocolService.operatorManager
       .defaultOperator()
       .createItemsKey()
-    const encrypted = await application.protocolService.encryptSplitSingle(
-      {
-        usesRootKey: {
-          items: [correctItemsKey.payload],
-          key: randomRootKey,
-        },
+    const encrypted = await application.protocolService.encryptSplitSingle({
+      usesRootKey: {
+        items: [correctItemsKey.payload],
+        key: randomRootKey,
       },
-      EncryptionIntent.Sync,
-    )
+    })
+
     await application.payloadManager.emitPayload(
-      CopyPayload(encrypted, {
+      encrypted.copy({
         errorDecrypting: true,
       }),
       PayloadSource.Constructor,
@@ -391,17 +394,14 @@ describe('key recovery service', function () {
 
     /** Create and emit errored encrypted items key payload */
     const itemsKey = await application.protocolService.getSureDefaultItemsKey()
-    const encrypted = await application.protocolService.encryptSplitSingle(
-      {
-        usesRootKeyWithKeyLookup: {
-          items: [itemsKey.payload],
-        },
+    const encrypted = await application.protocolService.encryptSplitSingle({
+      usesRootKeyWithKeyLookup: {
+        items: [itemsKey.payload],
       },
-      EncryptionIntent.Sync,
-    )
+    })
     const newUpdated = new Date()
     await application.payloadManager.emitPayload(
-      CopyPayload(encrypted, {
+      encrypted.copy({
         errorDecrypting: true,
         updated_at: newUpdated,
       }),
@@ -452,17 +452,14 @@ describe('key recovery service', function () {
 
     /** Create and emit errored encrypted items key payload */
     const itemsKey = await application.protocolService.getSureDefaultItemsKey()
-    const encrypted = await application.protocolService.encryptSplitSingle(
-      {
-        usesRootKeyWithKeyLookup: {
-          items: [itemsKey.payload],
-        },
+    const encrypted = await application.protocolService.encryptSplitSingle({
+      usesRootKeyWithKeyLookup: {
+        items: [itemsKey.payload],
       },
-      EncryptionIntent.Sync,
-    )
+    })
 
     await application.payloadManager.emitPayload(
-      CopyPayload(encrypted, {
+      encrypted.copy({
         errorDecrypting: true,
       }),
       PayloadSource.Constructor,
@@ -536,15 +533,13 @@ describe('key recovery service', function () {
     const randomItemsKey = await application.protocolService.operatorManager
       .operatorForVersion(ProtocolVersion.V003)
       .createItemsKey()
-    const encrypted = await application.protocolService.encryptSplitSingle(
-      {
-        usesRootKey: {
-          items: [randomItemsKey.payload],
-          key: randomRootKey,
-        },
+
+    const encrypted = await application.protocolService.encryptSplitSingle({
+      usesRootKey: {
+        items: [randomItemsKey.payload],
+        key: randomRootKey,
       },
-      EncryptionIntent.Sync,
-    )
+    })
 
     /** Attempt decryption and insert into rotation in errored state  */
     const decrypted = await application.protocolService.decryptSplitSingle({
@@ -562,110 +557,104 @@ describe('key recovery service', function () {
     await Factory.sleep(0.3)
 
     /** Should be decrypted now */
-    expect(application.items.findItem(encrypted.uuid).errorDecrypting).to.equal(false)
+    expect(application.items.findItem(encrypted.uuid).errorDecrypting).to.not.be.ok
 
     expect(application.syncService.isOutOfSync()).to.equal(false)
     await context.deinit()
   })
 
-  it(
-    'when replacing root key, new root key should be set before items key are re-saved to disk',
-    async function () {
-      const namespace = Factory.randomString()
-      const newPassword = 'new-password'
-      const contextA = await Factory.createAppContextWithFakeCrypto(namespace)
-      const appA = contextA.application
-      const receiveChallenge = (challenge) => {
-        const responses = []
-        for (const prompt of challenge.prompts) {
-          if (prompt.validation === ChallengeValidation.AccountPassword) {
-            responses.push(new ChallengeValue(prompt, contextA.password))
-          } else if (prompt.validation === ChallengeValidation.ProtectionSessionDuration) {
-            responses.push(new ChallengeValue(prompt, UnprotectedAccessSecondsDuration.OneMinute))
-          } else if (prompt.placeholder === 'Email') {
-            responses.push(new ChallengeValue(prompt, contextA.email))
-          } else if (prompt.placeholder === 'Password' || challenge.heading.includes('password')) {
-            /** Give newPassword when prompted to revalidate session */
-            responses.push(new ChallengeValue(prompt, newPassword))
-          } else {
-            console.error(
-              'Unhandled custom challenge in Factory.createAppContextWithFakeCrypto',
-              challenge,
-              prompt,
-            )
-          }
+  it('when replacing root key, new root key should be set before items key are re-saved to disk', async function () {
+    const namespace = Factory.randomString()
+    const newPassword = 'new-password'
+    const contextA = await Factory.createAppContextWithFakeCrypto(namespace)
+    const appA = contextA.application
+    const receiveChallenge = (challenge) => {
+      const responses = []
+      for (const prompt of challenge.prompts) {
+        if (prompt.validation === ChallengeValidation.AccountPassword) {
+          responses.push(new ChallengeValue(prompt, contextA.password))
+        } else if (prompt.validation === ChallengeValidation.ProtectionSessionDuration) {
+          responses.push(new ChallengeValue(prompt, UnprotectedAccessSecondsDuration.OneMinute))
+        } else if (prompt.placeholder === 'Email') {
+          responses.push(new ChallengeValue(prompt, contextA.email))
+        } else if (prompt.placeholder === 'Password' || challenge.heading.includes('password')) {
+          /** Give newPassword when prompted to revalidate session */
+          responses.push(new ChallengeValue(prompt, newPassword))
+        } else {
+          console.error(
+            'Unhandled custom challenge in Factory.createAppContextWithFakeCrypto',
+            challenge,
+            prompt,
+          )
         }
-        appA.submitValuesForChallenge(challenge, responses)
       }
-      await appA.prepareForLaunch({ receiveChallenge })
-      await appA.launch(true)
+      appA.submitValuesForChallenge(challenge, responses)
+    }
+    await appA.prepareForLaunch({ receiveChallenge })
+    await appA.launch(true)
 
-      await Factory.registerUserToApplication({
-        application: appA,
-        email: contextA.email,
-        password: contextA.password,
-      })
+    await Factory.registerUserToApplication({
+      application: appA,
+      email: contextA.email,
+      password: contextA.password,
+    })
 
-      /** Create simultaneous appB signed into same account */
-      const contextB = await Factory.createAppContextWithFakeCrypto('another-namespace')
-      const appB = contextB.application
-      await appB.prepareForLaunch({})
-      await appB.launch(true)
-      await Factory.loginToApplication({
-        application: appB,
-        email: contextA.email,
-        password: contextA.password,
-      })
+    /** Create simultaneous appB signed into same account */
+    const contextB = await Factory.createAppContextWithFakeCrypto('another-namespace')
+    const appB = contextB.application
+    await appB.prepareForLaunch({})
+    await appB.launch(true)
+    await Factory.loginToApplication({
+      application: appB,
+      email: contextA.email,
+      password: contextA.password,
+    })
 
-      /** Change password on appB */
-      const result = await appB.changePassword(contextA.password, newPassword)
-      expect(result.error).to.not.be.ok
-      await appB.sync.sync()
+    /** Change password on appB */
+    const result = await appB.changePassword(contextA.password, newPassword)
+    expect(result.error).to.not.be.ok
+    await appB.sync.sync()
 
-      const newDefaultKey = appB.protocolService.getSureDefaultItemsKey()
+    const newDefaultKey = appB.protocolService.getSureDefaultItemsKey()
 
-      const encrypted = await appB.protocolService.encryptSplitSingle(
-        {
-          usesRootKeyWithKeyLookup: {
-            items: [newDefaultKey.payload],
-          },
-        },
-        EncryptionIntent.Sync,
-      )
+    const encrypted = await appB.protocolService.encryptSplitSingle({
+      usesRootKeyWithKeyLookup: {
+        items: [newDefaultKey.payload],
+      },
+    })
 
-      /** Insert foreign items key into appA, which shouldn't be able to decrypt it yet */
-      await appA.payloadManager.emitPayload(
-        CopyPayload(encrypted, {
-          errorDecrypting: true,
-        }),
-        PayloadSource.Constructor,
-      )
+    /** Insert foreign items key into appA, which shouldn't be able to decrypt it yet */
+    await appA.payloadManager.emitPayload(
+      encrypted.copy({
+        errorDecrypting: true,
+      }),
+      PayloadSource.Constructor,
+    )
 
-      await Factory.awaitFunctionInvokation(
-        appA.keyRecoveryService,
-        'handleDecryptionOfAllKeysMatchingCorrectRootKey',
-      )
+    await Factory.awaitFunctionInvokation(
+      appA.keyRecoveryService,
+      'handleDecryptionOfAllKeysMatchingCorrectRootKey',
+    )
 
-      /** Stored version of items key should use new root key */
-      const stored = (await appA.deviceInterface.getAllRawDatabasePayloads(appA.identifier)).find(
-        (payload) => payload.uuid === newDefaultKey.uuid,
-      )
-      const storedParams = await appA.protocolService.getKeyEmbeddedKeyParams(
-        CreateItemFromPayload(CreateMaxPayloadFromAnyObject(stored)),
-      )
+    /** Stored version of items key should use new root key */
+    const stored = (await appA.deviceInterface.getAllRawDatabasePayloads(appA.identifier)).find(
+      (payload) => payload.uuid === newDefaultKey.uuid,
+    )
+    const storedParams = await appA.protocolService.getKeyEmbeddedKeyParams(
+      new EncryptedPayload(stored),
+    )
 
-      const correctStored = (
-        await appB.deviceInterface.getAllRawDatabasePayloads(appB.identifier)
-      ).find((payload) => payload.uuid === newDefaultKey.uuid)
+    const correctStored = (
+      await appB.deviceInterface.getAllRawDatabasePayloads(appB.identifier)
+    ).find((payload) => payload.uuid === newDefaultKey.uuid)
 
-      const correctParams = await appB.protocolService.getKeyEmbeddedKeyParams(
-        CreateItemFromPayload(CreateMaxPayloadFromAnyObject(correctStored)),
-      )
+    const correctParams = await appB.protocolService.getKeyEmbeddedKeyParams(
+      new EncryptedPayload(correctStored),
+    )
 
-      expect(storedParams).to.eql(correctParams)
+    expect(storedParams).to.eql(correctParams)
 
-      await contextA.deinit()
-      await contextB.deinit()
-    },
-  ).timeout(80000)
+    await contextA.deinit()
+    await contextB.deinit()
+  }).timeout(80000)
 })

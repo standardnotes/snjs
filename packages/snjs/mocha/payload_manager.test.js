@@ -13,7 +13,7 @@ describe('payload manager', () => {
   beforeEach(async function () {
     this.payloadManager = new PayloadManager()
     this.createNotePayload = async () => {
-      return CreateMaxPayloadFromAnyObject({
+      return new DecryptedPayload({
         uuid: Factory.generateUuidish(),
         content_type: ContentType.Note,
         content: {
@@ -47,9 +47,9 @@ describe('payload manager', () => {
     await this.payloadManager.emitPayload(payload)
 
     const newTitle = `${Math.random()}`
-    const changedPayload = CopyPayload(payload, {
+    const changedPayload = payload.copy({
       content: {
-        ...payload.safeContent,
+        ...payload.content,
         title: newTitle,
       },
     })
@@ -63,7 +63,7 @@ describe('payload manager', () => {
 
   it('insertion observer', async function () {
     const observations = []
-    this.payloadManager.addObserver(ContentType.Any, (_, inserted) => {
+    this.payloadManager.addObserver(ContentType.Any, ({ inserted }) => {
       observations.push({ inserted })
     })
     const payload = await this.createNotePayload()
@@ -75,7 +75,7 @@ describe('payload manager', () => {
 
   it('change observer', async function () {
     const observations = []
-    this.payloadManager.addObserver(ContentType.Any, (changed) => {
+    this.payloadManager.addObserver(ContentType.Any, ({ changed }) => {
       if (changed.length > 0) {
         observations.push({ changed })
       }
@@ -83,9 +83,9 @@ describe('payload manager', () => {
     const payload = await this.createNotePayload()
     await this.payloadManager.emitPayload(payload)
     await this.payloadManager.emitPayload(
-      CopyPayload(payload, {
+      payload.copy({
         content: {
-          ...payload.safeContent,
+          ...payload.content,
           title: 'new title',
         },
       }),
@@ -96,7 +96,7 @@ describe('payload manager', () => {
   })
 
   it('reset state', async function () {
-    this.payloadManager.addObserver(ContentType.Any, (payloads) => {})
+    this.payloadManager.addObserver(ContentType.Any, ({}) => {})
     const payload = await this.createNotePayload()
     await this.payloadManager.emitPayload(payload)
     await this.payloadManager.resetState()

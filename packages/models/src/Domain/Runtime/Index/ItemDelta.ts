@@ -1,8 +1,13 @@
-import { ItemInterface } from '../../Abstract/Item/ItemInterface'
+import { ItemContent } from '../../Abstract/Content/ItemContent'
+import {
+  DecryptedItemInterface,
+  DeletedItemInterface,
+  EncryptedItemInterface,
+} from '../../Abstract/Item'
 
-export interface ItemDelta {
-  changed: ItemInterface[]
-  inserted: ItemInterface[]
-  discarded: ItemInterface[]
-  ignored: ItemInterface[]
+export interface ItemDelta<C extends ItemContent = ItemContent> {
+  changed: (DecryptedItemInterface<C> | EncryptedItemInterface | DeletedItemInterface)[]
+  inserted: (DecryptedItemInterface<C> | EncryptedItemInterface | DeletedItemInterface)[]
+  discarded: DeletedItemInterface[]
+  ignored: EncryptedItemInterface[]
 }

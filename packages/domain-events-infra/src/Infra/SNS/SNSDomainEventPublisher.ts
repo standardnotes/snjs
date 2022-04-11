@@ -1,15 +1,10 @@
 import * as AWS from 'aws-sdk'
 import * as zlib from 'zlib'
 
-import { DomainEventInterface } from '@standardnotes/domain-events'
-import { DomainEventPublisherInterface } from '@standardnotes/domain-events'
+import { DomainEventInterface, DomainEventPublisherInterface } from '@standardnotes/domain-events'
 
 export class SNSDomainEventPublisher implements DomainEventPublisherInterface {
-  constructor (
-    private snsClient: AWS.SNS,
-    private topicArn: string,
-  ) {
-  }
+  constructor(private snsClient: AWS.SNS, private topicArn: string) {}
 
   async publish(event: DomainEventInterface): Promise<void> {
     const message: AWS.SNS.PublishInput = {

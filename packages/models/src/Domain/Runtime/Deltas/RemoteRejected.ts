@@ -1,23 +1,40 @@
-import { ImmutablePayloadCollection } from '../Collection/ImmutablePayloadCollection'
-import { CreateSourcedPayloadFromObject } from '../../Abstract/Payload/Utilities/Functions'
-import { PayloadSource } from '../../Abstract/Payload/PayloadSource'
+import { ImmutablePayloadCollection } from '../Collection/Payload/ImmutablePayloadCollection'
+import { PayloadSource } from '../../Abstract/Payload/Types/PayloadSource'
 import { PayloadsDelta } from './Delta'
+import {
+  FullyFormedPayloadInterface,
+  DeletedPayloadInterface,
+  EncryptedPayloadInterface,
+} from '../../Abstract/Payload'
 
-export class DeltaRemoteRejected extends PayloadsDelta {
-  // eslint-disable-next-line @typescript-eslint/require-await
-  public async resultingCollection(): Promise<ImmutablePayloadCollection> {
-    const results = []
-    for (const payload of this.applyCollection.all()) {
-      const decrypted = this.findRelatedPayload(payload.uuid, PayloadSource.DecryptedTransient)
-      if (!decrypted) {
-        throw 'Unable to find decrypted counterpart for rejected payload.'
+type Return = FullyFormedPayloadInterface
+
+export class DeltaRemoteRejected extends PayloadsDelta<
+  FullyFormedPayloadInterface,
+  EncryptedPayloadInterface | DeletedPayloadInterface,
+  FullyFormedPayloadInterface
+> {
+  public async resultingCollection(): Promise<ImmutablePayloadCollection<Return>> {
+    const results: Return[] = []
+
+    for (const apply of this.applyCollection.all()) {
+      const postProcessedCounterpart = this.findRelatedPostProcessedPayload(apply.uuid)
+
+      if (!postProcessedCounterpart) {
+        throw 'Unable to find postprocessed counterpart for rejected payload.'
       }
-      const result = CreateSourcedPayloadFromObject(decrypted, PayloadSource.RemoteRejected, {
-        lastSyncEnd: new Date(),
-        dirty: false,
-      })
+
+      const result = postProcessedCounterpart.copy(
+        {
+          lastSyncEnd: new Date(),
+          dirty: false,
+        },
+        PayloadSource.RemoteRejected,
+      )
+
       results.push(result)
     }
+
     return ImmutablePayloadCollection.WithPayloads(results, PayloadSource.RemoteRejected)
   }
 }

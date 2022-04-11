@@ -1,35 +1,39 @@
-import { ConflictStrategy, ItemsKeyContent, PayloadInterface } from '@standardnotes/models'
-import { ProtocolVersion } from '@standardnotes/common'
-import { HistoryEntryInterface, SNItem, ItemsKeyInterface } from '@standardnotes/models'
+import {
+  ConflictStrategy,
+  ItemsKeyContent,
+  DecryptedItem,
+  DecryptedPayloadInterface,
+  DecryptedItemInterface,
+  HistoryEntryInterface,
+  ItemsKeyInterface,
+  RootKeyInterface,
+} from '@standardnotes/models'
+import { ContentType, ProtocolVersion } from '@standardnotes/common'
 
-export function isItemsKey(x: unknown): x is ItemsKeyInterface {
-  return x instanceof SNItemsKey
+export function isItemsKey(x: ItemsKeyInterface | RootKeyInterface): x is ItemsKeyInterface {
+  return x.content_type === ContentType.ItemsKey
 }
 
 /**
  * A key used to encrypt other items. Items keys are synced and persisted.
  */
-export class SNItemsKey extends SNItem<ItemsKeyContent> implements ItemsKeyInterface {
+export class SNItemsKey extends DecryptedItem<ItemsKeyContent> implements ItemsKeyInterface {
   keyVersion: ProtocolVersion
   isDefault: boolean | undefined
   itemsKey: string
 
-  constructor(payload: PayloadInterface<ItemsKeyContent>) {
+  constructor(payload: DecryptedPayloadInterface<ItemsKeyContent>) {
     super(payload)
-    this.keyVersion = payload.safeContent.version
-    this.isDefault = payload.safeContent.isDefault
-    this.itemsKey = this.payload.safeContent.itemsKey
+    this.keyVersion = payload.content.version
+    this.isDefault = payload.content.isDefault
+    this.itemsKey = this.payload.content.itemsKey
   }
 
   /** Do not duplicate items keys. Always keep original */
-  strategyWhenConflictingWithItem(
-    item: SNItem,
-    previousRevision?: HistoryEntryInterface,
+  override strategyWhenConflictingWithItem(
+    _item: DecryptedItemInterface,
+    _previousRevision?: HistoryEntryInterface,
   ): ConflictStrategy {
-    if (this.errorDecrypting) {
-      return super.strategyWhenConflictingWithItem(item, previousRevision)
-    }
-
     return ConflictStrategy.KeepLeft
   }
 
@@ -37,6 +41,6 @@ export class SNItemsKey extends SNItem<ItemsKeyContent> implements ItemsKeyInter
     if (this.keyVersion === ProtocolVersion.V004) {
       throw 'Attempting to access legacy data authentication key.'
     }
-    return this.payload.safeContent.dataAuthenticationKey
+    return this.payload.content.dataAuthenticationKey
   }
 }

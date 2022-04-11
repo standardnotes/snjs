@@ -93,7 +93,7 @@ describe('003 protocol operations', () => {
       version: '003',
     })
     const key = await protocol003.computeRootKey(password, keyParams)
-    const payload = CreateMaxPayloadFromAnyObject({
+    const payload = new EncryptedPayload({
       uuid: '80488ade-933a-4570-8852-5282a094fafc',
       content_type: 'Note',
       enc_item_key:

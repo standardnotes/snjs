@@ -1,6 +1,6 @@
 import { ProtocolVersion } from '@standardnotes/common'
-import { ItemInterface } from '../../Abstract/Item/ItemInterface'
-import { ItemContent, SpecializedContent } from '../../Abstract/Item/ItemContent'
+import { DecryptedItemInterface } from './../../Abstract/Item/Interfaces/DecryptedItem'
+import { ItemContent, SpecializedContent } from '../../Abstract/Content/ItemContent'
 
 export interface ItemsKeyContentSpecialized extends SpecializedContent {
   version: ProtocolVersion
@@ -11,7 +11,7 @@ export interface ItemsKeyContentSpecialized extends SpecializedContent {
 
 export type ItemsKeyContent = ItemsKeyContentSpecialized & ItemContent
 
-export interface ItemsKeyInterface extends ItemInterface<ItemsKeyContent> {
+export interface ItemsKeyInterface extends DecryptedItemInterface<ItemsKeyContent> {
   get keyVersion(): ProtocolVersion
   get isDefault(): boolean | undefined
   get itemsKey(): string

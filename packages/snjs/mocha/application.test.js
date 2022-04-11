@@ -98,8 +98,11 @@ describe('application instances', () => {
   it('signing out application should delete snjs_version', async () => {
     const identifier = 'app'
     const app = await Factory.createAndInitializeApplication(identifier)
+
     expect(localStorage.getItem(`${identifier}-snjs_version`)).to.be.ok
+
     await app.user.signOut()
+
     expect(localStorage.getItem(`${identifier}-snjs_version`)).to.not.be.ok
   })
 
@@ -143,7 +146,7 @@ describe('application instances', () => {
     })
 
     it('shows confirmation dialog when there are unsaved changes', async () => {
-      await testSNApp.itemManager.setItemDirty(testNote1.uuid)
+      await testSNApp.itemManager.setItemDirty(testNote1)
       await testSNApp.user.signOut()
 
       const expectedConfirmMessage = signOutConfirmMessage(1)
@@ -163,7 +166,7 @@ describe('application instances', () => {
     })
 
     it('does not show confirmation dialog when there are unsaved changes and the "force" option is set to true', async () => {
-      await testSNApp.itemManager.setItemDirty(testNote1.uuid)
+      await testSNApp.itemManager.setItemDirty(testNote1)
       await testSNApp.user.signOut(true)
 
       expect(confirmAlert.callCount).to.equal(0)
@@ -175,7 +178,7 @@ describe('application instances', () => {
       confirmAlert.restore()
       confirmAlert = sinon.stub(testSNApp.alertService, 'confirm').callsFake((_message) => false)
 
-      await testSNApp.itemManager.setItemDirty(testNote1.uuid)
+      await testSNApp.itemManager.setItemDirty(testNote1)
       await testSNApp.user.signOut()
 
       const expectedConfirmMessage = signOutConfirmMessage(1)

@@ -1,69 +1,65 @@
 import { addIfUnique, removeFromArray } from '@standardnotes/utils'
-import { ItemMutator } from '../../Abstract/Item/ItemMutator'
 import { Uuid } from '@standardnotes/common'
-import { ComponentPermission } from '@standardnotes/features'
-import { AppDataField } from '../../Abstract/Item/AppDataField'
+import { ComponentPermission, FeatureDescription } from '@standardnotes/features'
+import { AppDataField } from '../../Abstract/Item/Types/AppDataField'
 import { ComponentContent } from './ComponentContent'
+import { DecryptedItemMutator } from '../../Abstract/Item/Mutator/DecryptedItemMutator'
 
-export class ComponentMutator extends ItemMutator {
-  get typedContent(): Partial<ComponentContent> {
-    return this.content as Partial<ComponentContent>
-  }
-
+export class ComponentMutator extends DecryptedItemMutator<ComponentContent> {
   set active(active: boolean) {
-    this.typedContent.active = active
+    this.content.active = active
   }
 
   set isMobileDefault(isMobileDefault: boolean) {
-    this.typedContent.isMobileDefault = isMobileDefault
+    this.content.isMobileDefault = isMobileDefault
   }
 
   set defaultEditor(defaultEditor: boolean) {
     this.setAppDataItem(AppDataField.DefaultEditor, defaultEditor)
   }
 
-  set componentData(componentData: Record<string, any>) {
-    this.typedContent.componentData = componentData
+  set componentData(componentData: Record<string, unknown>) {
+    this.content.componentData = componentData
   }
 
-  set package_info(package_info: any) {
-    this.typedContent.package_info = package_info
+  set package_info(package_info: FeatureDescription) {
+    this.content.package_info = package_info
   }
 
   set local_url(local_url: string) {
-    this.typedContent.local_url = local_url
+    this.content.local_url = local_url
   }
 
   set hosted_url(hosted_url: string) {
-    this.typedContent.hosted_url = hosted_url
+    this.content.hosted_url = hosted_url
   }
 
   set valid_until(valid_until: Date) {
-    this.typedContent.valid_until = valid_until
+    this.content.valid_until = valid_until
   }
 
   set permissions(permissions: ComponentPermission[]) {
-    this.typedContent.permissions = permissions
+    this.content.permissions = permissions
   }
 
   public associateWithItem(uuid: Uuid): void {
-    const associated = this.typedContent.associatedItemIds || []
+    const associated = this.content.associatedItemIds || []
     addIfUnique(associated, uuid)
-    this.typedContent.associatedItemIds = associated
+    this.content.associatedItemIds = associated
   }
 
   public disassociateWithItem(uuid: Uuid): void {
-    const disassociated = this.typedContent.disassociatedItemIds || []
+    const disassociated = this.content.disassociatedItemIds || []
     addIfUnique(disassociated, uuid)
-    this.typedContent.disassociatedItemIds = disassociated
+    this.content.disassociatedItemIds = disassociated
   }
 
   public removeAssociatedItemId(uuid: Uuid): void {
-    removeFromArray(this.typedContent.associatedItemIds || [], uuid)
+    removeFromArray(this.content.associatedItemIds || [], uuid)
   }
 
   public removeDisassociatedItemId(uuid: Uuid): void {
-    removeFromArray(this.typedContent.disassociatedItemIds || [], uuid)
+    removeFromArray(this.content.disassociatedItemIds || [], uuid)
   }
 
   public setLastSize(size: string): void {

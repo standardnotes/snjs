@@ -54,7 +54,7 @@ describe('2020-01-15 web migration', () => {
       /** Legacy versions would store json strings inside of embedded storage */
       auth_params: JSON.stringify(accountKey.keyParams.getPortableValue()),
     }
-    const storagePayload = CreateMaxPayloadFromAnyObject({
+    const storagePayload = new DecryptedPayload({
       uuid: await operator003.crypto.generateUUID(),
       content_type: ContentType.EncryptedStorage,
       content: {
@@ -65,7 +65,7 @@ describe('2020-01-15 web migration', () => {
       storagePayload,
       passcodeKey,
     )
-    const persistPayload = CreateMaxPayloadFromAnyObject(storagePayload, encryptionParams)
+    const persistPayload = new EncryptedPayload({ ...storagePayload, ...encryptionParams })
     await application.deviceInterface.setRawStorageValue(
       'encryptedStorage',
       JSON.stringify(persistPayload),
@@ -77,7 +77,7 @@ describe('2020-01-15 web migration', () => {
       notePayload,
       accountKey,
     )
-    const noteEncryptedPayload = CreateMaxPayloadFromAnyObject(notePayload, noteEncryptionParams)
+    const noteEncryptedPayload = new EncryptedPayload({ ...notePayload, ...noteEncryptionParams })
     await application.deviceInterface.saveRawDatabasePayload(
       noteEncryptedPayload,
       application.identifier,
@@ -94,7 +94,9 @@ describe('2020-01-15 web migration', () => {
 
     await application.launch(true)
     expect(application.sessionManager.online()).to.equal(true)
-    expect(application.protocolService.rootKeyEncryption.keyMode).to.equal(KeyMode.RootKeyPlusWrapper)
+    expect(application.protocolService.rootKeyEncryption.keyMode).to.equal(
+      KeyMode.RootKeyPlusWrapper,
+    )
     /** Should be decrypted */
     const storageMode = application.storageService.domainKeyForMode(StorageValueModes.Default)
     const valueStore = application.storageService.values[storageMode]
@@ -120,7 +122,9 @@ describe('2020-01-15 web migration', () => {
     /** Application should not retain server password from legacy versions */
     expect(rootKey.serverPassword).to.not.be.ok
     expect(rootKey.keyVersion).to.equal(ProtocolVersion.V003)
-    expect(application.protocolService.rootKeyEncryption.keyMode).to.equal(KeyMode.RootKeyPlusWrapper)
+    expect(application.protocolService.rootKeyEncryption.keyMode).to.equal(
+      KeyMode.RootKeyPlusWrapper,
+    )
 
     /** Expect note is decrypted */
     expect(application.itemManager.notes.length).to.equal(1)
@@ -165,7 +169,7 @@ describe('2020-01-15 web migration', () => {
     const embeddedStorage = {
       ...arbitraryValues,
     }
-    const storagePayload = CreateMaxPayloadFromAnyObject({
+    const storagePayload = new DecryptedPayload({
       uuid: await operator003.crypto.generateUUID(),
       content: {
         storage: embeddedStorage,
@@ -176,7 +180,7 @@ describe('2020-01-15 web migration', () => {
       storagePayload,
       passcodeKey,
     )
-    const persistPayload = CreateMaxPayloadFromAnyObject(storagePayload, encryptionParams)
+    const persistPayload = new EncryptedPayload({ ...storagePayload, ...encryptionParams })
     await application.deviceInterface.setRawStorageValue(
       'encryptedStorage',
       JSON.stringify(persistPayload),
@@ -188,7 +192,7 @@ describe('2020-01-15 web migration', () => {
       notePayload,
       passcodeKey,
     )
-    const noteEncryptedPayload = CreateMaxPayloadFromAnyObject(notePayload, noteEncryptionParams)
+    const noteEncryptedPayload = new EncryptedPayload({ ...notePayload, ...noteEncryptionParams })
     await application.deviceInterface.saveRawDatabasePayload(
       noteEncryptedPayload,
       application.identifier,
@@ -274,7 +278,7 @@ describe('2020-01-15 web migration', () => {
       notePayload,
       accountKey,
     )
-    const noteEncryptedPayload = CreateMaxPayloadFromAnyObject(notePayload, noteEncryptionParams)
+    const noteEncryptedPayload = new EncryptedPayload({ ...notePayload, ...noteEncryptionParams })
     await application.deviceInterface.saveRawDatabasePayload(
       noteEncryptedPayload,
       application.identifier,
@@ -449,7 +453,7 @@ describe('2020-01-15 web migration', () => {
       notePayload,
       accountKey,
     )
-    const noteEncryptedPayload = CreateMaxPayloadFromAnyObject(notePayload, noteEncryptionParams)
+    const noteEncryptedPayload = new EncryptedPayload({ ...notePayload, ...noteEncryptionParams })
     await application.deviceInterface.saveRawDatabasePayload(
       noteEncryptedPayload,
       application.identifier,
@@ -573,7 +577,7 @@ describe('2020-01-15 web migration', () => {
       auth_params: JSON.stringify(accountKey.keyParams.getPortableValue()),
       user: JSON.stringify({ uuid: 'anything', email: 'anything' }),
     }
-    const storagePayload = CreateMaxPayloadFromAnyObject({
+    const storagePayload = new DecryptedPayload({
       uuid: await operator002.crypto.generateUUID(),
       content_type: ContentType.EncryptedStorage,
       content: {
@@ -584,7 +588,7 @@ describe('2020-01-15 web migration', () => {
       storagePayload,
       passcodeKey,
     )
-    const persistPayload = CreateMaxPayloadFromAnyObject(storagePayload, encryptionParams)
+    const persistPayload = new EncryptedPayload({ ...storagePayload, ...encryptionParams })
     await application.deviceInterface.setRawStorageValue(
       'encryptedStorage',
       JSON.stringify(persistPayload),
@@ -596,7 +600,7 @@ describe('2020-01-15 web migration', () => {
       notePayload,
       accountKey,
     )
-    const noteEncryptedPayload = CreateMaxPayloadFromAnyObject(notePayload, noteEncryptionParams)
+    const noteEncryptedPayload = new EncryptedPayload({ ...notePayload, ...noteEncryptionParams })
     await application.deviceInterface.saveRawDatabasePayload(
       noteEncryptedPayload,
       application.identifier,
@@ -613,7 +617,9 @@ describe('2020-01-15 web migration', () => {
     await application.launch(true)
     expect(application.sessionManager.online()).to.equal(true)
     expect(application.sessionManager.getUser()).to.be.ok
-    expect(application.protocolService.rootKeyEncryption.keyMode).to.equal(KeyMode.RootKeyPlusWrapper)
+    expect(application.protocolService.rootKeyEncryption.keyMode).to.equal(
+      KeyMode.RootKeyPlusWrapper,
+    )
     /** Should be decrypted */
     const storageMode = application.storageService.domainKeyForMode(StorageValueModes.Default)
     const valueStore = application.storageService.values[storageMode]

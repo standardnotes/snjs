@@ -27,7 +27,7 @@ export abstract class AbstractService<EventName = string, EventData = undefined>
       await observer(eventName, data)
     }
 
-    this.internalEventBus.publish({
+    this.internalEventBus?.publish({
       type: eventName as unknown as string,
       payload: data,
     })
@@ -38,7 +38,7 @@ export abstract class AbstractService<EventName = string, EventData = undefined>
       await observer(eventName, data)
     }
 
-    await this.internalEventBus.publishSync(
+    await this.internalEventBus?.publishSync(
       {
         type: eventName as unknown as string,
         payload: data,
@@ -61,6 +61,7 @@ export abstract class AbstractService<EventName = string, EventData = undefined>
    */
   public deinit(): void {
     this.eventObservers.length = 0
+    ;(this.internalEventBus as unknown) = undefined
   }
 
   /**

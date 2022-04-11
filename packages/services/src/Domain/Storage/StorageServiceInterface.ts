@@ -1,5 +1,4 @@
-import { RootKeyInterface } from '@standardnotes/models'
-import { PurePayload } from '@standardnotes/models'
+import { PayloadInterface, RootKeyInterface } from '@standardnotes/models'
 import { StorageValueModes } from './StorageTypes'
 
 export interface StorageServiceInterface {
@@ -7,9 +6,9 @@ export interface StorageServiceInterface {
 
   canDecryptWithKey(key: RootKeyInterface): Promise<boolean>
 
-  savePayload(payload: PurePayload): Promise<void>
+  savePayload(payload: PayloadInterface): Promise<void>
 
-  savePayloads(decryptedPayloads: PurePayload[]): Promise<void>
+  savePayloads(decryptedPayloads: PayloadInterface[]): Promise<void>
 
   setValue(key: string, value: unknown, mode?: StorageValueModes): void
 

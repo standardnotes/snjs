@@ -1,12 +1,16 @@
-import { splitString } from '@standardnotes/utils'
-import { CreateItemFromPayload, ItemsKeyContent, ItemsKeyInterface } from '@standardnotes/models'
+import { splitString, UuidGenerator } from '@standardnotes/utils'
+import {
+  CreateDecryptedItemFromPayload,
+  DecryptedPayload,
+  ItemsKeyContent,
+  ItemsKeyInterface,
+  FillItemContent,
+} from '@standardnotes/models'
 import { SNRootKey } from '../../RootKey/RootKey'
 import { V003Algorithm } from '../../Algorithm'
 import { Create003KeyParams } from '../../RootKey/KeyParams'
 import { SNProtocolOperator002 } from '../002/Operator002'
-import { CreateMaxPayloadFromAnyObject, FillItemContent } from '@standardnotes/models'
 import { ContentType, KeyParamsOrigination, ProtocolVersion } from '@standardnotes/common'
-import { UuidGenerator } from '@standardnotes/utils'
 import { SNRootKeyParams } from '../../RootKey/RootKeyParams'
 import { CreateNewRootKey } from '../../RootKey/Functions'
 
@@ -17,11 +21,11 @@ import { CreateNewRootKey } from '../../RootKey/Functions'
  * changed, and overrides functions where behavior may differ.
  */
 export class SNProtocolOperator003 extends SNProtocolOperator002 {
-  get version(): ProtocolVersion {
+  override get version(): ProtocolVersion {
     return ProtocolVersion.V003
   }
 
-  protected generateNewItemsKeyContent(): ItemsKeyContent {
+  protected override generateNewItemsKeyContent(): ItemsKeyContent {
     const keyLength = V003Algorithm.EncryptionKeyLength
     const itemsKey = this.crypto.generateRandomKey(keyLength)
     const authKey = this.crypto.generateRandomKey(keyLength)
@@ -37,21 +41,27 @@ export class SNProtocolOperator003 extends SNProtocolOperator002 {
    * Creates a new random items key to use for item encryption.
    * The consumer must save/sync this item.
    */
-  public createItemsKey(): ItemsKeyInterface {
+  public override createItemsKey(): ItemsKeyInterface {
     const content = this.generateNewItemsKeyContent()
-    const payload = CreateMaxPayloadFromAnyObject({
+    const payload = new DecryptedPayload({
       uuid: UuidGenerator.GenerateUuid(),
       content_type: ContentType.ItemsKey,
       content: FillItemContent(content),
     })
-    return CreateItemFromPayload(payload)
+    return CreateDecryptedItemFromPayload(payload)
   }
 
-  public async computeRootKey(password: string, keyParams: SNRootKeyParams): Promise<SNRootKey> {
+  public override async computeRootKey(
+    password: string,
+    keyParams: SNRootKeyParams,
+  ): Promise<SNRootKey> {
     return this.deriveKey(password, keyParams)
   }
 
-  protected async deriveKey(password: string, keyParams: SNRootKeyParams): Promise<SNRootKey> {
+  protected override async deriveKey(
+    password: string,
+    keyParams: SNRootKeyParams,
+  ): Promise<SNRootKey> {
     const salt = await this.generateSalt(
       keyParams.content003.identifier,
       ProtocolVersion.V003,
@@ -81,7 +91,7 @@ export class SNProtocolOperator003 extends SNProtocolOperator002 {
     })
   }
 
-  public async createRootKey(
+  public override async createRootKey(
     identifier: string,
     password: string,
     origination: KeyParamsOrigination,

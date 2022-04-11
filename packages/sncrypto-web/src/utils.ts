@@ -248,7 +248,7 @@ export function padStart(counter: number): ArrayBuffer {
   const buffer = new ArrayBuffer(8)
   const bView = new DataView(buffer)
 
-  const byteString = '0'.repeat(64) // 8 bytes
+  const byteString = '0'.repeat(64)
   const bCounter = (byteString + counter.toString(2)).slice(-64)
 
   for (let byte = 0; byte < 64; byte += 8) {

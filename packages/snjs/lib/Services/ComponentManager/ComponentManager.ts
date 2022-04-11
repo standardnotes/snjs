@@ -1,24 +1,33 @@
-import { AllowedBatchStreaming } from './types'
+import { AllowedBatchStreaming } from './Types'
 import { SNPreferencesService } from '../Preferences/PreferencesService'
-import { FindNativeFeature } from '@standardnotes/features'
 import { SNFeaturesService } from '@Lib/Services/Features/FeaturesService'
-import { ContentType, Runtime, DisplayStringForContentType } from '@standardnotes/common'
-import { PayloadSource } from '@standardnotes/models'
+import { ContentType, DisplayStringForContentType } from '@standardnotes/common'
 import { ItemManager } from '@Lib/Services/Items/ItemManager'
-import { SNItem, SNNote, SNTheme, SNComponent, ComponentMutator } from '@standardnotes/models'
+import {
+  SNNote,
+  SNTheme,
+  SNComponent,
+  ComponentMutator,
+  PayloadSource,
+} from '@standardnotes/models'
 import { SNAlertService } from '@Lib/Services/Alert/AlertService'
 import { SNSyncService } from '@Lib/Services/Sync/SyncService'
 import find from 'lodash/find'
 import uniq from 'lodash/uniq'
-import { ComponentArea, ComponentAction, ComponentPermission } from '@standardnotes/features'
-import { Copy, concatArrays, filterFromArray, removeFromArray, sleep } from '@standardnotes/utils'
+import {
+  ComponentArea,
+  ComponentAction,
+  ComponentPermission,
+  FindNativeFeature,
+} from '@standardnotes/features'
+import { Copy, filterFromArray, removeFromArray, sleep } from '@standardnotes/utils'
 import { Environment, Platform } from '@Lib/Application/Platforms'
 import { UuidString } from '@Lib/Types/UuidString'
 import {
   PermissionDialog,
   DesktopManagerInterface,
   AllowedBatchContentTypes,
-} from '@Lib/Services/ComponentManager/types'
+} from '@Lib/Services/ComponentManager/Types'
 import { ActionObserver, ComponentViewer } from '@Lib/Services/ComponentManager/ComponentViewer'
 import { AbstractService, InternalEventBusInterface } from '@standardnotes/services'
 
@@ -26,6 +35,14 @@ const DESKTOP_URL_PREFIX = 'sn://'
 const LOCAL_HOST = 'localhost'
 const CUSTOM_LOCAL_HOST = 'sn.local'
 const ANDROID_LOCAL_HOST = '10.0.2.2'
+
+declare global {
+  interface Window {
+    /** IE Handlers */
+    attachEvent(event: string, listener: EventListener): boolean
+    detachEvent(event: string, listener: EventListener): void
+  }
+}
 
 export enum ComponentManagerEvent {
   ViewerDidFocus = 'ViewerDidFocus',
@@ -54,8 +71,7 @@ export class SNComponentManager extends AbstractService<ComponentManagerEvent, E
     protected alertService: SNAlertService,
     private environment: Environment,
     private platform: Platform,
-    private runtime: Runtime,
-    protected internalEventBus: InternalEventBusInterface,
+    protected override internalEventBus: InternalEventBusInterface,
   ) {
     super(internalEventBus)
     this.loggingEnabled = false
@@ -83,8 +99,7 @@ export class SNComponentManager extends AbstractService<ComponentManagerEvent, E
     })
   }
 
-  /** @override */
-  deinit(): void {
+  override deinit(): void {
     super.deinit()
     for (const viewer of this.viewers) {
       viewer.destroy()
@@ -120,7 +135,6 @@ export class SNComponentManager extends AbstractService<ComponentManagerEvent, E
       this.featuresService,
       this.environment,
       this.platform,
-      this.runtime,
       {
         runWithPermissions: this.runWithPermissions.bind(this),
         urlsForActiveThemes: this.urlsForActiveThemes.bind(this),
@@ -172,15 +186,10 @@ export class SNComponentManager extends AbstractService<ComponentManagerEvent, E
 
   addItemObserver(): void {
     this.removeItemObserver = this.itemManager.addObserver(
-      ContentType.Any,
-      (changed, inserted, discarded, _ignored, source) => {
-        const items = concatArrays(changed, inserted, discarded) as SNItem[]
-        const syncedComponents = items.filter((item) => {
-          return (
-            item.content_type === ContentType.Component || item.content_type === ContentType.Theme
-          )
-        }) as SNComponent[]
-        this.handleChangedComponents(syncedComponents, source)
+      [ContentType.Component, ContentType.Theme],
+      ({ changed, inserted, source }) => {
+        const items = [...changed, ...inserted] as SNComponent[]
+        this.handleChangedComponents(items, source)
       },
     )
   }
@@ -195,7 +204,7 @@ export class SNComponentManager extends AbstractService<ComponentManagerEvent, E
             // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
             iframe.dataset.componentViewerId!,
           )!
-          this.notifyEvent(ComponentManagerEvent.ViewerDidFocus, {
+          void this.notifyEvent(ComponentManagerEvent.ViewerDidFocus, {
             componentViewer: viewer,
           })
         })
@@ -215,10 +224,10 @@ export class SNComponentManager extends AbstractService<ComponentManagerEvent, E
   configureForNonMobileUsage(): void {
     window.addEventListener
       ? window.addEventListener('focus', this.detectFocusChange, true)
-      : (window as any).attachEvent('onfocusout', this.detectFocusChange)
+      : window.attachEvent('onfocusout', this.detectFocusChange)
     window.addEventListener
       ? window.addEventListener('blur', this.detectFocusChange, true)
-      : (window as any).attachEvent('onblur', this.detectFocusChange)
+      : window.attachEvent('onblur', this.detectFocusChange)
 
     /* On mobile, events listeners are handled by a respective component */
     window.addEventListener('message', this.onWindowMessage)
@@ -434,12 +443,15 @@ export class SNComponentManager extends AbstractService<ComponentManagerEvent, E
               )
             }
           }
-          await this.itemManager.changeItem(component.uuid, (m) => {
+
+          await this.itemManager.changeItem(component, (m) => {
             const mutator = m as ComponentMutator
             mutator.permissions = componentPermissions
           })
-          this.syncService.sync()
+
+          void this.syncService.sync()
         }
+
         this.permissionDialogs = this.permissionDialogs.filter((pendingDialog) => {
           /* Remove self */
           if (pendingDialog === params) {
@@ -471,6 +483,7 @@ export class SNComponentManager extends AbstractService<ComponentManagerEvent, E
           }
           return true
         })
+
         if (this.permissionDialogs.length > 0) {
           this.presentPermissionsDialog(this.permissionDialogs[0])
         }
@@ -501,14 +514,14 @@ export class SNComponentManager extends AbstractService<ComponentManagerEvent, E
 
     const theme = this.findComponent(uuid) as SNTheme
     if (theme.active) {
-      await this.itemManager.changeComponent(theme.uuid, (mutator) => {
+      await this.itemManager.changeComponent(theme, (mutator) => {
         mutator.active = false
       })
     } else {
       const activeThemes = this.getActiveThemes()
 
       /* Activate current before deactivating others, so as not to flicker */
-      await this.itemManager.changeComponent(theme.uuid, (mutator) => {
+      await this.itemManager.changeComponent(theme, (mutator) => {
         mutator.active = true
       })
 
@@ -517,7 +530,7 @@ export class SNComponentManager extends AbstractService<ComponentManagerEvent, E
         await sleep(10)
         for (const candidate of activeThemes) {
           if (candidate && !candidate.isLayerable()) {
-            await this.itemManager.changeComponent(candidate.uuid, (mutator) => {
+            await this.itemManager.changeComponent(candidate, (mutator) => {
               mutator.active = false
             })
           }
@@ -529,14 +542,9 @@ export class SNComponentManager extends AbstractService<ComponentManagerEvent, E
   async toggleComponent(uuid: UuidString): Promise<void> {
     this.log('Toggling component', uuid)
     const component = this.findComponent(uuid)
-    await this.itemManager.changeComponent(component.uuid, (mutator) => {
+    await this.itemManager.changeComponent(component, (mutator) => {
       mutator.active = !(mutator.getItem() as SNComponent).active
     })
-  }
-
-  async deleteComponent(uuid: UuidString): Promise<void> {
-    await this.itemManager.setItemToBeDeleted(uuid)
-    this.syncService.sync()
   }
 
   isComponentActive(component: SNComponent): boolean {
@@ -624,10 +632,10 @@ export class SNComponentManager extends AbstractService<ComponentManagerEvent, E
           {
             const componentAreaMapping = {
               [ComponentArea.EditorStack]: 'working note',
-              [ComponentArea.NoteTags]: 'working note',
               [ComponentArea.Editor]: 'working note',
+              [ComponentArea.Themes]: 'Unknown',
             }
-            contextAreaStrings.push((componentAreaMapping as any)[component.area])
+            contextAreaStrings.push(componentAreaMapping[component.area])
           }
           break
       }

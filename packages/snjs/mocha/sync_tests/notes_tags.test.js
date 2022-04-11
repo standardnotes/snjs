@@ -32,7 +32,7 @@ describe('notes + tags syncing', function () {
 
   it('syncing an item then downloading it should include items_key_id', async function () {
     const note = await Factory.createMappedNote(this.application)
-    await this.application.itemManager.setItemDirty(note.uuid)
+    await this.application.itemManager.setItemDirty(note)
     await this.application.syncService.sync(syncOptions)
     await this.application.payloadManager.resetState()
     await this.application.itemManager.resetState()
@@ -61,11 +61,11 @@ describe('notes + tags syncing', function () {
     expect(this.application.itemManager.tags.length).to.equal(1)
 
     for (let i = 0; i < 9; i++) {
-      await this.application.itemManager.setItemsDirty([note.uuid, tag.uuid])
+      await this.application.itemManager.setItemsDirty([note, tag])
       await this.application.syncService.sync(syncOptions)
       this.application.syncService.clearSyncPositionTokens()
       expect(tag.content.references.length).to.equal(1)
-      expect(this.application.itemManager.itemsReferencingItem(note.uuid).length).to.equal(1)
+      expect(this.application.itemManager.itemsReferencingItem(note).length).to.equal(1)
       expect(tag.noteCount).to.equal(1)
       expect(this.application.itemManager.notes.length).to.equal(1)
       expect(this.application.itemManager.tags.length).to.equal(1)
@@ -84,18 +84,18 @@ describe('notes + tags syncing', function () {
     )
     const originalNote = this.application.itemManager.notes[0]
     const originalTag = this.application.itemManager.tags[0]
-    await this.application.itemManager.setItemsDirty([originalNote.uuid, originalTag.uuid])
+    await this.application.itemManager.setItemsDirty([originalNote, originalTag])
 
     await this.application.syncService.sync(syncOptions)
 
     expect(originalTag.content.references.length).to.equal(1)
     expect(originalTag.noteCount).to.equal(1)
-    expect(this.application.itemManager.itemsReferencingItem(originalNote.uuid).length).to.equal(1)
+    expect(this.application.itemManager.itemsReferencingItem(originalNote).length).to.equal(1)
 
     // when signing in, all local items are cleared from storage (but kept in memory; to clear desktop logs),
     // then resaved with alternated uuids.
     await this.application.storageService.clearAllPayloads()
-    await this.application.syncService.markAllItemsAsNeedingSync()
+    await this.application.syncService.markAllItemsAsNeedingSyncAndPersist()
 
     expect(this.application.itemManager.notes.length).to.equal(1)
     expect(this.application.itemManager.tags.length).to.equal(1)
@@ -107,7 +107,7 @@ describe('notes + tags syncing', function () {
     expect(note.content.references.length).to.equal(0)
 
     expect(tag.noteCount).to.equal(1)
-    expect(this.application.itemManager.itemsReferencingItem(note.uuid).length).to.equal(1)
+    expect(this.application.itemManager.itemsReferencingItem(note).length).to.equal(1)
   })
 
   it('duplicating a tag should maintian its relationships', async function () {
@@ -120,9 +120,9 @@ describe('notes + tags syncing', function () {
     )
     let note = this.application.itemManager.notes[0]
     let tag = this.application.itemManager.tags[0]
-    expect(this.application.itemManager.itemsReferencingItem(note.uuid).length).to.equal(1)
+    expect(this.application.itemManager.itemsReferencingItem(note).length).to.equal(1)
 
-    await this.application.itemManager.setItemsDirty([note.uuid, tag.uuid])
+    await this.application.itemManager.setItemsDirty([note, tag])
     await this.application.syncService.sync(syncOptions)
     await this.application.syncService.clearSyncPositionTokens()
 
@@ -135,16 +135,17 @@ describe('notes + tags syncing', function () {
     expect(this.application.itemManager.notes.length).to.equal(1)
     expect(this.application.itemManager.tags.length).to.equal(1)
 
-    tag = await this.application.mutator.changeAndSaveItem(
-      tag.uuid,
-      (mutator) => {
-        mutator.title = `${Math.random()}`
-        mutator.updated_at_timestamp = Factory.dateToMicroseconds(Factory.yesterday())
+    await Factory.changePayloadTimeStampAndSync(
+      this.application,
+      tag.payload,
+      Factory.dateToMicroseconds(Factory.yesterday()),
+      {
+        title: `${Math.random()}`,
       },
-      undefined,
-      undefined,
       syncOptions,
     )
+
+    tag = this.application.itemManager.findItem(tag.uuid)
 
     // tag should now be conflicted and a copy created
     expect(this.application.itemManager.notes.length).to.equal(1)
@@ -164,11 +165,11 @@ describe('notes + tags syncing', function () {
     expect(conflictedTag.content.conflict_of).to.equal(originalTag.uuid)
     expect(conflictedTag.noteCount).to.equal(originalTag.noteCount)
 
-    expect(this.application.itemManager.itemsReferencingItem(conflictedTag.uuid).length).to.equal(0)
-    expect(this.application.itemManager.itemsReferencingItem(originalTag.uuid).length).to.equal(0)
+    expect(this.application.itemManager.itemsReferencingItem(conflictedTag).length).to.equal(0)
+    expect(this.application.itemManager.itemsReferencingItem(originalTag).length).to.equal(0)
 
     // Two tags now link to this note
-    const referencingItems = this.application.itemManager.itemsReferencingItem(note.uuid)
+    const referencingItems = this.application.itemManager.itemsReferencingItem(note)
     expect(referencingItems.length).to.equal(2)
     expect(referencingItems[0]).to.not.equal(referencingItems[1])
   }).timeout(10000)

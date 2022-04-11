@@ -1,17 +1,17 @@
-import { ItemMutator } from '../../Abstract/Item/ItemMutator'
 import { ContentType } from '@standardnotes/common'
 import { TagContent, SNTag } from './Tag'
 import { isTagToParentTagReference } from '../../Abstract/Reference/Functions'
 import { TagToParentTagReference } from '../../Abstract/Reference/TagToParentTagReference'
 import { ContenteReferenceType } from '../../Abstract/Reference/ContenteReferenceType'
+import { DecryptedItemMutator } from '../../Abstract/Item/Mutator/DecryptedItemMutator'
 
-export class TagMutator extends ItemMutator<TagContent> {
+export class TagMutator extends DecryptedItemMutator<TagContent> {
   set title(title: string) {
-    this.sureContent.title = title
+    this.content.title = title
   }
 
   set expanded(expanded: boolean) {
-    this.sureContent.expanded = expanded
+    this.content.expanded = expanded
   }
 
   public makeChildOf(tag: SNTag): void {
@@ -25,11 +25,11 @@ export class TagMutator extends ItemMutator<TagContent> {
 
     references.push(reference)
 
-    this.sureContent.references = references
+    this.content.references = references
   }
 
   public unsetParent(): void {
     const references = this.item.references.filter((ref) => !isTagToParentTagReference(ref))
-    this.sureContent.references = references
+    this.content.references = references
   }
 }

@@ -5,12 +5,12 @@ import * as Models from '@standardnotes/models'
 import {
   DecryptedParameters,
   EncryptedParameters,
-  ErroredDecryptingParameters,
+  encryptedParametersFromPayload,
+  ErrorDecryptingParameters,
 } from '../Encryption/EncryptedParameters'
-import { encryptedParametersFromPayload } from '../Intent/Functions'
 
 export async function encryptPayload(
-  payload: Models.PayloadInterface,
+  payload: Models.DecryptedPayloadInterface,
   key: Models.ItemsKeyInterface | SNRootKey,
   operatorManager: OperatorManager,
 ): Promise<EncryptedParameters> {
@@ -31,10 +31,10 @@ export async function encryptPayload(
 }
 
 export async function decryptPayload<C extends Models.ItemContent = Models.ItemContent>(
-  payload: Models.PayloadInterface<C>,
+  payload: Models.EncryptedPayloadInterface,
   key: Models.ItemsKeyInterface | SNRootKey,
   operatorManager: OperatorManager,
-): Promise<DecryptedParameters<C> | ErroredDecryptingParameters> {
+): Promise<DecryptedParameters<C> | ErrorDecryptingParameters> {
   const operator = operatorManager.operatorForVersion(payload.version)
 
   try {
@@ -51,7 +51,6 @@ export async function decryptPayload<C extends Models.ItemContent = Models.ItemC
     return {
       uuid: payload.uuid,
       errorDecrypting: true,
-      errorDecryptingValueChanged: !payload.errorDecrypting,
     }
   }
 }

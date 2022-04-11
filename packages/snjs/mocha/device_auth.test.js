@@ -73,6 +73,7 @@ describe('device authentication', function () {
     /** Recreate application and initialize */
     const tmpApplication = await Factory.createApplicationWithFakeCrypto(namespace)
     let numPasscodeAttempts = 1
+
     const promptValueReply = (prompts) => {
       const values = []
       for (const prompt of prompts) {
@@ -88,6 +89,7 @@ describe('device authentication', function () {
       }
       return values
     }
+
     const receiveChallenge = async (challenge) => {
       tmpApplication.addChallengeObserver(challenge, {
         onInvalidValue: (value) => {
@@ -99,6 +101,7 @@ describe('device authentication', function () {
       const initialValues = promptValueReply(challenge.prompts)
       tmpApplication.submitValuesForChallenge(challenge, initialValues)
     }
+
     await tmpApplication.prepareForLaunch({ receiveChallenge })
     expect(await tmpApplication.protocolService.getRootKey()).to.not.be.ok
     expect(
@@ -127,7 +130,9 @@ describe('device authentication', function () {
     const passcode = 'foobar'
     Factory.handlePasswordChallenges(application, password)
     await application.addPasscode(passcode)
-    expect(application.protocolService.rootKeyEncryption.keyMode).to.equal(KeyMode.RootKeyPlusWrapper)
+    expect(application.protocolService.rootKeyEncryption.keyMode).to.equal(
+      KeyMode.RootKeyPlusWrapper,
+    )
     expect(await application.hasPasscode()).to.equal(true)
     await Factory.safeDeinit(application)
 
@@ -166,7 +171,9 @@ describe('device authentication', function () {
       sampleStorageValue,
     )
     expect(await tmpApplication.protocolService.getRootKey()).to.be.ok
-    expect(tmpApplication.protocolService.rootKeyEncryption.keyMode).to.equal(KeyMode.RootKeyPlusWrapper)
+    expect(tmpApplication.protocolService.rootKeyEncryption.keyMode).to.equal(
+      KeyMode.RootKeyPlusWrapper,
+    )
     await Factory.safeDeinit(tmpApplication)
   }).timeout(Factory.TwentySecondTimeout)
 })

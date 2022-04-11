@@ -52,13 +52,15 @@ describe('notes and tags', () => {
     const notePayload = pair[0]
     const tagPayload = pair[1]
 
-    const mutatedTag = CreateMaxPayloadFromAnyObject(tagPayload, {
+    const mutatedTag = new DecryptedPayload({
+      ...tagPayload,
       content: {
-        ...tagPayload.safeContent,
+        ...tagPayload.content,
         references: null,
       },
     })
-    const mutatedNote = CreateMaxPayloadFromAnyObject(notePayload, {
+    const mutatedNote = new DecryptedPayload({
+      ...notePayload,
       content: {
         references: [
           {
@@ -77,7 +79,7 @@ describe('notes and tags', () => {
     const tag = this.application.itemManager.getItems([ContentType.Tag])[0]
 
     expect(note.content.references.length).to.equal(1)
-    expect(this.application.itemManager.itemsReferencingItem(tag.uuid).length).to.equal(1)
+    expect(this.application.itemManager.itemsReferencingItem(tag).length).to.equal(1)
   })
 
   it('creates relationship between note and tag', async function () {
@@ -104,23 +106,26 @@ describe('notes and tags', () => {
     expect(note.hasRelationshipWithItem(tag)).to.equal(false)
     expect(tag.hasRelationshipWithItem(note)).to.equal(true)
 
-    expect(this.application.itemManager.itemsReferencingItem(note.uuid).length).to.equal(1)
-    expect(note.payload.safeReferences.length).to.equal(0)
+    expect(this.application.itemManager.itemsReferencingItem(note).length).to.equal(1)
+    expect(note.payload.references.length).to.equal(0)
     expect(tag.noteCount).to.equal(1)
 
-    note = await this.application.itemManager.setItemToBeDeleted(note.uuid)
+    await this.application.itemManager.setItemToBeDeleted(note)
+
     tag = this.application.itemManager.tags[0]
 
-    expect(note.dirty).to.be.true
+    const deletedNotePayload = this.application.payloadManager.findOne(note.uuid)
+    expect(deletedNotePayload.dirty).to.be.true
     expect(tag.dirty).to.be.true
+
     await this.application.syncService.sync(syncOptions)
+
     expect(tag.content.references.length).to.equal(0)
-    expect(this.application.itemManager.itemsReferencingItem(note.uuid).length).to.equal(0)
+    expect(this.application.itemManager.itemsReferencingItem(note).length).to.equal(0)
     expect(tag.noteCount).to.equal(0)
 
-    note = this.application.itemManager.notes[0]
     tag = this.application.itemManager.tags[0]
-    expect(note).to.not.be.ok
+    expect(this.application.itemManager.notes.length).to.equal(0)
     expect(tag.dirty).to.be.false
   })
 
@@ -138,10 +143,11 @@ describe('notes and tags', () => {
 
     await this.application.syncService.sync(syncOptions)
 
-    const mutatedTag = CreateMaxPayloadFromAnyObject(tagPayload, {
+    const mutatedTag = new DecryptedPayload({
+      ...tagPayload,
       dirty: false,
       content: {
-        ...tagPayload.safeContent,
+        ...tagPayload.content,
         references: [],
       },
     })
@@ -154,7 +160,7 @@ describe('notes and tags', () => {
     tag = this.application.itemManager.findItem(tag.uuid)
 
     expect(tag.content.references.length).to.equal(0)
-    expect(this.application.itemManager.itemsReferencingItem(note.uuid).length).to.equal(0)
+    expect(this.application.itemManager.itemsReferencingItem(note).length).to.equal(0)
     expect(tag.noteCount).to.equal(0)
 
     // expect to be false
@@ -189,7 +195,7 @@ describe('notes and tags', () => {
     expect(tag.content.references.length).to.equal(1)
 
     tag = await this.application.mutator.changeAndSaveItem(
-      tag.uuid,
+      tag,
       (mutator) => {
         mutator.removeItemAsRelationship(note)
       },
@@ -198,7 +204,7 @@ describe('notes and tags', () => {
       syncOptions,
     )
 
-    expect(this.application.itemManager.itemsReferencingItem(note.uuid).length).to.equal(0)
+    expect(this.application.itemManager.itemsReferencingItem(note).length).to.equal(0)
     expect(tag.noteCount).to.equal(0)
   })
 
@@ -208,7 +214,7 @@ describe('notes and tags', () => {
     let note = this.application.itemManager.notes[0]
     let tag = this.application.itemManager.tags[0]
 
-    const duplicateTag = await this.application.itemManager.duplicateItem(tag.uuid, true)
+    const duplicateTag = await this.application.itemManager.duplicateItem(tag, true)
     await this.application.syncService.sync(syncOptions)
 
     note = this.application.itemManager.findItem(note.uuid)
@@ -220,7 +226,7 @@ describe('notes and tags', () => {
     expect(duplicateTag.content.references.length).to.equal(1)
     expect(duplicateTag.noteCount).to.equal(1)
 
-    const noteTags = this.application.itemManager.itemsReferencingItem(note.uuid)
+    const noteTags = this.application.itemManager.itemsReferencingItem(note)
     expect(noteTags.length).to.equal(2)
 
     const noteTag1 = noteTags[0]
@@ -241,11 +247,11 @@ describe('notes and tags', () => {
       PayloadSource.LocalChanged,
     )
     const note = this.application.itemManager.getItems([ContentType.Note])[0]
-    const duplicateNote = await this.application.itemManager.duplicateItem(note.uuid, true)
+    const duplicateNote = await this.application.itemManager.duplicateItem(note, true)
     expect(note.uuid).to.not.equal(duplicateNote.uuid)
 
-    expect(this.application.itemManager.itemsReferencingItem(duplicateNote.uuid).length).to.equal(
-      this.application.itemManager.itemsReferencingItem(note.uuid).length,
+    expect(this.application.itemManager.itemsReferencingItem(duplicateNote).length).to.equal(
+      this.application.itemManager.itemsReferencingItem(note).length,
     )
   })
 
@@ -264,11 +270,11 @@ describe('notes and tags', () => {
     expect(tag.noteCount).to.equal(1)
 
     expect(note.content.references.length).to.equal(0)
-    expect(this.application.itemManager.itemsReferencingItem(note.uuid).length).to.equal(1)
+    expect(this.application.itemManager.itemsReferencingItem(note).length).to.equal(1)
 
-    await this.application.itemManager.setItemToBeDeleted(tag.uuid)
+    await this.application.itemManager.setItemToBeDeleted(tag)
     tag = this.application.itemManager.findItem(tag.uuid)
-    expect(tag.content).to.not.be.ok
+    expect(tag).to.not.be.ok
   })
 
   it('modifying item content should not modify payload content', async function () {
@@ -279,7 +285,7 @@ describe('notes and tags', () => {
     )
     let note = this.application.itemManager.getItems([ContentType.Note])[0]
     note = await this.application.mutator.changeAndSaveItem(
-      note.uuid,
+      note,
       (mutator) => {
         mutator.content.title = Math.random()
       },
@@ -306,12 +312,11 @@ describe('notes and tags', () => {
     let tag = this.application.itemManager.getItems([ContentType.Tag])[0]
 
     await this.application.syncService.sync(syncOptions)
-    await this.application.itemManager.setItemToBeDeleted(tag.uuid)
+    await this.application.itemManager.setItemToBeDeleted(tag)
 
     note = this.application.itemManager.findItem(note.uuid)
-    tag = this.application.itemManager.findItem(tag.uuid)
+    this.application.itemManager.findItem(tag.uuid)
 
-    expect(tag.dirty).to.equal(true)
     expect(note.dirty).to.not.be.ok
   })
 
@@ -329,9 +334,7 @@ describe('notes and tags', () => {
         sortDirection: 'dsc',
       }),
     )
-    const titles = this.application.items
-      .getDisplayableItems(ContentType.Note)
-      .map((note) => note.title)
+    const titles = this.application.items.getDisplayableNotes().map((note) => note.title)
     expect(titles).to.deep.equal(['A', 'B', 'Y', 'Z'])
   })
 
@@ -367,7 +370,7 @@ describe('notes and tags', () => {
     it('should match a tag', async function () {
       const taggedNote = await Factory.createMappedNote(this.application)
       const tag = await this.application.mutator.findOrCreateTag('A')
-      await this.application.mutator.changeItem(tag.uuid, (mutator) => {
+      await this.application.mutator.changeItem(tag, (mutator) => {
         mutator.addItemAsRelationship(taggedNote)
       })
       await this.application.mutator.insertItem(
@@ -382,7 +385,7 @@ describe('notes and tags', () => {
           tags: [tag],
         }),
       )
-      const displayedNotes = this.application.items.getDisplayableItems(ContentType.Note)
+      const displayedNotes = this.application.items.getDisplayableNotes()
       expect(displayedNotes.length).to.equal(1)
       expect(displayedNotes[0].uuid).to.equal(taggedNote.uuid)
     })
@@ -391,11 +394,11 @@ describe('notes and tags', () => {
       const taggedNote = await Factory.createMappedNote(this.application)
       const trashedNote = await Factory.createMappedNote(this.application)
       const tag = await this.application.mutator.findOrCreateTag('A')
-      await this.application.mutator.changeItem(tag.uuid, (mutator) => {
+      await this.application.mutator.changeItem(tag, (mutator) => {
         mutator.addItemAsRelationship(taggedNote)
         mutator.addItemAsRelationship(trashedNote)
       })
-      await this.application.mutator.changeItem(trashedNote.uuid, (mutator) => {
+      await this.application.mutator.changeItem(trashedNote, (mutator) => {
         mutator.trashed = true
       })
       this.application.items.setNotesDisplayCriteria(
@@ -406,7 +409,7 @@ describe('notes and tags', () => {
           includeTrashed: false,
         }),
       )
-      const displayedNotes = this.application.items.getDisplayableItems(ContentType.Note)
+      const displayedNotes = this.application.items.getDisplayableNotes()
       expect(displayedNotes.length).to.equal(1)
       expect(displayedNotes[0].uuid).to.equal(taggedNote.uuid)
     })
@@ -422,11 +425,11 @@ describe('notes and tags', () => {
         }),
       )
       const Bnote = this.application.itemManager.notes.find((note) => note.title === 'B')
-      await this.application.mutator.changeItem(Bnote.uuid, (mutator) => {
+      await this.application.mutator.changeItem(Bnote, (mutator) => {
         mutator.pinned = true
       })
       const tag = await this.application.mutator.findOrCreateTag('A')
-      await this.application.mutator.changeItem(tag.uuid, (mutator) => {
+      await this.application.mutator.changeItem(tag, (mutator) => {
         for (const note of this.application.itemManager.notes) {
           mutator.addItemAsRelationship(note)
         }
@@ -440,7 +443,7 @@ describe('notes and tags', () => {
         }),
       )
 
-      const displayedNotes = this.application.items.getDisplayableItems(ContentType.Note)
+      const displayedNotes = this.application.items.getDisplayableNotes()
       expect(displayedNotes).to.have.length(4)
       expect(displayedNotes[0].title).to.equal('B')
       expect(displayedNotes[1].title).to.equal('A')
@@ -478,7 +481,7 @@ describe('notes and tags', () => {
         }),
       )
 
-      const displayedNotes = this.application.items.getDisplayableItems(ContentType.Note)
+      const displayedNotes = this.application.items.getDisplayableNotes()
       expect(displayedNotes).to.deep.equal(matches)
       expect(matches.length).to.equal(1)
       expect(matches[0].uuid).to.equal(note.uuid)
@@ -490,7 +493,7 @@ describe('notes and tags', () => {
           title: 'A',
         }),
       )
-      await this.application.mutator.changeItem(note.uuid, (mutator) => {
+      await this.application.mutator.changeItem(note, (mutator) => {
         mutator.pinned = true
       })
       await this.application.mutator.insertItem(
@@ -518,7 +521,7 @@ describe('notes and tags', () => {
         }),
       )
 
-      const displayedNotes = this.application.items.getDisplayableItems(ContentType.Note)
+      const displayedNotes = this.application.items.getDisplayableNotes()
       expect(displayedNotes).to.deep.equal(matches)
       expect(matches.length).to.equal(1)
       expect(matches[0].uuid).to.equal(note.uuid)
@@ -530,7 +533,7 @@ describe('notes and tags', () => {
           title: 'A',
         }),
       )
-      await this.application.mutator.changeItem(pinnedNote.uuid, (mutator) => {
+      await this.application.mutator.changeItem(pinnedNote, (mutator) => {
         mutator.pinned = true
       })
       const unpinnedNote = await this.application.mutator.insertItem(
@@ -557,7 +560,7 @@ describe('notes and tags', () => {
         }),
       )
 
-      const displayedNotes = this.application.items.getDisplayableItems(ContentType.Note)
+      const displayedNotes = this.application.items.getDisplayableNotes()
       expect(displayedNotes).to.deep.equal(matches)
       expect(matches.length).to.equal(1)
       expect(matches[0].uuid).to.equal(unpinnedNote.uuid)
@@ -594,7 +597,7 @@ describe('notes and tags', () => {
           views: [view],
         }),
       )
-      const displayedNotes = this.application.items.getDisplayableItems(ContentType.Note)
+      const displayedNotes = this.application.items.getDisplayableNotes()
       expect(displayedNotes).to.deep.equal(matches)
       expect(matches.length).to.equal(1)
       expect(matches[0].uuid).to.equal(longNote.uuid)
@@ -606,22 +609,28 @@ describe('notes and tags', () => {
         email: Factory.generateUuid(),
         password: Factory.generateUuid(),
       })
+
       const recentNote = await this.application.mutator.insertItem(
         await this.application.mutator.createTemplateItem(ContentType.Note, {
           title: 'A',
         }),
       )
+
       await this.application.sync.sync()
+
       const olderNote = await this.application.mutator.insertItem(
         await this.application.mutator.createTemplateItem(ContentType.Note, {
           title: 'B',
           text: 'b',
         }),
       )
-      await this.application.mutator.changeItem(olderNote.uuid, (mutator) => {
-        const threeDays = 3 * 24 * 60 * 60 * 1000
-        mutator.updated_at = new Date(Date.now() - threeDays)
-      })
+
+      const threeDays = 3 * 24 * 60 * 60 * 1000
+      await Factory.changePayloadUpdatedAt(
+        this.application,
+        olderNote.payload,
+        new Date(Date.now() - threeDays),
+      )
 
       /** Create an unsynced note which shouldn't get an updated_at */
       await this.application.mutator.insertItem(
@@ -648,7 +657,7 @@ describe('notes and tags', () => {
           views: [view],
         }),
       )
-      const displayedNotes = this.application.items.getDisplayableItems(ContentType.Note)
+      const displayedNotes = this.application.items.getDisplayableNotes()
       expect(displayedNotes).to.deep.equal(matches)
       expect(matches.length).to.equal(1)
       expect(matches[0].uuid).to.equal(recentNote.uuid)
@@ -662,7 +671,7 @@ describe('notes and tags', () => {
       )
       const taggedNote = await Factory.createMappedNote(this.application)
       const tag = await this.application.mutator.findOrCreateTag('A')
-      await this.application.mutator.changeItem(tag.uuid, (mutator) => {
+      await this.application.mutator.changeItem(tag, (mutator) => {
         mutator.addItemAsRelationship(taggedNote)
       })
 
@@ -684,7 +693,7 @@ describe('notes and tags', () => {
           views: [view],
         }),
       )
-      const displayedNotes = this.application.items.getDisplayableItems(ContentType.Note)
+      const displayedNotes = this.application.items.getDisplayableNotes()
       expect(displayedNotes).to.deep.equal(matches)
       expect(matches.length).to.equal(1)
       expect(matches[0].uuid).to.equal(untaggedNote.uuid)
@@ -693,7 +702,7 @@ describe('notes and tags', () => {
     it('"tags", "includes", ["title", "startsWith", "b"]', async function () {
       const taggedNote = await Factory.createMappedNote(this.application)
       const tag = await this.application.mutator.findOrCreateTag('B')
-      await this.application.mutator.changeItem(tag.uuid, (mutator) => {
+      await this.application.mutator.changeItem(tag, (mutator) => {
         mutator.addItemAsRelationship(taggedNote)
       })
       await this.application.mutator.insertItem(
@@ -720,7 +729,7 @@ describe('notes and tags', () => {
           views: [view],
         }),
       )
-      const displayedNotes = this.application.items.getDisplayableItems(ContentType.Note)
+      const displayedNotes = this.application.items.getDisplayableNotes()
       expect(displayedNotes).to.deep.equal(matches)
       expect(matches.length).to.equal(1)
       expect(matches[0].uuid).to.equal(taggedNote.uuid)
@@ -728,7 +737,7 @@ describe('notes and tags', () => {
 
     it('"ignored", "and", [["pinned", "=", true], ["locked", "=", true]]', async function () {
       const pinnedAndLockedNote = await Factory.createMappedNote(this.application)
-      await this.application.mutator.changeItem(pinnedAndLockedNote.uuid, (mutator) => {
+      await this.application.mutator.changeItem(pinnedAndLockedNote, (mutator) => {
         mutator.pinned = true
         mutator.locked = true
       })
@@ -738,7 +747,7 @@ describe('notes and tags', () => {
           title: 'A',
         }),
       )
-      await this.application.mutator.changeItem(pinnedNote.uuid, (mutator) => {
+      await this.application.mutator.changeItem(pinnedNote, (mutator) => {
         mutator.pinned = true
       })
 
@@ -747,7 +756,7 @@ describe('notes and tags', () => {
           title: 'A',
         }),
       )
-      await this.application.mutator.changeItem(lockedNote.uuid, (mutator) => {
+      await this.application.mutator.changeItem(lockedNote, (mutator) => {
         mutator.locked = true
       })
 
@@ -771,7 +780,7 @@ describe('notes and tags', () => {
           views: [view],
         }),
       )
-      const displayedNotes = this.application.items.getDisplayableItems(ContentType.Note)
+      const displayedNotes = this.application.items.getDisplayableNotes()
       expect(displayedNotes).to.deep.equal(matches)
       expect(matches.length).to.equal(1)
       expect(matches[0].uuid).to.equal(pinnedAndLockedNote.uuid)
@@ -779,7 +788,7 @@ describe('notes and tags', () => {
 
     it('"ignored", "or", [["content.protected", "=", true], ["pinned", "=", true]]', async function () {
       const protectedNote = await Factory.createMappedNote(this.application)
-      await this.application.mutator.changeItem(protectedNote.uuid, (mutator) => {
+      await this.application.mutator.changeItem(protectedNote, (mutator) => {
         mutator.protected = true
       })
 
@@ -788,7 +797,7 @@ describe('notes and tags', () => {
           title: 'A',
         }),
       )
-      await this.application.mutator.changeItem(pinnedNote.uuid, (mutator) => {
+      await this.application.mutator.changeItem(pinnedNote, (mutator) => {
         mutator.pinned = true
       })
 
@@ -797,7 +806,7 @@ describe('notes and tags', () => {
           title: 'A',
         }),
       )
-      await this.application.mutator.changeItem(pinnedAndProtectedNote.uuid, (mutator) => {
+      await this.application.mutator.changeItem(pinnedAndProtectedNote, (mutator) => {
         mutator.pinned = true
         mutator.protected = true
       })
@@ -828,7 +837,7 @@ describe('notes and tags', () => {
           views: [view],
         }),
       )
-      const displayedNotes = this.application.items.getDisplayableItems(ContentType.Note)
+      const displayedNotes = this.application.items.getDisplayableNotes()
       expect(displayedNotes.length).to.equal(matches.length)
       expect(matches.length).to.equal(3)
       expect(matches.find((note) => note.uuid === protectedNote.uuid)).to.exist
@@ -862,7 +871,7 @@ describe('notes and tags', () => {
       }),
     )
 
-    const displayedNotes = this.application.items.getDisplayableItems(ContentType.Note)
+    const displayedNotes = this.application.items.getDisplayableNotes()
     expect(displayedNotes.length).to.equal(2)
     expect(displayedNotes[0].uuid).to.equal(notePayload1.uuid)
     expect(displayedNotes[1].uuid).to.equal(notePayload4.uuid)
@@ -893,7 +902,7 @@ describe('notes and tags', () => {
       }),
     )
 
-    const displayedNotes = this.application.items.getDisplayableItems(ContentType.Note)
+    const displayedNotes = this.application.items.getDisplayableNotes()
     expect(displayedNotes.length).to.equal(3)
     expect(displayedNotes[0].uuid).to.equal(notePayload1.uuid)
     expect(displayedNotes[1].uuid).to.equal(notePayload2.uuid)

@@ -117,8 +117,8 @@ describe('migrations', () => {
     })
     await application.launch(true)
 
-    const mfaItem = CreateItemFromPayload(
-      CreateMaxPayloadFromAnyObject({
+    const mfaItem = CreateDecryptedItemFromPayload(
+      new DecryptedPayload({
         uuid: '123',
         content_type: 'SF|MFA',
         content: FillItemContent({
@@ -158,8 +158,8 @@ describe('migrations', () => {
     })
     await application.launch(true)
 
-    const noDistractionItem = CreateItemFromPayload(
-      CreateMaxPayloadFromAnyObject({
+    const noDistractionItem = CreateDecryptedItemFromPayload(
+      new DecryptedPayload({
         uuid: '123',
         content_type: ContentType.Theme,
         content: FillItemContent({

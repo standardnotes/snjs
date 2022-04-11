@@ -1,7 +1,10 @@
-import { ImmutablePayloadCollection } from '../Collection/ImmutablePayloadCollection'
-import { ImmutablePayloadCollectionSet } from '../Collection/ImmutablePayloadCollectionSet'
+import { ImmutablePayloadCollection } from '../Collection/Payload/ImmutablePayloadCollection'
+import { ImmutablePayloadCollectionSet } from '../Collection/Payload/ImmutablePayloadCollectionSet'
 import { HistoryMap } from '../History/HistoryMap'
-import { PayloadSource } from '../../Abstract/Payload/PayloadSource'
+import { PayloadSource } from '../../Abstract/Payload/Types/PayloadSource'
+import { Uuid } from '@standardnotes/common'
+import { FullyFormedPayloadInterface } from '../../Abstract/Payload'
+import { DeltaInterface } from './DeltaInterface'
 /**
  * A payload delta is a class that defines instructions that process an incoming collection
  * of payloads, applies some set of operations on those payloads wrt to the current base state,
@@ -18,7 +21,12 @@ import { PayloadSource } from '../../Abstract/Payload/PayloadSource'
  * baseCollection, the data the server is sending as applyCollection, and determine what
  * the end state of the data should look like.
  */
-export class PayloadsDelta {
+export abstract class PayloadsDelta<
+  Base extends FullyFormedPayloadInterface,
+  Apply extends FullyFormedPayloadInterface,
+  Result extends FullyFormedPayloadInterface,
+> implements DeltaInterface<Base, Result>
+{
   /**
    * @param baseCollection The authoratitive collection on top of which to compute changes.
    * @param applyCollection The collection of payloads to apply, from one given source only.
@@ -26,26 +34,22 @@ export class PayloadsDelta {
    *                             that may be neccessary to carry out computation.
    */
   constructor(
-    protected readonly baseCollection: ImmutablePayloadCollection,
-    protected readonly applyCollection: ImmutablePayloadCollection,
-    protected readonly relatedCollectionSet?: ImmutablePayloadCollectionSet,
+    readonly baseCollection: ImmutablePayloadCollection<Base>,
+    protected readonly applyCollection: ImmutablePayloadCollection<Apply>,
+    protected readonly relatedCollectionSet?: ImmutablePayloadCollectionSet<FullyFormedPayloadInterface>,
     protected readonly historyMap?: HistoryMap,
   ) {}
 
-  // eslint-disable-next-line @typescript-eslint/require-await
-  public async resultingCollection(): Promise<ImmutablePayloadCollection> {
-    throw 'Must override PayloadDelta.resultingCollection.'
+  public abstract resultingCollection(): Promise<ImmutablePayloadCollection<Result>>
+
+  findBasePayload(uuid: Uuid): Base | undefined {
+    return this.baseCollection.find(uuid)
   }
 
-  /**
-   * @param id  - The uuid of the payload to find
-   */
-  protected findBasePayload(id: string) {
-    return this.baseCollection.find(id)
-  }
-
-  protected findRelatedPayload(id: string, source: PayloadSource) {
-    const collection = this.relatedCollectionSet?.collectionForSource(source)
-    return collection?.find(id)
+  protected findRelatedPostProcessedPayload(uuid: Uuid): FullyFormedPayloadInterface | undefined {
+    const collection = this.relatedCollectionSet?.collectionForSource(
+      PayloadSource.PossiblyDecryptedSyncPostProcessed,
+    )
+    return collection?.find(uuid)
   }
 }

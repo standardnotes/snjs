@@ -1,5 +1,5 @@
 import { SNPureCrypto, StreamEncryptor, SodiumConstant } from '@standardnotes/sncrypto-common'
-import { DecryptedFileInterface } from '../types'
+import { DecryptedFileInterface } from '../Types'
 import { FileEncryptor } from './FileEncryptor'
 
 describe('file encryptor', () => {

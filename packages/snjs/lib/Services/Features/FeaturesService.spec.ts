@@ -1,4 +1,4 @@
-import { SNComponent, SNFeatureRepo, SNItem } from '@standardnotes/models'
+import { ItemInterface, SNComponent, SNFeatureRepo } from '@standardnotes/models'
 import { SNSyncService } from '../Sync/SyncService'
 import { SettingName } from '@standardnotes/settings'
 import {
@@ -32,7 +32,7 @@ describe('featuresService', () => {
   let crypto: SNPureCrypto
   let roles: RoleName[]
   let features: FeatureDescription[]
-  let items: SNItem[]
+  let items: ItemInterface[]
   let now: Date
   let tomorrow_server: number
   let tomorrow_client: number
@@ -73,7 +73,7 @@ describe('featuresService', () => {
       },
     ] as jest.Mocked<FeatureDescription[]>
 
-    items = [] as jest.Mocked<SNItem[]>
+    items = [] as jest.Mocked<ItemInterface[]>
 
     storageService = {} as jest.Mocked<SNStorageService>
     storageService.setValue = jest.fn()
@@ -95,7 +95,7 @@ describe('featuresService', () => {
     itemManager.getItems = jest.fn().mockReturnValue(items)
     itemManager.createItem = jest.fn()
     itemManager.createTemplateItem = jest.fn().mockReturnValue({})
-    itemManager.changeComponent = jest.fn().mockReturnValue({} as jest.Mocked<SNItem>)
+    itemManager.changeComponent = jest.fn().mockReturnValue({} as jest.Mocked<ItemInterface>)
     itemManager.setItemsToBeDeleted = jest.fn()
     itemManager.addObserver = jest.fn()
     itemManager.changeItem = jest.fn()
@@ -283,7 +283,7 @@ describe('featuresService', () => {
       const existingItem = new SNComponent({
         uuid: '789',
         content_type: ContentType.Component,
-        safeContent: {
+        content: {
           package_info: {
             identifier: FeatureIdentifier.BoldEditor,
             valid_until: new Date(),
@@ -296,10 +296,10 @@ describe('featuresService', () => {
       storageService.getValue = jest.fn().mockReturnValue(roles)
       itemManager.getItems = jest.fn().mockReturnValue([existingItem])
       const featuresService = createService()
-      await featuresService.initializeFromDisk()
+      featuresService.initializeFromDisk()
       await featuresService.updateRolesAndFetchFeatures('123', newRoles)
 
-      expect(itemManager.changeComponent).toHaveBeenCalledWith('789', expect.any(Function))
+      expect(itemManager.changeComponent).toHaveBeenCalledWith(existingItem, expect.any(Function))
     })
 
     it('creates items for expired components if they do not exist', async () => {
@@ -341,7 +341,7 @@ describe('featuresService', () => {
       const existingItem = new SNComponent({
         uuid: '456',
         content_type: ContentType.Theme,
-        safeContent: {
+        content: {
           package_info: {
             identifier: FeatureIdentifier.MidnightTheme,
             valid_until: new Date(),
@@ -371,7 +371,7 @@ describe('featuresService', () => {
       const featuresService = createService()
       await featuresService.initializeFromDisk()
       await featuresService.updateRolesAndFetchFeatures('123', newRoles)
-      expect(itemManager.setItemsToBeDeleted).toHaveBeenCalledWith(['456'])
+      expect(itemManager.setItemsToBeDeleted).toHaveBeenCalledWith([existingItem])
     })
 
     it('does not create an item for a feature without content type', async () => {
@@ -553,7 +553,7 @@ describe('featuresService', () => {
           new SNComponent({
             uuid: '123',
             content_type: ContentType.Theme,
-            safeContent: {
+            content: {
               valid_until: themeFeature.expires_at,
               package_info: {
                 ...themeFeature,
@@ -563,7 +563,7 @@ describe('featuresService', () => {
           new SNComponent({
             uuid: '456',
             content_type: ContentType.Component,
-            safeContent: {
+            content: {
               valid_until: new Date(editorFeature.expires_at),
               package_info: {
                 ...editorFeature,
@@ -748,7 +748,7 @@ describe('featuresService', () => {
       const extensionRepoItem = new SNFeatureRepo({
         uuid: '456',
         content_type: ContentType.ExtensionRepo,
-        safeContent: {
+        content: {
           url: `https://extensions.standardnotes.org/${extensionKey}`,
         },
       } as never)

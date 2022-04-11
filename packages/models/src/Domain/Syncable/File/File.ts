@@ -1,6 +1,6 @@
-import { SNItem } from '../../Abstract/Item/Item'
-import { ItemContent } from '../../Abstract/Item/ItemContent'
-import { PayloadInterface } from '../../Abstract/Payload/PayloadInterface'
+import { DecryptedItem } from '../../Abstract/Item/Implementations/DecryptedItem'
+import { ItemContent } from '../../Abstract/Content/ItemContent'
+import { DecryptedPayloadInterface } from '../../Abstract/Payload/Interfaces/DecryptedPayload'
 import { FileMetadata } from './FileMetadata'
 import { FileProtocolV1 } from './FileProtocolV1'
 
@@ -17,7 +17,7 @@ export interface FileContentSpecialized extends FileMetadata {
 export type FileContent = FileContentSpecialized & ItemContent
 
 export class SNFile
-  extends SNItem<FileContent>
+  extends DecryptedItem<FileContent>
   implements FileContentSpecialized, FileProtocolV1, FileMetadata
 {
   public readonly remoteIdentifier: string
@@ -28,18 +28,14 @@ export class SNFile
   public readonly chunkSizes: number[]
   public readonly mimeType: string
 
-  constructor(payload: PayloadInterface<FileContent>) {
+  constructor(payload: DecryptedPayloadInterface<FileContent>) {
     super(payload)
-    this.remoteIdentifier = this.typedContent.remoteIdentifier
-    this.name = this.typedContent.name
-    this.key = this.typedContent.key
-    this.size = this.typedContent.size
-    this.encryptionHeader = this.typedContent.encryptionHeader
-    this.chunkSizes = this.typedContent.chunkSizes
-    this.mimeType = this.typedContent.mimeType
-  }
-
-  private get typedContent(): FileContentSpecialized {
-    return this.safeContent as unknown as FileContentSpecialized
+    this.remoteIdentifier = this.content.remoteIdentifier
+    this.name = this.content.name
+    this.key = this.content.key
+    this.size = this.content.size
+    this.encryptionHeader = this.content.encryptionHeader
+    this.chunkSizes = this.content.chunkSizes
+    this.mimeType = this.content.mimeType
   }
 }

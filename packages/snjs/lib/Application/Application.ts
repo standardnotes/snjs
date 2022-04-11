@@ -13,6 +13,8 @@ import { UuidString, DeinitSource, ApplicationEventPayload } from '../Types'
 import { ApplicationEvent, applicationEventForSyncEvent } from '@Lib/Application/Event'
 import { Environment, Platform } from './Platforms'
 import { SNLog } from '../Log'
+import { useBoolean } from '@standardnotes/utils'
+import { DecryptedItemInterface } from '@standardnotes/models'
 
 /** How often to automatically sync, in milliseconds */
 const DEFAULT_AUTO_SYNC_INTERVAL = 30_000
@@ -25,7 +27,12 @@ type ApplicationObserver = {
   singleEvent?: ApplicationEvent
   callback: ApplicationEventCallback
 }
-type ItemStream = (items: Models.SNItem[], source: Models.PayloadSource) => void
+type ItemStream<I extends DecryptedItemInterface> = (data: {
+  changed: I[]
+  inserted: I[]
+  removed: (Models.DeletedItemInterface | Models.EncryptedItemInterface)[]
+  source: Models.PayloadSource
+}) => void
 type ObserverRemover = () => void
 
 /** The main entrypoint of an application. */
@@ -192,7 +199,7 @@ export class SNApplication implements InternalServices.ListedClientInterface {
         return undefined
       })
 
-    this.createdNewDatabase = databaseResult?.isNewDatabase || false
+    this.createdNewDatabase = useBoolean(databaseResult?.isNewDatabase, false)
 
     await this.migrationService.initialize()
 
@@ -249,7 +256,6 @@ export class SNApplication implements InternalServices.ListedClientInterface {
     this.webSocketsService.loadWebSocketUrl()
     await this.sessionManager.initializeFromDisk()
 
-    void this.historyManager.initializeFromDisk()
     this.settingsService.initializeFromDisk()
 
     this.featuresService.initializeFromDisk()
@@ -383,6 +389,7 @@ export class SNApplication implements InternalServices.ListedClientInterface {
     if (await this.protectionService.authorizeSessionRevoking()) {
       return this.sessionManager.revokeSession(sessionId)
     }
+    return undefined
   }
 
   /**
@@ -415,23 +422,30 @@ export class SNApplication implements InternalServices.ListedClientInterface {
    * immediately with the present items that match the constraint, and over time whenever
    * items matching the constraint are added, changed, or deleted.
    */
-  public streamItems(
+  public streamItems<I extends DecryptedItemInterface = DecryptedItemInterface>(
     contentType: Common.ContentType | Common.ContentType[],
-    stream: ItemStream,
+    stream: ItemStream<I>,
   ): () => void {
-    const observer = this.itemManager.addObserver(
+    const observer = this.itemManager.addObserver<I>(
       contentType,
-      (changed, inserted, discarded, _ignored, source) => {
-        const all = changed.concat(inserted).concat(discarded)
-        stream(all, source)
+      ({ changed, inserted, removed, source }) => {
+        stream({ changed, inserted, removed, source })
       },
     )
+
     /** Push current values now */
-    const matches = this.itemManager.getItems(contentType)
+    const matches = this.itemManager.getItems<I>(contentType)
     if (matches.length > 0) {
-      stream(matches, Models.PayloadSource.InitialObserverRegistrationPush)
+      stream({
+        inserted: matches,
+        changed: [],
+        removed: [],
+        source: Models.PayloadSource.InitialObserverRegistrationPush,
+      })
     }
+
     this.streamRemovers.push(observer)
+
     return () => {
       observer()
       Utils.removeFromArray(this.streamRemovers, observer)
@@ -1053,7 +1067,7 @@ export class SNApplication implements InternalServices.ListedClientInterface {
     this.integrityService = new ExternalServices.IntegrityService(
       this.apiService,
       this.apiService,
-      this.itemManager,
+      this.payloadManager,
       this.internalEventBus,
     )
 
@@ -1182,7 +1196,6 @@ export class SNApplication implements InternalServices.ListedClientInterface {
       this.alertService,
       this.environment,
       this.platform,
-      this.options.runtime,
       this.internalEventBus,
     )
     this.services.push(this.componentManager)
@@ -1205,6 +1218,7 @@ export class SNApplication implements InternalServices.ListedClientInterface {
   private createSingletonManager() {
     this.singletonManager = new InternalServices.SNSingletonManager(
       this.itemManager,
+      this.payloadManager,
       this.syncService,
       this.internalEventBus,
     )

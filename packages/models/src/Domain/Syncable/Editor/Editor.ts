@@ -1,7 +1,7 @@
-import { SNItem } from '../../Abstract/Item/Item'
-import { ItemContent } from '../../Abstract/Item/ItemContent'
+import { DecryptedItem } from '../../Abstract/Item/Implementations/DecryptedItem'
+import { ItemContent } from '../../Abstract/Content/ItemContent'
+import { DecryptedPayloadInterface } from '../../Abstract/Payload/Interfaces/DecryptedPayload'
 import { SNNote } from '../Note/Note'
-import { PayloadInterface } from '../../Abstract/Payload/PayloadInterface'
 
 interface EditorContent extends ItemContent {
   notes: SNNote[]
@@ -16,7 +16,7 @@ interface EditorContent extends ItemContent {
  * @deprecated
  * Editor objects are depracated in favor of SNComponent objects
  */
-export class SNEditor extends SNItem<EditorContent> {
+export class SNEditor extends DecryptedItem<EditorContent> {
   public readonly notes: SNNote[] = []
   public readonly data: Record<string, unknown> = {}
   public readonly url: string
@@ -24,12 +24,12 @@ export class SNEditor extends SNItem<EditorContent> {
   public readonly isDefault: boolean
   public readonly systemEditor: boolean
 
-  constructor(payload: PayloadInterface<EditorContent>) {
+  constructor(payload: DecryptedPayloadInterface<EditorContent>) {
     super(payload)
-    this.url = payload.safeContent.url
-    this.name = payload.safeContent.name
-    this.data = payload.safeContent.data || {}
-    this.isDefault = payload.safeContent.default
-    this.systemEditor = payload.safeContent.systemEditor
+    this.url = payload.content.url
+    this.name = payload.content.name
+    this.data = payload.content.data || {}
+    this.isDefault = payload.content.default
+    this.systemEditor = payload.content.systemEditor
   }
 }

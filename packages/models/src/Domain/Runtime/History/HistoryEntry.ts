@@ -1,20 +1,19 @@
-import { ItemInterface } from './../../Abstract/Item/ItemInterface'
+import { DecryptedItemInterface } from './../../Abstract/Item/Interfaces/DecryptedItem'
+import { DecryptedPayloadInterface } from './../../Abstract/Payload/Interfaces/DecryptedPayload'
 import { isNullOrUndefined } from '@standardnotes/utils'
-import { CreateItemFromPayload } from '../../Abstract/Item/Generator'
-import { SurePayload } from '../../Abstract/Payload/SurePayload'
-import { CopyPayload } from '../../Abstract/Payload/Utilities/Functions'
+import { CreateDecryptedItemFromPayload } from '../../Utilities/Item/ItemGenerator'
 import { NoteContent } from '../../Syncable/Note'
 import { HistoryEntryInterface } from './HistoryEntryInterface'
 
 export class HistoryEntry implements HistoryEntryInterface {
-  public readonly payload: SurePayload<NoteContent>
+  public readonly payload: DecryptedPayloadInterface<NoteContent>
   public readonly previousEntry?: HistoryEntry
   protected readonly defaultContentKeyToDiffOn: keyof NoteContent = 'text'
   protected readonly textCharDiffLength: number
   protected readonly hasPreviousEntry: boolean
 
-  constructor(payload: SurePayload<NoteContent>, previousEntry?: HistoryEntry) {
-    this.payload = CopyPayload(payload) as SurePayload<NoteContent>
+  constructor(payload: DecryptedPayloadInterface<NoteContent>, previousEntry?: HistoryEntry) {
+    this.payload = payload.copy()
     this.previousEntry = previousEntry
     this.hasPreviousEntry = !isNullOrUndefined(previousEntry)
     /** We'll try to compute the delta based on an assumed
@@ -34,8 +33,8 @@ export class HistoryEntry implements HistoryEntryInterface {
     }
   }
 
-  public itemFromPayload(): ItemInterface {
-    return CreateItemFromPayload(this.payload)
+  public itemFromPayload(): DecryptedItemInterface {
+    return CreateDecryptedItemFromPayload(this.payload)
   }
 
   public isSameAsEntry(entry: HistoryEntry): boolean {

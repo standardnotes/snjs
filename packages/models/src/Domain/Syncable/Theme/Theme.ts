@@ -1,26 +1,26 @@
 import { ComponentArea } from '@standardnotes/features'
 import { SNComponent } from '../Component/Component'
-import { SNItem } from '../../Abstract/Item/Item'
-import { ConflictStrategy } from '../../Abstract/Item/ConflictStrategy'
-import { AppDataField } from '../../Abstract/Item/AppDataField'
+import { ConflictStrategy } from '../../Abstract/Item/Types/ConflictStrategy'
+import { AppDataField } from '../../Abstract/Item/Types/AppDataField'
 import { HistoryEntryInterface } from '../../Runtime/History'
+import { DecryptedItemInterface, ItemInterface } from '../../Abstract/Item'
+import { ContentType } from '@standardnotes/common'
+import { useBoolean } from '@standardnotes/utils'
+
+export const isTheme = (x: ItemInterface): x is SNTheme => x.content_type === ContentType.Theme
 
 export class SNTheme extends SNComponent {
-  public area: ComponentArea = ComponentArea.Themes
+  public override area: ComponentArea = ComponentArea.Themes
 
   isLayerable(): boolean {
-    return (this.package_info && this.package_info.layerable) || false
+    return useBoolean(this.package_info && this.package_info.layerable, false)
   }
 
   /** Do not duplicate under most circumstances. Always keep original */
-  strategyWhenConflictingWithItem(
-    item: SNItem,
-    previousRevision?: HistoryEntryInterface,
+  override strategyWhenConflictingWithItem(
+    _item: DecryptedItemInterface,
+    _previousRevision?: HistoryEntryInterface,
   ): ConflictStrategy {
-    if (this.errorDecrypting) {
-      return super.strategyWhenConflictingWithItem(item, previousRevision)
-    }
-
     return ConflictStrategy.KeepLeft
   }
 

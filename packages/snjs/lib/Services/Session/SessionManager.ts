@@ -1,11 +1,16 @@
-import { AbstractService, InternalEventBusInterface } from '@standardnotes/services'
+import { AbstractService, InternalEventBusInterface, StorageKey } from '@standardnotes/services'
 import { Base64String } from '@standardnotes/sncrypto-common'
 import { ClientDisplayableError } from '@standardnotes/responses'
 import { CopyPayloadWithContentOverride } from '@standardnotes/models'
-import { EncryptionService, CreateNewRootKey } from '@standardnotes/encryption'
 import { isNullOrUndefined } from '@standardnotes/utils'
 import { JwtSession } from './Sessions/JwtSession'
-import { KeyParamsFromApiResponse, SNRootKeyParams, SNRootKey } from '@standardnotes/encryption'
+import {
+  KeyParamsFromApiResponse,
+  SNRootKeyParams,
+  SNRootKey,
+  EncryptionService,
+  CreateNewRootKey,
+} from '@standardnotes/encryption'
 import { PromptTitles, RegisterStrings, SessionStrings, SignInStrings } from '../Api/Messages'
 import { RemoteSession, RawStorageValue } from './Sessions/Types'
 import { Session } from './Sessions/Session'
@@ -16,7 +21,6 @@ import { SNAlertService } from '@Lib/Services/Alert/AlertService'
 import { SNApiService } from '../Api/ApiService'
 import { SNStorageService } from '../Storage/StorageService'
 import { SNWebSocketsService } from '../Api/WebsocketsService'
-import { StorageKey } from '@standardnotes/services'
 import { Strings } from '@Lib/Strings'
 import { Subscription } from '@standardnotes/auth'
 import { TokenSession } from './Sessions/TokenSession'
@@ -63,7 +67,7 @@ export class SNSessionManager
     private protocolService: EncryptionService,
     private challengeService: Challenge.ChallengeService,
     private webSocketsService: SNWebSocketsService,
-    protected internalEventBus: InternalEventBusInterface,
+    protected override internalEventBus: InternalEventBusInterface,
   ) {
     super(internalEventBus)
     apiService.setInvalidSessionObserver((revoked) => {
@@ -75,7 +79,7 @@ export class SNSessionManager
     })
   }
 
-  deinit(): void {
+  override deinit(): void {
     ;(this.protocolService as unknown) = undefined
     ;(this.storageService as unknown) = undefined
     ;(this.apiService as unknown) = undefined
@@ -91,27 +95,26 @@ export class SNSessionManager
     this.apiService.setUser(user)
   }
 
-  public async initializeFromDisk() {
-    this.setUser(await this.storageService.getValue(StorageKey.User))
+  public initializeFromDisk() {
+    this.setUser(this.storageService.getValue(StorageKey.User))
 
     if (!this.user) {
-      /** @legacy Check for uuid. */
-      const uuid = await this.storageService.getValue<string>(StorageKey.LegacyUuid)
-      if (uuid) {
-        this.setUser({ uuid: uuid, email: uuid })
+      const legacyUuidLookup = this.storageService.getValue<string>(StorageKey.LegacyUuid)
+      if (legacyUuidLookup) {
+        this.setUser({ uuid: legacyUuidLookup, email: legacyUuidLookup })
       }
     }
 
-    const rawSession = await this.storageService.getValue<RawStorageValue>(StorageKey.Session)
+    const rawSession = this.storageService.getValue<RawStorageValue>(StorageKey.Session)
     if (rawSession) {
       const session = SessionFromRawStorageValue(rawSession)
-      await this.setSession(session, false)
+      this.setSession(session, false)
       this.webSocketsService.startWebSocketConnection(session.authorizationValue)
     }
   }
 
-  private async setSession(session: Session, persist = true) {
-    await this.apiService.setSession(session, persist)
+  private setSession(session: Session, persist = true): void {
+    this.apiService.setSession(session, persist)
   }
 
   public online() {
@@ -240,7 +243,7 @@ export class SNSessionManager
     return (response as Responses.GetAvailableSubscriptionsResponse).data!
   }
 
-  private async promptForMfaValue() {
+  private async promptForMfaValue(): Promise<string | undefined> {
     const challenge = new Challenge.Challenge(
       [
         new Challenge.ChallengePrompt(
@@ -255,11 +258,15 @@ export class SNSessionManager
       true,
       SessionStrings.EnterMfa,
     )
+
     const response = await this.challengeService.promptForChallengeResponse(challenge)
+
     if (response) {
       this.challengeService.completeChallenge(challenge)
       return response.values[0].value as string
     }
+
+    return undefined
   }
 
   async register(
@@ -665,7 +672,7 @@ export class SNSessionManager
 
     this.setUser(user)
 
-    await this.storageService.setValue(StorageKey.User, user)
+    this.storageService.setValue(StorageKey.User, user)
 
     void this.apiService.setHost(host)
 

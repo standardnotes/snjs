@@ -1,6 +1,6 @@
 import { EncryptAndUploadFileOperation } from './EncryptAndUpload'
 import { SNPureCrypto, StreamEncryptor } from '@standardnotes/sncrypto-common'
-import { DecryptedFileInterface } from '../types'
+import { DecryptedFileInterface } from '../Types'
 import { FilesServerInterface } from '../FilesServerInterface'
 
 describe('encrypt and upload', () => {
@@ -28,7 +28,7 @@ describe('encrypt and upload', () => {
     }
   })
 
-  it('should initialize encryption header', async () => {
+  it('should initialize encryption header', () => {
     operation = new EncryptAndUploadFileOperation(file, 'api-token', crypto, apiService)
     const header = operation.initializeHeader()
 

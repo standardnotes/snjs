@@ -6,7 +6,7 @@ export class NoteHistoryEntry extends HistoryEntry {
     if (this.payload.updated_at.getTime() > 0) {
       return this.payload.updated_at.toLocaleString()
     } else {
-      return this.payload.created_at!.toLocaleString()
+      return this.payload.created_at.toLocaleString()
     }
   }
 
@@ -22,7 +22,7 @@ export class NoteHistoryEntry extends HistoryEntry {
     }
   }
 
-  public isDiscardable(): boolean {
-    return isEmpty(this.payload.safeContent.text)
+  public override isDiscardable(): boolean {
+    return isEmpty(this.payload.content.text)
   }
 }

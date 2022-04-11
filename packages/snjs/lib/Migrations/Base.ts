@@ -1,6 +1,10 @@
 import { AnyKeyParamsContent } from '@standardnotes/common'
 import { SNLog } from '@Lib/Log'
-import { CreateMaxPayloadFromAnyObject } from '@standardnotes/models'
+import {
+  EncryptedPayload,
+  EncryptedTransferPayload,
+  isErrorDecryptingPayload,
+} from '@standardnotes/models'
 import {
   ChallengeValidation,
   ChallengeReason,
@@ -24,7 +28,7 @@ const LastMigrationTimeStampKey2_0_0 = 'last_migration_timestamp'
  * to set up all other migrations.
  */
 export class BaseMigration extends Migration {
-  private reader?: StorageReader
+  private reader!: StorageReader
   private didPreRun = false
   private memoizedNeedsKeychainRepair?: boolean
 
@@ -100,7 +104,8 @@ export class BaseMigration extends Migration {
     if (this.reader) {
       return
     }
-    const version = (await this.getStoredVersion())!
+
+    const version = (await this.getStoredVersion()) as string
     this.reader = CreateReader(
       version,
       this.services.deviceInterface,
@@ -138,14 +143,14 @@ export class BaseMigration extends Migration {
       await this.loadReader()
     }
 
-    const usesKeychain = this.reader!.usesKeychain
+    const usesKeychain = this.reader.usesKeychain
     if (!usesKeychain) {
       /** Doesn't apply if this version did not use a keychain to begin with */
       this.memoizedNeedsKeychainRepair = false
       return this.memoizedNeedsKeychainRepair
     }
 
-    const rawAccountParams = await this.reader!.getAccountKeyParams()
+    const rawAccountParams = await this.reader.getAccountKeyParams()
     const hasAccountKeyParams = !isNullOrUndefined(rawAccountParams)
     if (!hasAccountKeyParams) {
       /** Doesn't apply if account is not involved */
@@ -153,14 +158,14 @@ export class BaseMigration extends Migration {
       return this.memoizedNeedsKeychainRepair
     }
 
-    const hasPasscode = await this.reader!.hasPasscode()
+    const hasPasscode = await this.reader.hasPasscode()
     if (hasPasscode) {
       /** Doesn't apply if using passcode, as keychain would be bypassed in that case */
       this.memoizedNeedsKeychainRepair = false
       return this.memoizedNeedsKeychainRepair
     }
 
-    const accountKeysMissing = !(await this.reader!.hasNonWrappedAccountKeys())
+    const accountKeysMissing = !(await this.reader.hasNonWrappedAccountKeys())
     if (!accountKeysMissing) {
       this.memoizedNeedsKeychainRepair = false
       return this.memoizedNeedsKeychainRepair
@@ -171,8 +176,8 @@ export class BaseMigration extends Migration {
   }
 
   private async repairMissingKeychain() {
-    const version = (await this.getStoredVersion())!
-    const rawAccountParams = await this.reader!.getAccountKeyParams()
+    const version = (await this.getStoredVersion()) as string
+    const rawAccountParams = await this.reader.getAccountKeyParams()
 
     /** Challenge for account password */
     const challenge = new Challenge(
@@ -189,6 +194,7 @@ export class BaseMigration extends Migration {
       KeychainRecoveryStrings.Title,
       KeychainRecoveryStrings.Text,
     )
+
     return new Promise((resolve) => {
       this.services.challengeService.addChallengeObserver(challenge, {
         onNonvalidatedSubmit: async (challengeResponse) => {
@@ -202,13 +208,14 @@ export class BaseMigration extends Migration {
           )
 
           /** Choose an item to decrypt */
-          const allItems = await this.services.deviceInterface.getAllRawDatabasePayloads(
-            this.services.identifier,
-          )
+          const allItems = (
+            await this.services.deviceInterface.getAllRawDatabasePayloads<EncryptedTransferPayload>(
+              this.services.identifier,
+            )
+          ).map((p) => new EncryptedPayload(p))
 
           let itemToDecrypt = allItems.find((item) => {
-            const payload = CreateMaxPayloadFromAnyObject(item)
-            return ContentTypeUsesRootKeyEncryption(payload.content_type)
+            return ContentTypeUsesRootKeyEncryption(item.content_type)
           })
 
           if (!itemToDecrypt) {
@@ -222,18 +229,18 @@ export class BaseMigration extends Migration {
             )
           }
 
-          const decryptedItem = await this.services.protocolService.decryptSplitSingle({
+          const decryptedPayload = await this.services.protocolService.decryptSplitSingle({
             usesRootKey: {
-              items: [CreateMaxPayloadFromAnyObject(itemToDecrypt)],
+              items: [itemToDecrypt],
               key: rootKey,
             },
           })
 
-          if (decryptedItem.errorDecrypting) {
+          if (isErrorDecryptingPayload(decryptedPayload)) {
             /** Wrong password, try again */
             this.services.challengeService.setValidationStatusForChallenge(
               challenge,
-              challengeResponse!.values[0],
+              challengeResponse.values[0],
               false,
             )
           } else {
@@ -261,6 +268,7 @@ export class BaseMigration extends Migration {
           }
         },
       })
+
       void this.services.challengeService.promptForChallengeResponse(challenge)
     })
   }

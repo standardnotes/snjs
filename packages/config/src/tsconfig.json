@@ -1,20 +1,23 @@
 {
   "compilerOptions": {
-    "target": "es6",
-    "module": "commonjs",
-    "moduleResolution": "node",
-    "noImplicitAny": true,
-    "noUnusedLocals": true,
-    "noImplicitThis": true,
-    "noUnusedParameters": true,
-    "noImplicitReturns": true,
-    "strictNullChecks": true,
     "alwaysStrict": true,
+    "declaration": true,
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
-    "declaration": true,
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "noFallthroughCasesInSwitch": true,
+    "noImplicitAny": true,
+    "noImplicitOverride": true,
+    "noImplicitReturns": true,
+    "noImplicitThis": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
     "removeComments": false,
-    "skipLibCheck": false
+    "skipLibCheck": false,
+    "strict": true,
+    "strictNullChecks": true,
+    "target": "es6"
   },
   "exclude": ["**/*.spec.ts", "dist"]
 }

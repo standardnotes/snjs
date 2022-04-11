@@ -1,6 +1,5 @@
-import { AnyRecord, ContentType } from '@standardnotes/common'
-import { isString, naturalSort, removeFromArray, UuidGenerator, Uuids } from '@standardnotes/utils'
-import { ItemsClientInterface } from './ItemsClientInterface'
+import { ContentType, Uuid } from '@standardnotes/common'
+import { naturalSort, removeFromArray, UuidGenerator, Uuids } from '@standardnotes/utils'
 import { ItemsKeyMutator, SNItemsKey } from '@standardnotes/encryption'
 import { PayloadManager } from '../Payloads/PayloadManager'
 import { TagsToFoldersMigrationApplicator } from '../../Migrations/Applicators/TagsToFolders'
@@ -8,21 +7,22 @@ import { TransactionalMutation } from './TransactionalMutation'
 import { UuidString } from '../../Types/UuidString'
 import * as Models from '@standardnotes/models'
 import * as Services from '@standardnotes/services'
+import { ItemsClientInterface } from './ItemsClientInterface'
+import { PayloadManagerChangeData } from '../Payloads'
+import { DecryptedItemInterface, ItemInterface } from '@standardnotes/models'
 
-type ItemsChangeObserver = {
+type ItemsChangeObserver<I extends DecryptedItemInterface = DecryptedItemInterface> = {
   contentType: ContentType[]
-  callback: Services.ItemManagerChangeObserverCallback<Models.SNItem>
+  callback: Services.ItemManagerChangeObserverCallback<I>
 }
 
 /**
- * The item manager is backed by the Payload Manager. Think of the item manager as a
- * more user-friendly or item-specific interface to creating and updating data.
- * The item manager listens for change events from the global payload manager, and
- * converts any payloads to SNItems, then propagates those items to listeners on the
- * item  manager. When the item manager makes a change to an item, it will modify items
- * using a  mutator, then emit those payloads to the payload manager. The payload manager
- * will then notify  its observers (which is us), we'll convert the payloads to items,
- * and then  we'll propagate them to our listeners.
+ * The item manager is backed by the payload manager. It listens for change events from the
+ * global payload manager, and converts any payloads to items, then propagates those items to
+ * listeners on the item manager. When the item manager makes a change to an item, it will modify
+ * items using a mutator, then emit those payloads to the payload manager. The payload manager
+ * will then notify its observers (which is us), we'll convert the payloads to items,
+ * and then we'll propagate them to our listeners.
  */
 export class ItemManager
   extends Services.AbstractService
@@ -31,13 +31,13 @@ export class ItemManager
   private unsubChangeObserver: () => void
   private observers: ItemsChangeObserver[] = []
   private collection!: Models.ItemCollection
-  private notesView!: Models.ItemCollectionNotesView
+  private notesCollection!: Models.NotesCollection
   private systemSmartViews: Models.SmartView[]
   private tagNotesIndex!: Models.TagNotesIndex
 
   constructor(
     private payloadManager: PayloadManager,
-    protected internalEventBus: Services.InternalEventBusInterface,
+    protected override internalEventBus: Services.InternalEventBusInterface,
   ) {
     super(internalEventBus)
     this.payloadManager = payloadManager
@@ -56,43 +56,49 @@ export class ItemManager
 
   private createCollection() {
     this.collection = new Models.ItemCollection()
+
     this.collection.setDisplayOptions(ContentType.Note, Models.CollectionSort.CreatedAt, 'dsc')
     this.collection.setDisplayOptions(ContentType.Tag, Models.CollectionSort.Title, 'dsc')
     this.collection.setDisplayOptions(ContentType.ItemsKey, Models.CollectionSort.CreatedAt, 'asc')
     this.collection.setDisplayOptions(ContentType.Component, Models.CollectionSort.CreatedAt, 'asc')
     this.collection.setDisplayOptions(ContentType.Theme, Models.CollectionSort.Title, 'asc')
     this.collection.setDisplayOptions(ContentType.SmartView, Models.CollectionSort.Title, 'dsc')
-    this.notesView = new Models.ItemCollectionNotesView(this.collection)
+
+    this.notesCollection = new Models.NotesCollection(this.collection)
     this.tagNotesIndex = new Models.TagNotesIndex(this.collection, this.tagNotesIndex?.observers)
   }
 
   /**
    * Returns all items.
    */
-  allItems(): Models.ItemInterface[] {
+  allItems(): Models.DecryptedItemInterface[] {
     return this.items
   }
 
   /**
    * Creates an unmanaged item from a payload.
    */
-  public createItemFromPayload(payload: Models.PurePayload): Models.SNItem {
-    return Models.CreateItemFromPayload(payload)
+  public createItemFromPayload(
+    payload: Models.DecryptedPayloadInterface,
+  ): Models.DecryptedItemInterface {
+    return Models.CreateDecryptedItemFromPayload(payload)
   }
 
   /**
    * Creates an unmanaged payload from any object, where the raw object
    * represents the same data a payload would.
    */
-  public createPayloadFromObject(object: AnyRecord): Models.PurePayload {
-    return Models.CreateMaxPayloadFromAnyObject(object as Models.RawPayload)
+  public createPayloadFromObject(
+    object: Models.DecryptedTransferPayload,
+  ): Models.DecryptedPayloadInterface {
+    return new Models.DecryptedPayload(object)
   }
 
   setDisplayOptions(
     contentType: ContentType,
-    sortBy?: Models.CollectionSort,
+    sortBy?: Models.CollectionSortProperty,
     direction?: Models.CollectionSortDirection,
-    filter?: (element: Models.ItemInterface) => boolean,
+    filter?: (element: Models.DecryptedItemInterface) => boolean,
   ): void {
     if (contentType === ContentType.Note) {
       console.warn(
@@ -136,98 +142,103 @@ export class ItemManager
       ...override,
     })
 
-    this.notesView.setCriteria(updatedCriteria)
+    this.notesCollection.setCriteria(updatedCriteria)
   }
 
-  public getDisplayableItems<T extends Models.ItemInterface>(contentType: ContentType): T[] {
-    if (contentType === ContentType.Note) {
-      return this.notesView.displayElements() as unknown as T[]
-    }
-    return this.collection.displayElements(contentType) as unknown as T[]
+  public getDisplayableItems<T extends Models.DecryptedItemInterface>(
+    contentType:
+      | ContentType.Tag
+      | ContentType.SmartView
+      | ContentType.Theme
+      | ContentType.Component,
+  ): T[] {
+    return this.collection.displayElements(contentType)
   }
 
-  public deinit(): void {
+  public getDisplayableNotes(): Models.SNNote[] {
+    return this.notesCollection.displayElements()
+  }
+
+  public override deinit(): void {
     this.unsubChangeObserver()
     ;(this.unsubChangeObserver as unknown) = undefined
     ;(this.payloadManager as unknown) = undefined
     ;(this.collection as unknown) = undefined
-    ;(this.notesView as unknown) = undefined
+    ;(this.notesCollection as unknown) = undefined
   }
 
   resetState(): void {
     this.createCollection()
   }
 
-  /**
-   * Returns an item for a given id
-   */
-  findItem<T extends Models.ItemInterface = Models.ItemInterface>(uuid: UuidString): T | undefined {
-    const itemFromCollection = this.collection.find(uuid)
+  findItem<T extends Models.DecryptedItemInterface = Models.DecryptedItemInterface>(
+    uuid: UuidString,
+  ): T | undefined {
+    const itemFromCollection = this.collection.findDecrypted<T>(uuid)
 
-    if (itemFromCollection) {
-      return itemFromCollection as T
-    }
-
-    const itemFromSmartViews = this.systemSmartViews.find((tag) => tag.uuid === uuid)
-
-    if (itemFromSmartViews) {
-      return itemFromSmartViews as unknown as T
-    }
-
-    return undefined
+    return itemFromCollection || (this.findSystemSmartView(uuid) as T | undefined)
   }
 
-  findSureItem<T extends Models.SNItem = Models.SNItem>(uuid: UuidString): T {
+  findAnyItem(uuid: UuidString): Models.ItemInterface | undefined {
+    const itemFromCollection = this.collection.find(uuid)
+
+    return itemFromCollection || this.findSystemSmartView(uuid)
+  }
+
+  private findSystemSmartView(uuid: Uuid): Models.SmartView | undefined {
+    return this.systemSmartViews.find((view) => view.uuid === uuid)
+  }
+
+  findSureItem<T extends Models.DecryptedItemInterface = Models.DecryptedItemInterface>(
+    uuid: UuidString,
+  ): T {
     return this.findItem(uuid) as T
   }
 
   /**
    * Returns all items matching given ids
-   * @param includeBlanks If true and an item is not found, an `undefined` element
+   */
+  findItems<T extends Models.DecryptedItemInterface>(uuids: UuidString[]): T[] {
+    return this.collection.findAllDecrypted(uuids) as T[]
+  }
+
+  /**
+   * If item is not found, an `undefined` element
    * will be inserted into the array.
    */
-  findItems<T extends Models.SNItem>(uuids: UuidString[], includeBlanks = false): T[] {
-    return this.collection.findAll(uuids, includeBlanks) as T[]
+  findItemsIncludingBlanks<T extends Models.DecryptedItemInterface>(
+    uuids: UuidString[],
+  ): (T | undefined)[] {
+    return this.collection.findAllDecryptedWithBlanks(uuids) as (T | undefined)[]
   }
 
   /**
    * Returns a detached array of all items
    */
-  public get items(): Models.SNItem[] {
+  public get items(): Models.DecryptedItemInterface[] {
+    return this.collection.nondeletedElements().filter(Models.isDecryptedItem)
+  }
+
+  allTrackedItems(): Models.ItemInterface[] {
     return this.collection.all()
   }
 
-  /**
-   * Returns a detached array of all items which are not deleted
-   */
-  public get nonDeletedItems() {
-    return this.collection.nondeletedElements()
-  }
-
-  public get invalidItems(): Models.ItemInterface[] {
-    return this.collection.invalidElements()
-  }
-
-  public get integrityPayloads(): Models.IntegrityPayload[] {
-    return this.collection.integrityPayloads()
-  }
-
   itemsKeys(): Models.ItemsKeyInterface[] {
-    return this.collection.displayElements(ContentType.ItemsKey) as Models.ItemsKeyInterface[]
+    return this.collection.displayElements(ContentType.ItemsKey)
   }
 
   /**
    * Returns all non-deleted notes
    */
   get notes() {
-    return this.notesView.displayElements()
+    return this.notesCollection.displayElements()
   }
 
   /**
    * Returns all non-deleted tags
    */
-  get tags() {
-    return this.collection.displayElements(ContentType.Tag) as Models.SNTag[]
+  get tags(): Models.SNTag[] {
+    return this.collection.displayElements(ContentType.Tag)
   }
 
   public hasTagsNeedingFoldersMigration(): boolean {
@@ -268,18 +279,21 @@ export class ItemManager
     return this.noteCount
   }
 
-  public addObserver(
+  public addObserver<I extends DecryptedItemInterface = DecryptedItemInterface>(
     contentType: ContentType | ContentType[],
-    callback: Services.ItemManagerChangeObserverCallback<Models.SNItem>,
+    callback: Services.ItemManagerChangeObserverCallback<I>,
   ): () => void {
     if (!Array.isArray(contentType)) {
       contentType = [contentType]
     }
-    const observer: ItemsChangeObserver = {
+
+    const observer: ItemsChangeObserver<I> = {
       contentType,
       callback,
     }
-    this.observers.push(observer)
+
+    this.observers.push(observer as ItemsChangeObserver)
+
     return () => {
       removeFromArray(this.observers, observer)
     }
@@ -288,11 +302,11 @@ export class ItemManager
   /**
    * Returns the items that reference the given item, or an empty array if no results.
    */
-  public itemsReferencingItem(uuid: UuidString, contentType?: ContentType): Models.SNItem[] {
-    if (!isString(uuid)) {
-      throw Error('Must use uuid string')
-    }
-    const uuids = this.collection.uuidsThatReferenceUuid(uuid)
+  public itemsReferencingItem(
+    itemToLookupUuidFor: Models.DecryptedItemInterface,
+    contentType?: ContentType,
+  ): Models.DecryptedItemInterface[] {
+    const uuids = this.collection.uuidsThatReferenceUuid(itemToLookupUuidFor.uuid)
     let referencing = this.findItems(uuids)
     if (contentType) {
       referencing = referencing.filter((ref) => {
@@ -305,13 +319,13 @@ export class ItemManager
   /**
    * Returns all items that an item directly references
    */
-  public referencesForItem(uuid: UuidString, contentType?: ContentType): Models.SNItem[] {
-    if (!isString(uuid)) {
-      throw Error('Must use uuid string')
-    }
-    const item = this.findSureItem(uuid)
+  public referencesForItem(
+    itemToLookupUuidFor: Models.DecryptedItemInterface,
+    contentType?: ContentType,
+  ): Models.DecryptedItemInterface[] {
+    const item = this.findSureItem(itemToLookupUuidFor.uuid)
     const uuids = item.references.map((ref) => ref.uuid)
-    let references = this.findItems(uuids) as Models.SNItem[]
+    let references = this.findItems(uuids)
     if (contentType) {
       references = references.filter((ref) => {
         return ref?.content_type === contentType
@@ -320,73 +334,91 @@ export class ItemManager
     return references
   }
 
-  private setPayloads(
-    changed: Models.PurePayload[],
-    inserted: Models.PurePayload[],
-    discarded: Models.PurePayload[],
-    ignored: Models.PurePayload[],
-    source: Models.PayloadSource,
-    sourceKey?: string,
-  ) {
-    const createItems = (items: Models.PurePayload[]) =>
-      items.map((item) => Models.CreateItemFromPayload(item))
+  private setPayloads(data: PayloadManagerChangeData) {
+    const { changed, inserted, discarded, ignored, unerrored, source, sourceKey } = data
+
+    const createItem = (payload: Models.FullyFormedPayloadInterface) =>
+      Models.CreateItemFromPayload(payload)
+
+    const changedItems = changed.map(createItem)
+
+    const insertedItems = inserted.map(createItem)
+
+    const discardedItems: Models.DeletedItemInterface[] = discarded.map(
+      (p) => new Models.DeletedItem(p),
+    )
+
+    const ignoredItems: Models.EncryptedItemInterface[] = ignored.map(
+      (p) => new Models.EncryptedItem(p),
+    )
+
+    const unerroredItems = unerrored.map(createItem) as DecryptedItemInterface[]
 
     const delta: Models.ItemDelta = {
-      changed: createItems(changed),
-      inserted: createItems(inserted),
-      discarded: createItems(discarded),
-      ignored: createItems(ignored),
+      changed: changedItems,
+      inserted: insertedItems,
+      discarded: discardedItems,
+      ignored: ignoredItems,
     }
 
     this.collection.onChange(delta)
-    this.notesView.onChange(delta)
+    this.notesCollection.onChange(delta)
     this.tagNotesIndex.onChange(delta)
 
     this.notifyObservers(
-      delta.changed,
-      delta.inserted,
+      delta.changed.filter(Models.isDecryptedItem),
+      delta.inserted.filter(Models.isDecryptedItem),
       delta.discarded,
       delta.ignored,
+      unerroredItems,
       source,
       sourceKey,
     )
   }
 
   private notifyObservers(
-    changed: Models.SNItem[],
-    inserted: Models.SNItem[],
-    discarded: Models.SNItem[],
-    ignored: Models.SNItem[],
+    changed: Models.DecryptedItemInterface[],
+    inserted: Models.DecryptedItemInterface[],
+    removed: (Models.DeletedItemInterface | Models.EncryptedItemInterface)[],
+    ignored: Models.EncryptedItemInterface[],
+    unerrored: Models.DecryptedItemInterface[],
     source: Models.PayloadSource,
     sourceKey?: string,
   ) {
-    const filter = (items: Models.SNItem[], types: ContentType[]) => {
+    const filter = <I extends Models.ItemInterface>(items: I[], types: ContentType[]) => {
       return items.filter((item) => {
         return types.includes(ContentType.Any) || types.includes(item.content_type)
       })
     }
+
     const observers = this.observers.slice()
+
     for (const observer of observers) {
       const filteredChanged = filter(changed, observer.contentType)
       const filteredInserted = filter(inserted, observer.contentType)
-      const filteredDiscarded = filter(discarded, observer.contentType)
+      const filteredDiscarded = filter(removed, observer.contentType)
       const filteredIgnored = filter(ignored, observer.contentType)
+      const filteredUnerrored = filter(unerrored, observer.contentType)
+
       if (
         filteredChanged.length === 0 &&
         filteredInserted.length === 0 &&
         filteredDiscarded.length === 0 &&
-        filteredIgnored.length === 0
+        filteredIgnored.length === 0 &&
+        filteredUnerrored.length === 0
       ) {
         continue
       }
-      observer.callback(
-        filteredChanged,
-        filteredInserted,
-        filteredDiscarded,
-        filteredIgnored,
+
+      observer.callback({
+        changed: filteredChanged,
+        inserted: filteredInserted,
+        removed: filteredDiscarded,
+        ignored: filteredIgnored,
+        unerrored: filteredUnerrored,
         source,
         sourceKey,
-      )
+      })
     }
   }
 
@@ -395,21 +427,18 @@ export class ItemManager
    * so that data is properly mapped through our function, and latest state
    * is properly reconciled.
    */
-  async changeItem<
-    M extends Models.ItemMutator = Models.ItemMutator,
-    I extends Models.ItemInterface = Models.SNItem,
+  public async changeItem<
+    M extends Models.DecryptedItemMutator = Models.DecryptedItemMutator,
+    I extends Models.DecryptedItemInterface = Models.DecryptedItemInterface,
   >(
-    uuid: UuidString,
+    itemToLookupUuidFor: I,
     mutate?: (mutator: M) => void,
     mutationType: Models.MutationType = Models.MutationType.UpdateUserTimestamps,
     payloadSource = Models.PayloadSource.LocalChanged,
     payloadSourceKey?: string,
   ): Promise<I> {
-    if (!isString(uuid)) {
-      throw Error('Invalid uuid for changeItem')
-    }
     const results = await this.changeItems<M, I>(
-      [uuid],
+      [itemToLookupUuidFor],
       mutate,
       mutationType,
       payloadSource,
@@ -422,28 +451,30 @@ export class ItemManager
    * @param mutate If not supplied, the intention would simply be to mark the item as dirty.
    */
   public async changeItems<
-    M extends Models.ItemMutator = Models.ItemMutator,
-    I extends Models.ItemInterface = Models.SNItem,
+    M extends Models.DecryptedItemMutator = Models.DecryptedItemMutator,
+    I extends Models.DecryptedItemInterface = Models.DecryptedItemInterface,
   >(
-    uuids: UuidString[],
+    itemsToLookupUuidsFor: I[],
     mutate?: (mutator: M) => void,
     mutationType: Models.MutationType = Models.MutationType.UpdateUserTimestamps,
     payloadSource = Models.PayloadSource.LocalChanged,
     payloadSourceKey?: string,
   ): Promise<I[]> {
-    const items = this.findItems(uuids as UuidString[], true)
-    const payloads = []
+    const items = this.findItemsIncludingBlanks(Uuids(itemsToLookupUuidsFor))
+    const payloads: Models.DecryptedPayloadInterface[] = []
+
     for (const item of items) {
       if (!item) {
         throw Error('Attempting to change non-existant item')
       }
-      const mutator = Models.CreateMutatorForItem(item, mutationType)
+      const mutator = Models.CreateDecryptedMutatorForItem(item, mutationType)
       if (mutate) {
         mutate(mutator as M)
       }
       const payload = mutator.getResult()
       payloads.push(payload)
     }
+
     await this.payloadManager.emitPayloads(payloads, payloadSource, payloadSourceKey)
     const results = this.findItems(payloads.map((p) => p.uuid)) as I[]
     return results
@@ -458,14 +489,14 @@ export class ItemManager
     transactions: TransactionalMutation[],
     payloadSource = Models.PayloadSource.LocalChanged,
     payloadSourceKey?: string,
-  ): Promise<(Models.SNItem | undefined)[]> {
-    const payloads: Models.PurePayload[] = []
+  ): Promise<(Models.DecryptedItemInterface | undefined)[]> {
+    const payloads: Models.DecryptedPayloadInterface[] = []
     for (const transaction of transactions) {
       const item = this.findItem(transaction.itemUuid)
       if (!item) {
         continue
       }
-      const mutator = Models.CreateMutatorForItem(
+      const mutator = Models.CreateDecryptedMutatorForItem(
         item,
         transaction.mutationType || Models.MutationType.UpdateUserTimestamps,
       )
@@ -483,9 +514,9 @@ export class ItemManager
     transaction: TransactionalMutation,
     payloadSource = Models.PayloadSource.LocalChanged,
     payloadSourceKey?: string,
-  ): Promise<Models.SNItem | undefined> {
+  ): Promise<Models.DecryptedItemInterface | undefined> {
     const item = this.findSureItem(transaction.itemUuid)
-    const mutator = Models.CreateMutatorForItem(
+    const mutator = Models.CreateDecryptedMutatorForItem(
       item,
       transaction.mutationType || Models.MutationType.UpdateUserTimestamps,
     )
@@ -498,106 +529,107 @@ export class ItemManager
   }
 
   async changeNote(
-    uuid: UuidString,
+    itemToLookupUuidFor: Models.SNNote,
     mutate: (mutator: Models.NoteMutator) => void,
     mutationType: Models.MutationType = Models.MutationType.UpdateUserTimestamps,
     payloadSource = Models.PayloadSource.LocalChanged,
     payloadSourceKey?: string,
-  ): Promise<Models.PurePayload[]> {
-    const note = this.findItem<Models.SNNote>(uuid)
+  ): Promise<Models.DecryptedPayloadInterface[]> {
+    const note = this.findItem<Models.SNNote>(itemToLookupUuidFor.uuid)
     if (!note) {
       throw Error('Attempting to change non-existant note')
     }
     const mutator = new Models.NoteMutator(note, mutationType)
+
     return this.applyTransform(mutator, mutate, payloadSource, payloadSourceKey)
   }
 
   async changeTag(
-    uuid: UuidString,
+    itemToLookupUuidFor: Models.SNTag,
     mutate: (mutator: Models.TagMutator) => void,
     mutationType: Models.MutationType = Models.MutationType.UpdateUserTimestamps,
     payloadSource = Models.PayloadSource.LocalChanged,
     payloadSourceKey?: string,
   ): Promise<Models.SNTag> {
-    const tag = this.findItem<Models.SNTag>(uuid)
+    const tag = this.findItem<Models.SNTag>(itemToLookupUuidFor.uuid)
     if (!tag) {
       throw Error('Attempting to change non-existant tag')
     }
     const mutator = new Models.TagMutator(tag, mutationType)
     await this.applyTransform(mutator, mutate, payloadSource, payloadSourceKey)
-    return this.findItem(uuid) as Models.SNTag
+    return this.findSureItem<Models.SNTag>(itemToLookupUuidFor.uuid)
   }
 
   async changeComponent(
-    uuid: UuidString,
+    itemToLookupUuidFor: Models.SNComponent,
     mutate: (mutator: Models.ComponentMutator) => void,
     mutationType: Models.MutationType = Models.MutationType.UpdateUserTimestamps,
     payloadSource = Models.PayloadSource.LocalChanged,
     payloadSourceKey?: string,
   ): Promise<Models.SNComponent> {
-    const component = this.findItem(uuid)
+    const component = this.findItem<Models.SNComponent>(itemToLookupUuidFor.uuid)
     if (!component) {
       throw Error('Attempting to change non-existant component')
     }
     const mutator = new Models.ComponentMutator(component, mutationType)
     await this.applyTransform(mutator, mutate, payloadSource, payloadSourceKey)
-    return this.findSureItem<Models.SNComponent>(uuid)
+    return this.findSureItem<Models.SNComponent>(itemToLookupUuidFor.uuid)
   }
 
   async changeFeatureRepo(
-    uuid: UuidString,
+    itemToLookupUuidFor: Models.SNFeatureRepo,
     mutate: (mutator: Models.FeatureRepoMutator) => void,
     mutationType: Models.MutationType = Models.MutationType.UpdateUserTimestamps,
     payloadSource = Models.PayloadSource.LocalChanged,
     payloadSourceKey?: string,
   ): Promise<Models.SNFeatureRepo> {
-    const repo = this.findItem(uuid)
+    const repo = this.findItem(itemToLookupUuidFor.uuid)
     if (!repo) {
       throw Error('Attempting to change non-existant repo')
     }
     const mutator = new Models.FeatureRepoMutator(repo, mutationType)
     await this.applyTransform(mutator, mutate, payloadSource, payloadSourceKey)
-    return this.findItem(uuid) as Models.SNFeatureRepo
+    return this.findSureItem<Models.SNFeatureRepo>(itemToLookupUuidFor.uuid)
   }
 
   async changeActionsExtension(
-    uuid: UuidString,
+    itemToLookupUuidFor: Models.SNActionsExtension,
     mutate: (mutator: Models.ActionsExtensionMutator) => void,
     mutationType: Models.MutationType = Models.MutationType.UpdateUserTimestamps,
     payloadSource = Models.PayloadSource.LocalChanged,
     payloadSourceKey?: string,
   ): Promise<Models.SNActionsExtension> {
-    const extension = this.findItem<Models.SNActionsExtension>(uuid)
+    const extension = this.findItem<Models.SNActionsExtension>(itemToLookupUuidFor.uuid)
     if (!extension) {
       throw Error('Attempting to change non-existant extension')
     }
     const mutator = new Models.ActionsExtensionMutator(extension, mutationType)
     await this.applyTransform(mutator, mutate, payloadSource, payloadSourceKey)
-    return this.findItem(uuid) as Models.SNActionsExtension
+    return this.findSureItem<Models.SNActionsExtension>(itemToLookupUuidFor.uuid)
   }
 
   async changeItemsKey(
-    uuid: UuidString,
+    itemToLookupUuidFor: Models.ItemsKeyInterface,
     mutate: (mutator: Models.ItemsKeyMutatorInterface) => void,
     mutationType: Models.MutationType = Models.MutationType.UpdateUserTimestamps,
     payloadSource = Models.PayloadSource.LocalChanged,
     payloadSourceKey?: string,
   ): Promise<Models.ItemsKeyInterface> {
-    const itemsKey = this.findItem<SNItemsKey>(uuid)
+    const itemsKey = this.findItem<SNItemsKey>(itemToLookupUuidFor.uuid)
     if (!itemsKey) {
       throw Error('Attempting to change non-existant itemsKey')
     }
     const mutator = new ItemsKeyMutator(itemsKey, mutationType)
     await this.applyTransform(mutator, mutate, payloadSource, payloadSourceKey)
-    return this.findItem(uuid) as Models.ItemsKeyInterface
+    return this.findSureItem<Models.ItemsKeyInterface>(itemToLookupUuidFor.uuid)
   }
 
-  private async applyTransform<T extends Models.ItemMutator>(
+  private async applyTransform<T extends Models.DecryptedItemMutator>(
     mutator: T,
     mutate: (mutator: T) => void,
     payloadSource = Models.PayloadSource.LocalChanged,
     payloadSourceKey?: string,
-  ) {
+  ): Promise<Models.DecryptedPayloadInterface[]> {
     mutate(mutator)
     const payload = mutator.getResult()
     return this.payloadManager.emitPayload(payload, payloadSource, payloadSourceKey)
@@ -606,28 +638,22 @@ export class ItemManager
   /**
    * Sets the item as needing sync. The item is then run through the mapping function,
    * and propagated to mapping observers.
-   * @param updateClientDate - Whether to update the item's "user modified date"
+   * @param isUserModified - Whether to update the item's "user modified date"
    */
-  public async setItemDirty(uuid: UuidString, isUserModified = false) {
-    if (!isString(uuid)) {
-      throw Error('Must use uuid when setting item dirty')
-    }
-    const result = await this.setItemsDirty([uuid], isUserModified)
+  public async setItemDirty(
+    itemToLookupUuidFor: Models.DecryptedItemInterface,
+    isUserModified = false,
+  ) {
+    const result = await this.setItemsDirty([itemToLookupUuidFor], isUserModified)
     return result[0]
   }
 
-  /**
-   * Similar to `setItemDirty`, but acts on an array of items as the first param.
-   */
   public async setItemsDirty(
-    uuids: UuidString[],
+    itemsToLookupUuidsFor: Models.DecryptedItemInterface[],
     isUserModified = false,
-  ): Promise<Models.ItemInterface[]> {
-    if (!isString(uuids[0])) {
-      throw Error('Must use uuid when setting item dirty')
-    }
+  ): Promise<Models.DecryptedItemInterface[]> {
     return this.changeItems(
-      uuids,
+      itemsToLookupUuidsFor,
       undefined,
       isUserModified
         ? Models.MutationType.UpdateUserTimestamps
@@ -638,30 +664,28 @@ export class ItemManager
   /**
    * Returns an array of items that need to be synced.
    */
-  public getDirtyItems(): Models.SNItem[] {
-    const dirty = this.collection.dirtyElements()
-    return dirty.filter((item) => {
-      return item.isSyncable
-    })
+  public getDirtyItems(): (Models.DecryptedItemInterface | Models.DeletedItemInterface)[] {
+    return this.collection.dirtyElements().filter(Models.isDecryptedOrDeletedItem)
   }
 
   /**
    * Duplicates an item and maps it, thus propagating the item to observers.
    * @param isConflict - Whether to mark the duplicate as a conflict of the original.
    */
-  public async duplicateItem<T extends Models.SNItem>(
-    uuid: UuidString,
+  public async duplicateItem<T extends Models.DecryptedItemInterface>(
+    itemToLookupUuidFor: T,
     isConflict = false,
     additionalContent?: Partial<Models.ItemContent>,
   ) {
-    const item = this.findSureItem(uuid)
-    const payload = Models.CreateMaxPayloadFromAnyObject(item)
-    const resultingPayloads = await Models.PayloadsByDuplicating(
+    const item = this.findSureItem(itemToLookupUuidFor.uuid)
+    const payload = item.payload.copy()
+    const resultingPayloads = await Models.PayloadsByDuplicating({
       payload,
-      this.payloadManager.getMasterCollection(),
+      baseCollection: this.payloadManager.getMasterCollection(),
       isConflict,
       additionalContent,
-    )
+    })
+
     await this.payloadManager.emitPayloads(resultingPayloads, Models.PayloadSource.LocalChanged)
     const duplicate = this.findSureItem<T>(resultingPayloads[0].uuid)
     return duplicate
@@ -672,174 +696,140 @@ export class ItemManager
    * @param needsSync - Whether to mark the item as needing sync
    */
   public async createItem<
-    T extends Models.ItemInterface,
+    T extends Models.DecryptedItemInterface,
     C extends Models.ItemContent = Models.ItemContent,
-  >(
-    contentType: ContentType,
-    content?: C,
-    needsSync = false,
-    override?: Partial<Models.PayloadInterface<C>>,
-  ): Promise<T> {
-    if (!contentType) {
-      throw 'Attempting to create item with no contentType'
-    }
-    const payload = Models.CreateMaxPayloadFromAnyObject<C>(
-      {
-        uuid: UuidGenerator.GenerateUuid(),
-        content_type: contentType,
-        content: content ? Models.FillItemContent<C>(content) : undefined,
-        dirty: needsSync,
-      },
-      override,
-    )
+  >(contentType: ContentType, content: C, needsSync = false): Promise<T> {
+    const payload = new Models.DecryptedPayload<C>({
+      uuid: UuidGenerator.GenerateUuid(),
+      content_type: contentType,
+      content: Models.FillItemContent<C>(content),
+      dirty: needsSync,
+    })
+
     await this.payloadManager.emitPayload(payload, Models.PayloadSource.Constructor)
+
     return this.findSureItem<T>(payload.uuid)
   }
 
   /**
    * Create an unmanaged item that can later be inserted via `insertItem`
    */
-  createTemplateItem<
+  public createTemplateItem<
     C extends Models.ItemContent = Models.ItemContent,
-    I extends Models.ItemInterface = Models.ItemInterface,
+    I extends Models.DecryptedItemInterface<C> = Models.DecryptedItemInterface<C>,
   >(contentType: ContentType, content?: C): I {
-    const payload = Models.CreateMaxPayloadFromAnyObject<C>({
+    const payload = new Models.DecryptedPayload<C>({
       uuid: UuidGenerator.GenerateUuid(),
       content_type: contentType,
       content: Models.FillItemContent<C>(content || {}),
     })
-    return Models.CreateItemFromPayload(payload)
+    const item = Models.CreateDecryptedItemFromPayload<C, I>(payload)
+    return item
   }
 
   /**
    * @param item item to be checked
    * @returns Whether the item is a template (unmanaged)
    */
-  public isTemplateItem(item: Models.SNItem): boolean {
+  public isTemplateItem(item: Models.DecryptedItemInterface): boolean {
     return !this.findItem(item.uuid)
   }
 
-  public async insertItem(item: Models.SNItem): Promise<Models.SNItem> {
+  public async insertItem(
+    item: Models.DecryptedItemInterface,
+  ): Promise<Models.DecryptedItemInterface> {
     return this.emitItemFromPayload(item.payload)
   }
 
-  public async insertItems(items: Models.SNItem[]): Promise<Models.SNItem[]> {
+  public async insertItems(
+    items: Models.DecryptedItemInterface[],
+  ): Promise<Models.DecryptedItemInterface[]> {
     return this.emitItemsFromPayloads(items.map((item) => item.payload))
   }
 
   public async emitItemFromPayload(
-    payload: Models.PurePayload,
+    payload: Models.DecryptedPayloadInterface,
     source = Models.PayloadSource.Constructor,
-  ): Promise<Models.SNItem> {
+  ): Promise<Models.DecryptedItemInterface> {
     await this.payloadManager.emitPayload(payload, source)
-    return this.findItem(payload.uuid) as Models.SNItem
+
+    return this.findSureItem(payload.uuid)
   }
 
   public async emitItemsFromPayloads(
-    payloads: Models.PurePayload[],
+    payloads: Models.DecryptedPayloadInterface[],
     source = Models.PayloadSource.Constructor,
-  ): Promise<Models.SNItem[]> {
+  ): Promise<Models.DecryptedItemInterface[]> {
     await this.payloadManager.emitPayloads(payloads, source)
+
     const uuids = Uuids(payloads)
+
     return this.findItems(uuids)
   }
 
   public async setItemToBeDeleted(
-    uuid: UuidString,
-    source?: Models.PayloadSource,
-  ): Promise<Models.SNItem | undefined> {
-    /** Capture referencing ids before we delete the item below, otherwise
-     * the index may be updated before we get a chance to act on it */
-    const referencingIds = this.collection.uuidsThatReferenceUuid(uuid)
-
-    const item = this.findSureItem(uuid)
-    const changedItem = await this.changeItem(
-      uuid,
-      (mutator) => {
-        mutator.setDeleted()
-      },
-      undefined,
-      source,
+    itemToLookupUuidFor: Models.DecryptedItemInterface,
+    source: Models.PayloadSource = Models.PayloadSource.LocalChanged,
+  ): Promise<void> {
+    const referencingIdsCapturedBeforeChanges = this.collection.uuidsThatReferenceUuid(
+      itemToLookupUuidFor.uuid,
     )
 
-    /** Handle indirect relationships.
-     * (Direct relationships are cleared by clearing content above) */
-    for (const referencingId of referencingIds) {
+    const item = this.findSureItem(itemToLookupUuidFor.uuid)
+
+    const mutator = new Models.DeleteItemMutator(item, Models.MutationType.UpdateUserTimestamps)
+
+    const deletedPayload = mutator.getDeletedResult()
+
+    await this.payloadManager.emitPayload(deletedPayload, source)
+
+    for (const referencingId of referencingIdsCapturedBeforeChanges) {
       const referencingItem = this.findItem(referencingId)
+
       if (referencingItem) {
-        await this.changeItem(referencingItem.uuid, (mutator) => {
+        await this.changeItem(referencingItem, (mutator) => {
           mutator.removeItemAsRelationship(item)
         })
       }
     }
-    return changedItem
   }
 
-  /**
-   * Like `setItemToBeDeleted`, but acts on an array of items.
-   */
-  public async setItemsToBeDeleted(uuids: UuidString[]): Promise<(Models.SNItem | undefined)[]> {
-    return Promise.all(uuids.map((uuid) => this.setItemToBeDeleted(uuid)))
+  public async setItemsToBeDeleted(
+    itemsToLookupUuidsFor: Models.DecryptedItemInterface[],
+  ): Promise<void> {
+    await Promise.all(itemsToLookupUuidsFor.map((item) => this.setItemToBeDeleted(item)))
   }
 
-  /**
-   * Returns all items of a certain type
-   * @param contentType - A string or array of strings representing
-   *    content types.
-   */
-  public getItems<T extends Models.SNItem>(
+  public getItems<T extends Models.DecryptedItemInterface>(
     contentType: ContentType | ContentType[],
-    nonerroredOnly = false,
   ): T[] {
-    const items = this.collection.all(contentType)
-    if (nonerroredOnly) {
-      return items.filter((item) => !item.errorDecrypting && !item.waitingForKey) as T[]
-    } else {
-      return items as T[]
-    }
+    return this.collection.allDecrypted<T>(contentType)
   }
 
-  /**
-   * Returns all items which are properly decrypted
-   */
-  nonErroredItemsForContentType<T extends Models.SNItem>(contentType: ContentType): T[] {
-    const items = this.collection.all(contentType)
-    return items.filter((item) => !item.errorDecrypting && !item.waitingForKey) as T[]
+  getAnyItems(contentType: ContentType | ContentType[]): ItemInterface[] {
+    return this.collection.all(contentType)
   }
 
-  /**
-   * Returns all items matching a given predicate
-   */
-  public itemsMatchingPredicate<T extends Models.SNItem>(
+  public itemsMatchingPredicate<T extends Models.DecryptedItemInterface>(
     contentType: ContentType,
     predicate: Models.PredicateInterface<T>,
   ): T[] {
-    return this.itemsMatchingPredicates(contentType, [predicate]) as T[]
+    return this.itemsMatchingPredicates(contentType, [predicate])
   }
 
-  /**
-   * Returns all items matching an array of predicates
-   */
-  public itemsMatchingPredicates<T extends Models.SNItem>(
+  public itemsMatchingPredicates<T extends Models.DecryptedItemInterface>(
     contentType: ContentType,
     predicates: Models.PredicateInterface<T>[],
-  ): Models.SNItem[] {
+  ): T[] {
     const subItems = this.getItems<T>(contentType)
     return this.subItemsMatchingPredicates(subItems, predicates)
   }
 
-  /**
-   * Performs actual predicate filtering for public methods above.
-   * Does not return deleted items.
-   */
-  public subItemsMatchingPredicates<T extends Models.SNItem>(
+  public subItemsMatchingPredicates<T extends Models.DecryptedItemInterface>(
     items: T[],
     predicates: Models.PredicateInterface<T>[],
   ): T[] {
     const results = items.filter((item) => {
-      if (item.deleted) {
-        return false
-      }
       for (const predicate of predicates) {
         if (!item.satisfiesPredicate(predicate)) {
           return false
@@ -847,6 +837,7 @@ export class ItemManager
       }
       return true
     })
+
     return results
   }
 
@@ -854,9 +845,6 @@ export class ItemManager
     return this.tags.filter((tag) => tag.parentId === undefined)
   }
 
-  /**
-   * Finds the first tag matching a given title
-   */
   public findTagByTitle(title: string): Models.SNTag | undefined {
     const lowerCaseTitle = title.toLowerCase()
     return this.tags.find((tag) => tag.title?.toLowerCase() === lowerCaseTitle)
@@ -864,11 +852,13 @@ export class ItemManager
 
   public findTagByTitleAndParent(
     title: string,
-    parentUuid: UuidString | undefined,
+    parentItemToLookupUuidFor?: Models.SNTag,
   ): Models.SNTag | undefined {
     const lowerCaseTitle = title.toLowerCase()
 
-    const tags = parentUuid ? this.getTagChildren(parentUuid) : this.getRootTags()
+    const tags = parentItemToLookupUuidFor
+      ? this.getTagChildren(parentItemToLookupUuidFor)
+      : this.getRootTags()
 
     return tags.find((tag) => tag.title?.toLowerCase() === lowerCaseTitle)
   }
@@ -885,7 +875,7 @@ export class ItemManager
         const expandedTitle = this.getTagLongTitle(tag)
         const matchesQuery = expandedTitle.toLowerCase().includes(searchQuery.toLowerCase())
         const tagInNote = note
-          ? this.itemsReferencingItem(note.uuid).some((item) => item?.uuid === tag.uuid)
+          ? this.itemsReferencingItem(note).some((item) => item?.uuid === tag.uuid)
           : false
         return matchesQuery && !tagInNote
       }),
@@ -893,16 +883,20 @@ export class ItemManager
     )
   }
 
-  getTagParent(tagUuid: UuidString): Models.SNTag | undefined {
-    const tag = this.findItem(tagUuid) as Models.SNTag
+  getTagParent(itemToLookupUuidFor: Models.SNTag): Models.SNTag | undefined {
+    const tag = this.findItem<Models.SNTag>(itemToLookupUuidFor.uuid)
+    if (!tag) {
+      return undefined
+    }
     const parentId = tag.parentId
     if (parentId) {
       return this.findItem(parentId) as Models.SNTag
     }
+    return undefined
   }
 
   public getTagPrefixTitle(tag: Models.SNTag): string | undefined {
-    const hierarchy = this.getTagParentChain(tag.uuid)
+    const hierarchy = this.getTagParentChain(tag)
 
     if (hierarchy.length === 0) {
       return undefined
@@ -913,17 +907,14 @@ export class ItemManager
   }
 
   public getTagLongTitle(tag: Models.SNTag): string {
-    const hierarchy = this.getTagParentChain(tag.uuid)
+    const hierarchy = this.getTagParentChain(tag)
     const tags = [...hierarchy, tag]
     const longTitle = tags.map((tag) => tag.title).join('/')
     return longTitle
   }
 
-  /**
-   * @returns Array of tags where the front of the array represents the top of the tree.
-   */
-  getTagParentChain(tagUuid: UuidString): Models.SNTag[] {
-    const tag = this.findItem<Models.SNTag>(tagUuid)
+  getTagParentChain(itemToLookupUuidFor: Models.SNTag): Models.SNTag[] {
+    const tag = this.findItem<Models.SNTag>(itemToLookupUuidFor.uuid)
     if (!tag) {
       return []
     }
@@ -947,9 +938,7 @@ export class ItemManager
     let current: Models.SNTag | undefined = undefined
 
     for (const title of titlesHierarchy) {
-      const currentUuid: string | undefined = current ? current.uuid : undefined
-
-      current = await this.findOrCreateTagByTitle(title, currentUuid)
+      current = await this.findOrCreateTagByTitle(title, current)
     }
 
     if (!current) {
@@ -959,35 +948,53 @@ export class ItemManager
     return current
   }
 
-  public getTagChildren(tagUuid: UuidString): Models.SNTag[] {
-    const tag = this.findItem(tagUuid) as Models.SNTag
+  public getTagChildren(itemToLookupUuidFor: Models.SNTag): Models.SNTag[] {
+    const tag = this.findItem<Models.SNTag>(itemToLookupUuidFor.uuid)
+    if (!tag) {
+      return []
+    }
+
     const tags = this.collection.elementsReferencingElement(tag, ContentType.Tag) as Models.SNTag[]
 
-    return tags.filter((tag) => tag.parentId === tagUuid)
+    return tags.filter((tag) => tag.parentId === itemToLookupUuidFor.uuid)
   }
 
-  public isTagAncestor(tagUuid: UuidString, childUuid: UuidString): boolean {
-    const tag = this.findItem(childUuid) as Models.SNTag
+  public isTagAncestor(
+    tagToLookUpUuidFor: Models.SNTag,
+    childToLookUpUuidFor: Models.SNTag,
+  ): boolean {
+    const tag = this.findItem<Models.SNTag>(childToLookUpUuidFor.uuid)
+    if (!tag) {
+      return false
+    }
+
     let parentId = tag.parentId
 
     while (parentId) {
-      if (parentId === tagUuid) {
+      if (parentId === tagToLookUpUuidFor.uuid) {
         return true
       }
 
-      const parent = this.findItem(parentId) as Models.SNTag
+      const parent = this.findItem<Models.SNTag>(parentId)
+      if (!parent) {
+        return false
+      }
+
       parentId = parent.parentId
     }
 
     return false
   }
 
-  public isValidTagParent(parentTagUuid: UuidString, childTagUuid: UuidString): boolean {
-    if (parentTagUuid === childTagUuid) {
+  public isValidTagParent(
+    parentTagToLookUpUuidFor: Models.SNTag,
+    childToLookUpUuidFor: Models.SNTag,
+  ): boolean {
+    if (parentTagToLookUpUuidFor.uuid === childToLookUpUuidFor.uuid) {
       return false
     }
 
-    if (this.isTagAncestor(childTagUuid, parentTagUuid)) {
+    if (this.isTagAncestor(childToLookUpUuidFor, parentTagToLookUpUuidFor)) {
       return false
     }
 
@@ -1002,11 +1009,11 @@ export class ItemManager
       throw new Error('Can not set a tag parent of itself')
     }
 
-    if (this.isTagAncestor(childTag.uuid, parentTag.uuid)) {
+    if (this.isTagAncestor(childTag, parentTag)) {
       throw new Error('Can not set a tag ancestor of itself')
     }
 
-    return this.changeTag(childTag.uuid, (m) => {
+    return this.changeTag(childTag, (m) => {
       m.makeChildOf(parentTag)
     })
   }
@@ -1015,13 +1022,13 @@ export class ItemManager
    * @returns The changed child tag
    */
   public unsetTagParent(childTag: Models.SNTag): Promise<Models.SNTag> {
-    const parentTag = this.getTagParent(childTag.uuid)
+    const parentTag = this.getTagParent(childTag)
 
     if (!parentTag) {
       return Promise.resolve(childTag)
     }
 
-    return this.changeTag(childTag.uuid, (m) => {
+    return this.changeTag(childTag, (m) => {
       m.unsetParent()
     })
   }
@@ -1030,7 +1037,7 @@ export class ItemManager
     file: Models.SNFile,
     note: Models.SNNote,
   ): Promise<Models.SNFile> {
-    return this.changeItem<Models.FileMutator, Models.SNFile>(file.uuid, (mutator) => {
+    return this.changeItem<Models.FileMutator, Models.SNFile>(file, (mutator) => {
       mutator.associateWithNote(note)
     })
   }
@@ -1039,7 +1046,7 @@ export class ItemManager
     file: Models.SNFile,
     note: Models.SNNote,
   ): Promise<Models.SNFile> {
-    return this.changeItem<Models.FileMutator, Models.SNFile>(file.uuid, (mutator) => {
+    return this.changeItem<Models.FileMutator, Models.SNFile>(file, (mutator) => {
       mutator.disassociateWithNote(note)
     })
   }
@@ -1051,12 +1058,12 @@ export class ItemManager
   ): Promise<Models.SNTag[]> {
     let tagsToAdd = [tag]
     if (addHierarchy) {
-      const parentChainTags = this.getTagParentChain(tag.uuid)
+      const parentChainTags = this.getTagParentChain(tag)
       tagsToAdd = [...parentChainTags, tag]
     }
     return Promise.all(
       tagsToAdd.map((tagToAdd) => {
-        return this.changeItem(tagToAdd.uuid, (mutator) => {
+        return this.changeItem(tagToAdd, (mutator) => {
           mutator.addItemAsRelationship(note)
         }) as Promise<Models.SNTag>
       }),
@@ -1070,26 +1077,29 @@ export class ItemManager
    */
   public getSortedTagsForNote(note: Models.SNNote): Models.SNTag[] {
     return naturalSort(
-      this.itemsReferencingItem(note.uuid).filter((ref) => {
+      this.itemsReferencingItem(note).filter((ref) => {
         return ref?.content_type === ContentType.Tag
       }) as Models.SNTag[],
       'title',
     )
   }
 
-  public async createTag(title: string, parentUuid?: UuidString): Promise<Models.SNTag> {
+  public async createTag(
+    title: string,
+    parentItemToLookupUuidFor?: Models.SNTag,
+  ): Promise<Models.SNTag> {
     const newTag = await this.createItem<Models.SNTag>(
       ContentType.Tag,
       Models.FillItemContent<Models.TagContent>({ title }),
       true,
     )
 
-    if (parentUuid) {
-      const parentTag = this.findItem(parentUuid)
-      if (!parentTag || !Models.isTag(parentTag)) {
+    if (parentItemToLookupUuidFor) {
+      const parentTag = this.findItem<Models.SNTag>(parentItemToLookupUuidFor.uuid)
+      if (!parentTag) {
         throw new Error('Invalid parent tag')
       }
-      return this.changeTag(newTag.uuid, (m) => {
+      return this.changeTag(newTag, (m) => {
         m.makeChildOf(parentTag)
       })
     }
@@ -1097,7 +1107,7 @@ export class ItemManager
     return newTag
   }
 
-  public async createSmartView<T extends Models.ItemInterface>(
+  public async createSmartView<T extends Models.DecryptedItemInterface>(
     title: string,
     predicate: Models.PredicateInterface<T>,
   ): Promise<Models.SmartView> {
@@ -1111,7 +1121,7 @@ export class ItemManager
     ) as Promise<Models.SmartView>
   }
 
-  public async createSmartViewFromDSL<T extends Models.ItemInterface>(
+  public async createSmartViewFromDSL<T extends Models.DecryptedItemInterface>(
     dsl: string,
   ): Promise<Models.SmartView> {
     let components = null
@@ -1143,14 +1153,14 @@ export class ItemManager
    */
   public async findOrCreateTagByTitle(
     title: string,
-    parentUuid?: UuidString,
+    parentItemToLookupUuidFor?: Models.SNTag,
   ): Promise<Models.SNTag> {
-    const tag = this.findTagByTitleAndParent(title, parentUuid)
-    return tag || this.createTag(title, parentUuid)
+    const tag = this.findTagByTitleAndParent(title, parentItemToLookupUuidFor)
+    return tag || this.createTag(title, parentItemToLookupUuidFor)
   }
 
   public notesMatchingSmartView(view: Models.SmartView): Models.SNNote[] {
-    return this.notesView.notesMatchingSmartView(view)
+    return this.notesCollection.notesMatchingSmartView(view)
   }
 
   public get allNotesSmartView(): Models.SmartView {
@@ -1186,7 +1196,7 @@ export class ItemManager
    */
   public async emptyTrash(): Promise<void> {
     const notes = this.trashedItems
-    await this.setItemsToBeDeleted(Uuids(notes))
+    await this.setItemsToBeDeleted(notes)
   }
 
   /**
@@ -1211,32 +1221,64 @@ export class ItemManager
    */
   public async removeAllItemsFromMemory(): Promise<void> {
     const uuids = Uuids(this.items)
-    /** We don't want to set as dirty, since we want to dispose of immediately. */
-    await this.changeItems(
-      uuids,
-      (mutator) => {
-        mutator.setDeleted()
-      },
-      Models.MutationType.NonDirtying,
-    )
+    const results: Models.DeletedPayloadInterface[] = []
+
+    for (const uuid of uuids) {
+      const mutator = new Models.DeleteItemMutator(
+        this.findSureItem(uuid),
+        /** We don't want to set as dirty, since we want to dispose of immediately. */
+        Models.MutationType.NonDirtying,
+      )
+      results.push(mutator.getDeletedResult())
+    }
+
+    await this.payloadManager.emitPayloads(results, Models.PayloadSource.LocalChanged)
+
     this.resetState()
     this.payloadManager.resetState()
   }
 
-  public removeItemLocally(item: Models.SNItem): void {
-    this.collection.discard(item)
+  public removeItemLocally(
+    item: Models.DecryptedItemInterface | Models.DeletedItemInterface,
+  ): void {
+    this.collection.discard([item])
     this.payloadManager.removePayloadLocally(item.payload)
   }
 
   public getFilesForNote(note: Models.SNNote): Models.SNFile[] {
-    return this.itemsReferencingItem(note.uuid).filter(
+    return this.itemsReferencingItem(note).filter(
       (ref) => ref.content_type === ContentType.File,
     ) as Models.SNFile[]
   }
 
   public renameFile(file: Models.SNFile, name: string): Promise<Models.SNFile> {
-    return this.changeItem<Models.FileMutator, Models.SNFile>(file.uuid, (mutator) => {
+    return this.changeItem<Models.FileMutator, Models.SNFile>(file, (mutator) => {
       mutator.name = name
     })
+  }
+
+  public async setLastSyncBeganForItems(
+    itemsToLookupUuidsFor: (Models.DecryptedItemInterface | Models.DeletedItemInterface)[],
+    date: Date,
+  ): Promise<void> {
+    const items = this.collection
+      .findAll(Uuids(itemsToLookupUuidsFor))
+      .filter(Models.isDecryptedOrDeletedItem)
+
+    const payloads: (Models.DecryptedPayloadInterface | Models.DeletedPayloadInterface)[] = []
+
+    for (const item of items) {
+      const mutator = new Models.ItemMutator<
+        Models.DecryptedPayloadInterface | Models.DeletedPayloadInterface
+      >(item, Models.MutationType.NonDirtying)
+
+      mutator.lastSyncBegan = date
+
+      const payload = mutator.getResult()
+
+      payloads.push(payload)
+    }
+
+    await this.payloadManager.emitPayloads(payloads, Models.PayloadSource.PreSyncSave)
   }
 }

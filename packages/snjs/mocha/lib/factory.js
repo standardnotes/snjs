@@ -132,6 +132,9 @@ export async function safeDeinit(application) {
     )
     return
   }
+
+  await application.storageService.awaitPersist()
+
   /** Limit waiting to 1s */
   await Promise.race([sleep(1), application.syncService?.awaitCurrentSyncs()])
   await application.prepareForDeinit()
@@ -147,7 +150,7 @@ export function getDefaultMockedEventServiceUrl() {
 }
 
 export function getDefaultWebSocketUrl() {
-  return 'ws://localhost'
+  return undefined
 }
 
 function getAppVersion() {
@@ -291,7 +294,7 @@ export async function registerOldUser({ application, email, password, version })
     accountKey.keyParams,
   )
   /** Mark all existing items as dirty. */
-  await application.itemManager.changeItems(Uuids(application.itemManager.items), (m) => {
+  await application.itemManager.changeItems(application.itemManager.items, (m) => {
     m.dirty = true
   })
   await application.sessionManager.handleSuccessAuthResponse(response, accountKey)
@@ -300,23 +303,27 @@ export async function registerOldUser({ application, email, password, version })
     mode: SyncMode.DownloadFirst,
     ...syncOptions,
   })
-  await application.protocolService.decryptErroredItems()
+  await application.protocolService.decryptErroredPayloads()
 }
 
 export function createStorageItemPayload(contentType) {
-  return CreateMaxPayloadFromAnyObject(createItemParams(contentType))
+  return new DecryptedPayload(createItemParams(contentType))
 }
 
 export function createNotePayload(title, text = undefined, dirty = true) {
-  return CreateMaxPayloadFromAnyObject(createNoteParams({ title, text, dirty }))
+  return new DecryptedPayload(createNoteParams({ title, text, dirty }))
+}
+
+export function createNote(title, text = undefined, dirty = true) {
+  return new SNNote(new DecryptedPayload(createNoteParams({ title, text, dirty })))
 }
 
 export function createStorageItemTagPayload(tagParams = {}) {
-  return CreateMaxPayloadFromAnyObject(createTagParams(tagParams))
+  return new DecryptedPayload(createTagParams(tagParams))
 }
 
 export function itemToStoragePayload(item) {
-  return CreateMaxPayloadFromAnyObject(item)
+  return new DecryptedPayload(item)
 }
 
 export function createMappedNote(application, title, text, dirty = true) {
@@ -331,8 +338,11 @@ export async function createMappedTag(application, tagParams = {}) {
 
 export async function createSyncedNote(application, title, text) {
   const payload = createNotePayload(title, text)
-  await application.itemManager.emitItemFromPayload(payload, PayloadSource.LocalChanged)
-  await application.itemManager.setItemDirty(payload.uuid)
+  const item = await application.itemManager.emitItemFromPayload(
+    payload,
+    PayloadSource.LocalChanged,
+  )
+  await application.itemManager.setItemDirty(item)
   await application.syncService.sync(syncOptions)
   const note = application.items.findItem(payload.uuid)
   return note
@@ -343,7 +353,7 @@ export async function getStoragePayloadsOfType(application, type) {
   return rawPayloads
     .filter((rp) => rp.content_type === type)
     .map((rp) => {
-      return CreateMaxPayloadFromAnyObject(rp)
+      return new CreatePayload(rp)
     })
 }
 
@@ -351,7 +361,7 @@ export async function createManyMappedNotes(application, count) {
   const createdNotes = []
   for (let i = 0; i < count; i++) {
     const note = await createMappedNote(application)
-    await application.itemManager.setItemDirty(note.uuid)
+    await application.itemManager.setItemDirty(note)
     createdNotes.push(note)
   }
   return createdNotes
@@ -362,9 +372,11 @@ export async function loginToApplication({
   email,
   password,
   ephemeral,
+  strict = false,
   mergeLocal = true,
+  awaitSync = true,
 }) {
-  return application.signIn(email, password, undefined, ephemeral, mergeLocal, true)
+  return application.signIn(email, password, strict, ephemeral, mergeLocal, awaitSync)
 }
 
 export async function awaitFunctionInvokation(object, functionName) {
@@ -435,11 +447,10 @@ export function createNoteParams({ title, text, dirty = true } = {}) {
     uuid: generateUuid(),
     content_type: ContentType.Note,
     dirty: dirty,
-    content: {
+    content: FillItemContent({
       title: title || 'hello',
       text: text || 'world',
-      references: [],
-    },
+    }),
   }
   return params
 }
@@ -449,10 +460,9 @@ export function createTagParams({ title, dirty = true, uuid = undefined } = {}) 
     uuid: uuid || generateUuid(),
     content_type: ContentType.Tag,
     dirty: dirty,
-    content: {
+    content: FillItemContent({
       title: title || 'thoughts',
-      references: [],
-    },
+    }),
   }
   return params
 }
@@ -476,7 +486,7 @@ export function createRelatedNoteTagPairPayload({
     },
   ]
   noteParams.content.references = []
-  return [CreateMaxPayloadFromAnyObject(noteParams), CreateMaxPayloadFromAnyObject(tagParams)]
+  return [new DecryptedPayload(noteParams), new DecryptedPayload(tagParams)]
 }
 
 export async function createSyncedNoteWithTag(application) {
@@ -614,14 +624,41 @@ export async function createTags(
 }
 
 export function pinNote(application, note) {
-  return application.mutator.changeItem(note.uuid, (mutator) => {
+  return application.mutator.changeItem(note, (mutator) => {
     mutator.pinned = true
   })
 }
 
+export async function insertItemWithOverride(
+  application,
+  contentType,
+  content,
+  needsSync = false,
+  errorDecrypting,
+) {
+  const item = await application.itemManager.createItem(contentType, content, needsSync)
+
+  if (errorDecrypting) {
+    const encrypted = new EncryptedPayload({
+      ...item.payload.ejected(),
+      content: '004:...',
+      errorDecrypting,
+    })
+
+    await application.itemManager.emitItemFromPayload(encrypted)
+  } else {
+    const decrypted = new DecryptedPayload({
+      ...item.payload.ejected(),
+    })
+    await application.itemManager.emitItemFromPayload(decrypted)
+  }
+
+  return application.itemManager.findAnyItem(item.uuid)
+}
+
 export async function alternateUuidForItem(application, uuid) {
   const item = application.itemManager.findItem(uuid)
-  const payload = CreateMaxPayloadFromAnyObject(item)
+  const payload = new DecryptedPayload(item)
   const results = await PayloadsByAlternatingUuid(
     payload,
     application.payloadManager.getMasterCollection(),
@@ -629,4 +666,92 @@ export async function alternateUuidForItem(application, uuid) {
   await application.payloadManager.emitPayloads(results, PayloadSource.LocalChanged)
   await application.syncService.persistPayloads(results)
   return application.itemManager.findItem(results[0].uuid)
+}
+
+export async function markDirtyAndSyncItem(application, itemToLookupUuidFor) {
+  const item = application.itemManager.findItem(itemToLookupUuidFor.uuid)
+  if (!item) {
+    throw Error('Attempting to save non-inserted item')
+  }
+  if (!item.dirty) {
+    await application.itemManager.changeItem(item, undefined, MutationType.NoUpdateUserTimestamps)
+  }
+  await application.sync.sync()
+}
+
+export async function changePayloadTimeStampAndSync(
+  application,
+  payload,
+  timestamp,
+  contentOverride,
+  syncOptions,
+) {
+  payload = application.payloadManager.collection.find(payload.uuid)
+  const changedPayload = new DecryptedPayload({
+    ...payload,
+    dirty: true,
+    dirtiedDate: new Date(),
+    content: {
+      ...payload.content,
+      ...contentOverride,
+    },
+    updated_at_timestamp: timestamp,
+  })
+
+  await application.itemManager.emitItemFromPayload(changedPayload)
+  await application.sync.sync(syncOptions)
+
+  return application.itemManager.findAnyItem(payload.uuid)
+}
+
+export async function changePayloadTimeStamp(application, payload, timestamp, contentOverride) {
+  const latestPayload = application.payloadManager.collection.find(payload.uuid)
+  const changedPayload = new DecryptedPayload({
+    ...latestPayload,
+    dirty: true,
+    dirtiedDate: new Date(),
+    content: {
+      ...latestPayload.content,
+      ...contentOverride,
+    },
+    updated_at_timestamp: timestamp,
+  })
+
+  await application.itemManager.emitItemFromPayload(changedPayload)
+
+  return application.itemManager.findAnyItem(payload.uuid)
+}
+
+export async function changePayloadUpdatedAt(application, payload, updatedAt) {
+  const latestPayload = application.payloadManager.collection.find(payload.uuid)
+  const changedPayload = new DecryptedPayload({
+    ...latestPayload,
+    dirty: true,
+    dirtiedDate: new Date(),
+    updated_at: updatedAt,
+  })
+
+  await application.itemManager.emitItemFromPayload(changedPayload)
+
+  return application.itemManager.findAnyItem(payload.uuid)
+}
+
+export async function changePayloadTimeStampDeleteAndSync(
+  application,
+  payload,
+  timestamp,
+  syncOptions,
+) {
+  payload = application.payloadManager.collection.find(payload.uuid)
+  const changedPayload = new DeletedPayload({
+    ...payload,
+    content: undefined,
+    dirty: true,
+    dirtiedDate: new Date(),
+    deleted: true,
+    updated_at_timestamp: timestamp,
+  })
+
+  await application.itemManager.emitItemFromPayload(changedPayload)
+  await application.sync.sync(syncOptions)
 }
