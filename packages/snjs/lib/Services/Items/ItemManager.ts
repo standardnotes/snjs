@@ -11,9 +11,9 @@ import { ItemsClientInterface } from './ItemsClientInterface'
 import { PayloadManagerChangeData } from '../Payloads'
 import { DecryptedItemInterface, ItemInterface } from '@standardnotes/models'
 
-type ItemsChangeObserver = {
+type ItemsChangeObserver<I extends DecryptedItemInterface = DecryptedItemInterface> = {
   contentType: ContentType[]
-  callback: Services.ItemManagerChangeObserverCallback
+  callback: Services.ItemManagerChangeObserverCallback<I>
 }
 
 /**
@@ -279,18 +279,21 @@ export class ItemManager
     return this.noteCount
   }
 
-  public addObserver(
+  public addObserver<I extends DecryptedItemInterface = DecryptedItemInterface>(
     contentType: ContentType | ContentType[],
-    callback: Services.ItemManagerChangeObserverCallback,
+    callback: Services.ItemManagerChangeObserverCallback<I>,
   ): () => void {
     if (!Array.isArray(contentType)) {
       contentType = [contentType]
     }
-    const observer: ItemsChangeObserver = {
+
+    const observer: ItemsChangeObserver<I> = {
       contentType,
       callback,
     }
-    this.observers.push(observer)
+
+    this.observers.push(observer as ItemsChangeObserver)
+
     return () => {
       removeFromArray(this.observers, observer)
     }

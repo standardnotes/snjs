@@ -1,6 +1,6 @@
 import { ItemContent } from '../../Abstract/Content/ItemContent'
 
-export interface NoteInterface {
+export interface NoteContentSpecialized {
   title: string
   text: string
   mobilePrefersPlainEditor?: boolean
@@ -10,4 +10,4 @@ export interface NoteInterface {
   spellcheck?: boolean
 }
 
-export type NoteContent = NoteInterface & ItemContent
+export type NoteContent = NoteContentSpecialized & ItemContent

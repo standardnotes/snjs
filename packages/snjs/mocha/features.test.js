@@ -281,7 +281,7 @@ describe('features', () => {
       ).to.equal(false)
       const extensionKey = UuidGenerator.GenerateUuid().split('-').join('')
       const promise = new Promise((resolve) => {
-        application.streamItems(ContentType.ExtensionRepo, (changed) => {
+        application.streamItems(ContentType.ExtensionRepo, ({ changed }) => {
           for (const item of changed) {
             if (item.content.migratedToUserSetting) {
               resolve()

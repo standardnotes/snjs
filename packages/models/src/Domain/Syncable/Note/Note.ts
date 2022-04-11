@@ -3,11 +3,11 @@ import { DecryptedItem } from '../../Abstract/Item/Implementations/DecryptedItem
 import { ItemInterface } from '../../Abstract/Item/Interfaces/ItemInterface'
 import { AppDataField } from '../../Abstract/Item/Types/AppDataField'
 import { DecryptedPayloadInterface } from '../../Abstract/Payload/Interfaces/DecryptedPayload'
-import { NoteContent, NoteInterface } from './NoteContent'
+import { NoteContent, NoteContentSpecialized } from './NoteContent'
 
 export const isNote = (x: ItemInterface): x is SNNote => x.content_type === ContentType.Note
 
-export class SNNote extends DecryptedItem<NoteContent> implements NoteInterface {
+export class SNNote extends DecryptedItem<NoteContent> implements NoteContentSpecialized {
   public readonly title: string
   public readonly text: string
   public readonly mobilePrefersPlainEditor?: boolean

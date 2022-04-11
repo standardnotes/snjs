@@ -46,7 +46,7 @@ export class NoteViewController {
 
   async initialize(): Promise<void> {
     if (!this.note) {
-      const note = await this.application.mutator.createTemplateItem<NoteContent, SNNote>(
+      const note = this.application.mutator.createTemplateItem<NoteContent, SNNote>(
         ContentType.Note,
         {
           text: '',
@@ -72,16 +72,21 @@ export class NoteViewController {
   }
 
   private streamItems() {
-    this.removeStreamObserver = this.application.streamItems(ContentType.Note, (items, source) => {
-      this.handleNoteStream(items as SNNote[], source)
-    })
+    this.removeStreamObserver = this.application.streamItems(
+      ContentType.Note,
+      ({ changed, inserted, source }) => {
+        this.handleNoteStream(changed.concat(inserted) as SNNote[], source)
+      },
+    )
   }
 
   deinit(): void {
     this.removeStreamObserver?.()
     ;(this.removeStreamObserver as unknown) = undefined
     ;(this.application as unknown) = undefined
+
     this.innerValueChangeObservers.length = 0
+
     this.saveTimeout = undefined
   }
 
@@ -90,6 +95,7 @@ export class NoteViewController {
     const matchingNote = notes.find((item) => {
       return item.uuid === this.note.uuid
     }) as SNNote
+
     if (matchingNote) {
       this.isTemplateNote = false
       this.note = matchingNote

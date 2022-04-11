@@ -11,16 +11,19 @@ export class LiveItem<T extends DecryptedItemInterface> {
 
     onChange && onChange(this.item)
 
-    this.removeObserver = application.streamItems(this.item.content_type, (items) => {
-      const matchingItem = items.find((item) => {
-        return item.uuid === uuid
-      })
+    this.removeObserver = application.streamItems(
+      this.item.content_type,
+      ({ changed, inserted }) => {
+        const matchingItem = [...changed, ...inserted].find((item) => {
+          return item.uuid === uuid
+        })
 
-      if (matchingItem) {
-        this.item = matchingItem as T
-        onChange && onChange(this.item)
-      }
-    })
+        if (matchingItem) {
+          this.item = matchingItem as T
+          onChange && onChange(this.item)
+        }
+      },
+    )
   }
 
   public deinit() {

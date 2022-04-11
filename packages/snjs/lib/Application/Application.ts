@@ -14,6 +14,7 @@ import { ApplicationEvent, applicationEventForSyncEvent } from '@Lib/Application
 import { Environment, Platform } from './Platforms'
 import { SNLog } from '../Log'
 import { useBoolean } from '@standardnotes/utils'
+import { DecryptedItemInterface } from '@standardnotes/models'
 
 /** How often to automatically sync, in milliseconds */
 const DEFAULT_AUTO_SYNC_INTERVAL = 30_000
@@ -26,10 +27,12 @@ type ApplicationObserver = {
   singleEvent?: ApplicationEvent
   callback: ApplicationEventCallback
 }
-type ItemStream = (
-  changedOrInserted: Models.DecryptedItemInterface[],
-  source: Models.PayloadSource,
-) => void
+type ItemStream<I extends DecryptedItemInterface> = (data: {
+  changed: I[]
+  inserted: I[]
+  removed: (Models.DeletedItemInterface | Models.EncryptedItemInterface)[]
+  source: Models.PayloadSource
+}) => void
 type ObserverRemover = () => void
 
 /** The main entrypoint of an application. */
@@ -419,19 +422,26 @@ export class SNApplication implements InternalServices.ListedClientInterface {
    * immediately with the present items that match the constraint, and over time whenever
    * items matching the constraint are added, changed, or deleted.
    */
-  public streamItems(
+  public streamItems<I extends DecryptedItemInterface = DecryptedItemInterface>(
     contentType: Common.ContentType | Common.ContentType[],
-    stream: ItemStream,
+    stream: ItemStream<I>,
   ): () => void {
-    const observer = this.itemManager.addObserver(contentType, ({ changed, inserted, source }) => {
-      const all = changed.concat(inserted)
-      stream(all, source)
-    })
+    const observer = this.itemManager.addObserver<I>(
+      contentType,
+      ({ changed, inserted, removed, source }) => {
+        stream({ changed, inserted, removed, source })
+      },
+    )
 
     /** Push current values now */
-    const matches = this.itemManager.getItems(contentType)
+    const matches = this.itemManager.getItems<I>(contentType)
     if (matches.length > 0) {
-      stream(matches, Models.PayloadSource.InitialObserverRegistrationPush)
+      stream({
+        inserted: matches,
+        changed: [],
+        removed: [],
+        source: Models.PayloadSource.InitialObserverRegistrationPush,
+      })
     }
 
     this.streamRemovers.push(observer)

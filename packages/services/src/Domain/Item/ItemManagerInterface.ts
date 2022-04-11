@@ -12,12 +12,12 @@ import {
 } from '@standardnotes/models'
 import { AbstractService } from '../Service/AbstractService'
 
-export type ItemManagerChangeData = {
+export type ItemManagerChangeData<I extends DecryptedItemInterface = DecryptedItemInterface> = {
   /** The items are pre-existing but have been changed */
-  changed: DecryptedItemInterface[]
+  changed: I[]
 
   /** The items have been newly inserted */
-  inserted: DecryptedItemInterface[]
+  inserted: I[]
 
   /** The items should no longer be displayed in the interface, either due to being deleted, or becoming error-encrypted */
   removed: (EncryptedItemInterface | DeletedItemInterface)[]
@@ -26,18 +26,20 @@ export type ItemManagerChangeData = {
   ignored: EncryptedItemInterface[]
 
   /** Items which were previously error decrypting but now successfully decrypted */
-  unerrored: DecryptedItemInterface[]
+  unerrored: I[]
 
   source: PayloadSource
   sourceKey?: string
 }
 
-export type ItemManagerChangeObserverCallback = (data: ItemManagerChangeData) => void
+export type ItemManagerChangeObserverCallback<
+  I extends DecryptedItemInterface = DecryptedItemInterface,
+> = (data: ItemManagerChangeData<I>) => void
 
 export interface ItemManagerInterface extends AbstractService {
-  addObserver(
+  addObserver<I extends DecryptedItemInterface = DecryptedItemInterface>(
     contentType: ContentType | ContentType[],
-    callback: ItemManagerChangeObserverCallback,
+    callback: ItemManagerChangeObserverCallback<I>,
   ): () => void
 
   /**

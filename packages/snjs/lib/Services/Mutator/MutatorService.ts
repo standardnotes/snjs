@@ -241,7 +241,7 @@ export class MutatorService extends AbstractService implements MutatorClientInte
 
   public duplicateItem<T extends Models.DecryptedItemInterface>(
     item: T,
-    additionalContent?: Partial<Models.ItemContent>,
+    additionalContent?: Partial<T['content']>,
   ): Promise<T> {
     const duplicate = this.itemManager.duplicateItem<T>(item, false, additionalContent)
     void this.syncService.sync()

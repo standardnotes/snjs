@@ -119,7 +119,7 @@ export interface MutatorClientInterface {
 
   duplicateItem<T extends Models.DecryptedItemInterface>(
     item: T,
-    additionalContent?: Partial<Models.ItemContent>,
+    additionalContent?: Partial<T['content']>,
   ): Promise<T>
 
   /**

@@ -203,7 +203,7 @@ export class ItemsEncryptionService extends Services.AbstractService {
     const resultParams = await this.decryptPayloadsWithKeyLookup(payloads)
 
     const decryptedPayloads = resultParams.map((params) => {
-      const original = Models.SureFindPayload(params.uuid, payloads)
+      const original = Models.SureFindPayload(payloads, params.uuid)
       if (isErrorDecryptingParameters(params)) {
         return new Models.EncryptedPayload({
           ...original.ejected(),
