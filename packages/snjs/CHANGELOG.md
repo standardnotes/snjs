@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.94.2](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.94.1...@standardnotes/snjs@2.94.2) (2022-04-11)
+
+
+### Bug Fixes
+
+* add parent tags setting when creating note in child tag ([#687](https://github.com/standardnotes/snjs/issues/687)) ([00d4eac](https://github.com/standardnotes/snjs/commit/00d4eac5486564e6b8a402ada10474b8792b24f1))
+
+
+
+
+
 ## [2.94.1](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.94.0...@standardnotes/snjs@2.94.1) (2022-04-01)
 
 **Note:** Version bump only for package @standardnotes/snjs
