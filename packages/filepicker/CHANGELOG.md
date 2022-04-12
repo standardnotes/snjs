@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.10.6](https://github.com/standardnotes/snjs/compare/@standardnotes/filepicker@1.10.5...@standardnotes/filepicker@1.10.6) (2022-04-12)
+
+
+### Bug Fixes
+
+* export byte_chunker from filepicker package ([#689](https://github.com/standardnotes/snjs/issues/689)) ([2541250](https://github.com/standardnotes/snjs/commit/2541250d7c01a0763c3162e7e68b28cb4c075322))
+
+
+
+
+
 ## [1.10.5](https://github.com/standardnotes/snjs/compare/@standardnotes/filepicker@1.10.4...@standardnotes/filepicker@1.10.5) (2022-04-11)
 
 **Note:** Version bump only for package @standardnotes/filepicker
