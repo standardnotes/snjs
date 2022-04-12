@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.26.10](https://github.com/standardnotes/snjs/compare/@standardnotes/domain-events@2.26.9...@standardnotes/domain-events@2.26.10) (2022-04-12)
+
+
+### Bug Fixes
+
+* add index and total count of backup files created in the backup attachment created event ([ff5233f](https://github.com/standardnotes/snjs/commit/ff5233f9b795f1b408a31c689d7907b66827dd38))
+
+
+
+
+
 ## [2.26.9](https://github.com/standardnotes/snjs/compare/@standardnotes/domain-events@2.26.8...@standardnotes/domain-events@2.26.9) (2022-04-11)
 
 **Note:** Version bump only for package @standardnotes/domain-events
