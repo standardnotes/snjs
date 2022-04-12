@@ -2283,30 +2283,30 @@
   version "2.0.15"
   resolved "https://codeload.github.com/standardnotes/filesafe-client/tar.gz/fc111cc0a81de01d63ba27dea2998100c6f0011f"
 
-"@standardnotes/focus-theme@1.2.7":
-  version "1.2.7"
-  resolved "https://registry.yarnpkg.com/@standardnotes/focus-theme/-/focus-theme-1.2.7.tgz#f309ffcc387f59b912f202a9cab937a7c2d0fd75"
-  integrity sha512-xoiWsZ9H1qvtfPXgYtiBrGE2wVupATYFk6ZqCa6Nzf8A1IZ7WB7itNYTL6OFI3fEjP/MMCrP8NAwTycOPDNfGQ==
+"@standardnotes/focus-theme@1.2.8":
+  version "1.2.8"
+  resolved "https://registry.yarnpkg.com/@standardnotes/focus-theme/-/focus-theme-1.2.8.tgz#5f38f603f348621d0bd3742ce24b2cdb584ff75a"
+  integrity sha512-dLX7DnlMtybSYwdBNsY3zSrM19Nkzk05TzYl3ZeYmdYTNabW8u7/HBFHF/vHFz1zMk9Nt3yHqsYMFIxHN/YIXA==
 
-"@standardnotes/futura-theme@1.2.6":
-  version "1.2.6"
-  resolved "https://registry.yarnpkg.com/@standardnotes/futura-theme/-/futura-theme-1.2.6.tgz#284561bf76010dd968be430e0f60d9b9a84f4a28"
-  integrity sha512-VfPf2D2zWz6mEQOAZTBGKuX3DLlJ9mK+P4k9dzTgLXYhnFsthnzOKjjUcDREjKDcnbhG6GLeg7dRgO4AxugUuw==
+"@standardnotes/futura-theme@1.2.8":
+  version "1.2.8"
+  resolved "https://registry.yarnpkg.com/@standardnotes/futura-theme/-/futura-theme-1.2.8.tgz#f4e7e6eacad821d2e4edbfd8bc00025aa4c6bdb9"
+  integrity sha512-fD4JDErsCQJ+R8Q2lUY0kT5sSVfzfubpWZgAYIZ6MHdOxXHGmEUDvII8AgDoUVCM0qH5VmcvJ/TENIBqz614yQ==
 
 "@standardnotes/markdown-visual@1.0.6":
   version "1.0.6"
   resolved "https://registry.yarnpkg.com/@standardnotes/markdown-visual/-/markdown-visual-1.0.6.tgz#79fba6d838f56bf563bee9ef8d0e2b89de4a48d8"
   integrity sha512-5Gp+6yUvdUv8N3gF3gutBTdClgPmKLzwWZWhB0/IpPjaxdgm/k0I++kkMwTy+3Iz/9aGgLqbpNNepstAEt845Q==
 
-"@standardnotes/midnight-theme@1.2.6":
-  version "1.2.6"
-  resolved "https://registry.yarnpkg.com/@standardnotes/midnight-theme/-/midnight-theme-1.2.6.tgz#723ff47df5608f7d533b9148289b945de389c275"
-  integrity sha512-5dXYBQ7Coz5uj3AQTG2Z8HgAcAE5ORRVE2H7A7HDQRkNHplpk70ngAg5ZUKHrO3HY+630quV3trOhy8VNe7+rA==
+"@standardnotes/midnight-theme@1.2.7":
+  version "1.2.7"
+  resolved "https://registry.yarnpkg.com/@standardnotes/midnight-theme/-/midnight-theme-1.2.7.tgz#34bb614425ee04b04d9c4675e4760a0bf6a992cd"
+  integrity sha512-xwtezvFZiTjvFrsBuMlMHL9YpcrIlbII3EBXYGe5lngvI9/8ufcNSq/edbE14f7q4mL+hxo5XP1HA861S9wy7g==
 
-"@standardnotes/solarized-dark-theme@1.2.5":
-  version "1.2.5"
-  resolved "https://registry.yarnpkg.com/@standardnotes/solarized-dark-theme/-/solarized-dark-theme-1.2.5.tgz#778ea18063745740740e9ea9dccce2c27596253e"
-  integrity sha512-f/RQCi9nHwZAwUBue8qEoL2GtzTs1buMwNdyr4VZ2LghkaB9I6uqsWaXlUnBIKG0rnNKNjayjYh/4dnJUiqM+Q==
+"@standardnotes/solarized-dark-theme@1.2.6":
+  version "1.2.6"
+  resolved "https://registry.yarnpkg.com/@standardnotes/solarized-dark-theme/-/solarized-dark-theme-1.2.6.tgz#96811405eb00de70927f36cc962d51b405eacdff"
+  integrity sha512-goKnEod+iHcS1CM30h/uTMFPJu4X51D3yjQM6TeHjOpT/dsRJiTF3e20bqLH9Xh2Om3Wx6pn01B+zyiRva9UJA==
 
 "@standardnotes/titanium-theme@1.2.6":
   version "1.2.6"
