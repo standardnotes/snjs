@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.2.4](https://github.com/standardnotes/snjs/compare/@standardnotes/models@1.2.3...@standardnotes/models@1.2.4) (2022-04-13)
+
+
+### Bug Fixes
+
+* emit changed deleted items as removed ([#691](https://github.com/standardnotes/snjs/issues/691)) ([b12f257](https://github.com/standardnotes/snjs/commit/b12f257b02d46ad9c717e6c51d6e7ca7e9c06959))
+
+
+
+
+
 ## [1.2.3](https://github.com/standardnotes/snjs/compare/@standardnotes/models@1.2.2...@standardnotes/models@1.2.3) (2022-04-12)
 
 **Note:** Version bump only for package @standardnotes/models
