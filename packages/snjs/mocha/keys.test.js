@@ -624,8 +624,11 @@ describe('keys', function () {
   })
 
   it('errored second client should not upload its items keys', async function () {
-    /** The original source of this issue was that when changing password on client A and syncing with B,
-     * the incoming items keys
+    /**
+     * The original source of this issue was that when changing password on client A and syncing with B,
+     * the newly encrypted items key retrieved on B would be included as "ignored", so its timestamps
+     * would not be emitted, and thus the application would be in sync. The app would then download
+     * the items key independently, and make duplicates erroneously.
      */
     const contextA = this.context
 
