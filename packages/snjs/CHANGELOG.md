@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.94.6](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.94.5...@standardnotes/snjs@2.94.6) (2022-04-13)
+
+
+### Bug Fixes
+
+* emit changed deleted items as removed ([#691](https://github.com/standardnotes/snjs/issues/691)) ([b12f257](https://github.com/standardnotes/snjs/commit/b12f257b02d46ad9c717e6c51d6e7ca7e9c06959))
+
+
+
+
+
 ## [2.94.5](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.94.4...@standardnotes/snjs@2.94.5) (2022-04-12)
 
 **Note:** Version bump only for package @standardnotes/snjs
