@@ -9,7 +9,11 @@ describe('keys', function () {
 
   beforeEach(async function () {
     localStorage.clear()
-    this.application = await Factory.createInitAppWithFakeCrypto()
+
+    this.context = await Factory.createAppContext()
+    await this.context.launch()
+
+    this.application = this.context.application
     this.email = UuidGenerator.GenerateUuid()
     this.password = UuidGenerator.GenerateUuid()
   })
@@ -18,7 +22,8 @@ describe('keys', function () {
     if (!this.application.dealloced) {
       await Factory.safeDeinit(this.application)
     }
-    this.application = null
+
+    this.application = undefined
     localStorage.clear()
   })
 
@@ -616,6 +621,45 @@ describe('keys', function () {
     expect(recreatedApp.protocolService.getRootKey()).to.be.ok
     expect(totalChallenges).to.equal(expectedChallenges)
     await Factory.safeDeinit(recreatedApp)
+  })
+
+  it('errored second client should not upload its items keys', async function () {
+    /** The original source of this issue was that when changing password on client A and syncing with B,
+     * the incoming items keys
+     */
+    const contextA = this.context
+
+    const email = Factory.generateUuid()
+    const password = Factory.generateUuid()
+    await Factory.registerUserToApplication({
+      application: contextA.application,
+      email,
+      password: password,
+    })
+
+    const contextB = await Factory.createAppContext({ email, password })
+    await contextB.launch()
+    await contextB.signIn()
+
+    contextA.ignoreChallenges()
+    contextB.ignoreChallenges()
+
+    const newPassword = Factory.generateUuid()
+
+    await contextA.application.userService.changeCredentials({
+      currentPassword: password,
+      newPassword: newPassword,
+      origination: KeyParamsOrigination.PasswordChange,
+    })
+
+    await contextB.syncWithIntegrityCheck()
+    await contextA.syncWithIntegrityCheck()
+
+    const clientAUndecryptables = contextA.application.keyRecoveryService.getUndecryptables()
+    const clientBUndecryptables = contextB.application.keyRecoveryService.getUndecryptables()
+
+    expect(Object.keys(clientBUndecryptables).length).to.equal(1)
+    expect(Object.keys(clientAUndecryptables).length).to.equal(0)
   })
 
   describe('changing password on 003 client while signed into 004 client should', function () {

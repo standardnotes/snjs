@@ -112,7 +112,7 @@ export abstract class GenericItem<P extends PayloadInterface = PayloadInterface>
    * Subclasses can override this method and provide their own opinion on whether
    * they want to be duplicated. For example, if this.content.x = 12 and
    * item.content.x = 13, this function can be overriden to always return
-   * ConflictStrategy.KeepLeft to say 'don't create a duplicate at all, the
+   * ConflictStrategy.KeepBase to say 'don't create a duplicate at all, the
    * change is not important.'
    *
    * In the default implementation, we create a duplicate if content differs.
@@ -125,31 +125,31 @@ export abstract class GenericItem<P extends PayloadInterface = PayloadInterface>
     previousRevision?: HistoryEntryInterface,
   ): ConflictStrategy {
     if (isEncryptedErroredItem(this)) {
-      return ConflictStrategy.KeepLeftDuplicateRight
+      return ConflictStrategy.KeepBaseDuplicateApply
     }
 
     if (this.isSingleton) {
-      return ConflictStrategy.KeepLeft
+      return ConflictStrategy.KeepBase
     }
 
     if (isDeletedItem(this)) {
-      return ConflictStrategy.KeepRight
+      return ConflictStrategy.KeepApply
     }
 
     if (isDeletedItem(item)) {
       if (this.payload.source === PayloadSource.FileImport) {
-        return ConflictStrategy.KeepLeft
+        return ConflictStrategy.KeepBase
       }
-      return ConflictStrategy.KeepRight
+      return ConflictStrategy.KeepApply
     }
 
     if (!isDecryptedItem(item) || !isDecryptedItem(this)) {
-      return ConflictStrategy.KeepLeftDuplicateRight
+      return ConflictStrategy.KeepBaseDuplicateApply
     }
 
     const contentDiffers = ItemContentsDiffer(this, item)
     if (!contentDiffers) {
-      return ConflictStrategy.KeepRight
+      return ConflictStrategy.KeepApply
     }
 
     const itemsAreDifferentExcludingRefs = ItemContentsDiffer(this, item, ['references'])
@@ -163,7 +163,7 @@ export abstract class GenericItem<P extends PayloadInterface = PayloadInterface>
          * be chosen as the winner, with no need for a conflict.
          */
         if (!ItemContentsDiffer(previousRevision.itemFromPayload(), item)) {
-          return ConflictStrategy.KeepLeft
+          return ConflictStrategy.KeepBase
         }
       }
       const twentySeconds = 20_000
@@ -179,13 +179,13 @@ export abstract class GenericItem<P extends PayloadInterface = PayloadInterface>
          */
         Date.now() - this.userModifiedDate.getTime() < twentySeconds
       ) {
-        return ConflictStrategy.KeepLeftDuplicateRight
+        return ConflictStrategy.KeepBaseDuplicateApply
       } else {
-        return ConflictStrategy.DuplicateLeftKeepRight
+        return ConflictStrategy.DuplicateBaseKeepApply
       }
     } else {
       /** Only the references have changed; merge them. */
-      return ConflictStrategy.KeepLeftMergeRefs
+      return ConflictStrategy.KeepBaseMergeRefs
     }
   }
 

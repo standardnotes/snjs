@@ -215,8 +215,6 @@ describe('key recovery service', function () {
 
     expect(appA.items.getAnyItems(ContentType.ItemsKey).length).to.equal(1)
 
-    appA.syncService.loggingEnabled = true
-
     /** Sync appA and expect a new items key to be downloaded and errored */
     const syncPromise = appA.sync.sync(syncOptions)
     await contextA.awaitNextSucessfulSync()

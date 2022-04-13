@@ -2549,7 +2549,7 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 * use correct placeholder for passcode prompt ([3a0a095](https://github.com/standardnotes/snjs/commit/3a0a09502d7823cd35dbfa42474b3ca3a542ac23))
 * use created_at for unsynced session history entries ([#305](https://github.com/standardnotes/snjs/issues/305)) ([fef99a8](https://github.com/standardnotes/snjs/commit/fef99a882659ee3e8c578ef6dcd2cb5192098fc6))
 * use isNullOrUndefined instead of `!` ([ce56b02](https://github.com/standardnotes/snjs/commit/ce56b02b0857579f2823fdf818b439ede22405e6))
-* use KeepLeft in conflict strategy instead of returning empty array ([ee0bdc1](https://github.com/standardnotes/snjs/commit/ee0bdc1753811d04dfb8844d952e9b688368a4bc))
+* use KeepBase in conflict strategy instead of returning empty array ([ee0bdc1](https://github.com/standardnotes/snjs/commit/ee0bdc1753811d04dfb8844d952e9b688368a4bc))
 * use tag uuid for filtering in searchTags ([d05488d](https://github.com/standardnotes/snjs/commit/d05488d70b68e8815dd0bd87914c72826aa4eed8))
 * use updated_at_timestamp for integrity hash; abort if missing fo… ([#308](https://github.com/standardnotes/snjs/issues/308)) ([d511871](https://github.com/standardnotes/snjs/commit/d51187188a4af0918f3caf29baaba2cf244f92d6))
 * validate extension urls ([2972649](https://github.com/standardnotes/snjs/commit/2972649d68ad8985da52837ead43131ae3f2e27e))

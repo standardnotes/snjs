@@ -62,6 +62,6 @@ export class SNActionsExtension extends DecryptedItem<ActionExtensionContent> {
     _item: DecryptedItemInterface,
     _previousRevision?: HistoryEntryInterface,
   ): ConflictStrategy {
-    return ConflictStrategy.KeepLeft
+    return ConflictStrategy.KeepBase
   }
 }
