@@ -352,7 +352,7 @@ export class ItemManager
       (p) => new Models.EncryptedItem(p),
     )
 
-    const unerroredItems = unerrored.map((p) => new Models.DecryptedItem(p))
+    const unerroredItems = unerrored.map((p) => Models.CreateDecryptedItemFromPayload(p))
 
     const delta: Models.ItemDelta = {
       changed: changedItems,
