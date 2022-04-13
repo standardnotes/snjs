@@ -514,6 +514,7 @@ export class SNSyncService
     const neverSyncedDeleted: DeletedItemInterface[] = items.filter((item) => {
       return item.neverSynced && isDeletedItem(item)
     }) as DeletedItemInterface[]
+
     subtractFromArray(items, neverSyncedDeleted)
 
     const decryptedPayloads = items.map((item) => {
@@ -521,6 +522,7 @@ export class SNSyncService
     })
 
     const payloadsNeedingSave = this.popPayloadsNeedingPreSyncSave(decryptedPayloads)
+
     await this.persistPayloads(payloadsNeedingSave)
 
     if (options.onPresyncSave) {

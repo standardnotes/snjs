@@ -942,7 +942,13 @@ describe('online syncing', function () {
       },
     })
 
-    const resolver = new ServerSyncResponseResolver(response, [payload], masterCollection, [], historyMap)
+    const resolver = new ServerSyncResponseResolver(
+      response,
+      [payload],
+      masterCollection,
+      [],
+      historyMap,
+    )
 
     const collections = await resolver.collectionsByProcessingResponse()
 
@@ -998,5 +1004,19 @@ describe('online syncing', function () {
 
     expect(events[0]).to.equal('on-presync-save')
     expect(events[1]).to.equal('sync-will-begin')
+  })
+
+  it('deleting an item permanently should include it in PayloadSource.PreSyncSave item change observer', async function () {
+    let conditionMet = false
+    this.application.streamItems([ContentType.Note], async ({ removed, source }) => {
+      if (source === PayloadSource.PreSyncSave && removed.length === 1) {
+        conditionMet = true
+      }
+    })
+
+    const note = await Factory.createSyncedNote(this.application)
+    await this.application.mutator.deleteItem(note)
+
+    expect(conditionMet).to.equal(true)
   })
 })

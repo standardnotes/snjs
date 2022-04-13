@@ -4,6 +4,7 @@ import { ItemManager } from './ItemManager'
 import { PayloadManager } from '../Payloads/PayloadManager'
 import { UuidGenerator } from '@standardnotes/utils'
 import * as Models from '@standardnotes/models'
+import { DeletedPayload } from '@standardnotes/models'
 
 const setupRandomUuid = () => {
   UuidGenerator.SetGenerator(() => String(Math.random()))
@@ -97,6 +98,28 @@ describe('itemManager', () => {
       }),
     )
   }
+
+  describe('item emit', () => {
+    it('deleted payloads should map to removed items', async () => {
+      itemManager = createService()
+
+      const payload = new DeletedPayload({
+        uuid: String(Math.random()),
+        content_type: ContentType.Note,
+        content: undefined,
+        deleted: true,
+        dirty: true,
+      })
+
+      const mockFn = jest.fn()
+
+      itemManager['notifyObservers'] = mockFn
+
+      await payloadManager.emitPayload(payload)
+
+      expect(mockFn.mock.calls[0][2]).toHaveLength(1)
+    })
+  })
 
   describe('note display criteria', () => {
     it('viewing notes with tag', async () => {

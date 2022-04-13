@@ -9,12 +9,12 @@ import * as Models from '@standardnotes/models'
 import * as Services from '@standardnotes/services'
 import { ItemsClientInterface } from './ItemsClientInterface'
 import { PayloadManagerChangeData } from '../Payloads'
-import { DecryptedItemInterface, ItemInterface } from '@standardnotes/models'
 
-type ItemsChangeObserver<I extends DecryptedItemInterface = DecryptedItemInterface> = {
-  contentType: ContentType[]
-  callback: Services.ItemManagerChangeObserverCallback<I>
-}
+type ItemsChangeObserver<I extends Models.DecryptedItemInterface = Models.DecryptedItemInterface> =
+  {
+    contentType: ContentType[]
+    callback: Services.ItemManagerChangeObserverCallback<I>
+  }
 
 /**
  * The item manager is backed by the payload manager. It listens for change events from the
@@ -279,7 +279,7 @@ export class ItemManager
     return this.noteCount
   }
 
-  public addObserver<I extends DecryptedItemInterface = DecryptedItemInterface>(
+  public addObserver<I extends Models.DecryptedItemInterface = Models.DecryptedItemInterface>(
     contentType: ContentType | ContentType[],
     callback: Services.ItemManagerChangeObserverCallback<I>,
   ): () => void {
@@ -352,25 +352,61 @@ export class ItemManager
       (p) => new Models.EncryptedItem(p),
     )
 
-    const unerroredItems = unerrored.map(createItem) as DecryptedItemInterface[]
+    const unerroredItems = unerrored.map((p) => new Models.DecryptedItem(p))
 
     const delta: Models.ItemDelta = {
       changed: changedItems,
       inserted: insertedItems,
       discarded: discardedItems,
       ignored: ignoredItems,
+      unerrored: unerroredItems,
     }
 
     this.collection.onChange(delta)
     this.notesCollection.onChange(delta)
     this.tagNotesIndex.onChange(delta)
 
+    this.notifyObserversByUiAdjustingDelta(delta, source, sourceKey)
+  }
+
+  private notifyObserversByUiAdjustingDelta(
+    delta: Models.ItemDelta,
+    source: Models.PayloadSource,
+    sourceKey?: string,
+  ) {
+    const changedItems: Models.DecryptedItemInterface[] = []
+    const insertedItems: Models.DecryptedItemInterface[] = []
+    const changedDeleted: Models.DeletedItemInterface[] = []
+    const insertedDeleted: Models.DeletedItemInterface[] = []
+
+    for (const item of delta.changed) {
+      if (Models.isDeletedItem(item)) {
+        changedDeleted.push(item)
+      } else if (Models.isDecryptedItem(item)) {
+        changedItems.push(item)
+      }
+    }
+
+    for (const item of delta.inserted) {
+      if (Models.isDeletedItem(item)) {
+        insertedDeleted.push(item)
+      } else if (Models.isDecryptedItem(item)) {
+        insertedItems.push(item)
+      }
+    }
+
+    const itemsToRemoveFromUI: Models.DeletedItemInterface[] = [
+      ...delta.discarded,
+      ...changedDeleted,
+      ...insertedDeleted,
+    ]
+
     this.notifyObservers(
-      delta.changed.filter(Models.isDecryptedItem),
-      delta.inserted.filter(Models.isDecryptedItem),
-      delta.discarded,
+      changedItems,
+      insertedItems,
+      itemsToRemoveFromUI,
       delta.ignored,
-      unerroredItems,
+      delta.unerrored,
       source,
       sourceKey,
     )
@@ -806,7 +842,7 @@ export class ItemManager
     return this.collection.allDecrypted<T>(contentType)
   }
 
-  getAnyItems(contentType: ContentType | ContentType[]): ItemInterface[] {
+  getAnyItems(contentType: ContentType | ContentType[]): Models.ItemInterface[] {
     return this.collection.all(contentType)
   }
 
