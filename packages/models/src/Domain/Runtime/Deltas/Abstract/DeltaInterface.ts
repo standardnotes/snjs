@@ -6,7 +6,7 @@ import { DeltaEmit } from './DeltaEmit'
 export interface DeltaInterface {
   baseCollection: ImmutablePayloadCollection
 
-  result(): Promise<DeltaEmit>
+  result(): DeltaEmit
 
   findBasePayload(uuid: Uuid): FullyFormedPayloadInterface | undefined
 }

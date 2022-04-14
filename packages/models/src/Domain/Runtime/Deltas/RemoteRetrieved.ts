@@ -6,8 +6,8 @@ import {
   isErrorDecryptingPayload,
   isDecryptedPayload,
 } from '../../Abstract/Payload/Interfaces/TypeCheck'
-import { FullyFormedPayloadInterface, PayloadEmitSource } from '../../Abstract/Payload'
-import { Uuid } from '@standardnotes/common'
+import { EncryptedPayloadInterface, FullyFormedPayloadInterface, PayloadEmitSource } from '../../Abstract/Payload'
+import { ContentType, Uuid } from '@standardnotes/common'
 import { HistoryMap } from '../History'
 import { ServerSyncPushContextualPayload } from '../../Abstract/Contextual/ServerSyncPush'
 import {
@@ -15,6 +15,7 @@ import {
   payloadsByRedirtyingBasedOnBaseState,
 } from './Utilities.ts/ApplyDirtyState'
 import { DeltaEmit } from './Abstract/DeltaEmit'
+import { ItemsKeyDelta } from './ItemsKeyDelta'
 
 export class DeltaRemoteRetrieved extends PayloadsDelta {
   constructor(
@@ -30,8 +31,9 @@ export class DeltaRemoteRetrieved extends PayloadsDelta {
     return this.itemsSavedOrSaving.find((i) => i.uuid === uuid) != undefined
   }
 
-  public async result(): Promise<DeltaEmit> {
-    const filtered: FullyFormedPayloadInterface[] = []
+  public result(): DeltaEmit {
+    const results: FullyFormedPayloadInterface[] = []
+    const ignored: EncryptedPayloadInterface[] = []
     const conflicted: FullyFormedPayloadInterface[] = []
 
     /**
@@ -39,6 +41,19 @@ export class DeltaRemoteRetrieved extends PayloadsDelta {
      * or if the item is locally dirty, filter it out of retrieved_items, and add to potential conflicts.
      */
     for (const apply of this.applyCollection.all()) {
+      if (apply.content_type === ContentType.ItemsKey) {
+        const itemsKeyDeltaEmit = new ItemsKeyDelta(this.baseCollection, [apply]).result()
+
+        if (itemsKeyDeltaEmit.changed) {
+          extendArray(results, itemsKeyDeltaEmit.changed)
+        }
+        if (itemsKeyDeltaEmit.ignored) {
+          extendArray(ignored, itemsKeyDeltaEmit.ignored)
+        }
+
+        continue
+      }
+
       const isSavedOrSaving = this.isUuidOfPayloadCurrentlySavingOrSaved(apply.uuid)
 
       if (isSavedOrSaving) {
@@ -54,7 +69,7 @@ export class DeltaRemoteRetrieved extends PayloadsDelta {
         continue
       }
 
-      filtered.push(payloadByRedirtyingBasedOnBaseState(apply, this.baseCollection))
+      results.push(payloadByRedirtyingBasedOnBaseState(apply, this.baseCollection))
     }
 
     /**
@@ -62,7 +77,6 @@ export class DeltaRemoteRetrieved extends PayloadsDelta {
      * local values, and if they differ, we create a new payload that is a copy
      * of the server payload.
      */
-    const conflictResults: FullyFormedPayloadInterface[] = []
     for (const conflict of conflicted) {
       if (!isDecryptedPayload(conflict)) {
         continue
@@ -75,16 +89,14 @@ export class DeltaRemoteRetrieved extends PayloadsDelta {
 
       const delta = new ConflictDelta(this.baseCollection, base, conflict, this.historyMap)
 
-      const payloads = payloadsByRedirtyingBasedOnBaseState(
-        await delta.result(),
-        this.baseCollection,
-      )
+      const payloads = payloadsByRedirtyingBasedOnBaseState(delta.result(), this.baseCollection)
 
-      extendArray(conflictResults, payloads)
+      extendArray(results, payloads)
     }
 
     return {
-      changed: filtered.concat(conflictResults),
+      changed: results,
+      ignored: ignored,
       source: PayloadEmitSource.RemoteRetrieved,
     }
   }

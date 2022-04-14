@@ -246,9 +246,19 @@ describe('keys', function () {
       errorDecrypting: true,
     })
 
-    await this.application.payloadManager.emitPayload(errored, PayloadEmitSource.LocalInserted)
+    const response = new ServerSyncResponse({
+      data: {
+        retrieved_items: [errored.ejected()],
+      },
+    })
 
-    const refreshedKey = this.application.items.findItem(itemsKey.uuid)
+    await this.application.syncService.handleSuccessServerResponse(
+      { payloadsSavedOrSaving: [] },
+      response,
+    )
+
+    const refreshedKey = this.application.payloadManager.findOne(itemsKey.uuid)
+
     expect(refreshedKey.errorDecrypting).to.not.be.ok
     expect(refreshedKey.content.itemsKey).to.be.ok
   })

@@ -829,7 +829,7 @@ export class SNSyncService
 
     const delta = new DeltaOfflineSaved(masterCollection, response.savedPayloads)
 
-    const emit = await delta.result()
+    const emit = delta.result()
 
     const payloadsToPersist = await this.payloadManager.emitDeltaEmit(emit)
 
@@ -894,10 +894,11 @@ export class SNSyncService
       historyMap,
     )
 
-    const emits = await resolver.result()
+    const emits = resolver.result()
 
     for (const emit of emits) {
       const payloadsToPersist = await this.payloadManager.emitDeltaEmit(emit)
+
       await this.persistPayloads(payloadsToPersist)
     }
 
@@ -1201,7 +1202,7 @@ export class SNSyncService
       this.historyService.getHistoryMapCopy(),
     )
 
-    const emit = await delta.result()
+    const emit = delta.result()
 
     await this.payloadManager.emitDeltaEmit(emit)
 

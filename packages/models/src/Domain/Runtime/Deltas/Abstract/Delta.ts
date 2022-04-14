@@ -31,7 +31,7 @@ export abstract class PayloadsDelta implements DeltaInterface {
     protected readonly historyMap: HistoryMap,
   ) {}
 
-  public abstract result(): Promise<DeltaEmit>
+  public abstract result(): DeltaEmit
 
   findBasePayload(uuid: Uuid): FullyFormedPayloadInterface | undefined {
     return this.baseCollection.find(uuid)

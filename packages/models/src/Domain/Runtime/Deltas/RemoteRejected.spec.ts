@@ -36,7 +36,7 @@ describe('remote rejected delta', () => {
       {} as HistoryMap,
     )
 
-    const result = await delta.result()
+    const result = delta.result()
     const payload = result.changed[0] as DecryptedPayload<NoteContent>
 
     expect(payload.content.title).toBe('foo')

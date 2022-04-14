@@ -13,7 +13,7 @@ import { DeltaEmit } from './Abstract/DeltaEmit'
  * In uuid_conflict, we receive the value we attmpted to save.
  */
 export class DeltaRemoteUuidConflicts extends PayloadsDelta {
-  public async result(): Promise<DeltaEmit> {
+  public result(): DeltaEmit {
     const results: FullyFormedPayloadInterface[] = []
     const baseCollectionCopy = this.baseCollection.mutableCopy()
 
@@ -31,7 +31,7 @@ export class DeltaRemoteUuidConflicts extends PayloadsDelta {
         continue
       }
 
-      const alternateResults = await PayloadsByAlternatingUuid(
+      const alternateResults = PayloadsByAlternatingUuid(
         useApply,
         ImmutablePayloadCollection.FromCollection(baseCollectionCopy),
       )

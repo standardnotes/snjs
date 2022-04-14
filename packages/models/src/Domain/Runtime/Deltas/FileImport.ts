@@ -23,11 +23,11 @@ export class DeltaFileImport extends CustomApplyDelta {
     super(baseCollection)
   }
 
-  public async result(): Promise<DeltaEmit<Return>> {
+  public result(): DeltaEmit<Return> {
     const results: Return[] = []
 
     for (const payload of this.applyPayloads) {
-      const handled = await this.payloadsByHandlingPayload(payload, results)
+      const handled = this.payloadsByHandlingPayload(payload, results)
 
       const payloads = handled.map((result) => {
         return result.copy({
@@ -45,10 +45,10 @@ export class DeltaFileImport extends CustomApplyDelta {
     }
   }
 
-  private async payloadsByHandlingPayload(
+  private payloadsByHandlingPayload(
     payload: DecryptedPayloadInterface | DeletedPayloadInterface,
     currentResults: Return[],
-  ): Promise<FullyFormedPayloadInterface[]> {
+  ): FullyFormedPayloadInterface[] {
     /**
      * Check to see if we've already processed a payload for this id.
      * If so, that would be the latest value, and not what's in the base collection.

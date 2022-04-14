@@ -2,7 +2,6 @@ import { ContentType, Uuid } from '@standardnotes/common'
 import {
   PayloadsChangeObserver,
   QueueElement,
-  OverwriteProtectedTypes,
   PayloadsChangeObserverCallback,
   EmitQueue,
 } from './Types'
@@ -10,7 +9,6 @@ import { removeFromArray, Uuids } from '@standardnotes/utils'
 import {
   DeltaFileImport,
   isDeletedPayload,
-  isErrorDecryptingPayload,
   ImmutablePayloadCollection,
   EncryptedPayloadInterface,
   PayloadSource,
@@ -154,15 +152,13 @@ export class PayloadManager extends AbstractService implements PayloadManagerInt
   private popQueue() {
     const first = this.emitQueue[0]
 
-    const { changed, inserted, discarded, ignored, unerrored } = this.applyPayloads(
-      first.emit.changed,
-    )
+    const { changed, inserted, discarded, unerrored } = this.applyPayloads(first.emit.changed)
 
     this.notifyChangeObservers(
       changed,
       inserted,
       discarded,
-      ignored,
+      first.emit.ignored || [],
       unerrored,
       first.emit.source,
       first.sourceKey,
@@ -181,54 +177,37 @@ export class PayloadManager extends AbstractService implements PayloadManagerInt
     const changed: FullyFormedPayloadInterface[] = []
     const inserted: FullyFormedPayloadInterface[] = []
     const discarded: DeletedPayloadInterface[] = []
-    const ignored: EncryptedPayloadInterface[] = []
     const unerrored: DecryptedPayloadInterface[] = []
 
-    for (const applyPayload of applyPayloads) {
-      if (!applyPayload.uuid || !applyPayload.content_type) {
-        console.error('Payload is corrupt', applyPayload)
+    for (const apply of applyPayloads) {
+      if (!apply.uuid || !apply.content_type) {
+        console.error('Payload is corrupt', apply)
 
         continue
       }
 
-      const masterPayload = this.collection.find(applyPayload.uuid)
+      const base = this.collection.find(apply.uuid)
 
-      let newPayload = applyPayload
+      if (isDeletedPayload(apply) && apply.discardable) {
+        this.collection.discard(apply)
 
-      if (
-        OverwriteProtectedTypes.includes(applyPayload.content_type) &&
-        isErrorDecryptingPayload(applyPayload) &&
-        masterPayload &&
-        !isErrorDecryptingPayload(masterPayload)
-      ) {
-        ignored.push(applyPayload)
-
-        newPayload = masterPayload.copy({
-          updated_at_timestamp: applyPayload.updated_at_timestamp,
-          updated_at: applyPayload.updated_at,
-        })
-      }
-
-      if (masterPayload && isEncryptedPayload(masterPayload) && isDecryptedPayload(applyPayload)) {
-        unerrored.push(newPayload as DecryptedPayloadInterface)
-      }
-
-      if (isDeletedPayload(newPayload) && newPayload.discardable) {
-        this.collection.discard(newPayload)
-
-        discarded.push(newPayload)
+        discarded.push(apply)
       } else {
-        this.collection.set(newPayload)
+        this.collection.set(apply)
 
-        if (!masterPayload) {
-          inserted.push(newPayload)
+        if (base) {
+          changed.push(apply)
+
+          if (isEncryptedPayload(base) && isDecryptedPayload(apply)) {
+            unerrored.push(apply)
+          }
         } else {
-          changed.push(newPayload)
+          inserted.push(apply)
         }
       }
     }
 
-    return { changed, inserted, discarded, ignored, unerrored }
+    return { changed, inserted, discarded, unerrored }
   }
 
   /**
@@ -311,7 +290,7 @@ export class PayloadManager extends AbstractService implements PayloadManagerInt
 
     const delta = new DeltaFileImport(this.getMasterCollection(), sourcedPayloads, historyMap)
 
-    const emit = await delta.result()
+    const emit = delta.result()
 
     await this.emitDeltaEmit(emit)
 

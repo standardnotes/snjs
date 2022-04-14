@@ -34,25 +34,25 @@ export class ServerSyncResponseResolver {
     private historyMap: HistoryMap,
   ) {}
 
-  public async result(): Promise<DeltaEmit[]> {
+  public result(): DeltaEmit[] {
     const emits: DeltaEmit[] = []
 
-    emits.push(await this.processRetrievedPayloads())
-    emits.push(await this.processSavedPayloads())
-    emits.push(await this.processUuidConflictPayloads())
-    emits.push(await this.processDataConflictPayloads())
-    emits.push(await this.processRejectedPayloads())
+    emits.push(this.processRetrievedPayloads())
+    emits.push(this.processSavedPayloads())
+    emits.push(this.processUuidConflictPayloads())
+    emits.push(this.processDataConflictPayloads())
+    emits.push(this.processRejectedPayloads())
 
     return emits
   }
 
-  private processSavedPayloads(): Promise<DeltaEmit> {
+  private processSavedPayloads(): DeltaEmit {
     const delta = new DeltaRemoteSaved(this.baseCollection, this.payloadSet.savedPayloads)
 
     return delta.result()
   }
 
-  private processRetrievedPayloads(): Promise<DeltaEmit> {
+  private processRetrievedPayloads(): DeltaEmit {
     const collection = ImmutablePayloadCollection.WithPayloads(this.payloadSet.retrievedPayloads)
 
     const delta = new DeltaRemoteRetrieved(
@@ -65,7 +65,7 @@ export class ServerSyncResponseResolver {
     return delta.result()
   }
 
-  private processDataConflictPayloads(): Promise<DeltaEmit> {
+  private processDataConflictPayloads(): DeltaEmit {
     const collection = ImmutablePayloadCollection.WithPayloads(this.payloadSet.dataConflictPayloads)
 
     const delta = new DeltaRemoteDataConflicts(this.baseCollection, collection, this.historyMap)
@@ -73,7 +73,7 @@ export class ServerSyncResponseResolver {
     return delta.result()
   }
 
-  private processUuidConflictPayloads(): Promise<DeltaEmit> {
+  private processUuidConflictPayloads(): DeltaEmit {
     const collection = ImmutablePayloadCollection.WithPayloads(this.payloadSet.uuidConflictPayloads)
 
     const delta = new DeltaRemoteUuidConflicts(this.baseCollection, collection, this.historyMap)
@@ -81,7 +81,7 @@ export class ServerSyncResponseResolver {
     return delta.result()
   }
 
-  private processRejectedPayloads(): Promise<DeltaEmit> {
+  private processRejectedPayloads(): DeltaEmit {
     const collection = ImmutablePayloadCollection.WithPayloads(this.payloadSet.rejectedPayloads)
 
     const delta = new DeltaRemoteRejected(this.baseCollection, collection, this.historyMap)

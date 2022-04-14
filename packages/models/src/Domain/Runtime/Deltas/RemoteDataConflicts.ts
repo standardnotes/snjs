@@ -6,7 +6,7 @@ import { payloadsByRedirtyingBasedOnBaseState } from './Utilities.ts/ApplyDirtyS
 import { DeltaEmit } from './Abstract/DeltaEmit'
 
 export class DeltaRemoteDataConflicts extends PayloadsDelta {
-  public async result(): Promise<DeltaEmit> {
+  public result(): DeltaEmit {
     const results: FullyFormedPayloadInterface[] = []
 
     for (const apply of this.applyCollection.all()) {
@@ -22,7 +22,7 @@ export class DeltaRemoteDataConflicts extends PayloadsDelta {
 
       const delta = new ConflictDelta(this.baseCollection, base, apply, this.historyMap)
 
-      const deltaResults = await delta.result()
+      const deltaResults = delta.result()
 
       const payloads = payloadsByRedirtyingBasedOnBaseState(deltaResults, this.baseCollection)
 

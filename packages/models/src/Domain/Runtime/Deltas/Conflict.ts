@@ -24,12 +24,10 @@ export class ConflictDelta {
     protected readonly historyMap: HistoryMap,
   ) {}
 
-  public async result(): Promise<FullyFormedPayloadInterface[]> {
+  public result(): FullyFormedPayloadInterface[] {
     const strategy = this.getConflictStrategy()
 
-    const results = await this.handleStrategy(strategy)
-
-    return results
+    return this.handleStrategy(strategy)
   }
 
   private getConflictStrategy(): ConflictStrategy {
@@ -81,7 +79,7 @@ export class ConflictDelta {
     return ConflictStrategy.KeepApply
   }
 
-  private async handleStrategy(strategy: ConflictStrategy): Promise<FullyFormedPayloadInterface[]> {
+  private handleStrategy(strategy: ConflictStrategy): FullyFormedPayloadInterface[] {
     if (strategy === ConflictStrategy.KeepBase) {
       const updatedAt = greaterOfTwoDates(
         this.basePayload.serverUpdatedAt,
@@ -137,7 +135,7 @@ export class ConflictDelta {
         this.applyPayload.source,
       )
 
-      const rightPayloads = await PayloadsByDuplicating({
+      const rightPayloads = PayloadsByDuplicating({
         payload: this.applyPayload,
         baseCollection: this.baseCollection,
         isConflict: true,
@@ -148,7 +146,7 @@ export class ConflictDelta {
     }
 
     if (strategy === ConflictStrategy.DuplicateBaseKeepApply) {
-      const leftPayloads = await PayloadsByDuplicating({
+      const leftPayloads = PayloadsByDuplicating({
         payload: this.basePayload,
         baseCollection: this.baseCollection,
         isConflict: true,

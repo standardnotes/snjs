@@ -11,5 +11,5 @@ export abstract class CustomApplyDelta implements DeltaInterface {
     return this.baseCollection.find(uuid)
   }
 
-  public abstract result(): Promise<DeltaEmit>
+  public abstract result(): DeltaEmit
 }

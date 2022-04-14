@@ -185,7 +185,7 @@ export class SNKeyRecoveryService extends AbstractService {
   }
 
   public async processPersistedUndecryptables() {
-    const record = await this.getUndecryptables()
+    const record = this.getUndecryptables()
     const rawPayloads = Object.values(record)
 
     if (rawPayloads.length === 0) {

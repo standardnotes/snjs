@@ -4,7 +4,7 @@ import { FullyFormedPayloadInterface, PayloadEmitSource } from '../../Abstract/P
 import { DeltaEmit } from './Abstract/DeltaEmit'
 
 export class DeltaRemoteRejected extends PayloadsDelta {
-  public async result(): Promise<DeltaEmit> {
+  public result(): DeltaEmit {
     const results: FullyFormedPayloadInterface[] = []
 
     for (const apply of this.applyCollection.all()) {

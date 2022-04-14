@@ -16,7 +16,7 @@ export class DeltaRemoteSaved extends CustomApplyDelta {
     super(baseCollection)
   }
 
-  public async result(): Promise<DeltaEmit> {
+  public result(): DeltaEmit {
     const processed: FullyFormedPayloadInterface[] = []
 
     for (const apply of this.applyContextualPayloads) {
