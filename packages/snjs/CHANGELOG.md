@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.94.9](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.94.8...@standardnotes/snjs@2.94.9) (2022-04-14)
+
+
+### Bug Fixes
+
+* map ignored item timestamps so application remains in sync ([#692](https://github.com/standardnotes/snjs/issues/692)) ([966cbb0](https://github.com/standardnotes/snjs/commit/966cbb0c254d4d95c802bd8951488a499d1f8bef))
+
+
+
+
+
 ## [2.94.8](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.94.7...@standardnotes/snjs@2.94.8) (2022-04-14)
 
 **Note:** Version bump only for package @standardnotes/snjs
