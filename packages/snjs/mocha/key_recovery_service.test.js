@@ -410,7 +410,9 @@ describe('key recovery service', function () {
     const currentItemsKey = application.items.findItem(itemsKey.uuid)
     expect(currentItemsKey.errorDecrypting).to.not.be.ok
     expect(currentItemsKey.itemsKey).to.equal(itemsKey.itemsKey)
-    expect(currentItemsKey.serverUpdatedAt.getTime()).to.equal(itemsKey.serverUpdatedAt.getTime())
+
+    /** The timestamp of our current key should be updated however so we do not enter out of sync state */
+    expect(currentItemsKey.serverUpdatedAt.getTime()).to.equal(newUpdated.getTime())
 
     /** Payload should be persisted as unrecoverable */
     const undecryptables = await application.keyRecoveryService.getUndecryptables()
@@ -426,9 +428,7 @@ describe('key recovery service', function () {
     const latestItemsKey = application.items.findItem(itemsKey.uuid)
     expect(latestItemsKey.errorDecrypting).to.not.be.ok
     expect(latestItemsKey.itemsKey).to.equal(itemsKey.itemsKey)
-    expect(latestItemsKey.serverUpdatedAt.getTime()).to.not.equal(
-      currentItemsKey.serverUpdatedAt.getTime(),
-    )
+
     expect(latestItemsKey.serverUpdatedAt.getTime()).to.equal(newUpdated.getTime())
 
     expect(application.syncService.isOutOfSync()).to.equal(false)
