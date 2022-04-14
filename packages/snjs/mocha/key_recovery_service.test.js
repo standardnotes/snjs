@@ -69,7 +69,7 @@ describe('key recovery service', function () {
     expect(decrypted.errorDecrypting).to.equal(true)
 
     /** Insert into rotation */
-    await application.payloadManager.emitPayload(decrypted, PayloadSource.Constructor)
+    await application.payloadManager.emitPayload(decrypted, PayloadEmitSource.LocalInserted)
 
     /** Wait and allow recovery wizard to complete */
     await Factory.sleep(0.3)
@@ -132,7 +132,7 @@ describe('key recovery service', function () {
       },
     })
 
-    await application.payloadManager.emitPayloads(decrypted, PayloadSource.Constructor)
+    await application.payloadManager.emitPayloads(decrypted, PayloadEmitSource.LocalInserted)
 
     /** Wait and allow recovery wizard to complete */
     await Factory.sleep(1.5)
@@ -357,7 +357,7 @@ describe('key recovery service', function () {
       encrypted.copy({
         errorDecrypting: true,
       }),
-      PayloadSource.Constructor,
+      PayloadEmitSource.LocalInserted,
     )
 
     /** At this point key recovery wizard will encounter an undecryptable items key,
@@ -403,7 +403,7 @@ describe('key recovery service', function () {
         errorDecrypting: true,
         updated_at: newUpdated,
       }),
-      PayloadSource.Constructor,
+      PayloadEmitSource.LocalInserted,
     )
 
     /** Our current items key should not be overwritten */
@@ -460,7 +460,7 @@ describe('key recovery service', function () {
       encrypted.copy({
         errorDecrypting: true,
       }),
-      PayloadSource.Constructor,
+      PayloadEmitSource.LocalInserted,
     )
     /** Allow enough time to persist to disk, but not enough to complete recovery wizard */
     console.warn(
@@ -549,7 +549,7 @@ describe('key recovery service', function () {
     expect(decrypted.errorDecrypting).to.equal(true)
 
     /** Insert into rotation */
-    await application.payloadManager.emitPayload(decrypted, PayloadSource.Constructor)
+    await application.payloadManager.emitPayload(decrypted, PayloadEmitSource.LocalInserted)
 
     /** Wait and allow recovery wizard to complete */
     await Factory.sleep(0.3)
@@ -626,7 +626,7 @@ describe('key recovery service', function () {
       encrypted.copy({
         errorDecrypting: true,
       }),
-      PayloadSource.Constructor,
+      PayloadEmitSource.LocalInserted,
     )
 
     await Factory.awaitFunctionInvokation(

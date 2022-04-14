@@ -12,7 +12,7 @@ import { ButtonType, SNAlertService } from '@Lib/Services/Alert/AlertService'
 import { ClientDisplayableError, UserFeaturesResponse } from '@standardnotes/responses'
 import { ContentType, RoleName } from '@standardnotes/common'
 import { FeaturesClientInterface } from './ClientInterface'
-import { FillItemContent, PayloadSource } from '@standardnotes/models'
+import { FillItemContent, PayloadEmitSource } from '@standardnotes/models'
 import { ItemManager } from '../Items/ItemManager'
 import { LEGACY_PROD_EXT_ORIGIN, PROD_OFFLINE_FEATURES_URL } from '../../Hosts'
 import { SettingName } from '@standardnotes/settings'
@@ -84,13 +84,14 @@ export class SNFeaturesService
       ContentType.ExtensionRepo,
       async ({ changed, inserted, source }) => {
         const sources = [
-          PayloadSource.Constructor,
-          PayloadSource.LocalRetrieved,
-          PayloadSource.RemoteRetrieved,
-          PayloadSource.FileImport,
+          PayloadEmitSource.InitialObserverRegistrationPush,
+          PayloadEmitSource.LocalInserted,
+          PayloadEmitSource.LocalDatabaseLoaded,
+          PayloadEmitSource.RemoteRetrieved,
+          PayloadEmitSource.FileImport,
         ]
 
-        if (source && sources.includes(source)) {
+        if (sources.includes(source)) {
           const items = [...changed, ...inserted] as Models.SNFeatureRepo[]
           if (this.sessionManager.isSignedIntoFirstPartyServer()) {
             await this.migrateFeatureRepoToUserSetting(items)
@@ -106,6 +107,7 @@ export class SNFeaturesService
         const featureRepos = this.itemManager.getItems(
           ContentType.ExtensionRepo,
         ) as Models.SNFeatureRepo[]
+
         if (!this.apiService.isThirdPartyHostUsed()) {
           void this.migrateFeatureRepoToUserSetting(featureRepos)
         }

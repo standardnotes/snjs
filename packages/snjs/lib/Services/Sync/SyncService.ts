@@ -54,6 +54,7 @@ import {
   CreateNonDecryptedPayloadSplit,
   DeltaOfflineSaved,
   FilteredServerItem,
+  PayloadEmitSource,
 } from '@standardnotes/models'
 import {
   AbstractService,
@@ -230,7 +231,7 @@ export class SNSyncService
 
     await this.payloadManager.emitPayloads(
       [...originallyDecryptedItemsKeysPayloads, ...newlyDecryptedItemsKeys],
-      PayloadSource.LocalRetrieved,
+      PayloadEmitSource.LocalDatabaseLoaded,
     )
   }
 
@@ -253,7 +254,7 @@ export class SNSyncService
     const unsortedPayloads = rawPayloads
       .map((rawPayload) => {
         try {
-          return CreatePayload(rawPayload)
+          return CreatePayload(rawPayload, PayloadSource.Constructor)
         } catch (e) {
           console.error('Creating payload fail+ed', e)
           return undefined
@@ -305,7 +306,7 @@ export class SNSyncService
 
       await this.payloadManager.emitPayloads(
         [...nonencrypted, ...results],
-        PayloadSource.LocalRetrieved,
+        PayloadEmitSource.LocalDatabaseLoaded,
       )
 
       void this.notifyEvent(SyncEvent.LocalDataIncrementalLoad)
@@ -370,7 +371,7 @@ export class SNSyncService
       })
     })
 
-    await this.payloadManager.emitPayloads(payloads, PayloadSource.LocalChanged)
+    await this.payloadManager.emitPayloads(payloads, PayloadEmitSource.LocalChanged)
     await this.persistPayloads(payloads)
   }
 
@@ -830,7 +831,10 @@ export class SNSyncService
 
     const collection = await delta.resultingCollection()
 
-    const payloadsToPersist = await this.payloadManager.emitCollection(collection)
+    const payloadsToPersist = await this.payloadManager.emitCollection(
+      collection,
+      PayloadEmitSource.OfflineSyncSaved,
+    )
 
     await this.persistPayloads(payloadsToPersist)
 
@@ -877,8 +881,11 @@ export class SNSyncService
     )
 
     const collections = await resolver.collectionsByProcessingResponse()
-    for (const collection of collections) {
-      const payloadsToPersist = await this.payloadManager.emitCollection(collection)
+    for (const emittableCollection of collections) {
+      const payloadsToPersist = await this.payloadManager.emitCollection(
+        emittableCollection.collection,
+        emittableCollection.emitSource,
+      )
       await this.persistPayloads(payloadsToPersist)
     }
 
@@ -1107,7 +1114,7 @@ export class SNSyncService
       })
     })
 
-    await this.payloadManager.emitPayloads(payloads, PayloadSource.LocalChanged)
+    await this.payloadManager.emitPayloads(payloads, PayloadEmitSource.LocalChanged)
     await this.persistPayloads(payloads)
   }
 
@@ -1177,14 +1184,14 @@ export class SNSyncService
   private async emitOutOfSyncRemotePayloads(payloads: FullyFormedPayloadInterface[]) {
     const delta = new DeltaOutOfSync(
       this.payloadManager.getMasterCollection(),
-      ImmutablePayloadCollection.WithPayloads(payloads, PayloadSource.RemoteRetrieved),
+      ImmutablePayloadCollection.WithPayloads(payloads),
       undefined,
       this.historyService.getHistoryMapCopy(),
     )
 
     const collection = await delta.resultingCollection()
 
-    await this.payloadManager.emitCollection(collection)
+    await this.payloadManager.emitCollection(collection, PayloadEmitSource.RemoteRetrieved)
 
     await this.persistPayloads(collection.payloads)
   }

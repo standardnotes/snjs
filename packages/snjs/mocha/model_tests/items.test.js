@@ -23,7 +23,7 @@ describe('items', () => {
 
   it('setting an item as dirty should update its client updated at', async function () {
     const params = Factory.createNotePayload()
-    await this.application.itemManager.emitItemsFromPayloads([params], PayloadSource.LocalChanged)
+    await this.application.itemManager.emitItemsFromPayloads([params], PayloadEmitSource.LocalChanged)
     const item = this.application.itemManager.items[0]
     const prevDate = item.userModifiedDate.getTime()
     await Factory.sleep(0.1)
@@ -35,7 +35,7 @@ describe('items', () => {
 
   it('setting an item as dirty with option to skip client updated at', async function () {
     const params = Factory.createNotePayload()
-    await this.application.itemManager.emitItemsFromPayloads([params], PayloadSource.LocalChanged)
+    await this.application.itemManager.emitItemsFromPayloads([params], PayloadEmitSource.LocalChanged)
     const item = this.application.itemManager.items[0]
     const prevDate = item.userModifiedDate.getTime()
     await Factory.sleep(0.1)
@@ -46,7 +46,7 @@ describe('items', () => {
 
   it('properly pins, archives, and locks', async function () {
     const params = Factory.createNotePayload()
-    await this.application.itemManager.emitItemsFromPayloads([params], PayloadSource.LocalChanged)
+    await this.application.itemManager.emitItemsFromPayloads([params], PayloadEmitSource.LocalChanged)
 
     const item = this.application.itemManager.items[0]
     expect(item.pinned).to.not.be.ok
@@ -72,7 +72,7 @@ describe('items', () => {
     const params2 = Factory.createNotePayload()
     await this.application.itemManager.emitItemsFromPayloads(
       [params1, params2],
-      PayloadSource.LocalChanged,
+      PayloadEmitSource.LocalChanged,
     )
 
     let item1 = this.application.itemManager.notes[0]
@@ -180,7 +180,7 @@ describe('items', () => {
     const params2 = Factory.createNotePayload()
     await this.application.itemManager.emitItemsFromPayloads(
       [params1, params2],
-      PayloadSource.LocalChanged,
+      PayloadEmitSource.LocalChanged,
     )
 
     let item1 = this.application.itemManager.notes[0]

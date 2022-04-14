@@ -53,7 +53,7 @@ describe('notes + tags syncing', function () {
 
     await this.application.itemManager.emitItemsFromPayloads(
       [notePayload, tagPayload],
-      PayloadSource.LocalChanged,
+      PayloadEmitSource.LocalChanged,
     )
     const note = this.application.itemManager.getItems([ContentType.Note])[0]
     const tag = this.application.itemManager.getItems([ContentType.Tag])[0]
@@ -80,7 +80,7 @@ describe('notes + tags syncing', function () {
     const tagPayload = pair[1]
     await this.application.itemManager.emitItemsFromPayloads(
       [notePayload, tagPayload],
-      PayloadSource.LocalChanged,
+      PayloadEmitSource.LocalChanged,
     )
     const originalNote = this.application.itemManager.notes[0]
     const originalTag = this.application.itemManager.tags[0]
@@ -116,7 +116,7 @@ describe('notes + tags syncing', function () {
     const tagPayload = pair[1]
     await this.application.itemManager.emitItemsFromPayloads(
       [notePayload, tagPayload],
-      PayloadSource.LocalChanged,
+      PayloadEmitSource.LocalChanged,
     )
     let note = this.application.itemManager.notes[0]
     let tag = this.application.itemManager.tags[0]

@@ -7,13 +7,13 @@ import {
 import { UserService } from '../User/UserService'
 import {
   ItemsKeyInterface,
-  PayloadSource,
   isErrorDecryptingPayload,
   EncryptedPayloadInterface,
   EncryptedPayload,
   isDecryptedPayload,
   ItemsKeyContent,
   DecryptedPayloadInterface,
+  PayloadEmitSource,
 } from '@standardnotes/models'
 import { SNSyncService } from '../Sync/SyncService'
 import { KeyRecoveryStrings } from '../Api/Messages'
@@ -103,7 +103,7 @@ export class SNKeyRecoveryService extends AbstractService {
     this.removeItemObserver = this.payloadManager.addObserver(
       [ContentType.ItemsKey],
       ({ changed, inserted, ignored, source }) => {
-        if (source === PayloadSource.LocalChanged) {
+        if (source === PayloadEmitSource.LocalChanged) {
           return
         }
 
@@ -497,10 +497,8 @@ export class SNKeyRecoveryService extends AbstractService {
     const decryptedMatching = matchingResults.filter(isDecryptedPayload)
 
     const allRelevantKeyPayloads = [...additionalKeys, ...decryptedMatching]
-    void this.payloadManager.emitPayloads(
-      allRelevantKeyPayloads,
-      PayloadSource.PossiblyDecryptedSyncPostProcessed,
-    )
+
+    void this.payloadManager.emitPayloads(allRelevantKeyPayloads, PayloadEmitSource.LocalChanged)
 
     await this.storageService.savePayloads(allRelevantKeyPayloads)
 

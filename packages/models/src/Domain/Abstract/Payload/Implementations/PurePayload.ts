@@ -28,7 +28,6 @@ export abstract class PurePayload<T extends TransferPayload<C>, C extends ItemCo
   readonly dirty?: boolean
 
   readonly lastSyncBegan?: Date
-  readonly lastSyncEnd?: Date
 
   readonly duplicate_of?: string
 
@@ -56,7 +55,6 @@ export abstract class PurePayload<T extends TransferPayload<C>, C extends ItemCo
     this.updated_at_timestamp = rawPayload.updated_at_timestamp || 0
 
     this.lastSyncBegan = rawPayload.lastSyncBegan ? new Date(rawPayload.lastSyncBegan) : undefined
-    this.lastSyncEnd = rawPayload.lastSyncEnd ? new Date(rawPayload.lastSyncEnd) : undefined
 
     if (rawPayload.dirtiedDate) {
       this.dirtiedDate = new Date(rawPayload.dirtiedDate)
@@ -82,7 +80,6 @@ export abstract class PurePayload<T extends TransferPayload<C>, C extends ItemCo
       duplicate_of: this.duplicate_of,
       dirtiedDate: this.dirtiedDate,
       lastSyncBegan: this.lastSyncBegan,
-      lastSyncEnd: this.lastSyncEnd,
     }
 
     return comprehensive

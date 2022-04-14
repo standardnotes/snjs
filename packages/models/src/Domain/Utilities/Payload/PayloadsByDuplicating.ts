@@ -26,7 +26,6 @@ export async function PayloadsByDuplicating<C extends ItemContent = ItemContent>
     dirty: true,
     dirtiedDate: new Date(),
     lastSyncBegan: undefined,
-    lastSyncEnd: undefined,
     duplicate_of: payload.uuid,
   }
 

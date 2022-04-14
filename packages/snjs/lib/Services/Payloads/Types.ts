@@ -4,7 +4,7 @@ import {
   DeletedPayloadInterface,
   EncryptedPayloadInterface,
   FullyFormedPayloadInterface,
-  PayloadSource,
+  PayloadEmitSource,
 } from '@standardnotes/models'
 
 export type EmitQueue<P extends FullyFormedPayloadInterface> = QueueElement<P>[]
@@ -25,7 +25,7 @@ export type PayloadManagerChangeData = {
   /** Payloads which were previously error decrypting but now successfully decrypted */
   unerrored: DecryptedPayloadInterface[]
 
-  source: PayloadSource
+  source: PayloadEmitSource
 
   sourceKey?: string
 }
@@ -40,7 +40,7 @@ export type PayloadsChangeObserver = {
 
 export type QueueElement<P extends FullyFormedPayloadInterface = FullyFormedPayloadInterface> = {
   payloads: P[]
-  source: PayloadSource
+  source: PayloadEmitSource
   sourceKey?: string
   resolve: (alteredPayloads: P[]) => void
 }

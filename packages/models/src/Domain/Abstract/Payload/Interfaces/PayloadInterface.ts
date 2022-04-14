@@ -24,7 +24,6 @@ export interface PayloadInterface<
   readonly dirtiedDate?: Date
   readonly dirty?: boolean
   readonly lastSyncBegan?: Date
-  readonly lastSyncEnd?: Date
 
   readonly duplicate_of?: Uuid
 

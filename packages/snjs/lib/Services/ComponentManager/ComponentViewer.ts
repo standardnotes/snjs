@@ -17,8 +17,8 @@ import {
   createComponentCreatedContextPayload,
   DecryptedPayload,
   ItemContent,
-  PayloadSource,
   ComponentDataDomain,
+  PayloadEmitSource,
 } from '@standardnotes/models'
 import find from 'lodash/find'
 import uniq from 'lodash/uniq'
@@ -251,7 +251,7 @@ export class ComponentViewer {
 
   handleChangesInItems(
     items: (DecryptedItemInterface | DeletedItemInterface | EncryptedItemInterface)[],
-    source?: PayloadSource,
+    source: PayloadEmitSource,
     sourceKey?: string,
   ): void {
     const nonencryptedItems = items.filter(isNotEncryptedItem)
@@ -299,7 +299,7 @@ export class ComponentViewer {
     )
   }
 
-  sendContextItemThroughBridge(item: DecryptedItemInterface, source?: PayloadSource): void {
+  sendContextItemThroughBridge(item: DecryptedItemInterface, source?: PayloadEmitSource): void {
     const requiredContextPermissions = [
       {
         name: ComponentAction.StreamContextItem,
@@ -335,25 +335,27 @@ export class ComponentViewer {
   private sendItemsInReply(
     items: (DecryptedItemInterface | DeletedItemInterface)[],
     message: ComponentMessage,
-    source?: PayloadSource,
+    source?: PayloadEmitSource,
   ): void {
     this.log('Send items in reply', this.component, items, message)
     const responseData: MessageReplyData = {}
+
     const mapped = items.map((item) => {
       return this.jsonForItem(item, source)
     })
+
     responseData.items = mapped
     this.replyToMessage(message, responseData)
   }
 
   private jsonForItem(
     item: DecryptedItemInterface | DeletedItemInterface,
-    source?: PayloadSource,
+    source?: PayloadEmitSource,
   ): OutgoingItemMessagePayload {
     const isMetadatUpdate =
-      source === PayloadSource.RemoteSaved ||
-      source === PayloadSource.LocalSaved ||
-      source === PayloadSource.PreSyncSave
+      source === PayloadEmitSource.RemoteSaved ||
+      source === PayloadEmitSource.OfflineSyncSaved ||
+      source === PayloadEmitSource.PreSyncSave
 
     const params: OutgoingItemMessagePayload = {
       uuid: item.uuid,
@@ -744,7 +746,7 @@ export class ComponentViewer {
             }
           },
           MutationType.UpdateUserTimestamps,
-          PayloadSource.ComponentRetrieved,
+          PayloadEmitSource.ComponentRetrieved,
           this.component.uuid,
         )
 
@@ -809,7 +811,7 @@ export class ComponentViewer {
               }
             },
             MutationType.UpdateUserTimestamps,
-            PayloadSource.ComponentCreated,
+            PayloadEmitSource.ComponentCreated,
             this.component.uuid,
           )
           processedItems.push(item)
@@ -864,7 +866,7 @@ export class ComponentViewer {
               void this.alertService.alert('The item you are trying to delete cannot be found.')
               continue
             }
-            await this.itemManager.setItemToBeDeleted(item, PayloadSource.ComponentRetrieved)
+            await this.itemManager.setItemToBeDeleted(item, PayloadEmitSource.ComponentRetrieved)
           }
 
           void this.syncService.sync()

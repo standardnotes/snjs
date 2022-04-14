@@ -47,7 +47,10 @@ export class MutatorService extends AbstractService implements MutatorClientInte
       Models.MutationType.UpdateUserTimestamps,
     )
     const dirtiedPayload = mutator.getResult()
-    const insertedItem = await this.itemManager.emitItemFromPayload(dirtiedPayload)
+    const insertedItem = await this.itemManager.emitItemFromPayload(
+      dirtiedPayload,
+      Models.PayloadEmitSource.LocalInserted,
+    )
     return insertedItem
   }
 
@@ -57,7 +60,7 @@ export class MutatorService extends AbstractService implements MutatorClientInte
     itemToLookupUuidFor: Models.DecryptedItemInterface,
     mutate: (mutator: M) => void,
     updateTimestamps = true,
-    payloadSource?: Models.PayloadSource,
+    emitSource?: Models.PayloadEmitSource,
     syncOptions?: SyncOptions,
   ): Promise<Models.DecryptedItemInterface | undefined> {
     await this.itemManager.changeItems(
@@ -66,7 +69,7 @@ export class MutatorService extends AbstractService implements MutatorClientInte
       updateTimestamps
         ? Models.MutationType.UpdateUserTimestamps
         : Models.MutationType.NoUpdateUserTimestamps,
-      payloadSource,
+      emitSource,
     )
     await this.syncService.sync(syncOptions)
     return this.itemManager.findItem(itemToLookupUuidFor.uuid)
@@ -78,7 +81,7 @@ export class MutatorService extends AbstractService implements MutatorClientInte
     itemsToLookupUuidsFor: Models.DecryptedItemInterface[],
     mutate: (mutator: M) => void,
     updateTimestamps = true,
-    payloadSource?: Models.PayloadSource,
+    emitSource?: Models.PayloadEmitSource,
     syncOptions?: SyncOptions,
   ): Promise<void> {
     await this.itemManager.changeItems(
@@ -87,7 +90,7 @@ export class MutatorService extends AbstractService implements MutatorClientInte
       updateTimestamps
         ? Models.MutationType.UpdateUserTimestamps
         : Models.MutationType.NoUpdateUserTimestamps,
-      payloadSource,
+      emitSource,
     )
     await this.syncService.sync(syncOptions)
   }
@@ -123,18 +126,18 @@ export class MutatorService extends AbstractService implements MutatorClientInte
 
   public async runTransactionalMutations(
     transactions: TransactionalMutation[],
-    payloadSource = Models.PayloadSource.LocalChanged,
+    emitSource = Models.PayloadEmitSource.LocalChanged,
     payloadSourceKey?: string,
   ): Promise<(Models.DecryptedItemInterface | undefined)[]> {
-    return this.itemManager.runTransactionalMutations(transactions, payloadSource, payloadSourceKey)
+    return this.itemManager.runTransactionalMutations(transactions, emitSource, payloadSourceKey)
   }
 
   public async runTransactionalMutation(
     transaction: TransactionalMutation,
-    payloadSource = Models.PayloadSource.LocalChanged,
+    emitSource = Models.PayloadEmitSource.LocalChanged,
     payloadSourceKey?: string,
   ): Promise<Models.DecryptedItemInterface | undefined> {
-    return this.itemManager.runTransactionalMutation(transaction, payloadSource, payloadSourceKey)
+    return this.itemManager.runTransactionalMutation(transaction, emitSource, payloadSourceKey)
   }
 
   private async protectItems<
@@ -204,7 +207,7 @@ export class MutatorService extends AbstractService implements MutatorClientInte
 
   public async mergeItem(
     item: Models.DecryptedItemInterface,
-    source: Models.PayloadSource,
+    source: Models.PayloadEmitSource,
   ): Promise<Models.DecryptedItemInterface> {
     return this.itemManager.emitItemFromPayload(item.payloadRepresentation(), source)
   }

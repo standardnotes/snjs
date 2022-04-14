@@ -1,9 +1,8 @@
 import { ImmutablePayloadCollection } from './../Collection/Payload/ImmutablePayloadCollection'
 import { PayloadInterface } from './../../Abstract/Payload/Interfaces/PayloadInterface'
 import { extendArray } from '@standardnotes/utils'
-import { PayloadSource } from '../../Abstract/Payload/Types/PayloadSource'
 import { ConflictDelta } from './Conflict'
-import { PayloadsDelta } from './Delta'
+import { PayloadsDelta } from './Abstract/Delta'
 import {
   isDeletedPayload,
   isErrorDecryptingPayload,
@@ -15,9 +14,12 @@ import {
   EncryptedPayloadInterface,
 } from '../../Abstract/Payload'
 import { Uuid } from '@standardnotes/common'
-import { ImmutablePayloadCollectionSet } from '../Collection/Payload/ImmutablePayloadCollectionSet'
 import { HistoryMap } from '../History'
 import { ServerSyncPushContextualPayload } from '../../Abstract/Contextual/ServerSyncPush'
+import {
+  payloadByRedirtyingBasedOnBaseState,
+  payloadsByRedirtyingBasedOnBaseState,
+} from './Utilities.ts/ApplyDirtyState'
 
 type Return = EncryptedPayloadInterface | DecryptedPayloadInterface | DeletedPayloadInterface
 
@@ -32,10 +34,10 @@ export class DeltaRemoteRetrieved extends PayloadsDelta<
       EncryptedPayloadInterface | DeletedPayloadInterface
     >,
     private itemsSavedOrSaving: ServerSyncPushContextualPayload[],
-    relatedCollectionSet?: ImmutablePayloadCollectionSet<FullyFormedPayloadInterface>,
+    relatedCollection?: ImmutablePayloadCollection<FullyFormedPayloadInterface>,
     historyMap?: HistoryMap,
   ) {
-    super(baseCollection, applyCollection, relatedCollectionSet, historyMap)
+    super(baseCollection, applyCollection, relatedCollection, historyMap)
   }
 
   private isUuidOfPayloadCurrentlySavingOrSaved(uuid: Uuid): boolean {
@@ -50,14 +52,14 @@ export class DeltaRemoteRetrieved extends PayloadsDelta<
      * If we have retrieved an item that was saved as part of this ongoing sync operation,
      * or if the item is locally dirty, filter it out of retrieved_items, and add to potential conflicts.
      */
-    for (const received of this.applyCollection.all()) {
-      const savedOrSaving = this.isUuidOfPayloadCurrentlySavingOrSaved(received.uuid)
+    for (const apply of this.applyCollection.all()) {
+      const savedOrSaving = this.isUuidOfPayloadCurrentlySavingOrSaved(apply.uuid)
 
-      const postProcessedCounterpart = this.findRelatedPostProcessedPayload(received.uuid)
+      const postProcessedCounterpart = this.findRelatedPostProcessedPayload(apply.uuid)
       if (!postProcessedCounterpart) {
         /** Should only be missing in case of deleted retrieved item */
-        if (isDeletedPayload(received)) {
-          filtered.push(received)
+        if (isDeletedPayload(apply)) {
+          filtered.push(apply)
         }
 
         continue
@@ -68,13 +70,15 @@ export class DeltaRemoteRetrieved extends PayloadsDelta<
         continue
       }
 
-      const base = this.findBasePayload(received.uuid)
+      const base = this.findBasePayload(apply.uuid)
       if (base?.dirty && !isErrorDecryptingPayload(base)) {
         conflicted.push(postProcessedCounterpart)
         continue
       }
 
-      filtered.push(postProcessedCounterpart as Return)
+      filtered.push(
+        payloadByRedirtyingBasedOnBaseState(postProcessedCounterpart, this.baseCollection) as Return,
+      )
     }
 
     /**
@@ -94,21 +98,15 @@ export class DeltaRemoteRetrieved extends PayloadsDelta<
         continue
       }
 
-      const delta = new ConflictDelta(
-        this.baseCollection,
-        current,
-        decrypted,
-        PayloadSource.ConflictData,
-      )
+      const delta = new ConflictDelta(this.baseCollection, current, decrypted)
 
       const deltaCollection = await delta.resultingCollection()
-      const payloads = deltaCollection.all()
+
+      const payloads = payloadsByRedirtyingBasedOnBaseState(deltaCollection.all(), this.baseCollection)
+
       extendArray(conflictResults, payloads)
     }
 
-    return ImmutablePayloadCollection.WithPayloads(
-      filtered.concat(conflictResults),
-      PayloadSource.RemoteRetrieved,
-    )
+    return ImmutablePayloadCollection.WithPayloads(filtered.concat(conflictResults))
   }
 }

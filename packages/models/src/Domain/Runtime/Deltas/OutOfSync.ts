@@ -8,8 +8,7 @@ import { extendArray } from '@standardnotes/utils'
 import { ImmutablePayloadCollection } from '../Collection/Payload/ImmutablePayloadCollection'
 import { isDecryptedPayload } from '../../Abstract/Payload/Interfaces/TypeCheck'
 import { PayloadContentsEqual } from '../../Utilities/Payload/PayloadContentsEqual'
-import { PayloadsDelta } from './Delta'
-import { PayloadSource } from '../../Abstract/Payload/Types/PayloadSource'
+import { PayloadsDelta } from './Abstract/Delta'
 import { ConflictDelta } from './Conflict'
 
 type Return = EncryptedPayloadInterface | DecryptedPayloadInterface | DeletedPayloadInterface
@@ -24,6 +23,7 @@ export class DeltaOutOfSync extends PayloadsDelta<
 
     for (const apply of this.applyCollection.all()) {
       const base = this.findBasePayload(apply.uuid)
+
       if (!base) {
         results.push(apply)
         continue
@@ -37,12 +37,7 @@ export class DeltaOutOfSync extends PayloadsDelta<
         (isApplyDecrypted && isBaseDecrypted && !PayloadContentsEqual(apply, base))
 
       if (needsConflict) {
-        const delta = new ConflictDelta(
-          this.baseCollection,
-          base,
-          apply,
-          PayloadSource.ConflictData,
-        )
+        const delta = new ConflictDelta(this.baseCollection, base, apply)
 
         const deltaCollection = await delta.resultingCollection()
         const conflictResults = deltaCollection.all()
@@ -52,6 +47,6 @@ export class DeltaOutOfSync extends PayloadsDelta<
       }
     }
 
-    return ImmutablePayloadCollection.WithPayloads(results, PayloadSource.RemoteRetrieved)
+    return ImmutablePayloadCollection.WithPayloads(results)
   }
 }

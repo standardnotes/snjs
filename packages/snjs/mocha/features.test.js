@@ -34,6 +34,7 @@ describe('features', () => {
     sinon.spy(application.itemManager, 'createItem')
     sinon.spy(application.itemManager, 'changeComponent')
     sinon.spy(application.itemManager, 'setItemsToBeDeleted')
+
     getUserFeatures = sinon.stub(application.apiService, 'getUserFeatures').callsFake(() => {
       return Promise.resolve({
         data: {
@@ -187,21 +188,26 @@ describe('features', () => {
       sinon.stub(application.apiService, 'isThirdPartyHostUsed').callsFake(() => {
         return false
       })
+
       expect(
         await application.settings.getDoesSensitiveSettingExist(SettingName.ExtensionKey),
       ).to.equal(false)
+
       const extensionKey = UuidGenerator.GenerateUuid().split('-').join('')
+
       const promise = new Promise((resolve) => {
         sinon
           .stub(application.featuresService, 'migrateFeatureRepoToUserSetting')
           .callsFake(resolve)
       })
+
       await application.itemManager.createItem(
         ContentType.ExtensionRepo,
         FillItemContent({
           url: `https://extensions.standardnotes.org/${extensionKey}`,
         }),
       )
+
       await promise
     })
 

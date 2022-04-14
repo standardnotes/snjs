@@ -1,11 +1,12 @@
 import { ImmutablePayloadCollection } from '../Collection/Payload/ImmutablePayloadCollection'
 import { PayloadSource } from '../../Abstract/Payload/Types/PayloadSource'
-import { PayloadsDelta } from './Delta'
+import { PayloadsDelta } from './Abstract/Delta'
 import {
   FullyFormedPayloadInterface,
   DeletedPayloadInterface,
   EncryptedPayloadInterface,
 } from '../../Abstract/Payload'
+import { payloadByRedirtyingBasedOnBaseState } from './Utilities.ts/ApplyDirtyState'
 
 type Return = FullyFormedPayloadInterface
 
@@ -24,17 +25,14 @@ export class DeltaRemoteRejected extends PayloadsDelta<
         throw 'Unable to find postprocessed counterpart for rejected payload.'
       }
 
-      const result = postProcessedCounterpart.copy(
-        {
-          lastSyncEnd: new Date(),
-          dirty: false,
-        },
-        PayloadSource.RemoteRejected,
+      const result = payloadByRedirtyingBasedOnBaseState(
+        postProcessedCounterpart.copy({}, PayloadSource.RemoteRetrieved),
+        this.baseCollection,
       )
 
       results.push(result)
     }
 
-    return ImmutablePayloadCollection.WithPayloads(results, PayloadSource.RemoteRejected)
+    return ImmutablePayloadCollection.WithPayloads(results)
   }
 }

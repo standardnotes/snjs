@@ -31,7 +31,7 @@ type ItemStream<I extends DecryptedItemInterface> = (data: {
   changed: I[]
   inserted: I[]
   removed: (Models.DeletedItemInterface | Models.EncryptedItemInterface)[]
-  source: Models.PayloadSource
+  source: Models.PayloadEmitSource
 }) => void
 type ObserverRemover = () => void
 
@@ -440,7 +440,7 @@ export class SNApplication implements InternalServices.ListedClientInterface {
         inserted: matches,
         changed: [],
         removed: [],
-        source: Models.PayloadSource.InitialObserverRegistrationPush,
+        source: Models.PayloadEmitSource.InitialObserverRegistrationPush,
       })
     }
 

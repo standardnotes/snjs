@@ -1,9 +1,7 @@
-import { ImmutablePayloadCollection } from '../Collection/Payload/ImmutablePayloadCollection'
-import { ImmutablePayloadCollectionSet } from '../Collection/Payload/ImmutablePayloadCollectionSet'
-import { HistoryMap } from '../History/HistoryMap'
-import { PayloadSource } from '../../Abstract/Payload/Types/PayloadSource'
+import { ImmutablePayloadCollection } from '../../Collection/Payload/ImmutablePayloadCollection'
+import { HistoryMap } from '../../History/HistoryMap'
 import { Uuid } from '@standardnotes/common'
-import { FullyFormedPayloadInterface } from '../../Abstract/Payload'
+import { FullyFormedPayloadInterface } from '../../../Abstract/Payload'
 import { DeltaInterface } from './DeltaInterface'
 /**
  * A payload delta is a class that defines instructions that process an incoming collection
@@ -30,13 +28,13 @@ export abstract class PayloadsDelta<
   /**
    * @param baseCollection The authoratitive collection on top of which to compute changes.
    * @param applyCollection The collection of payloads to apply, from one given source only.
-   * @param relatedCollectionSet A collection set (many collections) that contain payloads
+   * @param postProcessedCollection A collection that contains payloads
    *                             that may be neccessary to carry out computation.
    */
   constructor(
     readonly baseCollection: ImmutablePayloadCollection<Base>,
     protected readonly applyCollection: ImmutablePayloadCollection<Apply>,
-    protected readonly relatedCollectionSet?: ImmutablePayloadCollectionSet<FullyFormedPayloadInterface>,
+    protected readonly postProcessedCollection?: ImmutablePayloadCollection<FullyFormedPayloadInterface>,
     protected readonly historyMap?: HistoryMap,
   ) {}
 
@@ -47,9 +45,6 @@ export abstract class PayloadsDelta<
   }
 
   protected findRelatedPostProcessedPayload(uuid: Uuid): FullyFormedPayloadInterface | undefined {
-    const collection = this.relatedCollectionSet?.collectionForSource(
-      PayloadSource.PossiblyDecryptedSyncPostProcessed,
-    )
-    return collection?.find(uuid)
+    return this.postProcessedCollection?.find(uuid)
   }
 }

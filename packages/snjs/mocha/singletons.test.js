@@ -101,7 +101,7 @@ describe('singletons', function () {
 
     const items = await this.application.itemManager.emitItemsFromPayloads(
       [prefs1, prefs2, prefs3],
-      PayloadSource.LocalChanged,
+      PayloadEmitSource.LocalChanged,
     )
     await this.application.itemManager.setItemsDirty(items)
     await this.application.syncService.sync(syncOptions)
@@ -346,7 +346,7 @@ describe('singletons', function () {
     const payload = createPrefsPayload()
     const item = await this.application.itemManager.emitItemFromPayload(
       payload,
-      PayloadSource.LocalChanged,
+      PayloadEmitSource.LocalChanged,
     )
     await this.application.syncService.sync(syncOptions)
     const predicate = new Predicate('content_type', '=', item.content_type)

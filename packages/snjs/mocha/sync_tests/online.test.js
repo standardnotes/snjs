@@ -292,7 +292,7 @@ describe('online syncing', function () {
 
     const items = await this.application.itemManager.emitItemsFromPayloads(
       [errorred],
-      PayloadSource.LocalChanged,
+      PayloadEmitSource.LocalChanged,
     )
 
     const mappedItem = this.application.itemManager.findAnyItem(errorred.uuid)
@@ -307,7 +307,7 @@ describe('online syncing', function () {
 
     const mappedItems2 = await this.application.itemManager.emitItemsFromPayloads(
       [decryptedPayload],
-      PayloadSource.LocalChanged,
+      PayloadEmitSource.LocalChanged,
     )
 
     const mappedItem2 = mappedItems2[0]
@@ -523,7 +523,7 @@ describe('online syncing', function () {
 
     await this.application.itemManager.emitItemsFromPayloads(
       decryptionResults,
-      PayloadSource.LocalChanged,
+      PayloadEmitSource.LocalChanged,
     )
 
     expect(this.application.itemManager.allTrackedItems().length).to.equal(this.expectedItemCount)
@@ -719,7 +719,6 @@ describe('online syncing', function () {
     await sync
     note = this.application.items.findItem(note.uuid)
     expect(note.dirty).to.equal(false)
-    expect(note.lastSyncEnd).to.be.at.least(note.lastSyncBegan)
   })
 
   it('syncing twice without waiting should only execute 1 online sync', async function () {
@@ -777,7 +776,6 @@ describe('online syncing', function () {
 
     note = this.application.items.findItem(note.uuid)
     expect(note.dirty).to.equal(false)
-    expect(note.lastSyncEnd).to.be.above(note.lastSyncBegan)
     expect(note.content.text).to.equal(text)
 
     // client B
@@ -797,19 +795,25 @@ describe('online syncing', function () {
     /** We can't track how many times an item is synced, only how many times its mapped */
     const expectedSaveCount = 2
     let actualSaveCount = 0
+
     /** Create an item and sync it */
     let note = await Factory.createMappedNote(this.application)
+
     this.application.itemManager.addObserver(ContentType.Note, ({ source }) => {
-      if (source === PayloadSource.RemoteSaved) {
+      if (source === PayloadEmitSource.RemoteSaved) {
         actualSaveCount++
       }
     })
+
     this.expectedItemCount++
     this.application.syncService.ut_beginLatencySimulator(150)
+
     /** Dont await */
     const syncRequest = this.application.syncService.sync(syncOptions)
+
     /** Dirty the item 100ms into 150ms request */
     const newText = `${Math.random()}`
+
     setTimeout(
       async function () {
         await this.application.itemManager.changeItem(note, (mutator) => {
@@ -818,6 +822,7 @@ describe('online syncing', function () {
       }.bind(this),
       100,
     )
+
     /**
      * Await sync request. A sync request will perform another request if there
      * are still more dirty items, so awaiting this will perform two syncs.
@@ -838,7 +843,7 @@ describe('online syncing', function () {
     /** Create an item and sync it */
     let note = await Factory.createMappedNote(this.application)
     this.application.itemManager.addObserver(ContentType.Note, ({ source }) => {
-      if (source === PayloadSource.RemoteSaved) {
+      if (source === PayloadEmitSource.RemoteSaved) {
         actualSaveCount++
       }
     })
@@ -863,29 +868,39 @@ describe('online syncing', function () {
   })
 
   it('marking item dirty at exact same time as lastSyncBegan should sync again', async function () {
-    /** Due to lack of nanosecond support in JS, it's possible that two operations complete
+    this.retries(2)
+
+    /**
+     * Due to lack of nanosecond support in JS, it's possible that two operations complete
      * within the same millisecond cycle. What happens if you mark an item as dirty at time A and also begin
-     * syncing at time A? It should sync again. */
+     * syncing at time A? It should sync again.
+     */
     const expectedSaveCount = 2
     let actualSaveCount = 0
+
     /** Create an item and sync it */
     let note = await Factory.createMappedNote(this.application)
     let didPerformMutatation = false
     const newText = `${Math.random()}`
+
     this.application.itemManager.addObserver(ContentType.Note, async ({ changed, source }) => {
-      if (source === PayloadSource.RemoteSaved) {
+      if (source === PayloadEmitSource.RemoteSaved) {
         actualSaveCount++
-      } else if (source === PayloadSource.PreSyncSave && !didPerformMutatation) {
+      } else if (source === PayloadEmitSource.PreSyncSave && !didPerformMutatation) {
         didPerformMutatation = true
+
         const mutated = changed[0].payload.copy({
           content: { ...note.payload.content, text: newText },
           dirty: true,
           dirtiedDate: changed[0].lastSyncBegan,
         })
+
         await this.application.itemManager.emitItemFromPayload(mutated)
       }
     })
+
     this.expectedItemCount++
+
     /** Dont await */
     const syncRequest = this.application.syncService.sync(syncOptions)
     await syncRequest
@@ -907,7 +922,6 @@ describe('online syncing', function () {
     const note = await Factory.createSyncedNote(this.application)
     this.expectedItemCount++
     const lastSyncBegan = note.lastSyncBegan
-    const lastSyncEnd = note.lastSyncEnd
 
     const encrypted = await this.application.protocolService.encryptSplitSingle({
       usesItemsKeyWithKeyLookup: {
@@ -925,7 +939,6 @@ describe('online syncing', function () {
 
     const updatedNote = this.application.items.findAnyItem(note.uuid)
     expect(updatedNote.lastSyncBegan.getTime()).to.equal(lastSyncBegan.getTime())
-    expect(updatedNote.lastSyncEnd.getTime()).to.equal(lastSyncEnd.getTime())
   })
 
   it('should not allow receiving decrypted payloads from server', async function () {
@@ -983,7 +996,7 @@ describe('online syncing', function () {
 
     /** Item should no longer be dirty, otherwise it would keep syncing */
     const item = this.application.items.findItem(payload.uuid)
-    expect(item.dirty).to.equal(false)
+    expect(item.dirty).to.not.be.ok
   })
 
   it('should call onPresyncSave before sync begins', async function () {
@@ -1004,10 +1017,11 @@ describe('online syncing', function () {
     expect(events[1]).to.equal('sync-will-begin')
   })
 
-  it('deleting an item permanently should include it in PayloadSource.PreSyncSave item change observer', async function () {
+  it('deleting an item permanently should include it in PayloadEmitSource.PreSyncSave item change observer', async function () {
     let conditionMet = false
+
     this.application.streamItems([ContentType.Note], async ({ removed, source }) => {
-      if (source === PayloadSource.PreSyncSave && removed.length === 1) {
+      if (source === PayloadEmitSource.PreSyncSave && removed.length === 1) {
         conditionMet = true
       }
     })

@@ -129,7 +129,7 @@ describe('keys', function () {
       dirty: true,
       dirtiedDate: new Date(),
     })
-    await this.application.payloadManager.emitPayload(dirtied, PayloadSource.LocalChanged)
+    await this.application.payloadManager.emitPayload(dirtied, PayloadEmitSource.LocalChanged)
     await this.application.sync.sync()
 
     const rawPayloads = await this.application.storageService.getAllRawPayloads()
@@ -207,7 +207,7 @@ describe('keys', function () {
 
     await this.application.itemManager.emitItemsFromPayloads(
       [decryptedPayload],
-      PayloadSource.LocalChanged,
+      PayloadEmitSource.LocalChanged,
     )
 
     const note = this.application.itemManager.findAnyItem(notePayload.uuid)
@@ -217,7 +217,7 @@ describe('keys', function () {
     const keyPayload = new DecryptedPayload(itemsKey.payload.ejected())
     await this.application.itemManager.emitItemsFromPayloads(
       [keyPayload],
-      PayloadSource.LocalChanged,
+      PayloadEmitSource.LocalChanged,
     )
 
     /**
@@ -246,7 +246,7 @@ describe('keys', function () {
       errorDecrypting: true,
     })
 
-    await this.application.payloadManager.emitPayload(errored, PayloadSource.Constructor)
+    await this.application.payloadManager.emitPayload(errored, PayloadEmitSource.LocalInserted)
 
     const refreshedKey = this.application.items.findItem(itemsKey.uuid)
     expect(refreshedKey.errorDecrypting).to.not.be.ok

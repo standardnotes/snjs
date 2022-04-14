@@ -8,7 +8,6 @@ import { HistoryMap, historyMapFunctions } from '../History/HistoryMap'
 import { ConflictStrategy } from '../../Abstract/Item/Types/ConflictStrategy'
 import { PayloadsByDuplicating } from '../../Utilities/Payload/PayloadsByDuplicating'
 import { PayloadContentsEqual } from '../../Utilities/Payload/PayloadContentsEqual'
-import { PayloadSource } from '../../Abstract/Payload/Types/PayloadSource'
 import { FullyFormedPayloadInterface } from '../../Abstract/Payload'
 import {
   isDecryptedPayload,
@@ -22,7 +21,6 @@ export class ConflictDelta {
     protected readonly baseCollection: ImmutablePayloadCollection<FullyFormedPayloadInterface>,
     protected readonly basePayload: FullyFormedPayloadInterface,
     protected readonly applyPayload: FullyFormedPayloadInterface,
-    protected readonly source: PayloadSource,
     protected readonly historyMap?: HistoryMap,
   ) {}
 
@@ -33,7 +31,7 @@ export class ConflictDelta {
 
     const results = await this.handleStrategy(strategy)
 
-    return ImmutablePayloadCollection.WithPayloads(results, this.source)
+    return ImmutablePayloadCollection.WithPayloads(results)
   }
 
   private getConflictStrategy(): ConflictStrategy {
@@ -114,7 +112,6 @@ export class ConflictDelta {
       const result = this.applyPayload.copy(
         {
           lastSyncBegan: this.basePayload.lastSyncBegan,
-          lastSyncEnd: new Date(),
         },
         this.applyPayload.source,
       )
@@ -164,7 +161,6 @@ export class ConflictDelta {
       const rightPayload = this.applyPayload.copy(
         {
           lastSyncBegan: this.basePayload.lastSyncBegan,
-          lastSyncEnd: new Date(),
         },
         this.applyPayload.source,
       )

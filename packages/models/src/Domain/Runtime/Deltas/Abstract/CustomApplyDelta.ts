@@ -1,6 +1,6 @@
 import { DeltaInterface } from './DeltaInterface'
-import { ImmutablePayloadCollection } from '../Collection/Payload/ImmutablePayloadCollection'
-import { DeletedPayloadInterface, FullyFormedPayloadInterface } from '../../Abstract/Payload'
+import { ImmutablePayloadCollection } from '../../Collection/Payload/ImmutablePayloadCollection'
+import { DeletedPayloadInterface, FullyFormedPayloadInterface } from '../../../Abstract/Payload'
 import { Uuid } from '@standardnotes/common'
 
 type Return = FullyFormedPayloadInterface

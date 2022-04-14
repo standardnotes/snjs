@@ -1,17 +1,11 @@
 import { FullyFormedPayloadInterface } from './../../../Abstract/Payload/Interfaces/UnionTypes'
 import { ContentType } from '@standardnotes/common'
 import { UuidMap } from '@standardnotes/utils'
-import { PayloadSource } from '../../../Abstract/Payload/Types/PayloadSource'
 import { PayloadCollection } from './PayloadCollection'
 
-/**
- * A collection of payloads coming from a single source.
- */
 export class ImmutablePayloadCollection<
   P extends FullyFormedPayloadInterface,
 > extends PayloadCollection<P> {
-  public source?: PayloadSource
-
   public get payloads(): P[] {
     return this.all()
   }
@@ -20,10 +14,8 @@ export class ImmutablePayloadCollection<
    * side-effects, such as calling collection.set(). */
   static WithPayloads<T extends FullyFormedPayloadInterface>(
     payloads: T[] = [],
-    source?: PayloadSource,
   ): ImmutablePayloadCollection<T> {
     const collection = new ImmutablePayloadCollection<T>()
-    collection.source = source
     if (payloads.length > 0) {
       collection.set(payloads)
     }

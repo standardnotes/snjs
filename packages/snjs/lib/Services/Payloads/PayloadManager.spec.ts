@@ -3,6 +3,7 @@ import {
   EncryptedPayload,
   FillItemContent,
   ItemsKeyContent,
+  PayloadEmitSource,
 } from '@standardnotes/models'
 import { PayloadManager } from './PayloadManager'
 import { InternalEventBusInterface } from '@standardnotes/services'
@@ -19,6 +20,35 @@ describe('payload manager', () => {
     payloadManager = new PayloadManager(internalEventBus)
   })
 
+  it('emitting a payload should emit as-is and not merge on top of existing payload', async () => {
+    const decrypted = new DecryptedPayload({
+      uuid: '123',
+      content_type: ContentType.ItemsKey,
+      content: FillItemContent<ItemsKeyContent>({
+        itemsKey: 'secret',
+      }),
+      updated_at_timestamp: 1,
+      dirty: true,
+    })
+
+    await payloadManager.emitPayload(decrypted, PayloadEmitSource.LocalInserted)
+
+    const nondirty = new DecryptedPayload({
+      uuid: '123',
+      content_type: ContentType.ItemsKey,
+      updated_at_timestamp: 2,
+      content: FillItemContent<ItemsKeyContent>({
+        itemsKey: 'secret',
+      }),
+    })
+
+    await payloadManager.emitPayload(nondirty, PayloadEmitSource.LocalChanged)
+
+    const result = payloadManager.findOne('123')
+
+    expect(result?.dirty).toBeFalsy()
+  })
+
   it('emitting ignored payload should merge timestamps to keep client in sync', async () => {
     const decrypted = new DecryptedPayload({
       uuid: '123',
@@ -29,7 +59,7 @@ describe('payload manager', () => {
       updated_at_timestamp: 1,
     })
 
-    await payloadManager.emitPayload(decrypted)
+    await payloadManager.emitPayload(decrypted, PayloadEmitSource.LocalInserted)
 
     const errored = new EncryptedPayload({
       uuid: '123',
@@ -42,7 +72,7 @@ describe('payload manager', () => {
       waitingForKey: false,
     })
 
-    await payloadManager.emitPayload(errored)
+    await payloadManager.emitPayload(errored, PayloadEmitSource.LocalChanged)
 
     const result = payloadManager.findOne('123')
 

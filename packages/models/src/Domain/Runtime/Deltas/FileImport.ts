@@ -1,8 +1,7 @@
 import { extendArray } from '@standardnotes/utils'
 import { ImmutablePayloadCollection } from '../Collection/Payload/ImmutablePayloadCollection'
-import { PayloadSource } from '../../Abstract/Payload/Types/PayloadSource'
 import { ConflictDelta } from './Conflict'
-import { PayloadsDelta } from './Delta'
+import { PayloadsDelta } from './Abstract/Delta'
 import { DecryptedPayloadInterface } from '../../Abstract/Payload/Interfaces/DecryptedPayload'
 import {
   FullyFormedPayloadInterface,
@@ -33,7 +32,7 @@ export class DeltaFileImport extends PayloadsDelta<
       extendArray(results, payloads)
     }
 
-    return ImmutablePayloadCollection.WithPayloads(results, PayloadSource.FileImport)
+    return ImmutablePayloadCollection.WithPayloads(results)
   }
 
   private async payloadsByHandlingPayload(
@@ -79,7 +78,7 @@ export class DeltaFileImport extends PayloadsDelta<
       return [payload]
     }
 
-    const delta = new ConflictDelta(this.baseCollection, current, payload, PayloadSource.FileImport)
+    const delta = new ConflictDelta(this.baseCollection, current, payload)
 
     const deltaCollection = await delta.resultingCollection()
 
