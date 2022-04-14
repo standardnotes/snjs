@@ -111,7 +111,7 @@ export async function createAndInitializeApplication(
   host,
   crypto,
 ) {
-  Applications.createAndInitializeApplication(namespace, environment, platform, host, crypto)
+  return Applications.createAndInitializeApplication(namespace, environment, platform, host, crypto)
 }
 
 export async function initializeApplication(application) {
