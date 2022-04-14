@@ -4,9 +4,16 @@ import * as Factory from '../lib/factory.js'
 chai.use(chaiAsPromised)
 const expect = chai.expect
 
+const setupRandomUuid = () => {
+  let currentId = 0
+
+  UuidGenerator.SetGenerator(() => String(currentId++))
+}
+
 describe('web native folders migration', () => {
   beforeEach(async function () {
     this.application = await Factory.createInitAppWithFakeCrypto()
+    setupRandomUuid()
   })
 
   afterEach(async function () {
