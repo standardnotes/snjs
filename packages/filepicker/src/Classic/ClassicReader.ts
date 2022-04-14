@@ -1,7 +1,7 @@
+import { ByteChunker } from './../Chunker/ByteChunker'
 import { OnChunkCallback, FileSelectionResponse } from '../types'
 import { readFile as utilsReadFile } from '../utils'
 import { FileReaderInterface } from '../Interface/FileReader'
-import { ByteChunker } from '../byte_chunker'
 
 export const ClassicFileReader: FileReaderInterface = {
   selectFiles,
