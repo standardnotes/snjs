@@ -2,6 +2,8 @@ import FakeWebCrypto from './fake_web_crypto.js'
 import * as Applications from './Applications.js'
 import * as Utils from './Utils.js'
 
+UuidGenerator.SetGenerator(new FakeWebCrypto().generateUUID)
+
 export class AppContext {
   constructor({ identifier, crypto, email, password, passcode } = {}) {
     if (!identifier) {

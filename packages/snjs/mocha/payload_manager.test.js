@@ -5,11 +5,6 @@ chai.use(chaiAsPromised)
 const expect = chai.expect
 
 describe('payload manager', () => {
-  before(async function () {
-    const crypto = new SNWebCrypto()
-    UuidGenerator.SetGenerator(crypto.generateUUID)
-  })
-
   beforeEach(async function () {
     this.payloadManager = new PayloadManager()
     this.createNotePayload = async () => {
