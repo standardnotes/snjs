@@ -7,6 +7,7 @@ export class ClassicFileSaver {
     if (!this.loggingEnabled) {
       return
     }
+    // eslint-disable-next-line no-console
     console.log(args)
   }
 

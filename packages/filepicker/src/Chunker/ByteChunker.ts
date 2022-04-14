@@ -1,18 +1,17 @@
 import { OnChunkCallback } from '../types'
+
 export class ByteChunker {
-  public loggingEnabled = true
+  public loggingEnabled = false
   private bytes = new Uint8Array()
   private index = 1
 
-  constructor(
-    private minimumChunkSize: number,
-    private onChunk: OnChunkCallback,
-  ) {}
+  constructor(private minimumChunkSize: number, private onChunk: OnChunkCallback) {}
 
   private log(...args: any[]): void {
     if (!this.loggingEnabled) {
       return
     }
+    // eslint-disable-next-line no-console
     console.log(args)
   }
 
@@ -30,9 +29,7 @@ export class ByteChunker {
     const maxIndex = Math.max(this.minimumChunkSize, this.bytes.length)
     const chunk = this.bytes.slice(0, maxIndex)
     this.bytes = new Uint8Array([...this.bytes.slice(maxIndex)])
-    this.log(
-      `Chunker popping ${chunk.length}, total size in queue ${this.bytes.length}`,
-    )
+    this.log(`Chunker popping ${chunk.length}, total size in queue ${this.bytes.length}`)
     await this.onChunk(chunk, this.index++, isLast)
   }
 }
