@@ -1,14 +1,12 @@
 import { Uuid } from '@standardnotes/common'
-import { DeletedPayloadInterface, FullyFormedPayloadInterface } from '../../../Abstract/Payload'
+import { FullyFormedPayloadInterface } from '../../../Abstract/Payload'
 import { ImmutablePayloadCollection } from '../../Collection/Payload/ImmutablePayloadCollection'
+import { DeltaEmit } from './DeltaEmit'
 
-export interface DeltaInterface<
-  Base extends FullyFormedPayloadInterface,
-  Result extends FullyFormedPayloadInterface,
-> {
-  baseCollection: ImmutablePayloadCollection<Base>
+export interface DeltaInterface {
+  baseCollection: ImmutablePayloadCollection
 
-  resultingCollection(): Promise<ImmutablePayloadCollection<Result>>
+  result(): Promise<DeltaEmit>
 
-  findBasePayload(uuid: Uuid): DeletedPayloadInterface | Base | undefined
+  findBasePayload(uuid: Uuid): FullyFormedPayloadInterface | undefined
 }

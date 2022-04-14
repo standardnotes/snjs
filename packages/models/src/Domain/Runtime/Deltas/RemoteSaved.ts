@@ -3,11 +3,10 @@ import { DeletedPayload } from './../../Abstract/Payload/Implementations/Deleted
 import { ImmutablePayloadCollection } from '../Collection/Payload/ImmutablePayloadCollection'
 import { PayloadSource } from '../../Abstract/Payload/Types/PayloadSource'
 import { isDeletedPayload } from '../../Abstract/Payload/Interfaces/TypeCheck'
-import { FullyFormedPayloadInterface } from '../../Abstract/Payload'
+import { FullyFormedPayloadInterface, PayloadEmitSource } from '../../Abstract/Payload'
 import { CustomApplyDelta } from './Abstract/CustomApplyDelta'
 import { payloadByRedirtyingBasedOnBaseState } from './Utilities.ts/ApplyDirtyState'
-
-type Return = FullyFormedPayloadInterface
+import { DeltaEmit } from './Abstract/DeltaEmit'
 
 export class DeltaRemoteSaved extends CustomApplyDelta {
   constructor(
@@ -17,8 +16,8 @@ export class DeltaRemoteSaved extends CustomApplyDelta {
     super(baseCollection)
   }
 
-  public async resultingCollection(): Promise<ImmutablePayloadCollection<Return>> {
-    const processed: Return[] = []
+  public async result(): Promise<DeltaEmit> {
+    const processed: FullyFormedPayloadInterface[] = []
 
     for (const apply of this.applyContextualPayloads) {
       const base = this.findBasePayload(apply.uuid)
@@ -83,6 +82,9 @@ export class DeltaRemoteSaved extends CustomApplyDelta {
       }
     }
 
-    return ImmutablePayloadCollection.WithPayloads(processed)
+    return {
+      changed: processed,
+      source: PayloadEmitSource.RemoteSaved,
+    }
   }
 }

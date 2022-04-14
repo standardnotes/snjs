@@ -6,7 +6,7 @@ import {
   isErrorDecryptingPayload,
   isDecryptedPayload,
 } from '../../Abstract/Payload/Interfaces/TypeCheck'
-import { FullyFormedPayloadInterface } from '../../Abstract/Payload'
+import { FullyFormedPayloadInterface, PayloadEmitSource } from '../../Abstract/Payload'
 import { Uuid } from '@standardnotes/common'
 import { HistoryMap } from '../History'
 import { ServerSyncPushContextualPayload } from '../../Abstract/Contextual/ServerSyncPush'
@@ -14,6 +14,7 @@ import {
   payloadByRedirtyingBasedOnBaseState,
   payloadsByRedirtyingBasedOnBaseState,
 } from './Utilities.ts/ApplyDirtyState'
+import { DeltaEmit } from './Abstract/DeltaEmit'
 
 export class DeltaRemoteRetrieved extends PayloadsDelta {
   constructor(
@@ -29,9 +30,7 @@ export class DeltaRemoteRetrieved extends PayloadsDelta {
     return this.itemsSavedOrSaving.find((i) => i.uuid === uuid) != undefined
   }
 
-  public async resultingCollection(): Promise<
-    ImmutablePayloadCollection<FullyFormedPayloadInterface>
-  > {
+  public async result(): Promise<DeltaEmit> {
     const filtered: FullyFormedPayloadInterface[] = []
     const conflicted: FullyFormedPayloadInterface[] = []
 
@@ -76,16 +75,17 @@ export class DeltaRemoteRetrieved extends PayloadsDelta {
 
       const delta = new ConflictDelta(this.baseCollection, base, conflict, this.historyMap)
 
-      const deltaCollection = await delta.resultingCollection()
-
       const payloads = payloadsByRedirtyingBasedOnBaseState(
-        deltaCollection.all(),
+        await delta.result(),
         this.baseCollection,
       )
 
       extendArray(conflictResults, payloads)
     }
 
-    return ImmutablePayloadCollection.WithPayloads(filtered.concat(conflictResults))
+    return {
+      changed: filtered.concat(conflictResults),
+      source: PayloadEmitSource.RemoteRetrieved,
+    }
   }
 }

@@ -2,6 +2,7 @@ import { ContentType } from '@standardnotes/common'
 import {
   DecryptedPayloadInterface,
   DeletedPayloadInterface,
+  DeltaEmit,
   EncryptedPayloadInterface,
   FullyFormedPayloadInterface,
   PayloadEmitSource,
@@ -39,8 +40,7 @@ export type PayloadsChangeObserver = {
 }
 
 export type QueueElement<P extends FullyFormedPayloadInterface = FullyFormedPayloadInterface> = {
-  payloads: P[]
-  source: PayloadEmitSource
+  emit: DeltaEmit
   sourceKey?: string
   resolve: (alteredPayloads: P[]) => void
 }

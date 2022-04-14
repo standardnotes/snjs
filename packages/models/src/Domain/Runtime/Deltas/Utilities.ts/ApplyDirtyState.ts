@@ -3,7 +3,7 @@ import { FullyFormedPayloadInterface } from './../../../Abstract/Payload/Interfa
 
 export function payloadByRedirtyingBasedOnBaseState(
   payload: FullyFormedPayloadInterface,
-  baseCollection: ImmutablePayloadCollection<FullyFormedPayloadInterface>,
+  baseCollection: ImmutablePayloadCollection,
 ) {
   const basePayload = baseCollection.find(payload.uuid)
 
@@ -24,7 +24,7 @@ export function payloadByRedirtyingBasedOnBaseState(
 
 export function payloadsByRedirtyingBasedOnBaseState(
   payloads: FullyFormedPayloadInterface[],
-  baseCollection: ImmutablePayloadCollection<FullyFormedPayloadInterface>,
+  baseCollection: ImmutablePayloadCollection,
 ) {
   return payloads.map((p) => payloadByRedirtyingBasedOnBaseState(p, baseCollection))
 }

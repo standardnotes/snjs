@@ -829,12 +829,9 @@ export class SNSyncService
 
     const delta = new DeltaOfflineSaved(masterCollection, response.savedPayloads)
 
-    const collection = await delta.resultingCollection()
+    const emit = await delta.result()
 
-    const payloadsToPersist = await this.payloadManager.emitCollection(
-      collection,
-      PayloadEmitSource.OfflineSyncSaved,
-    )
+    const payloadsToPersist = await this.payloadManager.emitDeltaEmit(emit)
 
     await this.persistPayloads(payloadsToPersist)
 
@@ -897,12 +894,10 @@ export class SNSyncService
       historyMap,
     )
 
-    const collections = await resolver.collectionsByProcessingResponse()
-    for (const emittableCollection of collections) {
-      const payloadsToPersist = await this.payloadManager.emitCollection(
-        emittableCollection.collection,
-        emittableCollection.emitSource,
-      )
+    const emits = await resolver.result()
+
+    for (const emit of emits) {
+      const payloadsToPersist = await this.payloadManager.emitDeltaEmit(emit)
       await this.persistPayloads(payloadsToPersist)
     }
 
@@ -1206,11 +1201,11 @@ export class SNSyncService
       this.historyService.getHistoryMapCopy(),
     )
 
-    const collection = await delta.resultingCollection()
+    const emit = await delta.result()
 
-    await this.payloadManager.emitCollection(collection, PayloadEmitSource.RemoteRetrieved)
+    await this.payloadManager.emitDeltaEmit(emit)
 
-    await this.persistPayloads(collection.payloads)
+    await this.persistPayloads(emit.changed)
   }
 
   /** @e2e_testing */

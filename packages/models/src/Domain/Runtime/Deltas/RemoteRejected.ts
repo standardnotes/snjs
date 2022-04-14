@@ -1,10 +1,10 @@
-import { ImmutablePayloadCollection } from '../Collection/Payload/ImmutablePayloadCollection'
 import { PayloadSource } from '../../Abstract/Payload/Types/PayloadSource'
 import { PayloadsDelta } from './Abstract/Delta'
-import { FullyFormedPayloadInterface } from '../../Abstract/Payload'
+import { FullyFormedPayloadInterface, PayloadEmitSource } from '../../Abstract/Payload'
+import { DeltaEmit } from './Abstract/DeltaEmit'
 
 export class DeltaRemoteRejected extends PayloadsDelta {
-  public async resultingCollection(): Promise<ImmutablePayloadCollection> {
+  public async result(): Promise<DeltaEmit> {
     const results: FullyFormedPayloadInterface[] = []
 
     for (const apply of this.applyCollection.all()) {
@@ -24,6 +24,9 @@ export class DeltaRemoteRejected extends PayloadsDelta {
       results.push(result)
     }
 
-    return ImmutablePayloadCollection.WithPayloads(results)
+    return {
+      changed: results,
+      source: PayloadEmitSource.RemoteSaved,
+    }
   }
 }

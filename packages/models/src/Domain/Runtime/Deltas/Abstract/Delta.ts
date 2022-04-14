@@ -3,6 +3,7 @@ import { HistoryMap } from '../../History/HistoryMap'
 import { Uuid } from '@standardnotes/common'
 import { FullyFormedPayloadInterface } from '../../../Abstract/Payload'
 import { DeltaInterface } from './DeltaInterface'
+import { DeltaEmit } from './DeltaEmit'
 /**
  * A payload delta is a class that defines instructions that process an incoming collection
  * of payloads, applies some set of operations on those payloads wrt to the current base state,
@@ -19,9 +20,7 @@ import { DeltaInterface } from './DeltaInterface'
  * baseCollection, the data the server is sending as applyCollection, and determine what
  * the end state of the data should look like.
  */
-export abstract class PayloadsDelta
-  implements DeltaInterface<FullyFormedPayloadInterface, FullyFormedPayloadInterface>
-{
+export abstract class PayloadsDelta implements DeltaInterface {
   /**
    * @param baseCollection The authoratitive collection on top of which to compute changes.
    * @param applyCollection The collection of payloads to apply, from one given source only.
@@ -32,9 +31,7 @@ export abstract class PayloadsDelta
     protected readonly historyMap: HistoryMap,
   ) {}
 
-  public abstract resultingCollection(): Promise<
-    ImmutablePayloadCollection<FullyFormedPayloadInterface>
-  >
+  public abstract result(): Promise<DeltaEmit>
 
   findBasePayload(uuid: Uuid): FullyFormedPayloadInterface | undefined {
     return this.baseCollection.find(uuid)

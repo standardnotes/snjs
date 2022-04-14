@@ -165,7 +165,7 @@ export class SNKeyRecoveryService extends AbstractService {
      * the same items key in this storage, replace it with this latest incoming value.
      */
     if (persistIncoming) {
-      await this.saveToUndecryptables(keys)
+      this.saveToUndecryptables(keys)
     }
 
     this.addKeysToQueue(keys, (key, result) => {
@@ -219,8 +219,8 @@ export class SNKeyRecoveryService extends AbstractService {
     this.persistUndecryptables(record)
   }
 
-  private async removeFromUndecryptables(key: EncryptedPayloadInterface) {
-    const record = await this.getUndecryptables()
+  private removeFromUndecryptables(key: EncryptedPayloadInterface) {
+    const record = this.getUndecryptables()
 
     delete record[key.uuid]
 

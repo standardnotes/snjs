@@ -18,20 +18,18 @@ import { ContentType } from '@standardnotes/common'
 
 export class ConflictDelta {
   constructor(
-    protected readonly baseCollection: ImmutablePayloadCollection<FullyFormedPayloadInterface>,
+    protected readonly baseCollection: ImmutablePayloadCollection,
     protected readonly basePayload: FullyFormedPayloadInterface,
     protected readonly applyPayload: FullyFormedPayloadInterface,
     protected readonly historyMap: HistoryMap,
   ) {}
 
-  public async resultingCollection(): Promise<
-    ImmutablePayloadCollection<FullyFormedPayloadInterface>
-  > {
+  public async result(): Promise<FullyFormedPayloadInterface[]> {
     const strategy = this.getConflictStrategy()
 
     const results = await this.handleStrategy(strategy)
 
-    return ImmutablePayloadCollection.WithPayloads(results)
+    return results
   }
 
   private getConflictStrategy(): ConflictStrategy {

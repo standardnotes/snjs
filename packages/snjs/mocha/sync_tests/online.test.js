@@ -942,37 +942,39 @@ describe('online syncing', function () {
   })
 
   it('should not allow receiving decrypted payloads from server', async function () {
-    const masterCollection = this.application.payloadManager.getMasterCollection()
-    const historyMap = this.application.historyManager.getHistoryMapCopy()
+    const invalidPayload = new DecryptedPayload(
+      { ...Factory.createNotePayload(), uuid: 'rejected' },
+      PayloadSource.RemoteRetrieved,
+    )
 
-    const payload = new DecryptedPayload(Factory.createNotePayload(), PayloadSource.RemoteRetrieved)
+    const validPayload = new EncryptedPayload({
+      uuid: '123',
+      content_type: 'Note',
+      content: '004:...',
+    })
+
+    this.expectedItemCount++
 
     const response = new ServerSyncResponse({
       data: {
-        retrieved_items: [payload.ejected()],
+        retrieved_items: [invalidPayload.ejected(), validPayload.ejected()],
       },
     })
 
-    const resolver = new ServerSyncResponseResolver(
+    await this.application.syncService.handleSuccessServerResponse(
+      { payloadsSavedOrSaving: [] },
       response,
-      [payload],
-      masterCollection,
-      [],
-      historyMap,
     )
 
-    const collections = await resolver.collectionsByProcessingResponse()
-
-    for (const collection of collections) {
-      await this.application.payloadManager.emitCollection(collection)
-    }
-
-    expect(this.application.itemManager.notes.length).to.equal(0)
+    expect(this.application.payloadManager.findOne(invalidPayload.uuid)).to.not.be.ok
+    expect(this.application.payloadManager.findOne(validPayload.uuid)).to.be.ok
   })
 
   it('retrieved items should have both updated_at and updated_at_timestamps', async function () {
     const note = await Factory.createSyncedNote(this.application)
+
     this.expectedItemCount++
+
     expect(note.payload.created_at_timestamp).to.be.ok
     expect(note.payload.created_at).to.be.ok
     expect(note.payload.updated_at_timestamp).to.be.ok

@@ -1,9 +1,6 @@
 import {
   ImmutablePayloadCollection,
   HistoryMap,
-  DecryptedPayloadInterface,
-  DeletedPayloadInterface,
-  EncryptedPayloadInterface,
   DeltaRemoteRetrieved,
   DeltaRemoteSaved,
   DeltaRemoteDataConflicts,
@@ -11,14 +8,9 @@ import {
   ServerSyncPushContextualPayload,
   ServerSyncSavedContextualPayload,
   DeltaRemoteUuidConflicts,
-  PayloadEmitSource,
   DeltaRemoteRejected,
+  DeltaEmit,
 } from '@standardnotes/models'
-
-export type EmittableCollection = {
-  collection: ImmutablePayloadCollection<FullyFormedPayloadInterface>
-  emitSource: PayloadEmitSource
-}
 
 type PayloadSet = {
   retrievedPayloads: FullyFormedPayloadInterface[]
@@ -42,75 +34,25 @@ export class ServerSyncResponseResolver {
     private historyMap: HistoryMap,
   ) {}
 
-  public async collectionsByProcessingResponse(): Promise<EmittableCollection[]> {
-    const collections: EmittableCollection[] = []
+  public async result(): Promise<DeltaEmit[]> {
+    const emits: DeltaEmit[] = []
 
-    const collectionRetrieved = await this.processRetrievedPayloads()
-    if (collectionRetrieved.all().length > 0) {
-      collections.push({
-        collection: collectionRetrieved,
-        emitSource: PayloadEmitSource.RemoteRetrieved,
-      })
-    }
+    emits.push(await this.processRetrievedPayloads())
+    emits.push(await this.processSavedPayloads())
+    emits.push(await this.processUuidConflictPayloads())
+    emits.push(await this.processDataConflictPayloads())
+    emits.push(await this.processRejectedPayloads())
 
-    const collectionSaved = await this.processSavedPayloads()
-    if (collectionSaved.all().length > 0) {
-      collections.push({
-        collection: collectionSaved,
-        emitSource: PayloadEmitSource.RemoteSaved,
-      })
-    }
-
-    if (this.payloadSet.uuidConflictPayloads.length > 0) {
-      const collectionUuidConflicts = await this.processUuidConflictPayloads()
-      if (collectionUuidConflicts.all().length > 0) {
-        collections.push({
-          collection: collectionUuidConflicts,
-          emitSource: PayloadEmitSource.RemoteRetrieved,
-        })
-      }
-    }
-
-    if (this.payloadSet.dataConflictPayloads.length > 0) {
-      const collectionDataConflicts = await this.processDataConflictPayloads()
-      if (collectionDataConflicts.all().length > 0) {
-        collections.push({
-          collection: collectionDataConflicts,
-          emitSource: PayloadEmitSource.RemoteRetrieved,
-        })
-      }
-    }
-
-    if (this.payloadSet.rejectedPayloads.length > 0) {
-      const collectionRejected = await this.processRejectedPayloads()
-      if (collectionRejected.all().length > 0) {
-        collections.push({
-          collection: collectionRejected,
-          emitSource: PayloadEmitSource.RemoteRetrieved,
-        })
-      }
-    }
-
-    return collections
+    return emits
   }
 
-  private async processSavedPayloads(): Promise<
-    ImmutablePayloadCollection<
-      DecryptedPayloadInterface | EncryptedPayloadInterface | DeletedPayloadInterface
-    >
-  > {
+  private processSavedPayloads(): Promise<DeltaEmit> {
     const delta = new DeltaRemoteSaved(this.baseCollection, this.payloadSet.savedPayloads)
 
-    const result = await delta.resultingCollection()
-
-    return result
+    return delta.result()
   }
 
-  private async processRetrievedPayloads(): Promise<
-    ImmutablePayloadCollection<
-      DecryptedPayloadInterface | EncryptedPayloadInterface | DeletedPayloadInterface
-    >
-  > {
+  private processRetrievedPayloads(): Promise<DeltaEmit> {
     const collection = ImmutablePayloadCollection.WithPayloads(this.payloadSet.retrievedPayloads)
 
     const delta = new DeltaRemoteRetrieved(
@@ -120,50 +62,30 @@ export class ServerSyncResponseResolver {
       this.historyMap,
     )
 
-    const result = await delta.resultingCollection()
-
-    return result
+    return delta.result()
   }
 
-  private async processDataConflictPayloads(): Promise<
-    ImmutablePayloadCollection<
-      DecryptedPayloadInterface | EncryptedPayloadInterface | DeletedPayloadInterface
-    >
-  > {
+  private processDataConflictPayloads(): Promise<DeltaEmit> {
     const collection = ImmutablePayloadCollection.WithPayloads(this.payloadSet.dataConflictPayloads)
 
     const delta = new DeltaRemoteDataConflicts(this.baseCollection, collection, this.historyMap)
 
-    const result = await delta.resultingCollection()
-
-    return result
+    return delta.result()
   }
 
-  private async processUuidConflictPayloads(): Promise<
-    ImmutablePayloadCollection<
-      DecryptedPayloadInterface | EncryptedPayloadInterface | DeletedPayloadInterface
-    >
-  > {
+  private processUuidConflictPayloads(): Promise<DeltaEmit> {
     const collection = ImmutablePayloadCollection.WithPayloads(this.payloadSet.uuidConflictPayloads)
 
     const delta = new DeltaRemoteUuidConflicts(this.baseCollection, collection, this.historyMap)
 
-    const result = await delta.resultingCollection()
-
-    return result
+    return delta.result()
   }
 
-  private async processRejectedPayloads(): Promise<
-    ImmutablePayloadCollection<
-      DecryptedPayloadInterface | EncryptedPayloadInterface | DeletedPayloadInterface
-    >
-  > {
+  private processRejectedPayloads(): Promise<DeltaEmit> {
     const collection = ImmutablePayloadCollection.WithPayloads(this.payloadSet.rejectedPayloads)
 
     const delta = new DeltaRemoteRejected(this.baseCollection, collection, this.historyMap)
 
-    const result = await delta.resultingCollection()
-
-    return result
+    return delta.result()
   }
 }

@@ -3,8 +3,9 @@ import { ImmutablePayloadCollection } from '../Collection/Payload/ImmutablePaylo
 import { PayloadsByAlternatingUuid } from '../../Utilities/Payload/PayloadsByAlternatingUuid'
 import { PayloadsDelta } from './Abstract/Delta'
 import { isDecryptedPayload } from '../../Abstract/Payload/Interfaces/TypeCheck'
-import { FullyFormedPayloadInterface } from '../../Abstract/Payload'
+import { FullyFormedPayloadInterface, PayloadEmitSource } from '../../Abstract/Payload'
 import { payloadsByRedirtyingBasedOnBaseState } from './Utilities.ts/ApplyDirtyState'
+import { DeltaEmit } from './Abstract/DeltaEmit'
 
 /**
  * UUID conflicts can occur if a user attmpts to import an old data
@@ -12,7 +13,7 @@ import { payloadsByRedirtyingBasedOnBaseState } from './Utilities.ts/ApplyDirtyS
  * In uuid_conflict, we receive the value we attmpted to save.
  */
 export class DeltaRemoteUuidConflicts extends PayloadsDelta {
-  public async resultingCollection(): Promise<ImmutablePayloadCollection> {
+  public async result(): Promise<DeltaEmit> {
     const results: FullyFormedPayloadInterface[] = []
     const baseCollectionCopy = this.baseCollection.mutableCopy()
 
@@ -45,6 +46,9 @@ export class DeltaRemoteUuidConflicts extends PayloadsDelta {
       )
     }
 
-    return ImmutablePayloadCollection.WithPayloads(results)
+    return {
+      changed: results,
+      source: PayloadEmitSource.RemoteRetrieved,
+    }
   }
 }

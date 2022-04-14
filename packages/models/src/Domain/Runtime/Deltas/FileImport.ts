@@ -6,9 +6,11 @@ import {
   FullyFormedPayloadInterface,
   DeletedPayloadInterface,
   isDecryptedPayload,
+  PayloadEmitSource,
 } from '../../Abstract/Payload'
 import { CustomApplyDelta } from './Abstract/CustomApplyDelta'
 import { HistoryMap } from '../History'
+import { DeltaEmit } from './Abstract/DeltaEmit'
 
 type Return = DecryptedPayloadInterface
 
@@ -21,7 +23,7 @@ export class DeltaFileImport extends CustomApplyDelta {
     super(baseCollection)
   }
 
-  public async resultingCollection(): Promise<ImmutablePayloadCollection<Return>> {
+  public async result(): Promise<DeltaEmit<Return>> {
     const results: Return[] = []
 
     for (const payload of this.applyPayloads) {
@@ -37,7 +39,10 @@ export class DeltaFileImport extends CustomApplyDelta {
       extendArray(results, payloads)
     }
 
-    return ImmutablePayloadCollection.WithPayloads(results)
+    return {
+      changed: results,
+      source: PayloadEmitSource.FileImport,
+    }
   }
 
   private async payloadsByHandlingPayload(
@@ -85,8 +90,6 @@ export class DeltaFileImport extends CustomApplyDelta {
 
     const delta = new ConflictDelta(this.baseCollection, current, payload, this.historyMap)
 
-    const deltaCollection = await delta.resultingCollection()
-
-    return deltaCollection.all()
+    return delta.result()
   }
 }

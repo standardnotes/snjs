@@ -1,12 +1,12 @@
 import { extendArray } from '@standardnotes/utils'
-import { ImmutablePayloadCollection } from '../Collection/Payload/ImmutablePayloadCollection'
 import { ConflictDelta } from './Conflict'
 import { PayloadsDelta } from './Abstract/Delta'
-import { FullyFormedPayloadInterface } from '../../Abstract/Payload'
+import { FullyFormedPayloadInterface, PayloadEmitSource } from '../../Abstract/Payload'
 import { payloadsByRedirtyingBasedOnBaseState } from './Utilities.ts/ApplyDirtyState'
+import { DeltaEmit } from './Abstract/DeltaEmit'
 
 export class DeltaRemoteDataConflicts extends PayloadsDelta {
-  public async resultingCollection(): Promise<ImmutablePayloadCollection> {
+  public async result(): Promise<DeltaEmit> {
     const results: FullyFormedPayloadInterface[] = []
 
     for (const apply of this.applyCollection.all()) {
@@ -22,16 +22,16 @@ export class DeltaRemoteDataConflicts extends PayloadsDelta {
 
       const delta = new ConflictDelta(this.baseCollection, base, apply, this.historyMap)
 
-      const deltaCollection = await delta.resultingCollection()
+      const deltaResults = await delta.result()
 
-      const payloads = payloadsByRedirtyingBasedOnBaseState(
-        deltaCollection.all(),
-        this.baseCollection,
-      )
+      const payloads = payloadsByRedirtyingBasedOnBaseState(deltaResults, this.baseCollection)
 
       extendArray(results, payloads)
     }
 
-    return ImmutablePayloadCollection.WithPayloads(results)
+    return {
+      changed: results,
+      source: PayloadEmitSource.RemoteSaved,
+    }
   }
 }

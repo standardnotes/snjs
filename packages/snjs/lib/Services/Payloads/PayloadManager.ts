@@ -23,6 +23,7 @@ import {
   isEncryptedPayload,
   isDecryptedPayload,
   HistoryMap,
+  DeltaEmit,
 } from '@standardnotes/models'
 import {
   AbstractService,
@@ -94,12 +95,27 @@ export class PayloadManager extends AbstractService implements PayloadManagerInt
     return this.collection.invalidElements()
   }
 
-  public async emitCollection(
-    collection: ImmutablePayloadCollection<FullyFormedPayloadInterface>,
-    emitSource: PayloadEmitSource,
+  public async emitDeltaEmit<P extends FullyFormedPayloadInterface = FullyFormedPayloadInterface>(
+    emit: DeltaEmit<P>,
     sourceKey?: string,
-  ) {
-    return this.emitPayloads(collection.all(), emitSource, sourceKey)
+  ): Promise<P[]> {
+    if (emit.changed.length === 0) {
+      console.warn('Attempting to emit 0 payloads.')
+    }
+
+    return new Promise((resolve) => {
+      const element: QueueElement<P> = {
+        emit: emit,
+        sourceKey,
+        resolve,
+      }
+
+      this.emitQueue.push(element as unknown as QueueElement<FullyFormedPayloadInterface>)
+
+      if (this.emitQueue.length === 1) {
+        void this.popQueue()
+      }
+    })
   }
 
   /**
@@ -127,29 +143,20 @@ export class PayloadManager extends AbstractService implements PayloadManagerInt
     source: PayloadEmitSource,
     sourceKey?: string,
   ): Promise<P[]> {
-    if (payloads.length === 0) {
-      console.warn('Attempting to emit 0 payloads.')
+    const emit: DeltaEmit<P> = {
+      changed: payloads,
+      source: source,
     }
-    return new Promise((resolve) => {
-      const element: QueueElement<P> = {
-        payloads,
-        source,
-        sourceKey,
-        resolve,
-      }
 
-      this.emitQueue.push(element as unknown as QueueElement<FullyFormedPayloadInterface>)
-
-      if (this.emitQueue.length === 1) {
-        void this.popQueue()
-      }
-    })
+    return this.emitDeltaEmit(emit, sourceKey)
   }
 
   private popQueue() {
     const first = this.emitQueue[0]
 
-    const { changed, inserted, discarded, ignored, unerrored } = this.applyPayloads(first.payloads)
+    const { changed, inserted, discarded, ignored, unerrored } = this.applyPayloads(
+      first.emit.changed,
+    )
 
     this.notifyChangeObservers(
       changed,
@@ -157,7 +164,7 @@ export class PayloadManager extends AbstractService implements PayloadManagerInt
       discarded,
       ignored,
       unerrored,
-      first.source,
+      first.emit.source,
       first.sourceKey,
     )
 
@@ -304,11 +311,11 @@ export class PayloadManager extends AbstractService implements PayloadManagerInt
 
     const delta = new DeltaFileImport(this.getMasterCollection(), sourcedPayloads, historyMap)
 
-    const collection = await delta.resultingCollection()
+    const emit = await delta.result()
 
-    await this.emitCollection(collection, PayloadEmitSource.FileImport)
+    await this.emitDeltaEmit(emit)
 
-    return Uuids(collection.payloads)
+    return Uuids(payloads)
   }
 
   public removePayloadLocally(payload: FullyFormedPayloadInterface) {
