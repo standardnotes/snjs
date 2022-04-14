@@ -31,7 +31,7 @@ export class DeltaRemoteDataConflicts extends PayloadsDelta {
 
     return {
       changed: results,
-      source: PayloadEmitSource.RemoteSaved,
+      source: PayloadEmitSource.RemoteRetrieved,
     }
   }
 }
