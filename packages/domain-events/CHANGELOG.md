@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.27.0](https://github.com/standardnotes/snjs/compare/@standardnotes/domain-events@2.26.11...@standardnotes/domain-events@2.27.0) (2022-04-14)
+
+
+### Features
+
+* add shared subscription invitation canceled event ([789f9a6](https://github.com/standardnotes/snjs/commit/789f9a68955062314fd2bea83b9d49e82589b801))
+
+
+
+
+
 ## [2.26.11](https://github.com/standardnotes/snjs/compare/@standardnotes/domain-events@2.26.10...@standardnotes/domain-events@2.26.11) (2022-04-12)
 
 **Note:** Version bump only for package @standardnotes/domain-events
