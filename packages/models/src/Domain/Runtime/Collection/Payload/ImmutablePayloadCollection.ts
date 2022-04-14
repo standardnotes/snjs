@@ -4,7 +4,7 @@ import { UuidMap } from '@standardnotes/utils'
 import { PayloadCollection } from './PayloadCollection'
 
 export class ImmutablePayloadCollection<
-  P extends FullyFormedPayloadInterface,
+  P extends FullyFormedPayloadInterface = FullyFormedPayloadInterface,
 > extends PayloadCollection<P> {
   public get payloads(): P[] {
     return this.all()

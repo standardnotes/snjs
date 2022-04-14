@@ -22,6 +22,7 @@ import {
   FullyFormedPayloadInterface,
   isEncryptedPayload,
   isDecryptedPayload,
+  HistoryMap,
 } from '@standardnotes/models'
 import {
   AbstractService,
@@ -148,9 +149,7 @@ export class PayloadManager extends AbstractService implements PayloadManagerInt
   private popQueue() {
     const first = this.emitQueue[0]
 
-    const { changed, inserted, discarded, ignored, unerrored } = this.applyPayloads(
-      first.payloads,
-    )
+    const { changed, inserted, discarded, ignored, unerrored } = this.applyPayloads(first.payloads)
 
     this.notifyChangeObservers(
       changed,
@@ -297,13 +296,13 @@ export class PayloadManager extends AbstractService implements PayloadManagerInt
    * and marks the items as dirty.
    * @returns Resulting items
    */
-  public async importPayloads(payloads: DecryptedPayloadInterface[]): Promise<Uuid[]> {
+  public async importPayloads(
+    payloads: DecryptedPayloadInterface[],
+    historyMap: HistoryMap,
+  ): Promise<Uuid[]> {
     const sourcedPayloads = payloads.map((p) => p.copy(undefined, PayloadSource.FileImport))
 
-    const delta = new DeltaFileImport(
-      this.getMasterCollection(),
-      ImmutablePayloadCollection.WithPayloads(sourcedPayloads),
-    )
+    const delta = new DeltaFileImport(this.getMasterCollection(), sourcedPayloads, historyMap)
 
     const collection = await delta.resultingCollection()
 

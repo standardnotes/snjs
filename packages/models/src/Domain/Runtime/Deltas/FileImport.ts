@@ -1,25 +1,30 @@
 import { extendArray } from '@standardnotes/utils'
 import { ImmutablePayloadCollection } from '../Collection/Payload/ImmutablePayloadCollection'
 import { ConflictDelta } from './Conflict'
-import { PayloadsDelta } from './Abstract/Delta'
 import { DecryptedPayloadInterface } from '../../Abstract/Payload/Interfaces/DecryptedPayload'
 import {
   FullyFormedPayloadInterface,
   DeletedPayloadInterface,
   isDecryptedPayload,
 } from '../../Abstract/Payload'
+import { CustomApplyDelta } from './Abstract/CustomApplyDelta'
+import { HistoryMap } from '../History'
 
 type Return = DecryptedPayloadInterface
 
-export class DeltaFileImport extends PayloadsDelta<
-  FullyFormedPayloadInterface,
-  DecryptedPayloadInterface,
-  DecryptedPayloadInterface
-> {
+export class DeltaFileImport extends CustomApplyDelta {
+  constructor(
+    baseCollection: ImmutablePayloadCollection,
+    private readonly applyPayloads: DecryptedPayloadInterface[],
+    protected readonly historyMap: HistoryMap,
+  ) {
+    super(baseCollection)
+  }
+
   public async resultingCollection(): Promise<ImmutablePayloadCollection<Return>> {
     const results: Return[] = []
 
-    for (const payload of this.applyCollection.all()) {
+    for (const payload of this.applyPayloads) {
       const handled = await this.payloadsByHandlingPayload(payload, results)
 
       const payloads = handled.map((result) => {
@@ -78,7 +83,7 @@ export class DeltaFileImport extends PayloadsDelta<
       return [payload]
     }
 
-    const delta = new ConflictDelta(this.baseCollection, current, payload)
+    const delta = new ConflictDelta(this.baseCollection, current, payload, this.historyMap)
 
     const deltaCollection = await delta.resultingCollection()
 

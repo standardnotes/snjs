@@ -21,7 +21,7 @@ export class ConflictDelta {
     protected readonly baseCollection: ImmutablePayloadCollection<FullyFormedPayloadInterface>,
     protected readonly basePayload: FullyFormedPayloadInterface,
     protected readonly applyPayload: FullyFormedPayloadInterface,
-    protected readonly historyMap?: HistoryMap,
+    protected readonly historyMap: HistoryMap,
   ) {}
 
   public async resultingCollection(): Promise<
@@ -50,7 +50,6 @@ export class ConflictDelta {
        * already conflicted this item.
        */
       const existingConflict = this.baseCollection.conflictsOf(this.applyPayload.uuid)[0]
-
       if (
         existingConflict &&
         isDecryptedPayload(existingConflict) &&
@@ -62,7 +61,7 @@ export class ConflictDelta {
       } else {
         const tmpBaseItem = CreateDecryptedItemFromPayload(this.basePayload)
         const tmpApplyItem = CreateItemFromPayload(this.applyPayload)
-        const historyEntries = this.historyMap?.[this.basePayload.uuid] || []
+        const historyEntries = this.historyMap[this.basePayload.uuid] || []
         const previousRevision = historyMapFunctions.getNewestRevision(historyEntries)
 
         return tmpBaseItem.strategyWhenConflictingWithItem(tmpApplyItem, previousRevision)

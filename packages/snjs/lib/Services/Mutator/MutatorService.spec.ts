@@ -1,3 +1,4 @@
+import { SNHistoryManager } from './../History/HistoryManager'
 import { NoteContent, SNNote, FillItemContent, DecryptedPayload } from '@standardnotes/models'
 import { EncryptionService } from '@standardnotes/encryption'
 import { ContentType } from '@standardnotes/common'
@@ -26,6 +27,7 @@ describe('mutator service', () => {
   let protocolService: EncryptionService
   let challengeService: ChallengeService
   let componentManager: SNComponentManager
+  let historyService: SNHistoryManager
 
   let internalEventBus: InternalEventBusInterface
 
@@ -45,6 +47,7 @@ describe('mutator service', () => {
       payloadManager,
       challengeService,
       componentManager,
+      historyService,
       internalEventBus,
     )
   })

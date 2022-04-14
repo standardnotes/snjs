@@ -62,7 +62,7 @@ export class ServerSyncResponse {
     return this.allFullyFormedPayloads.length
   }
 
-  public get allFullyFormedPayloads(): FilteredServerItem[] {
+  private get allFullyFormedPayloads(): FilteredServerItem[] {
     return [
       ...this.retrievedPayloads,
       ...this.dataConflictPayloads,

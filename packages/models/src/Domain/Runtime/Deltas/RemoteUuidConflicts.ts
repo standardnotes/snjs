@@ -3,47 +3,35 @@ import { ImmutablePayloadCollection } from '../Collection/Payload/ImmutablePaylo
 import { PayloadsByAlternatingUuid } from '../../Utilities/Payload/PayloadsByAlternatingUuid'
 import { PayloadsDelta } from './Abstract/Delta'
 import { isDecryptedPayload } from '../../Abstract/Payload/Interfaces/TypeCheck'
-import {
-  DecryptedPayloadInterface,
-  FullyFormedPayloadInterface,
-  DeletedPayloadInterface,
-  EncryptedPayloadInterface,
-} from '../../Abstract/Payload'
+import { FullyFormedPayloadInterface } from '../../Abstract/Payload'
 import { payloadsByRedirtyingBasedOnBaseState } from './Utilities.ts/ApplyDirtyState'
-
-type Return = EncryptedPayloadInterface | DecryptedPayloadInterface | DeletedPayloadInterface
 
 /**
  * UUID conflicts can occur if a user attmpts to import an old data
  * backup with uuids from the old account into a new account.
  * In uuid_conflict, we receive the value we attmpted to save.
  */
-export class DeltaRemoteUuidConflicts extends PayloadsDelta<
-  FullyFormedPayloadInterface,
-  EncryptedPayloadInterface | DeletedPayloadInterface,
-  EncryptedPayloadInterface | DecryptedPayloadInterface | DeletedPayloadInterface
-> {
-  public async resultingCollection(): Promise<ImmutablePayloadCollection<Return>> {
-    const results: Return[] = []
+export class DeltaRemoteUuidConflicts extends PayloadsDelta {
+  public async resultingCollection(): Promise<ImmutablePayloadCollection> {
+    const results: FullyFormedPayloadInterface[] = []
     const baseCollectionCopy = this.baseCollection.mutableCopy()
 
-    for (const payload of this.applyCollection.all()) {
+    for (const apply of this.applyCollection.all()) {
       /**
        * The payload in question may have been modified as part of alternating a uuid for
        * another item. For example, alternating a uuid for a note will also affect the
        * referencing tag, which would be added to `results`, but could also be inside
        * of this.applyCollection. In this case we'd prefer the most recently modified value.
        */
-      const moreRecent = results.find((r) => r.uuid === payload.uuid)
-      const decrypted = moreRecent || this.findRelatedPostProcessedPayload(payload.uuid)
+      const moreRecent = results.find((r) => r.uuid === apply.uuid)
+      const useApply = moreRecent || apply
 
-      if (!decrypted || !isDecryptedPayload(decrypted)) {
-        console.error('Unable to find decrypted counterpart for payload', payload)
+      if (!isDecryptedPayload(useApply)) {
         continue
       }
 
       const alternateResults = await PayloadsByAlternatingUuid(
-        decrypted,
+        useApply,
         ImmutablePayloadCollection.FromCollection(baseCollectionCopy),
       )
 

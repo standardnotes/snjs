@@ -11,7 +11,7 @@ type Return = FullyFormedPayloadInterface
 
 export class DeltaRemoteSaved extends CustomApplyDelta {
   constructor(
-    baseCollection: ImmutablePayloadCollection<FullyFormedPayloadInterface>,
+    baseCollection: ImmutablePayloadCollection,
     private readonly applyContextualPayloads: ServerSyncSavedContextualPayload[],
   ) {
     super(baseCollection)

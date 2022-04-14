@@ -19,32 +19,24 @@ import { DeltaInterface } from './DeltaInterface'
  * baseCollection, the data the server is sending as applyCollection, and determine what
  * the end state of the data should look like.
  */
-export abstract class PayloadsDelta<
-  Base extends FullyFormedPayloadInterface,
-  Apply extends FullyFormedPayloadInterface,
-  Result extends FullyFormedPayloadInterface,
-> implements DeltaInterface<Base, Result>
+export abstract class PayloadsDelta
+  implements DeltaInterface<FullyFormedPayloadInterface, FullyFormedPayloadInterface>
 {
   /**
    * @param baseCollection The authoratitive collection on top of which to compute changes.
    * @param applyCollection The collection of payloads to apply, from one given source only.
-   * @param postProcessedCollection A collection that contains payloads
-   *                             that may be neccessary to carry out computation.
    */
   constructor(
-    readonly baseCollection: ImmutablePayloadCollection<Base>,
-    protected readonly applyCollection: ImmutablePayloadCollection<Apply>,
-    protected readonly postProcessedCollection?: ImmutablePayloadCollection<FullyFormedPayloadInterface>,
-    protected readonly historyMap?: HistoryMap,
+    readonly baseCollection: ImmutablePayloadCollection<FullyFormedPayloadInterface>,
+    protected readonly applyCollection: ImmutablePayloadCollection<FullyFormedPayloadInterface>,
+    protected readonly historyMap: HistoryMap,
   ) {}
 
-  public abstract resultingCollection(): Promise<ImmutablePayloadCollection<Result>>
+  public abstract resultingCollection(): Promise<
+    ImmutablePayloadCollection<FullyFormedPayloadInterface>
+  >
 
-  findBasePayload(uuid: Uuid): Base | undefined {
+  findBasePayload(uuid: Uuid): FullyFormedPayloadInterface | undefined {
     return this.baseCollection.find(uuid)
-  }
-
-  protected findRelatedPostProcessedPayload(uuid: Uuid): FullyFormedPayloadInterface | undefined {
-    return this.postProcessedCollection?.find(uuid)
   }
 }

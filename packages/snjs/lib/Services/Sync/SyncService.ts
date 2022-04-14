@@ -868,13 +868,30 @@ export class SNSyncService
 
     this.opStatus.setDownloadStatus(response.retrievedPayloads.length)
 
-    const processedPayloads = await this.processServerPayloads(response.allFullyFormedPayloads)
-
     const masterCollection = this.payloadManager.getMasterCollection()
+
     const historyMap = this.historyService.getHistoryMapCopy()
+
     const resolver = new ServerSyncResponseResolver(
-      response,
-      processedPayloads,
+      {
+        retrievedPayloads: await this.processServerPayloads(
+          response.retrievedPayloads,
+          PayloadSource.RemoteRetrieved,
+        ),
+        savedPayloads: response.savedPayloads,
+        uuidConflictPayloads: await this.processServerPayloads(
+          response.uuidConflictPayloads,
+          PayloadSource.RemoteRetrieved,
+        ),
+        dataConflictPayloads: await this.processServerPayloads(
+          response.dataConflictPayloads,
+          PayloadSource.RemoteRetrieved,
+        ),
+        rejectedPayloads: await this.processServerPayloads(
+          response.rejectedPayloads,
+          PayloadSource.RemoteRetrieved,
+        ),
+      },
       masterCollection,
       operation.payloadsSavedOrSaving,
       historyMap,
@@ -898,8 +915,9 @@ export class SNSyncService
 
   private async processServerPayloads(
     items: FilteredServerItem[],
+    source: PayloadSource,
   ): Promise<FullyFormedPayloadInterface[]> {
-    const payloads = items.map(CreatePayloadFromRawServerItem)
+    const payloads = items.map((i) => CreatePayloadFromRawServerItem(i, source))
 
     const { encrypted, deleted } = CreateNonDecryptedPayloadSplit(payloads)
 
@@ -1185,7 +1203,6 @@ export class SNSyncService
     const delta = new DeltaOutOfSync(
       this.payloadManager.getMasterCollection(),
       ImmutablePayloadCollection.WithPayloads(payloads),
-      undefined,
       this.historyService.getHistoryMapCopy(),
     )
 

@@ -1,3 +1,4 @@
+import { SNHistoryManager } from './../History/HistoryManager'
 import { AbstractService, InternalEventBusInterface } from '@standardnotes/services'
 import { BackupFile, EncryptionProvider } from '@standardnotes/encryption'
 import { ClientDisplayableError } from '@standardnotes/responses'
@@ -34,9 +35,22 @@ export class MutatorService extends AbstractService implements MutatorClientInte
     private payloadManager: PayloadManager,
     private challengeService: ChallengeService,
     private componentManager: SNComponentManager,
+    private historyService: SNHistoryManager,
     protected override internalEventBus: InternalEventBusInterface,
   ) {
     super(internalEventBus)
+  }
+
+  override deinit() {
+    super.deinit()
+    ;(this.itemManager as unknown) = undefined
+    ;(this.syncService as unknown) = undefined
+    ;(this.protectionService as unknown) = undefined
+    ;(this.encryption as unknown) = undefined
+    ;(this.payloadManager as unknown) = undefined
+    ;(this.challengeService as unknown) = undefined
+    ;(this.componentManager as unknown) = undefined
+    ;(this.historyService as unknown) = undefined
   }
 
   public async insertItem(
@@ -376,7 +390,10 @@ export class MutatorService extends AbstractService implements MutatorClientInte
       }
     })
 
-    const affectedUuids = await this.payloadManager.importPayloads(validPayloads)
+    const affectedUuids = await this.payloadManager.importPayloads(
+      validPayloads,
+      this.historyService.getHistoryMapCopy(),
+    )
 
     const promise = this.syncService.sync()
 

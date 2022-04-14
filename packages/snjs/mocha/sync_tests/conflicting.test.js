@@ -192,6 +192,11 @@ describe('online conflict handling', function () {
     const originalValue = note.title
     const dirtyValue = `${Math.random()}`
 
+    /** Modify nonsense first to get around strategyWhenConflictingWithItem with previousRevision check  */
+    await this.application.itemManager.changeNote(note, (mutator) => {
+      mutator.title = 'any'
+    })
+
     await this.application.itemManager.changeNote(note, (mutator) => {
       // modify this item locally to have differing contents from server
       mutator.title = dirtyValue

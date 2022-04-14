@@ -1,18 +1,12 @@
 import { ImmutablePayloadCollection } from './../Collection/Payload/ImmutablePayloadCollection'
-import { PayloadInterface } from './../../Abstract/Payload/Interfaces/PayloadInterface'
 import { extendArray } from '@standardnotes/utils'
 import { ConflictDelta } from './Conflict'
 import { PayloadsDelta } from './Abstract/Delta'
 import {
-  isDeletedPayload,
   isErrorDecryptingPayload,
+  isDecryptedPayload,
 } from '../../Abstract/Payload/Interfaces/TypeCheck'
-import {
-  DecryptedPayloadInterface,
-  DeletedPayloadInterface,
-  FullyFormedPayloadInterface,
-  EncryptedPayloadInterface,
-} from '../../Abstract/Payload'
+import { FullyFormedPayloadInterface } from '../../Abstract/Payload'
 import { Uuid } from '@standardnotes/common'
 import { HistoryMap } from '../History'
 import { ServerSyncPushContextualPayload } from '../../Abstract/Contextual/ServerSyncPush'
@@ -21,64 +15,47 @@ import {
   payloadsByRedirtyingBasedOnBaseState,
 } from './Utilities.ts/ApplyDirtyState'
 
-type Return = EncryptedPayloadInterface | DecryptedPayloadInterface | DeletedPayloadInterface
-
-export class DeltaRemoteRetrieved extends PayloadsDelta<
-  FullyFormedPayloadInterface,
-  EncryptedPayloadInterface | DeletedPayloadInterface,
-  EncryptedPayloadInterface | DecryptedPayloadInterface | DeletedPayloadInterface
-> {
+export class DeltaRemoteRetrieved extends PayloadsDelta {
   constructor(
-    baseCollection: ImmutablePayloadCollection<FullyFormedPayloadInterface>,
-    applyCollection: ImmutablePayloadCollection<
-      EncryptedPayloadInterface | DeletedPayloadInterface
-    >,
+    baseCollection: ImmutablePayloadCollection,
+    applyCollection: ImmutablePayloadCollection,
     private itemsSavedOrSaving: ServerSyncPushContextualPayload[],
-    relatedCollection?: ImmutablePayloadCollection<FullyFormedPayloadInterface>,
-    historyMap?: HistoryMap,
+    historyMap: HistoryMap,
   ) {
-    super(baseCollection, applyCollection, relatedCollection, historyMap)
+    super(baseCollection, applyCollection, historyMap)
   }
 
   private isUuidOfPayloadCurrentlySavingOrSaved(uuid: Uuid): boolean {
     return this.itemsSavedOrSaving.find((i) => i.uuid === uuid) != undefined
   }
 
-  public async resultingCollection(): Promise<ImmutablePayloadCollection<Return>> {
-    const filtered: Return[] = []
-    const conflicted: Array<PayloadInterface> = []
+  public async resultingCollection(): Promise<
+    ImmutablePayloadCollection<FullyFormedPayloadInterface>
+  > {
+    const filtered: FullyFormedPayloadInterface[] = []
+    const conflicted: FullyFormedPayloadInterface[] = []
 
     /**
      * If we have retrieved an item that was saved as part of this ongoing sync operation,
      * or if the item is locally dirty, filter it out of retrieved_items, and add to potential conflicts.
      */
     for (const apply of this.applyCollection.all()) {
-      const savedOrSaving = this.isUuidOfPayloadCurrentlySavingOrSaved(apply.uuid)
+      const isSavedOrSaving = this.isUuidOfPayloadCurrentlySavingOrSaved(apply.uuid)
 
-      const postProcessedCounterpart = this.findRelatedPostProcessedPayload(apply.uuid)
-      if (!postProcessedCounterpart) {
-        /** Should only be missing in case of deleted retrieved item */
-        if (isDeletedPayload(apply)) {
-          filtered.push(apply)
-        }
+      if (isSavedOrSaving) {
+        conflicted.push(apply)
 
-        continue
-      }
-
-      if (savedOrSaving) {
-        conflicted.push(postProcessedCounterpart)
         continue
       }
 
       const base = this.findBasePayload(apply.uuid)
       if (base?.dirty && !isErrorDecryptingPayload(base)) {
-        conflicted.push(postProcessedCounterpart)
+        conflicted.push(apply)
+
         continue
       }
 
-      filtered.push(
-        payloadByRedirtyingBasedOnBaseState(postProcessedCounterpart, this.baseCollection) as Return,
-      )
+      filtered.push(payloadByRedirtyingBasedOnBaseState(apply, this.baseCollection))
     }
 
     /**
@@ -86,23 +63,25 @@ export class DeltaRemoteRetrieved extends PayloadsDelta<
      * local values, and if they differ, we create a new payload that is a copy
      * of the server payload.
      */
-    const conflictResults: Return[] = []
+    const conflictResults: FullyFormedPayloadInterface[] = []
     for (const conflict of conflicted) {
-      const decrypted = this.findRelatedPostProcessedPayload(conflict.uuid)
-      if (!decrypted) {
+      if (!isDecryptedPayload(conflict)) {
         continue
       }
 
-      const current = this.findBasePayload(conflict.uuid)
-      if (!current) {
+      const base = this.findBasePayload(conflict.uuid)
+      if (!base) {
         continue
       }
 
-      const delta = new ConflictDelta(this.baseCollection, current, decrypted)
+      const delta = new ConflictDelta(this.baseCollection, base, conflict, this.historyMap)
 
       const deltaCollection = await delta.resultingCollection()
 
-      const payloads = payloadsByRedirtyingBasedOnBaseState(deltaCollection.all(), this.baseCollection)
+      const payloads = payloadsByRedirtyingBasedOnBaseState(
+        deltaCollection.all(),
+        this.baseCollection,
+      )
 
       extendArray(conflictResults, payloads)
     }

@@ -1,33 +1,24 @@
 import { ImmutablePayloadCollection } from '../Collection/Payload/ImmutablePayloadCollection'
 import { PayloadSource } from '../../Abstract/Payload/Types/PayloadSource'
 import { PayloadsDelta } from './Abstract/Delta'
-import {
-  FullyFormedPayloadInterface,
-  DeletedPayloadInterface,
-  EncryptedPayloadInterface,
-} from '../../Abstract/Payload'
-import { payloadByRedirtyingBasedOnBaseState } from './Utilities.ts/ApplyDirtyState'
+import { FullyFormedPayloadInterface } from '../../Abstract/Payload'
 
-type Return = FullyFormedPayloadInterface
-
-export class DeltaRemoteRejected extends PayloadsDelta<
-  FullyFormedPayloadInterface,
-  EncryptedPayloadInterface | DeletedPayloadInterface,
-  FullyFormedPayloadInterface
-> {
-  public async resultingCollection(): Promise<ImmutablePayloadCollection<Return>> {
-    const results: Return[] = []
+export class DeltaRemoteRejected extends PayloadsDelta {
+  public async resultingCollection(): Promise<ImmutablePayloadCollection> {
+    const results: FullyFormedPayloadInterface[] = []
 
     for (const apply of this.applyCollection.all()) {
-      const postProcessedCounterpart = this.findRelatedPostProcessedPayload(apply.uuid)
+      const base = this.findBasePayload(apply.uuid)
 
-      if (!postProcessedCounterpart) {
-        throw 'Unable to find postprocessed counterpart for rejected payload.'
+      if (!base) {
+        continue
       }
 
-      const result = payloadByRedirtyingBasedOnBaseState(
-        postProcessedCounterpart.copy({}, PayloadSource.RemoteRetrieved),
-        this.baseCollection,
+      const result = base.copy(
+        {
+          dirty: false,
+        },
+        PayloadSource.RemoteSaved,
       )
 
       results.push(result)

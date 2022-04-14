@@ -1,6 +1,5 @@
 import {
   ImmutablePayloadCollection,
-  PayloadSource,
   HistoryMap,
   DecryptedPayloadInterface,
   DeletedPayloadInterface,
@@ -11,17 +10,22 @@ import {
   FullyFormedPayloadInterface,
   ServerSyncPushContextualPayload,
   ServerSyncSavedContextualPayload,
-  FilteredServerItem,
   DeltaRemoteUuidConflicts,
   PayloadEmitSource,
   DeltaRemoteRejected,
 } from '@standardnotes/models'
-import { ServerSyncResponse } from '@Lib/Services/Sync/Account/Response'
-import { CreatePayloadFromRawServerItem } from './Utilities'
 
 export type EmittableCollection = {
   collection: ImmutablePayloadCollection<FullyFormedPayloadInterface>
   emitSource: PayloadEmitSource
+}
+
+type PayloadSet = {
+  retrievedPayloads: FullyFormedPayloadInterface[]
+  savedPayloads: ServerSyncSavedContextualPayload[]
+  uuidConflictPayloads: FullyFormedPayloadInterface[]
+  dataConflictPayloads: FullyFormedPayloadInterface[]
+  rejectedPayloads: FullyFormedPayloadInterface[]
 }
 
 /**
@@ -31,22 +35,17 @@ export type EmittableCollection = {
  * offers the 'recommended' new global state given a sync response and a current base state.
  */
 export class ServerSyncResponseResolver {
-  private relatedCollection: ImmutablePayloadCollection<FullyFormedPayloadInterface>
-
   constructor(
-    private response: ServerSyncResponse,
-    postProcessedRelated: FullyFormedPayloadInterface[],
+    private payloadSet: PayloadSet,
     private baseCollection: ImmutablePayloadCollection<FullyFormedPayloadInterface>,
     private payloadsSavedOrSaving: ServerSyncPushContextualPayload[],
     private historyMap: HistoryMap,
-  ) {
-    this.relatedCollection = ImmutablePayloadCollection.WithPayloads(postProcessedRelated)
-  }
+  ) {}
 
   public async collectionsByProcessingResponse(): Promise<EmittableCollection[]> {
     const collections: EmittableCollection[] = []
 
-    const collectionRetrieved = await this.processRetrievedPayloads(this.response.retrievedPayloads)
+    const collectionRetrieved = await this.processRetrievedPayloads()
     if (collectionRetrieved.all().length > 0) {
       collections.push({
         collection: collectionRetrieved,
@@ -54,7 +53,7 @@ export class ServerSyncResponseResolver {
       })
     }
 
-    const collectionSaved = await this.processSavedPayloads(this.response.savedPayloads)
+    const collectionSaved = await this.processSavedPayloads()
     if (collectionSaved.all().length > 0) {
       collections.push({
         collection: collectionSaved,
@@ -62,10 +61,8 @@ export class ServerSyncResponseResolver {
       })
     }
 
-    if (this.response.uuidConflictPayloads.length > 0) {
-      const collectionUuidConflicts = await this.processUuidConflictPayloads(
-        this.response.uuidConflictPayloads,
-      )
+    if (this.payloadSet.uuidConflictPayloads.length > 0) {
+      const collectionUuidConflicts = await this.processUuidConflictPayloads()
       if (collectionUuidConflicts.all().length > 0) {
         collections.push({
           collection: collectionUuidConflicts,
@@ -74,10 +71,8 @@ export class ServerSyncResponseResolver {
       }
     }
 
-    if (this.response.dataConflictPayloads.length > 0) {
-      const collectionDataConflicts = await this.processDataConflictPayloads(
-        this.response.dataConflictPayloads,
-      )
+    if (this.payloadSet.dataConflictPayloads.length > 0) {
+      const collectionDataConflicts = await this.processDataConflictPayloads()
       if (collectionDataConflicts.all().length > 0) {
         collections.push({
           collection: collectionDataConflicts,
@@ -86,8 +81,8 @@ export class ServerSyncResponseResolver {
       }
     }
 
-    if (this.response.rejectedPayloads.length > 0) {
-      const collectionRejected = await this.processRejectedPayloads(this.response.rejectedPayloads)
+    if (this.payloadSet.rejectedPayloads.length > 0) {
+      const collectionRejected = await this.processRejectedPayloads()
       if (collectionRejected.all().length > 0) {
         collections.push({
           collection: collectionRejected,
@@ -99,36 +94,29 @@ export class ServerSyncResponseResolver {
     return collections
   }
 
-  private async processSavedPayloads(
-    payloads: ServerSyncSavedContextualPayload[],
-  ): Promise<
+  private async processSavedPayloads(): Promise<
     ImmutablePayloadCollection<
       DecryptedPayloadInterface | EncryptedPayloadInterface | DeletedPayloadInterface
     >
   > {
-    const delta = new DeltaRemoteSaved(this.baseCollection, payloads)
+    const delta = new DeltaRemoteSaved(this.baseCollection, this.payloadSet.savedPayloads)
 
     const result = await delta.resultingCollection()
 
     return result
   }
 
-  private async processRetrievedPayloads(
-    items: FilteredServerItem[],
-  ): Promise<
+  private async processRetrievedPayloads(): Promise<
     ImmutablePayloadCollection<
       DecryptedPayloadInterface | EncryptedPayloadInterface | DeletedPayloadInterface
     >
   > {
-    const collection = ImmutablePayloadCollection.WithPayloads(
-      items.map((i) => CreatePayloadFromRawServerItem(i, PayloadSource.RemoteRetrieved)),
-    )
+    const collection = ImmutablePayloadCollection.WithPayloads(this.payloadSet.retrievedPayloads)
 
     const delta = new DeltaRemoteRetrieved(
       this.baseCollection,
       collection,
       this.payloadsSavedOrSaving,
-      this.relatedCollection,
       this.historyMap,
     )
 
@@ -137,69 +125,42 @@ export class ServerSyncResponseResolver {
     return result
   }
 
-  private async processDataConflictPayloads(
-    items: FilteredServerItem[],
-  ): Promise<
+  private async processDataConflictPayloads(): Promise<
     ImmutablePayloadCollection<
       DecryptedPayloadInterface | EncryptedPayloadInterface | DeletedPayloadInterface
     >
   > {
-    const collection = ImmutablePayloadCollection.WithPayloads(
-      items.map((i) => CreatePayloadFromRawServerItem(i, PayloadSource.RemoteRetrieved)),
-    )
+    const collection = ImmutablePayloadCollection.WithPayloads(this.payloadSet.dataConflictPayloads)
 
-    const delta = new DeltaRemoteDataConflicts(
-      this.baseCollection,
-      collection,
-      this.relatedCollection,
-      this.historyMap,
-    )
+    const delta = new DeltaRemoteDataConflicts(this.baseCollection, collection, this.historyMap)
 
     const result = await delta.resultingCollection()
 
     return result
   }
 
-  private async processUuidConflictPayloads(
-    items: FilteredServerItem[],
-  ): Promise<
+  private async processUuidConflictPayloads(): Promise<
     ImmutablePayloadCollection<
       DecryptedPayloadInterface | EncryptedPayloadInterface | DeletedPayloadInterface
     >
   > {
-    const collection = ImmutablePayloadCollection.WithPayloads(
-      items.map((i) => CreatePayloadFromRawServerItem(i, PayloadSource.RemoteRetrieved)),
-    )
+    const collection = ImmutablePayloadCollection.WithPayloads(this.payloadSet.uuidConflictPayloads)
 
-    const delta = new DeltaRemoteUuidConflicts(
-      this.baseCollection,
-      collection,
-      this.relatedCollection,
-      this.historyMap,
-    )
+    const delta = new DeltaRemoteUuidConflicts(this.baseCollection, collection, this.historyMap)
 
     const result = await delta.resultingCollection()
 
     return result
   }
 
-  private async processRejectedPayloads(
-    items: FilteredServerItem[],
-  ): Promise<
+  private async processRejectedPayloads(): Promise<
     ImmutablePayloadCollection<
       DecryptedPayloadInterface | EncryptedPayloadInterface | DeletedPayloadInterface
     >
   > {
-    const collection = ImmutablePayloadCollection.WithPayloads(
-      items.map((i) => CreatePayloadFromRawServerItem(i, PayloadSource.RemoteRetrieved)),
-    )
+    const collection = ImmutablePayloadCollection.WithPayloads(this.payloadSet.rejectedPayloads)
 
-    const delta = new DeltaRemoteRejected(
-      this.baseCollection,
-      collection,
-      this.relatedCollection,
-      this.historyMap,
-    )
+    const delta = new DeltaRemoteRejected(this.baseCollection, collection, this.historyMap)
 
     const result = await delta.resultingCollection()
 

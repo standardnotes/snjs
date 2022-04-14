@@ -1,16 +1,8 @@
 import { ImmutablePayloadCollection } from '../Collection/Payload/ImmutablePayloadCollection'
-import {
-  DecryptedPayloadInterface,
-  DeletedPayloadInterface,
-  EncryptedPayloadInterface,
-  FullyFormedPayloadInterface,
-} from '../../Abstract/Payload'
+import { FullyFormedPayloadInterface } from '../../Abstract/Payload'
 import { CustomApplyDelta } from './Abstract/CustomApplyDelta'
 import { OfflineSyncSavedContextualPayload } from '../../Abstract/Contextual/OfflineSyncSaved'
-import { CreatePayload } from '../../Utilities/Payload/CreatePayload'
 import { payloadByRedirtyingBasedOnBaseState } from './Utilities.ts/ApplyDirtyState'
-
-type Return = EncryptedPayloadInterface | DecryptedPayloadInterface | DeletedPayloadInterface
 
 export class DeltaOfflineSaved extends CustomApplyDelta {
   constructor(
@@ -20,8 +12,8 @@ export class DeltaOfflineSaved extends CustomApplyDelta {
     super(baseCollection)
   }
 
-  public async resultingCollection(): Promise<ImmutablePayloadCollection<Return>> {
-    const processed: Return[] = []
+  public async resultingCollection(): Promise<ImmutablePayloadCollection> {
+    const processed: FullyFormedPayloadInterface[] = []
 
     for (const apply of this.applyContextualPayloads) {
       const base = this.findBasePayload(apply.uuid)
@@ -29,9 +21,7 @@ export class DeltaOfflineSaved extends CustomApplyDelta {
         continue
       }
 
-      processed.push(
-        payloadByRedirtyingBasedOnBaseState(CreatePayload(base, base.source), this.baseCollection),
-      )
+      processed.push(payloadByRedirtyingBasedOnBaseState(base, this.baseCollection))
     }
 
     return ImmutablePayloadCollection.WithPayloads(processed)
