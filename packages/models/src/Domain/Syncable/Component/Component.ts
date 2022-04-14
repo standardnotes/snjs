@@ -89,7 +89,7 @@ export class SNComponent extends DecryptedItem<ComponentContent> implements Comp
     _item: DecryptedItemInterface,
     _previousRevision?: HistoryEntryInterface,
   ): ConflictStrategy {
-    return ConflictStrategy.KeepLeft
+    return ConflictStrategy.KeepBase
   }
 
   override get isSingleton(): boolean {

@@ -76,6 +76,10 @@ export class PayloadManager
     return this.collection.findAll([uuid])[0]
   }
 
+  public all(contentType: ContentType): FullyFormedPayloadInterface[] {
+    return this.collection.all(contentType)
+  }
+
   /**
    * One of many mapping helpers available.
    * This function maps a collection of payloads.
@@ -169,36 +173,41 @@ export class PayloadManager
     }
   }
 
-  private mergePayloadsOntoMaster(payloads: FullyFormedPayloadInterface[]) {
+  private mergePayloadsOntoMaster(applyPayloads: FullyFormedPayloadInterface[]) {
     const changed: FullyFormedPayloadInterface[] = []
     const inserted: FullyFormedPayloadInterface[] = []
     const discarded: DeletedPayloadInterface[] = []
     const ignored: EncryptedPayloadInterface[] = []
     const unerrored: DecryptedPayloadInterface[] = []
 
-    for (const payload of payloads) {
-      if (!payload.uuid || !payload.content_type) {
-        console.error('Payload is corrupt', payload)
+    for (const applyPayload of applyPayloads) {
+      if (!applyPayload.uuid || !applyPayload.content_type) {
+        console.error('Payload is corrupt', applyPayload)
 
         continue
       }
 
-      const masterPayload = this.collection.find(payload.uuid)
+      const masterPayload = this.collection.find(applyPayload.uuid)
+
+      let newPayload = applyPayload
 
       if (
-        OverwriteProtectedTypes.includes(payload.content_type) &&
-        isErrorDecryptingPayload(payload) &&
+        OverwriteProtectedTypes.includes(applyPayload.content_type) &&
+        isErrorDecryptingPayload(applyPayload) &&
         masterPayload &&
         !isErrorDecryptingPayload(masterPayload)
       ) {
-        ignored.push(payload)
+        ignored.push(applyPayload)
 
-        continue
+        newPayload = masterPayload.copy({
+          updated_at_timestamp: applyPayload.updated_at_timestamp,
+          updated_at: applyPayload.updated_at,
+        })
+      } else if (masterPayload) {
+        newPayload = MergePayloads(masterPayload, applyPayload)
       }
 
-      const newPayload = masterPayload ? MergePayloads(masterPayload, payload) : payload
-
-      if (masterPayload && isEncryptedPayload(masterPayload) && isDecryptedPayload(payload)) {
+      if (masterPayload && isEncryptedPayload(masterPayload) && isDecryptedPayload(applyPayload)) {
         unerrored.push(newPayload as DecryptedPayloadInterface)
       }
 

@@ -15,6 +15,7 @@ import {
   isErrorDecryptingPayload,
   isDeletedPayload,
 } from '../../Abstract/Payload/Interfaces/TypeCheck'
+import { ContentType } from '@standardnotes/common'
 
 export class ConflictDelta {
   constructor(
@@ -28,10 +29,20 @@ export class ConflictDelta {
   public async resultingCollection(): Promise<
     ImmutablePayloadCollection<FullyFormedPayloadInterface>
   > {
-    let strategy: ConflictStrategy | undefined = undefined
+    const strategy = this.getConflictStrategy()
+
+    const results = await this.handleStrategy(strategy)
+
+    return ImmutablePayloadCollection.WithPayloads(results, this.source)
+  }
+
+  private getConflictStrategy(): ConflictStrategy {
+    if (this.basePayload.content_type === ContentType.ItemsKey) {
+      return this.getItemsKeyConflictStrategy()
+    }
 
     if (isErrorDecryptingPayload(this.basePayload) || isErrorDecryptingPayload(this.applyPayload)) {
-      strategy = ConflictStrategy.KeepLeftDuplicateRight
+      return ConflictStrategy.KeepBaseDuplicateApply
     } else if (isDecryptedPayload(this.basePayload)) {
       /**
        * Ensure no conflict has already been created with the incoming content.
@@ -49,36 +60,34 @@ export class ConflictDelta {
         PayloadContentsEqual(existingConflict, this.applyPayload)
       ) {
         /** Conflict exists and its contents are the same as incoming value, do not make duplicate */
-        strategy = ConflictStrategy.KeepLeft
+        return ConflictStrategy.KeepBase
       } else {
         const tmpBaseItem = CreateDecryptedItemFromPayload(this.basePayload)
         const tmpApplyItem = CreateItemFromPayload(this.applyPayload)
         const historyEntries = this.historyMap?.[this.basePayload.uuid] || []
         const previousRevision = historyMapFunctions.getNewestRevision(historyEntries)
 
-        strategy = tmpBaseItem.strategyWhenConflictingWithItem(tmpApplyItem, previousRevision)
+        return tmpBaseItem.strategyWhenConflictingWithItem(tmpApplyItem, previousRevision)
       }
     } else if (isDeletedPayload(this.basePayload) || isDeletedPayload(this.applyPayload)) {
       const baseDeleted = isDeletedPayload(this.basePayload)
       const applyDeleted = isDeletedPayload(this.applyPayload)
       if (baseDeleted && applyDeleted) {
-        strategy = ConflictStrategy.KeepRight
+        return ConflictStrategy.KeepApply
       } else {
-        strategy = ConflictStrategy.KeepRight
+        return ConflictStrategy.KeepApply
       }
     }
 
-    if (strategy == undefined) {
-      throw Error('Unhandled strategy in Conflict Delta resultingCollection')
-    }
+    throw Error('Unhandled strategy in Conflict Delta getConflictStrategy')
+  }
 
-    const results = await this.handleStrategy(strategy)
-
-    return ImmutablePayloadCollection.WithPayloads(results, this.source)
+  private getItemsKeyConflictStrategy(): ConflictStrategy {
+    return ConflictStrategy.KeepApply
   }
 
   private async handleStrategy(strategy: ConflictStrategy): Promise<FullyFormedPayloadInterface[]> {
-    if (strategy === ConflictStrategy.KeepLeft) {
+    if (strategy === ConflictStrategy.KeepBase) {
       const updatedAt = greaterOfTwoDates(
         this.basePayload.serverUpdatedAt,
         this.applyPayload.serverUpdatedAt,
@@ -101,7 +110,7 @@ export class ConflictDelta {
       return [leftPayload]
     }
 
-    if (strategy === ConflictStrategy.KeepRight) {
+    if (strategy === ConflictStrategy.KeepApply) {
       const result = this.applyPayload.copy(
         {
           lastSyncBegan: this.basePayload.lastSyncBegan,
@@ -113,7 +122,7 @@ export class ConflictDelta {
       return [result]
     }
 
-    if (strategy === ConflictStrategy.KeepLeftDuplicateRight) {
+    if (strategy === ConflictStrategy.KeepBaseDuplicateApply) {
       const updatedAt = greaterOfTwoDates(
         this.basePayload.serverUpdatedAt,
         this.applyPayload.serverUpdatedAt,
@@ -144,7 +153,7 @@ export class ConflictDelta {
       return [leftPayload].concat(rightPayloads)
     }
 
-    if (strategy === ConflictStrategy.DuplicateLeftKeepRight) {
+    if (strategy === ConflictStrategy.DuplicateBaseKeepApply) {
       const leftPayloads = await PayloadsByDuplicating({
         payload: this.basePayload,
         baseCollection: this.baseCollection,
@@ -164,7 +173,7 @@ export class ConflictDelta {
     }
 
     if (
-      strategy === ConflictStrategy.KeepLeftMergeRefs &&
+      strategy === ConflictStrategy.KeepBaseMergeRefs &&
       isDecryptedPayload(this.basePayload) &&
       isDecryptedPayload(this.applyPayload)
     ) {

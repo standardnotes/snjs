@@ -21,7 +21,7 @@ export class SNTheme extends SNComponent {
     _item: DecryptedItemInterface,
     _previousRevision?: HistoryEntryInterface,
   ): ConflictStrategy {
-    return ConflictStrategy.KeepLeft
+    return ConflictStrategy.KeepBase
   }
 
   getMobileRules() {

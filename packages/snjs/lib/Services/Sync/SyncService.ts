@@ -1164,7 +1164,7 @@ export class SNSyncService
 
     this.setInSync(false)
 
-    await this.emitOutOfSyncRemotemPayloads([...decryptionResults, ...payloadSplit.deleted])
+    await this.emitOutOfSyncRemotePayloads([...decryptionResults, ...payloadSplit.deleted])
 
     const shouldCheckIntegrityAgainAfterSync = eventPayload.source !== SyncSource.ResolveOutOfSync
 
@@ -1174,15 +1174,18 @@ export class SNSyncService
     })
   }
 
-  private async emitOutOfSyncRemotemPayloads(payloads: FullyFormedPayloadInterface[]) {
+  private async emitOutOfSyncRemotePayloads(payloads: FullyFormedPayloadInterface[]) {
     const delta = new DeltaOutOfSync(
       this.payloadManager.getMasterCollection(),
       ImmutablePayloadCollection.WithPayloads(payloads, PayloadSource.RemoteRetrieved),
       undefined,
       this.historyService.getHistoryMapCopy(),
     )
+
     const collection = await delta.resultingCollection()
+
     await this.payloadManager.emitCollection(collection)
+
     await this.persistPayloads(collection.payloads)
   }
 

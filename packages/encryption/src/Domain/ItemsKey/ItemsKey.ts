@@ -34,7 +34,7 @@ export class SNItemsKey extends DecryptedItem<ItemsKeyContent> implements ItemsK
     _item: DecryptedItemInterface,
     _previousRevision?: HistoryEntryInterface,
   ): ConflictStrategy {
-    return ConflictStrategy.KeepLeft
+    return ConflictStrategy.KeepBase
   }
 
   get dataAuthenticationKey(): string | undefined {

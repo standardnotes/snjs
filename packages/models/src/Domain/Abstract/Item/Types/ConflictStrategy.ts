@@ -1,7 +1,7 @@
 export enum ConflictStrategy {
-  KeepLeft = 1,
-  KeepRight = 2,
-  KeepLeftDuplicateRight = 3,
-  DuplicateLeftKeepRight = 4,
-  KeepLeftMergeRefs = 5,
+  KeepBase = 1,
+  KeepApply = 2,
+  KeepBaseDuplicateApply = 3,
+  DuplicateBaseKeepApply = 4,
+  KeepBaseMergeRefs = 5,
 }

@@ -380,7 +380,6 @@ describe('online syncing', function () {
   })
 
   it('changing an item while it is being synced should sync again', async function () {
-    this.application.syncService.loggingEnabled = true
     const note = await Factory.createMappedNote(this.application)
 
     this.expectedItemCount++
@@ -409,7 +408,6 @@ describe('online syncing', function () {
   })
 
   it('deleting an item while it is being synced should keep deletion state', async function () {
-    this.application.syncService.loggingEnabled = true
     const note = await Factory.createMappedNote(this.application)
 
     this.expectedItemCount++

@@ -365,11 +365,13 @@ export class RootKeyEncryptionService extends Services.AbstractService<RootKeySe
       } else {
         await this.wrapAndPersistRootKey(wrappingKey)
       }
-      await this.storageService.setValue(
+
+      this.storageService.setValue(
         Services.StorageKey.RootKeyWrapperKeyParams,
         wrappingKey.keyParams.getPortableValue(),
         Services.StorageValueModes.Nonwrapped,
       )
+
       await this.handleKeyStatusChange()
     } else {
       throw Error('Invalid keyMode on setNewRootKeyWrapper')
@@ -432,7 +434,7 @@ export class RootKeyEncryptionService extends Services.AbstractService<RootKeySe
 
     this.setRootKeyInstance(key)
 
-    await this.storageService.setValue(
+    this.storageService.setValue(
       Services.StorageKey.RootKeyParams,
       key.keyParams.getPortableValue(),
       Services.StorageValueModes.Nonwrapped,
@@ -567,6 +569,7 @@ export class RootKeyEncryptionService extends Services.AbstractService<RootKeySe
    */
   public async reencryptItemsKeys(): Promise<void> {
     const itemsKeys = this.getItemsKeys()
+
     if (itemsKeys.length > 0) {
       /**
        * Do not call sync after marking dirty.

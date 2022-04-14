@@ -75,7 +75,7 @@ describe('history manager', () => {
       const item = await Factory.createSyncedNote(this.application)
 
       /** Simulate loading new application session */
-      const context = await Factory.createAppContext(identifier)
+      const context = await Factory.createAppContext({ identifier })
       await context.launch()
       expect(context.application.historyManager.sessionHistoryForItem(item).length).to.equal(0)
       await context.application.mutator.changeAndSaveItem(

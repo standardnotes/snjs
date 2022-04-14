@@ -180,6 +180,7 @@ export class SNKeyRecoveryService extends AbstractService {
 
   private async handleUndecryptableItemsKeys(keys: EncryptedPayloadInterface[]) {
     this.addKeysToQueue(keys)
+
     await this.beginProcessingQueue()
   }
 
@@ -196,20 +197,20 @@ export class SNKeyRecoveryService extends AbstractService {
     return this.handleIgnoredItemsKeys(keys, false)
   }
 
-  private async getUndecryptables() {
-    return this.storageService.getValue(
+  private getUndecryptables(): UndecryptableItemsStorage {
+    return this.storageService.getValue<UndecryptableItemsStorage>(
       StorageKey.KeyRecoveryUndecryptableItems,
       StorageValueModes.Default,
       {},
-    ) as Promise<UndecryptableItemsStorage>
+    )
   }
 
   private persistUndecryptables(record: UndecryptableItemsStorage) {
     this.storageService.setValue(StorageKey.KeyRecoveryUndecryptableItems, record)
   }
 
-  private async saveToUndecryptables(keys: EncryptedPayloadInterface[]) {
-    const record = await this.getUndecryptables()
+  private saveToUndecryptables(keys: EncryptedPayloadInterface[]) {
+    const record = this.getUndecryptables()
 
     for (const key of keys) {
       record[key.uuid] = key.ejected()
@@ -320,14 +321,21 @@ export class SNKeyRecoveryService extends AbstractService {
     if (this.isProcessingQueue) {
       return
     }
+
     this.isProcessingQueue = true
 
-    const clientParams = await this.getClientKeyParams()
+    const clientParams = this.getClientKeyParams()
+
     if (!this.serverParams && clientParams) {
       /** Get the user's latest key params from the server */
       const paramsResponse = await this.apiService.getAccountKeyParams(clientParams.identifier)
       if (!paramsResponse.error && paramsResponse.data) {
         this.serverParams = KeyParamsFromApiResponse(paramsResponse as KeyParamsResponse)
+      }
+
+      const deallocedAfterNetworkRequest = this.protocolService == undefined
+      if (deallocedAfterNetworkRequest) {
+        return
       }
     }
 
@@ -343,6 +351,7 @@ export class SNKeyRecoveryService extends AbstractService {
         queueItem = this.decryptionQueue[0]
       }
     }
+
     while (queueItem) {
       void this.popQueueItem(queueItem)
       await queueItem.promise
@@ -353,7 +362,7 @@ export class SNKeyRecoveryService extends AbstractService {
     void this.queuePromise.then(async () => {
       this.isProcessingQueue = false
       if (this.serverParams) {
-        const latestClientParams = await this.getClientKeyParams()
+        const latestClientParams = this.getClientKeyParams()
         const serverParamsDifferFromClients =
           latestClientParams && !this.serverParams.compare(latestClientParams)
         if (
@@ -368,6 +377,7 @@ export class SNKeyRecoveryService extends AbstractService {
           await this.performServerSignIn(this.serverParams)
         }
       }
+
       if (this.syncService.isOutOfSync()) {
         void this.syncService.sync({ checkIntegrity: true })
       }

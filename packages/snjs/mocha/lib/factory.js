@@ -1,7 +1,10 @@
 /* eslint-disable no-unused-expressions */
 /* eslint-disable no-undef */
-import WebDeviceInterface from './web_device_interface.js'
 import FakeWebCrypto from './fake_web_crypto.js'
+import { AppContext } from './AppContext.js'
+import * as Applications from './Applications.js'
+import * as Defaults from './Defaults.js'
+import * as Utils from './Utils.js'
 
 export const TenSecondTimeout = 10_000
 export const TwentySecondTimeout = 20_000
@@ -40,125 +43,35 @@ export async function createAndInitSimpleAppContext(
 }
 
 export async function createAppContextWithFakeCrypto(identifier) {
-  return createAppContext(identifier, new FakeWebCrypto())
+  return createAppContext({ identifier, crypto: new FakeWebCrypto() })
 }
 
 export async function createAppContextWithRealCrypto(identifier) {
-  return createAppContext(identifier, new SNWebCrypto())
+  return createAppContext({ identifier, crypto: new SNWebCrypto() })
 }
 
-export async function createAppContext(identifier, crypto) {
-  if (!identifier) {
-    identifier = `${Math.random()}`
-  }
-  const application = await createApplication(
-    identifier,
-    undefined,
-    undefined,
-    undefined,
-    crypto || new FakeWebCrypto(),
-  )
-  const email = UuidGenerator.GenerateUuid()
-  const password = UuidGenerator.GenerateUuid()
-  const passcode = 'mypasscode'
-  const handleChallenge = (challenge) => {
-    const responses = []
-    for (const prompt of challenge.prompts) {
-      if (prompt.validation === ChallengeValidation.LocalPasscode) {
-        responses.push(new ChallengeValue(prompt, passcode))
-      } else if (prompt.validation === ChallengeValidation.AccountPassword) {
-        responses.push(new ChallengeValue(prompt, password))
-      } else if (prompt.validation === ChallengeValidation.ProtectionSessionDuration) {
-        responses.push(new ChallengeValue(prompt, 0))
-      } else if (prompt.placeholder === 'Email') {
-        responses.push(new ChallengeValue(prompt, email))
-      } else if (prompt.placeholder === 'Password') {
-        responses.push(new ChallengeValue(prompt, password))
-      } else {
-        throw Error(`Unhandled custom challenge in Factory.createAppContext`)
-      }
-    }
-    application.submitValuesForChallenge(challenge, responses)
-  }
-  return {
-    application: application,
-    email,
-    identifier,
-    password,
-    passcode,
-    awaitNextSucessfulSync: () => {
-      return new Promise((resolve) => {
-        const removeObserver = application.syncService.addEventObserver((event) => {
-          if (event === SyncEvent.SyncCompletedWithAllItemsUploadedAndDownloaded) {
-            removeObserver()
-            resolve()
-          }
-        })
-      })
-    },
-    awaitNextSyncEvent: (eventName) => {
-      return new Promise((resolve) => {
-        const removeObserver = application.syncService.addEventObserver((event, data) => {
-          if (event === eventName) {
-            removeObserver()
-            resolve(data)
-          }
-        })
-      })
-    },
-    launch: async ({ awaitDatabaseLoad = true } = {}) => {
-      await application.prepareForLaunch({
-        receiveChallenge: handleChallenge,
-      })
-      await application.launch(awaitDatabaseLoad)
-    },
-    handleChallenge,
-    deinit: async () => {
-      await safeDeinit(application)
-    },
-  }
+export async function createAppContext({ identifier, crypto, email, password } = {}) {
+  const context = new AppContext({ identifier, crypto, email, password })
+  await context.initialize()
+  return context
 }
 
 export function disableIntegrityAutoHeal(application) {
-  application.syncService.emitOutOfSyncRemotemPayloads = () => {
+  application.syncService.emitOutOfSyncRemotePayloads = () => {
     console.warn('Integrity self-healing is disabled for this test')
   }
 }
 
 export async function safeDeinit(application) {
-  if (application.dealloced) {
-    console.warn(
-      'Attempting to deinit already deinited application. Check the test case to find where you are double deiniting.',
-    )
-    return
-  }
-
-  await application.storageService.awaitPersist()
-
-  /** Limit waiting to 1s */
-  await Promise.race([sleep(1), application.syncService?.awaitCurrentSyncs()])
-  await application.prepareForDeinit()
-  application.deinit(DeinitSource.SignOut)
+  return Utils.safeDeinit(application)
 }
 
 export function getDefaultHost() {
-  return 'http://localhost:3123'
-}
-
-export function getDefaultMockedEventServiceUrl() {
-  return 'http://localhost:3124'
-}
-
-export function getDefaultWebSocketUrl() {
-  return undefined
-}
-
-function getAppVersion() {
-  return '1.2.3'
+  return Defaults.getDefaultHost()
 }
 
 export async function publishMockedEvent(eventType, eventPayload) {
-  await fetch(`${getDefaultMockedEventServiceUrl()}/events`, {
+  await fetch(`${Defaults.getDefaultMockedEventServiceUrl()}/events`, {
     method: 'POST',
     headers: {
       Accept: 'application/json',
@@ -171,58 +84,24 @@ export async function publishMockedEvent(eventType, eventPayload) {
   })
 }
 
-export function createApplication(identifier, environment, platform, host, crypto) {
-  const deviceInterface = new WebDeviceInterface(setTimeout.bind(window), setInterval.bind(window))
-  return new SNApplication({
-    environment: environment || Environment.Web,
-    platform: platform || Platform.MacWeb,
-    deviceInterface,
-    crypto: crypto || new FakeWebCrypto(),
-    alertService: {
-      confirm: async () => true,
-      alert: async () => {},
-      blockingDialog: () => () => {},
-    },
-    identifier: identifier || `${Math.random()}`,
-    defaultHost: host || getDefaultHost(),
-    appVersion: getAppVersion(),
-    webSocketUrl: getDefaultWebSocketUrl(),
-  })
-}
-
 export function createApplicationWithFakeCrypto(identifier, environment, platform, host) {
-  return createApplication(identifier, environment, platform, host, new FakeWebCrypto())
+  return Applications.createApplicationWithFakeCrypto(identifier, environment, platform, host)
 }
 
 export function createApplicationWithRealCrypto(identifier, environment, platform, host) {
-  return createApplication(identifier, environment, platform, host, new SNWebCrypto())
+  return Applications.createApplicationWithRealCrypto(identifier, environment, platform, host)
 }
 
 export async function createAppWithRandNamespace(environment, platform) {
-  const namespace = Math.random().toString(36).substring(2, 15)
-  return createApplication(namespace, environment, platform)
+  return Applications.createAppWithRandNamespace(environment, platform)
 }
 
 export async function createInitAppWithFakeCrypto(environment, platform) {
-  const namespace = Math.random().toString(36).substring(2, 15)
-  return createAndInitializeApplication(
-    namespace,
-    environment,
-    platform,
-    undefined,
-    new FakeWebCrypto(),
-  )
+  return Applications.createInitAppWithFakeCrypto(environment, platform)
 }
 
 export async function createInitAppWithRealCrypto(environment, platform) {
-  const namespace = Math.random().toString(36).substring(2, 15)
-  return createAndInitializeApplication(
-    namespace,
-    environment,
-    platform,
-    undefined,
-    new SNWebCrypto(),
-  )
+  return Applications.createInitAppWithRealCrypto(environment, platform)
 }
 
 export async function createAndInitializeApplication(
@@ -232,21 +111,11 @@ export async function createAndInitializeApplication(
   host,
   crypto,
 ) {
-  const application = createApplication(namespace, environment, platform, host, crypto)
-  await initializeApplication(application)
-  return application
+  return Applications.createAndInitializeApplication(namespace, environment, platform, host, crypto)
 }
 
 export async function initializeApplication(application) {
-  await application.prepareForLaunch({
-    receiveChallenge: (challenge) => {
-      console.warn('Factory received potentially unhandled challenge', challenge)
-      if (challenge.reason !== ChallengeReason.Custom) {
-        throw Error("Factory application shouldn't have challenges")
-      }
-    },
-  })
-  await application.launch(true)
+  return Applications.initializeApplication(application)
 }
 
 export function registerUserToApplication({
@@ -519,12 +388,7 @@ export function tomorrow() {
 }
 
 export async function sleep(seconds) {
-  console.warn(`Test sleeping for ${seconds}s`)
-  return new Promise((resolve, reject) => {
-    setTimeout(function () {
-      resolve()
-    }, seconds * 1000)
-  })
+  return Utils.sleep(seconds)
 }
 
 export function shuffleArray(a) {
