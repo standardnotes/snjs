@@ -115,6 +115,6 @@ export class AppContext {
   }
 
   async deinit() {
-    await safeDeinit(application)
+    await Utils.safeDeinit(application)
   }
 }
