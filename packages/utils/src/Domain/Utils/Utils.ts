@@ -4,16 +4,10 @@ import { find, isArray, mergeWith, remove, uniq, uniqWith } from 'lodash'
 import { AnyRecord } from '@standardnotes/common'
 
 const collator =
-  typeof Intl !== 'undefined'
-    ? new Intl.Collator('en', { numeric: true })
-    : undefined
+  typeof Intl !== 'undefined' ? new Intl.Collator('en', { numeric: true }) : undefined
 
 export function getGlobalScope(): Window | unknown | null {
-  return typeof window !== 'undefined'
-    ? window
-    : typeof global !== 'undefined'
-      ? global
-      : null
+  return typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : null
 }
 
 export function dictToArray<T>(dict: Record<any, T>): T[] {
@@ -28,7 +22,7 @@ export function isWebEnvironment(): boolean {
 }
 
 interface IEDocument {
-  documentMode?: number;
+  documentMode?: number
 }
 
 /**
@@ -39,9 +33,7 @@ export function isWebCryptoAvailable(): boolean {
     (isWebEnvironment() &&
       !isReactNativeEnvironment() &&
       !(document && (document as IEDocument).documentMode)) ||
-    (/Edge/.test(navigator.userAgent) &&
-      window.crypto &&
-      !!window.crypto.subtle)
+    (/Edge/.test(navigator.userAgent) && window.crypto && !!window.crypto.subtle)
   )
 }
 
@@ -49,20 +41,14 @@ export function isWebCryptoAvailable(): boolean {
  * Whether we are in React Native app
  */
 export function isReactNativeEnvironment(): boolean {
-  return (
-    typeof navigator !== 'undefined' && navigator.product === 'ReactNative'
-  )
+  return typeof navigator !== 'undefined' && navigator.product === 'ReactNative'
 }
 
 /**
  * Searches array of objects for first object where object[key] === value
  * @returns Matching object or null if not found
  */
-export function findInArray<T, K extends keyof T>(
-  array: T[],
-  key: K,
-  value: T[K]
-): T | undefined {
+export function findInArray<T, K extends keyof T>(array: T[], key: K, value: T[K]): T | undefined {
   return array.find((item: T) => item[key] === value)
 }
 
@@ -70,17 +56,11 @@ export function findInArray<T, K extends keyof T>(
  * Searches array of objects for first object where object[key] === value
  * @returns Matching object or null if not found
  */
-export function searchArray<T>(
-  array: T[],
-  predicate: Partial<T>
-): T | undefined {
+export function searchArray<T>(array: T[], predicate: Partial<T>): T | undefined {
   return find(array, predicate) as T
 }
 
-export function sureSearchArray<T>(
-  array: T[],
-  predicate: Partial<T>
-): T {
+export function sureSearchArray<T>(array: T[], predicate: Partial<T>): T {
   return searchArray(array, predicate) as T
 }
 
@@ -146,11 +126,7 @@ export function greaterOfTwoDates(dateA: Date, dateB: Date): Date {
  * @param equalityKeys - Keys to determine element equality
  * @returns Array containing unique values
  */
-export function uniqCombineObjArrays<T>(
-  arrayA: T[],
-  arrayB: T[],
-  equalityKeys: (keyof T)[]
-): T[] {
+export function uniqCombineObjArrays<T>(arrayA: T[], arrayB: T[], equalityKeys: (keyof T)[]): T[] {
   return uniqWith(arrayA.concat(arrayB), (a: T, b: T) => {
     for (const key of equalityKeys) {
       if (a[key] !== b[key]) {
@@ -238,7 +214,7 @@ export function addIfUnique<T>(array: T[], value: T): boolean {
  */
 export function filterFromArray<T>(
   array: T[],
-  predicate: Partial<Record<keyof T, any>> | ((object: T) => boolean)
+  predicate: Partial<Record<keyof T, any>> | ((object: T) => boolean),
 ): void {
   remove(array, predicate)
 }
@@ -351,8 +327,8 @@ export function omitUndefinedCopy(object: any) {
  */
 export function dateSorted<T>(elements: T[], key: keyof T, ascending = true) {
   return elements.sort((a, b) => {
-    const aTimestamp = ((a[key] as unknown) as Date).getTime()
-    const bTimestamp = ((b[key] as unknown) as Date).getTime()
+    const aTimestamp = (a[key] as unknown as Date).getTime()
+    const bTimestamp = (b[key] as unknown as Date).getTime()
     const vector = ascending ? 1 : -1
     if (aTimestamp < bTimestamp) {
       return -1 * vector
@@ -530,10 +506,7 @@ export function isValidUrl(url: string): boolean {
  * Determines if an object has a getter defined for a given property
  */
 export function hasGetter(object: any, property: string) {
-  const descriptor = Object.getOwnPropertyDescriptor(
-    Object.getPrototypeOf(object),
-    property
-  )
+  const descriptor = Object.getOwnPropertyDescriptor(Object.getPrototypeOf(object), property)
   return descriptor && !isNullOrUndefined(descriptor.get)
 }
 
@@ -587,23 +560,23 @@ export function isSameDay(dateA: Date, dateB: Date) {
 export function naturalSort<T extends AnyRecord>(
   items: T[],
   property: keyof T,
-  direction: 'asc' | 'desc' = 'asc'
+  direction: 'asc' | 'desc' = 'asc',
 ): T[] {
   switch (direction) {
-  case 'asc':
-    return [...items].sort(
-      collator
-        ? (a, b) => collator.compare(a[property] as string, b[property] as string)
-        : (a, b) =>
-          (a[property] as string).localeCompare(b[property] as string, 'en', { numeric: true })
-    )
-  case 'desc':
-    return [...items].sort(
-      collator
-        ? (a, b) => collator.compare(b[property] as string, a[property] as string)
-        : (a, b) =>
-          (b[property] as string).localeCompare(a[property] as string, 'en', { numeric: true })
-    )
+    case 'asc':
+      return [...items].sort(
+        collator
+          ? (a, b) => collator.compare(a[property] as string, b[property] as string)
+          : (a, b) =>
+              (a[property] as string).localeCompare(b[property] as string, 'en', { numeric: true }),
+      )
+    case 'desc':
+      return [...items].sort(
+        collator
+          ? (a, b) => collator.compare(b[property] as string, a[property] as string)
+          : (a, b) =>
+              (b[property] as string).localeCompare(a[property] as string, 'en', { numeric: true }),
+      )
   }
 }
 
@@ -611,10 +584,7 @@ export function arraysEqual<T>(left: T[], right: T[]): boolean {
   if (left.length !== right.length) {
     return false
   }
-  return (
-    left.every((item) => right.includes(item)) &&
-    right.every((item) => left.includes(item))
-  )
+  return left.every((item) => right.includes(item)) && right.every((item) => left.includes(item))
 }
 
 const MicrosecondsInAMillisecond = 1_000
@@ -629,15 +599,15 @@ enum TimestampDigits {
 export function convertTimestampToMilliseconds(timestamp: number): number {
   const digits = String(timestamp).length
   switch (digits) {
-  case TimestampDigits.Seconds:
-    return timestamp * MillisecondsInASecond
-  case TimestampDigits.Milliseconds:
-    return timestamp
-  case TimestampDigits.Microseconds:
-    return Math.floor(timestamp / MicrosecondsInAMillisecond)
+    case TimestampDigits.Seconds:
+      return timestamp * MillisecondsInASecond
+    case TimestampDigits.Milliseconds:
+      return timestamp
+    case TimestampDigits.Microseconds:
+      return Math.floor(timestamp / MicrosecondsInAMillisecond)
 
-  default:
-    throw `Unhandled timestamp precision: ${timestamp}`
+    default:
+      throw `Unhandled timestamp precision: ${timestamp}`
   }
 }
 
@@ -647,11 +617,7 @@ export function sanitizeHtmlString(html: string): string {
 
 let sharedDateFormatter: unknown
 export function dateToLocalizedString(date: Date): string {
-  if (
-    typeof Intl !== 'undefined' &&
-    Intl.DateTimeFormat &&
-    typeof navigator !== 'undefined'
-  ) {
+  if (typeof Intl !== 'undefined' && Intl.DateTimeFormat && typeof navigator !== 'undefined') {
     if (!sharedDateFormatter) {
       const locale =
         navigator.languages && navigator.languages.length
@@ -701,10 +667,7 @@ export function secondHalfOfString(string: string): string {
 export function log(instance: any, message: string, ...args: unknown[]): void {
   const service = instance.constructor.name
   const date = new Date()
-  const timeString = date
-    .toLocaleTimeString()
-    .replace(' PM', '')
-    .replace(' AM', '')
+  const timeString = date.toLocaleTimeString().replace(' PM', '').replace(' AM', '')
   const string = `${service}:${timeString}.${date.getMilliseconds()}`
   if (args) {
     args = args.map((arg) => {
@@ -714,8 +677,10 @@ export function log(instance: any, message: string, ...args: unknown[]): void {
         return arg
       }
     })
+    // eslint-disable-next-line no-console
     console.log(string, message, ...args)
   } else {
+    // eslint-disable-next-line no-console
     console.log(string, message)
   }
 }
