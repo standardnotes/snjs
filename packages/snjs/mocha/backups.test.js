@@ -68,6 +68,7 @@ describe('backups', function () {
       email: this.email,
       password: this.password,
     })
+
     await Promise.all([
       Factory.createSyncedNote(this.application),
       Factory.createSyncedNote(this.application),

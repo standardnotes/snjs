@@ -465,7 +465,7 @@ export class SNApplication implements InternalServices.ListedClientInterface {
 
   public async setCustomHost(host: string): Promise<void> {
     await this.apiService.setHost(host)
-    await this.webSocketsService.setWebSocketUrl(undefined)
+    this.webSocketsService.setWebSocketUrl(undefined)
   }
 
   public getUser(): Responses.User | undefined {

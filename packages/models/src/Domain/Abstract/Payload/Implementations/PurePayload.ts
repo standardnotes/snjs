@@ -4,6 +4,10 @@ import { PayloadInterface } from '../Interfaces/PayloadInterface'
 import { PayloadSource } from '../Types/PayloadSource'
 import { TransferPayload } from '../../TransferPayload/Interfaces/TransferPayload'
 import { ItemContent } from '../../Content/ItemContent'
+import {
+  SyncResolvedParams,
+  SyncResolvedPayload,
+} from '../../../Runtime/Deltas/Utilities/SyncResolvedPayload'
 
 type RequiredKeepUndefined<T> = { [K in keyof T]-?: [T[K]] } extends infer U
   ? U extends Record<keyof U, [unknown]>
@@ -28,6 +32,7 @@ export abstract class PurePayload<T extends TransferPayload<C>, C extends ItemCo
   readonly dirty?: boolean
 
   readonly lastSyncBegan?: Date
+  readonly lastSyncEnd?: Date
 
   readonly duplicate_of?: string
 
@@ -55,6 +60,7 @@ export abstract class PurePayload<T extends TransferPayload<C>, C extends ItemCo
     this.updated_at_timestamp = rawPayload.updated_at_timestamp || 0
 
     this.lastSyncBegan = rawPayload.lastSyncBegan ? new Date(rawPayload.lastSyncBegan) : undefined
+    this.lastSyncEnd = rawPayload.lastSyncEnd ? new Date(rawPayload.lastSyncEnd) : undefined
 
     if (rawPayload.dirtiedDate) {
       this.dirtiedDate = new Date(rawPayload.dirtiedDate)
@@ -80,6 +86,7 @@ export abstract class PurePayload<T extends TransferPayload<C>, C extends ItemCo
       duplicate_of: this.duplicate_of,
       dirtiedDate: this.dirtiedDate,
       lastSyncBegan: this.lastSyncBegan,
+      lastSyncEnd: this.lastSyncEnd,
     }
 
     return comprehensive
@@ -96,4 +103,9 @@ export abstract class PurePayload<T extends TransferPayload<C>, C extends ItemCo
   abstract mergedWith(payload: this): this
 
   abstract copy(override?: Partial<TransferPayload>, source?: PayloadSource): this
+
+  abstract copyAsSyncResolved(
+    override?: Partial<T> & SyncResolvedParams,
+    source?: PayloadSource,
+  ): SyncResolvedPayload
 }

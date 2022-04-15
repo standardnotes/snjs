@@ -2,6 +2,10 @@ import { DeletedTransferPayload } from './../../TransferPayload/Interfaces/Delet
 import { DeletedPayloadInterface } from '../Interfaces/DeletedPayload'
 import { PayloadSource } from '../Types/PayloadSource'
 import { PurePayload } from './PurePayload'
+import {
+  SyncResolvedParams,
+  SyncResolvedPayload,
+} from '../../../Runtime/Deltas/Utilities/SyncResolvedPayload'
 
 export class DeletedPayload
   extends PurePayload<DeletedTransferPayload>
@@ -48,5 +52,19 @@ export class DeletedPayload
       source,
     )
     return result as this
+  }
+
+  copyAsSyncResolved(
+    override?: Partial<DeletedTransferPayload> & SyncResolvedParams,
+    source = this.source,
+  ): SyncResolvedPayload {
+    const result = new DeletedPayload(
+      {
+        ...this.ejected(),
+        ...override,
+      },
+      source,
+    )
+    return result as SyncResolvedPayload
   }
 }

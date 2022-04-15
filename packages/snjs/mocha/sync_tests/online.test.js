@@ -719,6 +719,7 @@ describe('online syncing', function () {
     await sync
     note = this.application.items.findItem(note.uuid)
     expect(note.dirty).to.equal(false)
+    expect(note.lastSyncEnd).to.be.at.least(note.lastSyncBegan)
   })
 
   it('syncing twice without waiting should only execute 1 online sync', async function () {
@@ -776,6 +777,7 @@ describe('online syncing', function () {
 
     note = this.application.items.findItem(note.uuid)
     expect(note.dirty).to.equal(false)
+    expect(note.lastSyncEnd).to.be.above(note.lastSyncBegan)
     expect(note.content.text).to.equal(text)
 
     // client B
@@ -834,7 +836,9 @@ describe('online syncing', function () {
   })
 
   it('marking item dirty after dirty items are prepared for sync but before they are synced should sync again', async function () {
-    /** There is a twilight zone where items needing sync are popped, and then say about 100ms of processing before
+    this.retries(2)
+    /**
+     * There is a twilight zone where items needing sync are popped, and then say about 100ms of processing before
      * we set those items' lastSyncBegan. If the item is dirtied in between these times, then item.dirtiedDate will be less than
      * item.lastSyncBegan, and it will not by synced again.
      */
@@ -922,6 +926,7 @@ describe('online syncing', function () {
     const note = await Factory.createSyncedNote(this.application)
     this.expectedItemCount++
     const lastSyncBegan = note.lastSyncBegan
+    const lastSyncEnd = note.lastSyncEnd
 
     const encrypted = await this.application.protocolService.encryptSplitSingle({
       usesItemsKeyWithKeyLookup: {
@@ -939,6 +944,7 @@ describe('online syncing', function () {
 
     const updatedNote = this.application.items.findAnyItem(note.uuid)
     expect(updatedNote.lastSyncBegan.getTime()).to.equal(lastSyncBegan.getTime())
+    expect(updatedNote.lastSyncEnd.getTime()).to.equal(lastSyncEnd.getTime())
   })
 
   it('should not allow receiving decrypted payloads from server', async function () {

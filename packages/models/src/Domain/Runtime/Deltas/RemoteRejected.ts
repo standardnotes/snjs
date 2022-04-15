@@ -1,22 +1,30 @@
 import { PayloadSource } from '../../Abstract/Payload/Types/PayloadSource'
-import { PayloadsDelta } from './Abstract/Delta'
-import { FullyFormedPayloadInterface, PayloadEmitSource } from '../../Abstract/Payload'
-import { DeltaEmit } from './Abstract/DeltaEmit'
+import { PayloadEmitSource } from '../../Abstract/Payload'
+import { ImmutablePayloadCollection } from '../Collection/Payload/ImmutablePayloadCollection'
+import { SyncDeltaEmit } from './Abstract/DeltaEmit'
+import { SyncDeltaInterface } from './Abstract/SyncDeltaInterface'
+import { SyncResolvedPayload } from './Utilities/SyncResolvedPayload'
 
-export class DeltaRemoteRejected extends PayloadsDelta {
-  public result(): DeltaEmit {
-    const results: FullyFormedPayloadInterface[] = []
+export class DeltaRemoteRejected implements SyncDeltaInterface {
+  constructor(
+    readonly baseCollection: ImmutablePayloadCollection,
+    readonly applyCollection: ImmutablePayloadCollection,
+  ) {}
+
+  public result(): SyncDeltaEmit {
+    const results: SyncResolvedPayload[] = []
 
     for (const apply of this.applyCollection.all()) {
-      const base = this.findBasePayload(apply.uuid)
+      const base = this.baseCollection.find(apply.uuid)
 
       if (!base) {
         continue
       }
 
-      const result = base.copy(
+      const result = base.copyAsSyncResolved(
         {
           dirty: false,
+          lastSyncEnd: new Date(),
         },
         PayloadSource.RemoteSaved,
       )

@@ -1,5 +1,9 @@
 import { ProtocolVersion, Uuid } from '@standardnotes/common'
 import { Copy } from '@standardnotes/utils'
+import {
+  SyncResolvedParams,
+  SyncResolvedPayload,
+} from '../../../Runtime/Deltas/Utilities/SyncResolvedPayload'
 import { FillItemContent, ItemContent } from '../../Content/ItemContent'
 import { ContentReference } from '../../Reference/ContentReference'
 import { DecryptedTransferPayload } from '../../TransferPayload/Interfaces/DecryptedTransferPayload'
@@ -68,5 +72,19 @@ export class DecryptedPayload<
       source,
     )
     return result as this
+  }
+
+  copyAsSyncResolved(
+    override?: Partial<T> & SyncResolvedParams,
+    source = this.source,
+  ): SyncResolvedPayload {
+    const result = new DecryptedPayload(
+      {
+        ...this.ejected(),
+        ...override,
+      },
+      source,
+    )
+    return result as SyncResolvedPayload
   }
 }

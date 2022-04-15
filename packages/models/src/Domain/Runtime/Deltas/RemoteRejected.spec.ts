@@ -1,4 +1,3 @@
-import { HistoryMap } from './../History/HistoryMap'
 import { ContentType } from '@standardnotes/common'
 import { FillItemContent } from '../../Abstract/Content/ItemContent'
 import { DecryptedPayload } from '../../Abstract/Payload'
@@ -33,7 +32,6 @@ describe('remote rejected delta', () => {
     const delta = new DeltaRemoteRejected(
       ImmutablePayloadCollection.FromCollection(baseCollection),
       ImmutablePayloadCollection.WithPayloads([rejectedPayload]),
-      {} as HistoryMap,
     )
 
     const result = delta.result()

@@ -1,29 +1,30 @@
 import { ImmutablePayloadCollection } from '../Collection/Payload/ImmutablePayloadCollection'
 import { FullyFormedPayloadInterface, PayloadEmitSource } from '../../Abstract/Payload'
-import { CustomApplyDelta } from './Abstract/CustomApplyDelta'
 import { OfflineSyncSavedContextualPayload } from '../../Abstract/Contextual/OfflineSyncSaved'
-import { payloadByRedirtyingBasedOnBaseState } from './Utilities.ts/ApplyDirtyState'
-import { DeltaEmit } from './Abstract/DeltaEmit'
+import { payloadByFinalizingSyncState } from './Utilities/ApplyDirtyState'
+import { SyncDeltaEmit } from './Abstract/DeltaEmit'
+import { SyncDeltaInterface } from './Abstract/SyncDeltaInterface'
+import { SyncResolvedPayload } from './Utilities/SyncResolvedPayload'
 
-export class DeltaOfflineSaved extends CustomApplyDelta {
+export class DeltaOfflineSaved implements SyncDeltaInterface {
   constructor(
-    baseCollection: ImmutablePayloadCollection<FullyFormedPayloadInterface>,
-    private readonly applyContextualPayloads: OfflineSyncSavedContextualPayload[],
-  ) {
-    super(baseCollection)
-  }
+    readonly baseCollection: ImmutablePayloadCollection<FullyFormedPayloadInterface>,
+    readonly applyContextualPayloads: OfflineSyncSavedContextualPayload[],
+  ) {}
 
-  public result(): DeltaEmit {
-    const processed: FullyFormedPayloadInterface[] = []
+  public result(): SyncDeltaEmit {
+    const processed: SyncResolvedPayload[] = []
 
     for (const apply of this.applyContextualPayloads) {
-      const base = this.findBasePayload(apply.uuid)
+      const base = this.baseCollection.find(apply.uuid)
+
       if (!base) {
         continue
       }
 
-      processed.push(payloadByRedirtyingBasedOnBaseState(base, this.baseCollection))
+      processed.push(payloadByFinalizingSyncState(base, this.baseCollection))
     }
+
     return {
       emits: processed,
       source: PayloadEmitSource.OfflineSyncSaved,

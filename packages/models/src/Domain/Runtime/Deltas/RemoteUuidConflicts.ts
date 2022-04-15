@@ -1,20 +1,26 @@
 import { extendArray, filterFromArray, Uuids } from '@standardnotes/utils'
 import { ImmutablePayloadCollection } from '../Collection/Payload/ImmutablePayloadCollection'
 import { PayloadsByAlternatingUuid } from '../../Utilities/Payload/PayloadsByAlternatingUuid'
-import { PayloadsDelta } from './Abstract/Delta'
 import { isDecryptedPayload } from '../../Abstract/Payload/Interfaces/TypeCheck'
-import { FullyFormedPayloadInterface, PayloadEmitSource } from '../../Abstract/Payload'
-import { payloadsByRedirtyingBasedOnBaseState } from './Utilities.ts/ApplyDirtyState'
-import { DeltaEmit } from './Abstract/DeltaEmit'
+import { PayloadEmitSource } from '../../Abstract/Payload'
+import { payloadsByFinalizingSyncState } from './Utilities/ApplyDirtyState'
+import { SyncDeltaEmit } from './Abstract/DeltaEmit'
+import { SyncDeltaInterface } from './Abstract/SyncDeltaInterface'
+import { SyncResolvedPayload } from './Utilities/SyncResolvedPayload'
 
 /**
  * UUID conflicts can occur if a user attmpts to import an old data
  * backup with uuids from the old account into a new account.
  * In uuid_conflict, we receive the value we attmpted to save.
  */
-export class DeltaRemoteUuidConflicts extends PayloadsDelta {
-  public result(): DeltaEmit {
-    const results: FullyFormedPayloadInterface[] = []
+export class DeltaRemoteUuidConflicts implements SyncDeltaInterface {
+  constructor(
+    readonly baseCollection: ImmutablePayloadCollection,
+    readonly applyCollection: ImmutablePayloadCollection,
+  ) {}
+
+  public result(): SyncDeltaEmit {
+    const results: SyncResolvedPayload[] = []
     const baseCollectionCopy = this.baseCollection.mutableCopy()
 
     for (const apply of this.applyCollection.all()) {
@@ -40,10 +46,7 @@ export class DeltaRemoteUuidConflicts extends PayloadsDelta {
 
       filterFromArray(results, (r) => Uuids(alternateResults).includes(r.uuid))
 
-      extendArray(
-        results,
-        payloadsByRedirtyingBasedOnBaseState(alternateResults, this.baseCollection),
-      )
+      extendArray(results, payloadsByFinalizingSyncState(alternateResults, this.baseCollection))
     }
 
     return {

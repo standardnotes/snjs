@@ -15,6 +15,9 @@ import {
   isDeletedPayload,
 } from '../../Abstract/Payload/Interfaces/TypeCheck'
 import { ContentType } from '@standardnotes/common'
+import { SyncResolvedPayload } from './Utilities/SyncResolvedPayload'
+import { ItemsKeyDelta } from './ItemsKeyDelta'
+import { SourcelessSyncDeltaEmit } from './Abstract/DeltaEmit'
 
 export class ConflictDelta {
   constructor(
@@ -24,17 +27,22 @@ export class ConflictDelta {
     protected readonly historyMap: HistoryMap,
   ) {}
 
-  public result(): FullyFormedPayloadInterface[] {
-    const strategy = this.getConflictStrategy()
+  public result(): SourcelessSyncDeltaEmit {
+    if (this.applyPayload.content_type === ContentType.ItemsKey) {
+      const keyDelta = new ItemsKeyDelta(this.baseCollection, [this.applyPayload])
 
-    return this.handleStrategy(strategy)
-  }
-
-  private getConflictStrategy(): ConflictStrategy {
-    if (this.basePayload.content_type === ContentType.ItemsKey) {
-      return this.getItemsKeyConflictStrategy()
+      return keyDelta.result()
     }
 
+    const strategy = this.getConflictStrategy()
+
+    return {
+      emits: this.handleStrategy(strategy),
+      ignored: [],
+    }
+  }
+
+  getConflictStrategy(): ConflictStrategy {
     if (isErrorDecryptingPayload(this.basePayload) || isErrorDecryptingPayload(this.applyPayload)) {
       return ConflictStrategy.KeepBaseDuplicateApply
     } else if (isDecryptedPayload(this.basePayload)) {
@@ -75,132 +83,156 @@ export class ConflictDelta {
     throw Error('Unhandled strategy in Conflict Delta getConflictStrategy')
   }
 
-  private getItemsKeyConflictStrategy(): ConflictStrategy {
-    return ConflictStrategy.KeepApply
-  }
-
-  private handleStrategy(strategy: ConflictStrategy): FullyFormedPayloadInterface[] {
+  private handleStrategy(strategy: ConflictStrategy): SyncResolvedPayload[] {
     if (strategy === ConflictStrategy.KeepBase) {
-      const updatedAt = greaterOfTwoDates(
-        this.basePayload.serverUpdatedAt,
-        this.applyPayload.serverUpdatedAt,
-      )
-      const updatedAtTimestamp = Math.max(
-        this.basePayload.updated_at_timestamp,
-        this.applyPayload.updated_at_timestamp,
-      )
-
-      const leftPayload = this.basePayload.copy(
-        {
-          updated_at: updatedAt,
-          updated_at_timestamp: updatedAtTimestamp,
-          dirty: true,
-          dirtiedDate: new Date(),
-        },
-        this.applyPayload.source,
-      )
-
-      return [leftPayload]
+      return this.handleKeepBaseStrategy()
     }
 
     if (strategy === ConflictStrategy.KeepApply) {
-      const result = this.applyPayload.copy(
-        {
-          lastSyncBegan: this.basePayload.lastSyncBegan,
-        },
-        this.applyPayload.source,
-      )
-
-      return [result]
+      return this.handleKeepApplyStrategy()
     }
 
     if (strategy === ConflictStrategy.KeepBaseDuplicateApply) {
-      const updatedAt = greaterOfTwoDates(
-        this.basePayload.serverUpdatedAt,
-        this.applyPayload.serverUpdatedAt,
-      )
-
-      const updatedAtTimestamp = Math.max(
-        this.basePayload.updated_at_timestamp,
-        this.applyPayload.updated_at_timestamp,
-      )
-
-      const leftPayload = this.basePayload.copy(
-        {
-          updated_at: updatedAt,
-          updated_at_timestamp: updatedAtTimestamp,
-          dirty: true,
-          dirtiedDate: new Date(),
-        },
-        this.applyPayload.source,
-      )
-
-      const rightPayloads = PayloadsByDuplicating({
-        payload: this.applyPayload,
-        baseCollection: this.baseCollection,
-        isConflict: true,
-        source: this.applyPayload.source,
-      })
-
-      return [leftPayload].concat(rightPayloads)
+      return this.handleKeepBaseDuplicateApplyStrategy()
     }
 
     if (strategy === ConflictStrategy.DuplicateBaseKeepApply) {
-      const leftPayloads = PayloadsByDuplicating({
-        payload: this.basePayload,
-        baseCollection: this.baseCollection,
-        isConflict: true,
-        source: this.applyPayload.source,
-      })
-
-      const rightPayload = this.applyPayload.copy(
-        {
-          lastSyncBegan: this.basePayload.lastSyncBegan,
-        },
-        this.applyPayload.source,
-      )
-
-      return leftPayloads.concat([rightPayload])
+      return this.handleDuplicateBaseKeepApply()
     }
 
-    if (
-      strategy === ConflictStrategy.KeepBaseMergeRefs &&
-      isDecryptedPayload(this.basePayload) &&
-      isDecryptedPayload(this.applyPayload)
-    ) {
-      const refs = uniqCombineObjArrays(
-        this.basePayload.content.references,
-        this.applyPayload.content.references,
-        ['uuid', 'content_type'],
-      )
-
-      const updatedAt = greaterOfTwoDates(
-        this.basePayload.serverUpdatedAt,
-        this.applyPayload.serverUpdatedAt,
-      )
-
-      const updatedAtTimestamp = Math.max(
-        this.basePayload.updated_at_timestamp,
-        this.applyPayload.updated_at_timestamp,
-      )
-
-      const payload = this.basePayload.copy(
-        {
-          updated_at: updatedAt,
-          updated_at_timestamp: updatedAtTimestamp,
-          dirty: true,
-          dirtiedDate: new Date(),
-          content: {
-            ...this.basePayload.content,
-            references: refs,
-          },
-        },
-        this.applyPayload.source,
-      )
-
-      return [payload]
+    if (strategy === ConflictStrategy.KeepBaseMergeRefs) {
+      return this.handleKeepBaseMergeRefsStrategy()
     }
 
     throw Error('Unhandled strategy in conflict delta payloadsByHandlingStrategy')
+  }
+
+  private handleKeepBaseStrategy(): SyncResolvedPayload[] {
+    const updatedAt = greaterOfTwoDates(
+      this.basePayload.serverUpdatedAt,
+      this.applyPayload.serverUpdatedAt,
+    )
+
+    const updatedAtTimestamp = Math.max(
+      this.basePayload.updated_at_timestamp,
+      this.applyPayload.updated_at_timestamp,
+    )
+
+    const leftPayload = this.basePayload.copyAsSyncResolved(
+      {
+        updated_at: updatedAt,
+        updated_at_timestamp: updatedAtTimestamp,
+        dirtiedDate: new Date(),
+        dirty: true,
+        lastSyncEnd: new Date(),
+      },
+      this.applyPayload.source,
+    )
+
+    return [leftPayload]
+  }
+
+  private handleKeepApplyStrategy(): SyncResolvedPayload[] {
+    const result = this.applyPayload.copyAsSyncResolved(
+      {
+        lastSyncBegan: this.basePayload.lastSyncBegan,
+        lastSyncEnd: new Date(),
+        dirty: false,
+      },
+      this.applyPayload.source,
+    )
+
+    return [result]
+  }
+
+  private handleKeepBaseDuplicateApplyStrategy(): SyncResolvedPayload[] {
+    const updatedAt = greaterOfTwoDates(
+      this.basePayload.serverUpdatedAt,
+      this.applyPayload.serverUpdatedAt,
+    )
+
+    const updatedAtTimestamp = Math.max(
+      this.basePayload.updated_at_timestamp,
+      this.applyPayload.updated_at_timestamp,
+    )
+
+    const leftPayload = this.basePayload.copyAsSyncResolved(
+      {
+        updated_at: updatedAt,
+        updated_at_timestamp: updatedAtTimestamp,
+        dirty: true,
+        dirtiedDate: new Date(),
+        lastSyncEnd: new Date(),
+      },
+      this.applyPayload.source,
+    )
+
+    const rightPayloads = PayloadsByDuplicating({
+      payload: this.applyPayload,
+      baseCollection: this.baseCollection,
+      isConflict: true,
+      source: this.applyPayload.source,
+    }) as SyncResolvedPayload[]
+
+    return [leftPayload].concat(rightPayloads)
+  }
+
+  private handleDuplicateBaseKeepApply(): SyncResolvedPayload[] {
+    const leftPayloads = PayloadsByDuplicating({
+      payload: this.basePayload,
+      baseCollection: this.baseCollection,
+      isConflict: true,
+      source: this.applyPayload.source,
+    }) as SyncResolvedPayload[]
+
+    const rightPayload = this.applyPayload.copyAsSyncResolved(
+      {
+        lastSyncBegan: this.basePayload.lastSyncBegan,
+        dirty: false,
+        lastSyncEnd: new Date(),
+      },
+      this.applyPayload.source,
+    )
+
+    return leftPayloads.concat([rightPayload])
+  }
+
+  private handleKeepBaseMergeRefsStrategy(): SyncResolvedPayload[] {
+    if (!isDecryptedPayload(this.basePayload) || !isDecryptedPayload(this.applyPayload)) {
+      return []
+    }
+
+    const refs = uniqCombineObjArrays(
+      this.basePayload.content.references,
+      this.applyPayload.content.references,
+      ['uuid', 'content_type'],
+    )
+
+    const updatedAt = greaterOfTwoDates(
+      this.basePayload.serverUpdatedAt,
+      this.applyPayload.serverUpdatedAt,
+    )
+
+    const updatedAtTimestamp = Math.max(
+      this.basePayload.updated_at_timestamp,
+      this.applyPayload.updated_at_timestamp,
+    )
+
+    const payload = this.basePayload.copyAsSyncResolved(
+      {
+        updated_at: updatedAt,
+        updated_at_timestamp: updatedAtTimestamp,
+        dirty: true,
+        dirtiedDate: new Date(),
+        lastSyncEnd: new Date(),
+        content: {
+          ...this.basePayload.content,
+          references: refs,
+        },
+      },
+      this.applyPayload.source,
+    )
+
+    return [payload]
   }
 }

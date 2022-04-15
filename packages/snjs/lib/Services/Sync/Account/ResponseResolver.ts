@@ -76,7 +76,7 @@ export class ServerSyncResponseResolver {
   private processUuidConflictPayloads(): DeltaEmit {
     const collection = ImmutablePayloadCollection.WithPayloads(this.payloadSet.uuidConflictPayloads)
 
-    const delta = new DeltaRemoteUuidConflicts(this.baseCollection, collection, this.historyMap)
+    const delta = new DeltaRemoteUuidConflicts(this.baseCollection, collection)
 
     return delta.result()
   }
@@ -84,7 +84,7 @@ export class ServerSyncResponseResolver {
   private processRejectedPayloads(): DeltaEmit {
     const collection = ImmutablePayloadCollection.WithPayloads(this.payloadSet.rejectedPayloads)
 
-    const delta = new DeltaRemoteRejected(this.baseCollection, collection, this.historyMap)
+    const delta = new DeltaRemoteRejected(this.baseCollection, collection)
 
     return delta.result()
   }
