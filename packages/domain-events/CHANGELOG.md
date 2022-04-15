@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.27.4](https://github.com/standardnotes/snjs/compare/@standardnotes/domain-events@2.27.3...@standardnotes/domain-events@2.27.4) (2022-04-15)
+
+
+### Bug Fixes
+
+* add subscription uuids to valet token and file removed events for cleanup purposes ([e05deb9](https://github.com/standardnotes/snjs/commit/e05deb9cd3fbc69e90fd2dbcae5a62582febe5fa))
+
+
+
+
+
 ## [2.27.3](https://github.com/standardnotes/snjs/compare/@standardnotes/domain-events@2.27.2...@standardnotes/domain-events@2.27.3) (2022-04-15)
 
 

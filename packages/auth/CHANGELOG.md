@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.18.6](https://github.com/standardnotes/snjs/compare/@standardnotes/auth@3.18.5...@standardnotes/auth@3.18.6) (2022-04-15)
+
+
+### Bug Fixes
+
+* add subscription uuids to valet token and file removed events for cleanup purposes ([e05deb9](https://github.com/standardnotes/snjs/commit/e05deb9cd3fbc69e90fd2dbcae5a62582febe5fa))
+
+
+
+
+
 ## [3.18.5](https://github.com/standardnotes/snjs/compare/@standardnotes/auth@3.18.4...@standardnotes/auth@3.18.5) (2022-04-11)
 
 **Note:** Version bump only for package @standardnotes/auth

@@ -1,6 +1,6 @@
 {
   "name": "@standardnotes/services",
-  "version": "1.8.5",
+  "version": "1.8.6",
   "engines": {
     "node": ">=14.0.0 <17.0.0"
   },
@@ -26,8 +26,8 @@
   },
   "dependencies": {
     "@standardnotes/common": "^1.19.3",
-    "@standardnotes/models": "^1.2.5",
-    "@standardnotes/responses": "^1.6.3",
+    "@standardnotes/models": "^1.2.6",
+    "@standardnotes/responses": "^1.6.4",
     "@standardnotes/utils": "^1.4.8"
   },
   "devDependencies": {
