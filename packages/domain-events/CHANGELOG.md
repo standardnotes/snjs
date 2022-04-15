@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.27.2](https://github.com/standardnotes/snjs/compare/@standardnotes/domain-events@2.27.1...@standardnotes/domain-events@2.27.2) (2022-04-15)
+
+
+### Bug Fixes
+
+* invitee identifier types on shared subscription events ([80aefea](https://github.com/standardnotes/snjs/commit/80aefeaf2e9ef17ed9d4218d15c168926d8c8134))
+
+
+
+
+
 ## [2.27.1](https://github.com/standardnotes/snjs/compare/@standardnotes/domain-events@2.27.0...@standardnotes/domain-events@2.27.1) (2022-04-14)
 
 
