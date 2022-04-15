@@ -25,7 +25,7 @@ export class DeltaOfflineSaved extends CustomApplyDelta {
       processed.push(payloadByRedirtyingBasedOnBaseState(base, this.baseCollection))
     }
     return {
-      changed: processed,
+      emits: processed,
       source: PayloadEmitSource.OfflineSyncSaved,
     }
   }

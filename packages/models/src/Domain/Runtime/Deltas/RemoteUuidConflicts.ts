@@ -47,7 +47,7 @@ export class DeltaRemoteUuidConflicts extends PayloadsDelta {
     }
 
     return {
-      changed: results,
+      emits: results,
       source: PayloadEmitSource.RemoteRetrieved,
     }
   }

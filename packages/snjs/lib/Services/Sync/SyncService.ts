@@ -1206,7 +1206,7 @@ export class SNSyncService
 
     await this.payloadManager.emitDeltaEmit(emit)
 
-    await this.persistPayloads(emit.changed)
+    await this.persistPayloads(emit.emits)
   }
 
   /** @e2e_testing */

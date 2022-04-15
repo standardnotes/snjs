@@ -97,7 +97,7 @@ export class PayloadManager extends AbstractService implements PayloadManagerInt
     emit: DeltaEmit<P>,
     sourceKey?: string,
   ): Promise<P[]> {
-    if (emit.changed.length === 0) {
+    if (emit.emits.length === 0 && emit.ignored?.length === 0) {
       console.warn('Attempting to emit 0 payloads.')
     }
 
@@ -142,7 +142,7 @@ export class PayloadManager extends AbstractService implements PayloadManagerInt
     sourceKey?: string,
   ): Promise<P[]> {
     const emit: DeltaEmit<P> = {
-      changed: payloads,
+      emits: payloads,
       source: source,
     }
 
@@ -152,7 +152,7 @@ export class PayloadManager extends AbstractService implements PayloadManagerInt
   private popQueue() {
     const first = this.emitQueue[0]
 
-    const { changed, inserted, discarded, unerrored } = this.applyPayloads(first.emit.changed)
+    const { changed, inserted, discarded, unerrored } = this.applyPayloads(first.emit.emits)
 
     this.notifyChangeObservers(
       changed,

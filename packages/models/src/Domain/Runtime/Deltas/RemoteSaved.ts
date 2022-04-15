@@ -83,7 +83,7 @@ export class DeltaRemoteSaved extends CustomApplyDelta {
     }
 
     return {
-      changed: processed,
+      emits: processed,
       source: PayloadEmitSource.RemoteSaved,
     }
   }

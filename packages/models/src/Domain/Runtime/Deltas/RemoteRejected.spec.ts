@@ -37,7 +37,7 @@ describe('remote rejected delta', () => {
     )
 
     const result = delta.result()
-    const payload = result.changed[0] as DecryptedPayload<NoteContent>
+    const payload = result.emits[0] as DecryptedPayload<NoteContent>
 
     expect(payload.content.title).toBe('foo')
     expect(payload.updated_at_timestamp).toBe(1)

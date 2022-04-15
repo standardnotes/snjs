@@ -5,7 +5,7 @@ import {
 } from '../../../Abstract/Payload'
 
 export type DeltaEmit<P extends FullyFormedPayloadInterface = FullyFormedPayloadInterface> = {
-  changed: P[]
+  emits: P[]
   ignored?: EncryptedPayloadInterface[]
   source: PayloadEmitSource
 }

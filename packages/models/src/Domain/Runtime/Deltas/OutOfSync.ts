@@ -21,8 +21,8 @@ export class DeltaOutOfSync extends PayloadsDelta {
       if (apply.content_type === ContentType.ItemsKey) {
         const itemsKeyDeltaEmit = new ItemsKeyDelta(this.baseCollection, [apply]).result()
 
-        if (itemsKeyDeltaEmit.changed) {
-          extendArray(results, itemsKeyDeltaEmit.changed)
+        if (itemsKeyDeltaEmit.emits) {
+          extendArray(results, itemsKeyDeltaEmit.emits)
         }
         if (itemsKeyDeltaEmit.ignored) {
           extendArray(ignored, itemsKeyDeltaEmit.ignored)
@@ -58,7 +58,7 @@ export class DeltaOutOfSync extends PayloadsDelta {
     }
 
     return {
-      changed: results,
+      emits: results,
       ignored: ignored,
       source: PayloadEmitSource.RemoteRetrieved,
     }

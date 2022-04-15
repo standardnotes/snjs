@@ -40,7 +40,7 @@ export class DeltaFileImport extends CustomApplyDelta {
     }
 
     return {
-      changed: results,
+      emits: results,
       source: PayloadEmitSource.FileImport,
     }
   }

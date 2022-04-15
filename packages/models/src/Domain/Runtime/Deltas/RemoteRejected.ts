@@ -25,7 +25,7 @@ export class DeltaRemoteRejected extends PayloadsDelta {
     }
 
     return {
-      changed: results,
+      emits: results,
       source: PayloadEmitSource.RemoteSaved,
     }
   }

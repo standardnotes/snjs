@@ -43,6 +43,16 @@ export class AppContext {
     this.ignoringChallenges = true
   }
 
+  resumeChallenges() {
+    this.ignoringChallenges = false
+  }
+
+  disableKeyRecovery() {
+    this.application.keyRecoveryService.beginProcessingQueue = () => {
+      console.warn('Key recovery is disabled for this test')
+    }
+  }
+
   handleChallenge = (challenge) => {
     if (this.ignoringChallenges) {
       this.application.challengeService.cancelChallenge(challenge)
@@ -63,6 +73,8 @@ export class AppContext {
         responses.push(new ChallengeValue(prompt, this.email))
       } else if (prompt.placeholder === 'Password') {
         responses.push(new ChallengeValue(prompt, this.password))
+      } else if (challenge.heading.includes('Enter your account password')) {
+        responses.push(new ChallengeValue(prompt, this.password))
       } else {
         throw Error(`Unhandled custom challenge in Factory.createAppContext`)
       }
@@ -73,6 +85,33 @@ export class AppContext {
 
   signIn() {
     return this.application.signIn(this.email, this.password)
+  }
+
+  register() {
+    return this.application.register(this.email, this.password)
+  }
+
+  receiveServerResponse({ retrievedItems }) {
+    const response = new ServerSyncResponse({
+      data: {
+        retrieved_items: retrievedItems,
+      },
+    })
+
+    return this.application.syncService.handleSuccessServerResponse(
+      { payloadsSavedOrSaving: [] },
+      response,
+    )
+  }
+
+  resolveWhenKeyRecovered(uuid) {
+    return new Promise((resolve) => {
+      this.application.keyRecoveryService.addEventObserver((_eventName, keys) => {
+        if (Uuids(keys).includes(uuid)) {
+          resolve()
+        }
+      })
+    })
   }
 
   async restart() {

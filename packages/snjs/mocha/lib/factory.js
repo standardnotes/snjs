@@ -42,8 +42,8 @@ export async function createAndInitSimpleAppContext(
   }
 }
 
-export async function createAppContextWithFakeCrypto(identifier) {
-  return createAppContext({ identifier, crypto: new FakeWebCrypto() })
+export async function createAppContextWithFakeCrypto(identifier, email, password) {
+  return createAppContext({ identifier, crypto: new FakeWebCrypto(), email, password })
 }
 
 export async function createAppContextWithRealCrypto(identifier) {

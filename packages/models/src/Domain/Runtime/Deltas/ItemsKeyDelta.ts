@@ -42,7 +42,7 @@ export class ItemsKeyDelta {
     }
 
     return {
-      changed,
+      emits: changed,
       ignored,
     }
   }

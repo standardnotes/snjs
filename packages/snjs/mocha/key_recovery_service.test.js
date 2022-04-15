@@ -244,7 +244,7 @@ describe('key recovery service', function () {
     await contextB.deinit()
   }).timeout(80000)
 
-  it.skip('when items key associated with item is errored, item should be marked waiting for key', async function () {
+  it('when items key associated with item is errored, item should be marked waiting for key', async function () {
     const namespace = Factory.randomString()
     const newPassword = `${Math.random()}`
     const contextA = await Factory.createAppContextWithFakeCrypto(namespace)
@@ -283,7 +283,7 @@ describe('key recovery service', function () {
 
     /** We expect the item in appA to be errored at this point, but we do not want it to recover */
     await appA.sync.sync()
-    expect(appA.items.findItem(note.uuid).waitingForKey).to.equal(true)
+    expect(appA.payloadManager.findOne(note.uuid).waitingForKey).to.equal(true)
     console.warn('Expecting exceptions below as we destroy app during key recovery')
     await Factory.safeDeinit(appA)
     await Factory.safeDeinit(appB)
@@ -293,8 +293,8 @@ describe('key recovery service', function () {
     await recreatedAppA.prepareForLaunch({ receiveChallenge: () => {} })
     await recreatedAppA.launch(true)
 
-    expect(recreatedappA.items.findItem(note.uuid).errorDecrypting).to.equal(true)
-    expect(recreatedappA.items.findItem(note.uuid).waitingForKey).to.equal(true)
+    expect(recreatedAppA.payloadManager.findOne(note.uuid).errorDecrypting).to.equal(true)
+    expect(recreatedAppA.payloadManager.findOne(note.uuid).waitingForKey).to.equal(true)
     await Factory.safeDeinit(recreatedAppA)
   })
 
@@ -372,23 +372,12 @@ describe('key recovery service', function () {
     await context.deinit()
   })
 
-  it(`when encountering an items key that cannot be decrypted, for which we already have a decrypted value,
-          it should be temporarily ignored and recovered separately`, async function () {
-    const context = await Factory.createAppContextWithFakeCrypto(Factory.randomString())
+  it(`when encountering an items key that cannot be decrypted for which we already have a decrypted value,
+          it should be emitted as ignored`, async function () {
+    const context = await Factory.createAppContextWithFakeCrypto()
     const application = context.application
-    const receiveChallenge = (challenge) => {
-      application.submitValuesForChallenge(challenge, [
-        new ChallengeValue(challenge.prompts[0], context.password),
-      ])
-    }
-    await application.prepareForLaunch({ receiveChallenge })
-    await application.launch(true)
-
-    await Factory.registerUserToApplication({
-      application: application,
-      email: context.email,
-      password: context.password,
-    })
+    await context.launch()
+    await context.register()
 
     /** Create and emit errored encrypted items key payload */
     const itemsKey = await application.protocolService.getSureDefaultItemsKey()
@@ -397,14 +386,15 @@ describe('key recovery service', function () {
         items: [itemsKey.payload],
       },
     })
+
     const newUpdated = new Date()
-    await application.payloadManager.emitPayload(
-      encrypted.copy({
-        errorDecrypting: true,
-        updated_at: newUpdated,
-      }),
-      PayloadEmitSource.LocalInserted,
-    )
+    const errored = encrypted.copy({
+      content: '004:...',
+      errorDecrypting: true,
+      updated_at: newUpdated,
+    })
+
+    await context.receiveServerResponse({ retrievedItems: [errored.ejected()] })
 
     /** Our current items key should not be overwritten */
     const currentItemsKey = application.items.findItem(itemsKey.uuid)
@@ -414,39 +404,54 @@ describe('key recovery service', function () {
     /** The timestamp of our current key should be updated however so we do not enter out of sync state */
     expect(currentItemsKey.serverUpdatedAt.getTime()).to.equal(newUpdated.getTime())
 
-    /** Payload should be persisted as unrecoverable */
-    const undecryptables = await application.keyRecoveryService.getUndecryptables()
-    expect(Object.keys(undecryptables).length).to.equal(1)
+    expect(application.syncService.isOutOfSync()).to.equal(false)
 
-    /** Allow key recovery wizard to finish its processes */
-    await Factory.sleep(1.5)
+    await context.deinit()
+  })
 
-    /** Unrecoverable should be cleared, and key recovered and emitted */
-    const latestUndecryptables = await application.keyRecoveryService.getUndecryptables()
-    expect(Object.keys(latestUndecryptables).length).to.equal(0)
+  it(`ignored key payloads should be added to undecryptables and recovered`, async function () {
+    const context = await Factory.createAppContextWithFakeCrypto()
+    const application = context.application
+    await context.launch()
+    await context.register()
+
+    const itemsKey = await application.protocolService.getSureDefaultItemsKey()
+    const encrypted = await application.protocolService.encryptSplitSingle({
+      usesRootKeyWithKeyLookup: {
+        items: [itemsKey.payload],
+      },
+    })
+
+    const newUpdated = new Date()
+    const errored = encrypted.copy({
+      errorDecrypting: true,
+      updated_at: newUpdated,
+    })
+
+    await application.payloadManager.emitDeltaEmit({
+      emits: [],
+      ignored: [errored],
+      source: PayloadEmitSource.RemoteRetrieved,
+    })
+
+    await context.resolveWhenKeyRecovered(itemsKey.uuid)
 
     const latestItemsKey = application.items.findItem(itemsKey.uuid)
+
     expect(latestItemsKey.errorDecrypting).to.not.be.ok
     expect(latestItemsKey.itemsKey).to.equal(itemsKey.itemsKey)
-
     expect(latestItemsKey.serverUpdatedAt.getTime()).to.equal(newUpdated.getTime())
-
     expect(application.syncService.isOutOfSync()).to.equal(false)
-    await Factory.safeDeinit(application)
+
+    await context.deinit()
   })
 
   it('application should prompt to recover undecryptables on launch', async function () {
     const namespace = Factory.randomString()
     const context = await Factory.createAppContextWithFakeCrypto(namespace)
     const application = context.application
-    await application.prepareForLaunch({})
-    await application.launch(true)
-
-    await Factory.registerUserToApplication({
-      application: application,
-      email: context.email,
-      password: context.password,
-    })
+    await context.launch()
+    await context.register()
 
     /** Create and emit errored encrypted items key payload */
     const itemsKey = await application.protocolService.getSureDefaultItemsKey()
@@ -456,45 +461,43 @@ describe('key recovery service', function () {
       },
     })
 
-    await application.payloadManager.emitPayload(
-      encrypted.copy({
-        errorDecrypting: true,
-      }),
-      PayloadEmitSource.LocalInserted,
-    )
+    context.disableKeyRecovery()
+
+    await application.payloadManager.emitDeltaEmit({
+      emits: [],
+      ignored: [
+        encrypted.copy({
+          errorDecrypting: true,
+        }),
+      ],
+      source: PayloadEmitSource.RemoteRetrieved,
+    })
+
     /** Allow enough time to persist to disk, but not enough to complete recovery wizard */
     console.warn(
       'Expecting some error below because we are destroying app in the middle of processing.',
     )
+
     await Factory.sleep(0.1)
+
     expect(application.syncService.isOutOfSync()).to.equal(false)
+
     await context.deinit()
 
-    /** Recreate application, and expect key recovery wizard to complete */
-    const recreatedApp = await Factory.createApplicationWithFakeCrypto(namespace)
-    let didReceivePasswordPrompt = false
-    const receiveChallenge = (challenge) => {
-      didReceivePasswordPrompt = true
-      recreatedApp.submitValuesForChallenge(challenge, [
-        new ChallengeValue(challenge.prompts[0], context.password),
-      ])
-    }
-    await recreatedApp.prepareForLaunch({ receiveChallenge })
-    await recreatedApp.launch(true)
+    const recreatedContext = await Factory.createAppContextWithFakeCrypto(
+      namespace,
+      context.email,
+      context.password,
+    )
 
-    /** Allow key recovery wizard to complete its processes */
-    await Factory.sleep(1.5)
+    const recreatedApp = recreatedContext.application
 
-    /** Unrecoverable should be cleared, and key recovered and emitted */
-    expect(didReceivePasswordPrompt).to.equal(true)
-    const latestUndecryptables = await recreatedApp.keyRecoveryService.getUndecryptables()
-    expect(Object.keys(latestUndecryptables).length).to.equal(0)
+    const promise = recreatedContext.resolveWhenKeyRecovered(itemsKey.uuid)
 
-    const latestItemsKey = recreatedApp.items.findItem(itemsKey.uuid)
-    expect(latestItemsKey.errorDecrypting).to.not.be.ok
-    expect(latestItemsKey.itemsKey).to.equal(itemsKey.itemsKey)
+    await recreatedContext.launch()
 
-    expect(recreatedApp.syncService.isOutOfSync()).to.equal(false)
+    await promise
+
     await Factory.safeDeinit(recreatedApp)
   })
 

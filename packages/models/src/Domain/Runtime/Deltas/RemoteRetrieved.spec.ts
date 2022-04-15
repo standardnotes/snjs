@@ -40,7 +40,7 @@ describe('remote retrieved delta', () => {
 
     const result = delta.result()
 
-    const updatedBasePayload = result.changed?.[0] as DecryptedPayload<ItemsKeyContent>
+    const updatedBasePayload = result.emits?.[0] as DecryptedPayload<ItemsKeyContent>
 
     expect(updatedBasePayload.content.itemsKey).toBe('secret')
     expect(updatedBasePayload.updated_at_timestamp).toBe(2)
