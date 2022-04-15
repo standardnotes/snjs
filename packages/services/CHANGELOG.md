@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.9.0](https://github.com/standardnotes/snjs/compare/@standardnotes/services@1.8.6...@standardnotes/services@1.9.0) (2022-04-15)
+
+
+### Features
+
+* no merge payloads in payload manager ([#693](https://github.com/standardnotes/snjs/issues/693)) ([68a577c](https://github.com/standardnotes/snjs/commit/68a577cb887fd2d5556dc9ddec461f6ae665fcb6))
+
+
+
+
+
 ## [1.8.6](https://github.com/standardnotes/snjs/compare/@standardnotes/services@1.8.5...@standardnotes/services@1.8.6) (2022-04-15)
 
 **Note:** Version bump only for package @standardnotes/services

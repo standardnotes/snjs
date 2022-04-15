@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.11.0](https://github.com/standardnotes/snjs/compare/@standardnotes/filepicker@1.10.6...@standardnotes/filepicker@1.11.0) (2022-04-15)
+
+
+### Features
+
+* no merge payloads in payload manager ([#693](https://github.com/standardnotes/snjs/issues/693)) ([68a577c](https://github.com/standardnotes/snjs/commit/68a577cb887fd2d5556dc9ddec461f6ae665fcb6))
+
+
+
+
+
 ## [1.10.6](https://github.com/standardnotes/snjs/compare/@standardnotes/filepicker@1.10.5...@standardnotes/filepicker@1.10.6) (2022-04-12)
 
 
