@@ -1,6 +1,6 @@
 {
   "name": "@standardnotes/services",
-  "version": "1.8.6",
+  "version": "1.9.0",
   "engines": {
     "node": ">=14.0.0 <17.0.0"
   },
@@ -25,13 +25,13 @@
     "test:unit": "jest spec --coverage"
   },
   "dependencies": {
-    "@standardnotes/common": "^1.19.3",
-    "@standardnotes/models": "^1.2.6",
-    "@standardnotes/responses": "^1.6.4",
-    "@standardnotes/utils": "^1.4.8"
+    "@standardnotes/common": "^1.19.4",
+    "@standardnotes/models": "^1.3.0",
+    "@standardnotes/responses": "^1.6.5",
+    "@standardnotes/utils": "^1.5.0"
   },
   "devDependencies": {
-    "@standardnotes/config": "^2.3.1",
+    "@standardnotes/config": "^2.4.0",
     "@types/jest": "^27.4.1",
     "@typescript-eslint/eslint-plugin": "^5.12.1",
     "@typescript-eslint/parser": "^5.12.1",
