@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.27.5](https://github.com/standardnotes/snjs/compare/@standardnotes/domain-events@2.27.4...@standardnotes/domain-events@2.27.5) (2022-04-15)
+
+
+### Bug Fixes
+
+* add regular subscription uuids to account deletion and sharing cancelation events ([ea8019f](https://github.com/standardnotes/snjs/commit/ea8019f74f932f73e1c7c2d89f14bd21804e2816))
+
+
+
+
+
 ## [2.27.4](https://github.com/standardnotes/snjs/compare/@standardnotes/domain-events@2.27.3...@standardnotes/domain-events@2.27.4) (2022-04-15)
 
 
