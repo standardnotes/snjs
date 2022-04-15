@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.6.0](https://github.com/standardnotes/snjs/compare/@standardnotes/utils@1.5.0...@standardnotes/utils@1.6.0) (2022-04-15)
+
+
+### Features
+
+* introduce sync resolved payloads to ensure deltas always return up to date dirty state ([#694](https://github.com/standardnotes/snjs/issues/694)) ([e5278ba](https://github.com/standardnotes/snjs/commit/e5278ba0b2afa987c37f009a2101fb91949d44c6))
+
+
+
+
+
 # [1.5.0](https://github.com/standardnotes/snjs/compare/@standardnotes/utils@1.4.8...@standardnotes/utils@1.5.0) (2022-04-15)
 
 
