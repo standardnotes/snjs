@@ -2,6 +2,6 @@ export interface SharedSubscriptionInvitationCreatedEventPayload {
   inviterEmail: string
   inviterSubscriptionId: number
   inviteeIdentifier: string
-  inviteeIdentifierType: 'email' | 'hash' | 'uuid'
+  inviteeIdentifierType: 'email' | 'hash'
   sharedSubscriptionInvitationUuid: string
 }
