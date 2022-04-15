@@ -1,27 +1,33 @@
 import { extendArray } from '@standardnotes/utils'
 import { ImmutablePayloadCollection } from '../Collection/Payload/ImmutablePayloadCollection'
-import { PayloadSource } from '../../Abstract/Payload/Types/PayloadSource'
 import { ConflictDelta } from './Conflict'
-import { PayloadsDelta } from './Delta'
 import { DecryptedPayloadInterface } from '../../Abstract/Payload/Interfaces/DecryptedPayload'
 import {
   FullyFormedPayloadInterface,
   DeletedPayloadInterface,
   isDecryptedPayload,
+  PayloadEmitSource,
 } from '../../Abstract/Payload'
+import { CustomApplyDelta } from './Abstract/CustomApplyDelta'
+import { HistoryMap } from '../History'
+import { DeltaEmit } from './Abstract/DeltaEmit'
 
 type Return = DecryptedPayloadInterface
 
-export class DeltaFileImport extends PayloadsDelta<
-  FullyFormedPayloadInterface,
-  DecryptedPayloadInterface,
-  DecryptedPayloadInterface
-> {
-  public async resultingCollection(): Promise<ImmutablePayloadCollection<Return>> {
+export class DeltaFileImport extends CustomApplyDelta {
+  constructor(
+    baseCollection: ImmutablePayloadCollection,
+    private readonly applyPayloads: DecryptedPayloadInterface[],
+    protected readonly historyMap: HistoryMap,
+  ) {
+    super(baseCollection)
+  }
+
+  public result(): DeltaEmit<Return> {
     const results: Return[] = []
 
-    for (const payload of this.applyCollection.all()) {
-      const handled = await this.payloadsByHandlingPayload(payload, results)
+    for (const payload of this.applyPayloads) {
+      const handled = this.payloadsByHandlingPayload(payload, results)
 
       const payloads = handled.map((result) => {
         return result.copy({
@@ -33,13 +39,16 @@ export class DeltaFileImport extends PayloadsDelta<
       extendArray(results, payloads)
     }
 
-    return ImmutablePayloadCollection.WithPayloads(results, PayloadSource.FileImport)
+    return {
+      emits: results,
+      source: PayloadEmitSource.FileImport,
+    }
   }
 
-  private async payloadsByHandlingPayload(
+  private payloadsByHandlingPayload(
     payload: DecryptedPayloadInterface | DeletedPayloadInterface,
     currentResults: Return[],
-  ): Promise<FullyFormedPayloadInterface[]> {
+  ): FullyFormedPayloadInterface[] {
     /**
      * Check to see if we've already processed a payload for this id.
      * If so, that would be the latest value, and not what's in the base collection.
@@ -79,10 +88,8 @@ export class DeltaFileImport extends PayloadsDelta<
       return [payload]
     }
 
-    const delta = new ConflictDelta(this.baseCollection, current, payload, PayloadSource.FileImport)
+    const delta = new ConflictDelta(this.baseCollection, current, payload, this.historyMap)
 
-    const deltaCollection = await delta.resultingCollection()
-
-    return deltaCollection.all()
+    return delta.result()
   }
 }

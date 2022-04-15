@@ -115,7 +115,7 @@ describe('itemManager', () => {
 
       itemManager['notifyObservers'] = mockFn
 
-      await payloadManager.emitPayload(payload)
+      await payloadManager.emitPayload(payload, Models.PayloadEmitSource.LocalInserted)
 
       expect(mockFn.mock.calls[0][2]).toHaveLength(1)
     })

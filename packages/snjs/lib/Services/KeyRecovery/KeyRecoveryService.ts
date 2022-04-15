@@ -7,13 +7,13 @@ import {
 import { UserService } from '../User/UserService'
 import {
   ItemsKeyInterface,
-  PayloadSource,
   isErrorDecryptingPayload,
   EncryptedPayloadInterface,
   EncryptedPayload,
   isDecryptedPayload,
   ItemsKeyContent,
   DecryptedPayloadInterface,
+  PayloadEmitSource,
 } from '@standardnotes/models'
 import { SNSyncService } from '../Sync/SyncService'
 import { KeyRecoveryStrings } from '../Api/Messages'
@@ -44,7 +44,9 @@ import {
   DecryptionCallback,
   DecryptionResponse,
   DecryptionQueueItem,
+  KeyRecoveryEvent,
 } from './Types'
+
 /**
  * The key recovery service listens to items key changes to detect any that cannot be decrypted.
  * If it detects an items key that is not properly decrypted, it will present a key recovery
@@ -80,7 +82,10 @@ import {
  * but our current copy is not, we will ignore the incoming value until we can properly
  * decrypt it.
  */
-export class SNKeyRecoveryService extends AbstractService {
+export class SNKeyRecoveryService extends AbstractService<
+  KeyRecoveryEvent,
+  DecryptedPayloadInterface[]
+> {
   private removeItemObserver: () => void
   private decryptionQueue: DecryptionQueueItem[] = []
   private serverParams?: SNRootKeyParams
@@ -103,7 +108,7 @@ export class SNKeyRecoveryService extends AbstractService {
     this.removeItemObserver = this.payloadManager.addObserver(
       [ContentType.ItemsKey],
       ({ changed, inserted, ignored, source }) => {
-        if (source === PayloadSource.LocalChanged) {
+        if (source === PayloadEmitSource.LocalChanged) {
           return
         }
 
@@ -127,11 +132,13 @@ export class SNKeyRecoveryService extends AbstractService {
     ;(this.protocolService as unknown) = undefined
     ;(this.challengeService as unknown) = undefined
     ;(this.alertService as unknown) = undefined
-    ;(this.userService as unknown) = undefined
-    ;(this.syncService as unknown) = undefined
     ;(this.storageService as unknown) = undefined
+    ;(this.syncService as unknown) = undefined
+    ;(this.userService as unknown) = undefined
+
     this.removeItemObserver()
     ;(this.removeItemObserver as unknown) = undefined
+
     super.deinit()
   }
 
@@ -165,12 +172,11 @@ export class SNKeyRecoveryService extends AbstractService {
      * the same items key in this storage, replace it with this latest incoming value.
      */
     if (persistIncoming) {
-      await this.saveToUndecryptables(keys)
+      this.saveToUndecryptables(keys)
     }
 
     this.addKeysToQueue(keys, (key, result) => {
       if (result.success) {
-        /** If it succeeds, remove the key from isolated storage. */
         void this.removeFromUndecryptables(key)
       }
     })
@@ -185,7 +191,8 @@ export class SNKeyRecoveryService extends AbstractService {
   }
 
   public async processPersistedUndecryptables() {
-    const record = await this.getUndecryptables()
+    const record = this.getUndecryptables()
+
     const rawPayloads = Object.values(record)
 
     if (rawPayloads.length === 0) {
@@ -219,8 +226,8 @@ export class SNKeyRecoveryService extends AbstractService {
     this.persistUndecryptables(record)
   }
 
-  private async removeFromUndecryptables(key: EncryptedPayloadInterface) {
-    const record = await this.getUndecryptables()
+  private removeFromUndecryptables(key: EncryptedPayloadInterface) {
+    const record = this.getUndecryptables()
 
     delete record[key.uuid]
 
@@ -313,7 +320,9 @@ export class SNKeyRecoveryService extends AbstractService {
     const promise: Promise<DecryptionResponse> = new Promise((resolve) => {
       queueItem.resolve = resolve
     })
+
     queueItem.promise = promise
+
     this.decryptionQueue.unshift(queueItem)
   }
 
@@ -342,25 +351,33 @@ export class SNKeyRecoveryService extends AbstractService {
     const hasAccount = this.protocolService.hasAccount()
     const hasPasscode = this.protocolService.hasPasscode()
     const credentialsMissing = !hasAccount && !hasPasscode
+
     let queueItem = this.decryptionQueue[0]
+
     if (credentialsMissing) {
       const rootKey = await this.performServerSignIn(queueItem.keyParams)
+
       if (rootKey) {
         await this.handleDecryptionOfAllKeysMatchingCorrectRootKey(rootKey, true)
+
         removeFromArray(this.decryptionQueue, queueItem)
+
         queueItem = this.decryptionQueue[0]
       }
     }
 
     while (queueItem) {
       void this.popQueueItem(queueItem)
+
       await queueItem.promise
+
       /** Always start from the beginning */
       queueItem = this.decryptionQueue[0]
     }
 
     void this.queuePromise.then(async () => {
       this.isProcessingQueue = false
+
       if (this.serverParams) {
         const latestClientParams = this.getClientKeyParams()
         const serverParamsDifferFromClients =
@@ -437,10 +454,9 @@ export class SNKeyRecoveryService extends AbstractService {
     }
 
     const password = response.values[0].value as string
-    /** Generate a root key using the input */
+
     const rootKey = await this.protocolService.computeRootKey(password, keyParams)
 
-    /** Attempt to decrypt this items key using the root key */
     const decryptedPayload = await this.protocolService.decryptSplitSingle<ItemsKeyContent>({
       usesRootKey: {
         items: [key],
@@ -448,12 +464,9 @@ export class SNKeyRecoveryService extends AbstractService {
       },
     })
 
-    /** Dismiss challenge */
     this.challengeService.completeChallenge(challenge)
 
-    /** If it succeeds, re-emit this items key */
     if (!isErrorDecryptingPayload(decryptedPayload)) {
-      /** Decrypt and remove from queue any other items keys who share these key params */
       const matching = await this.handleDecryptionOfAllKeysMatchingCorrectRootKey(
         rootKey,
         replacesRootKey,
@@ -461,7 +474,9 @@ export class SNKeyRecoveryService extends AbstractService {
       )
 
       const result = { success: true }
+
       resolve(result)
+
       queueItem.callback?.(key, result)
 
       for (const match of matching) {
@@ -470,8 +485,9 @@ export class SNKeyRecoveryService extends AbstractService {
       }
     } else {
       await this.alertService.alert(KeyRecoveryStrings.KeyRecoveryUnableToRecover)
-      /** If it fails, add back to queue */
+
       this.readdQueueItem(queueItem)
+
       resolve({ success: false })
     }
   }
@@ -482,25 +498,24 @@ export class SNKeyRecoveryService extends AbstractService {
     additionalKeys: DecryptedPayloadInterface<ItemsKeyContent>[] = [],
   ): Promise<DecryptionQueueItem[]> {
     if (replacesRootKey) {
-      /** Replace our root key with the generated root key */
       const wrappingKey = await this.getWrappingKeyIfApplicable()
       await this.protocolService.setRootKey(rootKey, wrappingKey)
     }
 
     const matching = this.popQueueForKeyParams(rootKey.keyParams)
+
     const matchingResults = await this.protocolService.decryptSplit({
       usesRootKey: {
         items: matching.map((m) => m.key),
         key: rootKey,
       },
     })
+
     const decryptedMatching = matchingResults.filter(isDecryptedPayload)
 
     const allRelevantKeyPayloads = [...additionalKeys, ...decryptedMatching]
-    void this.payloadManager.emitPayloads(
-      allRelevantKeyPayloads,
-      PayloadSource.PossiblyDecryptedSyncPostProcessed,
-    )
+
+    void this.payloadManager.emitPayloads(allRelevantKeyPayloads, PayloadEmitSource.LocalChanged)
 
     await this.storageService.savePayloads(allRelevantKeyPayloads)
 
@@ -509,12 +524,16 @@ export class SNKeyRecoveryService extends AbstractService {
     } else {
       void this.alertService.alert(KeyRecoveryStrings.KeyRecoveryKeyRecovered)
     }
+
+    await this.notifyEvent(KeyRecoveryEvent.KeysRecovered, allRelevantKeyPayloads)
+
     return matching
   }
 
   private popQueueForKeyParams(keyParams: SNRootKeyParams) {
     const matching = []
     const nonmatching = []
+
     for (const queueItem of this.decryptionQueue) {
       if (queueItem.keyParams.compare(keyParams)) {
         matching.push(queueItem)
@@ -522,7 +541,9 @@ export class SNKeyRecoveryService extends AbstractService {
         nonmatching.push(queueItem)
       }
     }
+
     this.decryptionQueue = nonmatching
+
     return matching
   }
 }

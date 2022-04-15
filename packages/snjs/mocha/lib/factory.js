@@ -42,8 +42,8 @@ export async function createAndInitSimpleAppContext(
   }
 }
 
-export async function createAppContextWithFakeCrypto(identifier) {
-  return createAppContext({ identifier, crypto: new FakeWebCrypto() })
+export async function createAppContextWithFakeCrypto(identifier, email, password) {
+  return createAppContext({ identifier, crypto: new FakeWebCrypto(), email, password })
 }
 
 export async function createAppContextWithRealCrypto(identifier) {
@@ -197,19 +197,19 @@ export function itemToStoragePayload(item) {
 
 export function createMappedNote(application, title, text, dirty = true) {
   const payload = createNotePayload(title, text, dirty)
-  return application.itemManager.emitItemFromPayload(payload, PayloadSource.LocalChanged)
+  return application.itemManager.emitItemFromPayload(payload, PayloadEmitSource.LocalChanged)
 }
 
 export async function createMappedTag(application, tagParams = {}) {
   const payload = createStorageItemTagPayload(tagParams)
-  return application.itemManager.emitItemFromPayload(payload, PayloadSource.LocalChanged)
+  return application.itemManager.emitItemFromPayload(payload, PayloadEmitSource.LocalChanged)
 }
 
 export async function createSyncedNote(application, title, text) {
   const payload = createNotePayload(title, text)
   const item = await application.itemManager.emitItemFromPayload(
     payload,
-    PayloadSource.LocalChanged,
+    PayloadEmitSource.LocalChanged,
   )
   await application.itemManager.setItemDirty(item)
   await application.syncService.sync(syncOptions)
@@ -527,7 +527,7 @@ export async function alternateUuidForItem(application, uuid) {
     payload,
     application.payloadManager.getMasterCollection(),
   )
-  await application.payloadManager.emitPayloads(results, PayloadSource.LocalChanged)
+  await application.payloadManager.emitPayloads(results, PayloadEmitSource.LocalChanged)
   await application.syncService.persistPayloads(results)
   return application.itemManager.findItem(results[0].uuid)
 }
@@ -550,6 +550,14 @@ export async function changePayloadTimeStampAndSync(
   contentOverride,
   syncOptions,
 ) {
+  await changePayloadTimeStamp(application, payload, timestamp, contentOverride)
+
+  await application.sync.sync(syncOptions)
+
+  return application.itemManager.findAnyItem(payload.uuid)
+}
+
+export async function changePayloadTimeStamp(application, payload, timestamp, contentOverride) {
   payload = application.payloadManager.collection.find(payload.uuid)
   const changedPayload = new DecryptedPayload({
     ...payload,
@@ -557,25 +565,6 @@ export async function changePayloadTimeStampAndSync(
     dirtiedDate: new Date(),
     content: {
       ...payload.content,
-      ...contentOverride,
-    },
-    updated_at_timestamp: timestamp,
-  })
-
-  await application.itemManager.emitItemFromPayload(changedPayload)
-  await application.sync.sync(syncOptions)
-
-  return application.itemManager.findAnyItem(payload.uuid)
-}
-
-export async function changePayloadTimeStamp(application, payload, timestamp, contentOverride) {
-  const latestPayload = application.payloadManager.collection.find(payload.uuid)
-  const changedPayload = new DecryptedPayload({
-    ...latestPayload,
-    dirty: true,
-    dirtiedDate: new Date(),
-    content: {
-      ...latestPayload.content,
       ...contentOverride,
     },
     updated_at_timestamp: timestamp,

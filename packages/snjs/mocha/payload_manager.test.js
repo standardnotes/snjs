@@ -26,17 +26,6 @@ describe('payload manager', () => {
     expect(this.payloadManager.collection.find(payload.uuid)).to.be.ok
   })
 
-  it('emit collection', async function () {
-    const payload = await this.createNotePayload()
-    const collection = ImmutablePayloadCollection.WithPayloads(
-      [payload],
-      PayloadSource.RemoteRetrieved,
-    )
-    await this.payloadManager.emitCollection(collection)
-
-    expect(this.payloadManager.collection.find(payload.uuid)).to.be.ok
-  })
-
   it('merge payloads onto master', async function () {
     const payload = await this.createNotePayload()
     await this.payloadManager.emitPayload(payload)
@@ -48,7 +37,7 @@ describe('payload manager', () => {
         title: newTitle,
       },
     })
-    const { changed, inserted } = await this.payloadManager.mergePayloadsOntoMaster([
+    const { changed, inserted } = await this.payloadManager.applyPayloads([
       changedPayload,
     ])
     expect(changed.length).to.equal(1)

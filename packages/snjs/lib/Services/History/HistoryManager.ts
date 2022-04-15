@@ -76,10 +76,7 @@ export class SNHistoryManager extends Services.AbstractService {
     for (const item of items) {
       const itemHistory = this.history[item.uuid] || []
       const latestEntry = Models.historyMapFunctions.getNewestRevision(itemHistory)
-      const historyPayload = new Models.DecryptedPayload<Models.NoteContent>(
-        item,
-        Models.PayloadSource.SessionHistory,
-      )
+      const historyPayload = new Models.DecryptedPayload<Models.NoteContent>(item)
 
       const currentValueEntry = Models.CreateHistoryEntryForPayload(historyPayload, latestEntry)
       if (currentValueEntry.isDiscardable()) {
@@ -176,10 +173,7 @@ export class SNHistoryManager extends Services.AbstractService {
       return undefined
     }
 
-    const encryptedPayload = new Models.EncryptedPayload(
-      payload,
-      Models.PayloadSource.RemoteHistory,
-    )
+    const encryptedPayload = new Models.EncryptedPayload(payload)
 
     const decryptedPayload = await this.protocolService.decryptSplitSingle<Models.NoteContent>({
       usesItemsKeyWithKeyLookup: { items: [encryptedPayload] },

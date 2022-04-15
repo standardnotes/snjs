@@ -12,7 +12,7 @@ import { ConditionalPayloadType } from './ConditionalPayloadType'
 
 export function CreatePayload<T extends FullyFormedTransferPayload>(
   from: T,
-  source: PayloadSource = PayloadSource.Constructor,
+  source: PayloadSource,
 ): ConditionalPayloadType<T> {
   if (isDecryptedTransferPayload(from)) {
     return new DecryptedPayload(from, source) as unknown as ConditionalPayloadType<T>
@@ -21,6 +21,6 @@ export function CreatePayload<T extends FullyFormedTransferPayload>(
   } else if (isDeletedTransferPayload(from)) {
     return new DeletedPayload(from, source) as unknown as ConditionalPayloadType<T>
   } else {
-    throw Error('Unhandled case in MergePayloads')
+    throw Error('Unhandled case in CreatePayload')
   }
 }

@@ -371,7 +371,7 @@ export class ItemManager
 
   private notifyObserversByUiAdjustingDelta(
     delta: Models.ItemDelta,
-    source: Models.PayloadSource,
+    source: Models.PayloadEmitSource,
     sourceKey?: string,
   ) {
     const changedItems: Models.DecryptedItemInterface[] = []
@@ -418,7 +418,7 @@ export class ItemManager
     removed: (Models.DeletedItemInterface | Models.EncryptedItemInterface)[],
     ignored: Models.EncryptedItemInterface[],
     unerrored: Models.DecryptedItemInterface[],
-    source: Models.PayloadSource,
+    source: Models.PayloadEmitSource,
     sourceKey?: string,
   ) {
     const filter = <I extends Models.ItemInterface>(items: I[], types: ContentType[]) => {
@@ -470,14 +470,14 @@ export class ItemManager
     itemToLookupUuidFor: I,
     mutate?: (mutator: M) => void,
     mutationType: Models.MutationType = Models.MutationType.UpdateUserTimestamps,
-    payloadSource = Models.PayloadSource.LocalChanged,
+    emitSource = Models.PayloadEmitSource.LocalChanged,
     payloadSourceKey?: string,
   ): Promise<I> {
     const results = await this.changeItems<M, I>(
       [itemToLookupUuidFor],
       mutate,
       mutationType,
-      payloadSource,
+      emitSource,
       payloadSourceKey,
     )
     return results[0]
@@ -493,7 +493,7 @@ export class ItemManager
     itemsToLookupUuidsFor: I[],
     mutate?: (mutator: M) => void,
     mutationType: Models.MutationType = Models.MutationType.UpdateUserTimestamps,
-    payloadSource = Models.PayloadSource.LocalChanged,
+    emitSource = Models.PayloadEmitSource.LocalChanged,
     payloadSourceKey?: string,
   ): Promise<I[]> {
     const items = this.findItemsIncludingBlanks(Uuids(itemsToLookupUuidsFor))
@@ -511,8 +511,10 @@ export class ItemManager
       payloads.push(payload)
     }
 
-    await this.payloadManager.emitPayloads(payloads, payloadSource, payloadSourceKey)
+    await this.payloadManager.emitPayloads(payloads, emitSource, payloadSourceKey)
+
     const results = this.findItems(payloads.map((p) => p.uuid)) as I[]
+
     return results
   }
 
@@ -523,32 +525,36 @@ export class ItemManager
    */
   public async runTransactionalMutations(
     transactions: TransactionalMutation[],
-    payloadSource = Models.PayloadSource.LocalChanged,
+    emitSource = Models.PayloadEmitSource.LocalChanged,
     payloadSourceKey?: string,
   ): Promise<(Models.DecryptedItemInterface | undefined)[]> {
     const payloads: Models.DecryptedPayloadInterface[] = []
+
     for (const transaction of transactions) {
       const item = this.findItem(transaction.itemUuid)
+
       if (!item) {
         continue
       }
+
       const mutator = Models.CreateDecryptedMutatorForItem(
         item,
         transaction.mutationType || Models.MutationType.UpdateUserTimestamps,
       )
+
       transaction.mutate(mutator)
       const payload = mutator.getResult()
       payloads.push(payload)
     }
 
-    await this.payloadManager.emitPayloads(payloads, payloadSource, payloadSourceKey)
+    await this.payloadManager.emitPayloads(payloads, emitSource, payloadSourceKey)
     const results = this.findItems(payloads.map((p) => p.uuid))
     return results
   }
 
   public async runTransactionalMutation(
     transaction: TransactionalMutation,
-    payloadSource = Models.PayloadSource.LocalChanged,
+    emitSource = Models.PayloadEmitSource.LocalChanged,
     payloadSourceKey?: string,
   ): Promise<Models.DecryptedItemInterface | undefined> {
     const item = this.findSureItem(transaction.itemUuid)
@@ -559,7 +565,7 @@ export class ItemManager
     transaction.mutate(mutator)
     const payload = mutator.getResult()
 
-    await this.payloadManager.emitPayloads([payload], payloadSource, payloadSourceKey)
+    await this.payloadManager.emitPayloads([payload], emitSource, payloadSourceKey)
     const result = this.findItem(payload.uuid)
     return result
   }
@@ -568,7 +574,7 @@ export class ItemManager
     itemToLookupUuidFor: Models.SNNote,
     mutate: (mutator: Models.NoteMutator) => void,
     mutationType: Models.MutationType = Models.MutationType.UpdateUserTimestamps,
-    payloadSource = Models.PayloadSource.LocalChanged,
+    emitSource = Models.PayloadEmitSource.LocalChanged,
     payloadSourceKey?: string,
   ): Promise<Models.DecryptedPayloadInterface[]> {
     const note = this.findItem<Models.SNNote>(itemToLookupUuidFor.uuid)
@@ -577,14 +583,14 @@ export class ItemManager
     }
     const mutator = new Models.NoteMutator(note, mutationType)
 
-    return this.applyTransform(mutator, mutate, payloadSource, payloadSourceKey)
+    return this.applyTransform(mutator, mutate, emitSource, payloadSourceKey)
   }
 
   async changeTag(
     itemToLookupUuidFor: Models.SNTag,
     mutate: (mutator: Models.TagMutator) => void,
     mutationType: Models.MutationType = Models.MutationType.UpdateUserTimestamps,
-    payloadSource = Models.PayloadSource.LocalChanged,
+    emitSource = Models.PayloadEmitSource.LocalChanged,
     payloadSourceKey?: string,
   ): Promise<Models.SNTag> {
     const tag = this.findItem<Models.SNTag>(itemToLookupUuidFor.uuid)
@@ -592,7 +598,7 @@ export class ItemManager
       throw Error('Attempting to change non-existant tag')
     }
     const mutator = new Models.TagMutator(tag, mutationType)
-    await this.applyTransform(mutator, mutate, payloadSource, payloadSourceKey)
+    await this.applyTransform(mutator, mutate, emitSource, payloadSourceKey)
     return this.findSureItem<Models.SNTag>(itemToLookupUuidFor.uuid)
   }
 
@@ -600,7 +606,7 @@ export class ItemManager
     itemToLookupUuidFor: Models.SNComponent,
     mutate: (mutator: Models.ComponentMutator) => void,
     mutationType: Models.MutationType = Models.MutationType.UpdateUserTimestamps,
-    payloadSource = Models.PayloadSource.LocalChanged,
+    emitSource = Models.PayloadEmitSource.LocalChanged,
     payloadSourceKey?: string,
   ): Promise<Models.SNComponent> {
     const component = this.findItem<Models.SNComponent>(itemToLookupUuidFor.uuid)
@@ -608,7 +614,7 @@ export class ItemManager
       throw Error('Attempting to change non-existant component')
     }
     const mutator = new Models.ComponentMutator(component, mutationType)
-    await this.applyTransform(mutator, mutate, payloadSource, payloadSourceKey)
+    await this.applyTransform(mutator, mutate, emitSource, payloadSourceKey)
     return this.findSureItem<Models.SNComponent>(itemToLookupUuidFor.uuid)
   }
 
@@ -616,7 +622,7 @@ export class ItemManager
     itemToLookupUuidFor: Models.SNFeatureRepo,
     mutate: (mutator: Models.FeatureRepoMutator) => void,
     mutationType: Models.MutationType = Models.MutationType.UpdateUserTimestamps,
-    payloadSource = Models.PayloadSource.LocalChanged,
+    emitSource = Models.PayloadEmitSource.LocalChanged,
     payloadSourceKey?: string,
   ): Promise<Models.SNFeatureRepo> {
     const repo = this.findItem(itemToLookupUuidFor.uuid)
@@ -624,7 +630,7 @@ export class ItemManager
       throw Error('Attempting to change non-existant repo')
     }
     const mutator = new Models.FeatureRepoMutator(repo, mutationType)
-    await this.applyTransform(mutator, mutate, payloadSource, payloadSourceKey)
+    await this.applyTransform(mutator, mutate, emitSource, payloadSourceKey)
     return this.findSureItem<Models.SNFeatureRepo>(itemToLookupUuidFor.uuid)
   }
 
@@ -632,7 +638,7 @@ export class ItemManager
     itemToLookupUuidFor: Models.SNActionsExtension,
     mutate: (mutator: Models.ActionsExtensionMutator) => void,
     mutationType: Models.MutationType = Models.MutationType.UpdateUserTimestamps,
-    payloadSource = Models.PayloadSource.LocalChanged,
+    emitSource = Models.PayloadEmitSource.LocalChanged,
     payloadSourceKey?: string,
   ): Promise<Models.SNActionsExtension> {
     const extension = this.findItem<Models.SNActionsExtension>(itemToLookupUuidFor.uuid)
@@ -640,7 +646,7 @@ export class ItemManager
       throw Error('Attempting to change non-existant extension')
     }
     const mutator = new Models.ActionsExtensionMutator(extension, mutationType)
-    await this.applyTransform(mutator, mutate, payloadSource, payloadSourceKey)
+    await this.applyTransform(mutator, mutate, emitSource, payloadSourceKey)
     return this.findSureItem<Models.SNActionsExtension>(itemToLookupUuidFor.uuid)
   }
 
@@ -648,27 +654,31 @@ export class ItemManager
     itemToLookupUuidFor: Models.ItemsKeyInterface,
     mutate: (mutator: Models.ItemsKeyMutatorInterface) => void,
     mutationType: Models.MutationType = Models.MutationType.UpdateUserTimestamps,
-    payloadSource = Models.PayloadSource.LocalChanged,
+    emitSource = Models.PayloadEmitSource.LocalChanged,
     payloadSourceKey?: string,
   ): Promise<Models.ItemsKeyInterface> {
     const itemsKey = this.findItem<SNItemsKey>(itemToLookupUuidFor.uuid)
+
     if (!itemsKey) {
       throw Error('Attempting to change non-existant itemsKey')
     }
+
     const mutator = new ItemsKeyMutator(itemsKey, mutationType)
-    await this.applyTransform(mutator, mutate, payloadSource, payloadSourceKey)
+
+    await this.applyTransform(mutator, mutate, emitSource, payloadSourceKey)
+
     return this.findSureItem<Models.ItemsKeyInterface>(itemToLookupUuidFor.uuid)
   }
 
   private async applyTransform<T extends Models.DecryptedItemMutator>(
     mutator: T,
     mutate: (mutator: T) => void,
-    payloadSource = Models.PayloadSource.LocalChanged,
+    emitSource = Models.PayloadEmitSource.LocalChanged,
     payloadSourceKey?: string,
   ): Promise<Models.DecryptedPayloadInterface[]> {
     mutate(mutator)
     const payload = mutator.getResult()
-    return this.payloadManager.emitPayload(payload, payloadSource, payloadSourceKey)
+    return this.payloadManager.emitPayload(payload, emitSource, payloadSourceKey)
   }
 
   /**
@@ -722,7 +732,7 @@ export class ItemManager
       additionalContent,
     })
 
-    await this.payloadManager.emitPayloads(resultingPayloads, Models.PayloadSource.LocalChanged)
+    await this.payloadManager.emitPayloads(resultingPayloads, Models.PayloadEmitSource.LocalChanged)
     const duplicate = this.findSureItem<T>(resultingPayloads[0].uuid)
     return duplicate
   }
@@ -742,7 +752,7 @@ export class ItemManager
       dirty: needsSync,
     })
 
-    await this.payloadManager.emitPayload(payload, Models.PayloadSource.Constructor)
+    await this.payloadManager.emitPayload(payload, Models.PayloadEmitSource.LocalInserted)
 
     return this.findSureItem<T>(payload.uuid)
   }
@@ -774,29 +784,33 @@ export class ItemManager
   public async insertItem(
     item: Models.DecryptedItemInterface,
   ): Promise<Models.DecryptedItemInterface> {
-    return this.emitItemFromPayload(item.payload)
+    return this.emitItemFromPayload(item.payload, Models.PayloadEmitSource.LocalChanged)
   }
 
   public async insertItems(
     items: Models.DecryptedItemInterface[],
+    emitSource: Models.PayloadEmitSource = Models.PayloadEmitSource.LocalInserted,
   ): Promise<Models.DecryptedItemInterface[]> {
-    return this.emitItemsFromPayloads(items.map((item) => item.payload))
+    return this.emitItemsFromPayloads(
+      items.map((item) => item.payload),
+      emitSource,
+    )
   }
 
   public async emitItemFromPayload(
     payload: Models.DecryptedPayloadInterface,
-    source = Models.PayloadSource.Constructor,
+    emitSource: Models.PayloadEmitSource,
   ): Promise<Models.DecryptedItemInterface> {
-    await this.payloadManager.emitPayload(payload, source)
+    await this.payloadManager.emitPayload(payload, emitSource)
 
     return this.findSureItem(payload.uuid)
   }
 
   public async emitItemsFromPayloads(
     payloads: Models.DecryptedPayloadInterface[],
-    source = Models.PayloadSource.Constructor,
+    emitSource: Models.PayloadEmitSource,
   ): Promise<Models.DecryptedItemInterface[]> {
-    await this.payloadManager.emitPayloads(payloads, source)
+    await this.payloadManager.emitPayloads(payloads, emitSource)
 
     const uuids = Uuids(payloads)
 
@@ -805,7 +819,7 @@ export class ItemManager
 
   public async setItemToBeDeleted(
     itemToLookupUuidFor: Models.DecryptedItemInterface,
-    source: Models.PayloadSource = Models.PayloadSource.LocalChanged,
+    source: Models.PayloadEmitSource = Models.PayloadEmitSource.LocalChanged,
   ): Promise<void> {
     const referencingIdsCapturedBeforeChanges = this.collection.uuidsThatReferenceUuid(
       itemToLookupUuidFor.uuid,
@@ -1268,7 +1282,7 @@ export class ItemManager
       results.push(mutator.getDeletedResult())
     }
 
-    await this.payloadManager.emitPayloads(results, Models.PayloadSource.LocalChanged)
+    await this.payloadManager.emitPayloads(results, Models.PayloadEmitSource.LocalChanged)
 
     this.resetState()
     this.payloadManager.resetState()
@@ -1315,6 +1329,6 @@ export class ItemManager
       payloads.push(payload)
     }
 
-    await this.payloadManager.emitPayloads(payloads, Models.PayloadSource.PreSyncSave)
+    await this.payloadManager.emitPayloads(payloads, Models.PayloadEmitSource.PreSyncSave)
   }
 }

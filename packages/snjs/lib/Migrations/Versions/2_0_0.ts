@@ -755,7 +755,7 @@ export class Migration2_0_0 extends Migration {
 
       await this.services.itemManager.emitItemFromPayload(
         itemsKey.payloadRepresentation(),
-        Models.PayloadSource.LocalChanged,
+        Models.PayloadEmitSource.LocalChanged,
       )
     }
   }

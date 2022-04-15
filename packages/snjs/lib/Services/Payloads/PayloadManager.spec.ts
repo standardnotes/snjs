@@ -1,8 +1,8 @@
 import {
   DecryptedPayload,
-  EncryptedPayload,
   FillItemContent,
   ItemsKeyContent,
+  PayloadEmitSource,
 } from '@standardnotes/models'
 import { PayloadManager } from './PayloadManager'
 import { InternalEventBusInterface } from '@standardnotes/services'
@@ -19,7 +19,7 @@ describe('payload manager', () => {
     payloadManager = new PayloadManager(internalEventBus)
   })
 
-  it('emitting ignored payload should merge timestamps to keep client in sync', async () => {
+  it('emitting a payload should emit as-is and not merge on top of existing payload', async () => {
     const decrypted = new DecryptedPayload({
       uuid: '123',
       content_type: ContentType.ItemsKey,
@@ -27,26 +27,24 @@ describe('payload manager', () => {
         itemsKey: 'secret',
       }),
       updated_at_timestamp: 1,
+      dirty: true,
     })
 
-    await payloadManager.emitPayload(decrypted)
+    await payloadManager.emitPayload(decrypted, PayloadEmitSource.LocalInserted)
 
-    const errored = new EncryptedPayload({
+    const nondirty = new DecryptedPayload({
       uuid: '123',
       content_type: ContentType.ItemsKey,
-      content: '004:...',
       updated_at_timestamp: 2,
-      enc_item_key: '004:...',
-      items_key_id: '456',
-      errorDecrypting: true,
-      waitingForKey: false,
+      content: FillItemContent<ItemsKeyContent>({
+        itemsKey: 'secret',
+      }),
     })
 
-    await payloadManager.emitPayload(errored)
+    await payloadManager.emitPayload(nondirty, PayloadEmitSource.LocalChanged)
 
     const result = payloadManager.findOne('123')
 
-    expect(result?.updated_at_timestamp).toBe(2)
-    expect(result?.content).toBeInstanceOf(Object)
+    expect(result?.dirty).toBeFalsy()
   })
 })

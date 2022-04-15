@@ -66,7 +66,7 @@ describe('importing', function () {
 
     await application.itemManager.emitItemsFromPayloads(
       [notePayload, tagPayload],
-      PayloadSource.LocalChanged,
+      PayloadEmitSource.LocalChanged,
     )
     expectedItemCount += 2
     const note = application.itemManager.getItems([ContentType.Note])[0]
@@ -101,7 +101,7 @@ describe('importing', function () {
      */
     await setup({ fakeCrypto: true })
     const notePayload = Factory.createNotePayload()
-    await application.itemManager.emitItemFromPayload(notePayload, PayloadSource.LocalSaved)
+    await application.itemManager.emitItemFromPayload(notePayload, PayloadEmitSource.LocalChanged)
     expectedItemCount++
     const mutatedNote = new DecryptedPayload({
       ...notePayload,
@@ -126,7 +126,7 @@ describe('importing', function () {
     await setup({ fakeCrypto: true })
     const pair = Factory.createRelatedNoteTagPairPayload()
     const tagPayload = pair[1]
-    await application.itemManager.emitItemsFromPayloads(pair, PayloadSource.LocalChanged)
+    await application.itemManager.emitItemsFromPayloads(pair, PayloadEmitSource.LocalChanged)
     const mutatedTag = new DecryptedPayload({
       ...tagPayload,
       content: {
@@ -149,7 +149,7 @@ describe('importing', function () {
     const pair = Factory.createRelatedNoteTagPairPayload()
     const notePayload = pair[0]
     const tagPayload = pair[1]
-    await application.itemManager.emitItemsFromPayloads(pair, PayloadSource.LocalChanged)
+    await application.itemManager.emitItemsFromPayloads(pair, PayloadEmitSource.LocalChanged)
     expectedItemCount += 2
     const note = application.itemManager.notes[0]
     const tag = application.itemManager.tags[0]
@@ -859,7 +859,7 @@ describe('importing', function () {
     Factory.handlePasswordChallenges(application, password)
 
     const pair = Factory.createRelatedNoteTagPairPayload()
-    await application.itemManager.emitItemsFromPayloads(pair, PayloadSource.LocalChanged)
+    await application.itemManager.emitItemsFromPayloads(pair, PayloadEmitSource.LocalChanged)
 
     await application.sync.sync()
 

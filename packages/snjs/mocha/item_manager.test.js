@@ -38,7 +38,7 @@ describe('item manager', function () {
 
   it('emitting item through payload and marking dirty should have userModifiedDate', async function () {
     const payload = Factory.createNotePayload()
-    const item = await this.itemManager.emitItemFromPayload(payload, PayloadSource.LocalChanged)
+    const item = await this.itemManager.emitItemFromPayload(payload, PayloadEmitSource.LocalChanged)
     const result = await this.itemManager.setItemDirty(item)
     const appData = result.payload.content.appData
     expect(appData[DecryptedItem.DefaultAppDomain()][AppDataField.UserModifiedDate]).to.be.ok
@@ -218,7 +218,7 @@ describe('item manager', function () {
       errorDecrypting: true,
     })
 
-    await this.itemManager.emitItemsFromPayloads([errorred], PayloadSource.LocalChanged)
+    await this.itemManager.emitItemsFromPayloads([errorred], PayloadEmitSource.LocalChanged)
 
     const dirtyItems = this.itemManager.getDirtyItems()
 
@@ -234,7 +234,7 @@ describe('item manager', function () {
       deleted: true,
     })
 
-    await this.itemManager.emitItemsFromPayloads([errorred], PayloadSource.LocalChanged)
+    await this.itemManager.emitItemsFromPayloads([errorred], PayloadEmitSource.LocalChanged)
 
     const dirtyItems = this.itemManager.getDirtyItems()
 

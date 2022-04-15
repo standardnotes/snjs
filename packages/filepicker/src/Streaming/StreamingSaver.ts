@@ -12,6 +12,7 @@ export class StreamingFileSaver {
     if (!this.loggingEnabled) {
       return
     }
+    // eslint-disable-next-line no-console
     console.log(args)
   }
 

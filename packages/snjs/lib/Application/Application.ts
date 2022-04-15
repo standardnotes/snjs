@@ -31,7 +31,7 @@ type ItemStream<I extends DecryptedItemInterface> = (data: {
   changed: I[]
   inserted: I[]
   removed: (Models.DeletedItemInterface | Models.EncryptedItemInterface)[]
-  source: Models.PayloadSource
+  source: Models.PayloadEmitSource
 }) => void
 type ObserverRemover = () => void
 
@@ -440,7 +440,7 @@ export class SNApplication implements InternalServices.ListedClientInterface {
         inserted: matches,
         changed: [],
         removed: [],
-        source: Models.PayloadSource.InitialObserverRegistrationPush,
+        source: Models.PayloadEmitSource.InitialObserverRegistrationPush,
       })
     }
 
@@ -981,7 +981,7 @@ export class SNApplication implements InternalServices.ListedClientInterface {
     this.createActionsManager()
     this.createFileService()
     this.createIntegrityService()
-    this.createMutationService()
+    this.createMutatorService()
   }
 
   private clearServices() {
@@ -1430,7 +1430,7 @@ export class SNApplication implements InternalServices.ListedClientInterface {
     this.services.push(this.mfaService)
   }
 
-  private createMutationService() {
+  private createMutatorService() {
     this.mutatorService = new InternalServices.MutatorService(
       this.itemManager,
       this.syncService,
@@ -1439,6 +1439,7 @@ export class SNApplication implements InternalServices.ListedClientInterface {
       this.payloadManager,
       this.challengeService,
       this.componentManager,
+      this.historyManager,
       this.internalEventBus,
     )
     this.services.push(this.mutatorService)

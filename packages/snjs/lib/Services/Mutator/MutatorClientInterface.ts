@@ -19,7 +19,7 @@ export interface MutatorClientInterface {
     itemToLookupUuidFor: Models.DecryptedItemInterface,
     mutate: (mutator: M) => void,
     updateTimestamps?: boolean,
-    payloadSource?: Models.PayloadSource,
+    emitSource?: Models.PayloadEmitSource,
     syncOptions?: SyncOptions,
   ): Promise<Models.DecryptedItemInterface | undefined>
 
@@ -30,7 +30,7 @@ export interface MutatorClientInterface {
     itemsToLookupUuidsFor: Models.DecryptedItemInterface[],
     mutate: (mutator: M) => void,
     updateTimestamps?: boolean,
-    payloadSource?: Models.PayloadSource,
+    emitSource?: Models.PayloadEmitSource,
     syncOptions?: SyncOptions,
   ): Promise<void>
 
@@ -59,13 +59,13 @@ export interface MutatorClientInterface {
    */
   runTransactionalMutations(
     transactions: TransactionalMutation[],
-    payloadSource?: Models.PayloadSource,
+    emitSource?: Models.PayloadEmitSource,
     payloadSourceKey?: string,
   ): Promise<(Models.DecryptedItemInterface | undefined)[]>
 
   runTransactionalMutation(
     transaction: TransactionalMutation,
-    payloadSource?: Models.PayloadSource,
+    emitSource?: Models.PayloadEmitSource,
     payloadSourceKey?: string,
   ): Promise<Models.DecryptedItemInterface | undefined>
 
@@ -86,7 +86,7 @@ export interface MutatorClientInterface {
    */
   mergeItem(
     item: Models.DecryptedItemInterface,
-    source: Models.PayloadSource,
+    source: Models.PayloadEmitSource,
   ): Promise<Models.DecryptedItemInterface>
 
   /**

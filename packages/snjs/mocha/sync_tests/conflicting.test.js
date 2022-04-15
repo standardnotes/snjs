@@ -69,7 +69,7 @@ describe('online conflict handling', function () {
 
     const item = await this.application.itemManager.emitItemFromPayload(
       payload,
-      PayloadSource.LocalChanged,
+      PayloadEmitSource.LocalChanged,
     )
 
     this.expectedItemCount++
@@ -99,7 +99,7 @@ describe('online conflict handling', function () {
     const payload = createDirtyPayload(ContentType.ItemsKey)
     const item = await this.application.itemManager.emitItemFromPayload(
       payload,
-      PayloadSource.LocalChanged,
+      PayloadEmitSource.LocalChanged,
     )
     this.expectedItemCount++
     await this.application.syncService.sync(syncOptions)
@@ -135,7 +135,7 @@ describe('online conflict handling', function () {
     })
     const editor = await this.application.itemManager.emitItemFromPayload(
       payload,
-      PayloadSource.LocalChanged,
+      PayloadEmitSource.LocalChanged,
     )
     this.expectedItemCount++
     await this.application.syncService.sync(syncOptions)
@@ -191,6 +191,11 @@ describe('online conflict handling', function () {
 
     const originalValue = note.title
     const dirtyValue = `${Math.random()}`
+
+    /** Modify nonsense first to get around strategyWhenConflictingWithItem with previousRevision check  */
+    await this.application.itemManager.changeNote(note, (mutator) => {
+      mutator.title = 'any'
+    })
 
     await this.application.itemManager.changeNote(note, (mutator) => {
       // modify this item locally to have differing contents from server
@@ -297,18 +302,20 @@ describe('online conflict handling', function () {
 
   it('should duplicate item if saving a modified item and clearing our sync token', async function () {
     let note = await Factory.createMappedNote(this.application)
+
     await this.application.itemManager.setItemDirty(note)
     await this.application.syncService.sync(syncOptions)
+
     this.expectedItemCount++
 
     const newTitle = `${Math.random()}`
-    /** First modify the item without saving so that
-     * our local contents digress from the server's */
+
+    /** First modify the item without saving so that our local contents digress from the server's */
     await this.application.mutator.changeItem(note, (mutator) => {
       mutator.title = `${Math.random()}`
     })
 
-    await Factory.changePayloadTimeStampAndSync(
+    await Factory.changePayloadTimeStamp(
       this.application,
       note.payload,
       Factory.dateToMicroseconds(Factory.yesterday()),
@@ -325,6 +332,7 @@ describe('online conflict handling', function () {
     await this.application.syncService.sync(syncOptions)
 
     note = this.application.items.findItem(note.uuid)
+
     // We expect the item title to be the new title, and not rolled back to original value
     expect(note.content.title).to.equal(newTitle)
 
@@ -446,7 +454,7 @@ describe('online conflict handling', function () {
     })
     await this.application.itemManager.emitItemsFromPayloads(
       [mutatedPayload],
-      PayloadSource.LocalChanged,
+      PayloadEmitSource.LocalChanged,
     )
     const resultNote = this.application.itemManager.findItem(note.uuid)
     expect(resultNote.uuid).to.equal(note.uuid)
@@ -596,7 +604,7 @@ describe('online conflict handling', function () {
     this.expectedItemCount -= 1 /** auto-created user preferences  */
     await this.application.itemManager.emitItemsFromPayloads(
       [payload1, payload2],
-      PayloadSource.LocalChanged,
+      PayloadEmitSource.LocalChanged,
     )
     this.expectedItemCount += 2
     let tag = this.application.itemManager.getItems(ContentType.Tag)[0]
@@ -682,8 +690,8 @@ describe('online conflict handling', function () {
 
     // conflict the note
     const newText = `${Math.random()}`
-    /** First modify the item without saving so that
-     * our local contents digress from the server's */
+
+    /** First modify the item without saving so that our local contents digress from the server's */
     await this.application.mutator.changeItem(note, (mutator) => {
       mutator.title = `${Math.random()}`
     })
@@ -777,7 +785,10 @@ describe('online conflict handling', function () {
       errorDecrypting: true,
       dirty: true,
     })
-    await this.application.itemManager.emitItemsFromPayloads([errorred], PayloadSource.LocalChanged)
+    await this.application.itemManager.emitItemsFromPayloads(
+      [errorred],
+      PayloadEmitSource.LocalChanged,
+    )
 
     /**
      * Retrieve this note from the server by clearing sync token

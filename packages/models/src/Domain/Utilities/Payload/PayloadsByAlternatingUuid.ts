@@ -16,12 +16,12 @@ import { DeletedPayloadInterface } from '../../Abstract/Payload/Interfaces/Delet
  * @returns An array of payloads that have changed as a result of copying.
  */
 
-export async function PayloadsByAlternatingUuid<
+export function PayloadsByAlternatingUuid<
   P extends DecryptedPayloadInterface = DecryptedPayloadInterface,
 >(
   payload: P,
   baseCollection: ImmutablePayloadCollection<FullyFormedPayloadInterface>,
-): Promise<(DecryptedPayloadInterface | DeletedPayloadInterface | EncryptedPayloadInterface)[]> {
+): (DecryptedPayloadInterface | DeletedPayloadInterface | EncryptedPayloadInterface)[] {
   const results: (
     | DecryptedPayloadInterface
     | DeletedPayloadInterface
@@ -36,7 +36,6 @@ export async function PayloadsByAlternatingUuid<
     dirty: true,
     dirtiedDate: new Date(),
     lastSyncBegan: undefined,
-    lastSyncEnd: undefined,
     duplicate_of: payload.uuid,
   })
   results.push(copy)

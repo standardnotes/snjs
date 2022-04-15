@@ -2,7 +2,6 @@ import { ContentType, Uuid } from '@standardnotes/common'
 import {
   PayloadsChangeObserver,
   QueueElement,
-  OverwriteProtectedTypes,
   PayloadsChangeObserverCallback,
   EmitQueue,
 } from './Types'
@@ -10,20 +9,25 @@ import { removeFromArray, Uuids } from '@standardnotes/utils'
 import {
   DeltaFileImport,
   isDeletedPayload,
-  isErrorDecryptingPayload,
   ImmutablePayloadCollection,
   EncryptedPayloadInterface,
   PayloadSource,
   DeletedPayloadInterface,
   DecryptedPayloadInterface,
   PayloadCollection,
-  MergePayloads,
+  PayloadEmitSource,
   DeletedPayload,
   FullyFormedPayloadInterface,
   isEncryptedPayload,
   isDecryptedPayload,
+  HistoryMap,
+  DeltaEmit,
 } from '@standardnotes/models'
-import * as Services from '@standardnotes/services'
+import {
+  AbstractService,
+  PayloadManagerInterface,
+  InternalEventBusInterface,
+} from '@standardnotes/services'
 import { IntegrityPayload } from '@standardnotes/responses'
 
 /**
@@ -36,15 +40,12 @@ import { IntegrityPayload } from '@standardnotes/responses'
  * It exposes methods that allow consumers to listen to mapping events. This is how
  * applications 'stream' items to display in the interface.
  */
-export class PayloadManager
-  extends Services.AbstractService
-  implements Services.PayloadManagerInterface
-{
+export class PayloadManager extends AbstractService implements PayloadManagerInterface {
   private changeObservers: PayloadsChangeObserver[] = []
   public collection: PayloadCollection<FullyFormedPayloadInterface>
   private emitQueue: EmitQueue<FullyFormedPayloadInterface> = []
 
-  constructor(protected override internalEventBus: Services.InternalEventBusInterface) {
+  constructor(protected override internalEventBus: InternalEventBusInterface) {
     super(internalEventBus)
     this.collection = new PayloadCollection()
   }
@@ -80,17 +81,6 @@ export class PayloadManager
     return this.collection.all(contentType)
   }
 
-  /**
-   * One of many mapping helpers available.
-   * This function maps a collection of payloads.
-   */
-  public async emitCollection(
-    collection: ImmutablePayloadCollection<FullyFormedPayloadInterface>,
-    sourceKey?: string,
-  ) {
-    return this.emitPayloads(collection.all(), collection.source, sourceKey)
-  }
-
   public get integrityPayloads(): IntegrityPayload[] {
     return this.collection.integrityPayloads()
   }
@@ -103,6 +93,29 @@ export class PayloadManager
     return this.collection.invalidElements()
   }
 
+  public async emitDeltaEmit<P extends FullyFormedPayloadInterface = FullyFormedPayloadInterface>(
+    emit: DeltaEmit<P>,
+    sourceKey?: string,
+  ): Promise<P[]> {
+    if (emit.emits.length === 0 && emit.ignored?.length === 0) {
+      console.warn('Attempting to emit 0 payloads.')
+    }
+
+    return new Promise((resolve) => {
+      const element: QueueElement<P> = {
+        emit: emit,
+        sourceKey,
+        resolve,
+      }
+
+      this.emitQueue.push(element as unknown as QueueElement<FullyFormedPayloadInterface>)
+
+      if (this.emitQueue.length === 1) {
+        void this.popQueue()
+      }
+    })
+  }
+
   /**
    * One of many mapping helpers available.
    * This function maps a payload to an item
@@ -111,7 +124,7 @@ export class PayloadManager
    */
   public async emitPayload<P extends FullyFormedPayloadInterface = FullyFormedPayloadInterface>(
     payload: P,
-    source: PayloadSource = PayloadSource.LocalChanged,
+    source: PayloadEmitSource,
     sourceKey?: string,
   ): Promise<P[]> {
     return this.emitPayloads([payload], source, sourceKey)
@@ -125,42 +138,29 @@ export class PayloadManager
    */
   public async emitPayloads<P extends FullyFormedPayloadInterface = FullyFormedPayloadInterface>(
     payloads: P[],
-    source: PayloadSource = PayloadSource.LocalChanged,
+    source: PayloadEmitSource,
     sourceKey?: string,
   ): Promise<P[]> {
-    if (payloads.length === 0) {
-      console.warn('Attempting to emit 0 payloads.')
+    const emit: DeltaEmit<P> = {
+      emits: payloads,
+      source: source,
     }
-    return new Promise((resolve) => {
-      const element: QueueElement<P> = {
-        payloads,
-        source,
-        sourceKey,
-        resolve,
-      }
 
-      this.emitQueue.push(element as unknown as QueueElement<FullyFormedPayloadInterface>)
-
-      if (this.emitQueue.length === 1) {
-        void this.popQueue()
-      }
-    })
+    return this.emitDeltaEmit(emit, sourceKey)
   }
 
   private popQueue() {
     const first = this.emitQueue[0]
 
-    const { changed, inserted, discarded, ignored, unerrored } = this.mergePayloadsOntoMaster(
-      first.payloads,
-    )
+    const { changed, inserted, discarded, unerrored } = this.applyPayloads(first.emit.emits)
 
     this.notifyChangeObservers(
       changed,
       inserted,
       discarded,
-      ignored,
+      first.emit.ignored || [],
       unerrored,
-      first.source,
+      first.emit.source,
       first.sourceKey,
     )
 
@@ -173,60 +173,41 @@ export class PayloadManager
     }
   }
 
-  private mergePayloadsOntoMaster(applyPayloads: FullyFormedPayloadInterface[]) {
+  private applyPayloads(applyPayloads: FullyFormedPayloadInterface[]) {
     const changed: FullyFormedPayloadInterface[] = []
     const inserted: FullyFormedPayloadInterface[] = []
     const discarded: DeletedPayloadInterface[] = []
-    const ignored: EncryptedPayloadInterface[] = []
     const unerrored: DecryptedPayloadInterface[] = []
 
-    for (const applyPayload of applyPayloads) {
-      if (!applyPayload.uuid || !applyPayload.content_type) {
-        console.error('Payload is corrupt', applyPayload)
+    for (const apply of applyPayloads) {
+      if (!apply.uuid || !apply.content_type) {
+        console.error('Payload is corrupt', apply)
 
         continue
       }
 
-      const masterPayload = this.collection.find(applyPayload.uuid)
+      const base = this.collection.find(apply.uuid)
 
-      let newPayload = applyPayload
+      if (isDeletedPayload(apply) && apply.discardable) {
+        this.collection.discard(apply)
 
-      if (
-        OverwriteProtectedTypes.includes(applyPayload.content_type) &&
-        isErrorDecryptingPayload(applyPayload) &&
-        masterPayload &&
-        !isErrorDecryptingPayload(masterPayload)
-      ) {
-        ignored.push(applyPayload)
-
-        newPayload = masterPayload.copy({
-          updated_at_timestamp: applyPayload.updated_at_timestamp,
-          updated_at: applyPayload.updated_at,
-        })
-      } else if (masterPayload) {
-        newPayload = MergePayloads(masterPayload, applyPayload)
-      }
-
-      if (masterPayload && isEncryptedPayload(masterPayload) && isDecryptedPayload(applyPayload)) {
-        unerrored.push(newPayload as DecryptedPayloadInterface)
-      }
-
-      if (isDeletedPayload(newPayload) && newPayload.discardable) {
-        this.collection.discard(newPayload)
-
-        discarded.push(newPayload)
+        discarded.push(apply)
       } else {
-        this.collection.set(newPayload)
+        this.collection.set(apply)
 
-        if (!masterPayload) {
-          inserted.push(newPayload)
+        if (base) {
+          changed.push(apply)
+
+          if (isEncryptedPayload(base) && isDecryptedPayload(apply)) {
+            unerrored.push(apply)
+          }
         } else {
-          changed.push(newPayload)
+          inserted.push(apply)
         }
       }
     }
 
-    return { changed, inserted, discarded, ignored, unerrored }
+    return { changed, inserted, discarded, unerrored }
   }
 
   /**
@@ -264,7 +245,7 @@ export class PayloadManager
     discarded: DeletedPayloadInterface[],
     ignored: EncryptedPayloadInterface[],
     unerrored: DecryptedPayloadInterface[],
-    source: PayloadSource,
+    source: PayloadEmitSource,
     sourceKey?: string,
   ) {
     /** Slice the observers array as sort modifies in-place */
@@ -301,19 +282,19 @@ export class PayloadManager
    * and marks the items as dirty.
    * @returns Resulting items
    */
-  public async importPayloads(payloads: DecryptedPayloadInterface[]): Promise<Uuid[]> {
+  public async importPayloads(
+    payloads: DecryptedPayloadInterface[],
+    historyMap: HistoryMap,
+  ): Promise<Uuid[]> {
     const sourcedPayloads = payloads.map((p) => p.copy(undefined, PayloadSource.FileImport))
 
-    const delta = new DeltaFileImport(
-      this.getMasterCollection(),
-      ImmutablePayloadCollection.WithPayloads(sourcedPayloads, PayloadSource.FileImport),
-    )
+    const delta = new DeltaFileImport(this.getMasterCollection(), sourcedPayloads, historyMap)
 
-    const collection = await delta.resultingCollection()
+    const emit = delta.result()
 
-    await this.emitCollection(collection)
+    await this.emitDeltaEmit(emit)
 
-    return Uuids(collection.payloads)
+    return Uuids(payloads)
   }
 
   public removePayloadLocally(payload: FullyFormedPayloadInterface) {
@@ -339,6 +320,6 @@ export class PayloadManager
         ),
     )
 
-    await this.emitPayloads(deleted, PayloadSource.LocalChanged)
+    await this.emitPayloads(deleted, PayloadEmitSource.LocalChanged)
   }
 }

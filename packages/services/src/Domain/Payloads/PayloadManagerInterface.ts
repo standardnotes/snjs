@@ -1,15 +1,15 @@
 import {
-  PayloadSource,
   PayloadInterface,
   EncryptedPayloadInterface,
   FullyFormedPayloadInterface,
+  PayloadEmitSource,
 } from '@standardnotes/models'
 import { IntegrityPayload } from '@standardnotes/responses'
 
 export interface PayloadManagerInterface {
   emitPayloads(
     payloads: PayloadInterface[],
-    source: PayloadSource,
+    emitSource: PayloadEmitSource,
     sourceKey?: string,
   ): Promise<PayloadInterface[]>
 

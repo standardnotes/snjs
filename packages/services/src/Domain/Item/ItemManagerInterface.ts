@@ -6,7 +6,7 @@ import {
   DecryptedItemInterface,
   DecryptedItemMutator,
   DecryptedPayloadInterface,
-  PayloadSource,
+  PayloadEmitSource,
   EncryptedItemInterface,
   DeletedItemInterface,
 } from '@standardnotes/models'
@@ -28,7 +28,7 @@ export type ItemManagerChangeData<I extends DecryptedItemInterface = DecryptedIt
   /** Items which were previously error decrypting but now successfully decrypted */
   unerrored: I[]
 
-  source: PayloadSource
+  source: PayloadEmitSource
   sourceKey?: string
 }
 
@@ -47,7 +47,7 @@ export interface ItemManagerInterface extends AbstractService {
    */
   setItemToBeDeleted(
     itemToLookupUuidFor: DecryptedItemInterface,
-    source?: PayloadSource,
+    source?: PayloadEmitSource,
   ): Promise<void>
 
   setItemsToBeDeleted(itemsToLookupUuidsFor: DecryptedItemInterface[]): Promise<void>
@@ -68,7 +68,7 @@ export interface ItemManagerInterface extends AbstractService {
 
   emitItemFromPayload(
     payload: DecryptedPayloadInterface,
-    source: PayloadSource,
+    source: PayloadEmitSource,
   ): Promise<DecryptedItemInterface>
 
   /**
@@ -88,7 +88,7 @@ export interface ItemManagerInterface extends AbstractService {
     itemToLookupUuidFor: I,
     mutate?: (mutator: M) => void,
     mutationType?: MutationType,
-    payloadSource?: PayloadSource,
+    emitSource?: PayloadEmitSource,
     payloadSourceKey?: string,
   ): Promise<I>
 
@@ -96,7 +96,7 @@ export interface ItemManagerInterface extends AbstractService {
     itemToLookupUuidFor: ItemsKeyInterface,
     mutate: (mutator: ItemsKeyMutatorInterface) => void,
     mutationType?: MutationType,
-    payloadSource?: PayloadSource,
+    emitSource?: PayloadEmitSource,
     payloadSourceKey?: string,
   ): Promise<ItemsKeyInterface>
 }

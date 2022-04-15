@@ -22,7 +22,6 @@ export class OfflineSyncOperation {
       return CreateOfflineSyncSavedPayload({
         ...payload,
         dirty: false,
-        lastSyncEnd: new Date(),
       })
     })
 

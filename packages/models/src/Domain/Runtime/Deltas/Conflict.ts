@@ -8,7 +8,6 @@ import { HistoryMap, historyMapFunctions } from '../History/HistoryMap'
 import { ConflictStrategy } from '../../Abstract/Item/Types/ConflictStrategy'
 import { PayloadsByDuplicating } from '../../Utilities/Payload/PayloadsByDuplicating'
 import { PayloadContentsEqual } from '../../Utilities/Payload/PayloadContentsEqual'
-import { PayloadSource } from '../../Abstract/Payload/Types/PayloadSource'
 import { FullyFormedPayloadInterface } from '../../Abstract/Payload'
 import {
   isDecryptedPayload,
@@ -19,21 +18,16 @@ import { ContentType } from '@standardnotes/common'
 
 export class ConflictDelta {
   constructor(
-    protected readonly baseCollection: ImmutablePayloadCollection<FullyFormedPayloadInterface>,
+    protected readonly baseCollection: ImmutablePayloadCollection,
     protected readonly basePayload: FullyFormedPayloadInterface,
     protected readonly applyPayload: FullyFormedPayloadInterface,
-    protected readonly source: PayloadSource,
-    protected readonly historyMap?: HistoryMap,
+    protected readonly historyMap: HistoryMap,
   ) {}
 
-  public async resultingCollection(): Promise<
-    ImmutablePayloadCollection<FullyFormedPayloadInterface>
-  > {
+  public result(): FullyFormedPayloadInterface[] {
     const strategy = this.getConflictStrategy()
 
-    const results = await this.handleStrategy(strategy)
-
-    return ImmutablePayloadCollection.WithPayloads(results, this.source)
+    return this.handleStrategy(strategy)
   }
 
   private getConflictStrategy(): ConflictStrategy {
@@ -52,7 +46,6 @@ export class ConflictDelta {
        * already conflicted this item.
        */
       const existingConflict = this.baseCollection.conflictsOf(this.applyPayload.uuid)[0]
-
       if (
         existingConflict &&
         isDecryptedPayload(existingConflict) &&
@@ -64,7 +57,7 @@ export class ConflictDelta {
       } else {
         const tmpBaseItem = CreateDecryptedItemFromPayload(this.basePayload)
         const tmpApplyItem = CreateItemFromPayload(this.applyPayload)
-        const historyEntries = this.historyMap?.[this.basePayload.uuid] || []
+        const historyEntries = this.historyMap[this.basePayload.uuid] || []
         const previousRevision = historyMapFunctions.getNewestRevision(historyEntries)
 
         return tmpBaseItem.strategyWhenConflictingWithItem(tmpApplyItem, previousRevision)
@@ -86,7 +79,7 @@ export class ConflictDelta {
     return ConflictStrategy.KeepApply
   }
 
-  private async handleStrategy(strategy: ConflictStrategy): Promise<FullyFormedPayloadInterface[]> {
+  private handleStrategy(strategy: ConflictStrategy): FullyFormedPayloadInterface[] {
     if (strategy === ConflictStrategy.KeepBase) {
       const updatedAt = greaterOfTwoDates(
         this.basePayload.serverUpdatedAt,
@@ -114,7 +107,6 @@ export class ConflictDelta {
       const result = this.applyPayload.copy(
         {
           lastSyncBegan: this.basePayload.lastSyncBegan,
-          lastSyncEnd: new Date(),
         },
         this.applyPayload.source,
       )
@@ -143,7 +135,7 @@ export class ConflictDelta {
         this.applyPayload.source,
       )
 
-      const rightPayloads = await PayloadsByDuplicating({
+      const rightPayloads = PayloadsByDuplicating({
         payload: this.applyPayload,
         baseCollection: this.baseCollection,
         isConflict: true,
@@ -154,7 +146,7 @@ export class ConflictDelta {
     }
 
     if (strategy === ConflictStrategy.DuplicateBaseKeepApply) {
-      const leftPayloads = await PayloadsByDuplicating({
+      const leftPayloads = PayloadsByDuplicating({
         payload: this.basePayload,
         baseCollection: this.baseCollection,
         isConflict: true,
@@ -164,7 +156,6 @@ export class ConflictDelta {
       const rightPayload = this.applyPayload.copy(
         {
           lastSyncBegan: this.basePayload.lastSyncBegan,
-          lastSyncEnd: new Date(),
         },
         this.applyPayload.source,
       )

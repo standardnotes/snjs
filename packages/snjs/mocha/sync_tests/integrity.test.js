@@ -47,7 +47,7 @@ describe('sync integrity', () => {
   it('should detect when out of sync', async function () {
     const item = await this.application.itemManager.emitItemFromPayload(
       Factory.createNotePayload(),
-      PayloadSource.LocalChanged,
+      PayloadEmitSource.LocalChanged,
     )
     this.expectedItemCount++
 
@@ -63,7 +63,7 @@ describe('sync integrity', () => {
   it('should self heal after out of sync', async function () {
     const item = await this.application.itemManager.emitItemFromPayload(
       Factory.createNotePayload(),
-      PayloadSource.LocalChanged,
+      PayloadEmitSource.LocalChanged,
     )
     this.expectedItemCount++
 

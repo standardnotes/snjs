@@ -217,7 +217,7 @@ export class ItemsEncryptionService extends Services.AbstractService {
       }
     })
 
-    await this.payloadManager.emitPayloads(decryptedPayloads, Models.PayloadSource.LocalChanged)
+    await this.payloadManager.emitPayloads(decryptedPayloads, Models.PayloadEmitSource.LocalChanged)
   }
 
   /**

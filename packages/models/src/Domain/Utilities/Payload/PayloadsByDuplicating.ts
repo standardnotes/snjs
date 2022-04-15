@@ -11,13 +11,13 @@ import { FullyFormedPayloadInterface } from '../../Abstract/Payload/Interfaces/U
  * Copies payload and assigns it a new uuid.
  * @returns An array of payloads that have changed as a result of copying.
  */
-export async function PayloadsByDuplicating<C extends ItemContent = ItemContent>(dto: {
+export function PayloadsByDuplicating<C extends ItemContent = ItemContent>(dto: {
   payload: FullyFormedPayloadInterface<C>
   baseCollection: ImmutablePayloadCollection<FullyFormedPayloadInterface>
   isConflict?: boolean
   additionalContent?: Partial<C>
   source?: PayloadSource
-}): Promise<FullyFormedPayloadInterface[]> {
+}): FullyFormedPayloadInterface[] {
   const { payload, baseCollection, isConflict, additionalContent, source } = dto
   const results: FullyFormedPayloadInterface[] = []
 
@@ -26,7 +26,6 @@ export async function PayloadsByDuplicating<C extends ItemContent = ItemContent>
     dirty: true,
     dirtiedDate: new Date(),
     lastSyncBegan: undefined,
-    lastSyncEnd: undefined,
     duplicate_of: payload.uuid,
   }
 

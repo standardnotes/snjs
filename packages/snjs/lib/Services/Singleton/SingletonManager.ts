@@ -7,6 +7,7 @@ import {
   SingletonStrategy,
   ItemContent,
   PredicateInterface,
+  PayloadEmitSource,
 } from '@standardnotes/models'
 import { arrayByRemovingFromIndex, extendArray, UuidGenerator } from '@standardnotes/utils'
 import { SNSyncService } from '../Sync/SyncService'
@@ -221,7 +222,10 @@ export class SNSingletonManager extends AbstractService {
       dirtiedDate: new Date(),
     })
 
-    const item = await this.itemManager.emitItemFromPayload(dirtyPayload)
+    const item = await this.itemManager.emitItemFromPayload(
+      dirtyPayload,
+      PayloadEmitSource.LocalInserted,
+    )
 
     void this.syncService.sync()
 

@@ -4,7 +4,7 @@ import {
   SNTag,
   NoteContent,
   DecryptedItemInterface,
-  PayloadSource,
+  PayloadEmitSource,
 } from '@standardnotes/models'
 import { removeFromArray } from '@standardnotes/utils'
 import { ContentType } from '@standardnotes/common'
@@ -27,7 +27,7 @@ export type EditorValues = {
 export class NoteViewController {
   public note!: SNNote
   private application: SNApplication
-  private innerValueChangeObservers: ((note: SNNote, source: PayloadSource) => void)[] = []
+  private innerValueChangeObservers: ((note: SNNote, source: PayloadEmitSource) => void)[] = []
   private removeStreamObserver?: () => void
   public isTemplateNote = false
   private saveTimeout?: Promise<void>
@@ -54,28 +54,41 @@ export class NoteViewController {
           references: [],
         },
       )
+
       if (this.defaultTag) {
         const tag = this.application.items.findItem(this.defaultTag) as SNTag
         await this.application.items.addTagToNote(note, tag, addTagHierarchy)
       }
+
       this.isTemplateNote = true
       this.note = note
-      this.notifyObservers(this.note, this.note.payload.source)
+
+      this.notifyObservers(this.note, PayloadEmitSource.InitialObserverRegistrationPush)
     }
     this.streamItems()
   }
 
-  private notifyObservers(note: SNNote, source: PayloadSource): void {
+  private notifyObservers(note: SNNote, source: PayloadEmitSource): void {
     for (const observer of this.innerValueChangeObservers) {
       observer(note, source)
     }
   }
 
   private streamItems() {
-    this.removeStreamObserver = this.application.streamItems(
+    this.removeStreamObserver = this.application.streamItems<SNNote>(
       ContentType.Note,
       ({ changed, inserted, source }) => {
-        this.handleNoteStream(changed.concat(inserted) as SNNote[], source)
+        const notes = changed.concat(inserted)
+
+        const matchingNote = notes.find((item) => {
+          return item.uuid === this.note.uuid
+        })
+
+        if (matchingNote) {
+          this.isTemplateNote = false
+          this.note = matchingNote
+          this.notifyObservers(matchingNote, source)
+        }
       },
     )
   }
@@ -90,19 +103,6 @@ export class NoteViewController {
     this.saveTimeout = undefined
   }
 
-  private handleNoteStream(notes: SNNote[], source: PayloadSource) {
-    /** Update our note object reference whenever it changes */
-    const matchingNote = notes.find((item) => {
-      return item.uuid === this.note.uuid
-    }) as SNNote
-
-    if (matchingNote) {
-      this.isTemplateNote = false
-      this.note = matchingNote
-      this.notifyObservers(matchingNote, source)
-    }
-  }
-
   public insertTemplatedNote(): Promise<DecryptedItemInterface> {
     this.isTemplateNote = false
     return this.application.mutator.insertItem(this.note)
@@ -113,11 +113,12 @@ export class NoteViewController {
    * (and thus a new object reference is created)
    */
   public addNoteInnerValueChangeObserver(
-    callback: (note: SNNote, source: PayloadSource) => void,
+    callback: (note: SNNote, source: PayloadEmitSource) => void,
   ): () => void {
     this.innerValueChangeObservers.push(callback)
+
     if (this.note) {
-      callback(this.note, this.note.payload.source)
+      callback(this.note, PayloadEmitSource.InitialObserverRegistrationPush)
     }
 
     return () => {

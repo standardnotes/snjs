@@ -21,3 +21,7 @@ export type DecryptionQueueItem = {
   promise?: Promise<DecryptionResponse>
   resolve?: (result: DecryptionResponse) => void
 }
+
+export enum KeyRecoveryEvent {
+  KeysRecovered = 'KeysRecovered',
+}

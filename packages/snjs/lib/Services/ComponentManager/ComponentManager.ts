@@ -8,7 +8,7 @@ import {
   SNTheme,
   SNComponent,
   ComponentMutator,
-  PayloadSource,
+  PayloadEmitSource,
 } from '@standardnotes/models'
 import { SNAlertService } from '@Lib/Services/Alert/AlertService'
 import { SNSyncService } from '@Lib/Services/Sync/SyncService'
@@ -157,13 +157,14 @@ export class SNComponentManager extends AbstractService<ComponentManagerEvent, E
     this.configureForDesktop()
   }
 
-  handleChangedComponents(components: SNComponent[], source: PayloadSource): void {
+  handleChangedComponents(components: SNComponent[], source: PayloadEmitSource): void {
     const acceptableSources = [
-      PayloadSource.LocalChanged,
-      PayloadSource.RemoteRetrieved,
-      PayloadSource.LocalRetrieved,
-      PayloadSource.Constructor,
+      PayloadEmitSource.LocalChanged,
+      PayloadEmitSource.RemoteRetrieved,
+      PayloadEmitSource.LocalDatabaseLoaded,
+      PayloadEmitSource.LocalInserted,
     ]
+
     if (components.length === 0 || !acceptableSources.includes(source)) {
       return
     }
@@ -185,10 +186,10 @@ export class SNComponentManager extends AbstractService<ComponentManagerEvent, E
   }
 
   addItemObserver(): void {
-    this.removeItemObserver = this.itemManager.addObserver(
+    this.removeItemObserver = this.itemManager.addObserver<SNComponent>(
       [ContentType.Component, ContentType.Theme],
       ({ changed, inserted, source }) => {
-        const items = [...changed, ...inserted] as SNComponent[]
+        const items = [...changed, ...inserted]
         this.handleChangedComponents(items, source)
       },
     )

@@ -68,8 +68,8 @@ describe('app models', () => {
       },
     })
 
-    await this.application.itemManager.emitItemsFromPayloads([mutated], PayloadSource.LocalChanged)
-    await this.application.itemManager.emitItemsFromPayloads([params2], PayloadSource.LocalChanged)
+    await this.application.itemManager.emitItemsFromPayloads([mutated], PayloadEmitSource.LocalChanged)
+    await this.application.itemManager.emitItemsFromPayloads([params2], PayloadEmitSource.LocalChanged)
 
     const item1 = this.application.itemManager.findItem(params1.uuid)
     const item2 = this.application.itemManager.findItem(params2.uuid)
@@ -93,14 +93,14 @@ describe('app models', () => {
 
     let items = await this.application.itemManager.emitItemsFromPayloads(
       [mutated],
-      PayloadSource.LocalChanged,
+      PayloadEmitSource.LocalChanged,
     )
     let item = items[0]
     expect(item).to.be.ok
 
     items = await this.application.itemManager.emitItemsFromPayloads(
       [mutated],
-      PayloadSource.LocalChanged,
+      PayloadEmitSource.LocalChanged,
     )
     item = items[0]
 
@@ -149,7 +149,7 @@ describe('app models', () => {
     })
     await this.application.itemManager.emitItemsFromPayloads(
       [damagedPayload],
-      PayloadSource.LocalChanged,
+      PayloadEmitSource.LocalChanged,
     )
 
     const refreshedItem1_2 = this.application.itemManager.findItem(item1.uuid)
@@ -242,7 +242,7 @@ describe('app models', () => {
           references: [],
         },
       }),
-      PayloadSource.LocalSaved,
+      PayloadEmitSource.LocalChanged,
     )
 
     expect(this.application.itemManager.itemsReferencingItem(item2).length).to.equal(0)
