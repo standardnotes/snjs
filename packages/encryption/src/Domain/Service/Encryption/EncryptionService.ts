@@ -283,7 +283,7 @@ export class EncryptionService
     const resultParams: (DecryptedParameters<C> | ErrorDecryptingParameters)[] = []
 
     if (split.usesRootKey) {
-      const rootKeyDecrypted = await this.rootKeyEncryption.decryptPayloads(
+      const rootKeyDecrypted = await this.rootKeyEncryption.decryptPayloads<C>(
         split.usesRootKey.items,
         split.usesRootKey.key,
       )
@@ -291,14 +291,14 @@ export class EncryptionService
     }
 
     if (split.usesRootKeyWithKeyLookup) {
-      const rootKeyDecrypted = await this.rootKeyEncryption.decryptPayloadsWithKeyLookup(
+      const rootKeyDecrypted = await this.rootKeyEncryption.decryptPayloadsWithKeyLookup<C>(
         split.usesRootKeyWithKeyLookup.items,
       )
       Utils.extendArray(resultParams, rootKeyDecrypted)
     }
 
     if (split.usesItemsKey) {
-      const itemsKeyDecrypted = await this.itemsEncryption.decryptPayloads(
+      const itemsKeyDecrypted = await this.itemsEncryption.decryptPayloads<C>(
         split.usesItemsKey.items,
         split.usesItemsKey.key,
       )
@@ -306,7 +306,7 @@ export class EncryptionService
     }
 
     if (split.usesItemsKeyWithKeyLookup) {
-      const itemsKeyDecrypted = await this.itemsEncryption.decryptPayloadsWithKeyLookup(
+      const itemsKeyDecrypted = await this.itemsEncryption.decryptPayloadsWithKeyLookup<C>(
         split.usesItemsKeyWithKeyLookup.items,
       )
       Utils.extendArray(resultParams, itemsKeyDecrypted)

@@ -1,54 +1,43 @@
-import { extendArray } from '@standardnotes/utils'
 import { ImmutablePayloadCollection } from '../Collection/Payload/ImmutablePayloadCollection'
 import { ConflictDelta } from './Conflict'
 import { DecryptedPayloadInterface } from '../../Abstract/Payload/Interfaces/DecryptedPayload'
 import {
-  FullyFormedPayloadInterface,
   DeletedPayloadInterface,
   isDecryptedPayload,
   PayloadEmitSource,
 } from '../../Abstract/Payload'
-import { CustomApplyDelta } from './Abstract/CustomApplyDelta'
 import { HistoryMap } from '../History'
-import { DeltaEmit } from './Abstract/DeltaEmit'
+import { extendSyncDelta, SourcelessSyncDeltaEmit, SyncDeltaEmit } from './Abstract/DeltaEmit'
+import { DeltaInterface } from './Abstract/DeltaInterface'
+import { SyncResolvedPayload } from './Utilities/SyncResolvedPayload'
 
-type Return = DecryptedPayloadInterface
-
-export class DeltaFileImport extends CustomApplyDelta {
+export class DeltaFileImport implements DeltaInterface {
   constructor(
-    baseCollection: ImmutablePayloadCollection,
+    readonly baseCollection: ImmutablePayloadCollection,
     private readonly applyPayloads: DecryptedPayloadInterface[],
     protected readonly historyMap: HistoryMap,
-  ) {
-    super(baseCollection)
-  }
+  ) {}
 
-  public result(): DeltaEmit<Return> {
-    const results: Return[] = []
-
-    for (const payload of this.applyPayloads) {
-      const handled = this.payloadsByHandlingPayload(payload, results)
-
-      const payloads = handled.map((result) => {
-        return result.copy({
-          dirty: true,
-          dirtiedDate: new Date(),
-        })
-      })
-
-      extendArray(results, payloads)
-    }
-
-    return {
-      emits: results,
+  public result(): SyncDeltaEmit {
+    const result: SyncDeltaEmit = {
+      emits: [],
+      ignored: [],
       source: PayloadEmitSource.FileImport,
     }
+
+    for (const payload of this.applyPayloads) {
+      const resolved = this.resolvePayload(payload, result)
+
+      extendSyncDelta(result, resolved)
+    }
+
+    return result
   }
 
-  private payloadsByHandlingPayload(
+  private resolvePayload(
     payload: DecryptedPayloadInterface | DeletedPayloadInterface,
-    currentResults: Return[],
-  ): FullyFormedPayloadInterface[] {
+    currentResults: SyncDeltaEmit,
+  ): SourcelessSyncDeltaEmit {
     /**
      * Check to see if we've already processed a payload for this id.
      * If so, that would be the latest value, and not what's in the base collection.
@@ -58,7 +47,7 @@ export class DeltaFileImport extends CustomApplyDelta {
      * Find the most recently created conflict if available, as that
      * would contain the most recent value.
      */
-    let current = currentResults.find((candidate) => {
+    let current = currentResults.emits.find((candidate) => {
       return isDecryptedPayload(candidate) && candidate.content.conflict_of === payload.uuid
     })
 
@@ -66,7 +55,7 @@ export class DeltaFileImport extends CustomApplyDelta {
      * If no latest conflict, find by uuid directly.
      */
     if (!current) {
-      current = currentResults.find((candidate) => {
+      current = currentResults.emits.find((candidate) => {
         return candidate.uuid === payload.uuid
       })
     }
@@ -75,9 +64,9 @@ export class DeltaFileImport extends CustomApplyDelta {
      * If not found in current results, use the base value.
      */
     if (!current) {
-      const baseCurrent = this.findBasePayload(payload.uuid)
-      if (baseCurrent && isDecryptedPayload(baseCurrent)) {
-        current = baseCurrent
+      const base = this.baseCollection.find(payload.uuid)
+      if (base && isDecryptedPayload(base)) {
+        current = base as SyncResolvedPayload
       }
     }
 
@@ -85,7 +74,16 @@ export class DeltaFileImport extends CustomApplyDelta {
      * If the current doesn't exist, we're creating a new item from payload.
      */
     if (!current) {
-      return [payload]
+      return {
+        emits: [
+          payload.copyAsSyncResolved({
+            dirty: true,
+            dirtiedDate: new Date(),
+            lastSyncEnd: new Date(0),
+          }),
+        ],
+        ignored: [],
+      }
     }
 
     const delta = new ConflictDelta(this.baseCollection, current, payload, this.historyMap)

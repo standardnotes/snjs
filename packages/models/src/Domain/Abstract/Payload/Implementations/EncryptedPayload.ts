@@ -1,4 +1,8 @@
 import { ProtocolVersion, protocolVersionFromEncryptedString } from '@standardnotes/common'
+import {
+  SyncResolvedParams,
+  SyncResolvedPayload,
+} from '../../../Runtime/Deltas/Utilities/SyncResolvedPayload'
 import { EncryptedTransferPayload } from '../../TransferPayload/Interfaces/EncryptedTransferPayload'
 import { EncryptedPayloadInterface } from '../Interfaces/EncryptedPayload'
 import { PayloadSource } from '../Types/PayloadSource'
@@ -63,5 +67,19 @@ export class EncryptedPayload
       source,
     )
     return result as this
+  }
+
+  copyAsSyncResolved(
+    override?: Partial<EncryptedTransferPayload> & SyncResolvedParams,
+    source = this.source,
+  ): SyncResolvedPayload {
+    const result = new EncryptedPayload(
+      {
+        ...this.ejected(),
+        ...override,
+      },
+      source,
+    )
+    return result as SyncResolvedPayload
   }
 }

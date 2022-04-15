@@ -527,9 +527,9 @@ export class RootKeyEncryptionService extends Services.AbstractService<RootKeySe
     return Promise.all(payloads.map((payload) => this.encryptPayload(payload, key)))
   }
 
-  public async decryptPayloadWithKeyLookup(
+  public async decryptPayloadWithKeyLookup<C extends Models.ItemContent = Models.ItemContent>(
     payload: Models.EncryptedPayloadInterface,
-  ): Promise<DecryptedParameters | ErrorDecryptingParameters> {
+  ): Promise<DecryptedParameters<C> | ErrorDecryptingParameters> {
     const key = this.getRootKey()
 
     if (key == undefined) {
@@ -550,17 +550,17 @@ export class RootKeyEncryptionService extends Services.AbstractService<RootKeySe
     return OperatorWrapper.decryptPayload(payload, key, this.operatorManager)
   }
 
-  public async decryptPayloadsWithKeyLookup(
+  public async decryptPayloadsWithKeyLookup<C extends Models.ItemContent = Models.ItemContent>(
     payloads: Models.EncryptedPayloadInterface[],
-  ): Promise<(DecryptedParameters | ErrorDecryptingParameters)[]> {
-    return Promise.all(payloads.map((payload) => this.decryptPayloadWithKeyLookup(payload)))
+  ): Promise<(DecryptedParameters<C> | ErrorDecryptingParameters)[]> {
+    return Promise.all(payloads.map((payload) => this.decryptPayloadWithKeyLookup<C>(payload)))
   }
 
-  public async decryptPayloads(
+  public async decryptPayloads<C extends Models.ItemContent = Models.ItemContent>(
     payloads: Models.EncryptedPayloadInterface[],
     key: SNRootKey,
-  ): Promise<(DecryptedParameters | ErrorDecryptingParameters)[]> {
-    return Promise.all(payloads.map((payload) => this.decryptPayload(payload, key)))
+  ): Promise<(DecryptedParameters<C> | ErrorDecryptingParameters)[]> {
+    return Promise.all(payloads.map((payload) => this.decryptPayload<C>(payload, key)))
   }
 
   /**

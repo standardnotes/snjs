@@ -1,5 +1,4 @@
 export * from './Conflict'
-export * from './Abstract/Delta'
 export * from './FileImport'
 export * from './OutOfSync'
 export * from './RemoteDataConflicts'

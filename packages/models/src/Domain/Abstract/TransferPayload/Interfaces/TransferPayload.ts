@@ -14,7 +14,9 @@ export interface TransferPayload<C extends ItemContent = ItemContent> {
 
   dirtiedDate?: Date
   dirty?: boolean
+
   lastSyncBegan?: Date
+  lastSyncEnd?: Date
 
   duplicate_of?: Uuid
 }

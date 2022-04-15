@@ -19,10 +19,7 @@ export class OfflineSyncOperation {
 
   async run() {
     const responsePayloads = this.payloads.map((payload) => {
-      return CreateOfflineSyncSavedPayload({
-        ...payload,
-        dirty: false,
-      })
+      return CreateOfflineSyncSavedPayload(payload)
     })
 
     const response = new OfflineSyncResponse(responsePayloads)

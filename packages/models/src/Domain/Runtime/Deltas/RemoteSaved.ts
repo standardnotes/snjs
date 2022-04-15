@@ -3,36 +3,39 @@ import { DeletedPayload } from './../../Abstract/Payload/Implementations/Deleted
 import { ImmutablePayloadCollection } from '../Collection/Payload/ImmutablePayloadCollection'
 import { PayloadSource } from '../../Abstract/Payload/Types/PayloadSource'
 import { isDeletedPayload } from '../../Abstract/Payload/Interfaces/TypeCheck'
-import { FullyFormedPayloadInterface, PayloadEmitSource } from '../../Abstract/Payload'
-import { CustomApplyDelta } from './Abstract/CustomApplyDelta'
-import { payloadByRedirtyingBasedOnBaseState } from './Utilities.ts/ApplyDirtyState'
-import { DeltaEmit } from './Abstract/DeltaEmit'
+import { PayloadEmitSource } from '../../Abstract/Payload'
+import { payloadByFinalizingSyncState } from './Utilities/ApplyDirtyState'
+import { SyncDeltaEmit } from './Abstract/DeltaEmit'
+import { SyncDeltaInterface } from './Abstract/SyncDeltaInterface'
+import { BuildSyncResolvedParams, SyncResolvedPayload } from './Utilities/SyncResolvedPayload'
 
-export class DeltaRemoteSaved extends CustomApplyDelta {
+export class DeltaRemoteSaved implements SyncDeltaInterface {
   constructor(
-    baseCollection: ImmutablePayloadCollection,
+    readonly baseCollection: ImmutablePayloadCollection,
     private readonly applyContextualPayloads: ServerSyncSavedContextualPayload[],
-  ) {
-    super(baseCollection)
-  }
+  ) {}
 
-  public result(): DeltaEmit {
-    const processed: FullyFormedPayloadInterface[] = []
+  public result(): SyncDeltaEmit {
+    const processed: SyncResolvedPayload[] = []
 
     for (const apply of this.applyContextualPayloads) {
-      const base = this.findBasePayload(apply.uuid)
+      const base = this.baseCollection.find(apply.uuid)
 
       if (!base) {
-        const result = new DeletedPayload(
+        const discarded = new DeletedPayload(
           {
             ...apply,
             deleted: true,
             content: undefined,
-            dirty: false,
+            ...BuildSyncResolvedParams({
+              dirty: false,
+              lastSyncEnd: new Date(),
+            }),
           },
           PayloadSource.RemoteSaved,
         )
-        processed.push(result)
+
+        processed.push(discarded as SyncResolvedPayload)
         continue
       }
 
@@ -40,7 +43,6 @@ export class DeltaRemoteSaved extends CustomApplyDelta {
        * If we save an item, but while in transit it is deleted locally, we want to keep
        * local deletion status, and not old (false) deleted value that was sent to server.
        */
-
       if (isDeletedPayload(base)) {
         const baseWasDeletedAfterThisRequest = !apply.deleted
         const regularDeletedPayload = apply.deleted
@@ -50,25 +52,31 @@ export class DeltaRemoteSaved extends CustomApplyDelta {
               ...apply,
               deleted: true,
               content: undefined,
-              dirty: true,
               dirtiedDate: new Date(),
+              ...BuildSyncResolvedParams({
+                dirty: true,
+                lastSyncEnd: new Date(),
+              }),
             },
             PayloadSource.RemoteSaved,
           )
-          processed.push(result)
+          processed.push(result as SyncResolvedPayload)
         } else if (regularDeletedPayload) {
-          const result = base.copy(
+          const discarded = base.copy(
             {
               ...apply,
               deleted: true,
-              dirty: false,
+              ...BuildSyncResolvedParams({
+                dirty: false,
+                lastSyncEnd: new Date(),
+              }),
             },
             PayloadSource.RemoteSaved,
           )
-          processed.push(result)
+          processed.push(discarded as SyncResolvedPayload)
         }
       } else {
-        const result = payloadByRedirtyingBasedOnBaseState(
+        const result = payloadByFinalizingSyncState(
           base.copy(
             {
               ...apply,

@@ -74,6 +74,10 @@ export abstract class GenericItem<P extends PayloadInterface = PayloadInterface>
     return this.payload.lastSyncBegan
   }
 
+  get lastSyncEnd() {
+    return this.payload.lastSyncEnd
+  }
+
   get duplicate_of() {
     return this.payload.duplicate_of
   }

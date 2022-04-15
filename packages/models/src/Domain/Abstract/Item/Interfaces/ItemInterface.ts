@@ -23,8 +23,10 @@ export interface ItemInterface<P extends PayloadInterface = PayloadInterface> {
   dirty: boolean | undefined
 
   lastSyncBegan: Date | undefined
-  duplicate_of: string | undefined
+  lastSyncEnd: Date | undefined
   neverSynced: boolean
+
+  duplicate_of: string | undefined
   isSingleton: boolean
   updated_at: Date | undefined
 

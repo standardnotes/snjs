@@ -36,6 +36,7 @@ export function PayloadsByAlternatingUuid<
     dirty: true,
     dirtiedDate: new Date(),
     lastSyncBegan: undefined,
+    lastSyncEnd: undefined,
     duplicate_of: payload.uuid,
   })
   results.push(copy)

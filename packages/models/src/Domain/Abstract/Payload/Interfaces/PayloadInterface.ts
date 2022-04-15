@@ -1,3 +1,7 @@
+import {
+  SyncResolvedParams,
+  SyncResolvedPayload,
+} from './../../../Runtime/Deltas/Utilities/SyncResolvedPayload'
 import { ContentType, Uuid } from '@standardnotes/common'
 import { ItemContent } from '../../Content/ItemContent'
 import { TransferPayload } from '../../TransferPayload/Interfaces/TransferPayload'
@@ -23,7 +27,9 @@ export interface PayloadInterface<
 
   readonly dirtiedDate?: Date
   readonly dirty?: boolean
+
   readonly lastSyncBegan?: Date
+  readonly lastSyncEnd?: Date
 
   readonly duplicate_of?: Uuid
 
@@ -40,4 +46,9 @@ export interface PayloadInterface<
   mergedWith(payload: this): this
 
   copy(override?: Partial<T>, source?: PayloadSource): this
+
+  copyAsSyncResolved(
+    override?: Partial<T> & SyncResolvedParams,
+    source?: PayloadSource,
+  ): SyncResolvedPayload
 }

@@ -149,9 +149,9 @@ export class ItemsEncryptionService extends Services.AbstractService {
     return Promise.all(payloads.map((payload) => this.encryptPayloadWithKeyLookup(payload)))
   }
 
-  public async decryptPayloadWithKeyLookup(
+  public async decryptPayloadWithKeyLookup<C extends Models.ItemContent = Models.ItemContent>(
     payload: Models.EncryptedPayloadInterface,
-  ): Promise<DecryptedParameters | ErrorDecryptingParameters> {
+  ): Promise<DecryptedParameters<C> | ErrorDecryptingParameters> {
     const key = this.keyToUseForDecryptionOfPayload(payload)
 
     if (key == undefined) {
@@ -165,10 +165,10 @@ export class ItemsEncryptionService extends Services.AbstractService {
     return this.decryptPayload(payload, key)
   }
 
-  public async decryptPayload(
+  public async decryptPayload<C extends Models.ItemContent = Models.ItemContent>(
     payload: Models.EncryptedPayloadInterface,
     key: Models.ItemsKeyInterface,
-  ): Promise<DecryptedParameters | ErrorDecryptingParameters> {
+  ): Promise<DecryptedParameters<C> | ErrorDecryptingParameters> {
     if (!payload.content) {
       return {
         uuid: payload.uuid,
@@ -179,17 +179,17 @@ export class ItemsEncryptionService extends Services.AbstractService {
     return OperatorWrapper.decryptPayload(payload, key, this.operatorManager)
   }
 
-  public async decryptPayloadsWithKeyLookup(
+  public async decryptPayloadsWithKeyLookup<C extends Models.ItemContent = Models.ItemContent>(
     payloads: Models.EncryptedPayloadInterface[],
-  ): Promise<(DecryptedParameters | ErrorDecryptingParameters)[]> {
-    return Promise.all(payloads.map((payload) => this.decryptPayloadWithKeyLookup(payload)))
+  ): Promise<(DecryptedParameters<C> | ErrorDecryptingParameters)[]> {
+    return Promise.all(payloads.map((payload) => this.decryptPayloadWithKeyLookup<C>(payload)))
   }
 
-  public async decryptPayloads(
+  public async decryptPayloads<C extends Models.ItemContent = Models.ItemContent>(
     payloads: Models.EncryptedPayloadInterface[],
     key: Models.ItemsKeyInterface,
-  ): Promise<(DecryptedParameters | ErrorDecryptingParameters)[]> {
-    return Promise.all(payloads.map((payload) => this.decryptPayload(payload, key)))
+  ): Promise<(DecryptedParameters<C> | ErrorDecryptingParameters)[]> {
+    return Promise.all(payloads.map((payload) => this.decryptPayload<C>(payload, key)))
   }
 
   public async decryptErroredPayloads(): Promise<void> {

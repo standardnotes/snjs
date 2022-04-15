@@ -1,40 +1,42 @@
-import {
-  EncryptedPayloadInterface,
-  FullyFormedPayloadInterface,
-  PayloadEmitSource,
-} from '../../Abstract/Payload'
-import { extendArray } from '@standardnotes/utils'
+import { PayloadEmitSource } from '../../Abstract/Payload'
 import { isDecryptedPayload } from '../../Abstract/Payload/Interfaces/TypeCheck'
 import { PayloadContentsEqual } from '../../Utilities/Payload/PayloadContentsEqual'
-import { PayloadsDelta } from './Abstract/Delta'
 import { ConflictDelta } from './Conflict'
-import { DeltaEmit } from './Abstract/DeltaEmit'
 import { ContentType } from '@standardnotes/common'
 import { ItemsKeyDelta } from './ItemsKeyDelta'
+import { payloadByFinalizingSyncState } from './Utilities/ApplyDirtyState'
+import { ImmutablePayloadCollection } from '../Collection/Payload/ImmutablePayloadCollection'
+import { HistoryMap } from '../History'
+import { extendSyncDelta, SyncDeltaEmit } from './Abstract/DeltaEmit'
+import { SyncDeltaInterface } from './Abstract/SyncDeltaInterface'
 
-export class DeltaOutOfSync extends PayloadsDelta {
-  public result(): DeltaEmit {
-    const results: FullyFormedPayloadInterface[] = []
-    const ignored: EncryptedPayloadInterface[] = []
+export class DeltaOutOfSync implements SyncDeltaInterface {
+  constructor(
+    readonly baseCollection: ImmutablePayloadCollection,
+    readonly applyCollection: ImmutablePayloadCollection,
+    readonly historyMap: HistoryMap,
+  ) {}
+
+  public result(): SyncDeltaEmit {
+    const result: SyncDeltaEmit = {
+      emits: [],
+      ignored: [],
+      source: PayloadEmitSource.RemoteRetrieved,
+    }
 
     for (const apply of this.applyCollection.all()) {
       if (apply.content_type === ContentType.ItemsKey) {
         const itemsKeyDeltaEmit = new ItemsKeyDelta(this.baseCollection, [apply]).result()
 
-        if (itemsKeyDeltaEmit.emits) {
-          extendArray(results, itemsKeyDeltaEmit.emits)
-        }
-        if (itemsKeyDeltaEmit.ignored) {
-          extendArray(ignored, itemsKeyDeltaEmit.ignored)
-        }
+        extendSyncDelta(result, itemsKeyDeltaEmit)
 
         continue
       }
 
-      const base = this.findBasePayload(apply.uuid)
+      const base = this.baseCollection.find(apply.uuid)
 
       if (!base) {
-        results.push(apply)
+        result.emits.push(payloadByFinalizingSyncState(apply, this.baseCollection))
 
         continue
       }
@@ -49,18 +51,12 @@ export class DeltaOutOfSync extends PayloadsDelta {
       if (needsConflict) {
         const delta = new ConflictDelta(this.baseCollection, base, apply, this.historyMap)
 
-        const deltaResults = delta.result()
-
-        extendArray(results, deltaResults)
+        extendSyncDelta(result, delta.result())
       } else {
-        results.push(apply)
+        result.emits.push(payloadByFinalizingSyncState(apply, this.baseCollection))
       }
     }
 
-    return {
-      emits: results,
-      ignored: ignored,
-      source: PayloadEmitSource.RemoteRetrieved,
-    }
+    return result
   }
 }

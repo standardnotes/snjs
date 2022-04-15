@@ -19,6 +19,7 @@ export function PayloadsByDuplicating<C extends ItemContent = ItemContent>(dto: 
   source?: PayloadSource
 }): FullyFormedPayloadInterface[] {
   const { payload, baseCollection, isConflict, additionalContent, source } = dto
+
   const results: FullyFormedPayloadInterface[] = []
 
   const baseOverride = {
@@ -26,6 +27,7 @@ export function PayloadsByDuplicating<C extends ItemContent = ItemContent>(dto: 
     dirty: true,
     dirtiedDate: new Date(),
     lastSyncBegan: undefined,
+    lastSyncEnd: undefined,
     duplicate_of: payload.uuid,
   }
 
