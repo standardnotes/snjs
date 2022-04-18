@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.4.1](https://github.com/standardnotes/snjs/compare/@standardnotes/encryption@1.4.0...@standardnotes/encryption@1.4.1) (2022-04-18)
+
+
+### Bug Fixes
+
+* make timestamps required in payload construction ([#695](https://github.com/standardnotes/snjs/issues/695)) ([b3326c0](https://github.com/standardnotes/snjs/commit/b3326c0a998cd9d44a76afc377f182885ef48275))
+
+
+
+
+
 # [1.4.0](https://github.com/standardnotes/snjs/compare/@standardnotes/encryption@1.3.0...@standardnotes/encryption@1.4.0) (2022-04-15)
 
 

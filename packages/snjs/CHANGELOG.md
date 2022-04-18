@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.96.2](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.96.1...@standardnotes/snjs@2.96.2) (2022-04-18)
+
+
+### Bug Fixes
+
+* make timestamps required in payload construction ([#695](https://github.com/standardnotes/snjs/issues/695)) ([b3326c0](https://github.com/standardnotes/snjs/commit/b3326c0a998cd9d44a76afc377f182885ef48275))
+
+
+
+
+
 ## [2.96.1](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.96.0...@standardnotes/snjs@2.96.1) (2022-04-18)
 
 

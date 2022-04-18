@@ -1,6 +1,6 @@
 {
   "name": "@standardnotes/responses",
-  "version": "1.6.5",
+  "version": "1.6.6",
   "engines": {
     "node": ">=14.0.0 <17.0.0"
   },
