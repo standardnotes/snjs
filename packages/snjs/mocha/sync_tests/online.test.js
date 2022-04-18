@@ -95,24 +95,33 @@ describe('online syncing', function () {
 
   it('can complete multipage sync on sign in', async function () {
     const count = 0
+
     await Factory.createManyMappedNotes(this.application, count)
+
     this.expectedItemCount += count
+
     await this.application.sync.sync(syncOptions)
+
     this.application = await Factory.signOutApplicationAndReturnNew(this.application)
+
     expect(this.application.itemManager.items.length).to.equal(BASE_ITEM_COUNT)
+
     const promise = Factory.loginToApplication({
       application: this.application,
       email: this.email,
       password: this.password,
     })
+
     /** Throw in some random syncs to cause trouble */
     const syncCount = 30
+
     for (let i = 0; i < syncCount; i++) {
       this.application.sync.sync(syncOptions)
       await Factory.sleep(0.01)
     }
     await promise
     expect(promise).to.be.fulfilled
+
     /** Allow any unwaited syncs in for loop to complete */
     await Factory.sleep(0.5)
   }).timeout(20000)
