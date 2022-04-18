@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.96.1](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.96.0...@standardnotes/snjs@2.96.1) (2022-04-18)
+
+
+### Bug Fixes
+
+* don't download role based features if using offline repo ([0d375b8](https://github.com/standardnotes/snjs/commit/0d375b85eab36b489fc05c6797a70284fe91f09b))
+
+
+
+
+
 # [2.96.0](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.95.0...@standardnotes/snjs@2.96.0) (2022-04-15)
 
 
