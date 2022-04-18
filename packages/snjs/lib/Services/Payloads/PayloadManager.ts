@@ -98,7 +98,7 @@ export class PayloadManager extends AbstractService implements PayloadManagerInt
     sourceKey?: string,
   ): Promise<P[]> {
     if (emit.emits.length === 0 && emit.ignored?.length === 0) {
-      console.warn('Attempting to emit 0 payloads.')
+      return []
     }
 
     return new Promise((resolve) => {

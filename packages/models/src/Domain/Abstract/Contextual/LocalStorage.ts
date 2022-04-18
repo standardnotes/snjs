@@ -28,8 +28,8 @@ export interface LocalStorageEncryptedContextualPayload extends ContextPayload {
   enc_item_key: string
   errorDecrypting: boolean
   items_key_id: string | undefined
-  updated_at_timestamp: number | undefined
-  updated_at: Date | undefined
+  updated_at_timestamp: number
+  updated_at: Date
   waitingForKey: boolean
 }
 
@@ -42,8 +42,8 @@ export interface LocalStorageDecryptedContextualPayload<C extends ItemContent = 
   dirtiedDate: Date | undefined
   dirty: boolean
   duplicate_of?: Uuid
-  updated_at_timestamp: number | undefined
-  updated_at: Date | undefined
+  updated_at_timestamp: number
+  updated_at: Date
 }
 
 export interface LocalStorageDeletedContextualPayload extends ContextPayload {
@@ -54,8 +54,8 @@ export interface LocalStorageDeletedContextualPayload extends ContextPayload {
   dirtiedDate: Date | undefined
   dirty: true
   duplicate_of?: Uuid
-  updated_at_timestamp: number | undefined
-  updated_at: Date | undefined
+  updated_at_timestamp: number
+  updated_at: Date
 }
 
 export function CreateEncryptedLocalStorageContextPayload(
