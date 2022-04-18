@@ -79,10 +79,10 @@ export enum KeyboardModifier {
 
 export type MessageData = Partial<{
   /** Related to the stream-item-context action */
-  item?: OutgoingItemMessagePayload
+  item?: IncomingComponentItemPayload
   /** Related to the stream-items action */
   content_types?: ContentType[]
-  items?: OutgoingItemMessagePayload[]
+  items?: IncomingComponentItemPayload[]
   /** Related to the request-permission action */
   permissions?: ComponentPermission[]
   /** Related to the component-registered action */
@@ -103,6 +103,15 @@ export type MessageData = Partial<{
   keyboardModifier?: KeyboardModifier
 }>
 
+export type MessageReplyData = {
+  approved?: boolean
+  deleted?: boolean
+  error?: string
+  item?: OutgoingItemMessagePayload
+  items?: OutgoingItemMessagePayload[]
+  themes?: string[]
+}
+
 export type StreamItemsMessageData = MessageData & {
   content_types: ContentType[]
 }
@@ -116,15 +125,6 @@ export type ComponentMessage = {
   sessionKey?: string
   componentData?: Record<string, unknown>
   data: MessageData
-}
-
-export type MessageReplyData = {
-  approved?: boolean
-  deleted?: boolean
-  error?: string
-  item?: OutgoingItemMessagePayload
-  items?: OutgoingItemMessagePayload[]
-  themes?: string[]
 }
 
 export type MessageReply = {

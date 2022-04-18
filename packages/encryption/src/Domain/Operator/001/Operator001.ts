@@ -20,6 +20,7 @@ import {
   ItemContent,
   DecryptedPayload,
   DecryptedPayloadInterface,
+  PayloadTimestampDefaults,
 } from '@standardnotes/models'
 import { SNPureCrypto } from '@standardnotes/sncrypto-common'
 import { SNRootKey } from '../../RootKey/RootKey'
@@ -76,6 +77,7 @@ export class SNProtocolOperator001 implements AsynchronousOperator {
       uuid: UuidGenerator.GenerateUuid(),
       content_type: ContentType.ItemsKey,
       content: this.generateNewItemsKeyContent(),
+      ...PayloadTimestampDefaults(),
     })
     return CreateDecryptedItemFromPayload(payload)
   }

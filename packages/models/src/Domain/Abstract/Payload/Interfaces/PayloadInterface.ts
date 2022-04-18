@@ -40,11 +40,6 @@ export interface PayloadInterface<
    */
   ejected(): TransferPayload
 
-  /**
-   * Returns a new payload by applying the input payload on top of the instance payload.
-   */
-  mergedWith(payload: this): this
-
   copy(override?: Partial<T>, source?: PayloadSource): this
 
   copyAsSyncResolved(

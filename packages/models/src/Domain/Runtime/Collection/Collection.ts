@@ -1,11 +1,6 @@
-import { extendArray, UuidMap } from '@standardnotes/utils'
+import { extendArray, isObject, isString, UuidMap } from '@standardnotes/utils'
 import { ContentType, Uuid } from '@standardnotes/common'
 import { remove } from 'lodash'
-import {
-  isDecryptedTransferPayload,
-  isDeletedTransferPayload,
-  isErrorDecryptingTransferPayload,
-} from '../../Abstract/TransferPayload'
 import { ItemContent } from '../../Abstract/Content/ItemContent'
 import { ContentReference } from '../../Abstract/Item'
 
@@ -58,15 +53,23 @@ export abstract class Collection<
   readonly conflictMap: UuidMap
 
   isDecryptedElement = (e: Decrypted | Encrypted | Deleted): e is Decrypted => {
-    return isDecryptedTransferPayload(e)
+    return isObject(e.content)
+  }
+
+  isEncryptedElement = (e: Decrypted | Encrypted | Deleted): e is Encrypted => {
+    return 'content' in e && isString(e.content)
+  }
+
+  isErrorDecryptingElement = (e: Decrypted | Encrypted | Deleted): e is Encrypted => {
+    return this.isEncryptedElement(e) && e.errorDecrypting === true
   }
 
   isDeletedElement = (e: Decrypted | Encrypted | Deleted): e is Deleted => {
-    return isDeletedTransferPayload(e)
+    return 'deleted' in e && e.deleted === true
   }
 
   isNonDeletedElement = (e: Decrypted | Encrypted | Deleted): e is Decrypted | Encrypted => {
-    return !isDeletedTransferPayload(e)
+    return !this.isDeletedElement(e)
   }
 
   constructor(
@@ -171,7 +174,7 @@ export abstract class Collection<
       this.map[element.uuid] = element
       this.setToTypedMap(element)
 
-      if (isErrorDecryptingTransferPayload(element)) {
+      if (this.isErrorDecryptingElement(element)) {
         this.invalidsIndex.add(element.uuid)
       } else {
         this.invalidsIndex.delete(element.uuid)

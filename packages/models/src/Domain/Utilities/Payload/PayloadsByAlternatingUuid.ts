@@ -76,6 +76,7 @@ export function PayloadsByAlternatingUuid<
        * Do not set as dirty; this item is non-syncable
        * and should be immediately discarded
        */
+      ...payload.ejected(),
       dirty: false,
       content: undefined,
       uuid: payload.uuid,

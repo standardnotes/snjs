@@ -13,12 +13,12 @@ import {
   DecryptedPayload,
   EncryptedPayload,
   FullyFormedPayloadInterface,
-  isDecryptedTransferPayload,
-  isEncryptedTransferPayload,
-  EncryptedTransferPayload,
+  isEncryptedLocalStoragePayload,
   ItemContent,
   DecryptedPayloadInterface,
   DeletedPayloadInterface,
+  PayloadTimestampDefaults,
+  LocalStorageEncryptedContextualPayload,
 } from '@standardnotes/models'
 
 /**
@@ -137,13 +137,13 @@ export class SNStorageService
   public isStorageWrapped(): boolean {
     const wrappedValue = this.values[Services.ValueModesKeys.Wrapped]
 
-    return wrappedValue != undefined && isEncryptedTransferPayload(wrappedValue)
+    return wrappedValue != undefined && isEncryptedLocalStoragePayload(wrappedValue)
   }
 
   public async canDecryptWithKey(key: SNRootKey): Promise<boolean> {
     const wrappedValue = this.values[Services.ValueModesKeys.Wrapped]
 
-    if (isDecryptedTransferPayload(wrappedValue)) {
+    if (!isEncryptedLocalStoragePayload(wrappedValue)) {
       throw Error('Attempting to decrypt non decrypted storage value')
     }
 
@@ -151,7 +151,10 @@ export class SNStorageService
     return !isErrorDecryptingParameters(decryptedPayload)
   }
 
-  private async decryptWrappedValue(wrappedValue: EncryptedTransferPayload, key?: SNRootKey) {
+  private async decryptWrappedValue(
+    wrappedValue: LocalStorageEncryptedContextualPayload,
+    key?: SNRootKey,
+  ) {
     /**
      * The read content type doesn't matter, so long as we know it responds
      * to content type. This allows a more seamless transition when both web
@@ -163,6 +166,7 @@ export class SNStorageService
 
     const payload = new EncryptedPayload({
       ...wrappedValue,
+      ...PayloadTimestampDefaults(),
       content_type: ContentType.EncryptedStorage,
     })
 
@@ -187,7 +191,7 @@ export class SNStorageService
   public async decryptStorage() {
     const wrappedValue = this.values[Services.ValueModesKeys.Wrapped]
 
-    if (isDecryptedTransferPayload(wrappedValue)) {
+    if (!isEncryptedLocalStoragePayload(wrappedValue)) {
       throw Error('Attempting to decrypt already decrypted storage')
     }
 
@@ -260,6 +264,7 @@ export class SNStorageService
       uuid: UuidGenerator.GenerateUuid(),
       content: valuesToWrap as unknown as ItemContent,
       content_type: ContentType.EncryptedStorage,
+      ...PayloadTimestampDefaults(),
     })
 
     if (this.encryptionProvider.hasRootKeyEncryptionSource()) {

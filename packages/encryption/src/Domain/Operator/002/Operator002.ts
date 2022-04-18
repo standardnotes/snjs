@@ -17,7 +17,7 @@ import { ItemAuthenticatedData } from '../../Encryption/ItemAuthenticatedData'
 import { LegacyAttachedData } from '../../Encryption/LegacyAttachedData'
 import { isItemsKey } from '../../ItemsKey'
 import { CreateNewRootKey } from '../../RootKey/Functions'
-import { ItemContent } from '@standardnotes/models'
+import { ItemContent, PayloadTimestampDefaults } from '@standardnotes/models'
 
 /**
  * @deprecated
@@ -49,6 +49,7 @@ export class SNProtocolOperator002 extends SNProtocolOperator001 {
       uuid: UuidGenerator.GenerateUuid(),
       content_type: Common.ContentType.ItemsKey,
       content: this.generateNewItemsKeyContent(),
+      ...PayloadTimestampDefaults(),
     })
     return Models.CreateDecryptedItemFromPayload(payload)
   }

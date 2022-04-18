@@ -4,7 +4,7 @@ import { ItemManager } from './ItemManager'
 import { PayloadManager } from '../Payloads/PayloadManager'
 import { UuidGenerator } from '@standardnotes/utils'
 import * as Models from '@standardnotes/models'
-import { DeletedPayload } from '@standardnotes/models'
+import { DeletedPayload, PayloadTimestampDefaults } from '@standardnotes/models'
 
 const setupRandomUuid = () => {
   UuidGenerator.SetGenerator(() => String(Math.random()))
@@ -71,6 +71,7 @@ describe('itemManager', () => {
         content: Models.FillItemContent<Models.TagContent>({
           title: title,
         }),
+        ...PayloadTimestampDefaults(),
       }),
     )
   }
@@ -83,6 +84,7 @@ describe('itemManager', () => {
         content: Models.FillItemContent<Models.NoteContent>({
           title: title,
         }),
+        ...PayloadTimestampDefaults(),
       }),
     )
   }
@@ -95,6 +97,7 @@ describe('itemManager', () => {
         content: Models.FillItemContent<Models.FileContent>({
           name: name,
         }),
+        ...PayloadTimestampDefaults(),
       }),
     )
   }
@@ -109,6 +112,7 @@ describe('itemManager', () => {
         content: undefined,
         deleted: true,
         dirty: true,
+        ...PayloadTimestampDefaults(),
       })
 
       const mockFn = jest.fn()

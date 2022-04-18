@@ -1,5 +1,11 @@
 import { SNHistoryManager } from './../History/HistoryManager'
-import { NoteContent, SNNote, FillItemContent, DecryptedPayload } from '@standardnotes/models'
+import {
+  NoteContent,
+  SNNote,
+  FillItemContent,
+  DecryptedPayload,
+  PayloadTimestampDefaults,
+} from '@standardnotes/models'
 import { EncryptionService } from '@standardnotes/encryption'
 import { ContentType } from '@standardnotes/common'
 import { InternalEventBusInterface } from '@standardnotes/services'
@@ -60,6 +66,7 @@ describe('mutator service', () => {
         content: FillItemContent<NoteContent>({
           title: title,
         }),
+        ...PayloadTimestampDefaults(),
       }),
     )
     return mutatorService.insertItem(note)

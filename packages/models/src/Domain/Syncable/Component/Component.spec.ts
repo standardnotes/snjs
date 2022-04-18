@@ -4,6 +4,7 @@ import { ContentType } from '@standardnotes/common'
 import { FillItemContent } from '../../Abstract/Content/ItemContent'
 import { SNComponent } from './Component'
 import { ComponentContent } from './ComponentContent'
+import { PayloadTimestampDefaults } from '../../Abstract/Payload'
 
 describe('component model', () => {
   it('valid hosted url should ignore url', () => {
@@ -16,6 +17,7 @@ describe('component model', () => {
             url: 'http://foo.com',
             hosted_url: 'http://bar.com',
           } as ComponentContent),
+          ...PayloadTimestampDefaults(),
         },
         PayloadSource.Constructor,
       ),
@@ -35,6 +37,7 @@ describe('component model', () => {
             url: 'http://foo.com',
             hosted_url: '#{foo.zoo}',
           } as ComponentContent),
+          ...PayloadTimestampDefaults(),
         },
         PayloadSource.Constructor,
       ),

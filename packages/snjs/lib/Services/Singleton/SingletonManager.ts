@@ -8,6 +8,7 @@ import {
   ItemContent,
   PredicateInterface,
   PayloadEmitSource,
+  PayloadTimestampDefaults,
 } from '@standardnotes/models'
 import { arrayByRemovingFromIndex, extendArray, UuidGenerator } from '@standardnotes/utils'
 import { SNSyncService } from '../Sync/SyncService'
@@ -220,6 +221,7 @@ export class SNSingletonManager extends AbstractService {
       content: createContent,
       dirty: true,
       dirtiedDate: new Date(),
+      ...PayloadTimestampDefaults(),
     })
 
     const item = await this.itemManager.emitItemFromPayload(

@@ -5,6 +5,7 @@ import {
   DecryptedPayload,
   EncryptedPayload,
   FullyFormedPayloadInterface,
+  PayloadTimestampDefaults,
 } from '../../Abstract/Payload'
 import { ItemsKeyContent } from '../../Syncable/ItemsKey/ItemsKeyInterface'
 import { ImmutablePayloadCollection } from '../Collection/Payload/ImmutablePayloadCollection'
@@ -28,6 +29,7 @@ describe('conflict delta', () => {
       content: FillItemContent<ItemsKeyContent>({
         itemsKey: key,
       }),
+      ...PayloadTimestampDefaults(),
       updated_at_timestamp: timestamp,
     })
   }
@@ -41,6 +43,7 @@ describe('conflict delta', () => {
       items_key_id: undefined,
       errorDecrypting: true,
       waitingForKey: false,
+      ...PayloadTimestampDefaults(),
       updated_at_timestamp: timestamp,
     })
   }

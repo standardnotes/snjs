@@ -2,6 +2,7 @@ import { SNRootKey } from './RootKey'
 import {
   DecryptedPayload,
   FillItemContent,
+  PayloadTimestampDefaults,
   RootKeyContent,
   RootKeyContentSpecialized,
 } from '@standardnotes/models'
@@ -15,6 +16,7 @@ export function CreateNewRootKey(content: RootKeyContentSpecialized): SNRootKey 
     uuid: uuid,
     content_type: ContentType.RootKey,
     content: FillRootKeyContent(content),
+    ...PayloadTimestampDefaults(),
   })
 
   return new SNRootKey(payload)

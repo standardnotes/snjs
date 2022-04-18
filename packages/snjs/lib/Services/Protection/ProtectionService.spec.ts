@@ -4,7 +4,13 @@ import { SNStorageService } from '../Storage/StorageService'
 import { SNProtectionService } from './ProtectionService'
 import { InternalEventBus, InternalEventBusInterface } from '@standardnotes/services'
 import { UuidGenerator } from '@standardnotes/utils'
-import { DecryptedPayload, FileContent, SNFile, FillItemContent } from '@standardnotes/models'
+import {
+  DecryptedPayload,
+  FileContent,
+  SNFile,
+  FillItemContent,
+  PayloadTimestampDefaults,
+} from '@standardnotes/models'
 import { ContentType } from '@standardnotes/common'
 
 const setupRandomUuid = () => {
@@ -36,6 +42,7 @@ describe('protectionService', () => {
           name: name,
           protected: isProtected,
         }),
+        ...PayloadTimestampDefaults(),
       }),
     )
   }

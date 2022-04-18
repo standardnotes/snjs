@@ -3,6 +3,7 @@ import {
   FillItemContent,
   ItemsKeyContent,
   PayloadEmitSource,
+  PayloadTimestampDefaults,
 } from '@standardnotes/models'
 import { PayloadManager } from './PayloadManager'
 import { InternalEventBusInterface } from '@standardnotes/services'
@@ -26,6 +27,7 @@ describe('payload manager', () => {
       content: FillItemContent<ItemsKeyContent>({
         itemsKey: 'secret',
       }),
+      ...PayloadTimestampDefaults(),
       updated_at_timestamp: 1,
       dirty: true,
     })
@@ -35,6 +37,7 @@ describe('payload manager', () => {
     const nondirty = new DecryptedPayload({
       uuid: '123',
       content_type: ContentType.ItemsKey,
+      ...PayloadTimestampDefaults(),
       updated_at_timestamp: 2,
       content: FillItemContent<ItemsKeyContent>({
         itemsKey: 'secret',

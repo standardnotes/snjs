@@ -7,6 +7,13 @@ import {
   EncryptedPayloadInterface,
 } from '../Payload'
 import { useBoolean } from '@standardnotes/utils'
+import { EncryptedTransferPayload, isEncryptedTransferPayload } from '../TransferPayload'
+
+export function isEncryptedLocalStoragePayload(
+  p: LocalStorageEncryptedContextualPayload | LocalStorageDecryptedContextualPayload,
+): p is LocalStorageEncryptedContextualPayload {
+  return isEncryptedTransferPayload(p as EncryptedTransferPayload)
+}
 
 export interface LocalStorageEncryptedContextualPayload extends ContextPayload {
   auth_hash?: string

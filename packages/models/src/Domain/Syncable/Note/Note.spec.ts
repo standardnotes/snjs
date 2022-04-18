@@ -4,6 +4,7 @@ import { SNNote } from './Note'
 import { NoteContent } from './NoteContent'
 import { ContentType } from '@standardnotes/common'
 import { FillItemContent } from '../../Abstract/Content/ItemContent'
+import { PayloadTimestampDefaults } from '../../Abstract/Payload'
 
 const randUuid = () => String(Math.random())
 
@@ -14,6 +15,7 @@ const create = (payload?: Partial<NoteContent>): SNNote =>
         uuid: randUuid(),
         content_type: ContentType.Note,
         content: FillItemContent({ ...payload }),
+        ...PayloadTimestampDefaults(),
       },
       PayloadSource.Constructor,
     ),

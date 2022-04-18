@@ -32,17 +32,6 @@ export class DeletedPayload
     }
   }
 
-  mergedWith(payload: DeletedPayloadInterface): this {
-    const result = new DeletedPayload(
-      {
-        ...this.ejected(),
-        ...payload.ejected(),
-      },
-      this.source,
-    )
-    return result as this
-  }
-
   copy(override?: Partial<DeletedTransferPayload>, source = this.source): this {
     const result = new DeletedPayload(
       {

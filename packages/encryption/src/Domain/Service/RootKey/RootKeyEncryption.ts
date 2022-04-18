@@ -23,6 +23,7 @@ import {
   FillItemContent,
   ItemsKeyContent,
   ItemsKeyContentSpecialized,
+  PayloadTimestampDefaults,
   RootKeyContent,
 } from '@standardnotes/models'
 
@@ -600,6 +601,7 @@ export class RootKeyEncryptionService extends Services.AbstractService<RootKeySe
           dataAuthenticationKey: rootKey.dataAuthenticationKey,
           version: operatorVersion,
         }),
+        ...PayloadTimestampDefaults(),
       })
       itemTemplate = Models.CreateDecryptedItemFromPayload(payload)
     } else {

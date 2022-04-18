@@ -1,5 +1,3 @@
-import { DecryptedTransferPayload } from './../TransferPayload/Interfaces/DecryptedTransferPayload'
-import { EncryptedTransferPayload } from './../TransferPayload/Interfaces/EncryptedTransferPayload'
 import { Uuid } from '@standardnotes/common'
 import { ContextPayload } from './ContextPayload'
 import { ItemContent } from '../Content/ItemContent'
@@ -7,27 +5,27 @@ import { ItemContent } from '../Content/ItemContent'
 export interface BackupFileEncryptedContextualPayload extends ContextPayload {
   auth_hash?: string
   content: string
-  created_at_timestamp?: number
-  created_at?: Date
+  created_at_timestamp: number
+  created_at: Date
   duplicate_of?: Uuid
   enc_item_key: string
   items_key_id?: string
-  updated_at?: Date
-  updated_at_timestamp?: number
+  updated_at: Date
+  updated_at_timestamp: number
 }
 
 export interface BackupFileDecryptedContextualPayload<C extends ItemContent = ItemContent>
   extends ContextPayload {
   content: C
-  created_at_timestamp?: number
-  created_at?: Date
+  created_at_timestamp: number
+  created_at: Date
   duplicate_of?: Uuid
-  updated_at?: Date
-  updated_at_timestamp?: number
+  updated_at: Date
+  updated_at_timestamp: number
 }
 
 export function CreateEncryptedBackupFileContextPayload(
-  fromPayload: EncryptedTransferPayload,
+  fromPayload: BackupFileEncryptedContextualPayload,
 ): BackupFileEncryptedContextualPayload {
   return {
     auth_hash: fromPayload.auth_hash,
@@ -46,7 +44,7 @@ export function CreateEncryptedBackupFileContextPayload(
 }
 
 export function CreateDecryptedBackupFileContextPayload(
-  fromPayload: DecryptedTransferPayload,
+  fromPayload: BackupFileDecryptedContextualPayload,
 ): BackupFileDecryptedContextualPayload {
   return {
     content_type: fromPayload.content_type,
