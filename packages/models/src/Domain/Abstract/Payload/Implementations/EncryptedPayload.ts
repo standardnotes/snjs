@@ -47,17 +47,6 @@ export class EncryptedPayload
     }
   }
 
-  mergedWith(payload: EncryptedPayloadInterface): this {
-    const result = new EncryptedPayload(
-      {
-        ...this.ejected(),
-        ...payload.ejected(),
-      },
-      this.source,
-    )
-    return result as this
-  }
-
   copy(override?: Partial<EncryptedTransferPayload>, source = this.source): this {
     const result = new EncryptedPayload(
       {

@@ -23,7 +23,7 @@ export function payloadByFinalizingSyncState(
 
   return payload.copyAsSyncResolved({
     dirty: stillDirty != undefined ? stillDirty : false,
-    dirtiedDate: stillDirty ? new Date() : undefined,
+    dirtiedDate: stillDirty != undefined ? new Date() : undefined,
     lastSyncEnd: new Date(),
   })
 }

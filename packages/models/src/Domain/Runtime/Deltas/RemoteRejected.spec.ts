@@ -1,6 +1,6 @@
 import { ContentType } from '@standardnotes/common'
 import { FillItemContent } from '../../Abstract/Content/ItemContent'
-import { DecryptedPayload } from '../../Abstract/Payload'
+import { DecryptedPayload, PayloadTimestampDefaults } from '../../Abstract/Payload'
 import { NoteContent } from '../../Syncable/Note'
 import { PayloadCollection } from '../Collection/Payload/PayloadCollection'
 import { DeltaRemoteRejected } from './RemoteRejected'
@@ -16,6 +16,7 @@ describe('remote rejected delta', () => {
       content: FillItemContent<NoteContent>({
         title: 'foo',
       }),
+      ...PayloadTimestampDefaults(),
       updated_at_timestamp: 1,
     })
 

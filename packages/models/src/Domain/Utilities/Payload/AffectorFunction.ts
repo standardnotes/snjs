@@ -8,12 +8,13 @@ import { ImmutablePayloadCollection } from '../../Runtime/Collection/Payload/Imm
 import { MutationType } from '../../Abstract/Item/Types/MutationType'
 import { FullyFormedPayloadInterface } from '../../Abstract/Payload/Interfaces/UnionTypes'
 import { isDecryptedPayload } from '../../Abstract/Payload'
+import { SyncResolvedPayload } from '../../Runtime/Deltas/Utilities/SyncResolvedPayload'
 
 export type AffectorFunction = (
   basePayload: FullyFormedPayloadInterface,
   duplicatePayload: FullyFormedPayloadInterface,
   baseCollection: ImmutablePayloadCollection<FullyFormedPayloadInterface>,
-) => FullyFormedPayloadInterface[]
+) => SyncResolvedPayload[]
 
 const NoteDuplicationAffectedPayloads: AffectorFunction = (
   basePayload: FullyFormedPayloadInterface,
@@ -43,8 +44,10 @@ const NoteDuplicationAffectedPayloads: AffectorFunction = (
   /** Modify the editor to include new note */
   const mutator = new ComponentMutator(editor, MutationType.NoUpdateUserTimestamps)
   mutator.associateWithItem(duplicatePayload.uuid)
-  const result = mutator.getResult()
-  return [result] as FullyFormedPayloadInterface[]
+
+  const result = mutator.getResult() as SyncResolvedPayload
+
+  return [result]
 }
 
 export const AffectorMapping = {

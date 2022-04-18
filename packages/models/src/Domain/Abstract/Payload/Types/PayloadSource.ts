@@ -9,8 +9,5 @@ export enum PayloadSource {
 
   RemoteSaved,
 
-  /** When a component is installed by the desktop and some of its values change */
-  DesktopInstalled,
-
   FileImport,
 }

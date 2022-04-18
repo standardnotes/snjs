@@ -7,13 +7,20 @@ import {
   EncryptedPayloadInterface,
 } from '../Payload'
 import { useBoolean } from '@standardnotes/utils'
+import { EncryptedTransferPayload, isEncryptedTransferPayload } from '../TransferPayload'
+
+export function isEncryptedLocalStoragePayload(
+  p: LocalStorageEncryptedContextualPayload | LocalStorageDecryptedContextualPayload,
+): p is LocalStorageEncryptedContextualPayload {
+  return isEncryptedTransferPayload(p as EncryptedTransferPayload)
+}
 
 export interface LocalStorageEncryptedContextualPayload extends ContextPayload {
   auth_hash?: string
   auth_params?: unknown
   content: string
   deleted: false
-  created_at_timestamp?: number
+  created_at_timestamp: number
   created_at: Date
   dirtiedDate: Date | undefined
   dirty: boolean
@@ -21,34 +28,34 @@ export interface LocalStorageEncryptedContextualPayload extends ContextPayload {
   enc_item_key: string
   errorDecrypting: boolean
   items_key_id: string | undefined
-  updated_at_timestamp: number | undefined
-  updated_at: Date | undefined
+  updated_at_timestamp: number
+  updated_at: Date
   waitingForKey: boolean
 }
 
 export interface LocalStorageDecryptedContextualPayload<C extends ItemContent = ItemContent>
   extends ContextPayload {
   content: C
-  created_at_timestamp?: number
+  created_at_timestamp: number
   created_at: Date
   deleted: false
   dirtiedDate: Date | undefined
   dirty: boolean
   duplicate_of?: Uuid
-  updated_at_timestamp: number | undefined
-  updated_at: Date | undefined
+  updated_at_timestamp: number
+  updated_at: Date
 }
 
 export interface LocalStorageDeletedContextualPayload extends ContextPayload {
   content: undefined
-  created_at_timestamp?: number
+  created_at_timestamp: number
   created_at: Date
   deleted: true
   dirtiedDate: Date | undefined
   dirty: true
   duplicate_of?: Uuid
-  updated_at_timestamp: number | undefined
-  updated_at: Date | undefined
+  updated_at_timestamp: number
+  updated_at: Date
 }
 
 export function CreateEncryptedLocalStorageContextPayload(

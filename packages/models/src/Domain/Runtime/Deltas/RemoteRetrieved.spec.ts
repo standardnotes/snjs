@@ -1,6 +1,11 @@
 import { ContentType } from '@standardnotes/common'
 import { FillItemContent } from '../../Abstract/Content/ItemContent'
-import { DecryptedPayload, EncryptedPayload, isEncryptedPayload } from '../../Abstract/Payload'
+import {
+  DecryptedPayload,
+  EncryptedPayload,
+  isEncryptedPayload,
+  PayloadTimestampDefaults,
+} from '../../Abstract/Payload'
 import { PayloadCollection } from '../Collection/Payload/PayloadCollection'
 import { ImmutablePayloadCollection } from '../Collection/Payload/ImmutablePayloadCollection'
 import { ItemsKeyContent } from '../../Syncable/ItemsKey/ItemsKeyInterface'
@@ -15,6 +20,7 @@ describe('remote retrieved delta', () => {
       content: FillItemContent<ItemsKeyContent>({
         itemsKey: 'secret',
       }),
+      ...PayloadTimestampDefaults(),
       updated_at_timestamp: 1,
     })
 
@@ -28,6 +34,7 @@ describe('remote retrieved delta', () => {
       items_key_id: undefined,
       errorDecrypting: false,
       waitingForKey: false,
+      ...PayloadTimestampDefaults(),
       updated_at_timestamp: 2,
     })
 

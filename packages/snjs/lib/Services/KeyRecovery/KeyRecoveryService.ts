@@ -30,7 +30,7 @@ import { SNAlertService } from '../Alert/AlertService'
 import { SNApiService } from '@Lib/Services/Api/ApiService'
 import { ContentType, leftVersionGreaterThanOrEqualToRight } from '@standardnotes/common'
 import { ItemManager } from '../Items/ItemManager'
-import { dateSorted, isNullOrUndefined, removeFromArray } from '@standardnotes/utils'
+import { dateSorted, removeFromArray } from '@standardnotes/utils'
 import { KeyParamsResponse } from '@standardnotes/responses'
 import {
   AbstractService,
@@ -432,8 +432,8 @@ export class SNKeyRecoveryService extends AbstractService<
         false,
       )[0]
 
-      const hasLocalItemsKey = !isNullOrUndefined(latest)
-      const isNewerThanLatest = key.created_at > latest?.created_at
+      const hasLocalItemsKey = latest != undefined
+      const isNewerThanLatest = hasLocalItemsKey && key.created_at > latest.created_at
       replacesRootKey = !hasLocalItemsKey || isNewerThanLatest
     }
 

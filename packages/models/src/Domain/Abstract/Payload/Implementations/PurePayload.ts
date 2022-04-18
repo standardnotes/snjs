@@ -100,8 +100,6 @@ export abstract class PurePayload<T extends TransferPayload<C>, C extends ItemCo
     return this.updated_at_timestamp
   }
 
-  abstract mergedWith(payload: this): this
-
   abstract copy(override?: Partial<TransferPayload>, source?: PayloadSource): this
 
   abstract copyAsSyncResolved(

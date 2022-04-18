@@ -9,11 +9,12 @@ import { ContentType } from '@standardnotes/common'
  * nothing else.
  */
 export interface ServerSyncSavedContextualPayload {
-  deleted: boolean
+  content_type: ContentType
   created_at_timestamp: number
+  created_at: Date
+  deleted: boolean
   updated_at_timestamp: number
   updated_at: Date
-  content_type: ContentType
   uuid: string
 }
 
@@ -23,6 +24,7 @@ export function CreateServerSyncSavedPayload(
   return {
     content_type: from.content_type,
     created_at_timestamp: from.created_at_timestamp,
+    created_at: from.created_at,
     deleted: useBoolean(from.deleted, false),
     updated_at_timestamp: from.updated_at_timestamp,
     updated_at: from.updated_at,

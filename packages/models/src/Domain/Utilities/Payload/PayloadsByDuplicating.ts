@@ -6,6 +6,7 @@ import { AffectorMapping } from './AffectorFunction'
 import { PayloadsByUpdatingReferencingPayloadReferences } from './PayloadsByUpdatingReferencingPayloadReferences'
 import { isDecryptedPayload } from '../../Abstract/Payload/Interfaces/TypeCheck'
 import { FullyFormedPayloadInterface } from '../../Abstract/Payload/Interfaces/UnionTypes'
+import { SyncResolvedPayload } from '../../Runtime/Deltas/Utilities/SyncResolvedPayload'
 
 /**
  * Copies payload and assigns it a new uuid.
@@ -17,21 +18,21 @@ export function PayloadsByDuplicating<C extends ItemContent = ItemContent>(dto: 
   isConflict?: boolean
   additionalContent?: Partial<C>
   source?: PayloadSource
-}): FullyFormedPayloadInterface[] {
+}): SyncResolvedPayload[] {
   const { payload, baseCollection, isConflict, additionalContent, source } = dto
 
-  const results: FullyFormedPayloadInterface[] = []
+  const results: SyncResolvedPayload[] = []
 
   const baseOverride = {
     uuid: UuidGenerator.GenerateUuid(),
     dirty: true,
     dirtiedDate: new Date(),
     lastSyncBegan: undefined,
-    lastSyncEnd: undefined,
+    lastSyncEnd: new Date(),
     duplicate_of: payload.uuid,
   }
 
-  let copy: FullyFormedPayloadInterface
+  let copy: SyncResolvedPayload
 
   if (isDecryptedPayload(payload)) {
     const contentOverride: C = {
@@ -43,13 +44,13 @@ export function PayloadsByDuplicating<C extends ItemContent = ItemContent>(dto: 
       contentOverride.conflict_of = payload.uuid
     }
 
-    copy = payload.copy({
+    copy = payload.copyAsSyncResolved({
       ...baseOverride,
       content: contentOverride,
       deleted: false,
     })
   } else {
-    copy = payload.copy(
+    copy = payload.copyAsSyncResolved(
       {
         ...baseOverride,
       },

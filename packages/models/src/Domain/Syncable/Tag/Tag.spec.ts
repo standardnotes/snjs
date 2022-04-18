@@ -4,6 +4,7 @@ import { SNTag, TagContent } from './Tag'
 import { ContentType } from '@standardnotes/common'
 import { FillItemContent } from '../../Abstract/Content/ItemContent'
 import { ContentReference } from '../../Abstract/Reference/ContentReference'
+import { PayloadTimestampDefaults } from '../../Abstract/Payload'
 
 const randUuid = () => String(Math.random())
 
@@ -17,6 +18,7 @@ const create = (title: string, references: ContentReference[] = []): SNTag => {
           title,
           references,
         } as TagContent),
+        ...PayloadTimestampDefaults(),
       },
       PayloadSource.Constructor,
     ),

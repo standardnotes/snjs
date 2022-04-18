@@ -194,6 +194,7 @@ describe('key recovery service', function () {
     /** Create simultaneous appB signed into same account */
     const contextB = await Factory.createAppContextWithFakeCrypto('another-namespace')
     const appB = contextB.application
+    contextB.ignoreChallenges()
     await appB.prepareForLaunch({})
     await appB.launch(true)
 
@@ -249,12 +250,7 @@ describe('key recovery service', function () {
     const newPassword = `${Math.random()}`
     const contextA = await Factory.createAppContextWithFakeCrypto(namespace)
     const appA = contextA.application
-    const receiveChallenge = (challenge) => {
-      const prompt = challenge.prompts[0]
-      /** Give newPassword when prompted */
-      appA.submitValuesForChallenge(challenge, [new ChallengeValue(prompt, newPassword)])
-    }
-    await appA.prepareForLaunch({ receiveChallenge })
+    await appA.prepareForLaunch({ receiveChallenge: () => {} })
     await appA.launch(true)
 
     await Factory.registerUserToApplication({
@@ -267,9 +263,9 @@ describe('key recovery service', function () {
 
     /** Create simultaneous appB signed into same account */
     const appB = await Factory.createApplicationWithFakeCrypto('another-namespace')
-    // eslint-disable-next-line @typescript-eslint/no-empty-function
     await appB.prepareForLaunch({ receiveChallenge: () => {} })
     await appB.launch(true)
+
     await Factory.loginToApplication({
       application: appB,
       email: contextA.email,
@@ -284,12 +280,12 @@ describe('key recovery service', function () {
     /** We expect the item in appA to be errored at this point, but we do not want it to recover */
     await appA.sync.sync()
     expect(appA.payloadManager.findOne(note.uuid).waitingForKey).to.equal(true)
+
     console.warn('Expecting exceptions below as we destroy app during key recovery')
     await Factory.safeDeinit(appA)
     await Factory.safeDeinit(appB)
 
     const recreatedAppA = await Factory.createApplicationWithFakeCrypto(namespace)
-    // eslint-disable-next-line @typescript-eslint/no-empty-function
     await recreatedAppA.prepareForLaunch({ receiveChallenge: () => {} })
     await recreatedAppA.launch(true)
 

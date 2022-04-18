@@ -10,6 +10,7 @@ import * as Models from '@standardnotes/models'
 import * as Services from '@standardnotes/services'
 import * as Utils from '@standardnotes/utils'
 import { isEnvironmentMobile, isEnvironmentWebOrDesktop } from '@Lib/Application/Platforms'
+import { PayloadTimestampDefaults } from '@standardnotes/models'
 
 type LegacyMobileKeychainStructure = {
   offline?: {
@@ -92,7 +93,7 @@ export class Migration2_0_0 extends Migration {
   private async migrateStorageStructureForWebDesktop() {
     const deviceInterface = this.services.deviceInterface
     const newStorageRawStructure: Services.StorageValuesObject = {
-      [Services.ValueModesKeys.Wrapped]: {} as Models.EncryptedTransferPayload,
+      [Services.ValueModesKeys.Wrapped]: {} as Models.LocalStorageEncryptedContextualPayload,
       [Services.ValueModesKeys.Unwrapped]: {},
       [Services.ValueModesKeys.Nonwrapped]: {},
     }
@@ -350,7 +351,7 @@ export class Migration2_0_0 extends Migration {
         [Services.NonwrappedStorageKey.MobileFirstRun]: firstRunValue,
       },
       [Services.ValueModesKeys.Unwrapped]: {},
-      [Services.ValueModesKeys.Wrapped]: {} as Models.DecryptedTransferPayload,
+      [Services.ValueModesKeys.Wrapped]: {} as Models.LocalStorageDecryptedContextualPayload,
     }
 
     const biometricPrefs = (await this.services.deviceInterface.getJsonParsedRawStorageValue(
@@ -488,6 +489,7 @@ export class Migration2_0_0 extends Migration {
           uuid: Utils.UuidGenerator.GenerateUuid(),
           content: Models.FillItemContent(rawStructure.unwrapped),
           content_type: ContentType.EncryptedStorage,
+          ...PayloadTimestampDefaults(),
         })
 
         /** Encrypt new storage.unwrapped structure with passcode */
@@ -749,6 +751,7 @@ export class Migration2_0_0 extends Migration {
         }),
         dirty: true,
         dirtiedDate: new Date(),
+        ...PayloadTimestampDefaults(),
       })
 
       const itemsKey = Models.CreateDecryptedItemFromPayload(payload)

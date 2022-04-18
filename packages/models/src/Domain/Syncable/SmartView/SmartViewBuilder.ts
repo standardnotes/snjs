@@ -7,12 +7,14 @@ import { NotesDisplayCriteria } from '../Note/NotesDisplayCriteria'
 import { FillItemContent } from '../../Abstract/Content/ItemContent'
 import { Predicate } from '../../Runtime/Predicate/Predicate'
 import { CompoundPredicate } from '../../Runtime/Predicate/CompoundPredicate'
+import { PayloadTimestampDefaults } from '../../Abstract/Payload'
 
 export function BuildSmartViews(criteria: NotesDisplayCriteria): SmartView[] {
   const notes = new SmartView(
     new DecryptedPayload({
       uuid: SystemViewId.AllNotes,
       content_type: ContentType.SmartView,
+      ...PayloadTimestampDefaults(),
       content: FillItemContent<SmartViewContent>({
         title: 'Notes',
         predicate: allNotesPredicate(criteria).toJson(),
@@ -24,6 +26,7 @@ export function BuildSmartViews(criteria: NotesDisplayCriteria): SmartView[] {
     new DecryptedPayload({
       uuid: SystemViewId.ArchivedNotes,
       content_type: ContentType.SmartView,
+      ...PayloadTimestampDefaults(),
       content: FillItemContent<SmartViewContent>({
         title: 'Archived',
         predicate: archivedNotesPredicate(criteria).toJson(),
@@ -35,6 +38,7 @@ export function BuildSmartViews(criteria: NotesDisplayCriteria): SmartView[] {
     new DecryptedPayload({
       uuid: SystemViewId.TrashedNotes,
       content_type: ContentType.SmartView,
+      ...PayloadTimestampDefaults(),
       content: FillItemContent<SmartViewContent>({
         title: 'Trash',
         predicate: trashedNotesPredicate(criteria).toJson(),
@@ -46,6 +50,7 @@ export function BuildSmartViews(criteria: NotesDisplayCriteria): SmartView[] {
     new DecryptedPayload({
       uuid: SystemViewId.UntaggedNotes,
       content_type: ContentType.SmartView,
+      ...PayloadTimestampDefaults(),
       content: FillItemContent<SmartViewContent>({
         title: 'Untagged',
         predicate: untaggedNotesPredicate(criteria).toJson(),

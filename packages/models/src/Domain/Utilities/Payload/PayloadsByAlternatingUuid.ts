@@ -7,7 +7,7 @@ import { isEncryptedPayload } from '../../Abstract/Payload/Interfaces/TypeCheck'
 import { FullyFormedPayloadInterface } from '../../Abstract/Payload/Interfaces/UnionTypes'
 import { EncryptedPayloadInterface } from '../../Abstract/Payload/Interfaces/EncryptedPayload'
 import { PayloadsByUpdatingReferencingPayloadReferences } from './PayloadsByUpdatingReferencingPayloadReferences'
-import { DeletedPayloadInterface } from '../../Abstract/Payload/Interfaces/DeletedPayload'
+import { SyncResolvedPayload } from '../../Runtime/Deltas/Utilities/SyncResolvedPayload'
 
 /**
  * Return the payloads that result if you alternated the uuid for the payload.
@@ -21,24 +21,21 @@ export function PayloadsByAlternatingUuid<
 >(
   payload: P,
   baseCollection: ImmutablePayloadCollection<FullyFormedPayloadInterface>,
-): (DecryptedPayloadInterface | DeletedPayloadInterface | EncryptedPayloadInterface)[] {
-  const results: (
-    | DecryptedPayloadInterface
-    | DeletedPayloadInterface
-    | EncryptedPayloadInterface
-  )[] = []
+): SyncResolvedPayload[] {
+  const results: SyncResolvedPayload[] = []
   /**
    * We need to clone payload and give it a new uuid,
    * then delete item with old uuid from db (cannot modify uuids in our IndexedDB setup)
    */
-  const copy = payload.copy({
+  const copy = payload.copyAsSyncResolved({
     uuid: UuidGenerator.GenerateUuid(),
     dirty: true,
     dirtiedDate: new Date(),
     lastSyncBegan: undefined,
-    lastSyncEnd: undefined,
+    lastSyncEnd: new Date(),
     duplicate_of: payload.uuid,
   })
+
   results.push(copy)
 
   /**
@@ -51,6 +48,7 @@ export function PayloadsByAlternatingUuid<
     [copy],
     [payload.uuid],
   )
+
   extendArray(results, updatedReferencing)
 
   if (payload.content_type === ContentType.ItemsKey) {
@@ -63,7 +61,14 @@ export function PayloadsByAlternatingUuid<
         (p) => isEncryptedPayload(p) && p.items_key_id === payload.uuid,
       ) as EncryptedPayloadInterface[]
 
-    const adjustedPayloads = matchingPayloads.map((a) => a.copy({ items_key_id: copy.uuid }))
+    const adjustedPayloads = matchingPayloads.map((a) =>
+      a.copyAsSyncResolved({
+        items_key_id: copy.uuid,
+        dirty: true,
+        dirtiedDate: new Date(),
+        lastSyncEnd: new Date(),
+      }),
+    )
 
     if (adjustedPayloads.length > 0) {
       extendArray(results, adjustedPayloads)
@@ -76,6 +81,11 @@ export function PayloadsByAlternatingUuid<
        * Do not set as dirty; this item is non-syncable
        * and should be immediately discarded
        */
+      created_at: payload.created_at,
+      updated_at: payload.updated_at,
+      created_at_timestamp: payload.created_at_timestamp,
+      updated_at_timestamp: payload.updated_at_timestamp,
+      dirtiedDate: undefined,
       dirty: false,
       content: undefined,
       uuid: payload.uuid,
@@ -84,7 +94,8 @@ export function PayloadsByAlternatingUuid<
     },
     payload.source,
   )
-  results.push(deletedSelf)
+
+  results.push(deletedSelf as SyncResolvedPayload)
 
   return results
 }

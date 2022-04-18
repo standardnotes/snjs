@@ -267,17 +267,16 @@ describe('storage manager', function () {
     expect(payload.format).to.not.be.ok
   })
 
-  it('storing an offline synced payload should not include dirty flags', async function () {
+  it('storing an offline synced payload should not include dirty flag', async function () {
     await this.application.addPasscode('123')
     await Factory.createSyncedNote(this.application)
     const payloads = await this.application.storageService.getAllRawPayloads()
     const payload = payloads[0]
 
-    expect(payload.dirtiedDate).to.not.be.ok
     expect(payload.dirty).to.not.be.ok
   })
 
-  it('storing an online synced payload should not include dirty flags', async function () {
+  it('storing an online synced payload should not include dirty flag', async function () {
     await Factory.registerUserToApplication({
       application: this.application,
       email: this.email,
@@ -289,7 +288,6 @@ describe('storage manager', function () {
     const payloads = await this.application.storageService.getAllRawPayloads()
     const payload = payloads[0]
 
-    expect(payload.dirtiedDate).to.not.be.ok
     expect(payload.dirty).to.not.be.ok
   })
 

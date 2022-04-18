@@ -16,6 +16,7 @@ export class DeletedPayload
 
   constructor(rawPayload: DeletedTransferPayload, source = PayloadSource.Constructor) {
     super(rawPayload, source)
+
     this.deleted = true
     this.content = undefined
   }
@@ -30,17 +31,6 @@ export class DeletedPayload
       deleted: this.deleted,
       content: undefined,
     }
-  }
-
-  mergedWith(payload: DeletedPayloadInterface): this {
-    const result = new DeletedPayload(
-      {
-        ...this.ejected(),
-        ...payload.ejected(),
-      },
-      this.source,
-    )
-    return result as this
   }
 
   copy(override?: Partial<DeletedTransferPayload>, source = this.source): this {

@@ -5,6 +5,7 @@ import {
   ItemsKeyContent,
   ItemsKeyInterface,
   FillItemContent,
+  PayloadTimestampDefaults,
 } from '@standardnotes/models'
 import { SNRootKey } from '../../RootKey/RootKey'
 import { V003Algorithm } from '../../Algorithm'
@@ -47,6 +48,7 @@ export class SNProtocolOperator003 extends SNProtocolOperator002 {
       uuid: UuidGenerator.GenerateUuid(),
       content_type: ContentType.ItemsKey,
       content: FillItemContent(content),
+      ...PayloadTimestampDefaults(),
     })
     return CreateDecryptedItemFromPayload(payload)
   }

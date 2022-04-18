@@ -7,10 +7,10 @@ export interface TransferPayload<C extends ItemContent = ItemContent> {
   content: C | string | undefined
   deleted?: boolean
 
-  updated_at?: Date
-  created_at?: Date
-  created_at_timestamp?: number
-  updated_at_timestamp?: number
+  updated_at: Date
+  created_at: Date
+  created_at_timestamp: number
+  updated_at_timestamp: number
 
   dirtiedDate?: Date
   dirty?: boolean

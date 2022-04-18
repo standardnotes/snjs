@@ -725,7 +725,7 @@ export class ItemManager
   ) {
     const item = this.findSureItem(itemToLookupUuidFor.uuid)
     const payload = item.payload.copy()
-    const resultingPayloads = await Models.PayloadsByDuplicating({
+    const resultingPayloads = Models.PayloadsByDuplicating({
       payload,
       baseCollection: this.payloadManager.getMasterCollection(),
       isConflict,
@@ -750,6 +750,7 @@ export class ItemManager
       content_type: contentType,
       content: Models.FillItemContent<C>(content),
       dirty: needsSync,
+      ...Models.PayloadTimestampDefaults(),
     })
 
     await this.payloadManager.emitPayload(payload, Models.PayloadEmitSource.LocalInserted)
@@ -768,6 +769,7 @@ export class ItemManager
       uuid: UuidGenerator.GenerateUuid(),
       content_type: contentType,
       content: Models.FillItemContent<C>(content || {}),
+      ...Models.PayloadTimestampDefaults(),
     })
     const item = Models.CreateDecryptedItemFromPayload<C, I>(payload)
     return item

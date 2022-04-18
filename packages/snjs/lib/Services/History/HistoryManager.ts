@@ -8,7 +8,7 @@ import { UuidString } from '../../Types/UuidString'
 import * as Models from '@standardnotes/models'
 import * as Responses from '@standardnotes/responses'
 import * as Services from '@standardnotes/services'
-import { isErrorDecryptingPayload, SNNote } from '@standardnotes/models'
+import { isErrorDecryptingPayload, PayloadTimestampDefaults, SNNote } from '@standardnotes/models'
 
 /** The amount of revisions per item above which should call for an optimization. */
 const DefaultItemRevisionsThreshold = 20
@@ -76,7 +76,7 @@ export class SNHistoryManager extends Services.AbstractService {
     for (const item of items) {
       const itemHistory = this.history[item.uuid] || []
       const latestEntry = Models.historyMapFunctions.getNewestRevision(itemHistory)
-      const historyPayload = new Models.DecryptedPayload<Models.NoteContent>(item)
+      const historyPayload = new Models.DecryptedPayload<Models.NoteContent>(item.payload)
 
       const currentValueEntry = Models.CreateHistoryEntryForPayload(historyPayload, latestEntry)
       if (currentValueEntry.isDiscardable()) {
@@ -153,7 +153,14 @@ export class SNHistoryManager extends Services.AbstractService {
     }
     const revision = (revisionResponse as Responses.SingleRevisionResponse).data
 
-    const serverPayload = new Models.EncryptedPayload(revision as Models.EncryptedTransferPayload)
+    const serverPayload = new Models.EncryptedPayload({
+      ...PayloadTimestampDefaults(),
+      ...revision,
+      updated_at: new Date(revision.updated_at),
+      created_at: new Date(revision.created_at),
+      waitingForKey: false,
+      errorDecrypting: false,
+    })
 
     /**
      * When an item is duplicated, its revisions also carry over to the newly created item.

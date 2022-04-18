@@ -13,12 +13,13 @@ import {
   isDecryptedItem,
   isNotEncryptedItem,
   isNote,
-  createComponentRetrievedContextPayload,
+  CreateComponentRetrievedContextPayload,
   createComponentCreatedContextPayload,
   DecryptedPayload,
   ItemContent,
   ComponentDataDomain,
   PayloadEmitSource,
+  PayloadTimestampDefaults,
 } from '@standardnotes/models'
 import find from 'lodash/find'
 import uniq from 'lodash/uniq'
@@ -33,13 +34,13 @@ import {
 } from '@Lib/Application/Platforms'
 import {
   ComponentMessage,
-  MessageReplyData,
   OutgoingItemMessagePayload,
   MessageReply,
   StreamItemsMessageData,
   AllowedBatchContentTypes,
   IncomingComponentItemPayload,
   DeleteItemsMessageData,
+  MessageReplyData,
 } from './Types'
 import {
   ComponentAction,
@@ -338,6 +339,7 @@ export class ComponentViewer {
     source?: PayloadEmitSource,
   ): void {
     this.log('Send items in reply', this.component, items, message)
+
     const responseData: MessageReplyData = {}
 
     const mapped = items.map((item) => {
@@ -345,6 +347,7 @@ export class ComponentViewer {
     })
 
     responseData.items = mapped
+
     this.replyToMessage(message, responseData)
   }
 
@@ -406,7 +409,6 @@ export class ComponentViewer {
   /**
    * @param essential If the message is non-essential, no alert will be shown
    *  if we can no longer find the window.
-   * @returns
    */
   sendMessage(message: ComponentMessage | MessageReply, essential = true): void {
     const permissibleActionsWhileHidden = [
@@ -490,15 +492,18 @@ export class ComponentViewer {
   }
 
   /** Called by client when the iframe is ready */
-  public async setWindow(window: Window): Promise<void> {
+  public setWindow(window: Window): void {
     if (this.window) {
       throw Error(
         'Attempting to override component viewer window. Create a new component viewer instead.',
       )
     }
+
     this.log('setWindow', 'component: ', this.component, 'window: ', window)
+
     this.window = window
-    this.sessionKey = await UuidGenerator.GenerateUuid()
+    this.sessionKey = UuidGenerator.GenerateUuid()
+
     this.sendMessage({
       action: ComponentAction.ComponentRegistered,
       sessionKey: this.sessionKey,
@@ -510,19 +515,23 @@ export class ComponentViewer {
         activeThemeUrls: this.componentManagerFunctions.urlsForActiveThemes(),
       },
     })
+
     this.log('setWindow got new sessionKey', this.sessionKey)
+
     this.postActiveThemes()
   }
 
   postActiveThemes(): void {
     const urls = this.componentManagerFunctions.urlsForActiveThemes()
-    const data: MessageReplyData = {
+    const data: MessageData = {
       themes: urls,
     }
+
     const message: ComponentMessage = {
       action: ComponentAction.ActivateThemes,
       data: data,
     }
+
     this.sendMessage(message, false)
   }
 
@@ -615,6 +624,7 @@ export class ComponentViewer {
         name: ComponentAction.StreamContextItem,
       },
     ]
+
     this.componentManagerFunctions.runWithPermissions(
       this.component.uuid,
       requiredPermissions,
@@ -673,15 +683,18 @@ export class ComponentViewer {
 
       async () => {
         responsePayloads = this.responseItemsByRemovingPrivateProperties(responsePayloads, true)
+
         /* Filter locked items */
         const uuids = Uuids(responsePayloads)
         const items = this.itemManager.findItemsIncludingBlanks(uuids)
         let lockedCount = 0
         let lockedNoteCount = 0
+
         for (const item of items) {
           if (!item) {
             continue
           }
+
           if (item.locked) {
             remove(responsePayloads, { uuid: item.uuid })
             lockedCount++
@@ -690,6 +703,7 @@ export class ComponentViewer {
             }
           }
         }
+
         if (lockedNoteCount === 1) {
           void this.alertService.alert(
             'The note you are attempting to save has editing disabled',
@@ -704,17 +718,21 @@ export class ComponentViewer {
             `${lockedCount} ${itemNoun} you are attempting to save ${auxVerb} editing disabled.`,
             'Items have Editing Disabled',
           )
+
           return
         }
 
         const contextualPayloads = responsePayloads.map((responseItem) => {
-          return createComponentRetrievedContextPayload(responseItem)
+          return CreateComponentRetrievedContextPayload(responseItem)
         })
 
         for (const contextualPayload of contextualPayloads) {
           const item = this.itemManager.findItem(contextualPayload.uuid)
           if (!item) {
-            const payload = new DecryptedPayload(contextualPayload)
+            const payload = new DecryptedPayload({
+              ...PayloadTimestampDefaults(),
+              ...contextualPayload,
+            })
             const template = CreateDecryptedItemFromPayload(payload)
             await this.itemManager.insertItem(template)
           } else {
@@ -730,8 +748,8 @@ export class ComponentViewer {
             const contextualPayload = sureSearchArray(contextualPayloads, {
               uuid: mutator.getUuid(),
             })
-            const payload = new DecryptedPayload(contextualPayload)
-            mutator.mergePayload(payload)
+
+            mutator.setCustomContent(contextualPayload.content)
 
             const responseItem = sureSearchArray(responsePayloads, {
               uuid: mutator.getUuid(),
@@ -796,7 +814,10 @@ export class ComponentViewer {
           }
 
           const contextualPayload = createComponentCreatedContextPayload(responseItem)
-          const payload = new DecryptedPayload(contextualPayload)
+          const payload = new DecryptedPayload({
+            ...PayloadTimestampDefaults(),
+            ...contextualPayload,
+          })
 
           const template = CreateDecryptedItemFromPayload(payload)
           const item = await this.itemManager.insertItem(template)

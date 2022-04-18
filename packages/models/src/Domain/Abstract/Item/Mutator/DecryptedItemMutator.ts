@@ -47,15 +47,6 @@ export class DecryptedItemMutator<C extends ItemContent = ItemContent> extends I
     return result
   }
 
-  /** Merges the input payload with the base payload */
-  public mergePayload(payload: DecryptedPayloadInterface<C>) {
-    const merged = this.payload.mergedWith(payload)
-    this.payload = merged
-
-    const mutableContent = Copy(merged.content)
-    this.content = mutableContent
-  }
-
   public override set lastSyncBegan(began: Date) {
     this.payload = this.payload.copy({
       content: this.content,
@@ -64,7 +55,7 @@ export class DecryptedItemMutator<C extends ItemContent = ItemContent> extends I
   }
 
   /** Not recommended to use as this might break item schema if used incorrectly */
-  public unsafe_setCustomContent(content: C): void {
+  public setCustomContent(content: C): void {
     this.content = Copy(content)
   }
 

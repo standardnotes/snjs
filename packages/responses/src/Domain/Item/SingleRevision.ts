@@ -1,6 +1,8 @@
+import { ContentType, Uuid } from '@standardnotes/common'
+
 export type SingleRevision = {
   auth_hash?: string
-  content_type: string
+  content_type: ContentType
   content: string
   created_at: string
   enc_item_key: string
@@ -9,5 +11,5 @@ export type SingleRevision = {
   items_key_id: string
   updated_at: string
   /** The uuid of the revision */
-  uuid: string
+  uuid: Uuid
 }

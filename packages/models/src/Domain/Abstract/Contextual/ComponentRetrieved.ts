@@ -12,7 +12,7 @@ export interface ComponentRetrievedContextualPayload<C extends ItemContent = Ite
   created_at?: Date
 }
 
-export function createComponentRetrievedContextPayload(
+export function CreateComponentRetrievedContextPayload(
   fromPayload: DecryptedTransferPayload,
 ): ComponentRetrievedContextualPayload {
   return {

@@ -172,8 +172,7 @@ export class ConflictDelta {
       baseCollection: this.baseCollection,
       isConflict: true,
       source: this.applyPayload.source,
-    }) as SyncResolvedPayload[]
-
+    })
     return [leftPayload].concat(rightPayloads)
   }
 
@@ -183,7 +182,7 @@ export class ConflictDelta {
       baseCollection: this.baseCollection,
       isConflict: true,
       source: this.applyPayload.source,
-    }) as SyncResolvedPayload[]
+    })
 
     const rightPayload = this.applyPayload.copyAsSyncResolved(
       {

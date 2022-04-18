@@ -52,17 +52,6 @@ export class DecryptedPayload<
     }
   }
 
-  mergedWith(payload: this): this {
-    const result = new DecryptedPayload(
-      {
-        ...this.ejected(),
-        ...payload.ejected(),
-      },
-      this.source,
-    )
-    return result as this
-  }
-
   copy(override?: Partial<T>, source = this.source): this {
     const result = new DecryptedPayload(
       {
