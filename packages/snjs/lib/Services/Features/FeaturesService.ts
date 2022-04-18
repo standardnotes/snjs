@@ -361,9 +361,17 @@ export class SNFeaturesService
   public async updateRolesAndFetchFeatures(userUuid: UuidString, roles: RoleName[]): Promise<void> {
     const userRolesChanged = this.haveRolesChanged(roles)
 
-    if (userRolesChanged || this.needsInitialFeaturesUpdate) {
-      this.needsInitialFeaturesUpdate = false
-      await this.setRoles(roles)
+    if (!userRolesChanged && !this.needsInitialFeaturesUpdate) {
+      return
+    }
+
+    this.needsInitialFeaturesUpdate = false
+
+    await this.setRoles(roles)
+
+    const shouldDownloadRoleBasedFeatures = !this.hasOfflineRepo()
+
+    if (shouldDownloadRoleBasedFeatures) {
       const featuresResponse = await this.apiService.getUserFeatures(userUuid)
 
       if (!featuresResponse.error && featuresResponse.data && !this.deinited) {
