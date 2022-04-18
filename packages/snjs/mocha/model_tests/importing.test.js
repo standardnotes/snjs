@@ -303,6 +303,7 @@ describe('importing', function () {
     application = await Factory.signOutApplicationAndReturnNew(application)
     email = UuidGenerator.GenerateUuid()
     Factory.handlePasswordChallenges(application, password)
+
     await Factory.registerUserToApplication({
       application: application,
       email: email,
@@ -311,7 +312,7 @@ describe('importing', function () {
 
     await application.mutator.importData(
       {
-        items: [note],
+        items: [note.payload],
       },
       true,
     )

@@ -3,7 +3,6 @@ import { ImmutablePayloadCollection } from '../Collection/Payload/ImmutablePaylo
 import { PayloadsByAlternatingUuid } from '../../Utilities/Payload/PayloadsByAlternatingUuid'
 import { isDecryptedPayload } from '../../Abstract/Payload/Interfaces/TypeCheck'
 import { PayloadEmitSource } from '../../Abstract/Payload'
-import { payloadsByFinalizingSyncState } from './Utilities/ApplyDirtyState'
 import { SyncDeltaEmit } from './Abstract/DeltaEmit'
 import { SyncDeltaInterface } from './Abstract/SyncDeltaInterface'
 import { SyncResolvedPayload } from './Utilities/SyncResolvedPayload'
@@ -46,7 +45,7 @@ export class DeltaRemoteUuidConflicts implements SyncDeltaInterface {
 
       filterFromArray(results, (r) => Uuids(alternateResults).includes(r.uuid))
 
-      extendArray(results, payloadsByFinalizingSyncState(alternateResults, this.baseCollection))
+      extendArray(results, alternateResults)
     }
 
     return {

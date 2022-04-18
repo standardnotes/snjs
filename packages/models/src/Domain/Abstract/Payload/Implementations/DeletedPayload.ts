@@ -16,6 +16,7 @@ export class DeletedPayload
 
   constructor(rawPayload: DeletedTransferPayload, source = PayloadSource.Constructor) {
     super(rawPayload, source)
+
     this.deleted = true
     this.content = undefined
   }

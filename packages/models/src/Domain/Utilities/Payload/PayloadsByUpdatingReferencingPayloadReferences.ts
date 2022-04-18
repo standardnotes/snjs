@@ -3,23 +3,21 @@ import { remove } from 'lodash'
 import { ImmutablePayloadCollection } from '../../Runtime/Collection/Payload/ImmutablePayloadCollection'
 import { ContentReference } from '../../Abstract/Reference/ContentReference'
 import { DecryptedPayloadInterface } from '../../Abstract/Payload/Interfaces/DecryptedPayload'
-import { ItemContent } from '../../Abstract/Content/ItemContent'
 import { FullyFormedPayloadInterface } from '../../Abstract/Payload/Interfaces/UnionTypes'
 import { isDecryptedPayload } from '../../Abstract/Payload'
+import { SyncResolvedPayload } from '../../Runtime/Deltas/Utilities/SyncResolvedPayload'
 
-export function PayloadsByUpdatingReferencingPayloadReferences<
-  C extends ItemContent = ItemContent,
-  P extends DecryptedPayloadInterface<C> = DecryptedPayloadInterface<C>,
->(
-  payload: P,
+export function PayloadsByUpdatingReferencingPayloadReferences(
+  payload: DecryptedPayloadInterface,
   baseCollection: ImmutablePayloadCollection<FullyFormedPayloadInterface>,
-  add: P[] = [],
+  add: FullyFormedPayloadInterface[] = [],
   removeIds: Uuid[] = [],
-): P[] {
+): SyncResolvedPayload[] {
   const referencingPayloads = baseCollection
     .elementsReferencingElement(payload)
     .filter(isDecryptedPayload)
-  const results: P[] = []
+
+  const results: SyncResolvedPayload[] = []
 
   for (const referencingPayload of referencingPayloads) {
     const references = referencingPayload.content.references.slice()
@@ -38,16 +36,17 @@ export function PayloadsByUpdatingReferencingPayloadReferences<
       remove(references, { uuid: id })
     }
 
-    const result = referencingPayload.copy({
+    const result = referencingPayload.copyAsSyncResolved({
       dirty: true,
       dirtiedDate: new Date(),
+      lastSyncEnd: new Date(),
       content: {
         ...referencingPayload.content,
         references,
       },
     })
 
-    results.push(result as P)
+    results.push(result)
   }
 
   return results
