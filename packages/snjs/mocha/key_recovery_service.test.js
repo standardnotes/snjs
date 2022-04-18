@@ -183,25 +183,22 @@ describe('key recovery service', function () {
     await appA.prepareForLaunch({ receiveChallenge })
     await appA.launch(true)
 
-    await Factory.registerUserToApplication({
-      application: appA,
-      email: contextA.email,
-      password: contextA.password,
-    })
+    await contextA.register()
 
     expect(appA.items.getItems(ContentType.ItemsKey).length).to.equal(1)
 
     /** Create simultaneous appB signed into same account */
-    const contextB = await Factory.createAppContextWithFakeCrypto('another-namespace')
+    const contextB = await Factory.createAppContextWithFakeCrypto(
+      'another-namespace',
+      contextA.email,
+      contextA.password,
+    )
     const appB = contextB.application
+    contextB.ignoreChallenges()
     await appB.prepareForLaunch({})
     await appB.launch(true)
 
-    await Factory.loginToApplication({
-      application: appB,
-      email: contextA.email,
-      password: contextA.password,
-    })
+    await contextB.signIn()
 
     /** Change password on appB */
     const result = await appB.changePassword(contextA.password, newPassword)

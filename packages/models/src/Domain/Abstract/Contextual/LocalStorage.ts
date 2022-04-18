@@ -20,7 +20,7 @@ export interface LocalStorageEncryptedContextualPayload extends ContextPayload {
   auth_params?: unknown
   content: string
   deleted: false
-  created_at_timestamp?: number
+  created_at_timestamp: number
   created_at: Date
   dirtiedDate: Date | undefined
   dirty: boolean
@@ -36,7 +36,7 @@ export interface LocalStorageEncryptedContextualPayload extends ContextPayload {
 export interface LocalStorageDecryptedContextualPayload<C extends ItemContent = ItemContent>
   extends ContextPayload {
   content: C
-  created_at_timestamp?: number
+  created_at_timestamp: number
   created_at: Date
   deleted: false
   dirtiedDate: Date | undefined
@@ -48,7 +48,7 @@ export interface LocalStorageDecryptedContextualPayload<C extends ItemContent = 
 
 export interface LocalStorageDeletedContextualPayload extends ContextPayload {
   content: undefined
-  created_at_timestamp?: number
+  created_at_timestamp: number
   created_at: Date
   deleted: true
   dirtiedDate: Date | undefined
