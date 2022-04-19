@@ -3,6 +3,36 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.97.2](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.97.1...@standardnotes/snjs@2.97.2) (2022-04-19)
+
+
+### Bug Fixes
+
+* properly handle encrypted item changes in collections ([#698](https://github.com/standardnotes/snjs/issues/698)) ([8b23c65](https://github.com/standardnotes/snjs/commit/8b23c6555decbdc5099fc4228ff889f7e5c8eb85))
+
+
+
+
+
+## [2.97.1](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.97.0...@standardnotes/snjs@2.97.1) (2022-04-19)
+
+**Note:** Version bump only for package @standardnotes/snjs
+
+
+
+
+
+# [2.97.0](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.96.3...@standardnotes/snjs@2.97.0) (2022-04-19)
+
+
+### Features
+
+* require authentication for all backup types ([#696](https://github.com/standardnotes/snjs/issues/696)) ([bdb8d6a](https://github.com/standardnotes/snjs/commit/bdb8d6a6897607de528307cacd6a173ad0d32cb5))
+
+
+
+
+
 ## [2.96.3](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.96.2...@standardnotes/snjs@2.96.3) (2022-04-19)
 
 **Note:** Version bump only for package @standardnotes/snjs

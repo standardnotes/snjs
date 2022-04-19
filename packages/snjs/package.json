@@ -1,6 +1,6 @@
 {
   "name": "@standardnotes/snjs",
-  "version": "2.96.3",
+  "version": "2.97.2",
   "engines": {
     "node": ">=14.0.0 <17.0.0"
   },
@@ -82,11 +82,11 @@
     "@standardnotes/auth": "^3.18.7",
     "@standardnotes/common": "^1.19.4",
     "@standardnotes/domain-events": "^2.27.6",
-    "@standardnotes/encryption": "^1.4.1",
+    "@standardnotes/encryption": "^1.4.3",
     "@standardnotes/features": "^1.37.5",
-    "@standardnotes/models": "^1.4.1",
+    "@standardnotes/models": "^1.4.3",
     "@standardnotes/responses": "^1.6.6",
-    "@standardnotes/services": "^1.9.2",
+    "@standardnotes/services": "^1.9.4",
     "@standardnotes/settings": "^1.14.0",
     "@standardnotes/sncrypto-common": "^1.7.6",
     "@standardnotes/utils": "^1.6.0"

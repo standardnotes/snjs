@@ -233,6 +233,7 @@ export class SNProtocolOperator004 implements SynchronousOperator {
     key: ItemsKeyInterface | SNRootKey,
   ): EncryptedParameters {
     const itemKey = this.crypto.generateRandomKey(V004Algorithm.EncryptionKeyLength)
+
     /** Encrypt content with item_key */
     const contentPlaintext = JSON.stringify(payload.content)
     const authenticatedData = this.generateAuthenticatedDataForPayload(payload, key)
@@ -241,12 +242,14 @@ export class SNProtocolOperator004 implements SynchronousOperator {
       itemKey,
       authenticatedData,
     )
+
     /** Encrypt item_key with master itemEncryptionKey */
     const encryptedItemKey = this.generateEncryptedProtocolString(
       itemKey,
       key.itemsKey,
       authenticatedData,
     )
+
     return {
       uuid: payload.uuid,
       items_key_id: isItemsKey(key) ? key.uuid : undefined,

@@ -95,17 +95,15 @@ export class ItemManager
   }
 
   setDisplayOptions(
-    contentType: ContentType,
+    contentType:
+      | ContentType.Tag
+      | ContentType.SmartView
+      | ContentType.Theme
+      | ContentType.Component,
     sortBy?: Models.CollectionSortProperty,
     direction?: Models.CollectionSortDirection,
-    filter?: (element: Models.DecryptedItemInterface) => boolean,
+    filter?: (element: Models.SortableItem) => boolean,
   ): void {
-    if (contentType === ContentType.Note) {
-      console.warn(
-        'Called setDisplayOptions with ContentType.Note. ' +
-          'setModels.NotesDisplayCriteria should be used instead.',
-      )
-    }
     this.collection.setDisplayOptions(contentType, sortBy, direction, filter)
   }
 
@@ -378,12 +376,15 @@ export class ItemManager
     const insertedItems: Models.DecryptedItemInterface[] = []
     const changedDeleted: Models.DeletedItemInterface[] = []
     const insertedDeleted: Models.DeletedItemInterface[] = []
+    const changedToEncrypted: Models.EncryptedItemInterface[] = []
 
     for (const item of delta.changed) {
       if (Models.isDeletedItem(item)) {
         changedDeleted.push(item)
       } else if (Models.isDecryptedItem(item)) {
         changedItems.push(item)
+      } else {
+        changedToEncrypted.push(item)
       }
     }
 
@@ -395,10 +396,11 @@ export class ItemManager
       }
     }
 
-    const itemsToRemoveFromUI: Models.DeletedItemInterface[] = [
+    const itemsToRemoveFromUI: (Models.DeletedItemInterface | Models.EncryptedItemInterface)[] = [
       ...delta.discarded,
       ...changedDeleted,
       ...insertedDeleted,
+      ...changedToEncrypted,
     ]
 
     this.notifyObservers(

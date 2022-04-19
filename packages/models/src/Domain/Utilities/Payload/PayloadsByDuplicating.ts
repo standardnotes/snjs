@@ -23,7 +23,7 @@ export function PayloadsByDuplicating<C extends ItemContent = ItemContent>(dto: 
 
   const results: SyncResolvedPayload[] = []
 
-  const baseOverride = {
+  const override = {
     uuid: UuidGenerator.GenerateUuid(),
     dirty: true,
     dirtiedDate: new Date(),
@@ -45,14 +45,14 @@ export function PayloadsByDuplicating<C extends ItemContent = ItemContent>(dto: 
     }
 
     copy = payload.copyAsSyncResolved({
-      ...baseOverride,
+      ...override,
       content: contentOverride,
       deleted: false,
     })
   } else {
     copy = payload.copyAsSyncResolved(
       {
-        ...baseOverride,
+        ...override,
       },
       source || payload.source,
     )

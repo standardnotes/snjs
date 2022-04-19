@@ -594,10 +594,14 @@ export class SNApplication implements InternalServices.ListedClientInterface {
     return this.listedService.getListedAccountInfo(account, inContextOfItem)
   }
 
-  public async createEncryptedBackupFile(
-    requireAuthorization = false,
-  ): Promise<Encryption.BackupFile | undefined> {
-    if (requireAuthorization && !(await this.protectionService.authorizeBackupCreation(true))) {
+  public async createEncryptedBackupFileForAutomatedDesktopBackups(): Promise<
+    Encryption.BackupFile | undefined
+  > {
+    return this.protocolService.createEncryptedBackupFile()
+  }
+
+  public async createEncryptedBackupFile(): Promise<Encryption.BackupFile | undefined> {
+    if (!(await this.protectionService.authorizeBackupCreation())) {
       return
     }
 
@@ -605,7 +609,7 @@ export class SNApplication implements InternalServices.ListedClientInterface {
   }
 
   public async createDecryptedBackupFile(): Promise<Encryption.BackupFile | undefined> {
-    if (!(await this.protectionService.authorizeBackupCreation(false))) {
+    if (!(await this.protectionService.authorizeBackupCreation())) {
       return
     }
 

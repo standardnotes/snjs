@@ -1,4 +1,4 @@
-import { Uuid, ProtocolVersion } from '@standardnotes/common'
+import { Uuid } from '@standardnotes/common'
 import { AppData, DefaultAppDomain } from '../Item/Types/DefaultAppDomain'
 import { ContentReference } from '../Reference/ContentReference'
 import { AppDataField } from '../Item/Types/AppDataField'
@@ -8,7 +8,6 @@ export interface SpecializedContent {}
 
 export interface ItemContent {
   references: ContentReference[]
-  version?: ProtocolVersion
   conflict_of?: Uuid
   protected?: boolean
   trashed?: boolean
@@ -49,24 +48,5 @@ export function FillItemContentSpecialized<
   S extends SpecializedContent,
   C extends ItemContent = ItemContent,
 >(content: S): C {
-  const typedContent = content as unknown as C
-  if (!typedContent.references) {
-    typedContent.references = []
-  }
-
-  if (!typedContent.appData) {
-    typedContent.appData = {
-      [DefaultAppDomain]: {},
-    }
-  }
-
-  if (!typedContent.appData[DefaultAppDomain]) {
-    typedContent.appData[DefaultAppDomain] = {}
-  }
-
-  if (!typedContent.appData[DefaultAppDomain][AppDataField.UserModifiedDate]) {
-    typedContent.appData[DefaultAppDomain][AppDataField.UserModifiedDate] = `${new Date()}`
-  }
-
-  return typedContent
+  return FillItemContent(content)
 }

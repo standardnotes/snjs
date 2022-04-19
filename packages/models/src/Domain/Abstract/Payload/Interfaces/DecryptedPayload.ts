@@ -1,4 +1,4 @@
-import { ProtocolVersion, Uuid } from '@standardnotes/common'
+import { Uuid } from '@standardnotes/common'
 import { DecryptedTransferPayload } from './../../TransferPayload/Interfaces/DecryptedTransferPayload'
 import { ItemContent } from '../../Content/ItemContent'
 import { ContentReference } from '../../Reference/ContentReference'
@@ -6,7 +6,6 @@ import { PayloadInterface } from './PayloadInterface'
 
 export interface DecryptedPayloadInterface<C extends ItemContent = ItemContent>
   extends PayloadInterface<DecryptedTransferPayload> {
-  readonly version: ProtocolVersion
   readonly content: C
   deleted: false
 
