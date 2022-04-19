@@ -1,17 +1,15 @@
 import { ItemContent } from './../../../Abstract/Content/ItemContent'
 import { EncryptedItemInterface } from './../../../Abstract/Item/Interfaces/EncryptedItem'
-import { CollectionSortDirection, CollectionSort } from '../CollectionSort'
+import { CollectionSortDirection, CollectionSort, SortableItem } from '../CollectionSort'
 import { ContentType, Uuid } from '@standardnotes/common'
-import { compareValues, isNullOrUndefined, uniqueArrayByKey } from '@standardnotes/utils'
+import { compareValues, isNullOrUndefined, isString, uniqueArrayByKey } from '@standardnotes/utils'
 import { SNIndex } from '../../Index/SNIndex'
 import { ItemDelta } from '../../Index/ItemDelta'
 import {
   isDeletedItem,
   isDecryptedItem,
-  isEncryptedErroredItem,
-  isDecryptedOrDeletedItem,
+  isEncryptedItem,
 } from '../../../Abstract/Item/Interfaces/TypeCheck'
-import { isNote } from '../../../Syncable/Note'
 import { DecryptedItemInterface } from '../../../Abstract/Item/Interfaces/DecryptedItem'
 import { CollectionInterface } from '../CollectionInterface'
 import { DeletedItemInterface } from '../../../Abstract/Item'
@@ -21,7 +19,7 @@ type DisplaySortBy = Partial<
   Record<
     ContentType,
     {
-      key: keyof DecryptedItemInterface
+      key: keyof SortableItem
       dir: CollectionSortDirection
     }
   >
@@ -29,15 +27,15 @@ type DisplaySortBy = Partial<
 
 type AnyItem = DecryptedItemInterface | EncryptedItemInterface | DeletedItemInterface
 
+type UuidToSortedPositionMap = Record<Uuid, number>
+
 export class ItemCollection
   extends Collection<AnyItem, DecryptedItemInterface, EncryptedItemInterface, DeletedItemInterface>
   implements SNIndex, CollectionInterface
 {
   private displaySortBy: DisplaySortBy = {}
 
-  private displayFilter: Partial<
-    Record<ContentType, (element: DecryptedItemInterface) => boolean>
-  > = {}
+  private displayFilter: Partial<Record<ContentType, (element: SortableItem) => boolean>> = {}
 
   /**
    * A display ready map of uuids-to-position in sorted array. i.e filteredMap[contentType]
@@ -45,20 +43,20 @@ export class ItemCollection
    * in the sorted array. We keep track of positions so that when we want to re-sort or remove
    * and element, we don't have to search the entire sorted array to do so.
    */
-  private filteredMap: Partial<Record<ContentType, Record<Uuid, number>>> = {}
+  private filteredMap: Partial<Record<ContentType, UuidToSortedPositionMap>> = {}
 
   /**
    * A sorted representation of the filteredMap, where sortedMap[contentType] returns
    * an array of sorted elements, based on the current displaySortBy
    */
-  private sortedMap: Partial<Record<ContentType, DecryptedItemInterface[]>> = {}
+  private sortedMap: Partial<Record<ContentType, SortableItem[]>> = {}
 
   public override set(elements: AnyItem | AnyItem[]): void {
     elements = uniqueArrayByKey(Array.isArray(elements) ? elements : [elements], 'uuid')
 
     super.set(elements)
 
-    this.filterSortElements(elements.filter(isDecryptedOrDeletedItem))
+    this.filterSortElements(elements)
   }
 
   public override discard(elements: AnyItem | AnyItem[]): void {
@@ -66,7 +64,7 @@ export class ItemCollection
 
     elements = Array.isArray(elements) ? elements : [elements]
 
-    this.filterSortElements(elements.filter(isDecryptedOrDeletedItem))
+    this.filterSortElements(elements)
   }
 
   public onChange(delta: ItemDelta): void {
@@ -118,12 +116,6 @@ export class ItemCollection
     return this.all(contentType).filter(isDecryptedItem) as T[]
   }
 
-  private allDecryptedAndDeleted(
-    contentType: ContentType,
-  ): (DecryptedItemInterface | DeletedItemInterface)[] {
-    return this.all(contentType).filter(isDecryptedOrDeletedItem)
-  }
-
   /**
    * Sets an optional sortBy and filter for a given content type. These options will be
    * applied against a separate "display-only" record and not the master record. Passing
@@ -138,10 +130,11 @@ export class ItemCollection
     contentType: ContentType,
     sortBy = CollectionSort.CreatedAt,
     direction: CollectionSortDirection = 'asc',
-    filter?: (element: DecryptedItemInterface) => boolean,
+    filter?: (element: SortableItem) => boolean,
   ): void {
     const existingSortBy = this.displaySortBy[contentType]
     const existingFilter = this.displayFilter[contentType]
+
     /** If the sort value is unchanged, and we are not setting a new filter,
      * we return, as to not rebuild and resort all elements */
     if (
@@ -153,13 +146,15 @@ export class ItemCollection
     ) {
       return
     }
+
     this.displaySortBy[contentType] = sortBy ? { key: sortBy, dir: direction } : undefined
     this.displayFilter[contentType] = filter
+
     /** Reset existing maps */
     this.filteredMap[contentType] = {}
     this.sortedMap[contentType] = []
 
-    const elements = this.allDecryptedAndDeleted(contentType)
+    const elements = this.all(contentType)
     if (elements.length > 0) {
       this.filterSortElements(elements)
     }
@@ -182,40 +177,39 @@ export class ItemCollection
     return elements.slice() as I[]
   }
 
-  private filterSortElements(elements: (DecryptedItemInterface | DeletedItemInterface)[]) {
+  private filterSortElements(elements: AnyItem[]) {
     if (Object.keys(this.displaySortBy).length === 0) {
       return
     }
 
-    /** If a content type is added to this set, we are indicating the entire sorted
+    /**
+     * If a content type is added to this set, we are indicating the entire sorted
      * array will need to be re-sorted. The reason for sorting the entire array and not
      * just inserting an element using binary search is that we need to keep track of the
      * sorted index of an item so that we can look up and change its value without having
-     * to search the array for it. */
+     * to search the array for it.
+     */
     const typesNeedingResort = new Set<ContentType>()
     for (const element of elements) {
       const contentType = element.content_type
-      const sortBy = this.displaySortBy[contentType]
-      /** Sort by is required, but filter is not */
 
+      const sortBy = this.displaySortBy[contentType]
       if (!sortBy) {
         continue
       }
 
       const filter = this.displayFilter[contentType]
-      /** Filtered content type map */
-      const filteredCTMap = this.filteredMap[contentType]!
-      const sortedElements = this.sortedMap[contentType]!
+      const filteredCTMap = this.filteredMap[contentType]
+      const sortedElements = this.sortedMap[contentType]
+
+      if (!filteredCTMap || !sortedElements) {
+        continue
+      }
+
       const previousIndex = filteredCTMap[element.uuid]
       const previousElement = !isNullOrUndefined(previousIndex)
         ? sortedElements[previousIndex]
         : undefined
-
-      /**
-       * If the element is deleted, or if it no longer exists in the primary map (because
-       * it was discarded without neccessarily being marked as deleted), it does not pass
-       * the filter. If no filter the element passes by default.
-       */
 
       const remove = () => {
         if (!isNullOrUndefined(previousIndex)) {
@@ -231,7 +225,7 @@ export class ItemCollection
         }
       }
 
-      if (isDeletedItem(element)) {
+      if (isDeletedItem(element) || isEncryptedItem(element)) {
         remove()
         continue
       }
@@ -239,22 +233,17 @@ export class ItemCollection
       const passes = !this.map[element.uuid] ? false : filter ? filter(element) : true
 
       if (passes) {
-        if (!isNullOrUndefined(previousElement)) {
-          /**
-           * Check to see if the element has changed its sort value.
-           * If so, we need to re-sort. Previous element might be encrypted.
-           */
-          const previousValue = isEncryptedErroredItem(previousElement)
-            ? undefined
-            : previousElement[sortBy.key]
+        if (previousElement != undefined) {
+          /** Check to see if the element has changed its sort value. If so, we need to re-sort. */
+          const previousValue = previousElement[sortBy.key]
 
-          const newValue = (element as any)[sortBy.key]
+          const newValue = element[sortBy.key]
 
           /** Replace the current element with the new one. */
           sortedElements[previousIndex] = element
 
           /** If the pinned status of the element has changed, it needs to be resorted */
-          const pinChanged = previousElement!.pinned !== element.pinned
+          const pinChanged = previousElement.pinned !== element.pinned
 
           if (!compareValues(previousValue, newValue) || pinChanged) {
             /** Needs resort because its re-sort value has changed,
@@ -280,17 +269,17 @@ export class ItemCollection
   }
 
   private resortContentType(contentType: ContentType) {
-    const sortedElements = this.sortedMap[contentType]!
-    const sortBy = this.displaySortBy[contentType]!
-    const filteredCTMap = this.filteredMap[contentType]!
+    const sortedElements = this.sortedMap[contentType]
+    const sortBy = this.displaySortBy[contentType]
+    const filteredContentTypeMap = this.filteredMap[contentType]
+
+    if (!sortBy || !sortedElements || !filteredContentTypeMap) {
+      return
+    }
 
     /** Resort the elements array, and update the saved positions */
     /** @O(n * log(n)) */
-    const sortFn = (
-      a?: DecryptedItemInterface,
-      b?: DecryptedItemInterface,
-      skipPinnedCheck = false,
-    ): number => {
+    const sortFn = (a?: SortableItem, b?: SortableItem, skipPinnedCheck = false): number => {
       /** If the elements are undefined, move to beginning */
       if (!a) {
         return -1
@@ -299,7 +288,11 @@ export class ItemCollection
         return 1
       }
 
-      if (!skipPinnedCheck && isNote(a) && isNote(b)) {
+      if (
+        !skipPinnedCheck &&
+        a.content_type === ContentType.Note &&
+        b.content_type === ContentType.Note
+      ) {
         if (a.pinned && b.pinned) {
           return sortFn(a, b, true)
         }
@@ -311,8 +304,8 @@ export class ItemCollection
         }
       }
 
-      const aValue: string = (a as any)[sortBy.key] || ''
-      const bValue: string = (b as any)[sortBy.key] || ''
+      const aValue = a[sortBy.key] || ''
+      const bValue = b[sortBy.key] || ''
       let vector = 1
 
       if (sortBy.dir === 'asc') {
@@ -323,7 +316,13 @@ export class ItemCollection
        * where empty strings causes crash:
        * https://github.com/facebook/react-native/issues/32174
        * */
-      if (sortBy.key === CollectionSort.Title && aValue.length > 0 && bValue.length > 0) {
+      if (
+        sortBy.key === CollectionSort.Title &&
+        isString(aValue) &&
+        isString(bValue) &&
+        aValue.length > 0 &&
+        bValue.length > 0
+      ) {
         return vector * aValue.localeCompare(bValue, 'en', { numeric: true })
       } else if (aValue > bValue) {
         return -1 * vector
@@ -350,7 +349,7 @@ export class ItemCollection
         continue
       }
       cleaned.push(element)
-      filteredCTMap[element.uuid] = currentIndex
+      filteredContentTypeMap[element.uuid] = currentIndex
       currentIndex++
     }
 

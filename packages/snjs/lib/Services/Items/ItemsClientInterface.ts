@@ -10,9 +10,9 @@ import {
   CollectionSortProperty,
   CollectionSortDirection,
   DecryptedTransferPayload,
-  ItemInterface,
   PredicateInterface,
   DecryptedItemInterface,
+  SortableItem,
 } from '@standardnotes/models'
 import { UuidString } from '@Lib/Types'
 
@@ -34,10 +34,14 @@ export interface ItemsClientInterface {
   get trashedItems(): SNNote[]
 
   setDisplayOptions(
-    contentType: ContentType,
+    contentType:
+      | ContentType.Tag
+      | ContentType.SmartView
+      | ContentType.Theme
+      | ContentType.Component,
     sortBy?: CollectionSortProperty,
     direction?: CollectionSortDirection,
-    filter?: (element: ItemInterface) => boolean,
+    filter?: (element: SortableItem) => boolean,
   ): void
 
   setNotesDisplayCriteria(criteria: NotesDisplayCriteria): void
