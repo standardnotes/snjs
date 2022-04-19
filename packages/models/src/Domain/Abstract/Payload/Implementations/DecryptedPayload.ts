@@ -1,4 +1,4 @@
-import { ProtocolVersion, Uuid } from '@standardnotes/common'
+import { Uuid } from '@standardnotes/common'
 import { Copy } from '@standardnotes/utils'
 import {
   SyncResolvedParams,
@@ -20,13 +20,11 @@ export class DecryptedPayload<
 {
   override readonly content: C
   override readonly deleted: false
-  readonly version: ProtocolVersion
 
   constructor(rawPayload: T, source = PayloadSource.Constructor) {
     super(rawPayload, source)
 
     this.content = Copy(FillItemContent<C>(rawPayload.content))
-    this.version = this.content.version || ProtocolVersion.V001
     this.deleted = false
   }
 

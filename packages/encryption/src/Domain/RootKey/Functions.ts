@@ -1,7 +1,7 @@
 import { SNRootKey } from './RootKey'
 import {
   DecryptedPayload,
-  FillItemContent,
+  FillItemContentSpecialized,
   PayloadTimestampDefaults,
   RootKeyContent,
   RootKeyContentSpecialized,
@@ -35,5 +35,5 @@ export function FillRootKeyContent(content: Partial<RootKeyContentSpecialized>):
     }
   }
 
-  return FillItemContent(content) as RootKeyContent
+  return FillItemContentSpecialized(content)
 }

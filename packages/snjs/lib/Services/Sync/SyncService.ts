@@ -957,7 +957,7 @@ export class SNSyncService
 
     results.forEach((result) => {
       if (
-        isDecryptedPayload<ItemsKeyInterface>(result) &&
+        isDecryptedPayload<ItemsKeyContent>(result) &&
         result.content_type === ContentType.ItemsKey
       ) {
         map[result.uuid] = result

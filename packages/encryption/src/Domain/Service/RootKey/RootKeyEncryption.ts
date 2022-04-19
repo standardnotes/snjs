@@ -20,7 +20,7 @@ import { ItemsKeyMutator } from '../../ItemsKey'
 import { CreateNewRootKey } from '../../RootKey/Functions'
 import {
   DecryptedPayload,
-  FillItemContent,
+  FillItemContentSpecialized,
   ItemsKeyContent,
   ItemsKeyContentSpecialized,
   PayloadTimestampDefaults,
@@ -297,7 +297,7 @@ export class RootKeyEncryptionService extends Services.AbstractService<RootKeySe
     const rootKey = this.getSureRootKey()
     const value: Models.DecryptedTransferPayload = {
       ...rootKey.payload.ejected(),
-      content: FillItemContent(rootKey.persistableValueWhenWrapping()),
+      content: FillItemContentSpecialized(rootKey.persistableValueWhenWrapping()),
     }
     const payload = new Models.DecryptedPayload(value)
 
