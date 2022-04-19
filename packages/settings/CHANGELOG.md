@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.14.0](https://github.com/standardnotes/snjs/compare/@standardnotes/settings@1.13.4...@standardnotes/settings@1.14.0) (2022-04-19)
+
+
+### Features
+
+* add subscription setting name ([66c739b](https://github.com/standardnotes/snjs/commit/66c739b9ee00d27d2cd3176224d884aed7e2b9f8))
+
+
+
+
+
 ## [1.13.4](https://github.com/standardnotes/snjs/compare/@standardnotes/settings@1.13.3...@standardnotes/settings@1.13.4) (2022-04-15)
 
 **Note:** Version bump only for package @standardnotes/settings
