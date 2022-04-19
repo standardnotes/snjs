@@ -1,14 +1,13 @@
 import { removeFromArray } from '@standardnotes/utils'
-import { Uuid } from '@standardnotes/common'
-import { isNote, SNNote } from '../Note'
-import { isTag, SNTag } from './Tag'
-import { SNIndex } from '../../Runtime/Index/SNIndex'
-import { ItemCollection } from '../../Runtime/Collection/Item/ItemCollection'
-import { ItemDelta } from '../../Runtime/Index/ItemDelta'
-import { isDecryptedItem } from '../../Abstract/Item'
+import { ContentType, Uuid } from '@standardnotes/common'
+import { isTag, SNTag } from '../../../Syncable/Tag/Tag'
+import { SNIndex } from '../../Index/SNIndex'
+import { ItemCollection } from './ItemCollection'
+import { ItemDelta } from '../../Index/ItemDelta'
+import { isDecryptedItem, ItemInterface } from '../../../Abstract/Item'
 
-/** tagUuid undefined signifies all notes count change */
-export type TagNoteCountChangeObserver = (tagUuid: Uuid | undefined) => void
+type AllNotesUuidSignifier = undefined
+export type TagNoteCountChangeObserver = (tagUuid: Uuid | AllNotesUuidSignifier) => void
 
 export class TagNotesIndex implements SNIndex {
   private tagToNotesMap: Partial<Record<Uuid, Set<Uuid>>> = {}
@@ -19,8 +18,11 @@ export class TagNotesIndex implements SNIndex {
     public observers: TagNoteCountChangeObserver[] = [],
   ) {}
 
-  private isNoteCountable = (note: SNNote) => {
-    return !note.archived && !note.trashed
+  private isNoteCountable = (note: ItemInterface) => {
+    if (isDecryptedItem(note)) {
+      return !note.archived && !note.trashed
+    }
+    return false
   }
 
   public addCountChangeObserver(observer: TagNoteCountChangeObserver): () => void {
@@ -47,8 +49,8 @@ export class TagNotesIndex implements SNIndex {
 
   public onChange(delta: ItemDelta): void {
     const changedOrInserted = delta.changed.concat(delta.inserted)
-    const notes = changedOrInserted.filter(isDecryptedItem).filter(isNote) as SNNote[]
-    const tags = changedOrInserted.filter(isDecryptedItem).filter(isTag) as SNTag[]
+    const notes = changedOrInserted.filter((i) => i.content_type === ContentType.Note)
+    const tags = changedOrInserted.filter(isDecryptedItem).filter(isTag)
 
     this.receiveNoteChanges(notes)
     this.receiveTagChanges(tags)
@@ -67,8 +69,9 @@ export class TagNotesIndex implements SNIndex {
     }
   }
 
-  private receiveNoteChanges(notes: SNNote[]): void {
+  private receiveNoteChanges(notes: ItemInterface[]): void {
     const previousAllCount = this.allCountableNotes.size
+
     for (const note of notes) {
       const isCountable = this.isNoteCountable(note)
       if (isCountable) {
@@ -78,6 +81,7 @@ export class TagNotesIndex implements SNIndex {
       }
 
       const associatedTagUuids = this.collection.uuidsThatReferenceUuid(note.uuid)
+
       for (const tagUuid of associatedTagUuids) {
         const set = this.setForTag(tagUuid)
         const previousCount = set.size
@@ -91,6 +95,7 @@ export class TagNotesIndex implements SNIndex {
         }
       }
     }
+
     if (previousAllCount !== this.allCountableNotes.size) {
       this.notifyObservers(undefined)
     }

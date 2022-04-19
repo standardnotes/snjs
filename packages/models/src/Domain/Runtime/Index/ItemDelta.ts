@@ -4,10 +4,11 @@ import {
   DeletedItemInterface,
   EncryptedItemInterface,
 } from '../../Abstract/Item'
+import { AnyItemInterface } from '../../Abstract/Item/Interfaces/UnionTypes'
 
 export interface ItemDelta<C extends ItemContent = ItemContent> {
-  changed: (DecryptedItemInterface<C> | EncryptedItemInterface | DeletedItemInterface)[]
-  inserted: (DecryptedItemInterface<C> | EncryptedItemInterface | DeletedItemInterface)[]
+  changed: AnyItemInterface[]
+  inserted: AnyItemInterface[]
   /** Items that were deleted and finished sync */
   discarded: DeletedItemInterface[]
   /** Items which have encrypted overwrite protection enabled */
