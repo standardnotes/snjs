@@ -14,6 +14,7 @@ import { DecryptedItemInterface } from '../../../Abstract/Item/Interfaces/Decryp
 import { CollectionInterface } from '../CollectionInterface'
 import { DeletedItemInterface } from '../../../Abstract/Item'
 import { Collection } from '../Collection'
+import { AnyItemInterface } from '../../../Abstract/Item/Interfaces/UnionTypes'
 
 type DisplaySortBy = Partial<
   Record<
@@ -25,12 +26,15 @@ type DisplaySortBy = Partial<
   >
 >
 
-type AnyItem = DecryptedItemInterface | EncryptedItemInterface | DeletedItemInterface
-
 type UuidToSortedPositionMap = Record<Uuid, number>
 
 export class ItemCollection
-  extends Collection<AnyItem, DecryptedItemInterface, EncryptedItemInterface, DeletedItemInterface>
+  extends Collection<
+    AnyItemInterface,
+    DecryptedItemInterface,
+    EncryptedItemInterface,
+    DeletedItemInterface
+  >
   implements SNIndex, CollectionInterface
 {
   private displaySortBy: DisplaySortBy = {}
@@ -51,7 +55,7 @@ export class ItemCollection
    */
   private sortedMap: Partial<Record<ContentType, SortableItem[]>> = {}
 
-  public override set(elements: AnyItem | AnyItem[]): void {
+  public override set(elements: AnyItemInterface | AnyItemInterface[]): void {
     elements = uniqueArrayByKey(Array.isArray(elements) ? elements : [elements], 'uuid')
 
     super.set(elements)
@@ -59,7 +63,7 @@ export class ItemCollection
     this.filterSortElements(elements)
   }
 
-  public override discard(elements: AnyItem | AnyItem[]): void {
+  public override discard(elements: AnyItemInterface | AnyItemInterface[]): void {
     super.discard(elements)
 
     elements = Array.isArray(elements) ? elements : [elements]
@@ -177,7 +181,7 @@ export class ItemCollection
     return elements.slice() as I[]
   }
 
-  private filterSortElements(elements: AnyItem[]) {
+  private filterSortElements(elements: AnyItemInterface[]) {
     if (Object.keys(this.displaySortBy).length === 0) {
       return
     }

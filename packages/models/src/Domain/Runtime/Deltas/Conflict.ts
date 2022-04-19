@@ -43,8 +43,16 @@ export class ConflictDelta {
   }
 
   getConflictStrategy(): ConflictStrategy {
-    if (isErrorDecryptingPayload(this.basePayload) || isErrorDecryptingPayload(this.applyPayload)) {
-      return ConflictStrategy.KeepBaseDuplicateApply
+    const isBaseErrored = isErrorDecryptingPayload(this.basePayload)
+    const isApplyErrored = isErrorDecryptingPayload(this.applyPayload)
+    if (isBaseErrored || isApplyErrored) {
+      if (isBaseErrored && !isApplyErrored) {
+        return ConflictStrategy.KeepBaseDuplicateApply
+      } else if (!isBaseErrored && isApplyErrored) {
+        return ConflictStrategy.DuplicateBaseKeepApply
+      } else if (isBaseErrored && isApplyErrored) {
+        return ConflictStrategy.KeepApply
+      }
     } else if (isDecryptedPayload(this.basePayload)) {
       /**
        * Ensure no conflict has already been created with the incoming content.
@@ -173,6 +181,7 @@ export class ConflictDelta {
       isConflict: true,
       source: this.applyPayload.source,
     })
+
     return [leftPayload].concat(rightPayloads)
   }
 
