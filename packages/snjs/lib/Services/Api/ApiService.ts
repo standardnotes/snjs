@@ -1,7 +1,7 @@
 import { FeatureDescription } from '@standardnotes/features'
 import { isNullOrUndefined, joinPaths } from '@standardnotes/utils'
 import { Role } from '@standardnotes/auth'
-import { SettingName } from '@standardnotes/settings'
+import { SettingName, SubscriptionSettingName } from '@standardnotes/settings'
 import { Uuid, ErrorTag } from '@standardnotes/common'
 import {
   AbstractService,
@@ -644,6 +644,24 @@ export class SNApiService
       url: joinPaths(
         this.host,
         Paths.v1.setting(userUuid, settingName.toLowerCase() as SettingName),
+      ),
+      authentication: this.session?.authorizationValue,
+      fallbackErrorMessage: messages.API_MESSAGE_FAILED_GET_SETTINGS,
+    })
+  }
+
+  async getSubscriptionSetting(
+    userUuid: UuidString,
+    settingName: SubscriptionSettingName,
+  ): Promise<Responses.GetSettingResponse> {
+    return await this.tokenRefreshableRequest<Responses.GetSettingResponse>({
+      verb: HttpVerb.Get,
+      url: joinPaths(
+        this.host,
+        Paths.v1.subscriptionSetting(
+          userUuid,
+          settingName.toLowerCase() as SubscriptionSettingName,
+        ),
       ),
       authentication: this.session?.authorizationValue,
       fallbackErrorMessage: messages.API_MESSAGE_FAILED_GET_SETTINGS,

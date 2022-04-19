@@ -1,5 +1,5 @@
 import { SettingsList } from './SettingsList'
-import { SettingName, SensitiveSettingName } from '@standardnotes/settings'
+import { SettingName, SensitiveSettingName, SubscriptionSettingName } from '@standardnotes/settings'
 import * as messages from '../Api/Messages'
 import { StatusCode, User } from '@standardnotes/responses'
 import { SettingsServerInterface } from './SettingsServerInterface'
@@ -49,6 +49,20 @@ export class SettingsGateway {
     const response = await this.settingsApi.getSetting(this.userUuid, name)
 
     // Backend responds with 400 when setting doesn't exist
+    if (response.status === StatusCode.HttpBadRequest) {
+      return undefined
+    }
+
+    if (response.error != undefined) {
+      throw new Error(response.error.message)
+    }
+
+    return response?.data?.setting?.value ?? undefined
+  }
+
+  async getSubscriptionSetting(name: SubscriptionSettingName): Promise<string | undefined> {
+    const response = await this.settingsApi.getSubscriptionSetting(this.userUuid, name)
+
     if (response.status === StatusCode.HttpBadRequest) {
       return undefined
     }

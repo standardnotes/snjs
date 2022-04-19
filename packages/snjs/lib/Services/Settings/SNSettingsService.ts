@@ -6,6 +6,7 @@ import {
   EmailBackupFrequency,
   SettingName,
   SensitiveSettingName,
+  SubscriptionSettingName,
 } from '@standardnotes/settings'
 import { ExtensionsServerURL } from '@Lib/Hosts'
 import { AbstractService, InternalEventBusInterface } from '@standardnotes/services'
@@ -43,6 +44,10 @@ export class SNSettingsService extends AbstractService implements SettingsClient
 
   async getSetting(name: SettingName) {
     return this.provider.getSetting(name)
+  }
+
+  async getSubscriptionSetting(name: SubscriptionSettingName) {
+    return this.provider.getSubscriptionSetting(name)
   }
 
   async updateSetting(name: SettingName, payload: string, sensitive = false) {
