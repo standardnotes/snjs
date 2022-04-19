@@ -40,10 +40,6 @@ export class DecryptedItem<C extends ItemContent = ItemContent>
     this.locked = this.getAppDomainValueWithDefault(AppDataField.Locked, false)
   }
 
-  get version() {
-    return this.payload.version
-  }
-
   public static DefaultAppDomain() {
     return DefaultAppDomain
   }
