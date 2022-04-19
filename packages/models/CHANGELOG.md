@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.4.4](https://github.com/standardnotes/snjs/compare/@standardnotes/models@1.4.3...@standardnotes/models@1.4.4) (2022-04-19)
+
+
+### Bug Fixes
+
+* better conflict errored items ([#699](https://github.com/standardnotes/snjs/issues/699)) ([1feaddd](https://github.com/standardnotes/snjs/commit/1feadddb79a4b39d08b6de979a380984fec6c689))
+
+
+
+
+
 ## [1.4.3](https://github.com/standardnotes/snjs/compare/@standardnotes/models@1.4.2...@standardnotes/models@1.4.3) (2022-04-19)
 
 
