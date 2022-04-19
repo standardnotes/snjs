@@ -77,15 +77,15 @@ export function PayloadsByAlternatingUuid<
 
   const deletedSelf = new DeletedPayload(
     {
-      /**
-       * Do not set as dirty; this item is non-syncable
-       * and should be immediately discarded
-       */
       created_at: payload.created_at,
       updated_at: payload.updated_at,
       created_at_timestamp: payload.created_at_timestamp,
       updated_at_timestamp: payload.updated_at_timestamp,
       dirtiedDate: undefined,
+      /**
+       * Do not set as dirty; this item is non-syncable
+       * and should be immediately discarded
+       */
       dirty: false,
       content: undefined,
       uuid: payload.uuid,

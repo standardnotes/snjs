@@ -64,7 +64,7 @@ describe('conflict delta', () => {
     expect(mocked).toBeCalledTimes(0)
   })
 
-  it('if either payload is errored, should keep base duplicate apply', () => {
+  it('if apply payload is errored but base payload is not, should duplicate base and keep apply', () => {
     const basePayload = createDecryptedItemsKey('123', 'secret')
 
     const baseCollection = createBaseCollection(basePayload)
@@ -73,6 +73,30 @@ describe('conflict delta', () => {
 
     const delta = new ConflictDelta(baseCollection, basePayload, applyPayload, historyMap)
 
+    expect(delta.getConflictStrategy()).toBe(ConflictStrategy.DuplicateBaseKeepApply)
+  })
+
+  it('if base payload is errored but apply is not, should keep base duplicate apply', () => {
+    const basePayload = createErroredItemsKey('123', 2)
+
+    const baseCollection = createBaseCollection(basePayload)
+
+    const applyPayload = createDecryptedItemsKey('123', 'secret')
+
+    const delta = new ConflictDelta(baseCollection, basePayload, applyPayload, historyMap)
+
     expect(delta.getConflictStrategy()).toBe(ConflictStrategy.KeepBaseDuplicateApply)
+  })
+
+  it('if base and apply are errored, should keep apply', () => {
+    const basePayload = createErroredItemsKey('123', 2)
+
+    const baseCollection = createBaseCollection(basePayload)
+
+    const applyPayload = createErroredItemsKey('123', 3)
+
+    const delta = new ConflictDelta(baseCollection, basePayload, applyPayload, historyMap)
+
+    expect(delta.getConflictStrategy()).toBe(ConflictStrategy.KeepApply)
   })
 })
