@@ -1,4 +1,3 @@
-import { NoteContent } from './../../../../models/src/Domain/Syncable/Note/NoteContent'
 import { ContentType } from '@standardnotes/common'
 import { InternalEventBusInterface } from '@standardnotes/services'
 import { ItemManager } from './ItemManager'
@@ -11,6 +10,7 @@ import {
   EncryptedPayload,
   FillItemContent,
   PayloadTimestampDefaults,
+  NoteContent,
 } from '@standardnotes/models'
 
 const setupRandomUuid = () => {
