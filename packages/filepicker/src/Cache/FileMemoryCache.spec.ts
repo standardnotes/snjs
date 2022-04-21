@@ -22,8 +22,7 @@ describe('file memory cache', () => {
   })
 
   it('should allow filling files up to limit', () => {
-    const maxSize = 5
-    const cache = new FileMemoryCache(maxSize)
+    const cache = new FileMemoryCache(5)
 
     cache.add('1', createFile(3))
     cache.add('2', createFile(2))
@@ -33,21 +32,19 @@ describe('file memory cache', () => {
   })
 
   it('should clear early files when adding new files above limit', () => {
-    const maxSize = 5
-    const cache = new FileMemoryCache(maxSize)
+    const cache = new FileMemoryCache(5)
 
     cache.add('1', createFile(3))
     cache.add('2', createFile(2))
-    cache.add('3', createFile(3))
+    cache.add('3', createFile(5))
 
     expect(cache.get('1')).toBeFalsy()
-    expect(cache.get('2')).toBeTruthy()
+    expect(cache.get('2')).toBeFalsy()
     expect(cache.get('3')).toBeTruthy()
   })
 
   it('should remove single file', () => {
-    const maxSize = 5
-    const cache = new FileMemoryCache(maxSize)
+    const cache = new FileMemoryCache(5)
 
     cache.add('1', createFile(3))
     cache.add('2', createFile(2))
@@ -59,8 +56,7 @@ describe('file memory cache', () => {
   })
 
   it('should clear all files', () => {
-    const maxSize = 5
-    const cache = new FileMemoryCache(maxSize)
+    const cache = new FileMemoryCache(5)
 
     cache.add('1', createFile(3))
     cache.add('2', createFile(2))
