@@ -39,7 +39,7 @@ describe('utils', () => {
       expect(formattedSize).toBe('999 B')
     })
 
-    it('should show as bytes if more than or equal to 1KB', () => {
+    it('should format as KB if more than 1000 bytes', () => {
       const size = 1_000
 
       const formattedSize = formatSizeToReadableString(size)
@@ -47,12 +47,20 @@ describe('utils', () => {
       expect(formattedSize).toBe('1 KB')
     })
 
-    it('should show as bytes if more than or equal to 1MB', () => {
+    it('should format as MB if more than 1000000 bytes', () => {
       const size = 1_000_000
 
       const formattedSize = formatSizeToReadableString(size)
 
       expect(formattedSize).toBe('1 MB')
+    })
+
+    it('should format as GB if more than 1000000000 bytes', () => {
+      const size = 1_000_000_000
+
+      const formattedSize = formatSizeToReadableString(size)
+
+      expect(formattedSize).toBe('1 GB')
     })
 
     it('should only show fixed-point notation if calculated size is not an integer', () => {
