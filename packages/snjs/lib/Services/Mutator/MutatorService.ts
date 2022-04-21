@@ -246,8 +246,16 @@ export class MutatorService extends AbstractService implements MutatorClientInte
     return this.itemManager.setItemsDirty(items)
   }
 
-  public async deleteItem(item: Models.DecryptedItemInterface): Promise<void> {
-    await this.itemManager.setItemToBeDeleted(item)
+  public async deleteItem(
+    item: Models.DecryptedItemInterface | Models.EncryptedItemInterface,
+  ): Promise<void> {
+    return this.deleteItems([item])
+  }
+
+  public async deleteItems(
+    items: (Models.DecryptedItemInterface | Models.EncryptedItemInterface)[],
+  ): Promise<void> {
+    await this.itemManager.setItemsToBeDeleted(items)
     await this.syncService.sync()
   }
 
