@@ -92,4 +92,9 @@ describe('settings service', function () {
     )
     expect(settings.getSettingValue(SettingName.MfaSecret)).to.not.be.ok
   })
+
+  it('reads a subscription setting', async () => {
+    const setting = await snApp.settings.getSubscriptionSetting('FILE_UPLOAD_BYTES_LIMIT')
+    expect(setting).to.be.a('string')
+  })
 })
