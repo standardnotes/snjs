@@ -8,6 +8,7 @@ import { AppDataField } from '../Types/AppDataField'
 import { DefaultAppDomain, DomainDataValueType, ItemDomainKey } from '../Types/DefaultAppDomain'
 import { ItemMutator } from './ItemMutator'
 import { DecryptedPayloadInterface } from '../../Payload/Interfaces/DecryptedPayload'
+import { ItemInterface } from '../Interfaces/ItemInterface'
 
 export class DecryptedItemMutator<C extends ItemContent = ItemContent> extends ItemMutator<
   DecryptedPayloadInterface<C>,
@@ -138,7 +139,7 @@ export class DecryptedItemMutator<C extends ItemContent = ItemContent> extends I
     this.content.references = references
   }
 
-  public removeItemAsRelationship(item: DecryptedItemInterface) {
+  public removeItemAsRelationship(item: ItemInterface) {
     let references = this.content.references || []
     references = references.filter((r) => r.uuid !== item.uuid)
     this.content.references = references

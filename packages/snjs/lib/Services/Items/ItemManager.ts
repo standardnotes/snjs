@@ -68,26 +68,16 @@ export class ItemManager
     this.tagNotesIndex = new Models.TagNotesIndex(this.collection, this.tagNotesIndex?.observers)
   }
 
-  /**
-   * Returns all items.
-   */
-  allItems(): Models.DecryptedItemInterface[] {
-    return this.items
+  get invalidItems(): Models.EncryptedItemInterface[] {
+    return this.collection.invalidElements()
   }
 
-  /**
-   * Creates an unmanaged item from a payload.
-   */
   public createItemFromPayload(
     payload: Models.DecryptedPayloadInterface,
   ): Models.DecryptedItemInterface {
     return Models.CreateDecryptedItemFromPayload(payload)
   }
 
-  /**
-   * Creates an unmanaged payload from any object, where the raw object
-   * represents the same data a payload would.
-   */
   public createPayloadFromObject(
     object: Models.DecryptedTransferPayload,
   ): Models.DecryptedPayloadInterface {
@@ -210,9 +200,6 @@ export class ItemManager
     return this.collection.findAllDecryptedWithBlanks(uuids) as (T | undefined)[]
   }
 
-  /**
-   * Returns a detached array of all items
-   */
   public get items(): Models.DecryptedItemInterface[] {
     return this.collection.nondeletedElements().filter(Models.isDecryptedItem)
   }
@@ -225,16 +212,10 @@ export class ItemManager
     return this.collection.displayElements(ContentType.ItemsKey)
   }
 
-  /**
-   * Returns all non-deleted notes
-   */
   get notes() {
     return this.notesCollection.displayElements()
   }
 
-  /**
-   * Returns all non-deleted tags
-   */
   get tags(): Models.SNTag[] {
     return this.collection.displayElements(ContentType.Tag)
   }
@@ -243,9 +224,6 @@ export class ItemManager
     return TagsToFoldersMigrationApplicator.isApplicableToCurrentData(this)
   }
 
-  /**
-   * Returns all non-deleted components
-   */
   get components(): Models.SNComponent[] {
     const components = this.collection.displayElements(
       ContentType.Component,
@@ -822,14 +800,18 @@ export class ItemManager
   }
 
   public async setItemToBeDeleted(
-    itemToLookupUuidFor: Models.DecryptedItemInterface,
+    itemToLookupUuidFor: Models.DecryptedItemInterface | Models.EncryptedItemInterface,
     source: Models.PayloadEmitSource = Models.PayloadEmitSource.LocalChanged,
   ): Promise<void> {
     const referencingIdsCapturedBeforeChanges = this.collection.uuidsThatReferenceUuid(
       itemToLookupUuidFor.uuid,
     )
 
-    const item = this.findSureItem(itemToLookupUuidFor.uuid)
+    const item = this.findAnyItem(itemToLookupUuidFor.uuid)
+
+    if (!item) {
+      return
+    }
 
     const mutator = new Models.DeleteItemMutator(item, Models.MutationType.UpdateUserTimestamps)
 
@@ -849,7 +831,7 @@ export class ItemManager
   }
 
   public async setItemsToBeDeleted(
-    itemsToLookupUuidsFor: Models.DecryptedItemInterface[],
+    itemsToLookupUuidsFor: (Models.DecryptedItemInterface | Models.EncryptedItemInterface)[],
   ): Promise<void> {
     await Promise.all(itemsToLookupUuidsFor.map((item) => this.setItemToBeDeleted(item)))
   }

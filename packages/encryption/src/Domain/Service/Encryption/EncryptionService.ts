@@ -443,7 +443,7 @@ export class EncryptionService
   }
 
   public async createEncryptedBackupFile(): Promise<BackupFile> {
-    const payloads = this.itemManager.allItems().map((item) => item.payload)
+    const payloads = this.itemManager.items.map((item) => item.payload)
 
     const split = SplitPayloadsByEncryptionType(payloads)
 

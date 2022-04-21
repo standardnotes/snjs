@@ -898,8 +898,8 @@ export class SNApplication implements InternalServices.ListedClientInterface {
     return Utils.UuidGenerator.GenerateUuid()
   }
 
-  public presentKeyRecoveryWizard(): Promise<void> {
-    return this.keyRecoveryService.processPersistedUndecryptables()
+  public presentKeyRecoveryWizard(): void {
+    return this.keyRecoveryService.presentKeyRecoveryWizard()
   }
 
   /**

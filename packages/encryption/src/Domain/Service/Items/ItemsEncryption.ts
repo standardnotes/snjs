@@ -51,7 +51,7 @@ export class ItemsEncryptionService extends Services.AbstractService {
    * disk using latest encryption status.
    */
   async repersistAllItems(): Promise<void> {
-    const items = this.itemManager.allItems()
+    const items = this.itemManager.items
     const payloads = items.map((item) => item.payload)
     return this.storageService.savePayloads(payloads)
   }

@@ -57,7 +57,7 @@ export interface ItemManagerInterface extends AbstractService {
     isUserModified?: boolean,
   ): Promise<DecryptedItemInterface[]>
 
-  allItems(): DecryptedItemInterface[]
+  get items(): DecryptedItemInterface[]
 
   /**
    * Inserts the item as-is by reading its payload value. This function will not
