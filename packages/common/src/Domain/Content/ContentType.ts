@@ -25,16 +25,19 @@ export enum ContentType {
 
 export function DisplayStringForContentType(contentType: ContentType): string | undefined {
   const map: Partial<Record<ContentType, string>> = {
-    [ContentType.Note]: 'note',
-    [ContentType.Tag]: 'tag',
-    [ContentType.SmartView]: 'smart view',
     [ContentType.ActionsExtension]: 'action-based extension',
     [ContentType.Component]: 'component',
     [ContentType.Editor]: 'editor',
-    [ContentType.Theme]: 'theme',
+    [ContentType.File]: 'file',
     [ContentType.FilesafeCredentials]: 'FileSafe credential',
     [ContentType.FilesafeFileMetadata]: 'FileSafe file',
     [ContentType.FilesafeIntegration]: 'FileSafe integration',
+    [ContentType.ItemsKey]: 'encryption key',
+    [ContentType.Note]: 'note',
+    [ContentType.SmartView]: 'smart view',
+    [ContentType.Tag]: 'tag',
+    [ContentType.Theme]: 'theme',
+    [ContentType.UserPrefs]: 'user preferences',
   }
 
   return map[contentType]

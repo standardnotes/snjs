@@ -158,4 +158,8 @@ export class AppContext {
   async deinit() {
     await Utils.safeDeinit(this.application)
   }
+
+  async sync(options) {
+    await this.application.sync.sync(options)
+  }
 }

@@ -8,6 +8,7 @@ import {
   NotesDisplayCriteria,
   DecryptedPayloadInterface,
   CollectionSortProperty,
+  EncryptedItemInterface,
   CollectionSortDirection,
   DecryptedTransferPayload,
   PredicateInterface,
@@ -17,6 +18,8 @@ import {
 import { UuidString } from '@Lib/Types'
 
 export interface ItemsClientInterface {
+  get invalidItems(): EncryptedItemInterface[]
+
   associateFileWithNote(file: SNFile, note: SNNote): Promise<SNFile>
 
   disassociateFileWithNote(file: SNFile, note: SNNote): Promise<SNFile>
@@ -27,6 +30,9 @@ export interface ItemsClientInterface {
 
   addTagToNote(note: SNNote, tag: SNTag, addHierarchy: boolean): Promise<SNTag[]>
 
+  /**
+   * Creates an unmanaged, un-inserted item from a payload.
+   */
   createItemFromPayload(payload: DecryptedPayloadInterface): DecryptedItemInterface
 
   createPayloadFromObject(object: DecryptedTransferPayload): DecryptedPayloadInterface
@@ -137,11 +143,6 @@ export interface ItemsClientInterface {
   findItems<T extends DecryptedItemInterface>(uuids: UuidString[]): T[]
 
   findSureItem<T extends DecryptedItemInterface = DecryptedItemInterface>(uuid: UuidString): T
-
-  /**
-   * Returns all items.
-   */
-  allItems(): DecryptedItemInterface[]
 
   /**
    * Finds an item by predicate.

@@ -113,7 +113,11 @@ export interface MutatorClientInterface {
     items: Models.DecryptedItemInterface[],
   ): Promise<(Models.DecryptedItemInterface | undefined)[]>
 
-  deleteItem(item: Models.DecryptedItemInterface): Promise<void>
+  deleteItem(item: Models.DecryptedItemInterface | Models.EncryptedItemInterface): Promise<void>
+
+  deleteItems(
+    items: (Models.DecryptedItemInterface | Models.EncryptedItemInterface)[],
+  ): Promise<void>
 
   emptyTrash(): Promise<void>
 

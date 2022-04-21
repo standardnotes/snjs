@@ -11,6 +11,7 @@ export type DecryptionCallback = (
 
 export type DecryptionResponse = {
   success: boolean
+  aborted?: boolean
   rootKey?: SNRootKey
 }
 

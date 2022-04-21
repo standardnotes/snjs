@@ -190,6 +190,14 @@ export class SNKeyRecoveryService extends AbstractService<
     await this.beginProcessingQueue()
   }
 
+  public presentKeyRecoveryWizard(): void {
+    const invalidKeys = this.itemManager.invalidItems
+      .filter((i) => i.content_type === ContentType.ItemsKey)
+      .map((i) => i.payload)
+
+    void this.handleIgnoredItemsKeys(invalidKeys, false)
+  }
+
   public async processPersistedUndecryptables() {
     const record = this.getUndecryptables()
 
@@ -369,7 +377,13 @@ export class SNKeyRecoveryService extends AbstractService<
     while (queueItem) {
       void this.popQueueItem(queueItem)
 
-      await queueItem.promise
+      const result = await queueItem.promise
+
+      if (result?.aborted) {
+        this.isProcessingQueue = false
+
+        return
+      }
 
       /** Always start from the beginning */
       queueItem = this.decryptionQueue[0]
@@ -446,10 +460,14 @@ export class SNKeyRecoveryService extends AbstractService<
     )
 
     const response = await this.challengeService.promptForChallengeResponse(challenge)
+
     if (!response) {
-      const result = { success: false }
+      const result: DecryptionResponse = { success: false, aborted: true }
+
       resolve(result)
+
       queueItem.callback?.(key, result)
+
       return
     }
 
