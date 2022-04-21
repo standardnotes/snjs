@@ -1,6 +1,9 @@
+import { InternalEventBusInterface } from '@standardnotes/services'
+import { SNFileService } from './FileService'
 import { SNSyncService } from '../Sync/SyncService'
 import { ItemManager, SNAlertService, SNApiService } from '@Lib/index'
 import { SNPureCrypto, StreamEncryptor } from '@standardnotes/sncrypto-common'
+import { SNFile } from '@standardnotes/models'
 
 describe('fileService', () => {
   let apiService: SNApiService
@@ -8,6 +11,8 @@ describe('fileService', () => {
   let syncService: SNSyncService
   let alertService: SNAlertService
   let crypto: SNPureCrypto
+  let fileService: SNFileService
+  let internalEventBus: InternalEventBusInterface
 
   beforeEach(() => {
     apiService = {} as jest.Mocked<SNApiService>
@@ -29,6 +34,17 @@ describe('fileService', () => {
 
     crypto = {} as jest.Mocked<SNPureCrypto>
     crypto.base64Decode = jest.fn()
+    internalEventBus = {} as jest.Mocked<InternalEventBusInterface>
+    internalEventBus.publish = jest.fn()
+
+    fileService = new SNFileService(
+      apiService,
+      itemManager,
+      syncService,
+      alertService,
+      crypto,
+      internalEventBus,
+    )
 
     crypto.xchacha20StreamInitDecryptor = jest.fn().mockReturnValue({
       state: {},
@@ -46,6 +62,29 @@ describe('fileService', () => {
     crypto.xchacha20StreamEncryptorPush = jest.fn().mockReturnValue(new Uint8Array())
   })
 
-  // eslint-disable-next-line @typescript-eslint/no-empty-function
-  it('placeholder', async () => {})
+  it('should cache file after download', async () => {
+    const file = {
+      uuid: '1',
+      size: 100_000,
+    } as jest.Mocked<SNFile>
+
+    let downloadMock = (apiService.downloadFile = jest.fn())
+    apiService.createFileValetToken = jest.fn()
+
+    await fileService.downloadFile(file, async () => {
+      return Promise.resolve()
+    })
+
+    expect(downloadMock).toHaveBeenCalledTimes(1)
+
+    downloadMock = apiService.downloadFile = jest.fn()
+
+    await fileService.downloadFile(file, async () => {
+      return Promise.resolve()
+    })
+
+    expect(downloadMock).toHaveBeenCalledTimes(0)
+
+    expect(fileService['cache'].get(file.uuid)).toBeTruthy()
+  })
 })

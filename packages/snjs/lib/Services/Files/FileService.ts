@@ -1,3 +1,4 @@
+import { FileMemoryCache } from '@standardnotes/filepicker'
 import { FilesServerInterface } from './FilesServerInterface'
 import { ClientDisplayableError } from '@standardnotes/responses'
 import { ContentType } from '@standardnotes/common'
@@ -19,7 +20,11 @@ import { UuidGenerator } from '@standardnotes/utils'
 import { AbstractService, InternalEventBusInterface } from '@standardnotes/services'
 import { FilesClientInterface } from './FilesClientInterface'
 
+const OneHundredMb = 100 * 1_000_000
+
 export class SNFileService extends AbstractService implements FilesClientInterface {
+  private cache: FileMemoryCache = new FileMemoryCache(OneHundredMb)
+
   constructor(
     private api: FilesServerInterface,
     private itemManager: ItemManager,
@@ -33,6 +38,9 @@ export class SNFileService extends AbstractService implements FilesClientInterfa
 
   override deinit(): void {
     super.deinit()
+
+    this.cache.clear()
+    ;(this.cache as unknown) = undefined
     ;(this.api as unknown) = undefined
     ;(this.itemManager as unknown) = undefined
     ;(this.syncService as unknown) = undefined
@@ -126,30 +134,54 @@ export class SNFileService extends AbstractService implements FilesClientInterfa
     file: SNFile,
     onDecryptedBytes: (bytes: Uint8Array) => Promise<void>,
   ): Promise<ClientDisplayableError | undefined> {
+    const cachedFile = this.cache.get(file.uuid)
+    if (cachedFile) {
+      await onDecryptedBytes(cachedFile)
+
+      return
+    }
+
     const tokenResult = await this.api.createFileValetToken(file.remoteIdentifier, 'read')
 
     if (tokenResult instanceof ClientDisplayableError) {
       return tokenResult
     }
 
-    // eslint-disable-next-line no-async-promise-executor
-    return new Promise(async (resolve) => {
+    const addToCache = file.size < this.cache.maxSize
+    let cacheEntryAggregate = new Uint8Array()
+
+    const bytesWrapper = async (bytes: Uint8Array): Promise<void> => {
+      if (addToCache) {
+        cacheEntryAggregate = new Uint8Array([...cacheEntryAggregate, ...bytes])
+      }
+      return onDecryptedBytes(bytes)
+    }
+
+    await new Promise((resolve) => {
       const operation = new DownloadAndDecryptFileOperation(
         file,
         this.crypto,
         this.api,
         tokenResult,
-        onDecryptedBytes,
+        bytesWrapper,
         (error) => {
           resolve(error)
         },
       )
 
-      await operation.run().then(() => resolve(undefined))
+      return operation.run().then(() => resolve(undefined))
     })
+
+    if (addToCache) {
+      this.cache.add(file.uuid, cacheEntryAggregate)
+    }
+
+    return undefined
   }
 
   public async deleteFile(file: SNFile): Promise<ClientDisplayableError | undefined> {
+    this.cache.remove(file.uuid)
+
     const tokenResult = await this.api.createFileValetToken(file.remoteIdentifier, 'delete')
 
     if (tokenResult instanceof ClientDisplayableError) {
