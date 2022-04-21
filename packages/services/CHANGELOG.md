@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.9.8](https://github.com/standardnotes/snjs/compare/@standardnotes/services@1.9.7...@standardnotes/services@1.9.8) (2022-04-21)
+
+
+### Bug Fixes
+
+* abort key recovery after aborted challenge ([#703](https://github.com/standardnotes/snjs/issues/703)) ([a67fb7e](https://github.com/standardnotes/snjs/commit/a67fb7e8cde41a5c9fadf545933e35d525faeaf0))
+
+
+
+
+
 ## [1.9.7](https://github.com/standardnotes/snjs/compare/@standardnotes/services@1.9.6...@standardnotes/services@1.9.7) (2022-04-20)
 
 **Note:** Version bump only for package @standardnotes/services

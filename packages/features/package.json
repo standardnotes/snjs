@@ -1,6 +1,6 @@
 {
   "name": "@standardnotes/features",
-  "version": "1.37.7",
+  "version": "1.37.8",
   "engines": {
     "node": ">=14.0.0 <17.0.0"
   },
@@ -23,8 +23,8 @@
     "lint": "eslint . --ext .ts"
   },
   "dependencies": {
-    "@standardnotes/auth": "^3.18.9",
-    "@standardnotes/common": "^1.19.4"
+    "@standardnotes/auth": "^3.18.10",
+    "@standardnotes/common": "^1.19.5"
   },
   "devDependencies": {
     "@standardnotes/config": "^2.4.0",
