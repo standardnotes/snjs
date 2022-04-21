@@ -17,9 +17,7 @@ export function parseFileName(fileName: string): {
   const pattern = /(?:\.([^.]+))?$/
   const extMatches = pattern.exec(fileName)
   const ext = extMatches?.[1] || ''
-  const name = fileName.includes('.')
-    ? fileName.substring(0, fileName.lastIndexOf('.'))
-    : fileName
+  const name = fileName.includes('.') ? fileName.substring(0, fileName.lastIndexOf('.')) : fileName
 
   return { name, ext }
 }
@@ -39,11 +37,15 @@ export function saveFile(name: string, bytes: Uint8Array): void {
 
 const BYTES_IN_ONE_KILOBYTE = 1_000
 const BYTES_IN_ONE_MEGABYTE = 1_000_000
+const BYTES_IN_ONE_GIGABYTE = 1_000_000_000
 
 export function formatSizeToReadableString(bytes: number): string {
   let size = bytes
   let unit = 'B'
-  if (bytes >= BYTES_IN_ONE_MEGABYTE) {
+  if (bytes >= BYTES_IN_ONE_GIGABYTE) {
+    size = bytes / BYTES_IN_ONE_GIGABYTE
+    unit = 'GB'
+  } else if (bytes >= BYTES_IN_ONE_MEGABYTE) {
     size = bytes / BYTES_IN_ONE_MEGABYTE
     unit = 'MB'
   } else if (bytes >= BYTES_IN_ONE_KILOBYTE) {
