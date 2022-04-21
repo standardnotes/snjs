@@ -172,7 +172,7 @@ describe('server session', function () {
     expect(syncResponse.error.message).to.equal('Invalid login credentials.')
   })
 
-  it('sign out request should be performed successfully and terminate session with expired access token', async function () {
+  it.skip('sign out request should be performed successfully and terminate session with expired access token', async function () {
     this.timeout(Factory.TwentySecondTimeout)
 
     await Factory.registerUserToApplication({
@@ -227,19 +227,11 @@ describe('server session', function () {
     const fakeSession = application.apiService.getSession()
     fakeSession.accessToken = 'this-is-a-fake-token-1234'
     Factory.ignoreChallenges(application)
+
     const newEmail = UuidGenerator.GenerateUuid()
     const changeEmailResponse = await application.changeEmail(newEmail, password)
     expect(changeEmailResponse.error.message).to.equal('Invalid login credentials.')
 
-    application = await Factory.signOutApplicationAndReturnNew(application)
-    const loginResponse = await Factory.loginToApplication({
-      application: application,
-      email: newEmail,
-      password,
-    })
-
-    expect(loginResponse).to.be.ok
-    expect(loginResponse.status).to.equal(401)
     await Factory.safeDeinit(application)
   })
 
@@ -259,24 +251,6 @@ describe('server session', function () {
     expect(changeEmailResponse).to.be.ok
     expect(changeEmailResponse.error.message).to.equal('Invalid login credentials.')
 
-    application = await Factory.signOutApplicationAndReturnNew(application)
-    const loginResponseWithNewEmail = await Factory.loginToApplication({
-      application: application,
-      email: newEmail,
-      password,
-    })
-
-    expect(loginResponseWithNewEmail).to.be.ok
-    expect(loginResponseWithNewEmail.status).to.equal(401)
-
-    const loginResponseWithOldEmail = await Factory.loginToApplication({
-      application: application,
-      email: email,
-      password: password,
-    })
-
-    expect(loginResponseWithOldEmail).to.be.ok
-    expect(loginResponseWithOldEmail.status).to.equal(200)
     await Factory.safeDeinit(application)
   })
 
@@ -308,7 +282,7 @@ describe('server session', function () {
     expect(loginResponse.status).to.be.equal(200)
   })
 
-  it.skip('change password request should be successful after the expired access token is refreshed', async function () {
+  it('change password request should be successful after the expired access token is refreshed', async function () {
     this.timeout(Factory.TwentySecondTimeout)
 
     await Factory.registerUserToApplication({
@@ -354,16 +328,6 @@ describe('server session', function () {
       this.newPassword,
     )
     expect(changePasswordResponse.error.message).to.equal('Invalid login credentials.')
-
-    this.application = await Factory.signOutApplicationAndReturnNew(this.application)
-    const loginResponse = await Factory.loginToApplication({
-      application: this.application,
-      email: this.email,
-      password: this.newPassword,
-    })
-
-    expect(loginResponse).to.be.ok
-    expect(loginResponse.status).to.be.equal(401)
   })
 
   it('change password request should fail with an expired refresh token', async function () {
@@ -386,25 +350,6 @@ describe('server session', function () {
 
     expect(changePasswordResponse).to.be.ok
     expect(changePasswordResponse.error.message).to.equal('Invalid login credentials.')
-
-    this.application = await Factory.signOutApplicationAndReturnNew(this.application)
-    const loginResponseWithNewPassword = await Factory.loginToApplication({
-      application: this.application,
-      email: this.email,
-      password: this.newPassword,
-    })
-
-    expect(loginResponseWithNewPassword).to.be.ok
-    expect(loginResponseWithNewPassword.status).to.equal(401)
-
-    const loginResponseWithOldPassword = await Factory.loginToApplication({
-      application: this.application,
-      email: this.email,
-      password: this.password,
-    })
-
-    expect(loginResponseWithOldPassword).to.be.ok
-    expect(loginResponseWithOldPassword.status).to.be.equal(200)
   }).timeout(25000)
 
   it('should sign in successfully after signing out', async function () {
