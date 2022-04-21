@@ -147,94 +147,49 @@ describe('key recovery service', function () {
     await context.deinit()
   })
 
-  it('when changing password on another client, it should prompt us for new account password', async function () {
-    /**
-     * This test takes way too long due to all the key generation occuring
-     * from registering, changing pw, logging in, verifying protections, reauthenticating expired sessions, etc,
-     * and is a prime candidate for race conditions and flakiness. It should be broken down into smaller tests.
-     */
-    const namespace = Factory.randomString()
-    const newPassword = `${Math.random()}`
-    const contextA = await Factory.createAppContextWithFakeCrypto(namespace)
-    const appA = contextA.application
-
-    const receiveChallenge = (challenge) => {
-      const responses = []
-      for (const prompt of challenge.prompts) {
-        if (prompt.validation === ChallengeValidation.AccountPassword) {
-          responses.push(new ChallengeValue(prompt, contextA.password))
-        } else if (prompt.validation === ChallengeValidation.ProtectionSessionDuration) {
-          responses.push(new ChallengeValue(prompt, UnprotectedAccessSecondsDuration.OneMinute))
-        } else if (prompt.placeholder === 'Email') {
-          responses.push(new ChallengeValue(prompt, contextA.email))
-        } else if (prompt.placeholder === 'Password' || challenge.heading.includes('password')) {
-          /** Give newPassword when prompted to revalidate session */
-          responses.push(new ChallengeValue(prompt, newPassword))
-        } else {
-          console.error(
-            'Unhandled custom challenge in Factory.createAppContextWithFakeCrypto',
-            challenge,
-            prompt,
-          )
-        }
-      }
-      appA.submitValuesForChallenge(challenge, responses)
-    }
-    await appA.prepareForLaunch({ receiveChallenge })
-    await appA.launch(true)
-
-    await Factory.registerUserToApplication({
-      application: appA,
-      email: contextA.email,
-      password: contextA.password,
-    })
-
-    expect(appA.items.getItems(ContentType.ItemsKey).length).to.equal(1)
+  it('when changing password on client B, client A should perform recovery flow', async function () {
+    const contextA = await Factory.createAppContextWithFakeCrypto()
+    await contextA.launch()
+    await contextA.register()
 
     /** Create simultaneous appB signed into same account */
-    const contextB = await Factory.createAppContextWithFakeCrypto('another-namespace')
-    const appB = contextB.application
+    const contextB = await Factory.createAppContextWithFakeCrypto(
+      'another-namespace',
+      contextA.email,
+      contextA.password,
+    )
     contextB.ignoreChallenges()
-    await appB.prepareForLaunch({})
-    await appB.launch(true)
+    await contextB.launch()
+    await contextB.signIn()
 
-    await Factory.loginToApplication({
-      application: appB,
-      email: contextA.email,
-      password: contextA.password,
-    })
+    const newPassword = `${Math.random()}`
 
     /** Change password on appB */
+    const appB = contextB.application
     const result = await appB.changePassword(contextA.password, newPassword)
     expect(result.error).to.not.be.ok
+    expect(appB.items.getAnyItems(ContentType.ItemsKey).length).to.equal(2)
 
     const note = await Factory.createSyncedNote(appB)
 
-    expect(appB.items.getAnyItems(ContentType.ItemsKey).length).to.equal(2)
-
-    await appB.sync.sync(syncOptions)
-
-    expect(appA.items.getAnyItems(ContentType.ItemsKey).length).to.equal(1)
-
     /** Sync appA and expect a new items key to be downloaded and errored */
-    const syncPromise = appA.sync.sync(syncOptions)
+    contextA.password = newPassword
+    const syncPromise = contextA.sync(syncOptions)
     await contextA.awaitNextSucessfulSync()
     await syncPromise
 
-    expect(appA.items.getAnyItems(ContentType.ItemsKey).length).to.equal(2)
+    const appA = contextA.application
 
     /** Same previously errored key should now no longer be errored, */
-    const keys = appA.itemManager.itemsKeys()
-    for (const key of keys) {
+    expect(appA.items.getAnyItems(ContentType.ItemsKey).length).to.equal(2)
+    for (const key of appA.itemManager.itemsKeys()) {
       expect(key.errorDecrypting).to.not.be.ok
     }
 
-    /** appA's root key should now match appB's. */
     const aKey = await appA.protocolService.getRootKey()
     const bKey = await appB.protocolService.getRootKey()
     expect(aKey.compare(bKey)).to.equal(true)
 
-    /** Expect appB note to be decrypted */
     expect(appA.items.findItem(note.uuid).errorDecrypting).to.not.be.ok
     expect(appB.items.findItem(note.uuid).errorDecrypting).to.not.be.ok
 
@@ -561,55 +516,27 @@ describe('key recovery service', function () {
   })
 
   it('when replacing root key, new root key should be set before items key are re-saved to disk', async function () {
-    const namespace = Factory.randomString()
-    const newPassword = 'new-password'
-    const contextA = await Factory.createAppContextWithFakeCrypto(namespace)
-    const appA = contextA.application
-    const receiveChallenge = (challenge) => {
-      const responses = []
-      for (const prompt of challenge.prompts) {
-        if (prompt.validation === ChallengeValidation.AccountPassword) {
-          responses.push(new ChallengeValue(prompt, contextA.password))
-        } else if (prompt.validation === ChallengeValidation.ProtectionSessionDuration) {
-          responses.push(new ChallengeValue(prompt, UnprotectedAccessSecondsDuration.OneMinute))
-        } else if (prompt.placeholder === 'Email') {
-          responses.push(new ChallengeValue(prompt, contextA.email))
-        } else if (prompt.placeholder === 'Password' || challenge.heading.includes('password')) {
-          /** Give newPassword when prompted to revalidate session */
-          responses.push(new ChallengeValue(prompt, newPassword))
-        } else {
-          console.error(
-            'Unhandled custom challenge in Factory.createAppContextWithFakeCrypto',
-            challenge,
-            prompt,
-          )
-        }
-      }
-      appA.submitValuesForChallenge(challenge, responses)
-    }
-    await appA.prepareForLaunch({ receiveChallenge })
-    await appA.launch(true)
+    const contextA = await Factory.createAppContextWithFakeCrypto()
+    await contextA.launch()
+    await contextA.register()
 
-    await Factory.registerUserToApplication({
-      application: appA,
-      email: contextA.email,
-      password: contextA.password,
-    })
+    const newPassword = 'new-password'
 
     /** Create simultaneous appB signed into same account */
-    const contextB = await Factory.createAppContextWithFakeCrypto('another-namespace')
+    const contextB = await Factory.createAppContextWithFakeCrypto(
+      'another-namespace',
+      contextA.email,
+      contextA.password,
+    )
+    contextB.ignoreChallenges()
+    await contextB.launch()
+    await contextB.signIn()
     const appB = contextB.application
-    await appB.prepareForLaunch({})
-    await appB.launch(true)
-    await Factory.loginToApplication({
-      application: appB,
-      email: contextA.email,
-      password: contextA.password,
-    })
 
     /** Change password on appB */
     const result = await appB.changePassword(contextA.password, newPassword)
     expect(result.error).to.not.be.ok
+    contextA.password = newPassword
     await appB.sync.sync()
 
     const newDefaultKey = appB.protocolService.getSureDefaultItemsKey()
@@ -621,6 +548,7 @@ describe('key recovery service', function () {
     })
 
     /** Insert foreign items key into appA, which shouldn't be able to decrypt it yet */
+    const appA = contextA.application
     await appA.payloadManager.emitPayload(
       encrypted.copy({
         errorDecrypting: true,
