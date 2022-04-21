@@ -3,6 +3,28 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.18.9](https://github.com/standardnotes/snjs/compare/@standardnotes/auth@3.18.8...@standardnotes/auth@3.18.9) (2022-04-20)
+
+
+### Bug Fixes
+
+* valet token data optional property ([f926ecb](https://github.com/standardnotes/snjs/commit/f926ecbd5481e9cc98cbfadf57260e1d4a5e54fc))
+
+
+
+
+
+## [3.18.8](https://github.com/standardnotes/snjs/compare/@standardnotes/auth@3.18.7...@standardnotes/auth@3.18.8) (2022-04-20)
+
+
+### Bug Fixes
+
+* valet token data property name ([990fca7](https://github.com/standardnotes/snjs/commit/990fca7bdab43d06339ffa25b907c850fd0afb22))
+
+
+
+
+
 ## [3.18.7](https://github.com/standardnotes/snjs/compare/@standardnotes/auth@3.18.6...@standardnotes/auth@3.18.7) (2022-04-15)
 
 **Note:** Version bump only for package @standardnotes/auth

@@ -3,6 +3,52 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.4.6](https://github.com/standardnotes/snjs/compare/@standardnotes/models@1.4.5...@standardnotes/models@1.4.6) (2022-04-20)
+
+**Note:** Version bump only for package @standardnotes/models
+
+
+
+
+
+## [1.4.5](https://github.com/standardnotes/snjs/compare/@standardnotes/models@1.4.4...@standardnotes/models@1.4.5) (2022-04-20)
+
+**Note:** Version bump only for package @standardnotes/models
+
+
+
+
+
+## [1.4.4](https://github.com/standardnotes/snjs/compare/@standardnotes/models@1.4.3...@standardnotes/models@1.4.4) (2022-04-19)
+
+
+### Bug Fixes
+
+* better conflict errored items ([#699](https://github.com/standardnotes/snjs/issues/699)) ([1feaddd](https://github.com/standardnotes/snjs/commit/1feadddb79a4b39d08b6de979a380984fec6c689))
+
+
+
+
+
+## [1.4.3](https://github.com/standardnotes/snjs/compare/@standardnotes/models@1.4.2...@standardnotes/models@1.4.3) (2022-04-19)
+
+
+### Bug Fixes
+
+* properly handle encrypted item changes in collections ([#698](https://github.com/standardnotes/snjs/issues/698)) ([8b23c65](https://github.com/standardnotes/snjs/commit/8b23c6555decbdc5099fc4228ff889f7e5c8eb85))
+
+
+
+
+
+## [1.4.2](https://github.com/standardnotes/snjs/compare/@standardnotes/models@1.4.1...@standardnotes/models@1.4.2) (2022-04-19)
+
+**Note:** Version bump only for package @standardnotes/models
+
+
+
+
+
 ## [1.4.1](https://github.com/standardnotes/snjs/compare/@standardnotes/models@1.4.0...@standardnotes/models@1.4.1) (2022-04-18)
 
 

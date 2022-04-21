@@ -2,7 +2,7 @@ import { Uuid } from '@standardnotes/common'
 
 export type ValetTokenData = {
   userUuid: Uuid,
-  performerSubscriptionUuid: Uuid
+  sharedSubscriptionUuid: Uuid | undefined
   regularSubscriptionUuid: Uuid
   permittedOperation: 'read' | 'write' | 'delete',
   permittedResources: Array<{

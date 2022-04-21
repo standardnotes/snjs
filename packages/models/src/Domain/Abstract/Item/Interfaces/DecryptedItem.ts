@@ -1,4 +1,4 @@
-import { ProtocolVersion, Uuid } from '@standardnotes/common'
+import { Uuid } from '@standardnotes/common'
 import { AppDataField } from '../Types/AppDataField'
 import { ComponentDataDomain, DefaultAppDomain } from '../Types/DefaultAppDomain'
 import { ContentReference } from '../../Reference/ContentReference'
@@ -21,7 +21,6 @@ export interface DecryptedItemInterface<C extends ItemContent = ItemContent>
   readonly archived: boolean
   readonly locked: boolean
   readonly userModifiedDate: Date
-  readonly version: ProtocolVersion
   readonly references: ContentReference[]
 
   getAppDomainValueWithDefault<T, D extends T>(key: AppDataField | PrefKey, defaultValue: D): T

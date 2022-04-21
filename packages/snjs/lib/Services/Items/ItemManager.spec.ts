@@ -4,7 +4,14 @@ import { ItemManager } from './ItemManager'
 import { PayloadManager } from '../Payloads/PayloadManager'
 import { UuidGenerator } from '@standardnotes/utils'
 import * as Models from '@standardnotes/models'
-import { DeletedPayload, PayloadTimestampDefaults } from '@standardnotes/models'
+import {
+  DecryptedPayload,
+  DeletedPayload,
+  EncryptedPayload,
+  FillItemContent,
+  PayloadTimestampDefaults,
+  NoteContent,
+} from '@standardnotes/models'
 
 const setupRandomUuid = () => {
   UuidGenerator.SetGenerator(() => String(Math.random()))
@@ -120,6 +127,38 @@ describe('itemManager', () => {
       itemManager['notifyObservers'] = mockFn
 
       await payloadManager.emitPayload(payload, Models.PayloadEmitSource.LocalInserted)
+
+      expect(mockFn.mock.calls[0][2]).toHaveLength(1)
+    })
+
+    it('decrypted items who become encrypted should be removed from ui', async () => {
+      itemManager = createService()
+
+      const decrypted = new DecryptedPayload({
+        uuid: String(Math.random()),
+        content_type: ContentType.Note,
+        content: FillItemContent<NoteContent>({
+          title: 'foo',
+        }),
+        ...PayloadTimestampDefaults(),
+      })
+
+      await payloadManager.emitPayload(decrypted, Models.PayloadEmitSource.LocalInserted)
+
+      const encrypted = new EncryptedPayload({
+        ...decrypted,
+        content: '004:...',
+        enc_item_key: '004:...',
+        items_key_id: '123',
+        waitingForKey: true,
+        errorDecrypting: true,
+      })
+
+      const mockFn = jest.fn()
+
+      itemManager['notifyObservers'] = mockFn
+
+      await payloadManager.emitPayload(encrypted, Models.PayloadEmitSource.LocalInserted)
 
       expect(mockFn.mock.calls[0][2]).toHaveLength(1)
     })

@@ -225,9 +225,9 @@ export class SNProtectionService
     return this.authorizeAction(ChallengeReason.ImportFile)
   }
 
-  async authorizeBackupCreation(encrypted: boolean): Promise<boolean> {
+  async authorizeBackupCreation(): Promise<boolean> {
     return this.authorizeAction(ChallengeReason.ExportBackup, {
-      fallBackToAccountPassword: encrypted,
+      fallBackToAccountPassword: true,
     })
   }
 
@@ -264,18 +264,22 @@ export class SNProtectionService
     }
 
     const prompts: ChallengePrompt[] = []
+
     if (this.hasBiometricsEnabled()) {
       prompts.push(new ChallengePrompt(ChallengeValidation.Biometric))
     }
+
     if (this.protocolService.hasPasscode()) {
       prompts.push(new ChallengePrompt(ChallengeValidation.LocalPasscode))
     }
+
     if (requireAccountPassword) {
       if (!this.protocolService.hasAccount()) {
         throw Error('Requiring account password for challenge with no account')
       }
       prompts.push(new ChallengePrompt(ChallengeValidation.AccountPassword))
     }
+
     if (prompts.length === 0) {
       if (fallBackToAccountPassword && this.protocolService.hasAccount()) {
         prompts.push(new ChallengePrompt(ChallengeValidation.AccountPassword))

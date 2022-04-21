@@ -31,7 +31,7 @@ describe('backups', function () {
     let data = await this.application.createDecryptedBackupFile()
     expect(data.version).to.equal(this.application.protocolService.getLatestVersion())
     await this.application.addPasscode('passcode')
-    data = await this.application.createEncryptedBackupFile()
+    data = await this.application.createEncryptedBackupFileForAutomatedDesktopBackups()
     expect(data.version).to.equal(this.application.protocolService.getLatestVersion())
   })
 
@@ -53,12 +53,12 @@ describe('backups', function () {
     ])
 
     // Encrypted backup without authorization
-    const encryptedData = await this.application.createEncryptedBackupFile()
+    const encryptedData = await this.application.createEncryptedBackupFileForAutomatedDesktopBackups()
     expect(encryptedData.items.length).to.equal(BASE_ITEM_COUNT_ENCRYPTED + 2)
 
     // Encrypted backup with authorization
     Factory.handlePasswordChallenges(this.application, passcode)
-    const authorizedEncryptedData = await this.application.createEncryptedBackupFile(true)
+    const authorizedEncryptedData = await this.application.createEncryptedBackupFile()
     expect(authorizedEncryptedData.items.length).to.equal(BASE_ITEM_COUNT_ENCRYPTED + 2)
   })
 
@@ -75,16 +75,17 @@ describe('backups', function () {
     ])
 
     // Encrypted backup without authorization
-    const encryptedData = await this.application.createEncryptedBackupFile()
+    const encryptedData = await this.application.createEncryptedBackupFileForAutomatedDesktopBackups()
     expect(encryptedData.items.length).to.equal(BASE_ITEM_COUNT_ENCRYPTED + 2)
+
+    Factory.handlePasswordChallenges(this.application, this.password)
 
     // Decrypted backup
     const decryptedData = await this.application.createDecryptedBackupFile()
     expect(decryptedData.items.length).to.equal(BASE_ITEM_COUNT_DECRYPTED + 2)
 
     // Encrypted backup with authorization
-    Factory.handlePasswordChallenges(this.application, this.password)
-    const authorizedEncryptedData = await this.application.createEncryptedBackupFile(true)
+    const authorizedEncryptedData = await this.application.createEncryptedBackupFile()
     expect(authorizedEncryptedData.items.length).to.equal(BASE_ITEM_COUNT_ENCRYPTED + 2)
   })
 
@@ -100,7 +101,7 @@ describe('backups', function () {
     ])
 
     // Encrypted backup without authorization
-    const encryptedData = await this.application.createEncryptedBackupFile()
+    const encryptedData = await this.application.createEncryptedBackupFileForAutomatedDesktopBackups()
     expect(encryptedData.items.length).to.equal(BASE_ITEM_COUNT_ENCRYPTED + 2)
 
     Factory.handlePasswordChallenges(this.application, passcode)
@@ -110,7 +111,7 @@ describe('backups', function () {
     expect(decryptedData.items.length).to.equal(BASE_ITEM_COUNT_DECRYPTED + 2)
 
     // Encrypted backup with authorization
-    const authorizedEncryptedData = await this.application.createEncryptedBackupFile(true)
+    const authorizedEncryptedData = await this.application.createEncryptedBackupFileForAutomatedDesktopBackups()
     expect(authorizedEncryptedData.items.length).to.equal(BASE_ITEM_COUNT_ENCRYPTED + 2)
   })
 
@@ -135,7 +136,7 @@ describe('backups', function () {
       password: this.password,
     })
 
-    backupData = await this.application.createEncryptedBackupFile()
+    backupData = await this.application.createEncryptedBackupFileForAutomatedDesktopBackups()
     rawItem = backupData.items.find((i) => i.content_type === ContentType.Note)
 
     expect(rawItem.fields).to.not.be.ok
@@ -182,19 +183,25 @@ describe('backups', function () {
 
   it('decrypted backup file with account should not have keyParams', async function () {
     const application = await Factory.createInitAppWithFakeCrypto()
+    const password = UuidGenerator.GenerateUuid()
     await Factory.registerUserToApplication({
       application: application,
       email: UuidGenerator.GenerateUuid(),
-      password: UuidGenerator.GenerateUuid(),
+      password: password,
     })
+
+    Factory.handlePasswordChallenges(application, password)
+
     const backup = await application.createDecryptedBackupFile()
+
     expect(backup).to.not.haveOwnProperty('keyParams')
+
     await Factory.safeDeinit(application)
   })
 
   it('encrypted backup file should have keyParams', async function () {
     await this.application.addPasscode('passcode')
-    const backup = await this.application.createEncryptedBackupFile()
+    const backup = await this.application.createEncryptedBackupFileForAutomatedDesktopBackups()
     expect(backup).to.haveOwnProperty('keyParams')
   })
 
@@ -205,7 +212,7 @@ describe('backups', function () {
 
   it('encrypted backup file should have itemsKeys', async function () {
     await this.application.addPasscode('passcode')
-    const backup = await this.application.createEncryptedBackupFile()
+    const backup = await this.application.createEncryptedBackupFileForAutomatedDesktopBackups()
     expect(backup.items.some((item) => item.content_type === ContentType.ItemsKey)).to.be.true
   })
 
@@ -219,7 +226,7 @@ describe('backups', function () {
     )
     let error
     try {
-      await this.application.createEncryptedBackupFile()
+      await this.application.createEncryptedBackupFileForAutomatedDesktopBackups()
     } catch (e) {
       error = e
     }
