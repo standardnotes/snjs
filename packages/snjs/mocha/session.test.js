@@ -172,7 +172,7 @@ describe('server session', function () {
     expect(syncResponse.error.message).to.equal('Invalid login credentials.')
   })
 
-  it.skip('sign out request should be performed successfully and terminate session with expired access token', async function () {
+  it('sign out request should be performed successfully and terminate session with expired access token', async function () {
     this.timeout(Factory.TwentySecondTimeout)
 
     await Factory.registerUserToApplication({
