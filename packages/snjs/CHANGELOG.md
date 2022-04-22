@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.99.0](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.98.2...@standardnotes/snjs@2.99.0) (2022-04-22)
+
+
+### Features
+
+* add getSubscriptionSetting function ([#700](https://github.com/standardnotes/snjs/issues/700)) ([9ce373e](https://github.com/standardnotes/snjs/commit/9ce373e7651d2fcfd2709c48c3565673dc4b776a))
+
+
+
+
+
 ## [2.98.2](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.98.1...@standardnotes/snjs@2.98.2) (2022-04-22)
 
 **Note:** Version bump only for package @standardnotes/snjs
