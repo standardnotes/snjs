@@ -56,20 +56,15 @@ describe('download and decrypt', () => {
   it('run should resolve when operation is complete', async () => {
     let receivedBytes = new Uint8Array()
 
-    operation = new DownloadAndDecryptFileOperation(
-      file,
-      crypto,
-      apiService,
-      'api-token',
-      // eslint-disable-next-line @typescript-eslint/require-await
-      async (decryptedBytes) => {
-        if (decryptedBytes) {
-          receivedBytes = new Uint8Array([...receivedBytes, ...decryptedBytes])
-        }
-      },
-    )
+    operation = new DownloadAndDecryptFileOperation(file, crypto, apiService, 'api-token')
 
-    await operation.run()
+    await operation.run(async (decryptedBytes) => {
+      if (decryptedBytes) {
+        receivedBytes = new Uint8Array([...receivedBytes, ...decryptedBytes])
+      }
+
+      await Promise.resolve()
+    })
 
     expect(receivedBytes.length).toEqual(NumChunks)
   })

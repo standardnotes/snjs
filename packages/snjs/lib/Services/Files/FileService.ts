@@ -151,9 +151,9 @@ export class SNFileService extends AbstractService implements FilesClientInterfa
       return onDecryptedBytes(bytes)
     }
 
-    const operation = new DownloadAndDecryptFileOperation(file, this.crypto, this.api, tokenResult, bytesWrapper)
+    const operation = new DownloadAndDecryptFileOperation(file, this.crypto, this.api, tokenResult)
 
-    const result = await operation.run()
+    const result = await operation.run(bytesWrapper)
 
     if (addToCache) {
       this.cache.add(file.uuid, cacheEntryAggregate)

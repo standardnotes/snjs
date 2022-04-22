@@ -13,10 +13,9 @@ export class DownloadAndDecryptFileOperation {
     private readonly crypto: SNPureCrypto,
     private readonly api: FilesServerInterface,
     private readonly apiToken: string,
-    private onDecryptedBytes: (decryptedBytes: Uint8Array) => Promise<void>,
   ) {}
 
-  public async run(): Promise<Result> {
+  public async run(onDecryptedBytes: (decryptedBytes: Uint8Array) => Promise<void>): Promise<Result> {
     const decryptor = new FileDecryptor(this.file, this.crypto)
 
     decryptor.initialize()
@@ -38,7 +37,7 @@ export class DownloadAndDecryptFileOperation {
           return
         }
 
-        await this.onDecryptedBytes(result.decryptedBytes)
+        await onDecryptedBytes(result.decryptedBytes)
       },
     )
 
