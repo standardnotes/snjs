@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.6.2](https://github.com/standardnotes/snjs/compare/@standardnotes/utils@1.6.1...@standardnotes/utils@1.6.2) (2022-04-22)
+
+**Note:** Version bump only for package @standardnotes/utils
+
+
+
+
+
 ## [1.6.1](https://github.com/standardnotes/snjs/compare/@standardnotes/utils@1.6.0...@standardnotes/utils@1.6.1) (2022-04-21)
 
 **Note:** Version bump only for package @standardnotes/utils
