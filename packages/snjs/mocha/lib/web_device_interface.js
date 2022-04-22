@@ -3,6 +3,8 @@
 const KEYCHAIN_STORAGE_KEY = 'keychain'
 
 export default class WebDeviceInterface {
+  environment = Environment.Web
+
   async getRawStorageValue(key) {
     return localStorage.getItem(key)
   }

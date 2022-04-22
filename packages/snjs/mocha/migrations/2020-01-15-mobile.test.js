@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-expressions */
 /* eslint-disable no-undef */
 import * as Factory from '../lib/factory.js'
 import FakeWebCrypto from '../lib/fake_web_crypto.js'
@@ -732,11 +731,13 @@ describe('2020-01-15 mobile migration', () => {
     const identifier = 'foo'
     const password = 'tar'
     const accountKey = await operator003.createRootKey(identifier, password)
+
     await application.deviceInterface.setRawStorageValue(
       'auth_params',
       JSON.stringify(accountKey.keyParams.getPortableValue()),
     )
     await application.deviceInterface.setRawStorageValue('user', JSON.stringify({ email: identifier }))
+
     await application.deviceInterface.setLegacyRawKeychainValue({
       mk: accountKey.masterKey,
       pw: accountKey.serverPassword,
