@@ -22,17 +22,6 @@ describe('settings service', function () {
       email: context.email,
       password: context.password,
     })
-
-    await Factory.publishMockedEvent('SUBSCRIPTION_PURCHASED', {
-      userEmail: context.email,
-      subscriptionId: 1,
-      subscriptionName: 'PRO_PLAN',
-      subscriptionExpiresAt: (new Date().getTime() + 3_600_000) * 1_000,
-      timestamp: Date.now(),
-      offline: false,
-    })
-
-    await Factory.sleep(0.25)
   })
 
   afterEach(async function () {
@@ -105,6 +94,17 @@ describe('settings service', function () {
   })
 
   it('reads a subscription setting', async () => {
+    await Factory.publishMockedEvent('SUBSCRIPTION_PURCHASED', {
+      userEmail: context.email,
+      subscriptionId: 1,
+      subscriptionName: 'PRO_PLAN',
+      subscriptionExpiresAt: (new Date().getTime() + 3_600_000) * 1_000,
+      timestamp: Date.now(),
+      offline: false,
+    })
+
+    await Factory.sleep(0.25)
+
     const setting = await application.settings.getSubscriptionSetting('FILE_UPLOAD_BYTES_LIMIT')
     expect(setting).to.be.a('string')
   })
