@@ -60,13 +60,8 @@ export function CreateDecryptionSplitWithKeyLookup(
   return result
 }
 
-export function FindPayloadInEncryptionSplit(
-  uuid: Uuid,
-  split: KeyedEncryptionSplit,
-): DecryptedPayloadInterface {
-  const inUsesItemsKey = split.usesItemsKey?.items.find(
-    (item: PayloadInterface) => item.uuid === uuid,
-  )
+export function FindPayloadInEncryptionSplit(uuid: Uuid, split: KeyedEncryptionSplit): DecryptedPayloadInterface {
+  const inUsesItemsKey = split.usesItemsKey?.items.find((item: PayloadInterface) => item.uuid === uuid)
   if (inUsesItemsKey) {
     return inUsesItemsKey
   }
@@ -76,16 +71,12 @@ export function FindPayloadInEncryptionSplit(
     return inUsesRootKey
   }
 
-  const inUsesItemsKeyWithKeyLookup = split.usesItemsKeyWithKeyLookup?.items.find(
-    (item) => item.uuid === uuid,
-  )
+  const inUsesItemsKeyWithKeyLookup = split.usesItemsKeyWithKeyLookup?.items.find((item) => item.uuid === uuid)
   if (inUsesItemsKeyWithKeyLookup) {
     return inUsesItemsKeyWithKeyLookup
   }
 
-  const inUsesRootKeyWithKeyLookup = split.usesRootKeyWithKeyLookup?.items.find(
-    (item) => item.uuid === uuid,
-  )
+  const inUsesRootKeyWithKeyLookup = split.usesRootKeyWithKeyLookup?.items.find((item) => item.uuid === uuid)
   if (inUsesRootKeyWithKeyLookup) {
     return inUsesRootKeyWithKeyLookup
   }
@@ -93,13 +84,8 @@ export function FindPayloadInEncryptionSplit(
   throw Error('Cannot find payload in encryption split')
 }
 
-export function FindPayloadInDecryptionSplit(
-  uuid: Uuid,
-  split: KeyedDecryptionSplit,
-): EncryptedPayloadInterface {
-  const inUsesItemsKey = split.usesItemsKey?.items.find(
-    (item: PayloadInterface) => item.uuid === uuid,
-  )
+export function FindPayloadInDecryptionSplit(uuid: Uuid, split: KeyedDecryptionSplit): EncryptedPayloadInterface {
+  const inUsesItemsKey = split.usesItemsKey?.items.find((item: PayloadInterface) => item.uuid === uuid)
   if (inUsesItemsKey) {
     return inUsesItemsKey
   }
@@ -109,16 +95,12 @@ export function FindPayloadInDecryptionSplit(
     return inUsesRootKey
   }
 
-  const inUsesItemsKeyWithKeyLookup = split.usesItemsKeyWithKeyLookup?.items.find(
-    (item) => item.uuid === uuid,
-  )
+  const inUsesItemsKeyWithKeyLookup = split.usesItemsKeyWithKeyLookup?.items.find((item) => item.uuid === uuid)
   if (inUsesItemsKeyWithKeyLookup) {
     return inUsesItemsKeyWithKeyLookup
   }
 
-  const inUsesRootKeyWithKeyLookup = split.usesRootKeyWithKeyLookup?.items.find(
-    (item) => item.uuid === uuid,
-  )
+  const inUsesRootKeyWithKeyLookup = split.usesRootKeyWithKeyLookup?.items.find((item) => item.uuid === uuid)
   if (inUsesRootKeyWithKeyLookup) {
     return inUsesRootKeyWithKeyLookup
   }

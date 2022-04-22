@@ -1,11 +1,7 @@
 import { NoteContent } from './../../../Syncable/Note/NoteContent'
 import { ContentType } from '@standardnotes/common'
 import { DecryptedItem, EncryptedItem } from '../../../Abstract/Item'
-import {
-  DecryptedPayload,
-  EncryptedPayload,
-  PayloadTimestampDefaults,
-} from '../../../Abstract/Payload'
+import { DecryptedPayload, EncryptedPayload, PayloadTimestampDefaults } from '../../../Abstract/Payload'
 import { ItemCollection } from './ItemCollection'
 import { FillItemContent } from '../../../Abstract/Content/ItemContent'
 import { TagNotesIndex } from './TagNotesIndex'

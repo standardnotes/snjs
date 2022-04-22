@@ -13,10 +13,7 @@ export class TagNotesIndex implements SNIndex {
   private tagToNotesMap: Partial<Record<Uuid, Set<Uuid>>> = {}
   private allCountableNotes = new Set<Uuid>()
 
-  constructor(
-    private collection: ItemCollection,
-    public observers: TagNoteCountChangeObserver[] = [],
-  ) {}
+  constructor(private collection: ItemCollection, public observers: TagNoteCountChangeObserver[] = []) {}
 
   private isNoteCountable = (note: ItemInterface) => {
     if (isDecryptedItem(note)) {

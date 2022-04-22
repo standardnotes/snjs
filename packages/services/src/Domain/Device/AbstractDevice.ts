@@ -73,9 +73,7 @@ export abstract class AbstractDevice implements DeviceInterface {
    * from scratch.
    * @returns { isNewDatabase } - True if the database was newly created
    */
-  abstract openDatabase(
-    identifier: ApplicationIdentifier,
-  ): Promise<{ isNewDatabase?: boolean } | undefined>
+  abstract openDatabase(identifier: ApplicationIdentifier): Promise<{ isNewDatabase?: boolean } | undefined>
 
   abstract getAllRawDatabasePayloads<T extends TransferPayload = TransferPayload>(
     identifier: ApplicationIdentifier,
@@ -83,15 +81,9 @@ export abstract class AbstractDevice implements DeviceInterface {
 
   abstract saveRawDatabasePayload(payload: any, identifier: ApplicationIdentifier): Promise<void>
 
-  abstract saveRawDatabasePayloads(
-    payloads: any[],
-    identifier: ApplicationIdentifier,
-  ): Promise<void>
+  abstract saveRawDatabasePayloads(payloads: any[], identifier: ApplicationIdentifier): Promise<void>
 
-  abstract removeRawDatabasePayloadWithId(
-    id: string,
-    identifier: ApplicationIdentifier,
-  ): Promise<void>
+  abstract removeRawDatabasePayloadWithId(id: string, identifier: ApplicationIdentifier): Promise<void>
 
   abstract removeAllRawDatabasePayloads(identifier: ApplicationIdentifier): Promise<void>
 

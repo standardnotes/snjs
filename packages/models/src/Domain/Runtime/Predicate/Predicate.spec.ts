@@ -141,10 +141,7 @@ describe('predicates', () => {
     })
 
     it('all matching', () => {
-      const predicate = new IncludesPredicate<Note>(
-        'tags',
-        new Predicate<Note>('title', 'in', ['sobar', 'foo']),
-      )
+      const predicate = new IncludesPredicate<Note>('tags', new Predicate<Note>('title', 'in', ['sobar', 'foo']))
 
       expect(predicate.matchesItem(item)).toEqual(true)
     })
@@ -210,9 +207,7 @@ describe('predicates', () => {
     it('recursive compound predicate', () => {
       expect(
         new CompoundPredicate<Note>('and', [
-          new NotPredicate<Note>(
-            new IncludesPredicate<Note>('tags', new Predicate<Tag>('title', '=', 'far')),
-          ),
+          new NotPredicate<Note>(new IncludesPredicate<Note>('tags', new Predicate<Tag>('title', '=', 'far'))),
           new IncludesPredicate<Note>('tags', new Predicate<Tag>('title', '=', 'foo')),
         ]).matchesItem(item),
       ).toEqual(false)
@@ -241,9 +236,7 @@ describe('predicates', () => {
     it('matching compound', () => {
       expect(
         new CompoundPredicate<Note>('and', [
-          new NotPredicate<Note>(
-            new IncludesPredicate<Note>('tags', new Predicate<Tag>('title', '=', 'boo')),
-          ),
+          new NotPredicate<Note>(new IncludesPredicate<Note>('tags', new Predicate<Tag>('title', '=', 'boo'))),
           new IncludesPredicate<Note>('tags', new Predicate<Tag>('title', '=', 'foo')),
         ]).matchesItem(item),
       ).toEqual(true)
@@ -399,9 +392,7 @@ describe('predicates', () => {
     })
 
     it('nested keypath', () => {
-      expect(new Predicate<any>('numbers.length', '=', numbers.length).matchesItem(item)).toEqual(
-        true,
-      )
+      expect(new Predicate<any>('numbers.length', '=', numbers.length).matchesItem(item)).toEqual(true)
     })
   })
 
@@ -564,9 +555,7 @@ describe('predicates', () => {
   describe('generators', () => {
     it('includes predicate', () => {
       const json = ['B-tags', 'tags', 'includes', ['title', 'startsWith', 'b']]
-      const predicate = predicateFromDSLString(
-        '!' + JSON.stringify(json),
-      ) as IncludesPredicate<Item>
+      const predicate = predicateFromDSLString('!' + JSON.stringify(json)) as IncludesPredicate<Item>
 
       expect(predicate).toBeInstanceOf(IncludesPredicate)
       expect(predicate.predicate).toBeInstanceOf(Predicate)
@@ -594,9 +583,7 @@ describe('predicates', () => {
         ],
       ]
 
-      const predicate = predicateFromDSLString(
-        '!' + JSON.stringify(json),
-      ) as CompoundPredicate<Item>
+      const predicate = predicateFromDSLString('!' + JSON.stringify(json)) as CompoundPredicate<Item>
 
       expect(predicate).toBeInstanceOf(CompoundPredicate)
 
@@ -609,9 +596,7 @@ describe('predicates', () => {
       expect(includesPredicate).toBeInstanceOf(IncludesPredicate)
 
       expect(notPredicate.predicate).toBeInstanceOf(IncludesPredicate)
-      expect((notPredicate.predicate as IncludesPredicate<Item>).predicate).toBeInstanceOf(
-        Predicate,
-      )
+      expect((notPredicate.predicate as IncludesPredicate<Item>).predicate).toBeInstanceOf(Predicate)
     })
 
     it('nested compound or', () => {
@@ -633,9 +618,7 @@ describe('predicates', () => {
         ],
       ]
 
-      const predicate = predicateFromDSLString(
-        '!' + JSON.stringify(json),
-      ) as CompoundPredicate<Item>
+      const predicate = predicateFromDSLString('!' + JSON.stringify(json)) as CompoundPredicate<Item>
 
       expect(predicate).toBeInstanceOf(CompoundPredicate)
 

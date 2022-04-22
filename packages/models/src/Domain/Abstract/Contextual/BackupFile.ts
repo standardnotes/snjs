@@ -14,8 +14,7 @@ export interface BackupFileEncryptedContextualPayload extends ContextPayload {
   updated_at_timestamp: number
 }
 
-export interface BackupFileDecryptedContextualPayload<C extends ItemContent = ItemContent>
-  extends ContextPayload {
+export interface BackupFileDecryptedContextualPayload<C extends ItemContent = ItemContent> extends ContextPayload {
   content: C
   created_at_timestamp: number
   created_at: Date

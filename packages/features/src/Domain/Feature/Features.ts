@@ -14,22 +14,14 @@ import { FeatureIdentifier } from './FeatureIdentifier'
 import { NoteType } from '../Component/NoteType'
 
 export function GetFeatures(): FeatureDescription[] {
-  return [
-    ...themes(),
-    ...editors(),
-    ...serverFeatures(),
-    ...clientFeatures(),
-    ...experimentalFeatures(),
-  ]
+  return [...themes(), ...editors(), ...serverFeatures(), ...clientFeatures(), ...experimentalFeatures()]
 }
 
 function githubDownloadUrl(repoUrl: string, version: string, identifier: FeatureIdentifier) {
   return `${repoUrl}/releases/download/${version}/${identifier}.zip`
 }
 
-function FillThemeComponentDefaults(
-  theme: Partial<ThemeFeatureDescription>,
-): ThemeFeatureDescription {
+function FillThemeComponentDefaults(theme: Partial<ThemeFeatureDescription>): ThemeFeatureDescription {
   if (!theme.static_files) {
     theme.static_files = ['dist', 'package.json']
   }
@@ -62,8 +54,7 @@ function themes(): ThemeFeatureDescription[] {
     description: 'Elegant utilitarianism.',
     git_repo_url: 'https://github.com/standardnotes/midnight-theme',
     marketing_url: 'https://standardnotes.com/extensions/midnight',
-    thumbnail_url:
-      'https://s3.amazonaws.com/standard-notes/screenshots/models/themes/midnight-with-mobile.jpg',
+    thumbnail_url: 'https://s3.amazonaws.com/standard-notes/screenshots/models/themes/midnight-with-mobile.jpg',
     dock_icon: {
       type: 'circle',
       background_color: '#086DD6',
@@ -80,8 +71,7 @@ function themes(): ThemeFeatureDescription[] {
     description: 'Calm and relaxed. Take some time off.',
     git_repo_url: 'https://github.com/standardnotes/futura-theme',
     marketing_url: 'https://standardnotes.com/extensions/futura',
-    thumbnail_url:
-      'https://s3.amazonaws.com/standard-notes/screenshots/models/themes/futura-with-mobile.jpg',
+    thumbnail_url: 'https://s3.amazonaws.com/standard-notes/screenshots/models/themes/futura-with-mobile.jpg',
     dock_icon: {
       type: 'circle',
       background_color: '#fca429',
@@ -98,8 +88,7 @@ function themes(): ThemeFeatureDescription[] {
     description: 'The perfect theme for any time.',
     git_repo_url: 'https://github.com/standardnotes/solarized-dark-theme',
     marketing_url: 'https://standardnotes.com/extensions/solarized-dark',
-    thumbnail_url:
-      'https://s3.amazonaws.com/standard-notes/screenshots/models/themes/solarized-dark.jpg',
+    thumbnail_url: 'https://s3.amazonaws.com/standard-notes/screenshots/models/themes/solarized-dark.jpg',
     dock_icon: {
       type: 'circle',
       background_color: '#2AA198',
@@ -116,8 +105,7 @@ function themes(): ThemeFeatureDescription[] {
     description: 'A theme for writers and readers.',
     git_repo_url: 'https://github.com/standardnotes/autobiography-theme',
     marketing_url: '',
-    thumbnail_url:
-      'https://s3.amazonaws.com/standard-notes/screenshots/models/themes/autobiography.jpg',
+    thumbnail_url: 'https://s3.amazonaws.com/standard-notes/screenshots/models/themes/autobiography.jpg',
     dock_icon: {
       type: 'circle',
       background_color: '#9D7441',
@@ -134,8 +122,7 @@ function themes(): ThemeFeatureDescription[] {
     description: 'For when you need to go in.',
     git_repo_url: 'https://github.com/standardnotes/focus-theme',
     marketing_url: 'https://standardnotes.com/extensions/focused',
-    thumbnail_url:
-      'https://s3.amazonaws.com/standard-notes/screenshots/models/themes/focus-with-mobile.jpg',
+    thumbnail_url: 'https://s3.amazonaws.com/standard-notes/screenshots/models/themes/focus-with-mobile.jpg',
     dock_icon: {
       type: 'circle',
       background_color: '#a464c2',
@@ -152,8 +139,7 @@ function themes(): ThemeFeatureDescription[] {
     description: 'Light on the eyes, heavy on the spirit.',
     git_repo_url: 'https://github.com/standardnotes/titanium-theme',
     marketing_url: 'https://standardnotes.com/extensions/titanium',
-    thumbnail_url:
-      'https://s3.amazonaws.com/standard-notes/screenshots/models/themes/titanium-with-mobile.jpg',
+    thumbnail_url: 'https://s3.amazonaws.com/standard-notes/screenshots/models/themes/titanium-with-mobile.jpg',
     dock_icon: {
       type: 'circle',
       background_color: '#6e2b9e',
@@ -177,12 +163,8 @@ function themes(): ThemeFeatureDescription[] {
   return [midnight, futura, solarizedDark, autobiography, focus, titanium, dynamic]
 }
 
-function FillEditorComponentDefaults(
-  component: Partial<EditorFeatureDescription>,
-): EditorFeatureDescription {
-  component.static_files = ['index.html', 'dist', 'package.json'].concat(
-    component.static_files || [],
-  )
+function FillEditorComponentDefaults(component: Partial<EditorFeatureDescription>): EditorFeatureDescription {
+  component.static_files = ['index.html', 'dist', 'package.json'].concat(component.static_files || [])
 
   if (component.git_repo_url && !component.download_url) {
     component.download_url = githubDownloadUrl(
@@ -278,8 +260,7 @@ function editors(): EditorFeatureDescription[] {
       'From highlighting to custom font sizes and colors, to tables and lists, this editor is perfect for crafting any document.',
     git_repo_url: 'https://github.com/standardnotes/plus-editor',
     marketing_url: 'https://standardnotes.com/extensions/plus-editor',
-    thumbnail_url:
-      'https://s3.amazonaws.com/standard-notes/screenshots/models/editors/plus-editor.jpg',
+    thumbnail_url: 'https://s3.amazonaws.com/standard-notes/screenshots/models/editors/plus-editor.jpg',
   })
 
   const markdownBasic: EditorFeatureDescription = FillEditorComponentDefaults({
@@ -293,8 +274,7 @@ function editors(): EditorFeatureDescription[] {
     description: 'A Markdown editor with dynamic split-pane preview.',
     git_repo_url: 'https://github.com/standardnotes/markdown-basic',
     marketing_url: 'https://standardnotes.com/extensions/simple-markdown-editor',
-    thumbnail_url:
-      'https://s3.amazonaws.com/standard-notes/screenshots/models/editors/simple-markdown.jpg',
+    thumbnail_url: 'https://s3.amazonaws.com/standard-notes/screenshots/models/editors/simple-markdown.jpg',
   })
 
   const markdownPro: EditorFeatureDescription = FillEditorComponentDefaults({
@@ -309,8 +289,7 @@ function editors(): EditorFeatureDescription[] {
       'A fully featured Markdown editor that supports live preview, a styling toolbar, and split pane support.',
     git_repo_url: 'https://github.com/standardnotes/advanced-markdown-editor',
     marketing_url: 'https://standardnotes.com/extensions/advanced-markdown',
-    thumbnail_url:
-      'https://s3.amazonaws.com/standard-notes/screenshots/models/editors/adv-markdown.jpg',
+    thumbnail_url: 'https://s3.amazonaws.com/standard-notes/screenshots/models/editors/adv-markdown.jpg',
   })
 
   const markdownMinimist: EditorFeatureDescription = FillEditorComponentDefaults({
@@ -322,12 +301,10 @@ function editors(): EditorFeatureDescription[] {
     permission_name: PermissionName.MarkdownMinimistEditor,
     version: '1.3.9',
     spellcheckControl: true,
-    description:
-      'A minimal Markdown editor with live rendering and in-text search via Ctrl/Cmd + F',
+    description: 'A minimal Markdown editor with live rendering and in-text search via Ctrl/Cmd + F',
     git_repo_url: 'https://github.com/standardnotes/minimal-markdown-editor',
     marketing_url: 'https://standardnotes.com/extensions/minimal-markdown-editor',
-    thumbnail_url:
-      'https://s3.amazonaws.com/standard-notes/screenshots/models/editors/min-markdown.jpg',
+    thumbnail_url: 'https://s3.amazonaws.com/standard-notes/screenshots/models/editors/min-markdown.jpg',
   } as EditorFeatureDescription)
 
   const markdownMath: EditorFeatureDescription = FillEditorComponentDefaults({
@@ -339,12 +316,10 @@ function editors(): EditorFeatureDescription[] {
     note_type: NoteType.Markdown,
     file_type: 'md',
     index_path: 'index.html',
-    description:
-      'A beautiful split-pane Markdown editor with synced-scroll, LaTeX support, and colorful syntax.',
+    description: 'A beautiful split-pane Markdown editor with synced-scroll, LaTeX support, and colorful syntax.',
     git_repo_url: 'https://github.com/standardnotes/math-editor',
     marketing_url: 'https://standardnotes.com/extensions/math-editor',
-    thumbnail_url:
-      'https://s3.amazonaws.com/standard-notes/screenshots/models/editors/fancy-markdown.jpg',
+    thumbnail_url: 'https://s3.amazonaws.com/standard-notes/screenshots/models/editors/fancy-markdown.jpg',
   })
 
   const task: EditorFeatureDescription = FillEditorComponentDefaults({
@@ -360,8 +335,7 @@ function editors(): EditorFeatureDescription[] {
       'A great way to manage short-term and long-term to-do"s. You can mark tasks as completed, change their order, and edit the text naturally in place.',
     git_repo_url: 'https://github.com/standardnotes/simple-task-editor',
     marketing_url: 'https://standardnotes.com/extensions/simple-task-editor',
-    thumbnail_url:
-      'https://s3.amazonaws.com/standard-notes/screenshots/models/editors/task-editor.jpg',
+    thumbnail_url: 'https://s3.amazonaws.com/standard-notes/screenshots/models/editors/task-editor.jpg',
   })
 
   const tokenvault: EditorFeatureDescription = FillEditorComponentDefaults({
@@ -376,8 +350,7 @@ function editors(): EditorFeatureDescription[] {
       'Encrypt and protect your 2FA secrets for all your internet accounts. TokenVault handles your 2FA secrets so that you never lose them again, or have to start over when you get a new device.',
     marketing_url: '',
     git_repo_url: 'https://github.com/standardnotes/token-vault',
-    thumbnail_url:
-      'https://standard-notes.s3.amazonaws.com/screenshots/models/editors/token-vault.png',
+    thumbnail_url: 'https://standard-notes.s3.amazonaws.com/screenshots/models/editors/token-vault.png',
   })
 
   const spreadsheets: EditorFeatureDescription = FillEditorComponentDefaults({
@@ -392,22 +365,10 @@ function editors(): EditorFeatureDescription[] {
       'A powerful spreadsheet editor with formatting and formula support. Not recommended for large data sets, as encryption of such data may decrease editor performance.',
     marketing_url: '',
     git_repo_url: 'https://github.com/standardnotes/secure-spreadsheets',
-    thumbnail_url:
-      'https://s3.amazonaws.com/standard-notes/screenshots/models/editors/spreadsheets.png',
+    thumbnail_url: 'https://s3.amazonaws.com/standard-notes/screenshots/models/editors/spreadsheets.png',
   })
 
-  return [
-    code,
-    bold,
-    plus,
-    markdownBasic,
-    markdownPro,
-    markdownMinimist,
-    markdownMath,
-    task,
-    tokenvault,
-    spreadsheets,
-  ]
+  return [code, bold, plus, markdownBasic, markdownPro, markdownMinimist, markdownMath, task, tokenvault, spreadsheets]
 }
 
 function experimentalFeatures(): FeatureDescription[] {

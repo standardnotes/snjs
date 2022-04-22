@@ -15,8 +15,7 @@ describe('IntegrityService', () => {
   let payloadManager: PayloadManagerInterface
   let internalEventBus: InternalEventBusInterface
 
-  const createService = () =>
-    new IntegrityService(integrityApi, itemApi, payloadManager, internalEventBus)
+  const createService = () => new IntegrityService(integrityApi, itemApi, payloadManager, internalEventBus)
 
   beforeEach(() => {
     integrityApi = {} as jest.Mocked<IntegrityApiInterface>

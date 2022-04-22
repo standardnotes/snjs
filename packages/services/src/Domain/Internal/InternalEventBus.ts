@@ -33,10 +33,7 @@ export class InternalEventBus implements InternalEventBusInterface {
     }
   }
 
-  async publishSync(
-    event: InternalEventInterface,
-    strategy: InternalEventPublishStrategy,
-  ): Promise<void> {
+  async publishSync(event: InternalEventInterface, strategy: InternalEventPublishStrategy): Promise<void> {
     const handlersForEventType = this.eventHandlers.get(event.type)
     if (handlersForEventType === undefined) {
       return

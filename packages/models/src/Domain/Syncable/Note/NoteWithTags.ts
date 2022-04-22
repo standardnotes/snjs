@@ -8,10 +8,7 @@ interface NoteWithTagsContent extends NoteContent {
 }
 
 export class NoteWithTags extends SNNote {
-  constructor(
-    payload: DecryptedPayloadInterface<NoteWithTagsContent>,
-    public readonly tags?: SNTag[],
-  ) {
+  constructor(payload: DecryptedPayloadInterface<NoteWithTagsContent>, public readonly tags?: SNTag[]) {
     super(payload)
     this.tags = tags || payload.content.tags
   }

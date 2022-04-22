@@ -29,9 +29,7 @@ export class IntegrityService
       return
     }
 
-    const integrityCheckResponse = await this.integrityApi.checkIntegrity(
-      this.payloadManager.integrityPayloads,
-    )
+    const integrityCheckResponse = await this.integrityApi.checkIntegrity(this.payloadManager.integrityPayloads)
     if (integrityCheckResponse.error !== undefined) {
       this.log(`Could not obtain integrity check: ${integrityCheckResponse.error}`)
 
@@ -47,11 +45,7 @@ export class IntegrityService
 
     const rawPayloads = []
     for (const serverItemResponse of serverItemResponses) {
-      if (
-        serverItemResponse.data === undefined ||
-        serverItemResponse.error ||
-        !('item' in serverItemResponse.data)
-      ) {
+      if (serverItemResponse.data === undefined || serverItemResponse.error || !('item' in serverItemResponse.data)) {
         this.log(`Could not obtain item for integrity adjustments: ${serverItemResponse.error}`)
 
         continue

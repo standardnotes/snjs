@@ -35,17 +35,15 @@ export async function DecryptBackupFile(
   protocolService: EncryptionService,
   password?: string,
 ): Promise<ClientDisplayableError | (EncryptedPayloadInterface | DecryptedPayloadInterface)[]> {
-  const payloads: (EncryptedPayloadInterface | DecryptedPayloadInterface)[] = file.items.map(
-    (item) => {
-      if (isEncryptedTransferPayload(item)) {
-        return new EncryptedPayload(item)
-      } else if (isDecryptedTransferPayload(item)) {
-        return new DecryptedPayload(item)
-      } else {
-        throw Error('Unhandled case in decryptBackupFile')
-      }
-    },
-  )
+  const payloads: (EncryptedPayloadInterface | DecryptedPayloadInterface)[] = file.items.map((item) => {
+    if (isEncryptedTransferPayload(item)) {
+      return new EncryptedPayload(item)
+    } else if (isDecryptedTransferPayload(item)) {
+      return new DecryptedPayload(item)
+    } else {
+      throw Error('Unhandled case in decryptBackupFile')
+    }
+  })
 
   const { encrypted, decrypted } = CreatePayloadSplit(payloads)
 
@@ -63,19 +61,11 @@ export async function DecryptBackupFile(
 
       return [
         ...decrypted,
-        ...(await decryptEncrypted(
-          password,
-          CreateAnyKeyParams(keyParamsData),
-          encrypted,
-          protocolService,
-        )),
+        ...(await decryptEncrypted(password, CreateAnyKeyParams(keyParamsData), encrypted, protocolService)),
       ]
     }
     case BackupFileType.EncryptedWithNonEncryptedItemsKey:
-      return [
-        ...decrypted,
-        ...(await decryptEncryptedWithNonEncryptedItemsKey(payloads, protocolService)),
-      ]
+      return [...decrypted, ...(await decryptEncryptedWithNonEncryptedItemsKey(payloads, protocolService))]
     case BackupFileType.FullyDecrypted:
       return [...decrypted, ...encrypted]
   }
@@ -115,9 +105,7 @@ async function decryptEncryptedWithNonEncryptedItemsKey(
     }
   })
 
-  const itemsKeys = decryptedItemsKeys.map((p) =>
-    CreateDecryptedItemFromPayload<ItemsKeyContent, SNItemsKey>(p),
-  )
+  const itemsKeys = decryptedItemsKeys.map((p) => CreateDecryptedItemFromPayload<ItemsKeyContent, SNItemsKey>(p))
 
   return decryptWithItemsKeys(encryptedPayloads, itemsKeys, protocolService)
 }
@@ -182,13 +170,7 @@ async function decryptWithItemsKeys(
     }
 
     try {
-      const key = findKeyToUseForPayload(
-        encryptedPayload,
-        itemsKeys,
-        protocolService,
-        keyParams,
-        fallbackRootKey,
-      )
+      const key = findKeyToUseForPayload(encryptedPayload, itemsKeys, protocolService, keyParams, fallbackRootKey)
 
       if (!key) {
         results.push(
@@ -253,9 +235,7 @@ async function decryptEncrypted(
 
   const decryptedPayloads = await decryptWithItemsKeys(
     payloads,
-    itemsKeysDecryptionResults
-      .filter(isDecryptedPayload)
-      .map((p) => CreateDecryptedItemFromPayload(p)),
+    itemsKeysDecryptionResults.filter(isDecryptedPayload).map((p) => CreateDecryptedItemFromPayload(p)),
     protocolService,
     keyParams,
     rootKey,

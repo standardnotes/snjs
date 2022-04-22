@@ -189,10 +189,7 @@ export class RootKeyEncryptionService extends Services.AbstractService<RootKeySe
   public async getRootKeyParams(): Promise<SNRootKeyParams | undefined> {
     if (this.keyMode === KeyMode.WrapperOnly) {
       return this.getRootKeyWrapperKeyParams()
-    } else if (
-      this.keyMode === KeyMode.RootKeyOnly ||
-      this.keyMode === KeyMode.RootKeyPlusWrapper
-    ) {
+    } else if (this.keyMode === KeyMode.RootKeyOnly || this.keyMode === KeyMode.RootKeyPlusWrapper) {
       return this.recomputeAccountKeyParams()
     } else if (this.keyMode === KeyMode.RootKeyNone) {
       return undefined
@@ -217,9 +214,7 @@ export class RootKeyEncryptionService extends Services.AbstractService<RootKeySe
     origination: Common.KeyParamsOrigination,
     version?: Common.ProtocolVersion,
   ) {
-    const operator = version
-      ? this.operatorManager.operatorForVersion(version)
-      : this.operatorManager.defaultOperator()
+    const operator = version ? this.operatorManager.operatorForVersion(version) : this.operatorManager.defaultOperator()
     return operator.createRootKey(identifier, password, origination)
   }
 
@@ -258,10 +253,7 @@ export class RootKeyEncryptionService extends Services.AbstractService<RootKeySe
     /** If wrapper only, storage is encrypted directly with wrappingKey */
     if (this.keyMode === KeyMode.WrapperOnly) {
       return this.storageService.canDecryptWithKey(wrappingKey)
-    } else if (
-      this.keyMode === KeyMode.RootKeyOnly ||
-      this.keyMode === KeyMode.RootKeyPlusWrapper
-    ) {
+    } else if (this.keyMode === KeyMode.RootKeyOnly || this.keyMode === KeyMode.RootKeyPlusWrapper) {
       /**
        * In these modes, storage is encrypted with account keys, and
        * account keys are encrypted with wrappingKey. Here we validate
@@ -394,10 +386,7 @@ export class RootKeyEncryptionService extends Services.AbstractService<RootKeySe
       this.keyMode = KeyMode.RootKeyOnly
     }
 
-    await this.storageService.removeValue(
-      Services.StorageKey.WrappedRootKey,
-      Services.StorageValueModes.Nonwrapped,
-    )
+    await this.storageService.removeValue(Services.StorageKey.WrappedRootKey, Services.StorageValueModes.Nonwrapped)
     await this.storageService.removeValue(
       Services.StorageKey.RootKeyWrapperKeyParams,
       Services.StorageValueModes.Nonwrapped,
@@ -423,10 +412,7 @@ export class RootKeyEncryptionService extends Services.AbstractService<RootKeySe
       this.keyMode = KeyMode.RootKeyPlusWrapper
     } else if (this.keyMode === KeyMode.RootKeyNone) {
       this.keyMode = KeyMode.RootKeyOnly
-    } else if (
-      this.keyMode === KeyMode.RootKeyOnly ||
-      this.keyMode === KeyMode.RootKeyPlusWrapper
-    ) {
+    } else if (this.keyMode === KeyMode.RootKeyOnly || this.keyMode === KeyMode.RootKeyPlusWrapper) {
       /** Root key is simply changing, mode stays the same */
       /** this.keyMode = this.keyMode; */
     } else {
@@ -458,18 +444,12 @@ export class RootKeyEncryptionService extends Services.AbstractService<RootKeySe
    */
   public async clearLocalKeyState() {
     await this.deviceInterface.clearNamespacedKeychainValue(this.identifier)
-    await this.storageService.removeValue(
-      Services.StorageKey.WrappedRootKey,
-      Services.StorageValueModes.Nonwrapped,
-    )
+    await this.storageService.removeValue(Services.StorageKey.WrappedRootKey, Services.StorageValueModes.Nonwrapped)
     await this.storageService.removeValue(
       Services.StorageKey.RootKeyWrapperKeyParams,
       Services.StorageValueModes.Nonwrapped,
     )
-    await this.storageService.removeValue(
-      Services.StorageKey.RootKeyParams,
-      Services.StorageValueModes.Nonwrapped,
-    )
+    await this.storageService.removeValue(Services.StorageKey.RootKeyParams, Services.StorageValueModes.Nonwrapped)
     this.keyMode = KeyMode.RootKeyNone
     this.setRootKeyInstance(undefined)
 
@@ -499,9 +479,7 @@ export class RootKeyEncryptionService extends Services.AbstractService<RootKeySe
     return this.itemManager.itemsKeys()
   }
 
-  public async encrypPayloadWithKeyLookup(
-    payload: Models.DecryptedPayloadInterface,
-  ): Promise<EncryptedParameters> {
+  public async encrypPayloadWithKeyLookup(payload: Models.DecryptedPayloadInterface): Promise<EncryptedParameters> {
     const key = this.getRootKey()
 
     if (key == undefined) {
@@ -517,10 +495,7 @@ export class RootKeyEncryptionService extends Services.AbstractService<RootKeySe
     return Promise.all(payloads.map((payload) => this.encrypPayloadWithKeyLookup(payload)))
   }
 
-  public async encryptPayload(
-    payload: Models.DecryptedPayloadInterface,
-    key: SNRootKey,
-  ): Promise<EncryptedParameters> {
+  public async encryptPayload(payload: Models.DecryptedPayloadInterface, key: SNRootKey): Promise<EncryptedParameters> {
     return OperatorWrapper.encryptPayload(payload, key, this.operatorManager)
   }
 

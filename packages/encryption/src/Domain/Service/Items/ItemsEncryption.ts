@@ -26,14 +26,11 @@ export class ItemsEncryptionService extends Services.AbstractService {
   ) {
     super(internalEventBus)
 
-    this.removeItemsObserver = this.itemManager.addObserver(
-      [ContentType.ItemsKey],
-      ({ changed, inserted }) => {
-        if (changed.concat(inserted).length > 0) {
-          void this.decryptErroredPayloads()
-        }
-      },
-    )
+    this.removeItemsObserver = this.itemManager.addObserver([ContentType.ItemsKey], ({ changed, inserted }) => {
+      if (changed.concat(inserted).length > 0) {
+        void this.decryptErroredPayloads()
+      }
+    })
   }
 
   public override deinit(): void {
@@ -60,9 +57,7 @@ export class ItemsEncryptionService extends Services.AbstractService {
     return this.itemManager.itemsKeys()
   }
 
-  public itemsKeyForPayload(
-    payload: Models.EncryptedPayloadInterface,
-  ): Models.ItemsKeyInterface | undefined {
+  public itemsKeyForPayload(payload: Models.EncryptedPayloadInterface): Models.ItemsKeyInterface | undefined {
     return this.getItemsKeys().find(
       (key) => key.uuid === payload.items_key_id || key.duplicateOf === payload.items_key_id,
     )
@@ -107,9 +102,7 @@ export class ItemsEncryptionService extends Services.AbstractService {
     return defaultKey
   }
 
-  public async encryptPayloadWithKeyLookup(
-    payload: Models.DecryptedPayloadInterface,
-  ): Promise<EncryptedParameters> {
+  public async encryptPayloadWithKeyLookup(payload: Models.DecryptedPayloadInterface): Promise<EncryptedParameters> {
     const key = this.keyToUseForItemEncryption()
 
     if (key instanceof StandardException) {
@@ -193,9 +186,7 @@ export class ItemsEncryptionService extends Services.AbstractService {
   }
 
   public async decryptErroredPayloads(): Promise<void> {
-    const payloads = this.payloadManager.invalidPayloads.filter(
-      (i) => i.content_type !== ContentType.ItemsKey,
-    )
+    const payloads = this.payloadManager.invalidPayloads.filter((i) => i.content_type !== ContentType.ItemsKey)
     if (payloads.length === 0) {
       return
     }

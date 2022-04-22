@@ -70,9 +70,7 @@ const run = async () => {
 
   console.log('Registering account...')
   await application.register(email, password)
-  console.log(
-    `Registered account ${email}/${password}. Be sure to edit docker/auth.env to increase session TTL.`,
-  )
+  console.log(`Registered account ${email}/${password}. Be sure to edit docker/auth.env to increase session TTL.`)
 
   console.log('Creating mock subscription...')
   await publishMockedEvent('SUBSCRIPTION_PURCHASED', {

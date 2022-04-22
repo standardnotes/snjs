@@ -1,9 +1,5 @@
 import { ItemContent } from '../../Abstract/Content/ItemContent'
-import {
-  DecryptedItemInterface,
-  DeletedItemInterface,
-  EncryptedItemInterface,
-} from '../../Abstract/Item'
+import { DecryptedItemInterface, DeletedItemInterface, EncryptedItemInterface } from '../../Abstract/Item'
 import { AnyItemInterface } from '../../Abstract/Item/Interfaces/UnionTypes'
 
 export interface ItemDelta<C extends ItemContent = ItemContent> {

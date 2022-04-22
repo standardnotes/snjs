@@ -1,9 +1,5 @@
 import { extendArray } from '@standardnotes/utils'
-import {
-  EncryptedPayloadInterface,
-  FullyFormedPayloadInterface,
-  PayloadEmitSource,
-} from '../../../Abstract/Payload'
+import { EncryptedPayloadInterface, FullyFormedPayloadInterface, PayloadEmitSource } from '../../../Abstract/Payload'
 import { SyncResolvedPayload } from '../Utilities/SyncResolvedPayload'
 
 export type DeltaEmit<P extends FullyFormedPayloadInterface = FullyFormedPayloadInterface> = {

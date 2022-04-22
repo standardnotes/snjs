@@ -1,7 +1,4 @@
-import {
-  LocalStorageEncryptedContextualPayload,
-  LocalStorageDecryptedContextualPayload,
-} from '@standardnotes/models'
+import { LocalStorageEncryptedContextualPayload, LocalStorageDecryptedContextualPayload } from '@standardnotes/models'
 
 export enum StoragePersistencePolicies {
   Default = 1,
@@ -31,9 +28,7 @@ export enum ValueModesKeys {
 
 export type ValuesObjectRecord = Record<string, unknown>
 
-export type WrappedStorageValue =
-  | LocalStorageEncryptedContextualPayload
-  | LocalStorageDecryptedContextualPayload
+export type WrappedStorageValue = LocalStorageEncryptedContextualPayload | LocalStorageDecryptedContextualPayload
 
 export type StorageValuesObject = {
   [ValueModesKeys.Wrapped]: WrappedStorageValue

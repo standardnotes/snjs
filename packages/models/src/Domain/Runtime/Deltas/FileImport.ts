@@ -1,11 +1,7 @@
 import { ImmutablePayloadCollection } from '../Collection/Payload/ImmutablePayloadCollection'
 import { ConflictDelta } from './Conflict'
 import { DecryptedPayloadInterface } from '../../Abstract/Payload/Interfaces/DecryptedPayload'
-import {
-  DeletedPayloadInterface,
-  isDecryptedPayload,
-  PayloadEmitSource,
-} from '../../Abstract/Payload'
+import { DeletedPayloadInterface, isDecryptedPayload, PayloadEmitSource } from '../../Abstract/Payload'
 import { HistoryMap } from '../History'
 import { extendSyncDelta, SourcelessSyncDeltaEmit, SyncDeltaEmit } from './Abstract/DeltaEmit'
 import { DeltaInterface } from './Abstract/DeltaInterface'

@@ -12,9 +12,7 @@ export class ImmutablePayloadCollection<
 
   /** We don't use a constructor for this because we don't want the constructor to have
    * side-effects, such as calling collection.set(). */
-  static WithPayloads<T extends FullyFormedPayloadInterface>(
-    payloads: T[] = [],
-  ): ImmutablePayloadCollection<T> {
+  static WithPayloads<T extends FullyFormedPayloadInterface>(payloads: T[] = []): ImmutablePayloadCollection<T> {
     const collection = new ImmutablePayloadCollection<T>()
     if (payloads.length > 0) {
       collection.set(payloads)
@@ -50,13 +48,7 @@ export class ImmutablePayloadCollection<
     const typedMapCopy = Object.assign({}, this.typedMap)
     const referenceMapCopy = this.referenceMap.makeCopy()
     const conflictMapCopy = this.conflictMap.makeCopy()
-    const result = new PayloadCollection(
-      true,
-      mapCopy,
-      typedMapCopy,
-      referenceMapCopy,
-      conflictMapCopy,
-    )
+    const result = new PayloadCollection(true, mapCopy, typedMapCopy, referenceMapCopy, conflictMapCopy)
     return result
   }
 }

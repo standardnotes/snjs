@@ -26,10 +26,7 @@ export class DecryptedItem<C extends ItemContent = ItemContent>
     super(payload)
     this.conflictOf = payload.content.conflict_of
 
-    const userModVal = this.getAppDomainValueWithDefault(
-      AppDataField.UserModifiedDate,
-      this.serverUpdatedAt || 0,
-    )
+    const userModVal = this.getAppDomainValueWithDefault(AppDataField.UserModifiedDate, this.serverUpdatedAt || 0)
 
     this.userModifiedDate = new Date(userModVal as number | Date)
     this.updatedAtString = dateToLocalizedString(this.userModifiedDate)
@@ -89,17 +86,12 @@ export class DecryptedItem<C extends ItemContent = ItemContent>
     return appData?.[key] as T
   }
 
-  public getAppDomainValueWithDefault<T, D extends T>(
-    key: AppDataField | PrefKey,
-    defaultValue: D,
-  ): T {
+  public getAppDomainValueWithDefault<T, D extends T>(key: AppDataField | PrefKey, defaultValue: D): T {
     const appData = this.getDomainData(DefaultAppDomain)
     return (appData?.[key] as T) || defaultValue
   }
 
-  public override payloadRepresentation(
-    override?: Partial<DecryptedTransferPayload<C>>,
-  ): DecryptedPayloadInterface<C> {
+  public override payloadRepresentation(override?: Partial<DecryptedTransferPayload<C>>): DecryptedPayloadInterface<C> {
     return this.payload.copy(override)
   }
 
@@ -109,9 +101,7 @@ export class DecryptedItem<C extends ItemContent = ItemContent>
    * if one component has active = true and another component has active = false,
    * it would be needless to duplicate them, so instead we ignore that value.
    */
-  public contentKeysToIgnoreWhenCheckingEquality<
-    C extends ItemContent = ItemContent,
-  >(): (keyof C)[] {
+  public contentKeysToIgnoreWhenCheckingEquality<C extends ItemContent = ItemContent>(): (keyof C)[] {
     return ['conflict_of']
   }
 

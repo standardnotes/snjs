@@ -29,9 +29,7 @@ export function isErrorDecryptingParameters(
   return (x as ErrorDecryptingParameters).errorDecrypting
 }
 
-export function encryptedParametersFromPayload(
-  payload: EncryptedPayloadInterface,
-): EncryptedParameters {
+export function encryptedParametersFromPayload(payload: EncryptedPayloadInterface): EncryptedParameters {
   return {
     uuid: payload.uuid,
     content: payload.content,

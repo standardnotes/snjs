@@ -7,10 +7,7 @@ import { AsynchronousOperator, SynchronousOperator } from '../Operator/Operator'
 import { AnyOperator } from '../Operator/AnyOperator'
 import { ProtocolVersion } from '@standardnotes/common'
 
-export function createOperatorForVersion(
-  version: ProtocolVersion,
-  crypto: SNPureCrypto,
-): AnyOperator {
+export function createOperatorForVersion(version: ProtocolVersion, crypto: SNPureCrypto): AnyOperator {
   if (version === ProtocolVersion.V001) {
     return new SNProtocolOperator001(crypto)
   } else if (version === ProtocolVersion.V002) {

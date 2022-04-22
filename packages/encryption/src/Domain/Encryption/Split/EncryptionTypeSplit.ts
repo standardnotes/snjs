@@ -6,9 +6,9 @@ export interface EncryptionTypeSplit<T = EncryptedPayloadInterface | DecryptedPa
   itemsKeyEncryption?: T[]
 }
 
-export function SplitPayloadsByEncryptionType<
-  T extends EncryptedPayloadInterface | DecryptedPayloadInterface,
->(payloads: T[]): EncryptionTypeSplit<T> {
+export function SplitPayloadsByEncryptionType<T extends EncryptedPayloadInterface | DecryptedPayloadInterface>(
+  payloads: T[],
+): EncryptionTypeSplit<T> {
   const usesRootKey: T[] = []
   const usesItemsKey: T[] = []
 

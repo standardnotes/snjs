@@ -29,15 +29,11 @@ export interface DecryptedItemInterface<C extends ItemContent = ItemContent>
 
   isItemContentEqualWith(otherItem: DecryptedItemInterface): boolean
 
-  payloadRepresentation(
-    override?: Partial<DecryptedTransferPayload<C>>,
-  ): DecryptedPayloadInterface<C>
+  payloadRepresentation(override?: Partial<DecryptedTransferPayload<C>>): DecryptedPayloadInterface<C>
 
   hasRelationshipWithItem(item: DecryptedItemInterface): boolean
 
-  getDomainData(
-    domain: typeof ComponentDataDomain | typeof DefaultAppDomain,
-  ): undefined | Record<string, unknown>
+  getDomainData(domain: typeof ComponentDataDomain | typeof DefaultAppDomain): undefined | Record<string, unknown>
 
   contentKeysToIgnoreWhenCheckingEquality<C extends ItemContent = ItemContent>(): (keyof C)[]
 

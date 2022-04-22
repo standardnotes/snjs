@@ -25,11 +25,7 @@ export class NotesCollection implements SNIndex {
 
   public setCriteria(criteria: NotesDisplayCriteria): void {
     this.criteria = criteria
-    this.collection.setDisplayOptions(
-      ContentType.Note,
-      criteria.sortProperty,
-      criteria.sortDirection,
-    )
+    this.collection.setDisplayOptions(ContentType.Note, criteria.sortProperty, criteria.sortDirection)
     this.needsRebuilding = true
   }
 
