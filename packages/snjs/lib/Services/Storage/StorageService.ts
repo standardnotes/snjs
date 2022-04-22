@@ -1,10 +1,10 @@
 import { ContentType, Uuid } from '@standardnotes/common'
 import { Copy, extendArray, UuidGenerator } from '@standardnotes/utils'
-import { Environment } from '@Lib/Application/Platforms'
 import { SNLog } from '../../Log'
 import { isErrorDecryptingParameters, SNRootKey } from '@standardnotes/encryption'
 import * as Encryption from '@standardnotes/encryption'
 import * as Services from '@standardnotes/services'
+import { Environment } from '@standardnotes/services'
 import {
   CreateDecryptedLocalStorageContextPayload,
   CreateDeletedLocalStorageContextPayload,

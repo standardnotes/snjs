@@ -3,7 +3,8 @@ import FakeWebCrypto from './fake_web_crypto.js'
 import * as Defaults from './Defaults.js'
 
 export function createApplication(identifier, environment, platform, host, crypto) {
-  const deviceInterface = new WebDeviceInterface(setTimeout.bind(window), setInterval.bind(window))
+  const deviceInterface = new WebDeviceInterface()
+  deviceInterface.environment = environment
 
   return new SNApplication({
     environment: environment || Environment.Web,

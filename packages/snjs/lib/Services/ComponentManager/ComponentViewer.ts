@@ -1,5 +1,6 @@
 import { SNPreferencesService } from '../Preferences/PreferencesService'
 import { FeatureStatus, FeaturesEvent } from '@Lib/Services/Features'
+import { Environment, Platform } from '@standardnotes/services'
 import { SNFeaturesService } from '@Lib/Services'
 import {
   SNComponent,
@@ -26,7 +27,7 @@ import uniq from 'lodash/uniq'
 import remove from 'lodash/remove'
 import { SNAlertService } from '@Lib/Services/Alert/AlertService'
 import { SNSyncService } from '@Lib/Services/Sync/SyncService'
-import { Environment, environmentToString, Platform, platformToString } from '@Lib/Application/Platforms'
+import { environmentToString, platformToString } from '@Lib/Application/Platforms'
 import {
   ComponentMessage,
   OutgoingItemMessagePayload,

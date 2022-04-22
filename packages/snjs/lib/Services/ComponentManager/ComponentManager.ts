@@ -10,7 +10,6 @@ import find from 'lodash/find'
 import uniq from 'lodash/uniq'
 import { ComponentArea, ComponentAction, ComponentPermission, FindNativeFeature } from '@standardnotes/features'
 import { Copy, filterFromArray, removeFromArray, sleep } from '@standardnotes/utils'
-import { Environment, Platform } from '@Lib/Application/Platforms'
 import { UuidString } from '@Lib/Types/UuidString'
 import {
   PermissionDialog,
@@ -18,7 +17,7 @@ import {
   AllowedBatchContentTypes,
 } from '@Lib/Services/ComponentManager/Types'
 import { ActionObserver, ComponentViewer } from '@Lib/Services/ComponentManager/ComponentViewer'
-import { AbstractService, InternalEventBusInterface } from '@standardnotes/services'
+import { AbstractService, InternalEventBusInterface, Environment, Platform } from '@standardnotes/services'
 
 const DESKTOP_URL_PREFIX = 'sn://'
 const LOCAL_HOST = 'localhost'

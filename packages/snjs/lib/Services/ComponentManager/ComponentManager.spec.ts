@@ -13,13 +13,12 @@ import {
 import { DesktopManagerInterface } from '@Lib/Services/ComponentManager/Types'
 import { ContentType } from '@standardnotes/common'
 import { GenericItem, SNComponent } from '@standardnotes/models'
-import { Environment, Platform } from '@Lib/Application/Platforms'
+import { InternalEventBusInterface, Environment, Platform } from '@standardnotes/services'
 import { SNAlertService } from '@Lib/Services/Alert/AlertService'
 import { ItemManager } from '@Lib/Services/Items/ItemManager'
 import { SNFeaturesService } from '@Lib/Services/Features/FeaturesService'
 import { SNComponentManager } from './ComponentManager'
 import { SNSyncService } from '../Sync/SyncService'
-import { InternalEventBusInterface } from '@standardnotes/services'
 
 describe('featuresService', () => {
   let itemManager: ItemManager

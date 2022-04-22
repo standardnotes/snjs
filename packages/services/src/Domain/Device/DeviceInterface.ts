@@ -1,31 +1,60 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
+import { Environment } from './Environments'
 import { ApplicationIdentifier } from '@standardnotes/common'
-import { FullyFormedTransferPayload } from '@standardnotes/models'
+import { FullyFormedTransferPayload, TransferPayload } from '@standardnotes/models'
+import { LegacyRawKeychainValue, NamespacedRootKeyInKeychain } from './KeychainTypes'
 
+/**
+ * Platforms must override this class to provide platform specific utilities
+ * and access to the migration service, such as exposing an interface to read
+ * raw values from the database or value storage.
+ */
 export interface DeviceInterface {
-  interval: any
-  timeout: any
+  environment: Environment
+
   deinit(): void
-  cancelTimeout(timeout: unknown): void
+
   getRawStorageValue(key: string): Promise<string | undefined>
+
   getJsonParsedRawStorageValue(key: string): Promise<unknown | undefined>
+
   getAllRawStorageKeyValues(): Promise<{ key: string; value: unknown }[]>
-  setRawStorageValue(key: string, value: any): Promise<void>
+
+  setRawStorageValue(key: string, value: string): Promise<void>
+
   removeRawStorageValue(key: string): Promise<void>
+
   removeAllRawStorageValues(): Promise<void>
+
+  /**
+   * On web platforms, databased created may be new.
+   * New databases can be because of new sessions, or if the browser deleted it.
+   * In this case, callers should orchestrate with the server to redownload all items
+   * from scratch.
+   * @returns { isNewDatabase } - True if the database was newly created
+   */
   openDatabase(identifier: ApplicationIdentifier): Promise<{ isNewDatabase?: boolean } | undefined>
+
   getAllRawDatabasePayloads<T extends FullyFormedTransferPayload = FullyFormedTransferPayload>(
     identifier: ApplicationIdentifier,
   ): Promise<T[]>
-  saveRawDatabasePayload(payload: any, identifier: ApplicationIdentifier): Promise<void>
-  saveRawDatabasePayloads(payloads: any[], identifier: ApplicationIdentifier): Promise<void>
+
+  saveRawDatabasePayload(payload: TransferPayload, identifier: ApplicationIdentifier): Promise<void>
+
+  saveRawDatabasePayloads(payloads: TransferPayload[], identifier: ApplicationIdentifier): Promise<void>
+
   removeRawDatabasePayloadWithId(id: string, identifier: ApplicationIdentifier): Promise<void>
+
   removeAllRawDatabasePayloads(identifier: ApplicationIdentifier): Promise<void>
-  getNamespacedKeychainValue(identifier: ApplicationIdentifier): Promise<any>
-  legacy_setRawKeychainValue(value: any): Promise<void>
-  setNamespacedKeychainValue(value: any, identifier: ApplicationIdentifier): Promise<void>
+
+  getNamespacedKeychainValue(identifier: ApplicationIdentifier): Promise<NamespacedRootKeyInKeychain | undefined>
+
+  setNamespacedKeychainValue(value: NamespacedRootKeyInKeychain, identifier: ApplicationIdentifier): Promise<void>
+
   clearNamespacedKeychainValue(identifier: ApplicationIdentifier): Promise<void>
-  getRawKeychainValue(): Promise<Record<string, any> | undefined | null>
+
+  setLegacyRawKeychainValue(value: LegacyRawKeychainValue): Promise<void>
+
   clearRawKeychainValue(): Promise<void>
+
   openUrl(url: string): void
 }

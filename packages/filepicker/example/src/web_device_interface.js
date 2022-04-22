@@ -1,13 +1,21 @@
 /* eslint-disable no-undef */
-/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
-
-import { AbstractDevice } from '@standardnotes/snjs'
-
 const KEYCHAIN_STORAGE_KEY = 'keychain'
 
-export default class WebDeviceInterface extends AbstractDevice {
+export default class WebDeviceInterface {
   async getRawStorageValue(key) {
     return localStorage.getItem(key)
+  }
+
+  async getJsonParsedRawStorageValue(key) {
+    const value = await this.getRawStorageValue(key)
+    if (isNullOrUndefined(value)) {
+      return undefined
+    }
+    try {
+      return JSON.parse(value)
+    } catch (e) {
+      return value
+    }
   }
 
   async getAllRawStorageKeyValues() {
@@ -60,10 +68,7 @@ export default class WebDeviceInterface extends AbstractDevice {
   }
 
   async saveRawDatabasePayload(payload, identifier) {
-    localStorage.setItem(
-      this._keyForPayloadId(payload.uuid, identifier),
-      JSON.stringify(payload),
-    )
+    localStorage.setItem(this._keyForPayloadId(payload.uuid, identifier), JSON.stringify(payload))
   }
 
   async saveRawDatabasePayloads(payloads, identifier) {
@@ -118,7 +123,7 @@ export default class WebDeviceInterface extends AbstractDevice {
 
   /** Allows unit tests to set legacy keychain structure as it was <= 003 */
   // eslint-disable-next-line camelcase
-  async legacy_setRawKeychainValue(value) {
+  async setLegacyRawKeychainValue(value) {
     localStorage.setItem(KEYCHAIN_STORAGE_KEY, JSON.stringify(value))
   }
 

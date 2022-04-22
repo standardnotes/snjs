@@ -11,19 +11,7 @@ import * as Services from '@standardnotes/services'
 import * as Utils from '@standardnotes/utils'
 import { isEnvironmentMobile, isEnvironmentWebOrDesktop } from '@Lib/Application/Platforms'
 import { PayloadTimestampDefaults } from '@standardnotes/models'
-
-type LegacyMobileKeychainStructure = {
-  offline?: {
-    timing?: unknown
-    pw?: string
-  }
-  encryptedAccountKeys?: unknown
-  mk: string
-  pw: string
-  ak: string
-  version?: string
-  jwt?: string
-}
+import { isMobileDevice } from '@standardnotes/services'
 
 interface LegacyStorageContent extends Models.ItemContent {
   storage: unknown
@@ -316,7 +304,9 @@ export class Migration2_0_0 extends Migration {
    * @access private
    */
   async migrateStorageStructureForMobile() {
-    const keychainValue = (await this.services.deviceInterface.getRawKeychainValue()) as LegacyMobileKeychainStructure
+    Utils.assert(isMobileDevice(this.services.deviceInterface))
+
+    const keychainValue = await this.services.deviceInterface.getRawKeychainValue()
 
     const wrappedAccountKey = ((await this.services.deviceInterface.getJsonParsedRawStorageValue(
       Services.LegacyKeys1_0_0.MobileWrappedRootKeyKey,

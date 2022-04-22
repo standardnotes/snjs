@@ -1,4 +1,4 @@
-import { RootKeyContentInStorage, RootKeyInKeychain } from './Types'
+import { RootKeyContentInStorage, NamespacedRootKeyInKeychain } from './Types'
 import { SNRootKeyParams } from './RootKeyParams'
 import { RootKeyInterface, RootKeyContent, DecryptedItem, DecryptedPayloadInterface } from '@standardnotes/models'
 import { ProtocolVersion } from '@standardnotes/common'
@@ -74,8 +74,8 @@ export class SNRootKey extends DecryptedItem<RootKeyContent> implements RootKeyI
   /**
    * @returns Object that is suitable for persisting in a keychain
    */
-  public getKeychainValue(): RootKeyInKeychain {
-    const values: RootKeyInKeychain = {
+  public getKeychainValue(): NamespacedRootKeyInKeychain {
+    const values: NamespacedRootKeyInKeychain = {
       version: this.keyVersion,
       masterKey: this.masterKey,
     }

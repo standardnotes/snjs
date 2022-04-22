@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-expressions */
 /* eslint-disable no-undef */
 import * as Factory from '../lib/factory.js'
 import FakeWebCrypto from '../lib/fake_web_crypto.js'
@@ -44,7 +43,7 @@ describe('2020-01-15 mobile migration', () => {
         'user',
         JSON.stringify({ email: identifier, server: customServer }),
       )
-      await application.deviceInterface.legacy_setRawKeychainValue({
+      await application.deviceInterface.setLegacyRawKeychainValue({
         offline: {
           pw: passcodeKey.serverPassword,
           timing: passcodeTiming,
@@ -196,7 +195,7 @@ describe('2020-01-15 mobile migration', () => {
       JSON.stringify(passcodeKey.keyParams.getPortableValue()),
     )
     const passcodeTiming = 'immediately'
-    await application.deviceInterface.legacy_setRawKeychainValue({
+    await application.deviceInterface.setLegacyRawKeychainValue({
       offline: {
         pw: passcodeKey.serverPassword,
         timing: passcodeTiming,
@@ -388,7 +387,7 @@ describe('2020-01-15 mobile migration', () => {
     )
     await application.deviceInterface.setRawStorageValue('user', JSON.stringify({ email: identifier }))
     expect(accountKey.keyVersion).to.equal(ProtocolVersion.V003)
-    await application.deviceInterface.legacy_setRawKeychainValue({
+    await application.deviceInterface.setLegacyRawKeychainValue({
       mk: accountKey.masterKey,
       pw: accountKey.serverPassword,
       ak: accountKey.dataAuthenticationKey,
@@ -603,7 +602,7 @@ describe('2020-01-15 mobile migration', () => {
     )
     await application.deviceInterface.setRawStorageValue('user', JSON.stringify({ email: identifier }))
     expect(accountKey.keyVersion).to.equal(ProtocolVersion.V002)
-    await application.deviceInterface.legacy_setRawKeychainValue({
+    await application.deviceInterface.setLegacyRawKeychainValue({
       mk: accountKey.masterKey,
       pw: accountKey.serverPassword,
       ak: accountKey.dataAuthenticationKey,
@@ -674,7 +673,7 @@ describe('2020-01-15 mobile migration', () => {
     )
     await application.deviceInterface.setRawStorageValue('user', JSON.stringify({ email: identifier }))
     expect(accountKey.keyVersion).to.equal(ProtocolVersion.V001)
-    await application.deviceInterface.legacy_setRawKeychainValue({
+    await application.deviceInterface.setLegacyRawKeychainValue({
       mk: accountKey.masterKey,
       pw: accountKey.serverPassword,
       jwt: 'foo',
@@ -732,12 +731,14 @@ describe('2020-01-15 mobile migration', () => {
     const identifier = 'foo'
     const password = 'tar'
     const accountKey = await operator003.createRootKey(identifier, password)
+
     await application.deviceInterface.setRawStorageValue(
       'auth_params',
       JSON.stringify(accountKey.keyParams.getPortableValue()),
     )
     await application.deviceInterface.setRawStorageValue('user', JSON.stringify({ email: identifier }))
-    await application.deviceInterface.legacy_setRawKeychainValue({
+
+    await application.deviceInterface.setLegacyRawKeychainValue({
       mk: accountKey.masterKey,
       pw: accountKey.serverPassword,
       ak: accountKey.dataAuthenticationKey,
@@ -766,7 +767,7 @@ describe('2020-01-15 mobile migration', () => {
       JSON.stringify(accountKey.keyParams.getPortableValue()),
     )
     await application.deviceInterface.setRawStorageValue('user', JSON.stringify({ email: identifier, jwt: 'foo' }))
-    await application.deviceInterface.legacy_setRawKeychainValue({
+    await application.deviceInterface.setLegacyRawKeychainValue({
       mk: accountKey.masterKey,
       pw: accountKey.serverPassword,
       ak: accountKey.dataAuthenticationKey,
@@ -916,7 +917,7 @@ describe('2020-01-15 mobile migration', () => {
       })
       const encryptedKeyParams = await operator003.generateEncryptedParametersAsync(keyPayload, passcodeKey)
       const wrappedKey = new EncryptedPayload({ ...keyPayload, ...encryptedKeyParams })
-      await application.deviceInterface.legacy_setRawKeychainValue({
+      await application.deviceInterface.setLegacyRawKeychainValue({
         encryptedAccountKeys: wrappedKey,
         offline: {
           pw: passcodeKey.serverPassword,
