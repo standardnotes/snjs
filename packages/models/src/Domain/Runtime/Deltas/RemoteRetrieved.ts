@@ -1,9 +1,6 @@
 import { ImmutablePayloadCollection } from './../Collection/Payload/ImmutablePayloadCollection'
 import { ConflictDelta } from './Conflict'
-import {
-  isErrorDecryptingPayload,
-  isDecryptedPayload,
-} from '../../Abstract/Payload/Interfaces/TypeCheck'
+import { isErrorDecryptingPayload, isDecryptedPayload } from '../../Abstract/Payload/Interfaces/TypeCheck'
 import { FullyFormedPayloadInterface, PayloadEmitSource } from '../../Abstract/Payload'
 import { ContentType, Uuid } from '@standardnotes/common'
 import { HistoryMap } from '../History'

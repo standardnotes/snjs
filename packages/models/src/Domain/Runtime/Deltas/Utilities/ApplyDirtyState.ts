@@ -17,9 +17,7 @@ export function payloadByFinalizingSyncState(
   }
 
   const stillDirty =
-    basePayload.dirtiedDate &&
-    basePayload.lastSyncBegan &&
-    basePayload.dirtiedDate >= basePayload.lastSyncBegan
+    basePayload.dirtiedDate && basePayload.lastSyncBegan && basePayload.dirtiedDate >= basePayload.lastSyncBegan
 
   return payload.copyAsSyncResolved({
     dirty: stillDirty != undefined ? stillDirty : false,

@@ -81,11 +81,7 @@ export class ChallengeService extends AbstractService {
   }
 
   public async promptForCorrectPasscode(reason: ChallengeReason): Promise<string | undefined> {
-    const challenge = new Challenge(
-      [new ChallengePrompt(ChallengeValidation.LocalPasscode)],
-      reason,
-      true,
-    )
+    const challenge = new Challenge([new ChallengePrompt(ChallengeValidation.LocalPasscode)], reason, true)
     const response = await this.promptForChallengeResponse(challenge)
     if (!response) {
       return undefined

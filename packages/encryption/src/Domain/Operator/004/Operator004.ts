@@ -119,24 +119,14 @@ export class SNProtocolOperator004 implements SynchronousOperator {
    * @param authenticatedData - JavaScript object (will be stringified) representing
                 'Additional authenticated data': data you want to be included in authentication.
    */
-  private encryptString004(
-    plaintext: string,
-    rawKey: string,
-    nonce: string,
-    authenticatedData: ItemAuthenticatedData,
-  ) {
+  private encryptString004(plaintext: string, rawKey: string, nonce: string, authenticatedData: ItemAuthenticatedData) {
     if (!nonce) {
       throw 'encryptString null nonce'
     }
     if (!rawKey) {
       throw 'encryptString null rawKey'
     }
-    return this.crypto.xchacha20Encrypt(
-      plaintext,
-      nonce,
-      rawKey,
-      this.authenticatedDataToString(authenticatedData),
-    )
+    return this.crypto.xchacha20Encrypt(plaintext, nonce, rawKey, this.authenticatedDataToString(authenticatedData))
   }
 
   /**
@@ -146,12 +136,7 @@ export class SNProtocolOperator004 implements SynchronousOperator {
    * @param rawAuthenticatedData String representing
                 'Additional authenticated data' - data you want to be included in authentication.
    */
-  private decryptString004(
-    ciphertext: string,
-    rawKey: string,
-    nonce: string,
-    rawAuthenticatedData: string,
-  ) {
+  private decryptString004(ciphertext: string, rawKey: string, nonce: string, rawAuthenticatedData: string) {
     return this.crypto.xchacha20Decrypt(ciphertext, nonce, rawKey, rawAuthenticatedData)
   }
 
@@ -159,11 +144,7 @@ export class SNProtocolOperator004 implements SynchronousOperator {
    * @param plaintext  The plaintext text to decrypt.
    * @param rawKey  The key to use to encrypt the plaintext.
    */
-  private generateEncryptedProtocolString(
-    plaintext: string,
-    rawKey: string,
-    authenticatedData: ItemAuthenticatedData,
-  ) {
+  private generateEncryptedProtocolString(plaintext: string, rawKey: string, authenticatedData: ItemAuthenticatedData) {
     const nonce = this.crypto.generateRandomKey(V004Algorithm.EncryptionNonceLength)
     const version = ProtocolVersion.V004
     const ciphertext = this.encryptString004(plaintext, rawKey, nonce, authenticatedData)
@@ -212,9 +193,7 @@ export class SNProtocolOperator004 implements SynchronousOperator {
   }
 
   private authenticatedDataToString(attachedData: ItemAuthenticatedData) {
-    return this.crypto.base64Encode(
-      JSON.stringify(Utils.sortedCopy(Utils.omitUndefinedCopy(attachedData))),
-    )
+    return this.crypto.base64Encode(JSON.stringify(Utils.sortedCopy(Utils.omitUndefinedCopy(attachedData))))
   }
 
   private stringToAuthenticatedData(
@@ -237,18 +216,10 @@ export class SNProtocolOperator004 implements SynchronousOperator {
     /** Encrypt content with item_key */
     const contentPlaintext = JSON.stringify(payload.content)
     const authenticatedData = this.generateAuthenticatedDataForPayload(payload, key)
-    const encryptedContentString = this.generateEncryptedProtocolString(
-      contentPlaintext,
-      itemKey,
-      authenticatedData,
-    )
+    const encryptedContentString = this.generateEncryptedProtocolString(contentPlaintext, itemKey, authenticatedData)
 
     /** Encrypt item_key with master itemEncryptionKey */
-    const encryptedItemKey = this.generateEncryptedProtocolString(
-      itemKey,
-      key.itemsKey,
-      authenticatedData,
-    )
+    const encryptedItemKey = this.generateEncryptedProtocolString(itemKey, key.itemsKey, authenticatedData)
 
     return {
       uuid: payload.uuid,
@@ -264,13 +235,10 @@ export class SNProtocolOperator004 implements SynchronousOperator {
     key: ItemsKeyInterface | SNRootKey,
   ): DecryptedParameters<C> | ErrorDecryptingParameters {
     const itemKeyComponents = this.deconstructEncryptedPayloadString(encrypted.enc_item_key)
-    const authenticatedData = this.stringToAuthenticatedData(
-      itemKeyComponents.rawAuthenticatedData,
-      {
-        u: encrypted.uuid,
-        v: encrypted.version,
-      },
-    )
+    const authenticatedData = this.stringToAuthenticatedData(itemKeyComponents.rawAuthenticatedData, {
+      u: encrypted.uuid,
+      v: encrypted.version,
+    })
 
     const useAuthenticatedString = this.authenticatedDataToString(authenticatedData)
     const itemKey = this.decryptString004(
@@ -320,10 +288,7 @@ export class SNProtocolOperator004 implements SynchronousOperator {
   }
 
   private async deriveKey(password: string, keyParams: SNRootKeyParams): Promise<SNRootKey> {
-    const salt = await this.generateSalt004(
-      keyParams.content004.identifier,
-      keyParams.content004.pw_nonce,
-    )
+    const salt = await this.generateSalt004(keyParams.content004.identifier, keyParams.content004.pw_nonce)
     const derivedKey = this.crypto.argon2(
       password,
       salt,

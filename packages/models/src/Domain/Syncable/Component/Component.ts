@@ -19,8 +19,7 @@ import { Predicate } from '../../Runtime/Predicate/Predicate'
 import { ItemInterface } from '../../Abstract/Item/Interfaces/ItemInterface'
 import { DecryptedItemInterface } from './../../Abstract/Item/Interfaces/DecryptedItem'
 
-export const isComponent = (x: ItemInterface): x is SNComponent =>
-  x.content_type === ContentType.Component
+export const isComponent = (x: ItemInterface): x is SNComponent => x.content_type === ContentType.Component
 
 export const isComponentOrTheme = (x: ItemInterface): x is SNComponent =>
   x.content_type === ContentType.Component || x.content_type === ContentType.Theme
@@ -134,11 +133,7 @@ export class SNComponent extends DecryptedItem<ComponentContent> implements Comp
   }
 
   public override contentKeysToIgnoreWhenCheckingEquality(): (keyof ItemContent)[] {
-    const componentKeys: (keyof ComponentContent)[] = [
-      'active',
-      'disassociatedItemIds',
-      'associatedItemIds',
-    ]
+    const componentKeys: (keyof ComponentContent)[] = ['active', 'disassociatedItemIds', 'associatedItemIds']
 
     const superKeys = super.contentKeysToIgnoreWhenCheckingEquality()
     return [...componentKeys, ...superKeys] as (keyof ItemContent)[]

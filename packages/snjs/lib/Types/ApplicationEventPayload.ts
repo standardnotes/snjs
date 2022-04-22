@@ -1,2 +1,1 @@
-
-export type ApplicationEventPayload = Partial<Record<string, unknown>>;
+export type ApplicationEventPayload = Partial<Record<string, unknown>>

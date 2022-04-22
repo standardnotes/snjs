@@ -71,9 +71,7 @@ export class NoteGroupController {
   /**
    * Notifies observer when the active controller has changed.
    */
-  public addActiveControllerChangeObserver(
-    callback: NoteControllerGroupChangeCallback,
-  ): () => void {
+  public addActiveControllerChangeObserver(callback: NoteControllerGroupChangeCallback): () => void {
     this.changeObservers.push(callback)
     if (this.activeNoteViewController) {
       callback(this.activeNoteViewController)

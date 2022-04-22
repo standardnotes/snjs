@@ -61,42 +61,26 @@ describe('2020-01-15 web migration', () => {
         storage: embeddedStorage,
       },
     })
-    const encryptionParams = await operator003.generateEncryptedParametersAsync(
-      storagePayload,
-      passcodeKey,
-    )
+    const encryptionParams = await operator003.generateEncryptedParametersAsync(storagePayload, passcodeKey)
     const persistPayload = new EncryptedPayload({ ...storagePayload, ...encryptionParams })
-    await application.deviceInterface.setRawStorageValue(
-      'encryptedStorage',
-      JSON.stringify(persistPayload),
-    )
+    await application.deviceInterface.setRawStorageValue('encryptedStorage', JSON.stringify(persistPayload))
 
     /** Create encrypted item and store it in db */
     const notePayload = Factory.createNotePayload()
-    const noteEncryptionParams = await operator003.generateEncryptedParametersAsync(
-      notePayload,
-      accountKey,
-    )
+    const noteEncryptionParams = await operator003.generateEncryptedParametersAsync(notePayload, accountKey)
     const noteEncryptedPayload = new EncryptedPayload({ ...notePayload, ...noteEncryptionParams })
-    await application.deviceInterface.saveRawDatabasePayload(
-      noteEncryptedPayload,
-      application.identifier,
-    )
+    await application.deviceInterface.saveRawDatabasePayload(noteEncryptedPayload, application.identifier)
 
     /** Run migration */
     await application.prepareForLaunch({
       receiveChallenge: async (challenge) => {
-        application.submitValuesForChallenge(challenge, [
-          new ChallengeValue(challenge.prompts[0], passcode),
-        ])
+        application.submitValuesForChallenge(challenge, [new ChallengeValue(challenge.prompts[0], passcode)])
       },
     })
 
     await application.launch(true)
     expect(application.sessionManager.online()).to.equal(true)
-    expect(application.protocolService.rootKeyEncryption.keyMode).to.equal(
-      KeyMode.RootKeyPlusWrapper,
-    )
+    expect(application.protocolService.rootKeyEncryption.keyMode).to.equal(KeyMode.RootKeyPlusWrapper)
     /** Should be decrypted */
     const storageMode = application.storageService.domainKeyForMode(StorageValueModes.Default)
     const valueStore = application.storageService.values[storageMode]
@@ -104,10 +88,7 @@ describe('2020-01-15 web migration', () => {
 
     expect(await application.deviceInterface.getRawStorageValue('offlineParams')).to.not.be.ok
 
-    const keyParams = await application.storageService.getValue(
-      StorageKey.RootKeyParams,
-      StorageValueModes.Nonwrapped,
-    )
+    const keyParams = await application.storageService.getValue(StorageKey.RootKeyParams, StorageValueModes.Nonwrapped)
     expect(typeof keyParams).to.equal('object')
 
     /** Embedded value should match */
@@ -122,9 +103,7 @@ describe('2020-01-15 web migration', () => {
     /** Application should not retain server password from legacy versions */
     expect(rootKey.serverPassword).to.not.be.ok
     expect(rootKey.keyVersion).to.equal(ProtocolVersion.V003)
-    expect(application.protocolService.rootKeyEncryption.keyMode).to.equal(
-      KeyMode.RootKeyPlusWrapper,
-    )
+    expect(application.protocolService.rootKeyEncryption.keyMode).to.equal(KeyMode.RootKeyPlusWrapper)
 
     /** Expect note is decrypted */
     expect(application.itemManager.notes.length).to.equal(1)
@@ -176,33 +155,19 @@ describe('2020-01-15 web migration', () => {
       },
       content_type: ContentType.EncryptedStorage,
     })
-    const encryptionParams = await operator003.generateEncryptedParametersAsync(
-      storagePayload,
-      passcodeKey,
-    )
+    const encryptionParams = await operator003.generateEncryptedParametersAsync(storagePayload, passcodeKey)
     const persistPayload = new EncryptedPayload({ ...storagePayload, ...encryptionParams })
-    await application.deviceInterface.setRawStorageValue(
-      'encryptedStorage',
-      JSON.stringify(persistPayload),
-    )
+    await application.deviceInterface.setRawStorageValue('encryptedStorage', JSON.stringify(persistPayload))
 
     /** Create encrypted item and store it in db */
     const notePayload = Factory.createNotePayload()
-    const noteEncryptionParams = await operator003.generateEncryptedParametersAsync(
-      notePayload,
-      passcodeKey,
-    )
+    const noteEncryptionParams = await operator003.generateEncryptedParametersAsync(notePayload, passcodeKey)
     const noteEncryptedPayload = new EncryptedPayload({ ...notePayload, ...noteEncryptionParams })
-    await application.deviceInterface.saveRawDatabasePayload(
-      noteEncryptedPayload,
-      application.identifier,
-    )
+    await application.deviceInterface.saveRawDatabasePayload(noteEncryptedPayload, application.identifier)
 
     await application.prepareForLaunch({
       receiveChallenge: async (challenge) => {
-        application.submitValuesForChallenge(challenge, [
-          new ChallengeValue(challenge.prompts[0], passcode),
-        ])
+        application.submitValuesForChallenge(challenge, [new ChallengeValue(challenge.prompts[0], passcode)])
       },
     })
     await application.launch(true)
@@ -274,15 +239,9 @@ describe('2020-01-15 web migration', () => {
     }
     /** Create encrypted item and store it in db */
     const notePayload = Factory.createNotePayload()
-    const noteEncryptionParams = await operator003.generateEncryptedParametersAsync(
-      notePayload,
-      accountKey,
-    )
+    const noteEncryptionParams = await operator003.generateEncryptedParametersAsync(notePayload, accountKey)
     const noteEncryptedPayload = new EncryptedPayload({ ...notePayload, ...noteEncryptionParams })
-    await application.deviceInterface.saveRawDatabasePayload(
-      noteEncryptedPayload,
-      application.identifier,
-    )
+    await application.deviceInterface.saveRawDatabasePayload(noteEncryptedPayload, application.identifier)
 
     /** Run migration */
     const promptValueReply = (prompts) => {
@@ -332,10 +291,7 @@ describe('2020-01-15 web migration', () => {
     expect(await application.deviceInterface.getRawStorageValue('auth_params')).to.not.be.ok
     expect(await application.deviceInterface.getRawStorageValue('jwt')).to.not.be.ok
 
-    const keyParams = await application.storageService.getValue(
-      StorageKey.RootKeyParams,
-      StorageValueModes.Nonwrapped,
-    )
+    const keyParams = await application.storageService.getValue(StorageKey.RootKeyParams, StorageValueModes.Nonwrapped)
     expect(typeof keyParams).to.equal('object')
 
     expect(rootKey.masterKey).to.equal(accountKey.masterKey)
@@ -380,10 +336,7 @@ describe('2020-01-15 web migration', () => {
 
     /** Create item and store it in db */
     const notePayload = Factory.createNotePayload()
-    await application.deviceInterface.saveRawDatabasePayload(
-      notePayload.ejected(),
-      application.identifier,
-    )
+    await application.deviceInterface.saveRawDatabasePayload(notePayload.ejected(), application.identifier)
 
     /** Run migration */
     await application.prepareForLaunch({
@@ -449,15 +402,9 @@ describe('2020-01-15 web migration', () => {
     }
     /** Create encrypted item and store it in db */
     const notePayload = Factory.createNotePayload()
-    const noteEncryptionParams = await operator001.generateEncryptedParametersAsync(
-      notePayload,
-      accountKey,
-    )
+    const noteEncryptionParams = await operator001.generateEncryptedParametersAsync(notePayload, accountKey)
     const noteEncryptedPayload = new EncryptedPayload({ ...notePayload, ...noteEncryptionParams })
-    await application.deviceInterface.saveRawDatabasePayload(
-      noteEncryptedPayload,
-      application.identifier,
-    )
+    await application.deviceInterface.saveRawDatabasePayload(noteEncryptedPayload, application.identifier)
 
     /** Run migration */
     const promptValueReply = (prompts) => {
@@ -507,10 +454,7 @@ describe('2020-01-15 web migration', () => {
     expect(await application.deviceInterface.getRawStorageValue('mk')).to.not.be.ok
     expect(await application.deviceInterface.getRawStorageValue('pw')).to.not.be.ok
 
-    const keyParams = await application.storageService.getValue(
-      StorageKey.RootKeyParams,
-      StorageValueModes.Nonwrapped,
-    )
+    const keyParams = await application.storageService.getValue(StorageKey.RootKeyParams, StorageValueModes.Nonwrapped)
     expect(typeof keyParams).to.equal('object')
 
     expect(rootKey.masterKey).to.equal(accountKey.masterKey)
@@ -558,10 +502,7 @@ describe('2020-01-15 web migration', () => {
     const offlineParams = passcodeKey.keyParams.getPortableValue()
     omitInPlace(offlineParams, ['version'])
 
-    await application.deviceInterface.setRawStorageValue(
-      'offlineParams',
-      JSON.stringify(offlineParams),
-    )
+    await application.deviceInterface.setRawStorageValue('offlineParams', JSON.stringify(offlineParams))
 
     /** Create old version account parameters */
     const password = 'tar'
@@ -584,42 +525,26 @@ describe('2020-01-15 web migration', () => {
         storage: embeddedStorage,
       },
     })
-    const encryptionParams = await operator002.generateEncryptedParametersAsync(
-      storagePayload,
-      passcodeKey,
-    )
+    const encryptionParams = await operator002.generateEncryptedParametersAsync(storagePayload, passcodeKey)
     const persistPayload = new EncryptedPayload({ ...storagePayload, ...encryptionParams })
-    await application.deviceInterface.setRawStorageValue(
-      'encryptedStorage',
-      JSON.stringify(persistPayload),
-    )
+    await application.deviceInterface.setRawStorageValue('encryptedStorage', JSON.stringify(persistPayload))
 
     /** Create encrypted item and store it in db */
     const notePayload = Factory.createNotePayload()
-    const noteEncryptionParams = await operator002.generateEncryptedParametersAsync(
-      notePayload,
-      accountKey,
-    )
+    const noteEncryptionParams = await operator002.generateEncryptedParametersAsync(notePayload, accountKey)
     const noteEncryptedPayload = new EncryptedPayload({ ...notePayload, ...noteEncryptionParams })
-    await application.deviceInterface.saveRawDatabasePayload(
-      noteEncryptedPayload,
-      application.identifier,
-    )
+    await application.deviceInterface.saveRawDatabasePayload(noteEncryptedPayload, application.identifier)
 
     /** Runs migration */
     await application.prepareForLaunch({
       receiveChallenge: async (challenge) => {
-        application.submitValuesForChallenge(challenge, [
-          new ChallengeValue(challenge.prompts[0], passcode),
-        ])
+        application.submitValuesForChallenge(challenge, [new ChallengeValue(challenge.prompts[0], passcode)])
       },
     })
     await application.launch(true)
     expect(application.sessionManager.online()).to.equal(true)
     expect(application.sessionManager.getUser()).to.be.ok
-    expect(application.protocolService.rootKeyEncryption.keyMode).to.equal(
-      KeyMode.RootKeyPlusWrapper,
-    )
+    expect(application.protocolService.rootKeyEncryption.keyMode).to.equal(KeyMode.RootKeyPlusWrapper)
     /** Should be decrypted */
     const storageMode = application.storageService.domainKeyForMode(StorageValueModes.Default)
     const valueStore = application.storageService.values[storageMode]
@@ -640,10 +565,7 @@ describe('2020-01-15 web migration', () => {
     expect(await application.deviceInterface.getRawStorageValue('mk')).to.not.be.ok
     expect(await application.deviceInterface.getRawStorageValue('pw')).to.not.be.ok
 
-    const keyParams = await application.storageService.getValue(
-      StorageKey.RootKeyParams,
-      StorageValueModes.Nonwrapped,
-    )
+    const keyParams = await application.storageService.getValue(StorageKey.RootKeyParams, StorageValueModes.Nonwrapped)
     expect(typeof keyParams).to.equal('object')
 
     expect(rootKey.masterKey).to.equal(accountKey.masterKey)

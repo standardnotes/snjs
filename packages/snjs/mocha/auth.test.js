@@ -57,14 +57,7 @@ describe('basic auth', function () {
   it('successfully signs in to registered account', async function () {
     await this.application.register(this.email, this.password)
     this.application = await Factory.signOutApplicationAndReturnNew(this.application)
-    const response = await this.application.signIn(
-      this.email,
-      this.password,
-      undefined,
-      undefined,
-      undefined,
-      true,
-    )
+    const response = await this.application.signIn(this.email, this.password, undefined, undefined, undefined, true)
     expect(response).to.be.ok
     expect(response.error).to.not.be.ok
     expect(await this.application.protocolService.getRootKey()).to.be.ok
@@ -74,28 +67,14 @@ describe('basic auth', function () {
     await this.application.register(this.email, this.password)
     await Factory.createSyncedNote(this.application)
     this.application = await Factory.signOutApplicationAndReturnNew(this.application)
-    const response = await this.application.signIn(
-      this.email,
-      this.password,
-      undefined,
-      undefined,
-      undefined,
-      true,
-    )
+    const response = await this.application.signIn(this.email, this.password, undefined, undefined, undefined, true)
     expect(response).to.be.ok
     expect(response.error).to.not.be.ok
     expect(await this.application.protocolService.getRootKey()).to.be.ok
 
     let error
     try {
-      await this.application.signIn(
-        this.email,
-        this.password,
-        undefined,
-        undefined,
-        undefined,
-        true,
-      )
+      await this.application.signIn(this.email, this.password, undefined, undefined, undefined, true)
     } catch (e) {
       error = e
     }
@@ -120,14 +99,7 @@ describe('basic auth', function () {
 
     await Promise.all([
       (async () => {
-        const response = await this.application.signIn(
-          this.email,
-          this.password,
-          undefined,
-          undefined,
-          undefined,
-          true,
-        )
+        const response = await this.application.signIn(this.email, this.password, undefined, undefined, undefined, true)
         expect(response).to.be.ok
         expect(response.error).to.not.be.ok
         expect(await this.application.protocolService.getRootKey()).to.be.ok
@@ -138,14 +110,7 @@ describe('basic auth', function () {
         /** Try to sign in while the first request is going */
         let error
         try {
-          await this.application.signIn(
-            this.email,
-            this.password,
-            undefined,
-            undefined,
-            undefined,
-            true,
-          )
+          await this.application.signIn(this.email, this.password, undefined, undefined, undefined, true)
         } catch (e) {
           error = e
         }
@@ -181,25 +146,11 @@ describe('basic auth', function () {
     await this.application.register(this.email, this.password)
     this.application = await Factory.signOutApplicationAndReturnNew(this.application)
 
-    let response = await this.application.signIn(
-      this.email,
-      'wrong password',
-      undefined,
-      undefined,
-      undefined,
-      true,
-    )
+    let response = await this.application.signIn(this.email, 'wrong password', undefined, undefined, undefined, true)
     expect(response).to.have.property('status', 401)
     expect(response.error).to.be.ok
 
-    response = await this.application.signIn(
-      this.email,
-      this.password,
-      undefined,
-      undefined,
-      undefined,
-      true,
-    )
+    response = await this.application.signIn(this.email, this.password, undefined, undefined, undefined, true)
 
     expect(response.status).to.equal(200)
     expect(response).to.not.haveOwnProperty('error')
@@ -241,14 +192,7 @@ describe('basic auth', function () {
      */
     await this.application.register(lowercase, this.password)
     this.application = await Factory.signOutApplicationAndReturnNew(this.application)
-    const response = await this.application.signIn(
-      uppercase,
-      this.password,
-      undefined,
-      undefined,
-      undefined,
-      true,
-    )
+    const response = await this.application.signIn(uppercase, this.password, undefined, undefined, undefined, true)
     expect(response).to.be.ok
     expect(response.error).to.not.be.ok
     expect(await this.application.protocolService.getRootKey()).to.be.ok
@@ -264,14 +208,7 @@ describe('basic auth', function () {
      */
     await this.application.register(nospace, this.password)
     this.application = await Factory.signOutApplicationAndReturnNew(this.application)
-    const response = await this.application.signIn(
-      withspace,
-      this.password,
-      undefined,
-      undefined,
-      undefined,
-      true,
-    )
+    const response = await this.application.signIn(withspace, this.password, undefined, undefined, undefined, true)
     expect(response).to.be.ok
     expect(response.error).to.not.be.ok
     expect(await this.application.protocolService.getRootKey()).to.be.ok
@@ -280,14 +217,7 @@ describe('basic auth', function () {
   it('fails login with wrong password', async function () {
     await this.application.register(this.email, this.password)
     this.application = await Factory.signOutApplicationAndReturnNew(this.application)
-    const response = await this.application.signIn(
-      this.email,
-      'wrongpassword',
-      undefined,
-      undefined,
-      undefined,
-      true,
-    )
+    const response = await this.application.signIn(this.email, 'wrongpassword', undefined, undefined, undefined, true)
     expect(response).to.be.ok
     expect(response.error).to.be.ok
     expect(await this.application.protocolService.getRootKey()).to.not.be.ok
@@ -323,10 +253,7 @@ describe('basic auth', function () {
       if (!didCompleteDownloadFirstSync) {
         return
       }
-      if (
-        !didCompletePostDownloadFirstSync &&
-        eventName === SyncEvent.SingleRoundTripSyncCompleted
-      ) {
+      if (!didCompletePostDownloadFirstSync && eventName === SyncEvent.SingleRoundTripSyncCompleted) {
         didCompletePostDownloadFirstSync = true
         /** Should be in sync */
         outOfSync = this.application.syncService.isOutOfSync()
@@ -398,14 +325,7 @@ describe('basic auth', function () {
     this.application = await Factory.signOutApplicationAndReturnNew(this.application)
 
     /** Should login with new password */
-    const signinResponse = await this.application.signIn(
-      this.email,
-      newPassword,
-      undefined,
-      undefined,
-      undefined,
-      true,
-    )
+    const signinResponse = await this.application.signIn(this.email, newPassword, undefined, undefined, undefined, true)
 
     expect(signinResponse).to.be.ok
     expect(signinResponse.error).to.not.be.ok
@@ -504,14 +424,7 @@ describe('basic auth', function () {
     })
     this.application = await Factory.signOutApplicationAndReturnNew(this.application)
     const performSignIn = sinon.spy(this.application.sessionManager, 'performSignIn')
-    await this.application.signIn(
-      this.email,
-      'wrong password',
-      undefined,
-      undefined,
-      undefined,
-      true,
-    )
+    await this.application.signIn(this.email, 'wrong password', undefined, undefined, undefined, true)
     expect(performSignIn.callCount).to.equal(1)
   })
 

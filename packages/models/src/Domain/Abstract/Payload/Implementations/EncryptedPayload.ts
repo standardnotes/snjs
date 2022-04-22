@@ -1,17 +1,11 @@
 import { ProtocolVersion, protocolVersionFromEncryptedString } from '@standardnotes/common'
-import {
-  SyncResolvedParams,
-  SyncResolvedPayload,
-} from '../../../Runtime/Deltas/Utilities/SyncResolvedPayload'
+import { SyncResolvedParams, SyncResolvedPayload } from '../../../Runtime/Deltas/Utilities/SyncResolvedPayload'
 import { EncryptedTransferPayload } from '../../TransferPayload/Interfaces/EncryptedTransferPayload'
 import { EncryptedPayloadInterface } from '../Interfaces/EncryptedPayload'
 import { PayloadSource } from '../Types/PayloadSource'
 import { PurePayload } from './PurePayload'
 
-export class EncryptedPayload
-  extends PurePayload<EncryptedTransferPayload>
-  implements EncryptedPayloadInterface
-{
+export class EncryptedPayload extends PurePayload<EncryptedTransferPayload> implements EncryptedPayloadInterface {
   override readonly content: string
   override readonly deleted: false
   readonly auth_hash?: string

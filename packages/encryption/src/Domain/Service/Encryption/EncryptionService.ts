@@ -74,10 +74,7 @@ export enum EncryptionServiceEvent {
  * It also exposes public methods that allows consumers to retrieve an items key
  * for a particular payload, and also retrieve all available items keys.
 */
-export class EncryptionService
-  extends Services.AbstractService<EncryptionServiceEvent>
-  implements EncryptionProvider
-{
+export class EncryptionService extends Services.AbstractService<EncryptionServiceEvent> implements EncryptionProvider {
   private operatorManager: OperatorManager
   private readonly itemsEncryption: ItemsEncryptionService
   private readonly rootKeyEncryption: RootKeyEncryption.RootKeyEncryptionService
@@ -201,9 +198,7 @@ export class EncryptionService
     await this.itemsEncryption.decryptErroredPayloads()
   }
 
-  public itemsKeyForPayload(
-    payload: Models.EncryptedPayloadInterface,
-  ): Models.ItemsKeyInterface | undefined {
+  public itemsKeyForPayload(payload: Models.EncryptedPayloadInterface): Models.ItemsKeyInterface | undefined {
     return this.itemsEncryption.itemsKeyForPayload(payload)
   }
 
@@ -214,15 +209,11 @@ export class EncryptionService
     return this.itemsEncryption.defaultItemsKeyForItemVersion(version, fromKeys)
   }
 
-  public async encryptSplitSingle(
-    split: KeyedEncryptionSplit,
-  ): Promise<Models.EncryptedPayloadInterface> {
+  public async encryptSplitSingle(split: KeyedEncryptionSplit): Promise<Models.EncryptedPayloadInterface> {
     return (await this.encryptSplit(split))[0]
   }
 
-  public async encryptSplit(
-    split: KeyedEncryptionSplit,
-  ): Promise<Models.EncryptedPayloadInterface[]> {
+  public async encryptSplit(split: KeyedEncryptionSplit): Promise<Models.EncryptedPayloadInterface[]> {
     const allEncryptedParams: EncryptedParameters[] = []
 
     if (split.usesRootKey) {
@@ -427,8 +418,7 @@ export class EncryptionService
     file: BackupFile,
     password?: string,
   ): Promise<
-    | ClientDisplayableError
-    | (Models.EncryptedPayloadInterface | Models.DecryptedPayloadInterface<Models.ItemContent>)[]
+    ClientDisplayableError | (Models.EncryptedPayloadInterface | Models.DecryptedPayloadInterface<Models.ItemContent>)[]
   > {
     const result = await DecryptBackupFile(file, this, password)
     return result
@@ -493,10 +483,7 @@ export class EncryptionService
    * @returns True if the root key has not yet been unwrapped (passcode locked).
    */
   public async isPasscodeLocked() {
-    return (
-      (await this.rootKeyEncryption.hasRootKeyWrapper()) &&
-      this.rootKeyEncryption.getRootKey() == undefined
-    )
+    return (await this.rootKeyEncryption.hasRootKeyWrapper()) && this.rootKeyEncryption.getRootKey() == undefined
   }
 
   public async getRootKeyParams() {
@@ -574,16 +561,12 @@ export class EncryptionService
       return undefined
     }
     const operator = this.operatorManager.operatorForVersion(version)
-    const authenticatedData = operator.getPayloadAuthenticatedData(
-      encryptedParametersFromPayload(payload),
-    )
+    const authenticatedData = operator.getPayloadAuthenticatedData(encryptedParametersFromPayload(payload))
     return authenticatedData
   }
 
   /** Returns the key params attached to this key's encrypted payload */
-  public getKeyEmbeddedKeyParams(
-    key: Models.EncryptedPayloadInterface,
-  ): SNRootKeyParams | undefined {
+  public getKeyEmbeddedKeyParams(key: Models.EncryptedPayloadInterface): SNRootKeyParams | undefined {
     const authenticatedData = this.getEmbeddedPayloadAuthenticatedData(key)
     if (!authenticatedData) {
       return undefined
@@ -706,9 +689,7 @@ export class EncryptionService
     }
     /** If we do not have an items key for our current account version, create one */
     const userVersion = this.getUserVersion()
-    const accountVersionedKey = this.itemsEncryption
-      .getItemsKeys()
-      .find((key) => key.keyVersion === userVersion)
+    const accountVersionedKey = this.itemsEncryption.getItemsKeys().find((key) => key.keyVersion === userVersion)
     if (Utils.isNullOrUndefined(accountVersionedKey)) {
       await this.rootKeyEncryption.createNewDefaultItemsKey()
     }
@@ -738,9 +719,7 @@ export class EncryptionService
       return
     }
 
-    const unsyncedKeys = this.itemsEncryption
-      .getItemsKeys()
-      .filter((key) => key.neverSynced && !key.dirty)
+    const unsyncedKeys = this.itemsEncryption.getItemsKeys().filter((key) => key.neverSynced && !key.dirty)
     if (unsyncedKeys.length > 0) {
       void this.itemManager.setItemsDirty(unsyncedKeys)
     }

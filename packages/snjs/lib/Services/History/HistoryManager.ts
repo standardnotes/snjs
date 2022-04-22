@@ -53,12 +53,9 @@ export class SNHistoryManager extends Services.AbstractService {
     protected override internalEventBus: Services.InternalEventBusInterface,
   ) {
     super(internalEventBus)
-    this.removeChangeObserver = this.itemManager.addObserver(
-      ContentType.Note,
-      ({ changed, inserted }) => {
-        this.recordNewHistoryForItems(changed.concat(inserted) as SNNote[])
-      },
-    )
+    this.removeChangeObserver = this.itemManager.addObserver(ContentType.Note, ({ changed, inserted }) => {
+      this.recordNewHistoryForItems(changed.concat(inserted) as SNNote[])
+    })
   }
 
   public override deinit(): void {
@@ -129,9 +126,7 @@ export class SNHistoryManager extends Services.AbstractService {
    * include the item's content. Instead, each revision's content must be fetched
    * individually upon selection via `fetchRemoteRevision`.
    */
-  async remoteHistoryForItem(
-    item: Models.SNNote,
-  ): Promise<Responses.RevisionListEntry[] | undefined> {
+  async remoteHistoryForItem(item: Models.SNNote): Promise<Responses.RevisionListEntry[] | undefined> {
     const response = await this.apiService.getItemRevisions(item.uuid)
     if (response.error || isNullOrUndefined(response.data)) {
       return undefined
@@ -193,10 +188,7 @@ export class SNHistoryManager extends Services.AbstractService {
     return new Models.HistoryEntry(decryptedPayload)
   }
 
-  async deleteRemoteRevision(
-    note: SNNote,
-    entry: Responses.RevisionListEntry,
-  ): Promise<Responses.MinimalHttpResponse> {
+  async deleteRemoteRevision(note: SNNote, entry: Responses.RevisionListEntry): Promise<Responses.MinimalHttpResponse> {
     const response = await this.apiService.deleteRevision(note.uuid, entry)
     return response
   }

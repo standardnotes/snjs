@@ -5,8 +5,7 @@ chai.use(chaiAsPromised)
 const expect = chai.expect
 
 describe('actions service', () => {
-  const errorProcessingActionMessage =
-    'An issue occurred while processing this action. Please try again.'
+  const errorProcessingActionMessage = 'An issue occurred while processing this action. Please try again.'
 
   before(async function () {
     this.timeout(20000)
@@ -81,36 +80,32 @@ describe('actions service', () => {
       ],
     }
 
-    this.fakeServer.respondWith(
-      'GET',
-      /http:\/\/my-extension.sn.org\/get_actions\/(.*)/,
-      (request, params) => {
-        const urlParams = new URLSearchParams(params)
-        const extension = Copy(this.actionsExtension)
+    this.fakeServer.respondWith('GET', /http:\/\/my-extension.sn.org\/get_actions\/(.*)/, (request, params) => {
+      const urlParams = new URLSearchParams(params)
+      const extension = Copy(this.actionsExtension)
 
-        if (urlParams.has('item_uuid')) {
-          extension.actions.push({
-            label: 'Action #4',
-            url: `http://my-extension.sn.org/action_4/?item_uuid=${urlParams.get('item_uuid')}`,
-            verb: 'post',
-            context: 'Item',
-            content_types: ['Note'],
-            access_type: 'decrypted',
-          })
+      if (urlParams.has('item_uuid')) {
+        extension.actions.push({
+          label: 'Action #4',
+          url: `http://my-extension.sn.org/action_4/?item_uuid=${urlParams.get('item_uuid')}`,
+          verb: 'post',
+          context: 'Item',
+          content_types: ['Note'],
+          access_type: 'decrypted',
+        })
 
-          extension.actions.push({
-            label: 'Action #6',
-            url: `http://my-extension.sn.org/action_6/?item_uuid=${urlParams.get('item_uuid')}`,
-            verb: 'post',
-            context: 'Item',
-            content_types: ['Note'],
-            access_type: 'encrypted',
-          })
-        }
+        extension.actions.push({
+          label: 'Action #6',
+          url: `http://my-extension.sn.org/action_6/?item_uuid=${urlParams.get('item_uuid')}`,
+          verb: 'post',
+          context: 'Item',
+          content_types: ['Note'],
+          access_type: 'encrypted',
+        })
+      }
 
-        request.respond(200, { 'Content-Type': 'application/json' }, JSON.stringify(extension))
-      },
-    )
+      request.respond(200, { 'Content-Type': 'application/json' }, JSON.stringify(extension))
+    })
 
     const payload = new DecryptedPayload({
       uuid: Factory.generateUuid(),
@@ -128,20 +123,16 @@ describe('actions service', () => {
       }),
     )
 
-    this.fakeServer.respondWith(
-      'GET',
-      /http:\/\/my-extension.sn.org\/action_[1,2]\/(.*)/,
-      (request) => {
-        request.respond(
-          200,
-          { 'Content-Type': 'application/json' },
-          JSON.stringify({
-            item: encryptedPayload,
-            auth_params: this.authParams,
-          }),
-        )
-      },
-    )
+    this.fakeServer.respondWith('GET', /http:\/\/my-extension.sn.org\/action_[1,2]\/(.*)/, (request) => {
+      request.respond(
+        200,
+        { 'Content-Type': 'application/json' },
+        JSON.stringify({
+          item: encryptedPayload,
+          auth_params: this.authParams,
+        }),
+      )
+    })
 
     this.fakeServer.respondWith('GET', 'http://my-extension.sn.org/action_3/', [
       200,
@@ -149,20 +140,16 @@ describe('actions service', () => {
       '<h2>Action #3</h2>',
     ])
 
-    this.fakeServer.respondWith(
-      'POST',
-      /http:\/\/my-extension.sn.org\/action_[4,6]\/(.*)/,
-      (request) => {
-        const requestBody = JSON.parse(request.requestBody)
+    this.fakeServer.respondWith('POST', /http:\/\/my-extension.sn.org\/action_[4,6]\/(.*)/, (request) => {
+      const requestBody = JSON.parse(request.requestBody)
 
-        const response = {
-          uuid: requestBody.items[0].uuid,
-          result: 'Action POSTed successfully.',
-        }
+      const response = {
+        uuid: requestBody.items[0].uuid,
+        result: 'Action POSTed successfully.',
+      }
 
-        request.respond(200, { 'Content-Type': 'application/json' }, JSON.stringify(response))
-      },
-    )
+      request.respond(200, { 'Content-Type': 'application/json' }, JSON.stringify(response))
+    })
 
     this.fakeServer.respondWith('GET', 'http://my-extension.sn.org/action_5/', (request) => {
       const encryptedPayloadClone = Copy(encryptedPayload)
@@ -237,10 +224,7 @@ describe('actions service', () => {
     const extensionItem = await this.itemManager.findItem(this.extensionItemUuid)
     expect(extensionItem.actions.length).to.be.eq(5)
 
-    const extensionWithItem = await this.actionsManager.loadExtensionInContextOfItem(
-      extensionItem,
-      noteItem,
-    )
+    const extensionWithItem = await this.actionsManager.loadExtensionInContextOfItem(extensionItem, noteItem)
     expect(extensionWithItem.actions.length).to.be.eq(7)
     expect(extensionWithItem.actions.map((action) => action.label)).to.include.members([
       /**
@@ -351,10 +335,7 @@ describe('actions service', () => {
         text: 'Time To Be King 8)',
       })
       this.extensionItem = await this.itemManager.findItem(this.extensionItemUuid)
-      this.extensionItem = await this.actionsManager.loadExtensionInContextOfItem(
-        this.extensionItem,
-        this.noteItem,
-      )
+      this.extensionItem = await this.actionsManager.loadExtensionInContextOfItem(this.extensionItem, this.noteItem)
 
       this.decryptedPostAction = this.extensionItem.actions.filter(
         (action) => action.access_type === 'decrypted' && action.verb === 'post',

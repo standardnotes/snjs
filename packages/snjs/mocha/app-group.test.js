@@ -51,16 +51,12 @@ describe('application group', function () {
     })
     const identifier = group.primaryApplication.identifier
 
-    const descriptorRecord = await group.deviceInterface.getJsonParsedRawStorageValue(
-      RawStorageKey.DescriptorRecord,
-    )
+    const descriptorRecord = await group.deviceInterface.getJsonParsedRawStorageValue(RawStorageKey.DescriptorRecord)
     expect(descriptorRecord[identifier].identifier).to.equal(identifier)
     expect(descriptorRecord[identifier].primary).to.equal(true)
 
     const application = await group.addNewApplication()
-    const descriptorRecord2 = await group.deviceInterface.getJsonParsedRawStorageValue(
-      RawStorageKey.DescriptorRecord,
-    )
+    const descriptorRecord2 = await group.deviceInterface.getJsonParsedRawStorageValue(RawStorageKey.DescriptorRecord)
     expect(Object.keys(descriptorRecord2).length).to.equal(2)
 
     expect(descriptorRecord2[identifier].primary).to.equal(false)

@@ -49,10 +49,7 @@ describe('model manager mapping', () => {
 
     this.expectedItemCount--
 
-    await this.application.itemManager.emitItemsFromPayloads(
-      [changedParams],
-      PayloadEmitSource.LocalChanged,
-    )
+    await this.application.itemManager.emitItemsFromPayloads([changedParams], PayloadEmitSource.LocalChanged)
 
     expect(this.application.itemManager.items.length).to.equal(this.expectedItemCount)
   })
@@ -60,20 +57,13 @@ describe('model manager mapping', () => {
   it('mapping deleted but dirty item should not delete it', async function () {
     const payload = Factory.createNotePayload()
 
-    const [item] = await this.application.itemManager.emitItemsFromPayloads(
-      [payload],
-      PayloadEmitSource.LocalChanged,
-    )
+    const [item] = await this.application.itemManager.emitItemsFromPayloads([payload], PayloadEmitSource.LocalChanged)
 
     this.expectedItemCount++
 
-    await this.application.itemManager.emitItemFromPayload(
-      new DeleteItemMutator(item).getDeletedResult(),
-    )
+    await this.application.itemManager.emitItemFromPayload(new DeleteItemMutator(item).getDeletedResult())
 
-    const payload2 = new DeletedPayload(
-      this.application.payloadManager.findOne(payload.uuid).ejected(),
-    )
+    const payload2 = new DeletedPayload(this.application.payloadManager.findOne(payload.uuid).ejected())
 
     await this.application.itemManager.emitItemsFromPayloads([payload2], PayloadEmitSource.LocalChanged)
 

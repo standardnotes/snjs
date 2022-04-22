@@ -1,9 +1,4 @@
-import {
-  PredicateTarget,
-  PredicateCompoundOperator,
-  PredicateInterface,
-  PredicateJsonForm,
-} from './Interface'
+import { PredicateTarget, PredicateCompoundOperator, PredicateInterface, PredicateJsonForm } from './Interface'
 
 export class CompoundPredicate<T extends PredicateTarget> implements PredicateInterface<T> {
   constructor(

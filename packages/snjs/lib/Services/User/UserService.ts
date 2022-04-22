@@ -26,10 +26,7 @@ export enum AccountEvent {
   SignedOut = 'SignedOut',
 }
 
-export class UserService
-  extends Services.AbstractService<AccountEvent>
-  implements UserClientInterface
-{
+export class UserService extends Services.AbstractService<AccountEvent> implements UserClientInterface {
   private signingIn = false
   private registering = false
 
@@ -84,9 +81,7 @@ export class UserService
       if (!result.response.error) {
         this.syncService.resetSyncState()
         await this.storageService.setPersistencePolicy(
-          ephemeral
-            ? Services.StoragePersistencePolicies.Ephemeral
-            : Services.StoragePersistencePolicies.Default,
+          ephemeral ? Services.StoragePersistencePolicies.Ephemeral : Services.StoragePersistencePolicies.Default,
         )
         if (mergeLocal) {
           await this.syncService.markAllItemsAsNeedingSyncAndPersist()
@@ -139,9 +134,7 @@ export class UserService
         this.syncService.resetSyncState()
 
         await this.storageService.setPersistencePolicy(
-          ephemeral
-            ? Services.StoragePersistencePolicies.Ephemeral
-            : Services.StoragePersistencePolicies.Default,
+          ephemeral ? Services.StoragePersistencePolicies.Ephemeral : Services.StoragePersistencePolicies.Default,
         )
 
         if (mergeLocal) {
@@ -221,10 +214,7 @@ export class UserService
    */
   public async correctiveSignIn(rootKey: SNRootKey): Promise<HttpResponse | SignInResponse> {
     this.lockSyncing()
-    const response = await this.sessionManager.bypassChecksAndSignInWithRootKey(
-      rootKey.keyParams.identifier,
-      rootKey,
-    )
+    const response = await this.sessionManager.bypassChecksAndSignInWithRootKey(rootKey.keyParams.identifier, rootKey)
     if (!response.error) {
       await this.notifyEvent(AccountEvent.SignedInOrRegistered)
       this.unlockSyncing()
@@ -348,10 +338,7 @@ export class UserService
       if (hasPasscode) {
         /* Upgrade passcode version */
         await this.removePasscodeWithoutWarning()
-        await this.setPasscodeWithoutWarning(
-          passcode as string,
-          KeyParamsOrigination.ProtocolUpgrade,
-        )
+        await this.setPasscodeWithoutWarning(passcode as string, KeyParamsOrigination.ProtocolUpgrade)
       }
       return { success: true }
     } catch (error) {
@@ -475,9 +462,7 @@ export class UserService
     newPassword?: string
     passcode?: string
   }): Promise<CredentialsChangeFunctionResponse> {
-    const { wrappingKey, canceled } = await this.challengeService.getWrappingKeyIfApplicable(
-      parameters.passcode,
-    )
+    const { wrappingKey, canceled } = await this.challengeService.getWrappingKeyIfApplicable(parameters.passcode)
 
     if (canceled) {
       return { error: Error(Messages.CredentialsChangeStrings.PasscodeRequired) }
@@ -491,9 +476,7 @@ export class UserService
       }
     }
 
-    const accountPasswordValidation = await this.protocolService.validateAccountPassword(
-      parameters.currentPassword,
-    )
+    const accountPasswordValidation = await this.protocolService.validateAccountPassword(parameters.currentPassword)
     if (!accountPasswordValidation.valid) {
       return {
         error: Error(Messages.INVALID_PASSWORD),

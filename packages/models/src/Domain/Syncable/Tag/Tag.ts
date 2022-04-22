@@ -26,8 +26,7 @@ export class SNTag extends DecryptedItem<TagContent> implements TagInterface {
   constructor(payload: DecryptedPayloadInterface<TagContent>) {
     super(payload)
     this.title = this.payload.content.title || ''
-    this.expanded =
-      this.payload.content.expanded != undefined ? this.payload.content.expanded : true
+    this.expanded = this.payload.content.expanded != undefined ? this.payload.content.expanded : true
   }
 
   get noteReferences(): ContentReference[] {

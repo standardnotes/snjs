@@ -3,23 +3,12 @@ import { SNPreferencesService } from '../Preferences/PreferencesService'
 import { SNFeaturesService } from '@Lib/Services/Features/FeaturesService'
 import { ContentType, DisplayStringForContentType } from '@standardnotes/common'
 import { ItemManager } from '@Lib/Services/Items/ItemManager'
-import {
-  SNNote,
-  SNTheme,
-  SNComponent,
-  ComponentMutator,
-  PayloadEmitSource,
-} from '@standardnotes/models'
+import { SNNote, SNTheme, SNComponent, ComponentMutator, PayloadEmitSource } from '@standardnotes/models'
 import { SNAlertService } from '@Lib/Services/Alert/AlertService'
 import { SNSyncService } from '@Lib/Services/Sync/SyncService'
 import find from 'lodash/find'
 import uniq from 'lodash/uniq'
-import {
-  ComponentArea,
-  ComponentAction,
-  ComponentPermission,
-  FindNativeFeature,
-} from '@standardnotes/features'
+import { ComponentArea, ComponentAction, ComponentPermission, FindNativeFeature } from '@standardnotes/features'
 import { Copy, filterFromArray, removeFromArray, sleep } from '@standardnotes/utils'
 import { Environment, Platform } from '@Lib/Application/Platforms'
 import { UuidString } from '@Lib/Types/UuidString'
@@ -272,10 +261,7 @@ export class SNComponentManager extends AbstractService<ComponentManagerEvent, E
           nativeFeature.index_path
         }`
       } else if (component.local_url) {
-        return component.local_url.replace(
-          DESKTOP_URL_PREFIX,
-          this.desktopManager!.getExtServerHost() + '/',
-        )
+        return component.local_url.replace(DESKTOP_URL_PREFIX, this.desktopManager!.getExtServerHost() + '/')
       } else {
         return component.hosted_url || component.legacy_url
       }
@@ -324,10 +310,7 @@ export class SNComponentManager extends AbstractService<ComponentManagerEvent, E
     return this.viewers.find((viewer) => viewer.sessionKey === key)
   }
 
-  areRequestedPermissionsValid(
-    component: SNComponent,
-    permissions: ComponentPermission[],
-  ): boolean {
+  areRequestedPermissionsValid(component: SNComponent, permissions: ComponentPermission[]): boolean {
     for (const permission of permissions) {
       if (permission.name === ComponentAction.StreamItems) {
         if (!AllowedBatchStreaming.includes(component.identifier)) {
@@ -353,11 +336,7 @@ export class SNComponentManager extends AbstractService<ComponentManagerEvent, E
     const component = this.findComponent(componentUuid)
 
     if (!this.areRequestedPermissionsValid(component, requiredPermissions)) {
-      console.error(
-        'Component is requesting invalid permissions',
-        componentUuid,
-        requiredPermissions,
-      )
+      console.error('Component is requesting invalid permissions', componentUuid, requiredPermissions)
       return
     }
     const nativeFeature = FindNativeFeature(component.identifier)
@@ -367,9 +346,7 @@ export class SNComponentManager extends AbstractService<ComponentManagerEvent, E
     requiredPermissions = Copy(requiredPermissions) as ComponentPermission[]
     for (const required of requiredPermissions.slice()) {
       /* Remove anything we already have */
-      const respectiveAcquired = acquiredPermissions.find(
-        (candidate) => candidate.name === required.name,
-      )
+      const respectiveAcquired = acquiredPermissions.find((candidate) => candidate.name === required.name)
       if (!respectiveAcquired) {
         continue
       }
@@ -431,17 +408,13 @@ export class SNComponentManager extends AbstractService<ComponentManagerEvent, E
           this.log('Changing component to expand permissions', component)
           const componentPermissions = Copy(latestComponent.permissions) as ComponentPermission[]
           for (const permission of permissions) {
-            const matchingPermission = componentPermissions.find(
-              (candidate) => candidate.name === permission.name,
-            )
+            const matchingPermission = componentPermissions.find((candidate) => candidate.name === permission.name)
             if (!matchingPermission) {
               componentPermissions.push(permission)
             } else {
               /* Permission already exists, but content_types may have been expanded */
               const contentTypes = matchingPermission.content_types || []
-              matchingPermission.content_types = uniq(
-                contentTypes.concat(permission.content_types!),
-              )
+              matchingPermission.content_types = uniq(contentTypes.concat(permission.content_types!))
             }
           }
 
@@ -459,14 +432,8 @@ export class SNComponentManager extends AbstractService<ComponentManagerEvent, E
             pendingDialog.actionBlock && pendingDialog.actionBlock(approved)
             return false
           }
-          const containsObjectSubset = (
-            source: ComponentPermission[],
-            target: ComponentPermission[],
-          ) => {
-            return !target.some(
-              (val) =>
-                !source.find((candidate) => JSON.stringify(candidate) === JSON.stringify(val)),
-            )
+          const containsObjectSubset = (source: ComponentPermission[], target: ComponentPermission[]) => {
+            return !target.some((val) => !source.find((candidate) => JSON.stringify(candidate) === JSON.stringify(val)))
           }
           if (pendingDialog.component === component) {
             /* remove pending dialogs that are encapsulated by already approved permissions, and run its function */
@@ -603,10 +570,7 @@ export class SNComponentManager extends AbstractService<ComponentManagerEvent, E
     }
   }
 
-  permissionsStringForPermissions(
-    permissions: ComponentPermission[],
-    component: SNComponent,
-  ): string {
+  permissionsStringForPermissions(permissions: ComponentPermission[], component: SNComponent): string {
     if (permissions.length === 0) {
       return '.'
     }
@@ -651,15 +615,10 @@ export class SNComponentManager extends AbstractService<ComponentManagerEvent, E
     return contentTypeStrings.concat(contextAreaStrings).join(', ') + '.'
   }
 
-  doesEditorChangeRequireAlert(
-    from: SNComponent | undefined,
-    to: SNComponent | undefined,
-  ): boolean {
+  doesEditorChangeRequireAlert(from: SNComponent | undefined, to: SNComponent | undefined): boolean {
     const isEitherPlainEditor = !from || !to
-    const isEitherMarkdown =
-      from?.package_info.file_type === 'md' || to?.package_info.file_type === 'md'
-    const areBothHtml =
-      from?.package_info.file_type === 'html' && to?.package_info.file_type === 'html'
+    const isEitherMarkdown = from?.package_info.file_type === 'md' || to?.package_info.file_type === 'md'
+    const areBothHtml = from?.package_info.file_type === 'html' && to?.package_info.file_type === 'html'
 
     if (isEitherPlainEditor || isEitherMarkdown || areBothHtml) {
       return false

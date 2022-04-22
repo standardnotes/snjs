@@ -51,9 +51,7 @@ describe('offline syncing', () => {
     const rawPayloads2 = await this.application.storageService.getAllRawPayloads()
     expect(rawPayloads2.length).to.equal(this.expectedItemCount)
 
-    const itemsKeyRaw = (
-      await Factory.getStoragePayloadsOfType(this.application, ContentType.ItemsKey)
-    )[0]
+    const itemsKeyRaw = (await Factory.getStoragePayloadsOfType(this.application, ContentType.ItemsKey))[0]
     const noteRaw = (await Factory.getStoragePayloadsOfType(this.application, ContentType.Note))[0]
 
     /** Encrypts with default items key */
@@ -79,9 +77,7 @@ describe('offline syncing', () => {
 
     const payload = rawPayloads2[0]
     expect(typeof payload.content).to.equal('string')
-    expect(
-      payload.content.startsWith(this.application.protocolService.getLatestVersion()),
-    ).to.equal(true)
+    expect(payload.content.startsWith(this.application.protocolService.getLatestVersion())).to.equal(true)
   })
 
   it('signing out while offline should succeed', async function () {

@@ -47,16 +47,10 @@ export function compareVersions(a: ProtocolVersion, b: ProtocolVersion): number 
   return aNum - bNum
 }
 
-export function leftVersionGreaterThanOrEqualToRight(
-  a: ProtocolVersion,
-  b: ProtocolVersion,
-): boolean {
+export function leftVersionGreaterThanOrEqualToRight(a: ProtocolVersion, b: ProtocolVersion): boolean {
   return compareVersions(a, b) >= 0
 }
 
-export function isVersionLessThanOrEqualTo(
-  input: ProtocolVersion,
-  compareTo: ProtocolVersion,
-): boolean {
+export function isVersionLessThanOrEqualTo(input: ProtocolVersion, compareTo: ProtocolVersion): boolean {
   return compareVersions(input, compareTo) <= 0
 }

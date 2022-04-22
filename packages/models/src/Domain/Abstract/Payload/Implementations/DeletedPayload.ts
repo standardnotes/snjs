@@ -2,15 +2,9 @@ import { DeletedTransferPayload } from './../../TransferPayload/Interfaces/Delet
 import { DeletedPayloadInterface } from '../Interfaces/DeletedPayload'
 import { PayloadSource } from '../Types/PayloadSource'
 import { PurePayload } from './PurePayload'
-import {
-  SyncResolvedParams,
-  SyncResolvedPayload,
-} from '../../../Runtime/Deltas/Utilities/SyncResolvedPayload'
+import { SyncResolvedParams, SyncResolvedPayload } from '../../../Runtime/Deltas/Utilities/SyncResolvedPayload'
 
-export class DeletedPayload
-  extends PurePayload<DeletedTransferPayload>
-  implements DeletedPayloadInterface
-{
+export class DeletedPayload extends PurePayload<DeletedTransferPayload> implements DeletedPayloadInterface {
   override readonly deleted: true
   override readonly content: undefined
 

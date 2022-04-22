@@ -20,10 +20,7 @@ describe('2020-01-15 mobile migration', () => {
       let application = await Factory.createAppWithRandNamespace(Environment.Mobile, Platform.Ios)
 
       /** Create legacy migrations value so that base migration detects old app */
-      await application.deviceInterface.setRawStorageValue(
-        'migrations',
-        JSON.stringify(['anything']),
-      )
+      await application.deviceInterface.setRawStorageValue('migrations', JSON.stringify(['anything']))
       const operator003 = new SNProtocolOperator003(new FakeWebCrypto())
       const identifier = 'foo'
       const passcode = 'bar'
@@ -66,36 +63,18 @@ describe('2020-01-15 mobile migration', () => {
           },
         },
       })
-      const encryptedKeyParams = await operator003.generateEncryptedParametersAsync(
-        keyPayload,
-        passcodeKey,
-      )
+      const encryptedKeyParams = await operator003.generateEncryptedParametersAsync(keyPayload, passcodeKey)
       const wrappedKey = new EncryptedPayload({ ...keyPayload.ejected(), ...encryptedKeyParams })
-      await application.deviceInterface.setRawStorageValue(
-        'encrypted_account_keys',
-        JSON.stringify(wrappedKey),
-      )
+      await application.deviceInterface.setRawStorageValue('encrypted_account_keys', JSON.stringify(wrappedKey))
       const biometricPrefs = { enabled: true, timing: 'immediately' }
       /** Create legacy storage. Storage in mobile was never wrapped. */
-      await application.deviceInterface.setRawStorageValue(
-        'biometrics_prefs',
-        JSON.stringify(biometricPrefs),
-      )
-      await application.deviceInterface.setRawStorageValue(
-        NonwrappedStorageKey.MobileFirstRun,
-        false,
-      )
+      await application.deviceInterface.setRawStorageValue('biometrics_prefs', JSON.stringify(biometricPrefs))
+      await application.deviceInterface.setRawStorageValue(NonwrappedStorageKey.MobileFirstRun, false)
       /** Create encrypted item and store it in db */
       const notePayload = Factory.createNotePayload()
-      const noteEncryptionParams = await operator003.generateEncryptedParametersAsync(
-        notePayload,
-        accountKey,
-      )
+      const noteEncryptionParams = await operator003.generateEncryptedParametersAsync(notePayload, accountKey)
       const noteEncryptedPayload = new EncryptedPayload({ ...notePayload, ...noteEncryptionParams })
-      await application.deviceInterface.saveRawDatabasePayload(
-        noteEncryptedPayload,
-        application.identifier,
-      )
+      await application.deviceInterface.saveRawDatabasePayload(noteEncryptedPayload, application.identifier)
       /** setup options */
       const lastExportDate = '2020:02'
       await application.deviceInterface.setRawStorageValue('LastExportDateKey', lastExportDate)
@@ -133,9 +112,7 @@ describe('2020-01-15 mobile migration', () => {
       })
       await application.launch(true)
 
-      expect(application.protocolService.rootKeyEncryption.keyMode).to.equal(
-        KeyMode.RootKeyPlusWrapper,
-      )
+      expect(application.protocolService.rootKeyEncryption.keyMode).to.equal(KeyMode.RootKeyPlusWrapper)
 
       /** Should be decrypted */
       const storageMode = application.storageService.domainKeyForMode(StorageValueModes.Default)
@@ -152,13 +129,9 @@ describe('2020-01-15 mobile migration', () => {
       expect(rootKey.dataAuthenticationKey).to.equal(accountKey.dataAuthenticationKey)
       expect(rootKey.serverPassword).to.not.be.ok
       expect(rootKey.keyVersion).to.equal(ProtocolVersion.V003)
-      expect(application.protocolService.rootKeyEncryption.keyMode).to.equal(
-        KeyMode.RootKeyPlusWrapper,
-      )
+      expect(application.protocolService.rootKeyEncryption.keyMode).to.equal(KeyMode.RootKeyPlusWrapper)
 
-      const keychainValue = await application.deviceInterface.getNamespacedKeychainValue(
-        application.identifier,
-      )
+      const keychainValue = await application.deviceInterface.getNamespacedKeychainValue(application.identifier)
       expect(keychainValue).to.not.be.ok
 
       /** Expect note is decrypted */
@@ -168,23 +141,14 @@ describe('2020-01-15 mobile migration', () => {
       expect(retrievedNote.content.text).to.equal(notePayload.content.text)
 
       expect(
-        await application.storageService.getValue(
-          NonwrappedStorageKey.MobileFirstRun,
-          StorageValueModes.Nonwrapped,
-        ),
+        await application.storageService.getValue(NonwrappedStorageKey.MobileFirstRun, StorageValueModes.Nonwrapped),
       ).to.equal(false)
 
       expect(
-        await application.storageService.getValue(
-          StorageKey.BiometricsState,
-          StorageValueModes.Nonwrapped,
-        ),
+        await application.storageService.getValue(StorageKey.BiometricsState, StorageValueModes.Nonwrapped),
       ).to.equal(biometricPrefs.enabled)
       expect(
-        await application.storageService.getValue(
-          StorageKey.MobileBiometricsTiming,
-          StorageValueModes.Nonwrapped,
-        ),
+        await application.storageService.getValue(StorageKey.MobileBiometricsTiming, StorageValueModes.Nonwrapped),
       ).to.equal(biometricPrefs.timing)
       expect(await application.getUser().email).to.equal(identifier)
 
@@ -241,32 +205,17 @@ describe('2020-01-15 mobile migration', () => {
 
     const biometricPrefs = { enabled: true, timing: 'immediately' }
     /** Create legacy storage. Storage in mobile was never wrapped. */
-    await application.deviceInterface.setRawStorageValue(
-      'biometrics_prefs',
-      JSON.stringify(biometricPrefs),
-    )
+    await application.deviceInterface.setRawStorageValue('biometrics_prefs', JSON.stringify(biometricPrefs))
     const passcodeKeyboardType = 'numeric'
-    await application.deviceInterface.setRawStorageValue(
-      'passcodeKeyboardType',
-      passcodeKeyboardType,
-    )
+    await application.deviceInterface.setRawStorageValue('passcodeKeyboardType', passcodeKeyboardType)
     await application.deviceInterface.setRawStorageValue(NonwrappedStorageKey.MobileFirstRun, false)
     /** Create encrypted item and store it in db */
     const notePayload = Factory.createNotePayload()
-    const noteEncryptionParams = await operator003.generateEncryptedParametersAsync(
-      notePayload,
-      passcodeKey,
-    )
+    const noteEncryptionParams = await operator003.generateEncryptedParametersAsync(notePayload, passcodeKey)
     const noteEncryptedPayload = new EncryptedPayload({ ...notePayload, ...noteEncryptionParams })
-    await application.deviceInterface.saveRawDatabasePayload(
-      noteEncryptedPayload,
-      application.identifier,
-    )
+    await application.deviceInterface.saveRawDatabasePayload(noteEncryptedPayload, application.identifier)
     /** setup options */
-    await application.deviceInterface.setRawStorageValue(
-      'DoNotShowAgainUnsupportedEditorsKey',
-      true,
-    )
+    await application.deviceInterface.setRawStorageValue('DoNotShowAgainUnsupportedEditorsKey', true)
     const options = JSON.stringify({
       sortBy: undefined,
       sortReverse: undefined,
@@ -280,10 +229,7 @@ describe('2020-01-15 mobile migration', () => {
     const promptValueReply = (prompts) => {
       const values = []
       for (const prompt of prompts) {
-        if (
-          prompt.validation === ChallengeValidation.None ||
-          prompt.validation === ChallengeValidation.LocalPasscode
-        ) {
+        if (prompt.validation === ChallengeValidation.None || prompt.validation === ChallengeValidation.LocalPasscode) {
           values.push(new ChallengeValue(prompt, passcode))
         }
         if (prompt.validation === ChallengeValidation.Biometric) {
@@ -321,9 +267,7 @@ describe('2020-01-15 mobile migration', () => {
     expect(rootKey.keyVersion).to.equal(ProtocolVersion.V003)
     expect(application.protocolService.rootKeyEncryption.keyMode).to.equal(KeyMode.WrapperOnly)
 
-    const keychainValue = await application.deviceInterface.getNamespacedKeychainValue(
-      application.identifier,
-    )
+    const keychainValue = await application.deviceInterface.getNamespacedKeychainValue(application.identifier)
     expect(keychainValue).to.not.be.ok
 
     /** Expect note is decrypted */
@@ -332,34 +276,19 @@ describe('2020-01-15 mobile migration', () => {
     expect(retrievedNote.uuid).to.equal(notePayload.uuid)
     expect(retrievedNote.content.text).to.equal(notePayload.content.text)
     expect(
-      await application.storageService.getValue(
-        NonwrappedStorageKey.MobileFirstRun,
-        StorageValueModes.Nonwrapped,
-      ),
+      await application.storageService.getValue(NonwrappedStorageKey.MobileFirstRun, StorageValueModes.Nonwrapped),
     ).to.equal(false)
     expect(
-      await application.storageService.getValue(
-        StorageKey.BiometricsState,
-        StorageValueModes.Nonwrapped,
-      ),
+      await application.storageService.getValue(StorageKey.BiometricsState, StorageValueModes.Nonwrapped),
     ).to.equal(biometricPrefs.enabled)
     expect(
-      await application.storageService.getValue(
-        StorageKey.MobileBiometricsTiming,
-        StorageValueModes.Nonwrapped,
-      ),
+      await application.storageService.getValue(StorageKey.MobileBiometricsTiming, StorageValueModes.Nonwrapped),
     ).to.equal(biometricPrefs.timing)
     expect(
-      await application.storageService.getValue(
-        StorageKey.MobilePasscodeTiming,
-        StorageValueModes.Nonwrapped,
-      ),
+      await application.storageService.getValue(StorageKey.MobilePasscodeTiming, StorageValueModes.Nonwrapped),
     ).to.eql(passcodeTiming)
     expect(
-      await application.storageService.getValue(
-        StorageKey.MobilePasscodeKeyboardType,
-        StorageValueModes.Nonwrapped,
-      ),
+      await application.storageService.getValue(StorageKey.MobilePasscodeKeyboardType, StorageValueModes.Nonwrapped),
     ).to.eql(passcodeKeyboardType)
     const preferences = await application.storageService.getValue('preferences')
     expect(preferences.sortBy).to.equal(undefined)
@@ -387,32 +316,17 @@ describe('2020-01-15 mobile migration', () => {
     )
     const biometricPrefs = { enabled: true, timing: 'immediately' }
     /** Create legacy storage. Storage in mobile was never wrapped. */
-    await application.deviceInterface.setRawStorageValue(
-      'biometrics_prefs',
-      JSON.stringify(biometricPrefs),
-    )
+    await application.deviceInterface.setRawStorageValue('biometrics_prefs', JSON.stringify(biometricPrefs))
     const passcodeKeyboardType = 'numeric'
-    await application.deviceInterface.setRawStorageValue(
-      'passcodeKeyboardType',
-      passcodeKeyboardType,
-    )
+    await application.deviceInterface.setRawStorageValue('passcodeKeyboardType', passcodeKeyboardType)
     await application.deviceInterface.setRawStorageValue(NonwrappedStorageKey.MobileFirstRun, false)
     /** Create encrypted item and store it in db */
     const notePayload = Factory.createNotePayload()
-    const noteEncryptionParams = await operator003.generateEncryptedParametersAsync(
-      notePayload,
-      passcodeKey,
-    )
+    const noteEncryptionParams = await operator003.generateEncryptedParametersAsync(notePayload, passcodeKey)
     const noteEncryptedPayload = new EncryptedPayload({ ...notePayload, ...noteEncryptionParams })
-    await application.deviceInterface.saveRawDatabasePayload(
-      noteEncryptedPayload,
-      application.identifier,
-    )
+    await application.deviceInterface.saveRawDatabasePayload(noteEncryptedPayload, application.identifier)
     /** setup options */
-    await application.deviceInterface.setRawStorageValue(
-      'DoNotShowAgainUnsupportedEditorsKey',
-      true,
-    )
+    await application.deviceInterface.setRawStorageValue('DoNotShowAgainUnsupportedEditorsKey', true)
     const options = JSON.stringify({
       sortBy: undefined,
       sortReverse: undefined,
@@ -426,10 +340,7 @@ describe('2020-01-15 mobile migration', () => {
     const promptValueReply = (prompts) => {
       const values = []
       for (const prompt of prompts) {
-        if (
-          prompt.validation === ChallengeValidation.None ||
-          prompt.validation === ChallengeValidation.LocalPasscode
-        ) {
+        if (prompt.validation === ChallengeValidation.None || prompt.validation === ChallengeValidation.LocalPasscode) {
           values.push(new ChallengeValue(prompt, passcode))
         }
         if (prompt.validation === ChallengeValidation.Biometric) {
@@ -475,10 +386,7 @@ describe('2020-01-15 mobile migration', () => {
       'auth_params',
       JSON.stringify(accountKey.keyParams.getPortableValue()),
     )
-    await application.deviceInterface.setRawStorageValue(
-      'user',
-      JSON.stringify({ email: identifier }),
-    )
+    await application.deviceInterface.setRawStorageValue('user', JSON.stringify({ email: identifier }))
     expect(accountKey.keyVersion).to.equal(ProtocolVersion.V003)
     await application.deviceInterface.legacy_setRawKeychainValue({
       mk: accountKey.masterKey,
@@ -492,29 +400,17 @@ describe('2020-01-15 mobile migration', () => {
       timing: 'immediately',
     }
     /** Create legacy storage. Storage in mobile was never wrapped. */
-    await application.deviceInterface.setRawStorageValue(
-      'biometrics_prefs',
-      JSON.stringify(biometricPrefs),
-    )
+    await application.deviceInterface.setRawStorageValue('biometrics_prefs', JSON.stringify(biometricPrefs))
     await application.deviceInterface.setRawStorageValue(NonwrappedStorageKey.MobileFirstRun, false)
     /** Create encrypted item and store it in db */
     const notePayload = Factory.createNotePayload()
-    const noteEncryptionParams = await operator003.generateEncryptedParametersAsync(
-      notePayload,
-      accountKey,
-    )
+    const noteEncryptionParams = await operator003.generateEncryptedParametersAsync(notePayload, accountKey)
     const noteEncryptedPayload = new EncryptedPayload({ ...notePayload, ...noteEncryptionParams })
-    await application.deviceInterface.saveRawDatabasePayload(
-      noteEncryptedPayload,
-      application.identifier,
-    )
+    await application.deviceInterface.saveRawDatabasePayload(noteEncryptedPayload, application.identifier)
     /** setup options */
     const lastExportDate = '2020:02'
     await application.deviceInterface.setRawStorageValue('LastExportDateKey', lastExportDate)
-    await application.deviceInterface.setRawStorageValue(
-      'DoNotShowAgainUnsupportedEditorsKey',
-      false,
-    )
+    await application.deviceInterface.setRawStorageValue('DoNotShowAgainUnsupportedEditorsKey', false)
     const options = JSON.stringify({
       sortBy: 'created_at',
       sortReverse: undefined,
@@ -563,10 +459,7 @@ describe('2020-01-15 mobile migration', () => {
     expect(rootKey.keyVersion).to.equal(ProtocolVersion.V003)
     expect(application.protocolService.rootKeyEncryption.keyMode).to.equal(KeyMode.RootKeyOnly)
 
-    const keyParams = await application.storageService.getValue(
-      StorageKey.RootKeyParams,
-      StorageValueModes.Nonwrapped,
-    )
+    const keyParams = await application.storageService.getValue(StorageKey.RootKeyParams, StorageValueModes.Nonwrapped)
     expect(typeof keyParams).to.equal('object')
 
     /** Expect note is decrypted */
@@ -575,22 +468,13 @@ describe('2020-01-15 mobile migration', () => {
     expect(retrievedNote.uuid).to.equal(notePayload.uuid)
     expect(retrievedNote.content.text).to.equal(notePayload.content.text)
     expect(
-      await application.storageService.getValue(
-        NonwrappedStorageKey.MobileFirstRun,
-        StorageValueModes.Nonwrapped,
-      ),
+      await application.storageService.getValue(NonwrappedStorageKey.MobileFirstRun, StorageValueModes.Nonwrapped),
     ).to.equal(false)
     expect(
-      await application.storageService.getValue(
-        StorageKey.BiometricsState,
-        StorageValueModes.Nonwrapped,
-      ),
+      await application.storageService.getValue(StorageKey.BiometricsState, StorageValueModes.Nonwrapped),
     ).to.equal(biometricPrefs.enabled)
     expect(
-      await application.storageService.getValue(
-        StorageKey.MobileBiometricsTiming,
-        StorageValueModes.Nonwrapped,
-      ),
+      await application.storageService.getValue(StorageKey.MobileBiometricsTiming, StorageValueModes.Nonwrapped),
     ).to.equal(biometricPrefs.timing)
     expect(await application.getUser().email).to.equal(identifier)
     const preferences = await application.storageService.getValue('preferences')
@@ -640,15 +524,9 @@ describe('2020-01-15 mobile migration', () => {
 
     /** Create encrypted item and store it in db */
     const notePayload = Factory.createNotePayload()
-    const noteEncryptionParams = await operator003.generateEncryptedParametersAsync(
-      notePayload,
-      accountKey,
-    )
+    const noteEncryptionParams = await operator003.generateEncryptedParametersAsync(notePayload, accountKey)
     const noteEncryptedPayload = new EncryptedPayload({ ...notePayload, ...noteEncryptionParams })
-    await application.deviceInterface.saveRawDatabasePayload(
-      noteEncryptedPayload,
-      application.identifier,
-    )
+    await application.deviceInterface.saveRawDatabasePayload(noteEncryptedPayload, application.identifier)
 
     /** Run migration */
     const promptValueReply = (prompts) => {
@@ -723,10 +601,7 @@ describe('2020-01-15 mobile migration', () => {
       'auth_params',
       JSON.stringify(accountKey.keyParams.getPortableValue()),
     )
-    await application.deviceInterface.setRawStorageValue(
-      'user',
-      JSON.stringify({ email: identifier }),
-    )
+    await application.deviceInterface.setRawStorageValue('user', JSON.stringify({ email: identifier }))
     expect(accountKey.keyVersion).to.equal(ProtocolVersion.V002)
     await application.deviceInterface.legacy_setRawKeychainValue({
       mk: accountKey.masterKey,
@@ -736,15 +611,9 @@ describe('2020-01-15 mobile migration', () => {
     })
     /** Create encrypted item and store it in db */
     const notePayload = Factory.createNotePayload()
-    const noteEncryptionParams = await operator002.generateEncryptedParametersAsync(
-      notePayload,
-      accountKey,
-    )
+    const noteEncryptionParams = await operator002.generateEncryptedParametersAsync(notePayload, accountKey)
     const noteEncryptedPayload = new EncryptedPayload({ ...notePayload, ...noteEncryptionParams })
-    await application.deviceInterface.saveRawDatabasePayload(
-      noteEncryptedPayload,
-      application.identifier,
-    )
+    await application.deviceInterface.saveRawDatabasePayload(noteEncryptedPayload, application.identifier)
 
     /** Run migration */
     const promptValueReply = (prompts) => {
@@ -803,10 +672,7 @@ describe('2020-01-15 mobile migration', () => {
         version: undefined,
       }),
     )
-    await application.deviceInterface.setRawStorageValue(
-      'user',
-      JSON.stringify({ email: identifier }),
-    )
+    await application.deviceInterface.setRawStorageValue('user', JSON.stringify({ email: identifier }))
     expect(accountKey.keyVersion).to.equal(ProtocolVersion.V001)
     await application.deviceInterface.legacy_setRawKeychainValue({
       mk: accountKey.masterKey,
@@ -815,15 +681,9 @@ describe('2020-01-15 mobile migration', () => {
     })
     /** Create encrypted item and store it in db */
     const notePayload = Factory.createNotePayload()
-    const noteEncryptionParams = await operator001.generateEncryptedParametersAsync(
-      notePayload,
-      accountKey,
-    )
+    const noteEncryptionParams = await operator001.generateEncryptedParametersAsync(notePayload, accountKey)
     const noteEncryptedPayload = new EncryptedPayload({ ...notePayload, ...noteEncryptionParams })
-    await application.deviceInterface.saveRawDatabasePayload(
-      noteEncryptedPayload,
-      application.identifier,
-    )
+    await application.deviceInterface.saveRawDatabasePayload(noteEncryptedPayload, application.identifier)
 
     /** Run migration */
     const promptValueReply = (prompts) => {
@@ -876,10 +736,7 @@ describe('2020-01-15 mobile migration', () => {
       'auth_params',
       JSON.stringify(accountKey.keyParams.getPortableValue()),
     )
-    await application.deviceInterface.setRawStorageValue(
-      'user',
-      JSON.stringify({ email: identifier }),
-    )
+    await application.deviceInterface.setRawStorageValue('user', JSON.stringify({ email: identifier }))
     await application.deviceInterface.legacy_setRawKeychainValue({
       mk: accountKey.masterKey,
       pw: accountKey.serverPassword,
@@ -908,10 +765,7 @@ describe('2020-01-15 mobile migration', () => {
       'auth_params',
       JSON.stringify(accountKey.keyParams.getPortableValue()),
     )
-    await application.deviceInterface.setRawStorageValue(
-      'user',
-      JSON.stringify({ email: identifier, jwt: 'foo' }),
-    )
+    await application.deviceInterface.setRawStorageValue('user', JSON.stringify({ email: identifier, jwt: 'foo' }))
     await application.deviceInterface.legacy_setRawKeychainValue({
       mk: accountKey.masterKey,
       pw: accountKey.serverPassword,
@@ -936,22 +790,13 @@ describe('2020-01-15 mobile migration', () => {
       timing: 'immediately',
     }
     /** Create legacy storage. Storage in mobile was never wrapped. */
-    await application.deviceInterface.setRawStorageValue(
-      'biometrics_prefs',
-      JSON.stringify(biometricPrefs),
-    )
+    await application.deviceInterface.setRawStorageValue('biometrics_prefs', JSON.stringify(biometricPrefs))
     await application.deviceInterface.setRawStorageValue(NonwrappedStorageKey.MobileFirstRun, false)
     /** Create encrypted item and store it in db */
     const notePayload = Factory.createNotePayload()
-    await application.deviceInterface.saveRawDatabasePayload(
-      notePayload.ejected(),
-      application.identifier,
-    )
+    await application.deviceInterface.saveRawDatabasePayload(notePayload.ejected(), application.identifier)
     /** setup options */
-    await application.deviceInterface.setRawStorageValue(
-      'DoNotShowAgainUnsupportedEditorsKey',
-      true,
-    )
+    await application.deviceInterface.setRawStorageValue('DoNotShowAgainUnsupportedEditorsKey', true)
     const options = JSON.stringify({
       sortBy: 'created_at',
       sortReverse: undefined,
@@ -964,10 +809,7 @@ describe('2020-01-15 mobile migration', () => {
     const promptValueReply = (prompts) => {
       const values = []
       for (const prompt of prompts) {
-        if (
-          prompt.validation === ChallengeValidation.None ||
-          prompt.validation === ChallengeValidation.LocalPasscode
-        ) {
+        if (prompt.validation === ChallengeValidation.None || prompt.validation === ChallengeValidation.LocalPasscode) {
           values.push(new ChallengeValue(prompt, passcode))
         }
         if (prompt.validation === ChallengeValidation.Biometric) {
@@ -1007,22 +849,13 @@ describe('2020-01-15 mobile migration', () => {
     expect(retrievedNote.uuid).to.equal(notePayload.uuid)
     expect(retrievedNote.content.text).to.equal(notePayload.content.text)
     expect(
-      await application.storageService.getValue(
-        NonwrappedStorageKey.MobileFirstRun,
-        StorageValueModes.Nonwrapped,
-      ),
+      await application.storageService.getValue(NonwrappedStorageKey.MobileFirstRun, StorageValueModes.Nonwrapped),
     ).to.equal(false)
     expect(
-      await application.storageService.getValue(
-        StorageKey.BiometricsState,
-        StorageValueModes.Nonwrapped,
-      ),
+      await application.storageService.getValue(StorageKey.BiometricsState, StorageValueModes.Nonwrapped),
     ).to.equal(biometricPrefs.enabled)
     expect(
-      await application.storageService.getValue(
-        StorageKey.MobileBiometricsTiming,
-        StorageValueModes.Nonwrapped,
-      ),
+      await application.storageService.getValue(StorageKey.MobileBiometricsTiming, StorageValueModes.Nonwrapped),
     ).to.equal(biometricPrefs.timing)
     const preferences = await application.storageService.getValue('preferences')
     expect(preferences.sortBy).to.equal('created_at')
@@ -1044,10 +877,7 @@ describe('2020-01-15 mobile migration', () => {
        */
       let application = await Factory.createAppWithRandNamespace(Environment.Mobile, Platform.Ios)
       /** Create legacy migrations value so that base migration detects old app */
-      await application.deviceInterface.setRawStorageValue(
-        'migrations',
-        JSON.stringify(['anything']),
-      )
+      await application.deviceInterface.setRawStorageValue('migrations', JSON.stringify(['anything']))
       const operator003 = new SNProtocolOperator003(new FakeWebCrypto())
       const identifier = 'foo'
       const passcode = 'bar'
@@ -1084,10 +914,7 @@ describe('2020-01-15 mobile migration', () => {
           },
         },
       })
-      const encryptedKeyParams = await operator003.generateEncryptedParametersAsync(
-        keyPayload,
-        passcodeKey,
-      )
+      const encryptedKeyParams = await operator003.generateEncryptedParametersAsync(keyPayload, passcodeKey)
       const wrappedKey = new EncryptedPayload({ ...keyPayload, ...encryptedKeyParams })
       await application.deviceInterface.legacy_setRawKeychainValue({
         encryptedAccountKeys: wrappedKey,
@@ -1098,25 +925,13 @@ describe('2020-01-15 mobile migration', () => {
       })
       const biometricPrefs = { enabled: true, timing: 'immediately' }
       /** Create legacy storage. Storage in mobile was never wrapped. */
-      await application.deviceInterface.setRawStorageValue(
-        'biometrics_prefs',
-        JSON.stringify(biometricPrefs),
-      )
-      await application.deviceInterface.setRawStorageValue(
-        NonwrappedStorageKey.MobileFirstRun,
-        false,
-      )
+      await application.deviceInterface.setRawStorageValue('biometrics_prefs', JSON.stringify(biometricPrefs))
+      await application.deviceInterface.setRawStorageValue(NonwrappedStorageKey.MobileFirstRun, false)
       /** Create encrypted item and store it in db */
       const notePayload = Factory.createNotePayload()
-      const noteEncryptionParams = await operator003.generateEncryptedParametersAsync(
-        notePayload,
-        accountKey,
-      )
+      const noteEncryptionParams = await operator003.generateEncryptedParametersAsync(notePayload, accountKey)
       const noteEncryptedPayload = new EncryptedPayload({ ...notePayload, ...noteEncryptionParams })
-      await application.deviceInterface.saveRawDatabasePayload(
-        noteEncryptedPayload,
-        application.identifier,
-      )
+      await application.deviceInterface.saveRawDatabasePayload(noteEncryptedPayload, application.identifier)
       /** setup options */
       const lastExportDate = '2020:02'
       await application.deviceInterface.setRawStorageValue('LastExportDateKey', lastExportDate)
@@ -1154,9 +969,7 @@ describe('2020-01-15 mobile migration', () => {
       })
       await application.launch(true)
 
-      expect(application.protocolService.rootKeyEncryption.keyMode).to.equal(
-        KeyMode.RootKeyPlusWrapper,
-      )
+      expect(application.protocolService.rootKeyEncryption.keyMode).to.equal(KeyMode.RootKeyPlusWrapper)
 
       /** Should be decrypted */
       const storageMode = application.storageService.domainKeyForMode(StorageValueModes.Default)
@@ -1173,13 +986,9 @@ describe('2020-01-15 mobile migration', () => {
       expect(rootKey.dataAuthenticationKey).to.equal(accountKey.dataAuthenticationKey)
       expect(rootKey.serverPassword).to.not.be.ok
       expect(rootKey.keyVersion).to.equal(ProtocolVersion.V003)
-      expect(application.protocolService.rootKeyEncryption.keyMode).to.equal(
-        KeyMode.RootKeyPlusWrapper,
-      )
+      expect(application.protocolService.rootKeyEncryption.keyMode).to.equal(KeyMode.RootKeyPlusWrapper)
 
-      const keychainValue = await application.deviceInterface.getNamespacedKeychainValue(
-        application.identifier,
-      )
+      const keychainValue = await application.deviceInterface.getNamespacedKeychainValue(application.identifier)
       expect(keychainValue).to.not.be.ok
 
       /** Expect note is decrypted */
@@ -1189,23 +998,14 @@ describe('2020-01-15 mobile migration', () => {
       expect(retrievedNote.content.text).to.equal(notePayload.content.text)
 
       expect(
-        await application.storageService.getValue(
-          NonwrappedStorageKey.MobileFirstRun,
-          StorageValueModes.Nonwrapped,
-        ),
+        await application.storageService.getValue(NonwrappedStorageKey.MobileFirstRun, StorageValueModes.Nonwrapped),
       ).to.equal(false)
 
       expect(
-        await application.storageService.getValue(
-          StorageKey.BiometricsState,
-          StorageValueModes.Nonwrapped,
-        ),
+        await application.storageService.getValue(StorageKey.BiometricsState, StorageValueModes.Nonwrapped),
       ).to.equal(biometricPrefs.enabled)
       expect(
-        await application.storageService.getValue(
-          StorageKey.MobileBiometricsTiming,
-          StorageValueModes.Nonwrapped,
-        ),
+        await application.storageService.getValue(StorageKey.MobileBiometricsTiming, StorageValueModes.Nonwrapped),
       ).to.equal(biometricPrefs.timing)
       expect(await application.getUser().email).to.equal(identifier)
 

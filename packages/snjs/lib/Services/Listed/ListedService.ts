@@ -7,11 +7,7 @@ import { SettingName } from '@standardnotes/settings'
 import { SNSettingsService } from '../Settings/SNSettingsService'
 import { ListedClientInterface } from './ListedClientInterface'
 import { SNApiService } from '../Api/ApiService'
-import {
-  ListedAccount,
-  ListedAccountInfo,
-  ListedAccountInfoResponse,
-} from '@standardnotes/responses'
+import { ListedAccount, ListedAccountInfo, ListedAccountInfoResponse } from '@standardnotes/responses'
 import { SNActionsExtension } from '@standardnotes/models'
 import { AbstractService, InternalEventBusInterface } from '@standardnotes/services'
 

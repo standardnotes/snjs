@@ -53,10 +53,7 @@ export enum SessionEvent {
  * server credentials, such as the session token. It also exposes methods for registering
  * for a new account, signing into an existing one, or changing an account password.
  */
-export class SNSessionManager
-  extends AbstractService<SessionEvent>
-  implements SessionsClientInterface
-{
+export class SNSessionManager extends AbstractService<SessionEvent> implements SessionsClientInterface {
   private user?: Responses.User
   private isSessionRenewChallengePresented = false
 
@@ -201,11 +198,7 @@ export class SNSessionManager
             currentKeyParams?.version,
           )
           if (signInResult.response.error) {
-            this.challengeService.setValidationStatusForChallenge(
-              challenge,
-              challengeResponse!.values[1],
-              false,
-            )
+            this.challengeService.setValidationStatusForChallenge(challenge, challengeResponse!.values[1], false)
             onResponse?.(signInResult.response)
           } else {
             resolve()
@@ -231,9 +224,7 @@ export class SNSessionManager
     return subscription
   }
 
-  public async getAvailableSubscriptions(): Promise<
-    Responses.AvailableSubscriptions | ClientDisplayableError
-  > {
+  public async getAvailableSubscriptions(): Promise<Responses.AvailableSubscriptions | ClientDisplayableError> {
     const response = await this.apiService.getAvailableSubscriptions()
 
     if (response.error) {
@@ -269,16 +260,10 @@ export class SNSessionManager
     return undefined
   }
 
-  async register(
-    email: string,
-    password: string,
-    ephemeral: boolean,
-  ): Promise<SessionManagerResponse> {
+  async register(email: string, password: string, ephemeral: boolean): Promise<SessionManagerResponse> {
     if (password.length < MINIMUM_PASSWORD_LENGTH) {
       return {
-        response: this.apiService.createErrorResponse(
-          Messages.InsufficientPasswordMessage(MINIMUM_PASSWORD_LENGTH),
-        ),
+        response: this.apiService.createErrorResponse(Messages.InsufficientPasswordMessage(MINIMUM_PASSWORD_LENGTH)),
       }
     }
     const { wrappingKey, canceled } = await this.challengeService.getWrappingKeyIfApplicable()
@@ -291,25 +276,12 @@ export class SNSessionManager
       }
     }
     email = cleanedEmailString(email)
-    const rootKey = await this.protocolService.createRootKey(
-      email,
-      password,
-      Common.KeyParamsOrigination.Registration,
-    )
+    const rootKey = await this.protocolService.createRootKey(email, password, Common.KeyParamsOrigination.Registration)
     const serverPassword = rootKey.serverPassword!
     const keyParams = rootKey.keyParams
-    const registerResponse = await this.apiService.register(
-      email,
-      serverPassword,
-      keyParams,
-      ephemeral,
-    )
+    const registerResponse = await this.apiService.register(email, serverPassword, keyParams, ephemeral)
     if (!registerResponse.error && registerResponse.data) {
-      await this.handleSuccessAuthResponse(
-        registerResponse as Responses.RegistrationResponse,
-        rootKey,
-        wrappingKey,
-      )
+      await this.handleSuccessAuthResponse(registerResponse as Responses.RegistrationResponse, rootKey, wrappingKey)
     }
     return {
       response: registerResponse,
@@ -483,13 +455,7 @@ export class SNSessionManager
       )
     }
 
-    const signInResponse = await this.apiService.signIn(
-      email,
-      rootKey.serverPassword!,
-      mfaKeyPath,
-      mfaCode,
-      ephemeral,
-    )
+    const signInResponse = await this.apiService.signIn(email, rootKey.serverPassword!, mfaKeyPath, mfaCode, ephemeral)
 
     if (!signInResponse.error && signInResponse.data) {
       const updatedKeyParams = (signInResponse as Responses.SignInResponse).data.key_params
@@ -499,11 +465,7 @@ export class SNSessionManager
         }),
       )
 
-      await this.handleSuccessAuthResponse(
-        signInResponse as Responses.SignInResponse,
-        expandedRootKey,
-        wrappingKey,
-      )
+      await this.handleSuccessAuthResponse(signInResponse as Responses.SignInResponse, expandedRootKey, wrappingKey)
 
       return signInResponse
     } else {
@@ -520,12 +482,7 @@ export class SNSessionManager
             Responses.StatusCode.CanceledMfa,
           )
         }
-        return this.bypassChecksAndSignInWithRootKey(
-          email,
-          rootKey,
-          signInResponse.error.payload.mfa_key,
-          inputtedCode,
-        )
+        return this.bypassChecksAndSignInWithRootKey(email, rootKey, signInResponse.error.payload.mfa_key, inputtedCode)
       } else {
         /** Some other error, return to caller */
         return signInResponse
@@ -596,11 +553,7 @@ export class SNSessionManager
     wrappingKey?: SNRootKey,
   ): Promise<SessionManagerResponse> {
     if (!response.error && response.data) {
-      await this.handleSuccessAuthResponse(
-        response as Responses.ChangeCredentialsResponse,
-        newRootKey,
-        wrappingKey,
-      )
+      await this.handleSuccessAuthResponse(response as Responses.ChangeCredentialsResponse, newRootKey, wrappingKey)
     }
     return {
       response: response,
@@ -682,10 +635,7 @@ export class SNSessionManager
   }
 
   private async handleSuccessAuthResponse(
-    response:
-      | Responses.RegistrationResponse
-      | Responses.SignInResponse
-      | Responses.ChangeCredentialsResponse,
+    response: Responses.RegistrationResponse | Responses.SignInResponse | Responses.ChangeCredentialsResponse,
     rootKey: SNRootKey,
     wrappingKey?: SNRootKey,
   ) {

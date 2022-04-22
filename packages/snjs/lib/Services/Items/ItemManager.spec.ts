@@ -61,9 +61,7 @@ describe('itemManager', () => {
     itemManager = {} as jest.Mocked<ItemManager>
     itemManager.getItems = jest.fn().mockReturnValue(items)
     itemManager.createItem = jest.fn()
-    itemManager.changeComponent = jest
-      .fn()
-      .mockReturnValue({} as jest.Mocked<Models.DecryptedItemInterface>)
+    itemManager.changeComponent = jest.fn().mockReturnValue({} as jest.Mocked<Models.DecryptedItemInterface>)
     itemManager.setItemsToBeDeleted = jest.fn()
     itemManager.addObserver = jest.fn()
     itemManager.changeItem = jest.fn()
@@ -445,16 +443,12 @@ describe('itemManager', () => {
 
       const [systemTag1, ...restOfSystemViews] = itemManager
         .getSmartViews()
-        .filter((view) =>
-          Object.values(Models.SystemViewId).includes(view.uuid as Models.SystemViewId),
-        )
+        .filter((view) => Object.values(Models.SystemViewId).includes(view.uuid as Models.SystemViewId))
 
       const isSystemTemplate = itemManager.isTemplateItem(systemTag1)
       expect(isSystemTemplate).toEqual(false)
 
-      const areTemplates = restOfSystemViews
-        .map((tag) => itemManager.isTemplateItem(tag))
-        .every((value) => !!value)
+      const areTemplates = restOfSystemViews.map((tag) => itemManager.isTemplateItem(tag)).every((value) => !!value)
       expect(areTemplates).toEqual(false)
     })
   })
@@ -482,16 +476,7 @@ describe('itemManager', () => {
       const barFooDelimiter = await itemManager.createTag('baz.bar.foo')
       const fooAttached = await itemManager.createTag('Foo')
       const note = createNote('note')
-      await itemManager.insertItems([
-        foo,
-        foobar,
-        bar,
-        barfoo,
-        fooDelimiter,
-        barFooDelimiter,
-        fooAttached,
-        note,
-      ])
+      await itemManager.insertItems([foo, foobar, bar, barfoo, fooDelimiter, barFooDelimiter, fooAttached, note])
       await itemManager.addTagToNote(note, fooAttached, false)
 
       const fooResults = itemManager.searchTags('foo')

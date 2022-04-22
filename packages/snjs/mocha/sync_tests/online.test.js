@@ -37,14 +37,7 @@ describe('online syncing', function () {
     }
 
     this.signIn = async () => {
-      await this.application.signIn(
-        this.email,
-        this.password,
-        undefined,
-        undefined,
-        undefined,
-        true,
-      )
+      await this.application.signIn(this.email, this.password, undefined, undefined, undefined, true)
     }
   })
 
@@ -299,10 +292,7 @@ describe('online syncing', function () {
       errorDecrypting: true,
     })
 
-    const items = await this.application.itemManager.emitItemsFromPayloads(
-      [errorred],
-      PayloadEmitSource.LocalChanged,
-    )
+    const items = await this.application.itemManager.emitItemsFromPayloads([errorred], PayloadEmitSource.LocalChanged)
 
     const mappedItem = this.application.itemManager.findAnyItem(errorred.uuid)
 
@@ -530,10 +520,7 @@ describe('online syncing', function () {
 
     const decryptionResults = await this.application.protocolService.decryptSplit(keyedSplit)
 
-    await this.application.itemManager.emitItemsFromPayloads(
-      decryptionResults,
-      PayloadEmitSource.LocalChanged,
-    )
+    await this.application.itemManager.emitItemsFromPayloads(decryptionResults, PayloadEmitSource.LocalChanged)
 
     expect(this.application.itemManager.allTrackedItems().length).to.equal(this.expectedItemCount)
 
@@ -735,10 +722,7 @@ describe('online syncing', function () {
     const expectedEvents = 1
     let actualEvents = 0
     this.application.syncService.addEventObserver((event, data) => {
-      if (
-        event === SyncEvent.SyncCompletedWithAllItemsUploaded &&
-        data.source === SyncSource.External
-      ) {
+      if (event === SyncEvent.SyncCompletedWithAllItemsUploaded && data.source === SyncSource.External) {
         actualEvents++
       }
     })
@@ -976,10 +960,7 @@ describe('online syncing', function () {
       },
     })
 
-    await this.application.syncService.handleSuccessServerResponse(
-      { payloadsSavedOrSaving: [] },
-      response,
-    )
+    await this.application.syncService.handleSuccessServerResponse({ payloadsSavedOrSaving: [] }, response)
 
     expect(this.application.payloadManager.findOne(invalidPayload.uuid)).to.not.be.ok
     expect(this.application.payloadManager.findOne(validPayload.uuid)).to.be.ok

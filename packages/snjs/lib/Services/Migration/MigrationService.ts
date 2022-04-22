@@ -4,12 +4,7 @@ import { compareSemVersions } from '@Lib/Version'
 import { lastElement } from '@standardnotes/utils'
 import { Migration } from '@Lib/Migrations/Migration'
 import { MigrationServices } from '../../Migrations/MigrationServices'
-import {
-  RawStorageKey,
-  namespacedKey,
-  ApplicationStage,
-  AbstractService,
-} from '@standardnotes/services'
+import { RawStorageKey, namespacedKey, ApplicationStage, AbstractService } from '@standardnotes/services'
 import { SnjsVersion, isRightVersionGreaterThanLeft } from '../../Version'
 import { SNLog } from '@Lib/Log'
 import { MigrationClasses } from '@Lib/Migrations/Versions'
@@ -43,9 +38,7 @@ export class SNMigrationService extends AbstractService {
   public async initialize(): Promise<void> {
     await this.runBaseMigrationPreRun()
 
-    const requiredMigrations = SNMigrationService.getRequiredMigrations(
-      await this.getStoredSnjsVersion(),
-    )
+    const requiredMigrations = SNMigrationService.getRequiredMigrations(await this.getStoredSnjsVersion())
 
     this.activeMigrations = this.instantiateMigrationClasses(requiredMigrations)
 
@@ -93,9 +86,7 @@ export class SNMigrationService extends AbstractService {
   }
 
   public async hasPendingMigrations(): Promise<boolean> {
-    const requiredMigrations = SNMigrationService.getRequiredMigrations(
-      await this.getStoredSnjsVersion(),
-    )
+    const requiredMigrations = SNMigrationService.getRequiredMigrations(await this.getStoredSnjsVersion())
     return requiredMigrations.length > 0 || (await this.baseMigration.needsKeychainRepair())
   }
 

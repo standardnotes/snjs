@@ -5,10 +5,7 @@ import { SNApplication } from '../../Application/Application'
 export class ApplicationService extends AbstractService {
   private unsubApp!: () => void
 
-  constructor(
-    protected application: SNApplication,
-    protected override internalEventBus: InternalEventBusInterface,
-  ) {
+  constructor(protected application: SNApplication, protected override internalEventBus: InternalEventBusInterface) {
     super(internalEventBus)
     this.addAppEventObserverAfterSubclassesFinishConstructing()
   }

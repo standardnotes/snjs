@@ -15,7 +15,7 @@ export function timingSafeEqual(a: string, b: string): boolean {
   }
 
   for (let i = 0; i < lenA; i++) {
-    result |= (strA.charCodeAt(i) ^ strB.charCodeAt(i))
+    result |= strA.charCodeAt(i) ^ strB.charCodeAt(i)
   }
 
   return result === 0

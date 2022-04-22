@@ -39,10 +39,7 @@ export async function decryptPayload<C extends Models.ItemContent = Models.ItemC
 
   try {
     if (isAsyncOperator(operator)) {
-      return await operator.generateDecryptedParametersAsync(
-        encryptedParametersFromPayload(payload),
-        key,
-      )
+      return await operator.generateDecryptedParametersAsync(encryptedParametersFromPayload(payload), key)
     } else {
       return operator.generateDecryptedParametersSync(encryptedParametersFromPayload(payload), key)
     }

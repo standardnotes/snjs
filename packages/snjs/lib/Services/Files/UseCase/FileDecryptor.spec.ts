@@ -15,9 +15,7 @@ describe('file decryptor', () => {
       state: {},
     } as StreamEncryptor)
 
-    crypto.xchacha20StreamDecryptorPush = jest
-      .fn()
-      .mockReturnValue({ message: new Uint8Array([0xaa]), tag: 0 })
+    crypto.xchacha20StreamDecryptorPush = jest.fn().mockReturnValue({ message: new Uint8Array([0xaa]), tag: 0 })
 
     file = {
       chunkSizes: [100_000],
@@ -32,10 +30,7 @@ describe('file decryptor', () => {
   it('initialize', () => {
     decryptor.initialize()
 
-    expect(crypto.xchacha20StreamInitDecryptor).toHaveBeenCalledWith(
-      file.encryptionHeader,
-      file.key,
-    )
+    expect(crypto.xchacha20StreamInitDecryptor).toHaveBeenCalledWith(file.encryptionHeader, file.key)
   })
 
   it('decryptBytes should return decrypted bytes', () => {

@@ -81,10 +81,7 @@ export class SNProtocolOperator002 extends SNProtocolOperator001 {
    * may have had costs of 5000, and others of 101000. Therefore, when computing
    * the root key, we must use the value returned by the server.
    */
-  public override async computeRootKey(
-    password: string,
-    keyParams: SNRootKeyParams,
-  ): Promise<SNRootKey> {
+  public override async computeRootKey(password: string, keyParams: SNRootKeyParams): Promise<SNRootKey> {
     return this.deriveKey(password, keyParams)
   }
 
@@ -263,10 +260,7 @@ export class SNProtocolOperator002 extends SNProtocolOperator001 {
     }
   }
 
-  protected override async deriveKey(
-    password: string,
-    keyParams: SNRootKeyParams,
-  ): Promise<SNRootKey> {
+  protected override async deriveKey(password: string, keyParams: SNRootKeyParams): Promise<SNRootKey> {
     const derivedKey = await this.crypto.pbkdf2(
       password,
       keyParams.content002.pw_salt,
@@ -289,11 +283,7 @@ export class SNProtocolOperator002 extends SNProtocolOperator001 {
     })
   }
 
-  private encryptionComponentsFromString002(
-    string: string,
-    encryptionKey?: string,
-    authKey?: string,
-  ) {
+  private encryptionComponentsFromString002(string: string, encryptionKey?: string, authKey?: string) {
     const components = string.split(':')
     return {
       encryptionVersion: components[0],

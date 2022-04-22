@@ -46,14 +46,11 @@ export class NoteViewController {
 
   async initialize(addTagHierarchy: boolean): Promise<void> {
     if (!this.note) {
-      const note = this.application.mutator.createTemplateItem<NoteContent, SNNote>(
-        ContentType.Note,
-        {
-          text: '',
-          title: this.defaultTitle || '',
-          references: [],
-        },
-      )
+      const note = this.application.mutator.createTemplateItem<NoteContent, SNNote>(ContentType.Note, {
+        text: '',
+        title: this.defaultTitle || '',
+        references: [],
+      })
 
       if (this.defaultTag) {
         const tag = this.application.items.findItem(this.defaultTag) as SNTag
@@ -112,9 +109,7 @@ export class NoteViewController {
    * Register to be notified when the controller's note's inner values change
    * (and thus a new object reference is created)
    */
-  public addNoteInnerValueChangeObserver(
-    callback: (note: SNNote, source: PayloadEmitSource) => void,
-  ): () => void {
+  public addNoteInnerValueChangeObserver(callback: (note: SNNote, source: PayloadEmitSource) => void): () => void {
     this.innerValueChangeObservers.push(callback)
 
     if (this.note) {

@@ -1,13 +1,5 @@
 /* eslint-disable camelcase */
-import {
-  base64_variants,
-  from_base64,
-  from_hex,
-  from_string,
-  to_base64,
-  to_hex,
-  to_string,
-} from './libsodium'
+import { base64_variants, from_base64, from_hex, from_string, to_base64, to_hex, to_string } from './libsodium'
 import { Buffer } from 'buffer'
 import { v4 as uuidv4 } from 'uuid'
 
@@ -39,10 +31,7 @@ export function getGlobalScope(): Window & typeof globalThis {
  * @access public
  */
 export function ieOrEdge(): boolean {
-  return (
-    (typeof document !== 'undefined' && !!document.documentMode) ||
-    /Edge/.test(navigator.userAgent)
-  )
+  return (typeof document !== 'undefined' && !!document.documentMode) || /Edge/.test(navigator.userAgent)
 }
 
 /**
@@ -50,9 +39,7 @@ export function ieOrEdge(): boolean {
  * @access public
  */
 export function isWebCryptoAvailable(): boolean {
-  return (
-    !ieOrEdge() && getGlobalScope().crypto && !!getGlobalScope().crypto.subtle
-  )
+  return !ieOrEdge() && getGlobalScope().crypto && !!getGlobalScope().crypto.subtle
 }
 
 /**
@@ -227,11 +214,7 @@ export function truncateOTP(hsBuffer: ArrayBuffer): number {
   const offset = hs[19] & 0b1111
 
   // Next we take 4 bytes out of the HS, starting at the offset
-  const P =
-    ((hs[offset] & 0x7f) << 24) |
-    (hs[offset + 1] << 16) |
-    (hs[offset + 2] << 8) |
-    hs[offset + 3]
+  const P = ((hs[offset] & 0x7f) << 24) | (hs[offset + 1] << 16) | (hs[offset + 2] << 8) | hs[offset + 3]
 
   // Finally, convert it into a binary string representation
   const pString = P.toString(2)

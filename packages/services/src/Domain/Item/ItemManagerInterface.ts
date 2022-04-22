@@ -32,9 +32,9 @@ export type ItemManagerChangeData<I extends DecryptedItemInterface = DecryptedIt
   sourceKey?: string
 }
 
-export type ItemManagerChangeObserverCallback<
-  I extends DecryptedItemInterface = DecryptedItemInterface,
-> = (data: ItemManagerChangeData<I>) => void
+export type ItemManagerChangeObserverCallback<I extends DecryptedItemInterface = DecryptedItemInterface> = (
+  data: ItemManagerChangeData<I>,
+) => void
 
 export interface ItemManagerInterface extends AbstractService {
   addObserver<I extends DecryptedItemInterface = DecryptedItemInterface>(
@@ -45,10 +45,7 @@ export interface ItemManagerInterface extends AbstractService {
   /**
    * Marks the item as deleted and needing sync.
    */
-  setItemToBeDeleted(
-    itemToLookupUuidFor: DecryptedItemInterface,
-    source?: PayloadEmitSource,
-  ): Promise<void>
+  setItemToBeDeleted(itemToLookupUuidFor: DecryptedItemInterface, source?: PayloadEmitSource): Promise<void>
 
   setItemsToBeDeleted(itemsToLookupUuidsFor: DecryptedItemInterface[]): Promise<void>
 
@@ -66,10 +63,7 @@ export interface ItemManagerInterface extends AbstractService {
    */
   insertItem(item: DecryptedItemInterface): Promise<DecryptedItemInterface>
 
-  emitItemFromPayload(
-    payload: DecryptedPayloadInterface,
-    source: PayloadEmitSource,
-  ): Promise<DecryptedItemInterface>
+  emitItemFromPayload(payload: DecryptedPayloadInterface, source: PayloadEmitSource): Promise<DecryptedItemInterface>
 
   /**
    * Returns all non-deleted items keys

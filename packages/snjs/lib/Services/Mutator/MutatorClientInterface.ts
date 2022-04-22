@@ -109,22 +109,15 @@ export interface MutatorClientInterface {
     isUserModified?: boolean,
   ): Promise<Models.DecryptedItemInterface | undefined>
 
-  setItemsNeedsSync(
-    items: Models.DecryptedItemInterface[],
-  ): Promise<(Models.DecryptedItemInterface | undefined)[]>
+  setItemsNeedsSync(items: Models.DecryptedItemInterface[]): Promise<(Models.DecryptedItemInterface | undefined)[]>
 
   deleteItem(item: Models.DecryptedItemInterface | Models.EncryptedItemInterface): Promise<void>
 
-  deleteItems(
-    items: (Models.DecryptedItemInterface | Models.EncryptedItemInterface)[],
-  ): Promise<void>
+  deleteItems(items: (Models.DecryptedItemInterface | Models.EncryptedItemInterface)[]): Promise<void>
 
   emptyTrash(): Promise<void>
 
-  duplicateItem<T extends Models.DecryptedItemInterface>(
-    item: T,
-    additionalContent?: Partial<T['content']>,
-  ): Promise<T>
+  duplicateItem<T extends Models.DecryptedItemInterface>(item: T, additionalContent?: Partial<T['content']>): Promise<T>
 
   /**
    * Migrates any tags containing a '.' character to sa chema-based heirarchy, removing

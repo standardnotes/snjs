@@ -1,7 +1,4 @@
-import {
-  CollectionSortDirection,
-  CollectionSortProperty,
-} from './../../Runtime/Collection/CollectionSort'
+import { CollectionSortDirection, CollectionSortProperty } from './../../Runtime/Collection/CollectionSort'
 import { ContentType } from '@standardnotes/common'
 import { NoteWithTags } from './NoteWithTags'
 import { DecryptedItem } from '../../Abstract/Item'
@@ -35,10 +32,7 @@ export class NotesDisplayCriteria {
     return Object.freeze(criteria)
   }
 
-  static Copy(
-    criteria: NotesDisplayCriteria,
-    override: Partial<NotesDisplayCriteria>,
-  ): NotesDisplayCriteria {
+  static Copy(criteria: NotesDisplayCriteria, override: Partial<NotesDisplayCriteria>): NotesDisplayCriteria {
     const copy = new NotesDisplayCriteria()
     Object.assign(copy, criteria)
     Object.assign(copy, override)
@@ -107,10 +101,7 @@ export function criteriaForSmartView(view: SmartView): NotesDisplayCriteria {
   return criteria
 }
 
-export function notesMatchingCriteria(
-  criteria: NotesDisplayCriteria,
-  collection: ItemCollection,
-): SNNote[] {
+export function notesMatchingCriteria(criteria: NotesDisplayCriteria, collection: ItemCollection): SNNote[] {
   const filters = criteria.computeFilters(collection)
   const allNotes = collection.displayElements(ContentType.Note) as SNNote[]
   return allNotes.filter((note) => {
@@ -127,24 +118,16 @@ function notePassesFilters(note: SNNote, filters: NoteFilter[]) {
   return true
 }
 
-export function noteMatchesQuery(
-  noteToMatch: SNNote,
-  searchQuery: SearchQuery,
-  collection: ItemCollection,
-): boolean {
+export function noteMatchesQuery(noteToMatch: SNNote, searchQuery: SearchQuery, collection: ItemCollection): boolean {
   const noteTags = collection.elementsReferencingElement(noteToMatch, ContentType.Tag) as SNTag[]
-  const someTagsMatches = noteTags.some(
-    (tag) => matchTypeForTagAndStringQuery(tag, searchQuery.query) !== Match.None,
-  )
+  const someTagsMatches = noteTags.some((tag) => matchTypeForTagAndStringQuery(tag, searchQuery.query) !== Match.None)
 
   if (noteToMatch.protected && !searchQuery.includeProtectedNoteText) {
     const match = matchTypeForNoteAndStringQuery(noteToMatch, searchQuery.query)
     /** Only true if there is a match in the titles (note and/or tags) */
     return match === Match.Title || match === Match.TitleAndText || someTagsMatches
   }
-  return (
-    matchTypeForNoteAndStringQuery(noteToMatch, searchQuery.query) !== Match.None || someTagsMatches
-  )
+  return matchTypeForNoteAndStringQuery(noteToMatch, searchQuery.query) !== Match.None || someTagsMatches
 }
 
 enum Match {
@@ -166,8 +149,7 @@ function matchTypeForNoteAndStringQuery(note: SNNote, searchString: string): Mat
   const quotedText = stringBetweenQuotes(lowercaseText)
   if (quotedText) {
     return (
-      (title.includes(quotedText) ? Match.Title : Match.None) +
-      (text.includes(quotedText) ? Match.Text : Match.None)
+      (title.includes(quotedText) ? Match.Title : Match.None) + (text.includes(quotedText) ? Match.Text : Match.None)
     )
   }
   if (stringIsUuid(lowercaseText)) {

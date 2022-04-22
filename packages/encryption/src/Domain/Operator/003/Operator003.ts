@@ -53,17 +53,11 @@ export class SNProtocolOperator003 extends SNProtocolOperator002 {
     return CreateDecryptedItemFromPayload(payload)
   }
 
-  public override async computeRootKey(
-    password: string,
-    keyParams: SNRootKeyParams,
-  ): Promise<SNRootKey> {
+  public override async computeRootKey(password: string, keyParams: SNRootKeyParams): Promise<SNRootKey> {
     return this.deriveKey(password, keyParams)
   }
 
-  protected override async deriveKey(
-    password: string,
-    keyParams: SNRootKeyParams,
-  ): Promise<SNRootKey> {
+  protected override async deriveKey(password: string, keyParams: SNRootKeyParams): Promise<SNRootKey> {
     const salt = await this.generateSalt(
       keyParams.content003.identifier,
       ProtocolVersion.V003,
@@ -110,12 +104,7 @@ export class SNProtocolOperator003 extends SNProtocolOperator002 {
     return this.deriveKey(password, keyParams)
   }
 
-  private async generateSalt(
-    identifier: string,
-    version: ProtocolVersion,
-    cost: number,
-    nonce: string,
-  ) {
+  private async generateSalt(identifier: string, version: ProtocolVersion, cost: number, nonce: string) {
     const result = await this.crypto.sha256([identifier, 'SF', version, cost, nonce].join(':'))
     return result
   }

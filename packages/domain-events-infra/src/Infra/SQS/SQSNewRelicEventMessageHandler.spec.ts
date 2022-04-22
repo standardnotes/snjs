@@ -38,7 +38,7 @@ describe('SQSNewRelicEventMessageHandler', () => {
     await createHandler().handleMessage(sqsMessage)
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    expect((<any> mockedStartBackgroundTransaction).mock.calls[0][0]).toBe('TEST')
+    expect((<any>mockedStartBackgroundTransaction).mock.calls[0][0]).toBe('TEST')
   })
 
   it('should handle errors', async () => {

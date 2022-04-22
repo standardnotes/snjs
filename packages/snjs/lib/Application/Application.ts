@@ -192,12 +192,10 @@ export class SNApplication implements InternalServices.ListedClientInterface {
 
     this.setLaunchCallback(callback)
 
-    const databaseResult = await this.deviceInterface
-      .openDatabase(this.identifier)
-      .catch((error) => {
-        void this.notifyEvent(ApplicationEvent.LocalDatabaseReadError, error)
-        return undefined
-      })
+    const databaseResult = await this.deviceInterface.openDatabase(this.identifier).catch((error) => {
+      void this.notifyEvent(ApplicationEvent.LocalDatabaseReadError, error)
+      return undefined
+    })
 
     this.createdNewDatabase = useBoolean(databaseResult?.isNewDatabase, false)
 
@@ -304,9 +302,7 @@ export class SNApplication implements InternalServices.ListedClientInterface {
   }
 
   private async handleLaunchChallengeResponse(response: Challenges.ChallengeResponse) {
-    if (
-      response.challenge.hasPromptForValidationType(Challenges.ChallengeValidation.LocalPasscode)
-    ) {
+    if (response.challenge.hasPromptForValidationType(Challenges.ChallengeValidation.LocalPasscode)) {
       let wrappingKey = response.artifacts?.wrappingKey
       if (!wrappingKey) {
         const value = response.getValueForType(Challenges.ChallengeValidation.LocalPasscode)
@@ -332,10 +328,7 @@ export class SNApplication implements InternalServices.ListedClientInterface {
   /**
    * @param singleEvent Whether to only listen for a particular event.
    */
-  public addEventObserver(
-    callback: ApplicationEventCallback,
-    singleEvent?: ApplicationEvent,
-  ): () => void {
+  public addEventObserver(callback: ApplicationEventCallback, singleEvent?: ApplicationEvent): () => void {
     const observer = { callback, singleEvent }
     this.eventHandlers.push(observer)
     return () => {
@@ -343,10 +336,7 @@ export class SNApplication implements InternalServices.ListedClientInterface {
     }
   }
 
-  public addSingleEventObserver(
-    event: ApplicationEvent,
-    callback: ApplicationEventCallback,
-  ): () => void {
+  public addSingleEventObserver(event: ApplicationEvent, callback: ApplicationEventCallback): () => void {
     // eslint-disable-next-line @typescript-eslint/require-await
     const filteredCallback = async (firedEvent: ApplicationEvent) => {
       if (firedEvent === event) {
@@ -426,12 +416,9 @@ export class SNApplication implements InternalServices.ListedClientInterface {
     contentType: Common.ContentType | Common.ContentType[],
     stream: ItemStream<I>,
   ): () => void {
-    const observer = this.itemManager.addObserver<I>(
-      contentType,
-      ({ changed, inserted, removed, source }) => {
-        stream({ changed, inserted, removed, source })
-      },
-    )
+    const observer = this.itemManager.addObserver<I>(contentType, ({ changed, inserted, removed, source }) => {
+      stream({ changed, inserted, removed, source })
+    })
 
     /** Push current values now */
     const matches = this.itemManager.getItems<I>(contentType)
@@ -594,9 +581,7 @@ export class SNApplication implements InternalServices.ListedClientInterface {
     return this.listedService.getListedAccountInfo(account, inContextOfItem)
   }
 
-  public async createEncryptedBackupFileForAutomatedDesktopBackups(): Promise<
-    Encryption.BackupFile | undefined
-  > {
+  public async createEncryptedBackupFileForAutomatedDesktopBackups(): Promise<Encryption.BackupFile | undefined> {
     return this.protocolService.createEncryptedBackupFile()
   }
 
@@ -633,10 +618,7 @@ export class SNApplication implements InternalServices.ListedClientInterface {
   }
 
   public getPreference<K extends Models.PrefKey>(key: K): Models.PrefValue[K] | undefined
-  public getPreference<K extends Models.PrefKey>(
-    key: K,
-    defaultValue: Models.PrefValue[K],
-  ): Models.PrefValue[K]
+  public getPreference<K extends Models.PrefKey>(key: K, defaultValue: Models.PrefValue[K]): Models.PrefValue[K]
   public getPreference<K extends Models.PrefKey>(
     key: K,
     defaultValue?: Models.PrefValue[K],
@@ -644,10 +626,7 @@ export class SNApplication implements InternalServices.ListedClientInterface {
     return this.preferencesService.getValue(key, defaultValue)
   }
 
-  public async setPreference<K extends Models.PrefKey>(
-    key: K,
-    value: Models.PrefValue[K],
-  ): Promise<void> {
+  public async setPreference<K extends Models.PrefKey>(key: K, value: Models.PrefValue[K]): Promise<void> {
     return this.preferencesService.setValue(key, value)
   }
 
@@ -666,9 +645,7 @@ export class SNApplication implements InternalServices.ListedClientInterface {
     }
   }
 
-  public promptForCustomChallenge(
-    challenge: Challenges.Challenge,
-  ): Promise<Challenges.ChallengeResponse | undefined> {
+  public promptForCustomChallenge(challenge: Challenges.Challenge): Promise<Challenges.ChallengeResponse | undefined> {
     return this.challengeService?.promptForChallengeResponse(challenge)
   }
 
@@ -679,10 +656,7 @@ export class SNApplication implements InternalServices.ListedClientInterface {
     return this.challengeService.addChallengeObserver(challenge, observer)
   }
 
-  public submitValuesForChallenge(
-    challenge: Challenges.Challenge,
-    values: Challenges.ChallengeValue[],
-  ): Promise<void> {
+  public submitValuesForChallenge(challenge: Challenges.Challenge, values: Challenges.ChallengeValue[]): Promise<void> {
     return this.challengeService.submitValuesForChallenge(challenge, values)
   }
 
@@ -877,17 +851,13 @@ export class SNApplication implements InternalServices.ListedClientInterface {
     return this.storageService.getStorageEncryptionPolicy()
   }
 
-  public setStorageEncryptionPolicy(
-    encryptionPolicy: ExternalServices.StorageEncryptionPolicy,
-  ): Promise<void> {
+  public setStorageEncryptionPolicy(encryptionPolicy: ExternalServices.StorageEncryptionPolicy): Promise<void> {
     this.storageService.setEncryptionPolicy(encryptionPolicy)
     return this.protocolService.repersistAllItems()
   }
 
   public enableEphemeralPersistencePolicy(): Promise<void> {
-    return this.storageService.setPersistencePolicy(
-      ExternalServices.StoragePersistencePolicies.Ephemeral,
-    )
+    return this.storageService.setPersistencePolicy(ExternalServices.StoragePersistencePolicies.Ephemeral)
   }
 
   public hasPendingMigrations(): Promise<boolean> {
@@ -951,10 +921,7 @@ export class SNApplication implements InternalServices.ListedClientInterface {
     return this.apiService.isThirdPartyHostUsed()
   }
 
-  public getCloudProviderIntegrationUrl(
-    cloudProviderName: Settings.CloudProvider,
-    isDevEnvironment: boolean,
-  ): string {
+  public getCloudProviderIntegrationUrl(cloudProviderName: Settings.CloudProvider, isDevEnvironment: boolean): string {
     return this.settingsService.getCloudProviderIntegrationUrl(cloudProviderName, isDevEnvironment)
   }
 
@@ -1025,18 +992,9 @@ export class SNApplication implements InternalServices.ListedClientInterface {
   }
 
   private defineInternalEventHandlers(): void {
-    this.internalEventBus.addEventHandler(
-      this.featuresService,
-      InternalServices.ApiServiceEvent.MetaReceived,
-    )
-    this.internalEventBus.addEventHandler(
-      this.integrityService,
-      ExternalServices.SyncEvent.SyncRequestsIntegrityCheck,
-    )
-    this.internalEventBus.addEventHandler(
-      this.syncService,
-      ExternalServices.IntegrityEvent.IntegrityCheckCompleted,
-    )
+    this.internalEventBus.addEventHandler(this.featuresService, InternalServices.ApiServiceEvent.MetaReceived)
+    this.internalEventBus.addEventHandler(this.integrityService, ExternalServices.SyncEvent.SyncRequestsIntegrityCheck)
+    this.internalEventBus.addEventHandler(this.syncService, ExternalServices.IntegrityEvent.IntegrityCheckCompleted)
   }
 
   private clearInternalEventBus(): void {

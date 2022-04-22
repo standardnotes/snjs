@@ -13,9 +13,7 @@ export function PayloadsByUpdatingReferencingPayloadReferences(
   add: FullyFormedPayloadInterface[] = [],
   removeIds: Uuid[] = [],
 ): SyncResolvedPayload[] {
-  const referencingPayloads = baseCollection
-    .elementsReferencingElement(payload)
-    .filter(isDecryptedPayload)
+  const referencingPayloads = baseCollection.elementsReferencingElement(payload).filter(isDecryptedPayload)
 
   const results: SyncResolvedPayload[] = []
 

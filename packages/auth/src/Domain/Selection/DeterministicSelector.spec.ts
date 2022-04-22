@@ -24,9 +24,15 @@ describe('DeterministicSelector', () => {
 
     const allowedValues = ['a', 'b', 'c', 'd', 'e']
 
-    const firstValue = selector.select('875a31ce95365904ef0e0a8e6cefc1f5e99adfef81bbdb6d4499eeb10ae0ff67', allowedValues)
+    const firstValue = selector.select(
+      '875a31ce95365904ef0e0a8e6cefc1f5e99adfef81bbdb6d4499eeb10ae0ff67',
+      allowedValues,
+    )
 
-    const secondValue = selector.select('a75a31ce95365904ef0e0a8e6cefc1f5e99adfef81bbdb6d4499eeb10ae0ff67', allowedValues)
+    const secondValue = selector.select(
+      'a75a31ce95365904ef0e0a8e6cefc1f5e99adfef81bbdb6d4499eeb10ae0ff67',
+      allowedValues,
+    )
 
     expect(firstValue).toEqual('d')
 

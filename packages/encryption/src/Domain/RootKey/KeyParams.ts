@@ -22,10 +22,7 @@ import { SNRootKeyParams } from './RootKeyParams'
  *  - Account identifier is returned as 'identifier'
  */
 
-type AllKeyParamsContents = KeyParamsContent001 &
-  KeyParamsContent002 &
-  KeyParamsContent003 &
-  KeyParamsContent004
+type AllKeyParamsContents = KeyParamsContent001 & KeyParamsContent002 & KeyParamsContent003 & KeyParamsContent004
 
 export const ValidKeyParamsKeys: (keyof AllKeyParamsContents)[] = [
   'identifier',
@@ -55,16 +52,12 @@ export function Create004KeyParams(keyParams: KeyParamsContent004) {
 
 export function CreateAnyKeyParams(keyParams: AnyKeyParamsContent) {
   if ('content' in keyParams) {
-    throw Error(
-      'Raw key params shouldnt have content; perhaps you passed in a SNRootKeyParams object.',
-    )
+    throw Error('Raw key params shouldnt have content; perhaps you passed in a SNRootKeyParams object.')
   }
   return new SNRootKeyParams(keyParams)
 }
 
-export function protocolVersionForKeyParams(
-  response: KeyParamsData | AnyKeyParamsContent,
-): ProtocolVersion {
+export function protocolVersionForKeyParams(response: KeyParamsData | AnyKeyParamsContent): ProtocolVersion {
   if (response.version) {
     return response.version
   }

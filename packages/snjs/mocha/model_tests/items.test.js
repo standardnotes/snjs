@@ -70,10 +70,7 @@ describe('items', () => {
   it('properly compares item equality', async function () {
     const params1 = Factory.createNotePayload()
     const params2 = Factory.createNotePayload()
-    await this.application.itemManager.emitItemsFromPayloads(
-      [params1, params2],
-      PayloadEmitSource.LocalChanged,
-    )
+    await this.application.itemManager.emitItemsFromPayloads([params1, params2], PayloadEmitSource.LocalChanged)
 
     let item1 = this.application.itemManager.notes[0]
     let item2 = this.application.itemManager.notes[1]
@@ -178,10 +175,7 @@ describe('items', () => {
   it('content equality should not have side effects', async function () {
     const params1 = Factory.createNotePayload()
     const params2 = Factory.createNotePayload()
-    await this.application.itemManager.emitItemsFromPayloads(
-      [params1, params2],
-      PayloadEmitSource.LocalChanged,
-    )
+    await this.application.itemManager.emitItemsFromPayloads([params1, params2], PayloadEmitSource.LocalChanged)
 
     let item1 = this.application.itemManager.notes[0]
     const item2 = this.application.itemManager.notes[1]

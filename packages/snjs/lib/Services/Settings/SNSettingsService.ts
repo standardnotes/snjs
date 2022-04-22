@@ -1,12 +1,7 @@
 import { SNApiService } from '../Api/ApiService'
 import { SettingsGateway } from './SettingsGateway'
 import { SNSessionManager } from '../Session/SessionManager'
-import {
-  CloudProvider,
-  EmailBackupFrequency,
-  SettingName,
-  SensitiveSettingName,
-} from '@standardnotes/settings'
+import { CloudProvider, EmailBackupFrequency, SettingName, SensitiveSettingName } from '@standardnotes/settings'
 import { ExtensionsServerURL } from '@Lib/Hosts'
 import { AbstractService, InternalEventBusInterface } from '@standardnotes/services'
 import { SettingsClientInterface } from './SettingsClientInterface'
@@ -61,10 +56,7 @@ export class SNSettingsService extends AbstractService implements SettingsClient
     return this.frequencyOptionsLabels[frequency]
   }
 
-  getCloudProviderIntegrationUrl(
-    cloudProviderName: CloudProvider,
-    isDevEnvironment: boolean,
-  ): string {
+  getCloudProviderIntegrationUrl(cloudProviderName: CloudProvider, isDevEnvironment: boolean): string {
     const { Dev, Prod } = ExtensionsServerURL
     const extServerUrl = isDevEnvironment ? Dev : Prod
     return `${extServerUrl}/${this.cloudProviderIntegrationUrlEndpoints[cloudProviderName]}?redirect_url=${extServerUrl}/components/cloudlink?`

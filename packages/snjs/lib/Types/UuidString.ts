@@ -1,1 +1,1 @@
-export type UuidString = string;
+export type UuidString = string

@@ -44,9 +44,8 @@ export function FillItemContent<C extends ItemContent = ItemContent>(content: Pa
   return content as C
 }
 
-export function FillItemContentSpecialized<
-  S extends SpecializedContent,
-  C extends ItemContent = ItemContent,
->(content: S): C {
+export function FillItemContentSpecialized<S extends SpecializedContent, C extends ItemContent = ItemContent>(
+  content: S,
+): C {
   return FillItemContent(content)
 }

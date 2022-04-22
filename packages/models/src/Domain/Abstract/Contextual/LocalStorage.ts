@@ -1,11 +1,7 @@
 import { Uuid } from '@standardnotes/common'
 import { ContextPayload } from './ContextPayload'
 import { ItemContent } from '../Content/ItemContent'
-import {
-  DecryptedPayloadInterface,
-  DeletedPayloadInterface,
-  EncryptedPayloadInterface,
-} from '../Payload'
+import { DecryptedPayloadInterface, DeletedPayloadInterface, EncryptedPayloadInterface } from '../Payload'
 import { useBoolean } from '@standardnotes/utils'
 import { EncryptedTransferPayload, isEncryptedTransferPayload } from '../TransferPayload'
 
@@ -33,8 +29,7 @@ export interface LocalStorageEncryptedContextualPayload extends ContextPayload {
   waitingForKey: boolean
 }
 
-export interface LocalStorageDecryptedContextualPayload<C extends ItemContent = ItemContent>
-  extends ContextPayload {
+export interface LocalStorageDecryptedContextualPayload<C extends ItemContent = ItemContent> extends ContextPayload {
   content: C
   created_at_timestamp: number
   created_at: Date

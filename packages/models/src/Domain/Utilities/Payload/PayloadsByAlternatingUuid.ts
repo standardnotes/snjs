@@ -16,9 +16,7 @@ import { SyncResolvedPayload } from '../../Runtime/Deltas/Utilities/SyncResolved
  * @returns An array of payloads that have changed as a result of copying.
  */
 
-export function PayloadsByAlternatingUuid<
-  P extends DecryptedPayloadInterface = DecryptedPayloadInterface,
->(
+export function PayloadsByAlternatingUuid<P extends DecryptedPayloadInterface = DecryptedPayloadInterface>(
   payload: P,
   baseCollection: ImmutablePayloadCollection<FullyFormedPayloadInterface>,
 ): SyncResolvedPayload[] {
@@ -57,9 +55,7 @@ export function PayloadsByAlternatingUuid<
      */
     const matchingPayloads = baseCollection
       .all()
-      .filter(
-        (p) => isEncryptedPayload(p) && p.items_key_id === payload.uuid,
-      ) as EncryptedPayloadInterface[]
+      .filter((p) => isEncryptedPayload(p) && p.items_key_id === payload.uuid) as EncryptedPayloadInterface[]
 
     const adjustedPayloads = matchingPayloads.map((a) =>
       a.copyAsSyncResolved({

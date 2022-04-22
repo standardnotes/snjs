@@ -84,10 +84,7 @@ const INVALID_SESSION_RESPONSE_STATUS = 401
  * The sync service largely does not perform any task unless it is called upon.
  */
 export class SNSyncService
-  extends AbstractService<
-    SyncEvent,
-    ServerSyncResponse | OfflineSyncResponse | { source: SyncSource }
-  >
+  extends AbstractService<SyncEvent, ServerSyncResponse | OfflineSyncResponse | { source: SyncSource }>
   implements InternalEventHandlerInterface, SyncClientInterface
 {
   private lastPreSyncSave?: Date
@@ -304,10 +301,7 @@ export class SNSyncService
 
       const results = await this.protocolService.decryptSplit(split)
 
-      await this.payloadManager.emitPayloads(
-        [...nonencrypted, ...results],
-        PayloadEmitSource.LocalDatabaseLoaded,
-      )
+      await this.payloadManager.emitPayloads([...nonencrypted, ...results], PayloadEmitSource.LocalDatabaseLoaded)
 
       void this.notifyEvent(SyncEvent.LocalDataIncrementalLoad)
 
@@ -380,9 +374,7 @@ export class SNSyncService
    * This way, if the application is closed before a sync request completes,
    * pending data will be saved to disk, and synced the next time the app opens.
    */
-  private popPayloadsNeedingPreSyncSave(
-    from: (DecryptedPayloadInterface | DeletedPayloadInterface)[],
-  ) {
+  private popPayloadsNeedingPreSyncSave(from: (DecryptedPayloadInterface | DeletedPayloadInterface)[]) {
     const lastPreSyncSave = this.lastPreSyncSave
     if (!lastPreSyncSave) {
       return from
@@ -455,10 +447,7 @@ export class SNSyncService
     return contextPayloads
   }
 
-  public async downloadFirstSync(
-    waitTimeOnFailureMs: number,
-    otherSyncOptions?: Partial<SyncOptions>,
-  ): Promise<void> {
+  public async downloadFirstSync(waitTimeOnFailureMs: number, otherSyncOptions?: Partial<SyncOptions>): Promise<void> {
     const maxTries = 5
 
     for (let i = 0; i < maxTries; i++) {
@@ -724,10 +713,7 @@ export class SNSyncService
     options: SyncOptions,
   ): Promise<{ operation: AccountSyncOperation | OfflineSyncOperation; mode: SyncMode }> {
     if (online) {
-      const { uploadPayloads, syncMode } = await this.getOnlineSyncParameters(
-        payloads,
-        options.mode,
-      )
+      const { uploadPayloads, syncMode } = await this.getOnlineSyncParameters(payloads, options.mode)
 
       return {
         operation: await this.createServerSyncOperation(
@@ -751,9 +737,7 @@ export class SNSyncService
   private async performSync(options: SyncOptions): Promise<unknown> {
     const { shouldExecuteSync, releaseLock } = this.configureSyncLock()
 
-    const { items, beginDate, decryptedPayloads, neverSyncedDeleted } = await this.prepareForSync(
-      options,
-    )
+    const { items, beginDate, decryptedPayloads, neverSyncedDeleted } = await this.prepareForSync(options)
 
     const inTimeResolveQueue = this.getPendingRequestsMadeInTimeToPiggyBackOnCurrentRequest()
 
@@ -769,11 +753,7 @@ export class SNSyncService
 
     const online = this.sessionManager.online()
 
-    const { operation, mode: syncMode } = await this.createSyncOperation(
-      decryptedPayloads,
-      online,
-      options,
-    )
+    const { operation, mode: syncMode } = await this.createSyncOperation(decryptedPayloads, online, options)
 
     const operationPromise = operation.run()
 
@@ -787,12 +767,7 @@ export class SNSyncService
 
     releaseLock()
 
-    const { hasError } = await this.handleSyncOperationFinish(
-      operation,
-      options,
-      neverSyncedDeleted,
-      syncMode,
-    )
+    const { hasError } = await this.handleSyncOperationFinish(operation, options, neverSyncedDeleted, syncMode)
     if (hasError) {
       return
     }
@@ -852,10 +827,7 @@ export class SNSyncService
     void this.notifyEvent(SyncEvent.SyncError, response)
   }
 
-  private async handleSuccessServerResponse(
-    operation: AccountSyncOperation,
-    response: ServerSyncResponse,
-  ) {
+  private async handleSuccessServerResponse(operation: AccountSyncOperation, response: ServerSyncResponse) {
     if (this._simulate_latency) {
       await sleep(this._simulate_latency.latency)
     }
@@ -871,10 +843,7 @@ export class SNSyncService
 
     const resolver = new ServerSyncResponseResolver(
       {
-        retrievedPayloads: await this.processServerPayloads(
-          response.retrievedPayloads,
-          PayloadSource.RemoteRetrieved,
-        ),
+        retrievedPayloads: await this.processServerPayloads(response.retrievedPayloads, PayloadSource.RemoteRetrieved),
         savedPayloads: response.savedPayloads,
         uuidConflictPayloads: await this.processServerPayloads(
           response.uuidConflictPayloads,
@@ -884,10 +853,7 @@ export class SNSyncService
           response.dataConflictPayloads,
           PayloadSource.RemoteRetrieved,
         ),
-        rejectedPayloads: await this.processServerPayloads(
-          response.rejectedPayloads,
-          PayloadSource.RemoteRetrieved,
-        ),
+        rejectedPayloads: await this.processServerPayloads(response.rejectedPayloads, PayloadSource.RemoteRetrieved),
       },
       masterCollection,
       operation.payloadsSavedOrSaving,
@@ -921,16 +887,14 @@ export class SNSyncService
 
     const { rootKeyEncryption, itemsKeyEncryption } = SplitPayloadsByEncryptionType(encrypted)
 
-    const { results: rootKeyDecryptionResults, map: processedItemsKeys } =
-      await this.decryptServerItemsKeys(rootKeyEncryption || [])
+    const { results: rootKeyDecryptionResults, map: processedItemsKeys } = await this.decryptServerItemsKeys(
+      rootKeyEncryption || [],
+    )
 
     extendArray(results, rootKeyDecryptionResults)
 
     if (itemsKeyEncryption) {
-      const decryptionResults = await this.decryptProcessedServerPayloads(
-        itemsKeyEncryption,
-        processedItemsKeys,
-      )
+      const decryptionResults = await this.decryptProcessedServerPayloads(itemsKeyEncryption, processedItemsKeys)
       extendArray(results, decryptionResults)
     }
 
@@ -956,10 +920,7 @@ export class SNSyncService
     const results = await this.protocolService.decryptSplit<ItemsKeyContent>(rootKeySplit)
 
     results.forEach((result) => {
-      if (
-        isDecryptedPayload<ItemsKeyContent>(result) &&
-        result.content_type === ContentType.ItemsKey
-      ) {
+      if (isDecryptedPayload<ItemsKeyContent>(result) && result.content_type === ContentType.ItemsKey) {
         map[result.uuid] = result
       }
     })
@@ -1016,10 +977,7 @@ export class SNSyncService
 
     this.lastSyncDate = new Date()
 
-    if (
-      operation instanceof AccountSyncOperation &&
-      operation.numberOfItemsInvolved >= this.majorChangeThreshold
-    ) {
+    if (operation instanceof AccountSyncOperation && operation.numberOfItemsInvolved >= this.majorChangeThreshold) {
       void this.notifyEvent(SyncEvent.MajorDataChange)
     }
 
@@ -1079,9 +1037,7 @@ export class SNSyncService
    * to simulate calling .sync as if it went through straight to the end without having
    * to be queued.
    */
-  private resolvePendingSyncRequestsThatMadeItInTimeOfCurrentRequest(
-    inTimeResolveQueue: SyncPromise[],
-  ) {
+  private resolvePendingSyncRequestsThatMadeItInTimeOfCurrentRequest(inTimeResolveQueue: SyncPromise[]) {
     for (const callback of inTimeResolveQueue) {
       callback.resolve()
     }

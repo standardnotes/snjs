@@ -3,8 +3,7 @@ import * as DOMPurify from 'dompurify'
 import { find, isArray, mergeWith, remove, uniq, uniqWith } from 'lodash'
 import { AnyRecord } from '@standardnotes/common'
 
-const collator =
-  typeof Intl !== 'undefined' ? new Intl.Collator('en', { numeric: true }) : undefined
+const collator = typeof Intl !== 'undefined' ? new Intl.Collator('en', { numeric: true }) : undefined
 
 export function getGlobalScope(): Window | unknown | null {
   return typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : null
@@ -30,9 +29,7 @@ interface IEDocument {
  */
 export function isWebCryptoAvailable(): boolean {
   return (
-    (isWebEnvironment() &&
-      !isReactNativeEnvironment() &&
-      !(document && (document as IEDocument).documentMode)) ||
+    (isWebEnvironment() && !isReactNativeEnvironment() && !(document && (document as IEDocument).documentMode)) ||
     (/Edge/.test(navigator.userAgent) && window.crypto && !!window.crypto.subtle)
   )
 }
@@ -223,9 +220,7 @@ export function filterFromArray<T>(
  * Returns a new array by removing all elements in subtract from array
  */
 export function arrayByDifference<T>(array: T[], subtract: T[]): T[] {
-  return array
-    .filter((x) => !subtract.includes(x))
-    .concat(subtract.filter((x) => !array.includes(x)))
+  return array.filter((x) => !subtract.includes(x)).concat(subtract.filter((x) => !array.includes(x)))
 }
 
 export function compareValues<T>(left: T, right: T) {
@@ -567,15 +562,13 @@ export function naturalSort<T extends AnyRecord>(
       return [...items].sort(
         collator
           ? (a, b) => collator.compare(a[property] as string, b[property] as string)
-          : (a, b) =>
-              (a[property] as string).localeCompare(b[property] as string, 'en', { numeric: true }),
+          : (a, b) => (a[property] as string).localeCompare(b[property] as string, 'en', { numeric: true }),
       )
     case 'desc':
       return [...items].sort(
         collator
           ? (a, b) => collator.compare(b[property] as string, a[property] as string)
-          : (a, b) =>
-              (b[property] as string).localeCompare(a[property] as string, 'en', { numeric: true }),
+          : (a, b) => (b[property] as string).localeCompare(a[property] as string, 'en', { numeric: true }),
       )
   }
 }
@@ -619,10 +612,7 @@ let sharedDateFormatter: unknown
 export function dateToLocalizedString(date: Date): string {
   if (typeof Intl !== 'undefined' && Intl.DateTimeFormat && typeof navigator !== 'undefined') {
     if (!sharedDateFormatter) {
-      const locale =
-        navigator.languages && navigator.languages.length
-          ? navigator.languages[0]
-          : navigator.language
+      const locale = navigator.languages && navigator.languages.length ? navigator.languages[0] : navigator.language
       sharedDateFormatter = new Intl.DateTimeFormat(locale, {
         year: 'numeric',
         month: 'short',

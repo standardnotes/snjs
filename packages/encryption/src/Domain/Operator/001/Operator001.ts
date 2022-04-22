@@ -1,16 +1,6 @@
-import {
-  ContentType,
-  KeyParamsOrigination,
-  ProtocolVersion,
-  ProtocolVersionLength,
-} from '@standardnotes/common'
+import { ContentType, KeyParamsOrigination, ProtocolVersion, ProtocolVersionLength } from '@standardnotes/common'
 import { Create001KeyParams } from '../../RootKey/KeyParams'
-import {
-  firstHalfOfString,
-  secondHalfOfString,
-  splitString,
-  UuidGenerator,
-} from '@standardnotes/utils'
+import { firstHalfOfString, secondHalfOfString, splitString, UuidGenerator } from '@standardnotes/utils'
 import { AsynchronousOperator } from '../Operator'
 import {
   CreateDecryptedItemFromPayload,

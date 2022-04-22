@@ -55,12 +55,7 @@ export class ServerSyncResponseResolver {
   private processRetrievedPayloads(): DeltaEmit {
     const collection = ImmutablePayloadCollection.WithPayloads(this.payloadSet.retrievedPayloads)
 
-    const delta = new DeltaRemoteRetrieved(
-      this.baseCollection,
-      collection,
-      this.payloadsSavedOrSaving,
-      this.historyMap,
-    )
+    const delta = new DeltaRemoteRetrieved(this.baseCollection, collection, this.payloadsSavedOrSaving, this.historyMap)
 
     return delta.result()
   }

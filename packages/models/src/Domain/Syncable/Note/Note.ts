@@ -27,10 +27,7 @@ export class SNNote extends DecryptedItem<NoteContent> implements NoteContentSpe
     this.hidePreview = Boolean(this.payload.content.hidePreview)
     this.spellcheck = this.payload.content.spellcheck
 
-    this.prefersPlainEditor = this.getAppDomainValueWithDefault(
-      AppDataField.PrefersPlainEditor,
-      false,
-    )
+    this.prefersPlainEditor = this.getAppDomainValueWithDefault(AppDataField.PrefersPlainEditor, false)
 
     this.mobilePrefersPlainEditor = this.payload.content.mobilePrefersPlainEditor
   }

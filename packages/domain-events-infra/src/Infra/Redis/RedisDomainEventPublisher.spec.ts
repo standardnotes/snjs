@@ -24,6 +24,9 @@ describe('RedisDomainEventPublisher', () => {
   it('should publish an event to a channel', async () => {
     await createPublisher().publish(event)
 
-    expect(redisClient.publish).toHaveBeenCalledWith('events', 'eJyrViqpLEhVslIKcQ0OUdJRKkiszMlPTFGyqlZKy88HiiclFinV1gIA9tQMhA==')
+    expect(redisClient.publish).toHaveBeenCalledWith(
+      'events',
+      'eJyrViqpLEhVslIKcQ0OUdJRKkiszMlPTFGyqlZKy88HiiclFinV1gIA9tQMhA==',
+    )
   })
 })

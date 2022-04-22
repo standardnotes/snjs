@@ -64,11 +64,7 @@ export function PayloadsByDuplicating<C extends ItemContent = ItemContent>(dto: 
     /**
      * Get the payloads that make reference to payload and add the copy.
      */
-    const updatedReferencing = PayloadsByUpdatingReferencingPayloadReferences(
-      payload,
-      baseCollection,
-      [copy],
-    )
+    const updatedReferencing = PayloadsByUpdatingReferencingPayloadReferences(payload, baseCollection, [copy])
     extendArray(results, updatedReferencing)
   }
 

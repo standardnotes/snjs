@@ -11,8 +11,7 @@ export interface CollectionElement {
   deleted?: boolean
 }
 
-export interface DecryptedCollectionElement<C extends ItemContent = ItemContent>
-  extends CollectionElement {
+export interface DecryptedCollectionElement<C extends ItemContent = ItemContent> extends CollectionElement {
   content: C
   references: ContentReference[]
 }

@@ -48,9 +48,7 @@ export function compoundPredicateFromArguments<T extends PredicateTarget>(
   return new CompoundPredicate(operator as PredicateCompoundOperator, subPredicates)
 }
 
-export function notPredicateFromArguments<T extends PredicateTarget>(
-  value: PredicateJsonForm,
-): PredicateInterface<T> {
+export function notPredicateFromArguments<T extends PredicateTarget>(value: PredicateJsonForm): PredicateInterface<T> {
   const subPredicate = predicateFromJson(value)
   return new NotPredicate(subPredicate)
 }
@@ -63,9 +61,7 @@ export function includesPredicateFromArguments<T extends PredicateTarget>(
   return new IncludesPredicate<T>(keypath, subPredicate)
 }
 
-export function predicateFromJson<T extends PredicateTarget>(
-  values: PredicateJsonForm,
-): PredicateInterface<T> {
+export function predicateFromJson<T extends PredicateTarget>(values: PredicateJsonForm): PredicateInterface<T> {
   if (Array.isArray(values)) {
     throw Error('Invalid predicateFromJson value')
   }
@@ -107,9 +103,7 @@ function isSureValue(value: unknown): value is SureValue {
   return false
 }
 
-function predicateDSLArrayToJsonPredicate(
-  predicateArray: RawPredicateInArrayForm,
-): PredicateJsonForm {
+function predicateDSLArrayToJsonPredicate(predicateArray: RawPredicateInArrayForm): PredicateJsonForm {
   const predicateValue = predicateArray[2] as
     | SureValue
     | SureValue[]
@@ -119,10 +113,7 @@ function predicateDSLArrayToJsonPredicate(
   let resolvedPredicateValue: PredicateJsonForm | SureValue | PredicateJsonForm[]
 
   if (Array.isArray(predicateValue)) {
-    const level1CondensedValue = predicateValue as
-      | SureValue[]
-      | RawPredicateInArrayForm
-      | RawPredicateInArrayForm[]
+    const level1CondensedValue = predicateValue as SureValue[] | RawPredicateInArrayForm | RawPredicateInArrayForm[]
 
     if (Array.isArray(level1CondensedValue[0])) {
       const level2CondensedValue = level1CondensedValue as RawPredicateInArrayForm[]

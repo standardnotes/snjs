@@ -7,8 +7,7 @@ import { InternalEventType } from './InternalEventType'
 export class InternalEventBus implements InternalEventBusInterface {
   private eventHandlers: Map<InternalEventType, InternalEventHandlerInterface[]>
 
-  constructor(
-  ) {
+  constructor() {
     this.eventHandlers = new Map<InternalEventType, InternalEventHandlerInterface[]>()
   }
 

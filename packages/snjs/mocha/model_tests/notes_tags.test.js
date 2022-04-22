@@ -71,10 +71,7 @@ describe('notes and tags', () => {
       },
     })
 
-    await this.application.itemManager.emitItemsFromPayloads(
-      [mutatedNote, mutatedTag],
-      PayloadEmitSource.LocalChanged,
-    )
+    await this.application.itemManager.emitItemsFromPayloads([mutatedNote, mutatedTag], PayloadEmitSource.LocalChanged)
     const note = this.application.itemManager.getItems([ContentType.Note])[0]
     const tag = this.application.itemManager.getItems([ContentType.Tag])[0]
 
@@ -90,10 +87,7 @@ describe('notes and tags', () => {
     expect(notePayload.content.references.length).to.equal(0)
     expect(tagPayload.content.references.length).to.equal(1)
 
-    await this.application.itemManager.emitItemsFromPayloads(
-      [notePayload, tagPayload],
-      PayloadEmitSource.LocalChanged,
-    )
+    await this.application.itemManager.emitItemsFromPayloads([notePayload, tagPayload], PayloadEmitSource.LocalChanged)
     let note = this.application.itemManager.notes[0]
     let tag = this.application.itemManager.tags[0]
 
@@ -151,10 +145,7 @@ describe('notes and tags', () => {
         references: [],
       },
     })
-    await this.application.itemManager.emitItemsFromPayloads(
-      [mutatedTag],
-      PayloadEmitSource.LocalChanged,
-    )
+    await this.application.itemManager.emitItemsFromPayloads([mutatedTag], PayloadEmitSource.LocalChanged)
 
     note = this.application.itemManager.findItem(note.uuid)
     tag = this.application.itemManager.findItem(tag.uuid)
@@ -184,10 +175,7 @@ describe('notes and tags', () => {
     const notePayload = pair[0]
     const tagPayload = pair[1]
 
-    await this.application.itemManager.emitItemsFromPayloads(
-      [notePayload, tagPayload],
-      PayloadEmitSource.LocalChanged,
-    )
+    await this.application.itemManager.emitItemsFromPayloads([notePayload, tagPayload], PayloadEmitSource.LocalChanged)
     const note = this.application.itemManager.getItems([ContentType.Note])[0]
     let tag = this.application.itemManager.getItems([ContentType.Tag])[0]
 
@@ -242,10 +230,7 @@ describe('notes and tags', () => {
     const pair = Factory.createRelatedNoteTagPairPayload()
     const notePayload = pair[0]
     const tagPayload = pair[1]
-    await this.application.itemManager.emitItemsFromPayloads(
-      [notePayload, tagPayload],
-      PayloadEmitSource.LocalChanged,
-    )
+    await this.application.itemManager.emitItemsFromPayloads([notePayload, tagPayload], PayloadEmitSource.LocalChanged)
     const note = this.application.itemManager.getItems([ContentType.Note])[0]
     const duplicateNote = await this.application.itemManager.duplicateItem(note, true)
     expect(note.uuid).to.not.equal(duplicateNote.uuid)
@@ -259,10 +244,7 @@ describe('notes and tags', () => {
     const pair = Factory.createRelatedNoteTagPairPayload()
     const notePayload = pair[0]
     const tagPayload = pair[1]
-    await this.application.itemManager.emitItemsFromPayloads(
-      [notePayload, tagPayload],
-      PayloadEmitSource.LocalChanged,
-    )
+    await this.application.itemManager.emitItemsFromPayloads([notePayload, tagPayload], PayloadEmitSource.LocalChanged)
     const note = this.application.itemManager.getItems([ContentType.Note])[0]
     let tag = this.application.itemManager.getItems([ContentType.Tag])[0]
 
@@ -279,10 +261,7 @@ describe('notes and tags', () => {
 
   it('modifying item content should not modify payload content', async function () {
     const notePayload = Factory.createNotePayload()
-    await this.application.itemManager.emitItemsFromPayloads(
-      [notePayload],
-      PayloadEmitSource.LocalChanged,
-    )
+    await this.application.itemManager.emitItemsFromPayloads([notePayload], PayloadEmitSource.LocalChanged)
     let note = this.application.itemManager.getItems([ContentType.Note])[0]
     note = await this.application.mutator.changeAndSaveItem(
       note,
@@ -304,10 +283,7 @@ describe('notes and tags', () => {
     const notePayload = pair[0]
     const tagPayload = pair[1]
 
-    await this.application.itemManager.emitItemsFromPayloads(
-      [notePayload, tagPayload],
-      PayloadEmitSource.LocalChanged,
-    )
+    await this.application.itemManager.emitItemsFromPayloads([notePayload, tagPayload], PayloadEmitSource.LocalChanged)
     let note = this.application.itemManager.getItems([ContentType.Note])[0]
     let tag = this.application.itemManager.getItems([ContentType.Tag])[0]
 
@@ -352,9 +328,9 @@ describe('notes and tags', () => {
       const titles = ['1', 'A', 'b', '2']
       const sortedTitles = titles.sort((a, b) => a.localeCompare(b))
       await Promise.all(titles.map((title) => this.application.mutator.findOrCreateTag(title)))
-      expect(
-        this.application.items.getDisplayableItems(ContentType.Tag).map((t) => t.title),
-      ).to.deep.equal(sortedTitles)
+      expect(this.application.items.getDisplayableItems(ContentType.Tag).map((t) => t.title)).to.deep.equal(
+        sortedTitles,
+      )
     })
 
     it('should sort tags in reverse alphabetical order', async function () {
@@ -362,9 +338,9 @@ describe('notes and tags', () => {
       const sortedTitles = titles.sort((a, b) => b.localeCompare(a))
       await Promise.all(titles.map((title) => this.application.mutator.findOrCreateTag(title)))
       this.application.items.setDisplayOptions(ContentType.Tag, 'title', 'asc')
-      expect(
-        this.application.items.getDisplayableItems(ContentType.Tag).map((t) => t.title),
-      ).to.deep.equal(sortedTitles)
+      expect(this.application.items.getDisplayableItems(ContentType.Tag).map((t) => t.title)).to.deep.equal(
+        sortedTitles,
+      )
     })
 
     it('should match a tag', async function () {
@@ -626,11 +602,7 @@ describe('notes and tags', () => {
       )
 
       const threeDays = 3 * 24 * 60 * 60 * 1000
-      await Factory.changePayloadUpdatedAt(
-        this.application,
-        olderNote.payload,
-        new Date(Date.now() - threeDays),
-      )
+      await Factory.changePayloadUpdatedAt(this.application, olderNote.payload, new Date(Date.now() - threeDays))
 
       /** Create an unsynced note which shouldn't get an updated_at */
       await this.application.mutator.insertItem(

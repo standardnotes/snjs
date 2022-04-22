@@ -73,18 +73,15 @@ export class SNSingletonManager extends AbstractService {
    * all items keys have been downloaded.
    */
   private addObservers() {
-    this.removeItemObserver = this.itemManager.addObserver(
-      ContentType.Any,
-      ({ inserted, unerrored }) => {
-        if (unerrored.length > 0) {
-          this.resolveQueue = this.resolveQueue.concat(unerrored)
-        }
+    this.removeItemObserver = this.itemManager.addObserver(ContentType.Any, ({ inserted, unerrored }) => {
+      if (unerrored.length > 0) {
+        this.resolveQueue = this.resolveQueue.concat(unerrored)
+      }
 
-        if (inserted.length > 0) {
-          this.resolveQueue = this.resolveQueue.concat(inserted)
-        }
-      },
-    )
+      if (inserted.length > 0) {
+        this.resolveQueue = this.resolveQueue.concat(inserted)
+      }
+    })
 
     this.removeSyncObserver = this.syncService.addEventObserver(async (eventName) => {
       if (
@@ -224,10 +221,7 @@ export class SNSingletonManager extends AbstractService {
       ...PayloadTimestampDefaults(),
     })
 
-    const item = await this.itemManager.emitItemFromPayload(
-      dirtyPayload,
-      PayloadEmitSource.LocalInserted,
-    )
+    const item = await this.itemManager.emitItemFromPayload(dirtyPayload, PayloadEmitSource.LocalInserted)
 
     void this.syncService.sync()
 

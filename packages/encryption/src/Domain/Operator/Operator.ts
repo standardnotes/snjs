@@ -3,11 +3,7 @@ import * as Models from '@standardnotes/models'
 import { SNRootKey } from '../RootKey/RootKey'
 import { SNRootKeyParams } from '../RootKey/RootKeyParams'
 import { KeyParamsOrigination } from '@standardnotes/common'
-import {
-  DecryptedParameters,
-  EncryptedParameters,
-  ErrorDecryptingParameters,
-} from '../Encryption/EncryptedParameters'
+import { DecryptedParameters, EncryptedParameters, ErrorDecryptingParameters } from '../Encryption/EncryptedParameters'
 import { RootKeyEncryptedAuthenticatedData } from '../Encryption/RootKeyEncryptedAuthenticatedData'
 import { ItemAuthenticatedData } from '../Encryption/ItemAuthenticatedData'
 import { LegacyAttachedData } from '../Encryption/LegacyAttachedData'
@@ -48,11 +44,7 @@ export interface OperatorCommon {
    *    for the user
    * @param password - Plain string representing raw user password
    */
-  createRootKey(
-    identifier: string,
-    password: string,
-    origination: KeyParamsOrigination,
-  ): Promise<SNRootKey>
+  createRootKey(identifier: string, password: string, origination: KeyParamsOrigination): Promise<SNRootKey>
 }
 
 export interface SynchronousOperator extends OperatorCommon {

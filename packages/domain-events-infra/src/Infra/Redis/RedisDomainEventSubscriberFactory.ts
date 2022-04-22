@@ -21,8 +21,7 @@ export class RedisDomainEventSubscriberFactory implements DomainEventSubscriberF
     this.redisClient.on(
       'message',
       /* istanbul ignore next */
-      async (_channel: string, message: string) =>
-        await this.domainEventMessageHandler.handleMessage(message),
+      async (_channel: string, message: string) => await this.domainEventMessageHandler.handleMessage(message),
     )
 
     return subscriber

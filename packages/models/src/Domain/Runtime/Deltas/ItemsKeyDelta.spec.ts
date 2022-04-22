@@ -38,9 +38,7 @@ describe('items key delta', () => {
       updated_at_timestamp: 2,
     })
 
-    const delta = new ItemsKeyDelta(ImmutablePayloadCollection.FromCollection(baseCollection), [
-      payloadToIgnore,
-    ])
+    const delta = new ItemsKeyDelta(ImmutablePayloadCollection.FromCollection(baseCollection), [payloadToIgnore])
 
     const result = delta.result()
     const updatedBasePayload = result.emits?.[0] as DecryptedPayload<ItemsKeyContent>
