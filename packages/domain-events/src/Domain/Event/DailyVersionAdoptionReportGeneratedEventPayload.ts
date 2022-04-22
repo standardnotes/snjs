@@ -1,10 +1,10 @@
 export interface DailyVersionAdoptionReportGeneratedEventPayload {
   snjsStatistics: Array<{
-    version: string,
+    version: string
     count: number
   }>
   applicationStatistics: Array<{
-    version: string,
+    version: string
     count: number
   }>
   outOfSyncIncidents: number

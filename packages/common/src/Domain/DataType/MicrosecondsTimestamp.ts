@@ -1,1 +1,1 @@
-export type MicrosecondsTimestamp = number;
+export type MicrosecondsTimestamp = number

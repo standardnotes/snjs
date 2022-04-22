@@ -1,4 +1,4 @@
 export type OfflineUserTokenData = {
-  userEmail: string,
-  featuresToken: string,
+  userEmail: string
+  featuresToken: string
 }
