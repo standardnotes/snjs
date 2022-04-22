@@ -1,7 +1,7 @@
 import { isNullOrUndefined } from '@standardnotes/utils'
 import { isEnvironmentMobile } from '@Lib/Application/Platforms'
 import { PreviousSnjsVersion1_0_0 } from '../../../Version'
-import { LegacyKeys1_0_0 } from '@standardnotes/services'
+import { isMobileDevice, LegacyKeys1_0_0 } from '@standardnotes/services'
 import { StorageReader } from '../Reader'
 
 export class StorageReader1_0_0 extends StorageReader {
@@ -18,7 +18,7 @@ export class StorageReader1_0_0 extends StorageReader {
    * the keychain
    */
   public async hasNonWrappedAccountKeys() {
-    if (isEnvironmentMobile(this.environment)) {
+    if (isMobileDevice(this.deviceInterface)) {
       const value = await this.deviceInterface.getRawKeychainValue()
       return !isNullOrUndefined(value)
     } else {

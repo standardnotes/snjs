@@ -1,7 +1,7 @@
 import { ProtocolVersion } from '@standardnotes/common'
 import { RootKeyContentSpecialized } from '@standardnotes/models'
 
-export interface RootKeyInKeychain {
+export interface NamespacedRootKeyInKeychain {
   version: ProtocolVersion
   masterKey: string
   dataAuthenticationKey?: string

@@ -30,7 +30,7 @@ export class NoteViewController {
   private innerValueChangeObservers: ((note: SNNote, source: PayloadEmitSource) => void)[] = []
   private removeStreamObserver?: () => void
   public isTemplateNote = false
-  private saveTimeout?: Promise<void>
+  private saveTimeout?: ReturnType<typeof setTimeout>
 
   constructor(
     application: SNApplication,
@@ -170,6 +170,7 @@ export class NoteViewController {
           const truncate = noteText.length > NOTE_PREVIEW_CHAR_LIMIT
           const substring = noteText.substring(0, NOTE_PREVIEW_CHAR_LIMIT)
           const previewPlain = substring + (truncate ? STRING_ELLIPSES : '')
+
           // eslint-disable-next-line camelcase
           noteMutator.preview_plain = previewPlain
           // eslint-disable-next-line camelcase
@@ -180,12 +181,12 @@ export class NoteViewController {
     )
 
     if (this.saveTimeout) {
-      this.application.deviceInterface.cancelTimeout(this.saveTimeout)
+      clearTimeout(this.saveTimeout)
     }
 
     const noDebounce = dto.bypassDebouncer || this.application.noAccount()
     const syncDebouceMs = noDebounce ? SAVE_TIMEOUT_NO_DEBOUNCE : SAVE_TIMEOUT_DEBOUNCE
-    this.saveTimeout = this.application.deviceInterface.timeout(() => {
+    this.saveTimeout = setTimeout(() => {
       void this.application.sync.sync()
     }, syncDebouceMs)
   }

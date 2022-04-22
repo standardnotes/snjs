@@ -11,7 +11,7 @@ import * as Settings from '@standardnotes/settings'
 import { Subscription } from '@standardnotes/auth'
 import { UuidString, DeinitSource, ApplicationEventPayload } from '../Types'
 import { ApplicationEvent, applicationEventForSyncEvent } from '@Lib/Application/Event'
-import { Environment, Platform } from './Platforms'
+import { Environment, Platform } from '@standardnotes/services'
 import { SNLog } from '../Log'
 import { useBoolean } from '@standardnotes/utils'
 import { DecryptedItemInterface } from '@standardnotes/models'
@@ -81,7 +81,7 @@ export class SNApplication implements InternalServices.ListedClientInterface {
   private streamRemovers: ObserverRemover[] = []
   private serviceObservers: ObserverRemover[] = []
   private managedSubscribers: ObserverRemover[] = []
-  private autoSyncInterval!: number
+  private autoSyncInterval!: ReturnType<typeof setInterval>
 
   /** True if the result of deviceInterface.openDatabase yields a new database being created */
   private createdNewDatabase = false
@@ -313,7 +313,7 @@ export class SNApplication implements InternalServices.ListedClientInterface {
   }
 
   private beginAutoSyncTimer() {
-    this.autoSyncInterval = this.deviceInterface.interval(() => {
+    this.autoSyncInterval = setInterval(() => {
       this.syncService.log('Syncing from autosync')
       void this.sync.sync()
     }, DEFAULT_AUTO_SYNC_INTERVAL)

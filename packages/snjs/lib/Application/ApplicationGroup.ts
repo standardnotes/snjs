@@ -18,20 +18,20 @@ export type ApplicationDescriptor = {
 
 export type DescriptorRecord = Record<string, ApplicationDescriptor>
 
-type AppGroupCallback = {
-  applicationCreator: (descriptor: ApplicationDescriptor, deviceInterface: DeviceInterface) => SNApplication
+type AppGroupCallback<D extends DeviceInterface = DeviceInterface> = {
+  applicationCreator: (descriptor: ApplicationDescriptor, deviceInterface: D) => SNApplication
 }
 
 type AppGroupChangeCallback = () => void
 
-export class SNApplicationGroup extends AbstractService {
+export class SNApplicationGroup<D extends DeviceInterface = DeviceInterface> extends AbstractService {
   public primaryApplication?: SNApplication
   private descriptorRecord!: DescriptorRecord
   private changeObservers: AppGroupChangeCallback[] = []
-  callback!: AppGroupCallback
+  callback!: AppGroupCallback<D>
   private applications: SNApplication[] = []
 
-  constructor(public deviceInterface: DeviceInterface, internalEventBus?: InternalEventBusInterface) {
+  constructor(public deviceInterface: D, internalEventBus?: InternalEventBusInterface) {
     if (internalEventBus === undefined) {
       internalEventBus = new InternalEventBus()
     }
@@ -45,14 +45,15 @@ export class SNApplicationGroup extends AbstractService {
     ;(this.deviceInterface as unknown) = undefined
   }
 
-  public async initialize(callback: AppGroupCallback): Promise<void> {
+  public async initialize(callback: AppGroupCallback<D>): Promise<void> {
     this.callback = callback
+
     this.descriptorRecord = (await this.deviceInterface.getJsonParsedRawStorageValue(
       RawStorageKey.DescriptorRecord,
     )) as DescriptorRecord
 
     if (!this.descriptorRecord) {
-      await this.createDescriptorRecord()
+      this.createDescriptorRecord()
     }
 
     const primaryDescriptor = this.findPrimaryDescriptor()
@@ -61,6 +62,7 @@ export class SNApplicationGroup extends AbstractService {
     }
 
     const application = this.buildApplication(primaryDescriptor)
+
     this.applications.push(application)
 
     void this.setPrimaryApplication(application, false)

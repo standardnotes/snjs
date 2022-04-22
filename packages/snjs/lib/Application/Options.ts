@@ -1,8 +1,7 @@
 import { Runtime, ApplicationIdentifier } from '@standardnotes/common'
 import { SNAlertService } from '../Services/Alert/AlertService'
-import { DeviceInterface } from '@standardnotes/services'
+import { DeviceInterface, Environment, Platform } from '@standardnotes/services'
 import { SNPureCrypto } from '@standardnotes/sncrypto-common'
-import { Environment, Platform } from './Platforms'
 
 export interface ApplicationSyncOptions {
   /**

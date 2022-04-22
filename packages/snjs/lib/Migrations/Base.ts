@@ -217,9 +217,9 @@ export class BaseMigration extends Migration {
              */
             if (version === PreviousSnjsVersion1_0_0) {
               /** Store in top level keychain */
-              await this.services.deviceInterface.legacy_setRawKeychainValue({
+              await this.services.deviceInterface.setLegacyRawKeychainValue({
                 mk: rootKey.masterKey,
-                ak: rootKey.dataAuthenticationKey,
+                ak: rootKey.dataAuthenticationKey as string,
                 version: accountParams.version,
               })
             } else {

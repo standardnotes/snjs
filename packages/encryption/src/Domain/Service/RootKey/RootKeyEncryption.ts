@@ -1,4 +1,4 @@
-import { RootKeyInKeychain } from './../../RootKey/Types'
+import { NamespacedRootKeyInKeychain } from './../../RootKey/Types'
 import { CreateAnyKeyParams } from '../../RootKey/KeyParams'
 import { findDefaultItemsKey } from '../Functions'
 import { KeyMode } from './KeyMode'
@@ -140,7 +140,7 @@ export class RootKeyEncryptionService extends Services.AbstractService<RootKeySe
 
   private async getRootKeyFromKeychain() {
     const rawKey = (await this.deviceInterface.getNamespacedKeychainValue(this.identifier)) as
-      | RootKeyInKeychain
+      | NamespacedRootKeyInKeychain
       | undefined
 
     if (rawKey == undefined) {
@@ -162,6 +162,7 @@ export class RootKeyEncryptionService extends Services.AbstractService<RootKeySe
     if (this.keyMode !== KeyMode.RootKeyOnly) {
       throw 'Should not be persisting wrapped key to keychain.'
     }
+
     const rawKey = this.getSureRootKey().getKeychainValue()
 
     return this.executeCriticalFunction(() => {

@@ -1,7 +1,6 @@
 import { ApplicationIdentifier } from '@standardnotes/common'
 import { compareSemVersions, isRightVersionGreaterThanLeft } from '@Lib/Version'
-import { DeviceInterface } from '@standardnotes/services'
-import { Environment } from '@Lib/Application/Platforms'
+import { DeviceInterface, Environment } from '@standardnotes/services'
 import { StorageReader } from './Reader'
 import * as ReaderClasses from './Versions'
 
