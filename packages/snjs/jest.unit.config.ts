@@ -1,5 +1,5 @@
-const { pathsToModuleNameMapper } = require('ts-jest');
-const { compilerOptions } = require('./lib/tsconfig');
+const { pathsToModuleNameMapper } = require('ts-jest')
+const { compilerOptions } = require('./lib/tsconfig')
 
 /*
  * For a detailed explanation regarding each configuration property and type check, visit:
@@ -74,4 +74,4 @@ export default {
   },
 
   verbose: true,
-};
+}

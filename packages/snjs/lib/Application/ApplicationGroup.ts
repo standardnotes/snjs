@@ -19,10 +19,7 @@ export type ApplicationDescriptor = {
 export type DescriptorRecord = Record<string, ApplicationDescriptor>
 
 type AppGroupCallback = {
-  applicationCreator: (
-    descriptor: ApplicationDescriptor,
-    deviceInterface: DeviceInterface,
-  ) => SNApplication
+  applicationCreator: (descriptor: ApplicationDescriptor, deviceInterface: DeviceInterface) => SNApplication
 }
 
 type AppGroupChangeCallback = () => void
@@ -34,10 +31,7 @@ export class SNApplicationGroup extends AbstractService {
   callback!: AppGroupCallback
   private applications: SNApplication[] = []
 
-  constructor(
-    public deviceInterface: DeviceInterface,
-    internalEventBus?: InternalEventBusInterface,
-  ) {
+  constructor(public deviceInterface: DeviceInterface, internalEventBus?: InternalEventBusInterface) {
     if (internalEventBus === undefined) {
       internalEventBus = new InternalEventBus()
     }
@@ -84,10 +78,7 @@ export class SNApplicationGroup extends AbstractService {
       },
     }
 
-    void this.deviceInterface.setRawStorageValue(
-      RawStorageKey.DescriptorRecord,
-      JSON.stringify(descriptorRecord),
-    )
+    void this.deviceInterface.setRawStorageValue(RawStorageKey.DescriptorRecord, JSON.stringify(descriptorRecord))
 
     this.descriptorRecord = descriptorRecord
 
@@ -194,10 +185,7 @@ export class SNApplicationGroup extends AbstractService {
   }
 
   private persistDescriptors() {
-    void this.deviceInterface.setRawStorageValue(
-      RawStorageKey.DescriptorRecord,
-      JSON.stringify(this.descriptorRecord),
-    )
+    void this.deviceInterface.setRawStorageValue(RawStorageKey.DescriptorRecord, JSON.stringify(this.descriptorRecord))
   }
 
   public async renameDescriptor(descriptor: ApplicationDescriptor, label: string) {

@@ -167,11 +167,9 @@ describe('features', () => {
 
       // Timeout since we don't await for features update
       await new Promise((resolve) => setTimeout(resolve, 1000))
-      expect(
-        application.itemManager.setItemsToBeDeleted.calledWith([
-          sinon.match({ uuid: themeItem.uuid }),
-        ]),
-      ).to.equal(true)
+      expect(application.itemManager.setItemsToBeDeleted.calledWith([sinon.match({ uuid: themeItem.uuid })])).to.equal(
+        true,
+      )
 
       const noTheme = application.items.getItems(ContentType.Theme)[0]
       expect(noTheme).to.not.be.ok
@@ -189,16 +187,12 @@ describe('features', () => {
         return false
       })
 
-      expect(
-        await application.settings.getDoesSensitiveSettingExist(SettingName.ExtensionKey),
-      ).to.equal(false)
+      expect(await application.settings.getDoesSensitiveSettingExist(SettingName.ExtensionKey)).to.equal(false)
 
       const extensionKey = UuidGenerator.GenerateUuid().split('-').join('')
 
       const promise = new Promise((resolve) => {
-        sinon
-          .stub(application.featuresService, 'migrateFeatureRepoToUserSetting')
-          .callsFake(resolve)
+        sinon.stub(application.featuresService, 'migrateFeatureRepoToUserSetting').callsFake(resolve)
       })
 
       await application.itemManager.createItem(
@@ -238,9 +232,7 @@ describe('features', () => {
         return false
       })
       const promise = new Promise((resolve) => {
-        sinon
-          .stub(application.featuresService, 'migrateFeatureRepoToUserSetting')
-          .callsFake(resolve)
+        sinon.stub(application.featuresService, 'migrateFeatureRepoToUserSetting').callsFake(resolve)
       })
       await Factory.loginToApplication({
         application,
@@ -266,9 +258,7 @@ describe('features', () => {
       await application.sync.sync()
 
       const promise = new Promise((resolve) => {
-        sinon
-          .stub(application.featuresService, 'migrateFeatureRepoToUserSetting')
-          .callsFake(resolve)
+        sinon.stub(application.featuresService, 'migrateFeatureRepoToUserSetting').callsFake(resolve)
       })
       await Factory.loginToApplication({
         application,
@@ -282,9 +272,7 @@ describe('features', () => {
       sinon.stub(application.apiService, 'isThirdPartyHostUsed').callsFake(() => {
         return false
       })
-      expect(
-        await application.settings.getDoesSensitiveSettingExist(SettingName.ExtensionKey),
-      ).to.equal(false)
+      expect(await application.settings.getDoesSensitiveSettingExist(SettingName.ExtensionKey)).to.equal(false)
       const extensionKey = UuidGenerator.GenerateUuid().split('-').join('')
       const promise = new Promise((resolve) => {
         application.streamItems(ContentType.ExtensionRepo, ({ changed }) => {

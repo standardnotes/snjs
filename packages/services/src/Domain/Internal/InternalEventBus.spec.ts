@@ -30,8 +30,14 @@ describe('InternalEventBus', () => {
     eventBus.publish({ type: 'test_event_2', payload: { foo: 'bar' } })
 
     expect(eventHandler1.handleEvent).not.toHaveBeenCalled()
-    expect(eventHandler2.handleEvent).toHaveBeenCalledWith({ type: 'test_event_2', payload: { foo: 'bar' } })
-    expect(eventHandler3.handleEvent).toHaveBeenCalledWith({ type: 'test_event_2', payload: { foo: 'bar' } })
+    expect(eventHandler2.handleEvent).toHaveBeenCalledWith({
+      type: 'test_event_2',
+      payload: { foo: 'bar' },
+    })
+    expect(eventHandler3.handleEvent).toHaveBeenCalledWith({
+      type: 'test_event_2',
+      payload: { foo: 'bar' },
+    })
   })
 
   it('should do nothing if there are no appropriate event handlers', () => {
@@ -55,11 +61,20 @@ describe('InternalEventBus', () => {
     eventBus.addEventHandler(eventHandler1, 'test_event_3')
     eventBus.addEventHandler(eventHandler3, 'test_event_2')
 
-    await eventBus.publishSync({ type: 'test_event_2', payload: { foo: 'bar' } }, InternalEventPublishStrategy.SEQUENCE)
+    await eventBus.publishSync(
+      { type: 'test_event_2', payload: { foo: 'bar' } },
+      InternalEventPublishStrategy.SEQUENCE,
+    )
 
     expect(eventHandler1.handleEvent).not.toHaveBeenCalled()
-    expect(eventHandler2.handleEvent).toHaveBeenCalledWith({ type: 'test_event_2', payload: { foo: 'bar' } })
-    expect(eventHandler3.handleEvent).toHaveBeenCalledWith({ type: 'test_event_2', payload: { foo: 'bar' } })
+    expect(eventHandler2.handleEvent).toHaveBeenCalledWith({
+      type: 'test_event_2',
+      payload: { foo: 'bar' },
+    })
+    expect(eventHandler3.handleEvent).toHaveBeenCalledWith({
+      type: 'test_event_2',
+      payload: { foo: 'bar' },
+    })
   })
 
   it('should handle event synchronously in a random order', async () => {
@@ -69,11 +84,20 @@ describe('InternalEventBus', () => {
     eventBus.addEventHandler(eventHandler1, 'test_event_3')
     eventBus.addEventHandler(eventHandler3, 'test_event_2')
 
-    await eventBus.publishSync({ type: 'test_event_2', payload: { foo: 'bar' } }, InternalEventPublishStrategy.ASYNC)
+    await eventBus.publishSync(
+      { type: 'test_event_2', payload: { foo: 'bar' } },
+      InternalEventPublishStrategy.ASYNC,
+    )
 
     expect(eventHandler1.handleEvent).not.toHaveBeenCalled()
-    expect(eventHandler2.handleEvent).toHaveBeenCalledWith({ type: 'test_event_2', payload: { foo: 'bar' } })
-    expect(eventHandler3.handleEvent).toHaveBeenCalledWith({ type: 'test_event_2', payload: { foo: 'bar' } })
+    expect(eventHandler2.handleEvent).toHaveBeenCalledWith({
+      type: 'test_event_2',
+      payload: { foo: 'bar' },
+    })
+    expect(eventHandler3.handleEvent).toHaveBeenCalledWith({
+      type: 'test_event_2',
+      payload: { foo: 'bar' },
+    })
   })
 
   it('should do nothing if there are no appropriate event handlers for synchronous handling', async () => {
@@ -83,7 +107,10 @@ describe('InternalEventBus', () => {
     eventBus.addEventHandler(eventHandler1, 'test_event_3')
     eventBus.addEventHandler(eventHandler3, 'test_event_2')
 
-    await eventBus.publishSync({ type: 'test_event_4', payload: { foo: 'bar' } }, InternalEventPublishStrategy.ASYNC)
+    await eventBus.publishSync(
+      { type: 'test_event_4', payload: { foo: 'bar' } },
+      InternalEventPublishStrategy.ASYNC,
+    )
 
     expect(eventHandler1.handleEvent).not.toHaveBeenCalled()
     expect(eventHandler2.handleEvent).not.toHaveBeenCalled()

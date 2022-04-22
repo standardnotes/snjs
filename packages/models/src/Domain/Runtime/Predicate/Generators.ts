@@ -78,7 +78,9 @@ export function predicateFromJson<T extends PredicateTarget>(
   )
 }
 
-export function predicateFromDSLString<T extends PredicateTarget>(dsl: string): PredicateInterface<T> {
+export function predicateFromDSLString<T extends PredicateTarget>(
+  dsl: string,
+): PredicateInterface<T> {
   try {
     const components = JSON.parse(dsl.substring(1, dsl.length)) as string[]
     components.shift()

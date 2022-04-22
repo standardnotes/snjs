@@ -21,15 +21,11 @@ describe('migrations', () => {
   })
 
   it('should return correct required migrations if stored version is 1.0.0', async function () {
-    expect((await SNMigrationService.getRequiredMigrations('1.0.0')).length).to.equal(
-      allMigrations.length,
-    )
+    expect((await SNMigrationService.getRequiredMigrations('1.0.0')).length).to.equal(allMigrations.length)
   })
 
   it('should return correct required migrations if stored version is 2.0.0', async function () {
-    expect((await SNMigrationService.getRequiredMigrations('2.0.0')).length).to.equal(
-      allMigrations.length - 1,
-    )
+    expect((await SNMigrationService.getRequiredMigrations('2.0.0')).length).to.equal(allMigrations.length - 1)
   })
 
   it('should return 0 required migrations if stored version is futuristic', async function () {
@@ -79,10 +75,7 @@ describe('migrations', () => {
   it('after running all migrations from a 2.0.0 installation, should set stored version to current', async function () {
     const application = await Factory.createAppWithRandNamespace()
     /** Set up 2.0.0 structure with tell-tale storage key */
-    await application.deviceInterface.setRawStorageValue(
-      'last_migration_timestamp',
-      JSON.stringify(['anything']),
-    )
+    await application.deviceInterface.setRawStorageValue('last_migration_timestamp', JSON.stringify(['anything']))
     await application.prepareForLaunch({
       receiveChallenge: () => {},
     })
@@ -131,9 +124,7 @@ describe('migrations', () => {
 
     expect(application.items.getItems('SF|MFA').length).to.equal(1)
     expect(
-      (await application.storageService.getAllRawPayloads()).filter(
-        (p) => p.content_type === 'SF|MFA',
-      ).length,
+      (await application.storageService.getAllRawPayloads()).filter((p) => p.content_type === 'SF|MFA').length,
     ).to.equal(1)
 
     /** Run migration */
@@ -142,9 +133,7 @@ describe('migrations', () => {
 
     expect(application.items.getItems('SF|MFA').length).to.equal(0)
     expect(
-      (await application.storageService.getAllRawPayloads()).filter(
-        (p) => p.content_type === 'SF|MFA',
-      ).length,
+      (await application.storageService.getAllRawPayloads()).filter((p) => p.content_type === 'SF|MFA').length,
     ).to.equal(0)
 
     await Factory.safeDeinit(application)

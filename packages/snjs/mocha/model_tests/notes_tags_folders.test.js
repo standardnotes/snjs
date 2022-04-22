@@ -46,19 +46,14 @@ describe('tags as folders', () => {
 
     expect(this.application.items.getTagParent(tagParent)).to.equal(tagGrandParent2)
     expect(this.application.items.getTagChildren(tagGrandParent)).deep.to.equal([])
-    expect(Uuids(this.application.items.getTagChildren(tagGrandParent2))).deep.to.equal(
-      Uuids([tagParent]),
-    )
+    expect(Uuids(this.application.items.getTagChildren(tagGrandParent2))).deep.to.equal(Uuids([tagParent]))
 
     // ## Now the user tries to move the tag into one of its children
-    await expect(this.application.mutator.setTagParent(tagChildren, tagParent)).to.eventually.be
-      .rejected
+    await expect(this.application.mutator.setTagParent(tagChildren, tagParent)).to.eventually.be.rejected
 
     expect(this.application.items.getTagParent(tagParent)).to.equal(tagGrandParent2)
     expect(this.application.items.getTagChildren(tagGrandParent)).deep.to.equal([])
-    expect(Uuids(this.application.items.getTagChildren(tagGrandParent2))).deep.to.equal(
-      Uuids([tagParent]),
-    )
+    expect(Uuids(this.application.items.getTagChildren(tagGrandParent2))).deep.to.equal(Uuids([tagParent]))
 
     // ## Now the user move the tag outside any hierarchy
     await this.application.mutator.unsetTagParent(tagParent)

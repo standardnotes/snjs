@@ -6,10 +6,7 @@ export enum WebSocketsServiceEvent {
   UserRoleMessageReceived = 'WebSocketMessageReceived',
 }
 
-export class SNWebSocketsService extends AbstractService<
-  WebSocketsServiceEvent,
-  UserRolesChangedEvent
-> {
+export class SNWebSocketsService extends AbstractService<WebSocketsServiceEvent, UserRolesChangedEvent> {
   private webSocket?: WebSocket
 
   constructor(

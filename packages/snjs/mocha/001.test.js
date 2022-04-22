@@ -16,11 +16,7 @@ describe('001 protocol operations', () => {
   before(async () => {
     localStorage.clear()
     await Factory.initializeApplication(application)
-    _key = await protocol001.createRootKey(
-      _identifier,
-      _password,
-      KeyParamsOrigination.Registration,
-    )
+    _key = await protocol001.createRootKey(_identifier, _password, KeyParamsOrigination.Registration)
     _keyParams = _key.keyParams
   })
 
@@ -39,11 +35,7 @@ describe('001 protocol operations', () => {
   })
 
   it('generates valid keys for registration', async () => {
-    const key = await protocol001.createRootKey(
-      _identifier,
-      _password,
-      KeyParamsOrigination.Registration,
-    )
+    const key = await protocol001.createRootKey(_identifier, _password, KeyParamsOrigination.Registration)
     expect(key.serverPassword).to.be.ok
     expect(key.masterKey).to.be.ok
 
@@ -63,12 +55,8 @@ describe('001 protocol operations', () => {
     })
     const key = await protocol001.computeRootKey(password, keyParams)
     expect(key.keyVersion).to.equal('001')
-    expect(key.serverPassword).to.equal(
-      '8f2f0513e90648c08ef6fa55eda00bb76e82dfdc2e218e4338b6246e0f68eb78',
-    )
-    expect(key.masterKey).to.equal(
-      '65e040f8ef6775fecbb7ee5599ec3f059faa96d728e50f2014237a802ac5bd0f',
-    )
+    expect(key.serverPassword).to.equal('8f2f0513e90648c08ef6fa55eda00bb76e82dfdc2e218e4338b6246e0f68eb78')
+    expect(key.masterKey).to.equal('65e040f8ef6775fecbb7ee5599ec3f059faa96d728e50f2014237a802ac5bd0f')
     expect(key.dataAuthenticationKey).to.not.be.ok
     const payload = new EncryptedPayload({
       auth_hash: '0ae7e3c9fce61f07a8d5d267accab20793a06ab266c245fe59178d49c1ad3fa6',

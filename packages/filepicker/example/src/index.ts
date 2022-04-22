@@ -1,10 +1,4 @@
-import {
-  SNApplication,
-  Environment,
-  Platform,
-  SNLog,
-  Runtime,
-} from '../../../snjs'
+import { SNApplication, Environment, Platform, SNLog, Runtime } from '../../../snjs'
 import WebDeviceInterface from './web_device_interface'
 import { SNWebCrypto } from '../../../sncrypto-web'
 import { ClassicFileApi } from './classic_file_api'
@@ -47,10 +41,7 @@ const application = new SNApplication({
 
 console.log('Created application', application)
 
-export async function publishMockedEvent(
-  eventType: string,
-  eventPayload: unknown,
-): Promise<void> {
+export async function publishMockedEvent(eventType: string, eventPayload: unknown): Promise<void> {
   await fetch(`${mocksHost}/events`, {
     method: 'POST',
     headers: {

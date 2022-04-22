@@ -1,5 +1,4 @@
-
 export interface FileMetadata {
-  name: string;
-  mimeType: string;
+  name: string
+  mimeType: string
 }

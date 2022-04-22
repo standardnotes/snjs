@@ -157,12 +157,9 @@ describe('item manager', function () {
 
   it('observer', async function () {
     const observed = []
-    this.itemManager.addObserver(
-      ContentType.Any,
-      ({ changed, inserted, removed, source, sourceKey }) => {
-        observed.push({ changed, inserted, removed, source, sourceKey })
-      },
-    )
+    this.itemManager.addObserver(ContentType.Any, ({ changed, inserted, removed, source, sourceKey }) => {
+      observed.push({ changed, inserted, removed, source, sourceKey })
+    })
     const note = await this.createNote()
     const tag = await this.createTag([note])
     expect(observed.length).to.equal(2)

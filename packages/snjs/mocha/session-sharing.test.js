@@ -43,7 +43,7 @@ describe('session sharing', function () {
       'masterKey',
       'keyParams',
       'user',
-      'host'
+      'host',
     ]
 
     for (const key of expectedKeys) {

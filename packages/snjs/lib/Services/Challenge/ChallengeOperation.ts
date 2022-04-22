@@ -36,11 +36,7 @@ export class ChallengeOperation {
   }
 
   public nonvalidatedSubmit() {
-    const response = new ChallengeResponse(
-      this.challenge,
-      this.nonvalidatedValues.slice(),
-      this.artifacts,
-    )
+    const response = new ChallengeResponse(this.challenge, this.nonvalidatedValues.slice(), this.artifacts)
     this.onNonvalidatedSubmit?.(response)
     /** Reset values */
     this.nonvalidatedValues = []

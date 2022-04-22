@@ -36,10 +36,7 @@ describe('backups', function () {
   })
 
   it('no passcode + no account backup file should have correct number of items', async function () {
-    await Promise.all([
-      Factory.createSyncedNote(this.application),
-      Factory.createSyncedNote(this.application),
-    ])
+    await Promise.all([Factory.createSyncedNote(this.application), Factory.createSyncedNote(this.application)])
     const data = await this.application.createDecryptedBackupFile()
     expect(data.items.length).to.equal(BASE_ITEM_COUNT_DECRYPTED + 2)
   })
@@ -47,10 +44,7 @@ describe('backups', function () {
   it('passcode + no account backup file should have correct number of items', async function () {
     const passcode = 'passcode'
     await this.application.addPasscode(passcode)
-    await Promise.all([
-      Factory.createSyncedNote(this.application),
-      Factory.createSyncedNote(this.application),
-    ])
+    await Promise.all([Factory.createSyncedNote(this.application), Factory.createSyncedNote(this.application)])
 
     // Encrypted backup without authorization
     const encryptedData = await this.application.createEncryptedBackupFileForAutomatedDesktopBackups()
@@ -69,10 +63,7 @@ describe('backups', function () {
       password: this.password,
     })
 
-    await Promise.all([
-      Factory.createSyncedNote(this.application),
-      Factory.createSyncedNote(this.application),
-    ])
+    await Promise.all([Factory.createSyncedNote(this.application), Factory.createSyncedNote(this.application)])
 
     // Encrypted backup without authorization
     const encryptedData = await this.application.createEncryptedBackupFileForAutomatedDesktopBackups()
@@ -95,10 +86,7 @@ describe('backups', function () {
     await this.application.register(this.email, this.password)
     Factory.handlePasswordChallenges(this.application, this.password)
     await this.application.addPasscode(passcode)
-    await Promise.all([
-      Factory.createSyncedNote(this.application),
-      Factory.createSyncedNote(this.application),
-    ])
+    await Promise.all([Factory.createSyncedNote(this.application), Factory.createSyncedNote(this.application)])
 
     // Encrypted backup without authorization
     const encryptedData = await this.application.createEncryptedBackupFileForAutomatedDesktopBackups()
@@ -221,9 +209,7 @@ describe('backups', function () {
     const backup = await this.application.createDecryptedBackupFile()
     expect(backup).to.not.haveOwnProperty('keyParams')
     expect(backup.items.some((item) => item.content_type === ContentType.ItemsKey)).to.be.false
-    expect(backup.items.find((item) => item.content_type === ContentType.Note).uuid).to.equal(
-      note.uuid,
-    )
+    expect(backup.items.find((item) => item.content_type === ContentType.Note).uuid).to.equal(note.uuid)
     let error
     try {
       await this.application.createEncryptedBackupFileForAutomatedDesktopBackups()

@@ -40,20 +40,14 @@ describe('application instances', () => {
     await Factory.createMappedNote(app1)
     await app1.syncService.sync(syncOptions)
 
-    expect((await app1.storageService.getAllRawPayloads()).length).length.to.equal(
-      BASE_ITEM_COUNT + 1,
-    )
+    expect((await app1.storageService.getAllRawPayloads()).length).length.to.equal(BASE_ITEM_COUNT + 1)
     expect((await app2.storageService.getAllRawPayloads()).length).length.to.equal(BASE_ITEM_COUNT)
 
     await Factory.createMappedNote(app2)
     await app2.syncService.sync(syncOptions)
 
-    expect((await app1.storageService.getAllRawPayloads()).length).length.to.equal(
-      BASE_ITEM_COUNT + 1,
-    )
-    expect((await app2.storageService.getAllRawPayloads()).length).length.to.equal(
-      BASE_ITEM_COUNT + 1,
-    )
+    expect((await app1.storageService.getAllRawPayloads()).length).length.to.equal(BASE_ITEM_COUNT + 1)
+    expect((await app2.storageService.getAllRawPayloads()).length).length.to.equal(BASE_ITEM_COUNT + 1)
     await Factory.safeDeinit(app1)
     await Factory.safeDeinit(app2)
   })
@@ -131,9 +125,7 @@ describe('application instances', () => {
     const signOutConfirmMessage = (numberOfItems) => {
       const singular = numberOfItems === 1
       return (
-        `There ${singular ? 'is' : 'are'} ${numberOfItems} ${
-          singular ? 'item' : 'items'
-        } with unsynced changes. ` +
+        `There ${singular ? 'is' : 'are'} ${numberOfItems} ${singular ? 'item' : 'items'} with unsynced changes. ` +
         'If you sign out, these changes will be lost forever. Are you sure you want to sign out?'
       )
     }

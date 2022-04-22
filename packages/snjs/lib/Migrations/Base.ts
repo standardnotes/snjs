@@ -1,16 +1,7 @@
 import { AnyKeyParamsContent } from '@standardnotes/common'
 import { SNLog } from '@Lib/Log'
-import {
-  EncryptedPayload,
-  EncryptedTransferPayload,
-  isErrorDecryptingPayload,
-} from '@standardnotes/models'
-import {
-  ChallengeValidation,
-  ChallengeReason,
-  Challenge,
-  ChallengePrompt,
-} from '../Services/Challenge'
+import { EncryptedPayload, EncryptedTransferPayload, isErrorDecryptingPayload } from '@standardnotes/models'
+import { ChallengeValidation, ChallengeReason, Challenge, ChallengePrompt } from '../Services/Challenge'
 import { KeychainRecoveryStrings, SessionStrings } from '../Services/Api/Messages'
 import { PreviousSnjsVersion1_0_0, PreviousSnjsVersion2_0_0, SnjsVersion } from '../Version'
 import { Migration } from '@Lib/Migrations/Migration'
@@ -62,14 +53,7 @@ export class BaseMigration extends Migration {
     if (!version) {
       /** Determine if we are 1.0.0 or 2.0.0 */
       /** If any of these keys exist in raw storage, we are coming from a 1.x architecture */
-      const possibleLegacyKeys = [
-        'migrations',
-        'ephemeral',
-        'user',
-        'cachedThemes',
-        'syncToken',
-        'encryptedStorage',
-      ]
+      const possibleLegacyKeys = ['migrations', 'ephemeral', 'user', 'cachedThemes', 'syncToken', 'encryptedStorage']
       let hasLegacyValue = false
       for (const legacyKey of possibleLegacyKeys) {
         const value = await this.services.deviceInterface.getRawStorageValue(legacyKey)
@@ -87,10 +71,7 @@ export class BaseMigration extends Migration {
         const migrationValue = await this.services.deviceInterface.getRawStorageValue(migrationKey)
         const is_2_0_0_application = !isNullOrUndefined(migrationValue)
         if (is_2_0_0_application) {
-          await this.services.deviceInterface.setRawStorageValue(
-            storageKey,
-            PreviousSnjsVersion2_0_0,
-          )
+          await this.services.deviceInterface.setRawStorageValue(storageKey, PreviousSnjsVersion2_0_0)
           await this.services.deviceInterface.removeRawStorageValue(LastMigrationTimeStampKey2_0_0)
         } else {
           /** Is new application, use current version as not to run any migrations */
@@ -181,14 +162,7 @@ export class BaseMigration extends Migration {
 
     /** Challenge for account password */
     const challenge = new Challenge(
-      [
-        new ChallengePrompt(
-          ChallengeValidation.None,
-          undefined,
-          SessionStrings.PasswordInputPlaceholder,
-          true,
-        ),
-      ],
+      [new ChallengePrompt(ChallengeValidation.None, undefined, SessionStrings.PasswordInputPlaceholder, true)],
       ChallengeReason.Custom,
       false,
       KeychainRecoveryStrings.Title,
@@ -199,13 +173,8 @@ export class BaseMigration extends Migration {
       this.services.challengeService.addChallengeObserver(challenge, {
         onNonvalidatedSubmit: async (challengeResponse) => {
           const password = challengeResponse.values[0].value as string
-          const accountParams = this.services.protocolService.createKeyParams(
-            rawAccountParams as AnyKeyParamsContent,
-          )
-          const rootKey = await this.services.protocolService.computeRootKey(
-            password,
-            accountParams,
-          )
+          const accountParams = this.services.protocolService.createKeyParams(rawAccountParams as AnyKeyParamsContent)
+          const rootKey = await this.services.protocolService.computeRootKey(password, accountParams)
 
           /** Choose an item to decrypt */
           const allItems = (
@@ -224,9 +193,7 @@ export class BaseMigration extends Migration {
           }
 
           if (!itemToDecrypt) {
-            throw SNLog.error(
-              Error('Attempting keychain recovery validation but no items present.'),
-            )
+            throw SNLog.error(Error('Attempting keychain recovery validation but no items present.'))
           }
 
           const decryptedPayload = await this.services.protocolService.decryptSplitSingle({
@@ -258,10 +225,7 @@ export class BaseMigration extends Migration {
             } else {
               /** Store in namespaced location */
               const rawKey = rootKey.getKeychainValue()
-              await this.services.deviceInterface.setNamespacedKeychainValue(
-                rawKey,
-                this.services.identifier,
-              )
+              await this.services.deviceInterface.setNamespacedKeychainValue(rawKey, this.services.identifier)
             }
             resolve(true)
             this.services.challengeService.completeChallenge(challenge)

@@ -23,10 +23,7 @@ export class Migration2_7_0 extends Migration {
       new Predicate<SNComponent>('identifier', '=', batchMgrId),
     ])
 
-    const batchMgrSingleton = this.services.singletonManager.findSingleton(
-      ContentType.Component,
-      batchMgrPred,
-    )
+    const batchMgrSingleton = this.services.singletonManager.findSingleton(ContentType.Component, batchMgrPred)
 
     if (batchMgrSingleton) {
       await this.services.itemManager.setItemToBeDeleted(batchMgrSingleton)

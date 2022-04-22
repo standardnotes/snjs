@@ -1,11 +1,5 @@
 import { EncryptionService, SNRootKey } from '@standardnotes/encryption'
-import {
-  Challenge,
-  ChallengeValidation,
-  ChallengeService,
-  ChallengeReason,
-  ChallengePrompt,
-} from '../Challenge'
+import { Challenge, ChallengeValidation, ChallengeService, ChallengeReason, ChallengePrompt } from '../Challenge'
 import { ListedService } from '../Listed/ListedService'
 import { ActionResponse, HttpResponse } from '@standardnotes/responses'
 import { ContentType } from '@standardnotes/common'
@@ -29,11 +23,7 @@ import { SNSyncService } from '../Sync/SyncService'
 import { PayloadManager } from '../Payloads/PayloadManager'
 import { SNHttpService } from '../Api/HttpService'
 import { SNAlertService } from '../Alert/AlertService'
-import {
-  AbstractService,
-  DeviceInterface,
-  InternalEventBusInterface,
-} from '@standardnotes/services'
+import { AbstractService, DeviceInterface, InternalEventBusInterface } from '@standardnotes/services'
 
 /**
  * The Actions Service allows clients to interact with action-based extensions.
@@ -83,19 +73,14 @@ export class SNActionsService extends AbstractService {
   }
 
   public getExtensions(): SNActionsExtension[] {
-    const extensionItems = this.itemManager.getItems<SNActionsExtension>(
-      ContentType.ActionsExtension,
-    )
+    const extensionItems = this.itemManager.getItems<SNActionsExtension>(ContentType.ActionsExtension)
     const excludingListed = extensionItems.filter((extension) => !extension.isListedExtension)
     return excludingListed
   }
 
   public extensionsInContextOfItem(item: DecryptedItemInterface) {
     return this.getExtensions().filter((ext) => {
-      return (
-        ext.supported_types.includes(item.content_type) ||
-        ext.actionsWithContextForItem(item).length > 0
-      )
+      return ext.supported_types.includes(item.content_type) || ext.actionsWithContextForItem(item).length > 0
     })
   }
 
@@ -114,12 +99,10 @@ export class SNActionsService extends AbstractService {
       item_uuid: item.uuid,
     }
 
-    const response = (await this.httpService
-      .getAbsolute(extension.url, params)
-      .catch((response) => {
-        console.error('Error loading extension', response)
-        return undefined
-      })) as ActionResponse
+    const response = (await this.httpService.getAbsolute(extension.url, params).catch((response) => {
+      console.error('Error loading extension', response)
+      return undefined
+    })) as ActionResponse
 
     if (!response) {
       return
@@ -140,10 +123,7 @@ export class SNActionsService extends AbstractService {
     return CreateDecryptedItemFromPayload(payloadResult) as SNActionsExtension
   }
 
-  public async runAction(
-    action: Action,
-    item: DecryptedItemInterface,
-  ): Promise<ActionResponse | undefined> {
+  public async runAction(action: Action, item: DecryptedItemInterface): Promise<ActionResponse | undefined> {
     let result
     switch (action.verb) {
       case 'render':
@@ -167,9 +147,7 @@ export class SNActionsService extends AbstractService {
       .then(async (response) => {
         const payload = await this.payloadByDecryptingResponse(response as ActionResponse)
         if (payload) {
-          const item = CreateDecryptedItemFromPayload<ActionExtensionContent, SNActionsExtension>(
-            payload,
-          )
+          const item = CreateDecryptedItemFromPayload<ActionExtensionContent, SNActionsExtension>(payload)
           return {
             ...(response as ActionResponse),
             item,
@@ -228,13 +206,12 @@ export class SNActionsService extends AbstractService {
     }
 
     for (const itemsKey of this.itemManager.itemsKeys()) {
-      const decryptedPayload =
-        await this.protocolService.decryptSplitSingle<ActionExtensionContent>({
-          usesItemsKey: {
-            items: [payload],
-            key: itemsKey,
-          },
-        })
+      const decryptedPayload = await this.protocolService.decryptSplitSingle<ActionExtensionContent>({
+        usesItemsKey: {
+          items: [payload],
+          key: itemsKey,
+        },
+      })
 
       if (!isErrorDecryptingPayload(decryptedPayload)) {
         return decryptedPayload
@@ -316,9 +293,7 @@ export class SNActionsService extends AbstractService {
       })
       .catch((response) => {
         console.error('Action error response:', response)
-        void this.alertService.alert(
-          'An issue occurred while processing this action. Please try again.',
-        )
+        void this.alertService.alert('An issue occurred while processing this action. Please try again.')
         return response as ActionResponse
       })
   }

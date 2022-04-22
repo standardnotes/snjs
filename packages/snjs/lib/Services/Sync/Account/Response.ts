@@ -25,11 +25,9 @@ export class ServerSyncResponse {
   constructor(rawResponse: RawSyncResponse) {
     this.rawResponse = rawResponse
 
-    this.savedPayloads = FilterDisallowedRemotePayloadsAndMap(rawResponse.data?.saved_items || []).map(
-      (rawItem) => {
-        return CreateServerSyncSavedPayload(rawItem)
-      },
-    )
+    this.savedPayloads = FilterDisallowedRemotePayloadsAndMap(rawResponse.data?.saved_items || []).map((rawItem) => {
+      return CreateServerSyncSavedPayload(rawItem)
+    })
 
     this.retrievedPayloads = FilterDisallowedRemotePayloadsAndMap(rawResponse.data?.retrieved_items || [])
 

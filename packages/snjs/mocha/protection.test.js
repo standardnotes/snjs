@@ -26,11 +26,7 @@ describe('protections', function () {
     await application.prepareForLaunch({
       receiveChallenge: (challenge) => {
         challengePrompts += 1
-        expect(
-          challenge.prompts.find(
-            (prompt) => prompt.validation === ChallengeValidation.AccountPassword,
-          ),
-        ).to.be.ok
+        expect(challenge.prompts.find((prompt) => prompt.validation === ChallengeValidation.AccountPassword)).to.be.ok
         const values = challenge.prompts.map(
           (prompt) =>
             new ChallengeValue(
@@ -73,11 +69,7 @@ describe('protections', function () {
     await application.prepareForLaunch({
       receiveChallenge: (challenge) => {
         challengePrompts += 1
-        expect(
-          challenge.prompts.find(
-            (prompt) => prompt.validation === ChallengeValidation.LocalPasscode,
-          ),
-        ).to.be.ok
+        expect(challenge.prompts.find((prompt) => prompt.validation === ChallengeValidation.LocalPasscode)).to.be.ok
         const values = challenge.prompts.map(
           (prompt) =>
             new ChallengeValue(
@@ -109,11 +101,7 @@ describe('protections', function () {
     await application.prepareForLaunch({
       receiveChallenge: (challenge) => {
         challengePrompts += 1
-        expect(
-          challenge.prompts.find(
-            (prompt) => prompt.validation === ChallengeValidation.LocalPasscode,
-          ),
-        ).to.be.ok
+        expect(challenge.prompts.find((prompt) => prompt.validation === ChallengeValidation.LocalPasscode)).to.be.ok
         const values = challenge.prompts.map(
           (prompt) =>
             new ChallengeValue(
@@ -168,11 +156,7 @@ describe('protections', function () {
     await application.prepareForLaunch({
       receiveChallenge: (challenge) => {
         challengePrompts += 1
-        expect(
-          challenge.prompts.find(
-            (prompt) => prompt.validation === ChallengeValidation.LocalPasscode,
-          ),
-        ).to.be.ok
+        expect(challenge.prompts.find((prompt) => prompt.validation === ChallengeValidation.LocalPasscode)).to.be.ok
         const values = challenge.prompts.map(
           (prompt) =>
             new ChallengeValue(
@@ -253,11 +237,7 @@ describe('protections', function () {
     application = await Factory.createApplicationWithFakeCrypto(Factory.randomString())
     await application.prepareForLaunch({
       receiveChallenge: (challenge) => {
-        expect(
-          challenge.prompts.find(
-            (prompt) => prompt.validation === ChallengeValidation.LocalPasscode,
-          ),
-        ).to.be.ok
+        expect(challenge.prompts.find((prompt) => prompt.validation === ChallengeValidation.LocalPasscode)).to.be.ok
         const values = challenge.prompts.map(
           (prompt) =>
             new ChallengeValue(
@@ -284,11 +264,7 @@ describe('protections', function () {
     application = await Factory.createApplicationWithFakeCrypto(Factory.randomString())
     await application.prepareForLaunch({
       receiveChallenge: (challenge) => {
-        expect(
-          challenge.prompts.find(
-            (prompt) => prompt.validation === ChallengeValidation.LocalPasscode,
-          ),
-        ).to.be.ok
+        expect(challenge.prompts.find((prompt) => prompt.validation === ChallengeValidation.LocalPasscode)).to.be.ok
         const values = challenge.prompts.map(
           (prompt) =>
             new ChallengeValue(
@@ -412,9 +388,7 @@ describe('protections', function () {
     it('should return true when session length has been set', async function () {
       application = await Factory.createInitAppWithFakeCrypto()
       await application.addPasscode('passcode')
-      await application.protectionService.setSessionLength(
-        UnprotectedAccessSecondsDuration.OneMinute,
-      )
+      await application.protectionService.setSessionLength(UnprotectedAccessSecondsDuration.OneMinute)
       expect(application.hasUnprotectedAccessSession()).to.be.true
     })
 
@@ -433,11 +407,7 @@ describe('protections', function () {
       await application.prepareForLaunch({
         receiveChallenge: (challenge) => {
           challengePrompts += 1
-          expect(
-            challenge.prompts.find(
-              (prompt) => prompt.validation === ChallengeValidation.AccountPassword,
-            ),
-          ).to.be.ok
+          expect(challenge.prompts.find((prompt) => prompt.validation === ChallengeValidation.AccountPassword)).to.be.ok
           expect(challenge.reason).to.equal(ChallengeReason.SelectProtectedNote)
           const values = challenge.prompts.map(
             (prompt) =>
@@ -464,12 +434,9 @@ describe('protections', function () {
       notes[0] = await application.mutator.protectNote(notes[0])
       notes[1] = await application.mutator.protectNote(notes[1])
 
-      expect(
-        await application.authorizeProtectedActionForNotes(
-          notes,
-          ChallengeReason.SelectProtectedNote,
-        ),
-      ).lengthOf(NOTE_COUNT)
+      expect(await application.authorizeProtectedActionForNotes(notes, ChallengeReason.SelectProtectedNote)).lengthOf(
+        NOTE_COUNT,
+      )
       expect(challengePrompts).to.equal(1)
     })
 
@@ -481,11 +448,7 @@ describe('protections', function () {
       await application.prepareForLaunch({
         receiveChallenge: (challenge) => {
           challengePrompts += 1
-          expect(
-            challenge.prompts.find(
-              (prompt) => prompt.validation === ChallengeValidation.LocalPasscode,
-            ),
-          ).to.be.ok
+          expect(challenge.prompts.find((prompt) => prompt.validation === ChallengeValidation.LocalPasscode)).to.be.ok
           expect(challenge.reason).to.equal(ChallengeReason.SelectProtectedNote)
           const values = challenge.prompts.map(
             (prompt) =>
@@ -508,12 +471,9 @@ describe('protections', function () {
       notes[0] = await application.mutator.protectNote(notes[0])
       notes[1] = await application.mutator.protectNote(notes[1])
 
-      expect(
-        await application.authorizeProtectedActionForNotes(
-          notes,
-          ChallengeReason.SelectProtectedNote,
-        ),
-      ).lengthOf(NOTE_COUNT)
+      expect(await application.authorizeProtectedActionForNotes(notes, ChallengeReason.SelectProtectedNote)).lengthOf(
+        NOTE_COUNT,
+      )
       expect(challengePrompts).to.equal(1)
     })
 
@@ -536,12 +496,7 @@ describe('protections', function () {
       notes[0] = await application.mutator.protectNote(notes[0])
       notes[1] = await application.mutator.protectNote(notes[1])
 
-      expect(
-        await application.authorizeProtectedActionForNotes(
-          notes,
-          ChallengeReason.SelectProtectedNote,
-        ),
-      ).lengthOf(1)
+      expect(await application.authorizeProtectedActionForNotes(notes, ChallengeReason.SelectProtectedNote)).lengthOf(1)
       expect(challengePrompts).to.equal(1)
     })
   })
@@ -575,11 +530,7 @@ describe('protections', function () {
       await application.prepareForLaunch({
         receiveChallenge: (challenge) => {
           challengePrompts += 1
-          expect(
-            challenge.prompts.find(
-              (prompt) => prompt.validation === ChallengeValidation.LocalPasscode,
-            ),
-          ).to.be.ok
+          expect(challenge.prompts.find((prompt) => prompt.validation === ChallengeValidation.LocalPasscode)).to.be.ok
           expect(challenge.reason).to.equal(ChallengeReason.UnprotectNote)
           const values = challenge.prompts.map(
             (prompt) =>
@@ -616,11 +567,7 @@ describe('protections', function () {
       await application.prepareForLaunch({
         receiveChallenge: (challenge) => {
           challengePrompts += 1
-          expect(
-            challenge.prompts.find(
-              (prompt) => prompt.validation === ChallengeValidation.LocalPasscode,
-            ),
-          ).to.be.ok
+          expect(challenge.prompts.find((prompt) => prompt.validation === ChallengeValidation.LocalPasscode)).to.be.ok
           expect(challenge.reason).to.equal(ChallengeReason.UnprotectNote)
           const values = challenge.prompts.map(
             (prompt) =>

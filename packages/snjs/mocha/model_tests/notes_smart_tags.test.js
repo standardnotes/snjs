@@ -43,10 +43,7 @@ describe('notes and smart views', () => {
     ])
 
     // The user pin 2 notes
-    await Promise.all([
-      Factory.pinNote(this.application, note_1),
-      Factory.pinNote(this.application, note_3),
-    ])
+    await Promise.all([Factory.pinNote(this.application, note_1), Factory.pinNote(this.application, note_3)])
 
     // ## The user creates smart views (long & pinned)
     const not_pinned = '!["Not Pinned", "pinned", "=", false]'

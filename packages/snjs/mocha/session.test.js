@@ -32,9 +32,7 @@ describe('server session', function () {
 
   async function sleepUntilSessionExpires(application, basedOnAccessToken = true) {
     const currentSession = application.apiService.session
-    const timestamp = basedOnAccessToken
-      ? currentSession.accessExpiration
-      : currentSession.refreshExpiration
+    const timestamp = basedOnAccessToken ? currentSession.accessExpiration : currentSession.refreshExpiration
     const timeRemaining = (timestamp - Date.now()) / 1000 // in ms
     /*
       If the token has not expired yet, we will return the remaining time.
@@ -263,10 +261,7 @@ describe('server session', function () {
       password: this.password,
     })
 
-    const changePasswordResponse = await this.application.changePassword(
-      this.password,
-      this.newPassword,
-    )
+    const changePasswordResponse = await this.application.changePassword(this.password, this.newPassword)
 
     expect(changePasswordResponse.status).to.equal(200)
     expect(changePasswordResponse.data.user).to.be.ok
@@ -294,10 +289,7 @@ describe('server session', function () {
     // Waiting enough time for the access token to expire.
     await sleepUntilSessionExpires(this.application)
 
-    const changePasswordResponse = await this.application.changePassword(
-      this.password,
-      this.newPassword,
-    )
+    const changePasswordResponse = await this.application.changePassword(this.password, this.newPassword)
 
     expect(changePasswordResponse).to.be.ok
     expect(changePasswordResponse.status).to.equal(200)
@@ -323,10 +315,7 @@ describe('server session', function () {
     const fakeSession = this.application.apiService.getSession()
     fakeSession.accessToken = 'this-is-a-fake-token-1234'
     Factory.ignoreChallenges(this.application)
-    const changePasswordResponse = await this.application.changePassword(
-      this.password,
-      this.newPassword,
-    )
+    const changePasswordResponse = await this.application.changePassword(this.password, this.newPassword)
     expect(changePasswordResponse.error.message).to.equal('Invalid login credentials.')
   })
 
@@ -343,10 +332,7 @@ describe('server session', function () {
     await sleepUntilSessionExpires(this.application, false)
 
     Factory.ignoreChallenges(this.application)
-    const changePasswordResponse = await this.application.changePassword(
-      this.password,
-      this.newPassword,
-    )
+    const changePasswordResponse = await this.application.changePassword(this.password, this.newPassword)
 
     expect(changePasswordResponse).to.be.ok
     expect(changePasswordResponse.error.message).to.equal('Invalid login credentials.')
@@ -435,8 +421,7 @@ describe('server session', function () {
 
     expect(syncResponse.error).to.be.ok
 
-    const errorMessage =
-      'Your account session is being renewed with the server. Please try your request again.'
+    const errorMessage = 'Your account session is being renewed with the server. Please try your request again.'
     expect(syncResponse.error.message).to.be.equal(errorMessage)
     /** Wait for finish so that test cleans up properly */
     await refreshPromise

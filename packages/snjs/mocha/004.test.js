@@ -15,11 +15,7 @@ describe('004 protocol operations', function () {
 
   before(async function () {
     await Factory.initializeApplication(application)
-    _key = await protocol004.createRootKey(
-      _identifier,
-      _password,
-      KeyParamsOrigination.Registration,
-    )
+    _key = await protocol004.createRootKey(_identifier, _password, KeyParamsOrigination.Registration)
     _keyParams = _key.keyParams
   })
 
@@ -61,12 +57,8 @@ describe('004 protocol operations', function () {
       version: '004',
     })
     const key = await protocol004.computeRootKey(password, keyParams)
-    expect(key.masterKey).to.equal(
-      '5d68e78b56d454e32e1f5dbf4c4e7cf25d74dc1efc942e7c9dfce572c1f3b943',
-    )
-    expect(key.serverPassword).to.equal(
-      '83707dfc837b3fe52b317be367d3ed8e14e903b2902760884fd0246a77c2299d',
-    )
+    expect(key.masterKey).to.equal('5d68e78b56d454e32e1f5dbf4c4e7cf25d74dc1efc942e7c9dfce572c1f3b943')
+    expect(key.serverPassword).to.equal('83707dfc837b3fe52b317be367d3ed8e14e903b2902760884fd0246a77c2299d')
     expect(key.dataAuthenticationKey).to.not.be.ok
   })
 
@@ -112,10 +104,7 @@ describe('004 protocol operations', function () {
   it('can decrypt encrypted params', async function () {
     const payload = Factory.createNotePayload()
     const key = await protocol004.createItemsKey()
-    const params = await protocol004.generateEncryptedParametersSync(
-      payload,
-      key,
-    )
+    const params = await protocol004.generateEncryptedParametersSync(payload, key)
     const decrypted = await protocol004.generateDecryptedParametersSync(params, key)
     expect(decrypted.errorDecrypting).to.not.be.ok
     expect(decrypted.content).to.eql(payload.content)
@@ -124,10 +113,7 @@ describe('004 protocol operations', function () {
   it('modifying the uuid of the payload should fail to decrypt', async function () {
     const payload = Factory.createNotePayload()
     const key = await protocol004.createItemsKey()
-    const params = await protocol004.generateEncryptedParametersSync(
-      payload,
-      key,
-    )
+    const params = await protocol004.generateEncryptedParametersSync(payload, key)
     params.uuid = 'foo'
     const result = await protocol004.generateDecryptedParametersSync(params, key)
     expect(result.errorDecrypting).to.equal(true)

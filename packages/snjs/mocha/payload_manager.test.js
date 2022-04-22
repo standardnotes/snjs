@@ -37,9 +37,7 @@ describe('payload manager', () => {
         title: newTitle,
       },
     })
-    const { changed, inserted } = await this.payloadManager.applyPayloads([
-      changedPayload,
-    ])
+    const { changed, inserted } = await this.payloadManager.applyPayloads([changedPayload])
     expect(changed.length).to.equal(1)
     expect(inserted.length).to.equal(0)
     expect(this.payloadManager.collection.find(payload.uuid).content.title).to.equal(newTitle)

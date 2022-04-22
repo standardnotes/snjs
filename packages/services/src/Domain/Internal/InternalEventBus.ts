@@ -7,8 +7,7 @@ import { InternalEventType } from './InternalEventType'
 export class InternalEventBus implements InternalEventBusInterface {
   private eventHandlers: Map<InternalEventType, InternalEventHandlerInterface[]>
 
-  constructor(
-  ) {
+  constructor() {
     this.eventHandlers = new Map<InternalEventType, InternalEventHandlerInterface[]>()
   }
 
@@ -34,7 +33,10 @@ export class InternalEventBus implements InternalEventBusInterface {
     }
   }
 
-  async publishSync(event: InternalEventInterface, strategy: InternalEventPublishStrategy): Promise<void> {
+  async publishSync(
+    event: InternalEventInterface,
+    strategy: InternalEventPublishStrategy,
+  ): Promise<void> {
     const handlersForEventType = this.eventHandlers.get(event.type)
     if (handlersForEventType === undefined) {
       return

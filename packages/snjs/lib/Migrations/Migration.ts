@@ -1,9 +1,4 @@
-import {
-  Challenge,
-  ChallengeValidation,
-  ChallengeReason,
-  ChallengePrompt,
-} from '../Services/Challenge'
+import { Challenge, ChallengeValidation, ChallengeReason, ChallengePrompt } from '../Services/Challenge'
 import { MigrationServices } from './MigrationServices'
 import { ApplicationStage } from '@standardnotes/services'
 
@@ -32,14 +27,8 @@ export abstract class Migration {
     this.onDoneHandler = undefined
   }
 
-  protected async promptForPasscodeUntilCorrect(
-    validationCallback: (passcode: string) => Promise<boolean>,
-  ) {
-    const challenge = new Challenge(
-      [new ChallengePrompt(ChallengeValidation.None)],
-      ChallengeReason.Migration,
-      false,
-    )
+  protected async promptForPasscodeUntilCorrect(validationCallback: (passcode: string) => Promise<boolean>) {
+    const challenge = new Challenge([new ChallengePrompt(ChallengeValidation.None)], ChallengeReason.Migration, false)
     return new Promise((resolve) => {
       this.services.challengeService.addChallengeObserver(challenge, {
         onNonvalidatedSubmit: async (challengeResponse) => {

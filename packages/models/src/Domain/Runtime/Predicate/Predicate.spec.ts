@@ -361,15 +361,11 @@ describe('predicates', () => {
     })
 
     it('matching array', () => {
-      expect(
-        new Predicate<any>('numbers', '!=', ['1']).matchesItem(item),
-      ).toEqual(true)
+      expect(new Predicate<any>('numbers', '!=', ['1']).matchesItem(item)).toEqual(true)
     })
 
     it('nonmatching array', () => {
-      expect(
-        new Predicate<any>('numbers', '!=', ['1', '2', '3']).matchesItem(item),
-      ).toEqual(false)
+      expect(new Predicate<any>('numbers', '!=', ['1', '2', '3']).matchesItem(item)).toEqual(false)
     })
   })
 
@@ -395,15 +391,11 @@ describe('predicates', () => {
     })
 
     it('nonmatching array', () => {
-      expect(
-        new Predicate<any>('numbers', '=', ['1']).matchesItem(item),
-      ).toEqual(false)
+      expect(new Predicate<any>('numbers', '=', ['1']).matchesItem(item)).toEqual(false)
     })
 
     it('matching array', () => {
-      expect(
-        new Predicate<any>('numbers', '=', ['1', '2', '3']).matchesItem(item),
-      ).toEqual(true)
+      expect(new Predicate<any>('numbers', '=', ['1', '2', '3']).matchesItem(item)).toEqual(true)
     })
 
     it('nested keypath', () => {
@@ -584,9 +576,7 @@ describe('predicates', () => {
 
     it('includes string should be mapped to normal predicate', () => {
       const json = ['TODO', 'title', 'includes', 'TODO']
-      const predicate = predicateFromDSLString(
-        '!' + JSON.stringify(json),
-      ) as Predicate<Item>
+      const predicate = predicateFromDSLString('!' + JSON.stringify(json)) as Predicate<Item>
 
       expect(predicate).toBeInstanceOf(Predicate)
       expect(predicate.keypath).toEqual('title')

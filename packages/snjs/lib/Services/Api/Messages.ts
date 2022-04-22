@@ -1,8 +1,7 @@
 import { SNRootKeyParams } from '@standardnotes/encryption'
 import { ProtocolVersion, KeyParamsOrigination } from '@standardnotes/common'
 
-export const API_MESSAGE_GENERIC_INVALID_LOGIN =
-  'A server error occurred while trying to sign in. Please try again.'
+export const API_MESSAGE_GENERIC_INVALID_LOGIN = 'A server error occurred while trying to sign in. Please try again.'
 export const API_MESSAGE_GENERIC_REGISTRATION_FAIL =
   'A server error occurred while trying to register. Please try again.'
 export const API_MESSAGE_GENERIC_CHANGE_CREDENTIALS_FAIL =
@@ -10,17 +9,14 @@ export const API_MESSAGE_GENERIC_CHANGE_CREDENTIALS_FAIL =
 export const API_MESSAGE_GENERIC_SYNC_FAIL = 'Could not connect to server.'
 
 export const ServerErrorStrings = {
-  DeleteAccountError:
-    'Your account was unable to be deleted due to an error. Please try your request again.',
+  DeleteAccountError: 'Your account was unable to be deleted due to an error. Please try your request again.',
 }
 
-export const API_MESSAGE_GENERIC_INTEGRITY_CHECK_FAIL =
-  'Could not check your data integrity with the server.'
+export const API_MESSAGE_GENERIC_INTEGRITY_CHECK_FAIL = 'Could not check your data integrity with the server.'
 
 export const API_MESSAGE_GENERIC_SINGLE_ITEM_SYNC_FAIL = 'Could not retrieve item.'
 
-export const API_MESSAGE_REGISTRATION_IN_PROGRESS =
-  'An existing registration request is already in progress.'
+export const API_MESSAGE_REGISTRATION_IN_PROGRESS = 'An existing registration request is already in progress.'
 export const API_MESSAGE_LOGIN_IN_PROGRESS = 'An existing sign in request is already in progress.'
 export const API_MESSAGE_CHANGE_CREDENTIALS_IN_PROGRESS =
   'An existing change credentials request is already in progress.'
@@ -33,16 +29,13 @@ export const API_MESSAGE_GENERIC_TOKEN_REFRESH_FAIL =
 export const API_MESSAGE_TOKEN_REFRESH_IN_PROGRESS =
   'Your account session is being renewed with the server. Please try your request again.'
 
-export const API_MESSAGE_RATE_LIMITED =
-  'Too many successive server requests. Please wait a few minutes and try again.'
+export const API_MESSAGE_RATE_LIMITED = 'Too many successive server requests. Please wait a few minutes and try again.'
 
-export const API_MESSAGE_INVALID_SESSION =
-  'Please sign in to an account in order to continue with your request.'
+export const API_MESSAGE_INVALID_SESSION = 'Please sign in to an account in order to continue with your request.'
 
 export const API_MESSAGE_FAILED_GET_SETTINGS = 'Failed to get settings.'
 export const API_MESSAGE_FAILED_UPDATE_SETTINGS = 'Failed to update settings.'
-export const API_MESSAGE_FAILED_LISTED_REGISTRATION =
-  'Unable to register for Listed. Please try again later.'
+export const API_MESSAGE_FAILED_LISTED_REGISTRATION = 'Unable to register for Listed. Please try again later.'
 
 export const API_MESSAGE_FAILED_CREATE_FILE_TOKEN = 'Failed to create file token.'
 
@@ -141,12 +134,10 @@ export const KeyRecoveryStrings = {
   KeyRecoveryLoginFlowInvalidPassword: 'Incorrect credentials entered. Please try again.',
   KeyRecoveryRootKeyReplaced: 'Your credentials have successfully been updated.',
   KeyRecoveryPasscodeRequiredTitle: 'Passcode Required',
-  KeyRecoveryPasscodeRequiredText:
-    'You must enter your passcode in order to save your new credentials.',
+  KeyRecoveryPasscodeRequiredText: 'You must enter your passcode in order to save your new credentials.',
   KeyRecoveryPasswordRequired: 'Your account password is required to recover an encryption key.',
   KeyRecoveryKeyRecovered: 'Your key has successfully been recovered.',
-  KeyRecoveryUnableToRecover:
-    'Unable to recover your key with the attempted password. Please try again.',
+  KeyRecoveryUnableToRecover: 'Unable to recover your key with the attempted password. Please try again.',
 }
 
 export const ChallengeModalTitle = {
@@ -176,8 +167,7 @@ export const SessionStrings = {
     'The associated app will be signed out and all data removed ' +
     'from the device when it is next launched. You can sign back in on that ' +
     'device at any time.',
-  CurrentSessionRevoked:
-    'Your session has been revoked and all local data has been removed ' + 'from this device.',
+  CurrentSessionRevoked: 'Your session has been revoked and all local data has been removed ' + 'from this device.',
 }
 
 export const ChallengeStrings = {
@@ -196,8 +186,7 @@ export const ChallengeStrings = {
     'Your application passcode is required to perform an upgrade of your local data storage structure.',
   EnterPasscodeForRootResave: 'Enter your application passcode to continue',
   EnterCredentialsForProtocolUpgrade: 'Enter your credentials to perform encryption upgrade',
-  EnterCredentialsForDecryptedBackupDownload:
-    'Enter your credentials to download a decrypted backup',
+  EnterCredentialsForDecryptedBackupDownload: 'Enter your credentials to download a decrypted backup',
   AccountPasswordPlaceholder: 'Account Password',
   LocalPasscodePlaceholder: 'Application Passcode',
   DecryptEncryptedFile: 'Enter the account password associated with the import file',

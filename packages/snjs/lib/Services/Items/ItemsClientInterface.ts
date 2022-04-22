@@ -40,11 +40,7 @@ export interface ItemsClientInterface {
   get trashedItems(): SNNote[]
 
   setDisplayOptions(
-    contentType:
-      | ContentType.Tag
-      | ContentType.SmartView
-      | ContentType.Theme
-      | ContentType.Component,
+    contentType: ContentType.Tag | ContentType.SmartView | ContentType.Theme | ContentType.Component,
     sortBy?: CollectionSortProperty,
     direction?: CollectionSortDirection,
     filter?: (element: SortableItem) => boolean,
@@ -53,11 +49,7 @@ export interface ItemsClientInterface {
   setNotesDisplayCriteria(criteria: NotesDisplayCriteria): void
 
   getDisplayableItems<T extends DecryptedItemInterface>(
-    contentType:
-      | ContentType.Tag
-      | ContentType.SmartView
-      | ContentType.Theme
-      | ContentType.Component,
+    contentType: ContentType.Tag | ContentType.SmartView | ContentType.Theme | ContentType.Component,
   ): T[]
 
   getDisplayableNotes(): SNNote[]
@@ -80,15 +72,9 @@ export interface ItemsClientInterface {
 
   hasTagsNeedingFoldersMigration(): boolean
 
-  referencesForItem(
-    itemToLookupUuidFor: DecryptedItemInterface,
-    contentType?: ContentType,
-  ): DecryptedItemInterface[]
+  referencesForItem(itemToLookupUuidFor: DecryptedItemInterface, contentType?: ContentType): DecryptedItemInterface[]
 
-  itemsReferencingItem(
-    itemToLookupUuidFor: DecryptedItemInterface,
-    contentType?: ContentType,
-  ): DecryptedItemInterface[]
+  itemsReferencingItem(itemToLookupUuidFor: DecryptedItemInterface, contentType?: ContentType): DecryptedItemInterface[]
 
   /**
    * Finds tags with title or component starting with a search query and (optionally) not associated with a note
@@ -133,9 +119,7 @@ export interface ItemsClientInterface {
   /**
    * Finds an item by UUID.
    */
-  findItem<T extends DecryptedItemInterface = DecryptedItemInterface>(
-    uuid: UuidString,
-  ): T | undefined
+  findItem<T extends DecryptedItemInterface = DecryptedItemInterface>(uuid: UuidString): T | undefined
 
   /**
    * Finds an item by predicate.

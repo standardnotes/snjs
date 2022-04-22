@@ -39,43 +39,23 @@ export class SNHttpService extends AbstractService {
     super(internalEventBus)
   }
 
-  public async getAbsolute(
-    url: string,
-    params?: HttpParams,
-    authentication?: string,
-  ): Promise<HttpResponse> {
+  public async getAbsolute(url: string, params?: HttpParams, authentication?: string): Promise<HttpResponse> {
     return this.runHttp({ url, params, verb: HttpVerb.Get, authentication })
   }
 
-  public async postAbsolute(
-    url: string,
-    params?: HttpParams,
-    authentication?: string,
-  ): Promise<HttpResponse> {
+  public async postAbsolute(url: string, params?: HttpParams, authentication?: string): Promise<HttpResponse> {
     return this.runHttp({ url, params, verb: HttpVerb.Post, authentication })
   }
 
-  public async putAbsolute(
-    url: string,
-    params?: HttpParams,
-    authentication?: string,
-  ): Promise<HttpResponse> {
+  public async putAbsolute(url: string, params?: HttpParams, authentication?: string): Promise<HttpResponse> {
     return this.runHttp({ url, params, verb: HttpVerb.Put, authentication })
   }
 
-  public async patchAbsolute(
-    url: string,
-    params: HttpParams,
-    authentication?: string,
-  ): Promise<HttpResponse> {
+  public async patchAbsolute(url: string, params: HttpParams, authentication?: string): Promise<HttpResponse> {
     return this.runHttp({ url, params, verb: HttpVerb.Patch, authentication })
   }
 
-  public async deleteAbsolute(
-    url: string,
-    params?: HttpParams,
-    authentication?: string,
-  ): Promise<HttpResponse> {
+  public async deleteAbsolute(url: string, params?: HttpParams, authentication?: string): Promise<HttpResponse> {
     return this.runHttp({ url, params, verb: HttpVerb.Delete, authentication })
   }
 
@@ -98,11 +78,7 @@ export class SNHttpService extends AbstractService {
 
   private createXmlRequest(httpRequest: HttpRequest) {
     const request = new XMLHttpRequest()
-    if (
-      httpRequest.params &&
-      httpRequest.verb === HttpVerb.Get &&
-      Object.keys(httpRequest.params).length > 0
-    ) {
+    if (httpRequest.params && httpRequest.verb === HttpVerb.Get && Object.keys(httpRequest.params).length > 0) {
       httpRequest.url = this.urlForUrlAndParams(httpRequest.url, httpRequest.params)
     }
     request.open(httpRequest.verb, httpRequest.url, true)
@@ -133,10 +109,7 @@ export class SNHttpService extends AbstractService {
     return request
   }
 
-  private async runRequest(
-    request: XMLHttpRequest,
-    body?: string | Uint8Array,
-  ): Promise<HttpResponse> {
+  private async runRequest(request: XMLHttpRequest, body?: string | Uint8Array): Promise<HttpResponse> {
     return new Promise((resolve, reject) => {
       request.onreadystatechange = () => {
         this.stateChangeHandlerForRequest(request, resolve, reject)
@@ -175,8 +148,7 @@ export class SNHttpService extends AbstractService {
       if (httpStatus !== StatusCode.HttpStatusNoContent) {
         let body
 
-        const contentTypeHeader =
-          response.headers?.get('content-type') || response.headers?.get('Content-Type')
+        const contentTypeHeader = response.headers?.get('content-type') || response.headers?.get('Content-Type')
 
         if (contentTypeHeader?.includes('application/json')) {
           body = JSON.parse(request.responseText)
@@ -198,10 +170,7 @@ export class SNHttpService extends AbstractService {
     } catch (error) {
       console.error(error)
     }
-    if (
-      httpStatus >= StatusCode.HttpStatusMinSuccess &&
-      httpStatus <= StatusCode.HttpStatusMaxSuccess
-    ) {
+    if (httpStatus >= StatusCode.HttpStatusMinSuccess && httpStatus <= StatusCode.HttpStatusMaxSuccess) {
       resolve(response)
     } else {
       if (httpStatus === StatusCode.HttpStatusForbidden) {

@@ -32,9 +32,7 @@ describe('device authentication', function () {
       const values = []
       for (const prompt of prompts) {
         if (prompt.validation === ChallengeValidation.LocalPasscode) {
-          values.push(
-            new ChallengeValue(prompt, numPasscodeAttempts < 2 ? wrongPasscode : passcode),
-          )
+          values.push(new ChallengeValue(prompt, numPasscodeAttempts < 2 ? wrongPasscode : passcode))
         }
       }
       return values
@@ -78,10 +76,7 @@ describe('device authentication', function () {
       const values = []
       for (const prompt of prompts) {
         if (prompt.validation === ChallengeValidation.LocalPasscode) {
-          const response = new ChallengeValue(
-            prompt,
-            numPasscodeAttempts < 2 ? wrongPasscode : passcode,
-          )
+          const response = new ChallengeValue(prompt, numPasscodeAttempts < 2 ? wrongPasscode : passcode)
           values.push(response)
         } else if (prompt.validation === ChallengeValidation.Biometric) {
           values.push(new ChallengeValue(prompt, true))
@@ -104,9 +99,7 @@ describe('device authentication', function () {
 
     await tmpApplication.prepareForLaunch({ receiveChallenge })
     expect(await tmpApplication.protocolService.getRootKey()).to.not.be.ok
-    expect(
-      (await tmpApplication.protectionService.createLaunchChallenge()).prompts.length,
-    ).to.equal(2)
+    expect((await tmpApplication.protectionService.createLaunchChallenge()).prompts.length).to.equal(2)
     await tmpApplication.launch(true)
     expect(await tmpApplication.protocolService.getRootKey()).to.be.ok
     expect(tmpApplication.protocolService.rootKeyEncryption.keyMode).to.equal(KeyMode.WrapperOnly)
@@ -130,9 +123,7 @@ describe('device authentication', function () {
     const passcode = 'foobar'
     Factory.handlePasswordChallenges(application, password)
     await application.addPasscode(passcode)
-    expect(application.protocolService.rootKeyEncryption.keyMode).to.equal(
-      KeyMode.RootKeyPlusWrapper,
-    )
+    expect(application.protocolService.rootKeyEncryption.keyMode).to.equal(KeyMode.RootKeyPlusWrapper)
     expect(await application.hasPasscode()).to.equal(true)
     await Factory.safeDeinit(application)
 
@@ -144,9 +135,7 @@ describe('device authentication', function () {
       const values = []
       for (const prompt of prompts) {
         if (prompt.validation === ChallengeValidation.LocalPasscode) {
-          values.push(
-            new ChallengeValue(prompt, numPasscodeAttempts < 2 ? wrongPasscode : passcode),
-          )
+          values.push(new ChallengeValue(prompt, numPasscodeAttempts < 2 ? wrongPasscode : passcode))
         }
       }
       return values
@@ -167,13 +156,9 @@ describe('device authentication', function () {
     })
     expect(await tmpApplication.protocolService.getRootKey()).to.not.be.ok
     await tmpApplication.launch(true)
-    expect(await tmpApplication.storageService.getValue(sampleStorageKey)).to.equal(
-      sampleStorageValue,
-    )
+    expect(await tmpApplication.storageService.getValue(sampleStorageKey)).to.equal(sampleStorageValue)
     expect(await tmpApplication.protocolService.getRootKey()).to.be.ok
-    expect(tmpApplication.protocolService.rootKeyEncryption.keyMode).to.equal(
-      KeyMode.RootKeyPlusWrapper,
-    )
+    expect(tmpApplication.protocolService.rootKeyEncryption.keyMode).to.equal(KeyMode.RootKeyPlusWrapper)
     await Factory.safeDeinit(tmpApplication)
   }).timeout(Factory.TwentySecondTimeout)
 })

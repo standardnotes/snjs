@@ -4,10 +4,7 @@ import { UuidString } from '@Lib/Types'
 
 export type UndecryptableItemsStorage = Record<UuidString, EncryptedTransferPayload>
 
-export type DecryptionCallback = (
-  key: EncryptedPayloadInterface,
-  result: DecryptionResponse,
-) => void
+export type DecryptionCallback = (key: EncryptedPayloadInterface, result: DecryptionResponse) => void
 
 export type DecryptionResponse = {
   success: boolean

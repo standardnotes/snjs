@@ -82,14 +82,9 @@ describe('settings service', function () {
 
   it('creates and lists a sensitive setting', async () => {
     await snApp.settings.updateSetting(SettingName.MfaSecret, 'fake_secret', true)
-    await snApp.settings.updateSetting(
-      SettingName.MuteFailedBackupsEmails,
-      MuteFailedBackupsEmailsOption.Muted,
-    )
+    await snApp.settings.updateSetting(SettingName.MuteFailedBackupsEmails, MuteFailedBackupsEmailsOption.Muted)
     const settings = await snApp.settings.listSettings()
-    expect(settings.getSettingValue(SettingName.MuteFailedBackupsEmails)).to.eql(
-      MuteFailedBackupsEmailsOption.Muted,
-    )
+    expect(settings.getSettingValue(SettingName.MuteFailedBackupsEmails)).to.eql(MuteFailedBackupsEmailsOption.Muted)
     expect(settings.getSettingValue(SettingName.MfaSecret)).to.not.be.ok
   })
 })

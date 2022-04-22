@@ -23,11 +23,7 @@ describe('003 protocol operations', () => {
   // runs once before all tests in this block
   before(async () => {
     await Factory.initializeApplication(sharedApplication)
-    _key = await protocol003.createRootKey(
-      _identifier,
-      _password,
-      KeyParamsOrigination.Registration,
-    )
+    _key = await protocol003.createRootKey(_identifier, _password, KeyParamsOrigination.Registration)
     _keyParams = _key.keyParams
   })
 
@@ -48,11 +44,7 @@ describe('003 protocol operations', () => {
   })
 
   it('generates valid keys for registration', async () => {
-    const key = await protocol003.createRootKey(
-      _identifier,
-      _password,
-      KeyParamsOrigination.Registration,
-    )
+    const key = await protocol003.createRootKey(_identifier, _password, KeyParamsOrigination.Registration)
 
     expect(key.dataAuthenticationKey).to.be.ok
     expect(key.serverPassword).to.be.ok
@@ -73,15 +65,9 @@ describe('003 protocol operations', () => {
       version: '003',
     })
     const key = await protocol003.computeRootKey(password, keyParams)
-    expect(key.serverPassword).to.equal(
-      '60fdae231049d81974c562e943ad472f0143daa87f43048d2ede2d199ea7be25',
-    )
-    expect(key.masterKey).to.equal(
-      '2b2162e5299f71f9fcd39789a01f6062f2779220e97a43d7895cf30da11186e9',
-    )
-    expect(key.dataAuthenticationKey).to.equal(
-      '24dfba6f42ffc07a5223440a28a574d463e99d8d4aeb68fe95f55aa8ed5fd39f',
-    )
+    expect(key.serverPassword).to.equal('60fdae231049d81974c562e943ad472f0143daa87f43048d2ede2d199ea7be25')
+    expect(key.masterKey).to.equal('2b2162e5299f71f9fcd39789a01f6062f2779220e97a43d7895cf30da11186e9')
+    expect(key.dataAuthenticationKey).to.equal('24dfba6f42ffc07a5223440a28a574d463e99d8d4aeb68fe95f55aa8ed5fd39f')
   })
 
   it('can decrypt item generated with web version 3.3.6', async () => {
@@ -123,10 +109,7 @@ describe('003 protocol operations', () => {
   it('generating encryption params includes items_key_id', async () => {
     const payload = Factory.createNotePayload()
     const key = await protocol003.createItemsKey()
-    const params = await protocol003.generateEncryptedParametersAsync(
-      payload,
-      key,
-    )
+    const params = await protocol003.generateEncryptedParametersAsync(payload, key)
     expect(params.content).to.be.ok
     expect(params.enc_item_key).to.be.ok
     expect(params.items_key_id).to.equal(key.uuid)
@@ -135,10 +118,7 @@ describe('003 protocol operations', () => {
   it('can decrypt encrypted params', async () => {
     const payload = Factory.createNotePayload()
     const key = await protocol003.createItemsKey()
-    const params = await protocol003.generateEncryptedParametersAsync(
-      payload,
-      key,
-    )
+    const params = await protocol003.generateEncryptedParametersAsync(payload, key)
     const decrypted = await protocol003.generateDecryptedParametersAsync(params, key)
     expect(decrypted.content).to.eql(payload.content)
   })
