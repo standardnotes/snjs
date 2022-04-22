@@ -98,10 +98,7 @@ export class AppContext {
       },
     })
 
-    return this.application.syncService.handleSuccessServerResponse(
-      { payloadsSavedOrSaving: [] },
-      response,
-    )
+    return this.application.syncService.handleSuccessServerResponse({ payloadsSavedOrSaving: [] }, response)
   }
 
   resolveWhenKeyRecovered(uuid) {

@@ -11,9 +11,7 @@ import { PayloadInterface } from '../../Payload/Interfaces/PayloadInterface'
 import { HistoryEntryInterface } from '../../../Runtime/History/HistoryEntryInterface'
 import { isDecryptedItem, isDeletedItem, isEncryptedErroredItem } from '../Interfaces/TypeCheck'
 
-export abstract class GenericItem<P extends PayloadInterface = PayloadInterface>
-  implements ItemInterface<P>
-{
+export abstract class GenericItem<P extends PayloadInterface = PayloadInterface> implements ItemInterface<P> {
   payload: P
   public readonly duplicateOf?: Uuid
   public readonly createdAtString?: string

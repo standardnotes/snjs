@@ -14,9 +14,7 @@ describe('crypto operations', function () {
 
   // from https://github.com/xorbit/node-aes-gcm/blob/588f9066a217335acc56ab45559d2b46edc9fa83/test/test.js#L342
   it('aes gcm NIST Test Case 15', async () => {
-    const key =
-      'feffe9928665731c6d6a8f9467308308' +
-      'feffe9928665731c6d6a8f9467308308'
+    const key = 'feffe9928665731c6d6a8f9467308308' + 'feffe9928665731c6d6a8f9467308308'
     const iv = 'cafebabefacedbaddecaf888'
     const string =
       'd9313225f88406e5a55909c5aff5269a' +
@@ -26,9 +24,9 @@ describe('crypto operations', function () {
     const aad = ''
     const desiredCiphertext = Buffer.from(
       '522dc1f099567d07f47f37a32a84427d' +
-      '643a8cdcbfe5c0c97598a2bd2555d1aa' +
-      '8cb08e48590dbb3da7b08b1056828838' +
-      'c5f61e6393ba7a0abcc9f662898015ad',
+        '643a8cdcbfe5c0c97598a2bd2555d1aa' +
+        '8cb08e48590dbb3da7b08b1056828838' +
+        'c5f61e6393ba7a0abcc9f662898015ad',
       'hex',
     ).toString('base64')
     const desiredTag = 'b094dac5d93471bdec1a502270e3cc6c'
@@ -52,18 +50,12 @@ describe('crypto operations', function () {
   // from https://github.com/standardnotes/auth/blob/d5585b3ad0a27f58fb413ff2d85699d82b2e9b65/src/Domain/Encryption/Crypter.spec.ts#L32
   it('should encrypt and decrypt data with an expected output', async () => {
     const keys = [
-      '00000000000000000000000000000000' +
-        '00000000000000000000000000000000',
-      '00000000000000000000000000000000' +
-        '00000000000000000000000000000000',
-      'feffe9928665731c6d6a8f9467308308' +
-        'feffe9928665731c6d6a8f9467308308',
-      'feffe9928665731c6d6a8f9467308308' +
-        'feffe9928665731c6d6a8f9467308308',
-      'feffe9928665731c6d6a8f9467308308' +
-        'feffe9928665731c6d6a8f9467308308',
-      'feffe9928665731c6d6a8f9467308308' +
-      'feffe9928665731c6d6a8f9467308308',
+      '00000000000000000000000000000000' + '00000000000000000000000000000000',
+      '00000000000000000000000000000000' + '00000000000000000000000000000000',
+      'feffe9928665731c6d6a8f9467308308' + 'feffe9928665731c6d6a8f9467308308',
+      'feffe9928665731c6d6a8f9467308308' + 'feffe9928665731c6d6a8f9467308308',
+      'feffe9928665731c6d6a8f9467308308' + 'feffe9928665731c6d6a8f9467308308',
+      'feffe9928665731c6d6a8f9467308308' + 'feffe9928665731c6d6a8f9467308308',
     ]
 
     const ivs = [
@@ -73,9 +65,9 @@ describe('crypto operations', function () {
       'cafebabefacedbaddecaf888',
       'cafebabefacedbad',
       '9313225df88406e555909c5aff5269aa' +
-      '6a7a9538534f7da1e4c303d2a318a728' +
-      'c3c0c95156809539fcf0e2429a6b5254' +
-      '16aedbf5a0de6a57a637b39b',
+        '6a7a9538534f7da1e4c303d2a318a728' +
+        'c3c0c95156809539fcf0e2429a6b5254' +
+        '16aedbf5a0de6a57a637b39b',
     ]
 
     const inputs = [
@@ -94,9 +86,9 @@ describe('crypto operations', function () {
         '1c3c0c95956809532fcf0e2449a6b525' +
         'b16aedf5aa0de657ba637b39',
       'd9313225f88406e5a55909c5aff5269a' +
-      '86a7a9531534f7da2e4c303d8a318a72' +
-      '1c3c0c95956809532fcf0e2449a6b525' +
-      'b16aedf5aa0de657ba637b39',
+        '86a7a9531534f7da2e4c303d8a318a72' +
+        '1c3c0c95956809532fcf0e2449a6b525' +
+        'b16aedf5aa0de657ba637b39',
     ]
 
     const outputs = [
@@ -115,21 +107,18 @@ describe('crypto operations', function () {
         'feb582d33934a4f0954cc2363bc73f78' +
         '62ac430e64abe499f47c9b1f',
       '5a8def2f0c9e53f1f75d7853659e2a20' +
-      'eeb2b22aafde6419a058ab4f6f746bf4' +
-      '0fc0c3b780f244452da3ebf1c5d82cde' +
-      'a2418997200ef82e44ae7e3f',
+        'eeb2b22aafde6419a058ab4f6f746bf4' +
+        '0fc0c3b780f244452da3ebf1c5d82cde' +
+        'a2418997200ef82e44ae7e3f',
     ]
 
     const aads = [
       '',
       '',
       '',
-      'feedfacedeadbeeffeedfacedeadbeef' +
-      'abaddad2',
-      'feedfacedeadbeeffeedfacedeadbeef' +
-      'abaddad2',
-      'feedfacedeadbeeffeedfacedeadbeef' +
-      'abaddad2',
+      'feedfacedeadbeeffeedfacedeadbeef' + 'abaddad2',
+      'feedfacedeadbeeffeedfacedeadbeef' + 'abaddad2',
+      'feedfacedeadbeeffeedfacedeadbeef' + 'abaddad2',
     ]
 
     const tags = [

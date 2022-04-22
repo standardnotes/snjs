@@ -1,10 +1,5 @@
 import { ContentType, Uuid } from '@standardnotes/common'
-import {
-  PayloadsChangeObserver,
-  QueueElement,
-  PayloadsChangeObserverCallback,
-  EmitQueue,
-} from './Types'
+import { PayloadsChangeObserver, QueueElement, PayloadsChangeObserverCallback, EmitQueue } from './Types'
 import { removeFromArray, Uuids } from '@standardnotes/utils'
 import {
   DeltaFileImport,
@@ -23,11 +18,7 @@ import {
   HistoryMap,
   DeltaEmit,
 } from '@standardnotes/models'
-import {
-  AbstractService,
-  PayloadManagerInterface,
-  InternalEventBusInterface,
-} from '@standardnotes/services'
+import { AbstractService, PayloadManagerInterface, InternalEventBusInterface } from '@standardnotes/services'
 import { IntegrityPayload } from '@standardnotes/responses'
 
 /**
@@ -216,11 +207,7 @@ export class PayloadManager extends AbstractService implements PayloadManagerInt
    * @param priority - The lower the priority, the earlier the function is called
    *  wrt to other observers
    */
-  public addObserver(
-    types: ContentType | ContentType[],
-    callback: PayloadsChangeObserverCallback,
-    priority = 1,
-  ) {
+  public addObserver(types: ContentType | ContentType[], callback: PayloadsChangeObserverCallback, priority = 1) {
     if (!Array.isArray(types)) {
       types = [types]
     }
@@ -282,10 +269,7 @@ export class PayloadManager extends AbstractService implements PayloadManagerInt
    * and marks the items as dirty.
    * @returns Resulting items
    */
-  public async importPayloads(
-    payloads: DecryptedPayloadInterface[],
-    historyMap: HistoryMap,
-  ): Promise<Uuid[]> {
+  public async importPayloads(payloads: DecryptedPayloadInterface[], historyMap: HistoryMap): Promise<Uuid[]> {
     const sourcedPayloads = payloads.map((p) => p.copy(undefined, PayloadSource.FileImport))
 
     const delta = new DeltaFileImport(this.getMasterCollection(), sourcedPayloads, historyMap)

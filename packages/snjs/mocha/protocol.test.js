@@ -23,12 +23,7 @@ describe('protocol', function () {
   })
 
   it('checks supported versions to make sure it includes 001, 002, 003, 004', function () {
-    expect(this.application.protocolService.supportedVersions()).to.eql([
-      '001',
-      '002',
-      '003',
-      '004',
-    ])
+    expect(this.application.protocolService.supportedVersions()).to.eql(['001', '002', '003', '004'])
   })
 
   it('platform derivation support', function () {

@@ -34,10 +34,7 @@ export interface ItemInterface<P extends PayloadInterface = PayloadInterface> {
 
   singletonStrategy: SingletonStrategy
 
-  strategyWhenConflictingWithItem(
-    item: ItemInterface,
-    previousRevision?: HistoryEntryInterface,
-  ): ConflictStrategy
+  strategyWhenConflictingWithItem(item: ItemInterface, previousRevision?: HistoryEntryInterface): ConflictStrategy
 
   satisfiesPredicate(predicate: PredicateInterface<ItemInterface>): boolean
 

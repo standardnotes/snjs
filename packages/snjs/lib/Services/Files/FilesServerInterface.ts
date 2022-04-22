@@ -1,8 +1,4 @@
-import {
-  StartUploadSessionResponse,
-  MinimalHttpResponse,
-  ClientDisplayableError,
-} from '@standardnotes/responses'
+import { StartUploadSessionResponse, MinimalHttpResponse, ClientDisplayableError } from '@standardnotes/responses'
 import { EncryptedFileInterface } from './Types'
 
 export interface FilesServerInterface {

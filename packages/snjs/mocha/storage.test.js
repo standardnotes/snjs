@@ -55,9 +55,7 @@ describe('storage manager', function () {
       password: this.password,
       ephemeral: false,
     })
-    const keychainValue = await this.application.deviceInterface.getNamespacedKeychainValue(
-      this.application.identifier,
-    )
+    const keychainValue = await this.application.deviceInterface.getNamespacedKeychainValue(this.application.identifier)
     expect(keychainValue.masterKey).to.be.ok
     expect(keychainValue.serverPassword).to.not.be.ok
   })
@@ -144,27 +142,15 @@ describe('storage manager', function () {
       email: this.email,
       password: this.password,
     })
-    expect(
-      await this.application.deviceInterface.getNamespacedKeychainValue(
-        this.application.identifier,
-      ),
-    ).to.be.ok
+    expect(await this.application.deviceInterface.getNamespacedKeychainValue(this.application.identifier)).to.be.ok
     await this.application.storageService.setValueAndAwaitPersist('foo', 'bar')
     Factory.handlePasswordChallenges(this.application, this.password)
     await this.application.addPasscode(passcode)
-    expect(
-      await this.application.deviceInterface.getNamespacedKeychainValue(
-        this.application.identifier,
-      ),
-    ).to.not.be.ok
+    expect(await this.application.deviceInterface.getNamespacedKeychainValue(this.application.identifier)).to.not.be.ok
     await this.application.storageService.setValueAndAwaitPersist('bar', 'foo')
     Factory.handlePasswordChallenges(this.application, passcode)
     await this.application.removePasscode()
-    expect(
-      await this.application.deviceInterface.getNamespacedKeychainValue(
-        this.application.identifier,
-      ),
-    ).to.be.ok
+    expect(await this.application.deviceInterface.getNamespacedKeychainValue(this.application.identifier)).to.be.ok
 
     const wrappedValue = this.application.storageService.values[ValueModesKeys.Wrapped]
     const payload = new EncryptedPayload(wrappedValue)
@@ -209,8 +195,7 @@ describe('storage manager', function () {
     })
 
     /** Should not be wrapped root key yet */
-    expect(await this.application.protocolService.rootKeyEncryption.getWrappedRootKey()).to.not.be
-      .ok
+    expect(await this.application.protocolService.rootKeyEncryption.getWrappedRootKey()).to.not.be.ok
 
     const passcode = '123'
     Factory.handlePasswordChallenges(this.application, this.password)
@@ -223,8 +208,7 @@ describe('storage manager', function () {
     const accountKey = await this.application.protocolService.getRootKey()
     expect(await this.application.storageService.canDecryptWithKey(accountKey)).to.equal(true)
     const passcodeKey = await this.application.protocolService.computeWrappingKey(passcode)
-    const wrappedRootKey =
-      await this.application.protocolService.rootKeyEncryption.getWrappedRootKey()
+    const wrappedRootKey = await this.application.protocolService.rootKeyEncryption.getWrappedRootKey()
     /** Expect that we can decrypt wrapped root key with passcode key */
     const payload = new EncryptedPayload(wrappedRootKey)
     const decrypted = await this.application.protocolService.decryptSplitSingle({

@@ -15,11 +15,7 @@ describe('002 protocol operations', () => {
   before(async () => {
     localStorage.clear()
     await Factory.initializeApplication(application)
-    _key = await protocol002.createRootKey(
-      _identifier,
-      _password,
-      KeyParamsOrigination.Registration,
-    )
+    _key = await protocol002.createRootKey(_identifier, _password, KeyParamsOrigination.Registration)
     _keyParams = _key.keyParams
   })
 
@@ -38,11 +34,7 @@ describe('002 protocol operations', () => {
   })
 
   it('generates valid keys for registration', async () => {
-    const key = await protocol002.createRootKey(
-      _identifier,
-      _password,
-      KeyParamsOrigination.Registration,
-    )
+    const key = await protocol002.createRootKey(_identifier, _password, KeyParamsOrigination.Registration)
     expect(key.dataAuthenticationKey).to.be.ok
     expect(key.serverPassword).to.be.ok
     expect(key.masterKey).to.be.ok
@@ -61,15 +53,9 @@ describe('002 protocol operations', () => {
     })
     const key = await protocol002.computeRootKey(password, keyParams)
     expect(key.keyVersion).to.equal('002')
-    expect(key.serverPassword).to.equal(
-      'f3cc7efc93380a7a3765dcb0498dabe83387acdda78f43bc7cfc31f4a2a05077',
-    )
-    expect(key.masterKey).to.equal(
-      '66500f7c9fb8ba0843e13e2f555feb5e43a3c27fee23e9b900a2577f1b373e1a',
-    )
-    expect(key.dataAuthenticationKey).to.equal(
-      'af3d6a7fd6c0422a7a84b0e99d6ac2a79b77675c9848f74314c20046e1f95c75',
-    )
+    expect(key.serverPassword).to.equal('f3cc7efc93380a7a3765dcb0498dabe83387acdda78f43bc7cfc31f4a2a05077')
+    expect(key.masterKey).to.equal('66500f7c9fb8ba0843e13e2f555feb5e43a3c27fee23e9b900a2577f1b373e1a')
+    expect(key.dataAuthenticationKey).to.equal('af3d6a7fd6c0422a7a84b0e99d6ac2a79b77675c9848f74314c20046e1f95c75')
     const payload = new EncryptedPayload({
       content:
         '002:0ff292a79549e817003886e9c4865eaf5faa0b3ada5b41c846c63bd4056e6816:959b042a-3892-461e-8c50-477c10c7c40a:c856f9d81033994f397285e2d060e9d4:pQ/jKyb8qCsz18jdMiYkpxf4l8ELIbTtwqUwLM3fRUwDL4/ofZLGICuFlssmrb74Brm+N19znwfNQ9ouFPtijA==',

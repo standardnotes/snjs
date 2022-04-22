@@ -5,11 +5,7 @@ import { ContentType, Uuid } from '@standardnotes/common'
 import { compareValues, isNullOrUndefined, isString, uniqueArrayByKey } from '@standardnotes/utils'
 import { SNIndex } from '../../Index/SNIndex'
 import { ItemDelta } from '../../Index/ItemDelta'
-import {
-  isDeletedItem,
-  isDecryptedItem,
-  isEncryptedItem,
-} from '../../../Abstract/Item/Interfaces/TypeCheck'
+import { isDeletedItem, isDecryptedItem, isEncryptedItem } from '../../../Abstract/Item/Interfaces/TypeCheck'
 import { DecryptedItemInterface } from '../../../Abstract/Item/Interfaces/DecryptedItem'
 import { CollectionInterface } from '../CollectionInterface'
 import { DeletedItemInterface } from '../../../Abstract/Item'
@@ -29,12 +25,7 @@ type DisplaySortBy = Partial<
 type UuidToSortedPositionMap = Record<Uuid, number>
 
 export class ItemCollection
-  extends Collection<
-    AnyItemInterface,
-    DecryptedItemInterface,
-    EncryptedItemInterface,
-    DeletedItemInterface
-  >
+  extends Collection<AnyItemInterface, DecryptedItemInterface, EncryptedItemInterface, DeletedItemInterface>
   implements SNIndex, CollectionInterface
 {
   private displaySortBy: DisplaySortBy = {}
@@ -81,9 +72,7 @@ export class ItemCollection
     this.discard(delta.discarded)
   }
 
-  public findDecrypted<T extends DecryptedItemInterface = DecryptedItemInterface>(
-    uuid: Uuid,
-  ): T | undefined {
+  public findDecrypted<T extends DecryptedItemInterface = DecryptedItemInterface>(uuid: Uuid): T | undefined {
     const result = this.find(uuid)
 
     if (!result) {
@@ -93,9 +82,7 @@ export class ItemCollection
     return isDecryptedItem(result) ? (result as T) : undefined
   }
 
-  public findAllDecrypted<T extends DecryptedItemInterface = DecryptedItemInterface>(
-    uuids: Uuid[],
-  ): T[] {
+  public findAllDecrypted<T extends DecryptedItemInterface = DecryptedItemInterface>(uuids: Uuid[]): T[] {
     return this.findAll(uuids).filter(isDecryptedItem) as T[]
   }
 
@@ -114,9 +101,7 @@ export class ItemCollection
     return mapped as (DecryptedItemInterface<C> | undefined)[]
   }
 
-  public allDecrypted<T extends DecryptedItemInterface>(
-    contentType: ContentType | ContentType[],
-  ): T[] {
+  public allDecrypted<T extends DecryptedItemInterface>(contentType: ContentType | ContentType[]): T[] {
     return this.all(contentType).filter(isDecryptedItem) as T[]
   }
 
@@ -168,9 +153,7 @@ export class ItemCollection
    * Returns the filtered and sorted list of elements for this content type,
    * according to the options set via `setDisplayOptions`
    */
-  public displayElements<I extends DecryptedItemInterface = DecryptedItemInterface>(
-    contentType: ContentType,
-  ): I[] {
+  public displayElements<I extends DecryptedItemInterface = DecryptedItemInterface>(contentType: ContentType): I[] {
     const elements = this.sortedMap[contentType]
     if (!elements) {
       throw Error(
@@ -211,9 +194,7 @@ export class ItemCollection
       }
 
       const previousIndex = filteredCTMap[element.uuid]
-      const previousElement = !isNullOrUndefined(previousIndex)
-        ? sortedElements[previousIndex]
-        : undefined
+      const previousElement = !isNullOrUndefined(previousIndex) ? sortedElements[previousIndex] : undefined
 
       const remove = () => {
         if (!isNullOrUndefined(previousIndex)) {
@@ -292,11 +273,7 @@ export class ItemCollection
         return 1
       }
 
-      if (
-        !skipPinnedCheck &&
-        a.content_type === ContentType.Note &&
-        b.content_type === ContentType.Note
-      ) {
+      if (!skipPinnedCheck && a.content_type === ContentType.Note && b.content_type === ContentType.Note) {
         if (a.pinned && b.pinned) {
           return sortFn(a, b, true)
         }

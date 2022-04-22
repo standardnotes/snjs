@@ -66,10 +66,7 @@ export class SNSettingsService extends AbstractService implements SettingsClient
     return this.frequencyOptionsLabels[frequency]
   }
 
-  getCloudProviderIntegrationUrl(
-    cloudProviderName: CloudProvider,
-    isDevEnvironment: boolean,
-  ): string {
+  getCloudProviderIntegrationUrl(cloudProviderName: CloudProvider, isDevEnvironment: boolean): string {
     const { Dev, Prod } = ExtensionsServerURL
     const extServerUrl = isDevEnvironment ? Dev : Prod
     return `${extServerUrl}/${this.cloudProviderIntegrationUrlEndpoints[cloudProviderName]}?redirect_url=${extServerUrl}/components/cloudlink?`

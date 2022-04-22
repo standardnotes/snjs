@@ -1,21 +1,9 @@
-import {
-  SNUserPrefs,
-  PrefKey,
-  PrefValue,
-  UserPrefsMutator,
-  ItemContent,
-  FillItemContent,
-} from '@standardnotes/models'
+import { SNUserPrefs, PrefKey, PrefValue, UserPrefsMutator, ItemContent, FillItemContent } from '@standardnotes/models'
 import { ContentType } from '@standardnotes/common'
 import { ItemManager } from '../Items/ItemManager'
 import { SNSingletonManager } from '../Singleton/SingletonManager'
 import { SNSyncService } from '../Sync/SyncService'
-import {
-  AbstractService,
-  InternalEventBusInterface,
-  SyncEvent,
-  ApplicationStage,
-} from '@standardnotes/services'
+import { AbstractService, InternalEventBusInterface, SyncEvent, ApplicationStage } from '@standardnotes/services'
 
 const preferencesChangedEvent = 'preferencesChanged'
 type PreferencesChangedEvent = typeof preferencesChangedEvent
@@ -71,10 +59,7 @@ export class SNPreferencesService extends AbstractService<PreferencesChangedEven
     }
   }
 
-  getValue<K extends PrefKey>(
-    key: K,
-    defaultValue: PrefValue[K] | undefined,
-  ): PrefValue[K] | undefined
+  getValue<K extends PrefKey>(key: K, defaultValue: PrefValue[K] | undefined): PrefValue[K] | undefined
   getValue<K extends PrefKey>(key: K, defaultValue: PrefValue[K]): PrefValue[K]
   getValue<K extends PrefKey>(key: K, defaultValue?: PrefValue[K]): PrefValue[K] | undefined {
     return this.preferences?.getPref(key) ?? defaultValue
@@ -85,12 +70,9 @@ export class SNPreferencesService extends AbstractService<PreferencesChangedEven
       return
     }
 
-    this.preferences = (await this.itemManager.changeItem<UserPrefsMutator>(
-      this.preferences,
-      (m) => {
-        m.setPref(key, value)
-      },
-    )) as SNUserPrefs
+    this.preferences = (await this.itemManager.changeItem<UserPrefsMutator>(this.preferences, (m) => {
+      m.setPref(key, value)
+    })) as SNUserPrefs
 
     void this.notifyEvent(preferencesChangedEvent)
 
@@ -107,10 +89,10 @@ export class SNPreferencesService extends AbstractService<PreferencesChangedEven
     try {
       const previousRef = this.preferences
 
-      this.preferences = await this.singletonManager.findOrCreateContentTypeSingleton<
-        ItemContent,
-        SNUserPrefs
-      >(ContentType.UserPrefs, FillItemContent({}))
+      this.preferences = await this.singletonManager.findOrCreateContentTypeSingleton<ItemContent, SNUserPrefs>(
+        ContentType.UserPrefs,
+        FillItemContent({}),
+      )
 
       if (
         previousRef?.uuid !== this.preferences.uuid ||

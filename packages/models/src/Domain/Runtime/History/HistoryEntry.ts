@@ -22,8 +22,7 @@ export class HistoryEntry implements HistoryEntryInterface {
 
     if (propertyValue) {
       if (previousEntry) {
-        const previousValue =
-          (previousEntry.payload.content[this.defaultContentKeyToDiffOn] as string)?.length || 0
+        const previousValue = (previousEntry.payload.content[this.defaultContentKeyToDiffOn] as string)?.length || 0
         this.textCharDiffLength = propertyValue.length - previousValue
       } else {
         this.textCharDiffLength = propertyValue.length

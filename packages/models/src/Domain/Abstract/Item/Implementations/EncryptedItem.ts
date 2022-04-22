@@ -3,10 +3,7 @@ import { EncryptedItemInterface } from '../Interfaces/EncryptedItem'
 import { EncryptedPayloadInterface } from '../../Payload/Interfaces/EncryptedPayload'
 import { GenericItem } from './GenericItem'
 
-export class EncryptedItem
-  extends GenericItem<EncryptedPayloadInterface>
-  implements EncryptedItemInterface
-{
+export class EncryptedItem extends GenericItem<EncryptedPayloadInterface> implements EncryptedItemInterface {
   constructor(payload: EncryptedPayloadInterface) {
     super(payload)
   }
@@ -15,9 +12,7 @@ export class EncryptedItem
     return this.payload.version
   }
 
-  public override payloadRepresentation(
-    override?: Partial<EncryptedTransferPayload>,
-  ): EncryptedPayloadInterface {
+  public override payloadRepresentation(override?: Partial<EncryptedTransferPayload>): EncryptedPayloadInterface {
     return this.payload.copy(override)
   }
 

@@ -27,11 +27,7 @@ const LocalHost = 'localhost'
 export function isUrlFirstParty(url: string): boolean {
   try {
     const { host } = new URL(url)
-    return (
-      host.startsWith(LocalHost) ||
-      APPLICATION_DEFAULT_HOSTS.includes(host) ||
-      FILES_DEFAULT_HOSTS.includes(host)
-    )
+    return host.startsWith(LocalHost) || APPLICATION_DEFAULT_HOSTS.includes(host) || FILES_DEFAULT_HOSTS.includes(host)
   } catch (_err) {
     return false
   }

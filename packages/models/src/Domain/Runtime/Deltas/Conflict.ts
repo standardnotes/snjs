@@ -1,9 +1,6 @@
 import { greaterOfTwoDates, uniqCombineObjArrays } from '@standardnotes/utils'
 import { ImmutablePayloadCollection } from '../Collection/Payload/ImmutablePayloadCollection'
-import {
-  CreateDecryptedItemFromPayload,
-  CreateItemFromPayload,
-} from '../../Utilities/Item/ItemGenerator'
+import { CreateDecryptedItemFromPayload, CreateItemFromPayload } from '../../Utilities/Item/ItemGenerator'
 import { HistoryMap, historyMapFunctions } from '../History/HistoryMap'
 import { ConflictStrategy } from '../../Abstract/Item/Types/ConflictStrategy'
 import { PayloadsByDuplicating } from '../../Utilities/Payload/PayloadsByDuplicating'
@@ -116,15 +113,9 @@ export class ConflictDelta {
   }
 
   private handleKeepBaseStrategy(): SyncResolvedPayload[] {
-    const updatedAt = greaterOfTwoDates(
-      this.basePayload.serverUpdatedAt,
-      this.applyPayload.serverUpdatedAt,
-    )
+    const updatedAt = greaterOfTwoDates(this.basePayload.serverUpdatedAt, this.applyPayload.serverUpdatedAt)
 
-    const updatedAtTimestamp = Math.max(
-      this.basePayload.updated_at_timestamp,
-      this.applyPayload.updated_at_timestamp,
-    )
+    const updatedAtTimestamp = Math.max(this.basePayload.updated_at_timestamp, this.applyPayload.updated_at_timestamp)
 
     const leftPayload = this.basePayload.copyAsSyncResolved(
       {
@@ -154,15 +145,9 @@ export class ConflictDelta {
   }
 
   private handleKeepBaseDuplicateApplyStrategy(): SyncResolvedPayload[] {
-    const updatedAt = greaterOfTwoDates(
-      this.basePayload.serverUpdatedAt,
-      this.applyPayload.serverUpdatedAt,
-    )
+    const updatedAt = greaterOfTwoDates(this.basePayload.serverUpdatedAt, this.applyPayload.serverUpdatedAt)
 
-    const updatedAtTimestamp = Math.max(
-      this.basePayload.updated_at_timestamp,
-      this.applyPayload.updated_at_timestamp,
-    )
+    const updatedAtTimestamp = Math.max(this.basePayload.updated_at_timestamp, this.applyPayload.updated_at_timestamp)
 
     const leftPayload = this.basePayload.copyAsSyncResolved(
       {
@@ -210,21 +195,14 @@ export class ConflictDelta {
       return []
     }
 
-    const refs = uniqCombineObjArrays(
-      this.basePayload.content.references,
-      this.applyPayload.content.references,
-      ['uuid', 'content_type'],
-    )
+    const refs = uniqCombineObjArrays(this.basePayload.content.references, this.applyPayload.content.references, [
+      'uuid',
+      'content_type',
+    ])
 
-    const updatedAt = greaterOfTwoDates(
-      this.basePayload.serverUpdatedAt,
-      this.applyPayload.serverUpdatedAt,
-    )
+    const updatedAt = greaterOfTwoDates(this.basePayload.serverUpdatedAt, this.applyPayload.serverUpdatedAt)
 
-    const updatedAtTimestamp = Math.max(
-      this.basePayload.updated_at_timestamp,
-      this.applyPayload.updated_at_timestamp,
-    )
+    const updatedAtTimestamp = Math.max(this.basePayload.updated_at_timestamp, this.applyPayload.updated_at_timestamp)
 
     const payload = this.basePayload.copyAsSyncResolved(
       {

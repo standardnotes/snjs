@@ -51,10 +51,7 @@ describe('notes + tags syncing', function () {
     const notePayload = pair[0]
     const tagPayload = pair[1]
 
-    await this.application.itemManager.emitItemsFromPayloads(
-      [notePayload, tagPayload],
-      PayloadEmitSource.LocalChanged,
-    )
+    await this.application.itemManager.emitItemsFromPayloads([notePayload, tagPayload], PayloadEmitSource.LocalChanged)
     const note = this.application.itemManager.getItems([ContentType.Note])[0]
     const tag = this.application.itemManager.getItems([ContentType.Tag])[0]
     expect(this.application.itemManager.notes.length).to.equal(1)
@@ -78,10 +75,7 @@ describe('notes + tags syncing', function () {
     const pair = Factory.createRelatedNoteTagPairPayload()
     const notePayload = pair[0]
     const tagPayload = pair[1]
-    await this.application.itemManager.emitItemsFromPayloads(
-      [notePayload, tagPayload],
-      PayloadEmitSource.LocalChanged,
-    )
+    await this.application.itemManager.emitItemsFromPayloads([notePayload, tagPayload], PayloadEmitSource.LocalChanged)
     const originalNote = this.application.itemManager.notes[0]
     const originalTag = this.application.itemManager.tags[0]
     await this.application.itemManager.setItemsDirty([originalNote, originalTag])
@@ -114,10 +108,7 @@ describe('notes + tags syncing', function () {
     const pair = Factory.createRelatedNoteTagPairPayload()
     const notePayload = pair[0]
     const tagPayload = pair[1]
-    await this.application.itemManager.emitItemsFromPayloads(
-      [notePayload, tagPayload],
-      PayloadEmitSource.LocalChanged,
-    )
+    await this.application.itemManager.emitItemsFromPayloads([notePayload, tagPayload], PayloadEmitSource.LocalChanged)
     let note = this.application.itemManager.notes[0]
     let tag = this.application.itemManager.tags[0]
     expect(this.application.itemManager.itemsReferencingItem(note).length).to.equal(1)

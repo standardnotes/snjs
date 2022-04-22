@@ -34,9 +34,7 @@ import { DeletedItem } from '../../Abstract/Item/Implementations/DeletedItem'
 import { EncryptedItemInterface } from '../../Abstract/Item/Interfaces/EncryptedItem'
 import { DeletedItemInterface } from '../../Abstract/Item/Interfaces/DeletedItem'
 
-type ItemClass<C extends ItemContent = ItemContent> = new (
-  payload: DecryptedPayloadInterface<C>,
-) => DecryptedItem<C>
+type ItemClass<C extends ItemContent = ItemContent> = new (payload: DecryptedPayloadInterface<C>) => DecryptedItem<C>
 
 type MutatorClass<C extends ItemContent = ItemContent> = new (
   item: DecryptedItemInterface<C>,

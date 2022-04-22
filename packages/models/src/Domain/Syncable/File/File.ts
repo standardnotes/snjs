@@ -16,10 +16,7 @@ export interface FileContentSpecialized extends FileMetadata {
 
 export type FileContent = FileContentSpecialized & ItemContent
 
-export class SNFile
-  extends DecryptedItem<FileContent>
-  implements FileContentSpecialized, FileProtocolV1, FileMetadata
-{
+export class SNFile extends DecryptedItem<FileContent> implements FileContentSpecialized, FileProtocolV1, FileMetadata {
   public readonly remoteIdentifier: string
   public readonly name: string
   public readonly key: string

@@ -21,13 +21,9 @@ export class ClassicFileApi {
       if (operation instanceof ClientDisplayableError) {
         continue
       }
-      const fileResult = await ClassicFileReader.readFile(
-        file,
-        2_000_000,
-        async (chunk, index, isLast) => {
-          await this.application.files.pushBytesForUpload(operation, chunk, index, isLast)
-        },
-      )
+      const fileResult = await ClassicFileReader.readFile(file, 2_000_000, async (chunk, index, isLast) => {
+        await this.application.files.pushBytesForUpload(operation, chunk, index, isLast)
+      })
       const snFile = await this.application.files.finishUpload(operation, fileResult)
 
       if (snFile instanceof ClientDisplayableError) {

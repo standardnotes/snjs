@@ -31,10 +31,7 @@ import {
  * decrypt the persisted key/values, and also a method to determine whether a particular
  * key can decrypt wrapped storage.
  */
-export class SNStorageService
-  extends Services.AbstractService
-  implements Services.StorageServiceInterface
-{
+export class SNStorageService extends Services.AbstractService implements Services.StorageServiceInterface {
   private encryptionProvider!: Encryption.EncryptionProvider
   private storagePersistable = false
   private persistencePolicy!: Services.StoragePersistencePolicies
@@ -91,14 +88,8 @@ export class SNStorageService
     }
   }
 
-  public setEncryptionPolicy(
-    encryptionPolicy: Services.StorageEncryptionPolicy,
-    persist = true,
-  ): void {
-    if (
-      encryptionPolicy === Services.StorageEncryptionPolicy.Disabled &&
-      this.environment !== Environment.Mobile
-    ) {
+  public setEncryptionPolicy(encryptionPolicy: Services.StorageEncryptionPolicy, persist = true): void {
+    if (encryptionPolicy === Services.StorageEncryptionPolicy.Disabled && this.environment !== Environment.Mobile) {
       throw Error('Disabling storage encryption is only available on mobile.')
     }
 
@@ -151,10 +142,7 @@ export class SNStorageService
     return !isErrorDecryptingParameters(decryptedPayload)
   }
 
-  private async decryptWrappedValue(
-    wrappedValue: LocalStorageEncryptedContextualPayload,
-    key?: SNRootKey,
-  ) {
+  private async decryptWrappedValue(wrappedValue: LocalStorageEncryptedContextualPayload, key?: SNRootKey) {
     /**
      * The read content type doesn't matter, so long as we know it responds
      * to content type. This allows a more seamless transition when both web
@@ -233,16 +221,12 @@ export class SNStorageService
     this.currentPersistPromise = this.executeCriticalFunction(async () => {
       const values = await this.generatePersistableValues()
 
-      const persistencePolicySuddenlyChanged =
-        this.persistencePolicy === Services.StoragePersistencePolicies.Ephemeral
+      const persistencePolicySuddenlyChanged = this.persistencePolicy === Services.StoragePersistencePolicies.Ephemeral
       if (persistencePolicySuddenlyChanged) {
         return values
       }
 
-      await this.deviceInterface?.setRawStorageValue(
-        this.getPersistenceKey(),
-        JSON.stringify(values),
-      )
+      await this.deviceInterface?.setRawStorageValue(this.getPersistenceKey(), JSON.stringify(values))
 
       return values
     })
@@ -276,11 +260,9 @@ export class SNStorageService
 
       const encryptedPayload = await this.encryptionProvider.encryptSplitSingle(split)
 
-      rawContent[Services.ValueModesKeys.Wrapped] =
-        CreateEncryptedLocalStorageContextPayload(encryptedPayload)
+      rawContent[Services.ValueModesKeys.Wrapped] = CreateEncryptedLocalStorageContextPayload(encryptedPayload)
     } else {
-      rawContent[Services.ValueModesKeys.Wrapped] =
-        CreateDecryptedLocalStorageContextPayload(payload)
+      rawContent[Services.ValueModesKeys.Wrapped] = CreateDecryptedLocalStorageContextPayload(payload)
     }
 
     return rawContent as Services.StorageValuesObject
@@ -302,11 +284,7 @@ export class SNStorageService
     await this.persistValuesToDisk()
   }
 
-  private setValueWithNoPersist(
-    key: string,
-    value: unknown,
-    mode = Services.StorageValueModes.Default,
-  ): void {
+  private setValueWithNoPersist(key: string, value: unknown, mode = Services.StorageValueModes.Default): void {
     if (!this.values) {
       throw Error(`Attempting to set storage key ${key} before loading local storage.`)
     }
@@ -405,8 +383,7 @@ export class SNStorageService
       return
     }
 
-    const { encrypted, decrypted, deleted, discardable } =
-      CreatePayloadSplitWithDiscardables(payloads)
+    const { encrypted, decrypted, deleted, discardable } = CreatePayloadSplitWithDiscardables(payloads)
 
     const encryptionEnabled = this.encryptionPolicy === Services.StorageEncryptionPolicy.Default
     const rootKeyEncryptionAvailable = this.encryptionProvider.hasRootKeyEncryptionSource()
@@ -441,9 +418,7 @@ export class SNStorageService
 
     const encryptedResults = await this.encryptionProvider.encryptSplit(keyLookupSplit)
 
-    const exportedEncrypted = [...encrypted, ...encryptedResults].map(
-      CreateEncryptedLocalStorageContextPayload,
-    )
+    const exportedEncrypted = [...encrypted, ...encryptedResults].map(CreateEncryptedLocalStorageContextPayload)
 
     const exportedDecrypted = unencryptable.map(CreateDecryptedLocalStorageContextPayload)
 

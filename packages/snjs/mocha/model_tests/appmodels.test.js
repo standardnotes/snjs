@@ -91,17 +91,11 @@ describe('app models', () => {
       },
     })
 
-    let items = await this.application.itemManager.emitItemsFromPayloads(
-      [mutated],
-      PayloadEmitSource.LocalChanged,
-    )
+    let items = await this.application.itemManager.emitItemsFromPayloads([mutated], PayloadEmitSource.LocalChanged)
     let item = items[0]
     expect(item).to.be.ok
 
-    items = await this.application.itemManager.emitItemsFromPayloads(
-      [mutated],
-      PayloadEmitSource.LocalChanged,
-    )
+    items = await this.application.itemManager.emitItemsFromPayloads([mutated], PayloadEmitSource.LocalChanged)
     item = items[0]
 
     expect(item.content.foo).to.equal('bar')
@@ -147,10 +141,7 @@ describe('app models', () => {
         references: [],
       },
     })
-    await this.application.itemManager.emitItemsFromPayloads(
-      [damagedPayload],
-      PayloadEmitSource.LocalChanged,
-    )
+    await this.application.itemManager.emitItemsFromPayloads([damagedPayload], PayloadEmitSource.LocalChanged)
 
     const refreshedItem1_2 = this.application.itemManager.findItem(item1.uuid)
     const refreshedItem2_2 = this.application.itemManager.findItem(item2.uuid)
@@ -268,9 +259,7 @@ describe('app models', () => {
     expect(this.application.itemManager.notes.length).to.equal(2)
 
     expect(alternatedItem.content.references.length).to.equal(1)
-    expect(this.application.itemManager.itemsReferencingItem(alternatedItem.uuid).length).to.equal(
-      0,
-    )
+    expect(this.application.itemManager.itemsReferencingItem(alternatedItem.uuid).length).to.equal(0)
 
     expect(this.application.itemManager.itemsReferencingItem(item2).length).to.equal(1)
 
@@ -304,11 +293,9 @@ describe('app models', () => {
     expect(this.application.payloadManager.findOne(item1.uuid).errorDecrypting).to.equal(true)
     expect(this.application.payloadManager.findOne(item1.uuid).items_key_id).to.equal(itemsKey.uuid)
 
-    sinon
-      .stub(this.application.protocolService.itemsEncryption, 'decryptErroredPayloads')
-      .callsFake(() => {
-        // prevent auto decryption
-      })
+    sinon.stub(this.application.protocolService.itemsEncryption, 'decryptErroredPayloads').callsFake(() => {
+      // prevent auto decryption
+    })
 
     const alternatedKey = await Factory.alternateUuidForItem(this.application, itemsKey.uuid)
     const updatedPayload = this.application.payloadManager.findOne(item1.uuid)

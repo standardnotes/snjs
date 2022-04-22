@@ -37,33 +37,15 @@ export async function createAppWithRandNamespace(environment, platform) {
 
 export async function createInitAppWithFakeCrypto(environment, platform) {
   const namespace = Math.random().toString(36).substring(2, 15)
-  return createAndInitializeApplication(
-    namespace,
-    environment,
-    platform,
-    undefined,
-    new FakeWebCrypto(),
-  )
+  return createAndInitializeApplication(namespace, environment, platform, undefined, new FakeWebCrypto())
 }
 
 export async function createInitAppWithRealCrypto(environment, platform) {
   const namespace = Math.random().toString(36).substring(2, 15)
-  return createAndInitializeApplication(
-    namespace,
-    environment,
-    platform,
-    undefined,
-    new SNWebCrypto(),
-  )
+  return createAndInitializeApplication(namespace, environment, platform, undefined, new SNWebCrypto())
 }
 
-export async function createAndInitializeApplication(
-  namespace,
-  environment,
-  platform,
-  host,
-  crypto,
-) {
+export async function createAndInitializeApplication(namespace, environment, platform, host, crypto) {
   const application = createApplication(namespace, environment, platform, host, crypto)
   await initializeApplication(application)
   return application

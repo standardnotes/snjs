@@ -104,13 +104,7 @@ export async function createInitAppWithRealCrypto(environment, platform) {
   return Applications.createInitAppWithRealCrypto(environment, platform)
 }
 
-export async function createAndInitializeApplication(
-  namespace,
-  environment,
-  platform,
-  host,
-  crypto,
-) {
+export async function createAndInitializeApplication(namespace, environment, platform, host, crypto) {
   return Applications.createAndInitializeApplication(namespace, environment, platform, host, crypto)
 }
 
@@ -118,13 +112,7 @@ export async function initializeApplication(application) {
   return Applications.initializeApplication(application)
 }
 
-export function registerUserToApplication({
-  application,
-  email,
-  password,
-  ephemeral,
-  mergeLocal = true,
-}) {
+export function registerUserToApplication({ application, email, password, ephemeral, mergeLocal = true }) {
   if (!email) email = generateUuid()
   if (!password) password = generateUuid()
   return application.register(email, password, ephemeral, mergeLocal)
@@ -133,11 +121,7 @@ export function registerUserToApplication({
 export async function setOldVersionPasscode({ application, passcode, version }) {
   const identifier = await application.protocolService.crypto.generateUUID()
   const operator = application.protocolService.operatorManager.operatorForVersion(version)
-  const key = await operator.createRootKey(
-    identifier,
-    passcode,
-    KeyParamsOrigination.PasscodeCreate,
-  )
+  const key = await operator.createRootKey(identifier, passcode, KeyParamsOrigination.PasscodeCreate)
   await application.protocolService.setNewRootKeyWrapper(key)
   await application.userService.rewriteItemsKeys()
   await application.syncService.sync(syncOptions)
@@ -151,17 +135,9 @@ export async function registerOldUser({ application, email, password, version })
   if (!email) email = generateUuid()
   if (!password) password = generateUuid()
   const operator = application.protocolService.operatorManager.operatorForVersion(version)
-  const accountKey = await operator.createRootKey(
-    email,
-    password,
-    KeyParamsOrigination.Registration,
-  )
+  const accountKey = await operator.createRootKey(email, password, KeyParamsOrigination.Registration)
 
-  const response = await application.apiService.register(
-    email,
-    accountKey.serverPassword,
-    accountKey.keyParams,
-  )
+  const response = await application.apiService.register(email, accountKey.serverPassword, accountKey.keyParams)
   /** Mark all existing items as dirty. */
   await application.itemManager.changeItems(application.itemManager.items, (m) => {
     m.dirty = true
@@ -207,10 +183,7 @@ export async function createMappedTag(application, tagParams = {}) {
 
 export async function createSyncedNote(application, title, text) {
   const payload = createNotePayload(title, text)
-  const item = await application.itemManager.emitItemFromPayload(
-    payload,
-    PayloadEmitSource.LocalChanged,
-  )
+  const item = await application.itemManager.emitItemFromPayload(payload, PayloadEmitSource.LocalChanged)
   await application.itemManager.setItemDirty(item)
   await application.syncService.sync(syncOptions)
   const note = application.items.findItem(payload.uuid)
@@ -276,9 +249,7 @@ export async function signOutApplicationAndReturnNew(application) {
 export async function signOutAndBackIn(application, email, password) {
   const isRealCrypto = application.crypto instanceof SNWebCrypto
   await application.user.signOut()
-  const newApplication = isRealCrypto
-    ? await createInitAppWithRealCrypto()
-    : await createInitAppWithFakeCrypto()
+  const newApplication = isRealCrypto ? await createInitAppWithRealCrypto() : await createInitAppWithFakeCrypto()
   await this.loginToApplication({
     application: newApplication,
     email,
@@ -336,12 +307,7 @@ export function createTagParams({ title, dirty = true, uuid = undefined } = {}) 
   return params
 }
 
-export function createRelatedNoteTagPairPayload({
-  noteTitle,
-  noteText,
-  tagTitle,
-  dirty = true,
-} = {}) {
+export function createRelatedNoteTagPairPayload({ noteTitle, noteText, tagTitle, dirty = true } = {}) {
   const noteParams = createNoteParams({
     title: noteTitle,
     text: noteText,
@@ -458,12 +424,7 @@ export function handlePasswordChallenges(application, password) {
   })
 }
 
-export async function createTags(
-  application,
-  hierarchy,
-  parent = undefined,
-  resultAccumulator = undefined,
-) {
+export async function createTags(application, hierarchy, parent = undefined, resultAccumulator = undefined) {
   const result = resultAccumulator || {}
 
   const promises = Object.entries(hierarchy).map(async ([key, value]) => {
@@ -493,13 +454,7 @@ export function pinNote(application, note) {
   })
 }
 
-export async function insertItemWithOverride(
-  application,
-  contentType,
-  content,
-  needsSync = false,
-  errorDecrypting,
-) {
+export async function insertItemWithOverride(application, contentType, content, needsSync = false, errorDecrypting) {
   const item = await application.itemManager.createItem(contentType, content, needsSync)
 
   if (errorDecrypting) {
@@ -523,10 +478,7 @@ export async function insertItemWithOverride(
 export async function alternateUuidForItem(application, uuid) {
   const item = application.itemManager.findItem(uuid)
   const payload = new DecryptedPayload(item)
-  const results = await PayloadsByAlternatingUuid(
-    payload,
-    application.payloadManager.getMasterCollection(),
-  )
+  const results = await PayloadsByAlternatingUuid(payload, application.payloadManager.getMasterCollection())
   await application.payloadManager.emitPayloads(results, PayloadEmitSource.LocalChanged)
   await application.syncService.persistPayloads(results)
   return application.itemManager.findItem(results[0].uuid)
@@ -543,13 +495,7 @@ export async function markDirtyAndSyncItem(application, itemToLookupUuidFor) {
   await application.sync.sync()
 }
 
-export async function changePayloadTimeStampAndSync(
-  application,
-  payload,
-  timestamp,
-  contentOverride,
-  syncOptions,
-) {
+export async function changePayloadTimeStampAndSync(application, payload, timestamp, contentOverride, syncOptions) {
   await changePayloadTimeStamp(application, payload, timestamp, contentOverride)
 
   await application.sync.sync(syncOptions)
@@ -589,12 +535,7 @@ export async function changePayloadUpdatedAt(application, payload, updatedAt) {
   return application.itemManager.findAnyItem(payload.uuid)
 }
 
-export async function changePayloadTimeStampDeleteAndSync(
-  application,
-  payload,
-  timestamp,
-  syncOptions,
-) {
+export async function changePayloadTimeStampDeleteAndSync(application, payload, timestamp, syncOptions) {
   payload = application.payloadManager.collection.find(payload.uuid)
   const changedPayload = new DeletedPayload({
     ...payload,

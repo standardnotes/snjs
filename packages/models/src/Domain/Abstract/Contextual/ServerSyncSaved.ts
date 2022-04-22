@@ -18,9 +18,7 @@ export interface ServerSyncSavedContextualPayload {
   uuid: string
 }
 
-export function CreateServerSyncSavedPayload(
-  from: FilteredServerItem,
-): ServerSyncSavedContextualPayload {
+export function CreateServerSyncSavedPayload(from: FilteredServerItem): ServerSyncSavedContextualPayload {
   return {
     content_type: from.content_type,
     created_at_timestamp: from.created_at_timestamp,

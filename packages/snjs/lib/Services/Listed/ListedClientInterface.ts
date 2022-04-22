@@ -5,8 +5,5 @@ export interface ListedClientInterface {
   canRegisterNewListedAccount: () => boolean
   requestNewListedAccount: () => Promise<ListedAccount | undefined>
   getListedAccounts(): Promise<ListedAccount[]>
-  getListedAccountInfo(
-    account: ListedAccount,
-    inContextOfItem?: Uuid,
-  ): Promise<ListedAccountInfo | undefined>
+  getListedAccountInfo(account: ListedAccount, inContextOfItem?: Uuid): Promise<ListedAccountInfo | undefined>
 }

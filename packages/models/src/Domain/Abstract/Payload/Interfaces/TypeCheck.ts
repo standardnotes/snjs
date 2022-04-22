@@ -16,9 +16,7 @@ export function isDecryptedPayload<C extends ItemContent = ItemContent>(
   return isDecryptedTransferPayload(payload)
 }
 
-export function isEncryptedPayload(
-  payload: PayloadInterface,
-): payload is EncryptedPayloadInterface {
+export function isEncryptedPayload(payload: PayloadInterface): payload is EncryptedPayloadInterface {
   return isEncryptedTransferPayload(payload)
 }
 
@@ -26,8 +24,6 @@ export function isDeletedPayload(payload: PayloadInterface): payload is DeletedP
   return isDeletedTransferPayload(payload)
 }
 
-export function isErrorDecryptingPayload(
-  payload: PayloadInterface,
-): payload is EncryptedPayloadInterface {
+export function isErrorDecryptingPayload(payload: PayloadInterface): payload is EncryptedPayloadInterface {
   return isErrorDecryptingTransferPayload(payload)
 }

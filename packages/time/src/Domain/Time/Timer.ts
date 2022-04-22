@@ -82,8 +82,6 @@ export class Timer implements TimerInterface {
   }
 
   convertMicrosecondsToDate(microseconds: number): Date {
-    return this.convertStringDateToDate(
-      this.convertMicrosecondsToStringDate(microseconds)
-    )
+    return this.convertStringDateToDate(this.convertMicrosecondsToStringDate(microseconds))
   }
 }

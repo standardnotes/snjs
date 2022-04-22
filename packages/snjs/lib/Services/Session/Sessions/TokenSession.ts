@@ -11,13 +11,7 @@ export class TokenSession extends Session {
     const refreshExpiration: number = body.refresh_expiration
     const readonlyAccess: boolean = body.readonly_access
 
-    return new TokenSession(
-      accessToken,
-      accessExpiration,
-      refreshToken,
-      refreshExpiration,
-      readonlyAccess,
-    )
+    return new TokenSession(accessToken, accessExpiration, refreshToken, refreshExpiration, readonlyAccess)
   }
 
   constructor(

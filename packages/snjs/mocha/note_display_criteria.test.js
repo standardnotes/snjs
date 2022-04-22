@@ -204,9 +204,7 @@ describe('note display criteria', function () {
     const nonmatchingCriteria = NotesDisplayCriteria.Create({
       tags: [looseTag],
     })
-    expect(notesMatchingCriteria(nonmatchingCriteria, this.itemManager.collection).length).to.equal(
-      0,
-    )
+    expect(notesMatchingCriteria(nonmatchingCriteria, this.itemManager.collection).length).to.equal(0)
   })
 
   describe('smart views', function () {

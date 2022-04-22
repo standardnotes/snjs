@@ -5,4 +5,4 @@ import { ItemAuthenticatedData } from './ItemAuthenticatedData'
 export type RootKeyEncryptedAuthenticatedData = ItemAuthenticatedData & {
   /** The key params used to generate the root key that encrypts this item key */
   kp: AnyKeyParamsContent
-};
+}

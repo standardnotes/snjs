@@ -11,7 +11,8 @@ describe('RedisDomainEventSubscriberFactory', () => {
   let domainEventMessageHandler: DomainEventMessageHandlerInterface
   const eventChannel = 'events'
 
-  const createFactory = () => new RedisDomainEventSubscriberFactory(redisClient, domainEventMessageHandler, eventChannel)
+  const createFactory = () =>
+    new RedisDomainEventSubscriberFactory(redisClient, domainEventMessageHandler, eventChannel)
 
   beforeEach(() => {
     redisClient = {} as jest.Mocked<IORedis.Redis>

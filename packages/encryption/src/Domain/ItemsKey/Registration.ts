@@ -3,8 +3,4 @@ import { RegisterItemClass, DecryptedItemMutator, ItemsKeyContent } from '@stand
 import { SNItemsKey } from './ItemsKey'
 import { ItemsKeyMutator } from './ItemsKeyMutator'
 
-RegisterItemClass(
-  ContentType.ItemsKey,
-  SNItemsKey,
-  ItemsKeyMutator as unknown as DecryptedItemMutator<ItemsKeyContent>,
-)
+RegisterItemClass(ContentType.ItemsKey, SNItemsKey, ItemsKeyMutator as unknown as DecryptedItemMutator<ItemsKeyContent>)

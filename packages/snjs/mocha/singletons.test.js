@@ -25,10 +25,7 @@ describe('singletons', function () {
   }
 
   function findOrCreatePrefsSingleton(application) {
-    return application.singletonManager.findOrCreateContentTypeSingleton(
-      ContentType.UserPrefs,
-      FillItemContent({}),
-    )
+    return application.singletonManager.findOrCreateContentTypeSingleton(ContentType.UserPrefs, FillItemContent({}))
   }
 
   beforeEach(async function () {
@@ -50,14 +47,7 @@ describe('singletons', function () {
     }
 
     this.signIn = async () => {
-      await this.application.signIn(
-        this.email,
-        this.password,
-        undefined,
-        undefined,
-        undefined,
-        true,
-      )
+      await this.application.signIn(this.email, this.password, undefined, undefined, undefined, true)
     }
 
     this.extManagerId = 'org.standardnotes.extensions-manager'
@@ -125,10 +115,7 @@ describe('singletons', function () {
 
     await this.application.sync.sync(syncOptions)
 
-    expect(
-      this.application.itemManager.itemsMatchingPredicate(ContentType.Component, this.extPred)
-        .length,
-    ).to.equal(1)
+    expect(this.application.itemManager.itemsMatchingPredicate(ContentType.Component, this.extPred).length).to.equal(1)
   })
 
   it('resolves via find or create', async function () {
@@ -145,16 +132,13 @@ describe('singletons', function () {
         mode: SyncMode.DownloadFirst,
       })
     })
-    const userPreferences =
-      await this.application.singletonManager.findOrCreateContentTypeSingleton(contentType, {})
+    const userPreferences = await this.application.singletonManager.findOrCreateContentTypeSingleton(contentType, {})
 
     expect(userPreferences).to.be.ok
     const refreshedUserPrefs = this.application.items.findItem(userPreferences.uuid)
     expect(refreshedUserPrefs).to.be.ok
     await this.application.sync.sync(syncOptions)
-    expect(
-      this.application.itemManager.itemsMatchingPredicate(contentType, predicate).length,
-    ).to.equal(1)
+    expect(this.application.itemManager.itemsMatchingPredicate(contentType, predicate).length).to.equal(1)
   })
 
   it('resolves registered predicate with signing in/out', async function () {
@@ -262,9 +246,7 @@ describe('singletons', function () {
   })
 
   it('if only result is errorDecrypting, create new item', async function () {
-    const item = this.application.itemManager.items.find(
-      (item) => item.content_type === ContentType.UserPrefs,
-    )
+    const item = this.application.itemManager.items.find((item) => item.content_type === ContentType.UserPrefs)
 
     const erroredPayload = new EncryptedPayload({
       ...item.payload.ejected(),
@@ -336,18 +318,12 @@ describe('singletons', function () {
     await Factory.sleep(0)
     await this.application.syncService.sync(syncOptions)
 
-    expect(
-      this.application.itemManager.itemsMatchingPredicate(ContentType.Component, this.extPred)
-        .length,
-    ).to.equal(1)
+    expect(this.application.itemManager.itemsMatchingPredicate(ContentType.Component, this.extPred).length).to.equal(1)
   })
 
   it('alternating the uuid of a singleton should return correct result', async function () {
     const payload = createPrefsPayload()
-    const item = await this.application.itemManager.emitItemFromPayload(
-      payload,
-      PayloadEmitSource.LocalChanged,
-    )
+    const item = await this.application.itemManager.emitItemFromPayload(payload, PayloadEmitSource.LocalChanged)
     await this.application.syncService.sync(syncOptions)
     const predicate = new Predicate('content_type', '=', item.content_type)
     let resolvedItem = await this.application.singletonManager.findOrCreateContentTypeSingleton(

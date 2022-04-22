@@ -82,10 +82,7 @@ describe('featuresService', () => {
     internalEventBus.publish = jest.fn()
   })
 
-  const nativeComponent = (
-    identifier?: FeatureIdentifier,
-    file_type?: FeatureDescription['file_type'],
-  ) => {
+  const nativeComponent = (identifier?: FeatureIdentifier, file_type?: FeatureDescription['file_type']) => {
     return new SNComponent({
       uuid: '789',
       content_type: ContentType.Component,
@@ -140,10 +137,7 @@ describe('featuresService', () => {
 
       const manager = createManager(Environment.Desktop, Platform.MacDesktop)
       expect(
-        manager.areRequestedPermissionsValid(
-          nativeComponent(FeatureIdentifier.MarkdownBasicEditor),
-          permissions,
-        ),
+        manager.areRequestedPermissionsValid(nativeComponent(FeatureIdentifier.MarkdownBasicEditor), permissions),
       ).toEqual(true)
     })
 
@@ -193,10 +187,7 @@ describe('featuresService', () => {
 
       const manager = createManager(Environment.Desktop, Platform.MacDesktop)
       expect(
-        manager.areRequestedPermissionsValid(
-          nativeComponent(FeatureIdentifier.DeprecatedFileSafe),
-          permissions,
-        ),
+        manager.areRequestedPermissionsValid(nativeComponent(FeatureIdentifier.DeprecatedFileSafe), permissions),
       ).toEqual(false)
     })
 
@@ -214,10 +205,7 @@ describe('featuresService', () => {
 
       const manager = createManager(Environment.Desktop, Platform.MacDesktop)
       expect(
-        manager.areRequestedPermissionsValid(
-          nativeComponent(FeatureIdentifier.DeprecatedFileSafe),
-          permissions,
-        ),
+        manager.areRequestedPermissionsValid(nativeComponent(FeatureIdentifier.DeprecatedFileSafe), permissions),
       ).toEqual(true)
     })
 
@@ -234,12 +222,9 @@ describe('featuresService', () => {
       ]
 
       const manager = createManager(Environment.Desktop, Platform.MacDesktop)
-      expect(
-        manager.areRequestedPermissionsValid(
-          nativeComponent(FeatureIdentifier.BoldEditor),
-          permissions,
-        ),
-      ).toEqual(true)
+      expect(manager.areRequestedPermissionsValid(nativeComponent(FeatureIdentifier.BoldEditor), permissions)).toEqual(
+        true,
+      )
     })
 
     it('non bold editor should not able to stream filesafe files', () => {
@@ -255,12 +240,9 @@ describe('featuresService', () => {
       ]
 
       const manager = createManager(Environment.Desktop, Platform.MacDesktop)
-      expect(
-        manager.areRequestedPermissionsValid(
-          nativeComponent(FeatureIdentifier.PlusEditor),
-          permissions,
-        ),
-      ).toEqual(false)
+      expect(manager.areRequestedPermissionsValid(nativeComponent(FeatureIdentifier.PlusEditor), permissions)).toEqual(
+        false,
+      )
     })
   })
 
@@ -271,9 +253,7 @@ describe('featuresService', () => {
         const component = nativeComponent()
         const url = manager.urlForComponent(component)
         const feature = FindNativeFeature(component.identifier)
-        expect(url).toEqual(
-          `${desktopExtHost}/components/${feature?.identifier}/${feature?.index_path}`,
-        )
+        expect(url).toEqual(`${desktopExtHost}/components/${feature?.identifier}/${feature?.index_path}`)
       })
 
       it('returns native path for deprecated native component', () => {
@@ -281,9 +261,7 @@ describe('featuresService', () => {
         const component = deprecatedComponent()
         const url = manager.urlForComponent(component)
         const feature = FindNativeFeature(component.identifier)
-        expect(url).toEqual(
-          `${desktopExtHost}/components/${feature?.identifier}/${feature?.index_path}`,
-        )
+        expect(url).toEqual(`${desktopExtHost}/components/${feature?.identifier}/${feature?.index_path}`)
       })
 
       it('returns nonnative path for third party component', () => {
@@ -317,9 +295,7 @@ describe('featuresService', () => {
         const component = nativeComponent()
         const url = manager.urlForComponent(component)
         const feature = FindNativeFeature(component.identifier) as FeatureDescription
-        expect(url).toEqual(
-          `http://localhost/components/${component.identifier}/${feature.index_path}`,
-        )
+        expect(url).toEqual(`http://localhost/components/${component.identifier}/${feature.index_path}`)
       })
 
       it('returns hosted path for third party component', () => {

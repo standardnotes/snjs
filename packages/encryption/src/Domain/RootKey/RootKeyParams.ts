@@ -76,14 +76,9 @@ export class SNRootKeyParams {
     }
 
     if ([ProtocolVersion.V004, ProtocolVersion.V003].includes(this.version)) {
-      return (
-        this.identifier === other.identifier &&
-        this.content004.pw_nonce === other.content003.pw_nonce
-      )
+      return this.identifier === other.identifier && this.content004.pw_nonce === other.content003.pw_nonce
     } else if ([ProtocolVersion.V002, ProtocolVersion.V001].includes(this.version)) {
-      return (
-        this.identifier === other.identifier && this.content002.pw_salt === other.content001.pw_salt
-      )
+      return this.identifier === other.identifier && this.content002.pw_salt === other.content001.pw_salt
     } else {
       throw Error('Unhandled version in KeyParams.compare')
     }

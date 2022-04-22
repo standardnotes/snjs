@@ -1,5 +1,5 @@
 import { ItemDelta } from './ItemDelta'
 
 export interface SNIndex {
-  onChange(delta: ItemDelta): void;
+  onChange(delta: ItemDelta): void
 }

@@ -1,9 +1,4 @@
-import {
-  SNRootKeyParams,
-  EncryptionService,
-  SNRootKey,
-  KeyParamsFromApiResponse,
-} from '@standardnotes/encryption'
+import { SNRootKeyParams, EncryptionService, SNRootKey, KeyParamsFromApiResponse } from '@standardnotes/encryption'
 import { UserService } from '../User/UserService'
 import {
   ItemsKeyInterface,
@@ -19,13 +14,7 @@ import { SNSyncService } from '../Sync/SyncService'
 import { KeyRecoveryStrings } from '../Api/Messages'
 import { SNStorageService } from '../Storage/StorageService'
 import { PayloadManager } from '../Payloads/PayloadManager'
-import {
-  Challenge,
-  ChallengeValidation,
-  ChallengeReason,
-  ChallengePrompt,
-  ChallengeService,
-} from '../Challenge'
+import { Challenge, ChallengeValidation, ChallengeReason, ChallengePrompt, ChallengeService } from '../Challenge'
 import { SNAlertService } from '../Alert/AlertService'
 import { SNApiService } from '@Lib/Services/Api/ApiService'
 import { ContentType, leftVersionGreaterThanOrEqualToRight } from '@standardnotes/common'
@@ -82,10 +71,7 @@ import {
  * but our current copy is not, we will ignore the incoming value until we can properly
  * decrypt it.
  */
-export class SNKeyRecoveryService extends AbstractService<
-  KeyRecoveryEvent,
-  DecryptedPayloadInterface[]
-> {
+export class SNKeyRecoveryService extends AbstractService<KeyRecoveryEvent, DecryptedPayloadInterface[]> {
   private removeItemObserver: () => void
   private decryptionQueue: DecryptionQueueItem[] = []
   private serverParams?: SNRootKeyParams
@@ -394,13 +380,8 @@ export class SNKeyRecoveryService extends AbstractService<
 
       if (this.serverParams) {
         const latestClientParams = this.getClientKeyParams()
-        const serverParamsDifferFromClients =
-          latestClientParams && !this.serverParams.compare(latestClientParams)
-        if (
-          latestClientParams &&
-          this.serverKeyParamsAreSafe(latestClientParams) &&
-          serverParamsDifferFromClients
-        ) {
+        const serverParamsDifferFromClients = latestClientParams && !this.serverParams.compare(latestClientParams)
+        if (latestClientParams && this.serverKeyParamsAreSafe(latestClientParams) && serverParamsDifferFromClients) {
           /**
            * The only way left to validate our password is to sign in with the server,
            * creating an all new session.
@@ -485,11 +466,9 @@ export class SNKeyRecoveryService extends AbstractService<
     this.challengeService.completeChallenge(challenge)
 
     if (!isErrorDecryptingPayload(decryptedPayload)) {
-      const matching = await this.handleDecryptionOfAllKeysMatchingCorrectRootKey(
-        rootKey,
-        replacesRootKey,
-        [decryptedPayload],
-      )
+      const matching = await this.handleDecryptionOfAllKeysMatchingCorrectRootKey(rootKey, replacesRootKey, [
+        decryptedPayload,
+      ])
 
       const result = { success: true }
 

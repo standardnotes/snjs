@@ -1,16 +1,10 @@
-import {
-  SyncResolvedParams,
-  SyncResolvedPayload,
-} from './../../../Runtime/Deltas/Utilities/SyncResolvedPayload'
+import { SyncResolvedParams, SyncResolvedPayload } from './../../../Runtime/Deltas/Utilities/SyncResolvedPayload'
 import { ContentType, Uuid } from '@standardnotes/common'
 import { ItemContent } from '../../Content/ItemContent'
 import { TransferPayload } from '../../TransferPayload/Interfaces/TransferPayload'
 import { PayloadSource } from '../Types/PayloadSource'
 
-export interface PayloadInterface<
-  T extends TransferPayload = TransferPayload,
-  C extends ItemContent = ItemContent,
-> {
+export interface PayloadInterface<T extends TransferPayload = TransferPayload, C extends ItemContent = ItemContent> {
   readonly source: PayloadSource
   readonly uuid: Uuid
   readonly content_type: ContentType
@@ -42,8 +36,5 @@ export interface PayloadInterface<
 
   copy(override?: Partial<T>, source?: PayloadSource): this
 
-  copyAsSyncResolved(
-    override?: Partial<T> & SyncResolvedParams,
-    source?: PayloadSource,
-  ): SyncResolvedPayload
+  copyAsSyncResolved(override?: Partial<T> & SyncResolvedParams, source?: PayloadSource): SyncResolvedPayload
 }

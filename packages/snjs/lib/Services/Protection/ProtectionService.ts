@@ -34,9 +34,7 @@ export enum UnprotectedAccessSecondsDuration {
 }
 
 export function isValidProtectionSessionLength(number: unknown): boolean {
-  return (
-    typeof number === 'number' && Object.values(UnprotectedAccessSecondsDuration).includes(number)
-  )
+  return typeof number === 'number' && Object.values(UnprotectedAccessSecondsDuration).includes(number)
 }
 
 export const ProtectionSessionDurations = [
@@ -63,10 +61,7 @@ export const ProtectionSessionDurations = [
  * like viewing a protected note, as well as managing how long that
  * authentication should be valid for.
  */
-export class SNProtectionService
-  extends AbstractService<ProtectionEvent>
-  implements ProtectionsClientInterface
-{
+export class SNProtectionService extends AbstractService<ProtectionEvent> implements ProtectionsClientInterface {
   private sessionExpiryTimeout = -1
 
   constructor(
@@ -94,11 +89,7 @@ export class SNProtectionService
   }
 
   public hasProtectionSources(): boolean {
-    return (
-      this.protocolService.hasAccount() ||
-      this.protocolService.hasPasscode() ||
-      this.hasBiometricsEnabled()
-    )
+    return this.protocolService.hasAccount() || this.protocolService.hasPasscode() || this.hasBiometricsEnabled()
   }
 
   public hasUnprotectedAccessSession(): boolean {
@@ -109,10 +100,7 @@ export class SNProtectionService
   }
 
   public hasBiometricsEnabled(): boolean {
-    const biometricsState = this.storageService.getValue(
-      StorageKey.BiometricsState,
-      StorageValueModes.Nonwrapped,
-    )
+    const biometricsState = this.storageService.getValue(StorageKey.BiometricsState, StorageValueModes.Nonwrapped)
     return Boolean(biometricsState)
   }
 
@@ -121,11 +109,7 @@ export class SNProtectionService
       SNLog.onError(Error('Tried to enable biometrics when they already are enabled.'))
       return false
     }
-    await this.storageService.setValue(
-      StorageKey.BiometricsState,
-      true,
-      StorageValueModes.Nonwrapped,
-    )
+    await this.storageService.setValue(StorageKey.BiometricsState, true, StorageValueModes.Nonwrapped)
     return true
   }
 
@@ -135,11 +119,7 @@ export class SNProtectionService
       return false
     }
     if (await this.validateOrRenewSession(ChallengeReason.DisableBiometrics)) {
-      await this.storageService.setValue(
-        StorageKey.BiometricsState,
-        false,
-        StorageValueModes.Nonwrapped,
-      )
+      await this.storageService.setValue(StorageKey.BiometricsState, false, StorageValueModes.Nonwrapped)
       return true
     } else {
       return false
@@ -161,10 +141,7 @@ export class SNProtectionService
     }
   }
 
-  async authorizeProtectedActionForFiles(
-    files: SNFile[],
-    challengeReason: ChallengeReason,
-  ): Promise<SNFile[]> {
+  async authorizeProtectedActionForFiles(files: SNFile[], challengeReason: ChallengeReason): Promise<SNFile[]> {
     let sessionValidation: Promise<boolean> | undefined
     const authorizedFiles = []
     for (const file of files) {
@@ -179,10 +156,7 @@ export class SNProtectionService
     return authorizedFiles
   }
 
-  async authorizeProtectedActionForNotes(
-    notes: SNNote[],
-    challengeReason: ChallengeReason,
-  ): Promise<SNNote[]> {
+  async authorizeProtectedActionForNotes(notes: SNNote[], challengeReason: ChallengeReason): Promise<SNNote[]> {
     let sessionValidation: Promise<boolean> | undefined
     const authorizedNotes = []
     for (const note of notes) {
@@ -301,9 +275,7 @@ export class SNProtectionService
         chosenSessionLength,
       ),
     )
-    const response = await this.challengeService.promptForChallengeResponse(
-      new Challenge(prompts, reason, true),
-    )
+    const response = await this.challengeService.promptForChallengeResponse(new Challenge(prompts, reason, true))
     if (response) {
       const length = response.values.find(
         (value) => value.prompt.validation === ChallengeValidation.ProtectionSessionDuration,

@@ -19,11 +19,9 @@ export class Migration2_42_0 extends Migration {
   }
 
   private async deleteNoDistraction(): Promise<void> {
-    const themes = (this.services.itemManager.getItems(ContentType.Theme) as SNTheme[]).filter(
-      (theme) => {
-        return theme.identifier === NoDistractionIdentifier
-      },
-    )
+    const themes = (this.services.itemManager.getItems(ContentType.Theme) as SNTheme[]).filter((theme) => {
+      return theme.identifier === NoDistractionIdentifier
+    })
 
     for (const theme of themes) {
       await this.services.itemManager.setItemToBeDeleted(theme)

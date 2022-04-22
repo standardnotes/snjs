@@ -1,4 +1,4 @@
 export enum MuteFailedCloudBackupsEmailsOption {
   Muted = 'muted',
-  NotMuted = 'not_muted'
+  NotMuted = 'not_muted',
 }

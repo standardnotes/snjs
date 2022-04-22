@@ -67,14 +67,7 @@ describe('auth fringe cases', () => {
         "and 'Unable to find operator for version undefined'",
       )
 
-      await restartedApplication.signIn(
-        context.email,
-        context.password,
-        undefined,
-        undefined,
-        undefined,
-        awaitSync,
-      )
+      await restartedApplication.signIn(context.email, context.password, undefined, undefined, undefined, awaitSync)
       const refreshedNote = restartedApplication.itemManager.findItem(note.uuid)
       expect(isDecryptedItem(refreshedNote)).to.equal(true)
       expect(restartedApplication.itemManager.notes.length).to.equal(1)
@@ -89,11 +82,7 @@ describe('auth fringe cases', () => {
 
       const staleText = 'stale text'
 
-      const firstVersionOfNote = await Factory.createSyncedNote(
-        context.application,
-        undefined,
-        staleText,
-      )
+      const firstVersionOfNote = await Factory.createSyncedNote(context.application, undefined, staleText)
 
       const serverText = 'server text'
 
@@ -111,13 +100,9 @@ describe('auth fringe cases', () => {
 
       expect(newApplication.itemManager.notes.length).to.equal(2)
 
-      expect(
-        newApplication.itemManager.notes.find((n) => n.uuid === firstVersionOfNote.uuid).text,
-      ).to.equal(staleText)
+      expect(newApplication.itemManager.notes.find((n) => n.uuid === firstVersionOfNote.uuid).text).to.equal(staleText)
 
-      const conflictedCopy = newApplication.itemManager.notes.find(
-        (n) => n.uuid !== firstVersionOfNote.uuid,
-      )
+      const conflictedCopy = newApplication.itemManager.notes.find((n) => n.uuid !== firstVersionOfNote.uuid)
       expect(conflictedCopy.text).to.equal(serverText)
       expect(conflictedCopy.duplicate_of).to.equal(firstVersionOfNote.uuid)
       await Factory.safeDeinit(newApplication)

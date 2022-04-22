@@ -1,9 +1,5 @@
 import { ServerSyncPushContextualPayload } from '@standardnotes/models'
-import {
-  arrayByDifference,
-  nonSecureRandomIdentifier,
-  subtractFromArray,
-} from '@standardnotes/utils'
+import { arrayByDifference, nonSecureRandomIdentifier, subtractFromArray } from '@standardnotes/utils'
 import { ServerSyncResponse } from '@Lib/Services/Sync/Account/Response'
 import { ResponseSignalReceiver, SyncSignal } from '@Lib/Services/Sync/Signals'
 import { SNApiService } from '../../Api/ApiService'

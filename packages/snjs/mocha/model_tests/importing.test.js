@@ -64,10 +64,7 @@ describe('importing', function () {
     const notePayload = pair[0]
     const tagPayload = pair[1]
 
-    await application.itemManager.emitItemsFromPayloads(
-      [notePayload, tagPayload],
-      PayloadEmitSource.LocalChanged,
-    )
+    await application.itemManager.emitItemsFromPayloads([notePayload, tagPayload], PayloadEmitSource.LocalChanged)
     expectedItemCount += 2
     const note = application.itemManager.getItems([ContentType.Note])[0]
     const tag = application.itemManager.getItems([ContentType.Tag])[0]
@@ -263,10 +260,7 @@ describe('importing', function () {
 
     Factory.handlePasswordChallenges(application, password)
 
-    const [note, tag] = await Promise.all([
-      Factory.createMappedNote(application),
-      Factory.createMappedTag(application),
-    ])
+    const [note, tag] = await Promise.all([Factory.createMappedNote(application), Factory.createMappedTag(application)])
 
     await application.sync.sync({ awaitAll: true })
 
@@ -364,10 +358,7 @@ describe('importing', function () {
       password: password,
     })
 
-    const [note, tag] = await Promise.all([
-      Factory.createMappedNote(application),
-      Factory.createMappedTag(application),
-    ])
+    const [note, tag] = await Promise.all([Factory.createMappedNote(application), Factory.createMappedTag(application)])
 
     const backupData = await application.createEncryptedBackupFileForAutomatedDesktopBackups()
 
@@ -396,10 +387,7 @@ describe('importing', function () {
       password: password,
     })
 
-    const [note, tag] = await Promise.all([
-      Factory.createMappedNote(application),
-      Factory.createMappedTag(application),
-    ])
+    const [note, tag] = await Promise.all([Factory.createMappedNote(application), Factory.createMappedTag(application)])
 
     const backupData = await application.createEncryptedBackupFileForAutomatedDesktopBackups()
 
@@ -424,10 +412,7 @@ describe('importing', function () {
       password: password,
     })
 
-    const [note, tag] = await Promise.all([
-      Factory.createMappedNote(application),
-      Factory.createMappedTag(application),
-    ])
+    const [note, tag] = await Promise.all([Factory.createMappedNote(application), Factory.createMappedTag(application)])
 
     const backupData = await application.createEncryptedBackupFileForAutomatedDesktopBackups()
 
@@ -651,9 +636,7 @@ describe('importing', function () {
     application = await Factory.createInitAppWithFakeCrypto()
     application.setLaunchCallback({
       receiveChallenge: (challenge) => {
-        const values = challenge.prompts.map(
-          (prompt) => new ChallengeValue(prompt, 'incorrect password'),
-        )
+        const values = challenge.prompts.map((prompt) => new ChallengeValue(prompt, 'incorrect password'))
         application.submitValuesForChallenge(challenge, values)
       },
     })
@@ -704,9 +687,7 @@ describe('importing', function () {
     })
 
     const backupData = await application.createEncryptedBackupFileForAutomatedDesktopBackups()
-    backupData.items = backupData.items.filter(
-      (payload) => payload.content_type !== ContentType.ItemsKey,
-    )
+    backupData.items = backupData.items.filter((payload) => payload.content_type !== ContentType.ItemsKey)
 
     await Factory.safeDeinit(application)
     application = await Factory.createInitAppWithFakeCrypto()

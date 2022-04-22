@@ -4,13 +4,7 @@ import { SNStorageService } from '../Storage/StorageService'
 import { SNProtectionService } from './ProtectionService'
 import { InternalEventBus, InternalEventBusInterface } from '@standardnotes/services'
 import { UuidGenerator } from '@standardnotes/utils'
-import {
-  DecryptedPayload,
-  FileContent,
-  SNFile,
-  FillItemContent,
-  PayloadTimestampDefaults,
-} from '@standardnotes/models'
+import { DecryptedPayload, FileContent, SNFile, FillItemContent, PayloadTimestampDefaults } from '@standardnotes/models'
 import { ContentType } from '@standardnotes/common'
 
 const setupRandomUuid = () => {
@@ -25,12 +19,7 @@ describe('protectionService', () => {
   let protectionService: SNProtectionService
 
   const createService = () => {
-    return new SNProtectionService(
-      protocolService,
-      challengeService,
-      storageService,
-      internalEventBus,
-    )
+    return new SNProtectionService(protocolService, challengeService, storageService, internalEventBus)
   }
 
   const createFile = (name: string, isProtected?: boolean) => {
@@ -69,10 +58,7 @@ describe('protectionService', () => {
 
       const unprotectedFile = createFile('protected.txt', false)
 
-      await protectionService.authorizeProtectedActionForFiles(
-        [unprotectedFile],
-        ChallengeReason.AccessProtectedFile,
-      )
+      await protectionService.authorizeProtectedActionForFiles([unprotectedFile], ChallengeReason.AccessProtectedFile)
 
       expect(challengeService.promptForChallengeResponse).not.toHaveBeenCalled()
     })
@@ -82,10 +68,7 @@ describe('protectionService', () => {
 
       const protectedFile = createFile('protected.txt', true)
 
-      await protectionService.authorizeProtectedActionForFiles(
-        [protectedFile],
-        ChallengeReason.AccessProtectedFile,
-      )
+      await protectionService.authorizeProtectedActionForFiles([protectedFile], ChallengeReason.AccessProtectedFile)
 
       expect(challengeService.promptForChallengeResponse).toHaveBeenCalled()
     })

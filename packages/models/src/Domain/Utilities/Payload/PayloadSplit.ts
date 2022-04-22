@@ -2,11 +2,7 @@ import { ItemContent } from '../../Abstract/Content/ItemContent'
 import { DecryptedPayloadInterface } from '../../Abstract/Payload/Interfaces/DecryptedPayload'
 import { DeletedPayloadInterface } from '../../Abstract/Payload/Interfaces/DeletedPayload'
 import { EncryptedPayloadInterface } from '../../Abstract/Payload/Interfaces/EncryptedPayload'
-import {
-  isDecryptedPayload,
-  isDeletedPayload,
-  isEncryptedPayload,
-} from '../../Abstract/Payload/Interfaces/TypeCheck'
+import { isDecryptedPayload, isDeletedPayload, isEncryptedPayload } from '../../Abstract/Payload/Interfaces/TypeCheck'
 import { FullyFormedPayloadInterface } from '../../Abstract/Payload/Interfaces/UnionTypes'
 
 export interface PayloadSplit<C extends ItemContent = ItemContent> {

@@ -67,10 +67,7 @@ describe('online conflict handling', function () {
   it('components should not be duplicated under any circumstances', async function () {
     const payload = createDirtyPayload(ContentType.Component)
 
-    const item = await this.application.itemManager.emitItemFromPayload(
-      payload,
-      PayloadEmitSource.LocalChanged,
-    )
+    const item = await this.application.itemManager.emitItemFromPayload(payload, PayloadEmitSource.LocalChanged)
 
     this.expectedItemCount++
 
@@ -97,10 +94,7 @@ describe('online conflict handling', function () {
 
   it('items keys should not be duplicated under any circumstances', async function () {
     const payload = createDirtyPayload(ContentType.ItemsKey)
-    const item = await this.application.itemManager.emitItemFromPayload(
-      payload,
-      PayloadEmitSource.LocalChanged,
-    )
+    const item = await this.application.itemManager.emitItemFromPayload(payload, PayloadEmitSource.LocalChanged)
     this.expectedItemCount++
     await this.application.syncService.sync(syncOptions)
     /** First modify the item without saving so that
@@ -133,10 +127,7 @@ describe('online conflict handling', function () {
         area: ComponentArea.Editor,
       },
     })
-    const editor = await this.application.itemManager.emitItemFromPayload(
-      payload,
-      PayloadEmitSource.LocalChanged,
-    )
+    const editor = await this.application.itemManager.emitItemFromPayload(payload, PayloadEmitSource.LocalChanged)
     this.expectedItemCount++
     await this.application.syncService.sync(syncOptions)
 
@@ -452,10 +443,7 @@ describe('online conflict handling', function () {
       deleted: false,
       updated_at: Factory.yesterday(),
     })
-    await this.application.itemManager.emitItemsFromPayloads(
-      [mutatedPayload],
-      PayloadEmitSource.LocalChanged,
-    )
+    await this.application.itemManager.emitItemsFromPayloads([mutatedPayload], PayloadEmitSource.LocalChanged)
     const resultNote = this.application.itemManager.findItem(note.uuid)
     expect(resultNote.uuid).to.equal(note.uuid)
     await this.application.itemManager.setItemDirty(resultNote)
@@ -576,14 +564,9 @@ describe('online conflict handling', function () {
         mutator.text = '1'
       })
 
-      await Factory.changePayloadTimeStamp(
-        this.application,
-        note.payload,
-        Factory.dateToMicroseconds(yesterday),
-        {
-          text: '2',
-        },
-      )
+      await Factory.changePayloadTimeStamp(this.application, note.payload, Factory.dateToMicroseconds(yesterday), {
+        text: '2',
+      })
 
       // We expect all the notes to be duplicated.
       this.expectedItemCount++
@@ -602,10 +585,7 @@ describe('online conflict handling', function () {
     const payload1 = Factory.createStorageItemPayload(ContentType.Tag)
     const payload2 = Factory.createStorageItemPayload(ContentType.UserPrefs)
     this.expectedItemCount -= 1 /** auto-created user preferences  */
-    await this.application.itemManager.emitItemsFromPayloads(
-      [payload1, payload2],
-      PayloadEmitSource.LocalChanged,
-    )
+    await this.application.itemManager.emitItemsFromPayloads([payload1, payload2], PayloadEmitSource.LocalChanged)
     this.expectedItemCount += 2
     let tag = this.application.itemManager.getItems(ContentType.Tag)[0]
     let userPrefs = this.application.itemManager.getItems(ContentType.UserPrefs)[0]
@@ -744,9 +724,7 @@ describe('online conflict handling', function () {
     await this.application.sync.sync()
 
     /** Simulate a dropped response by reverting the note back its post-change, pre-sync state */
-    const retroNote = await this.application.itemManager.emitItemFromPayload(
-      noteAfterChange.payload,
-    )
+    const retroNote = await this.application.itemManager.emitItemFromPayload(noteAfterChange.payload)
     expect(retroNote.serverUpdatedAt.getTime()).to.equal(noteAfterChange.serverUpdatedAt.getTime())
 
     /** Change the item to its final title and sync */
@@ -785,10 +763,7 @@ describe('online conflict handling', function () {
       errorDecrypting: true,
       dirty: true,
     })
-    await this.application.itemManager.emitItemsFromPayloads(
-      [errorred],
-      PayloadEmitSource.LocalChanged,
-    )
+    await this.application.itemManager.emitItemsFromPayloads([errorred], PayloadEmitSource.LocalChanged)
 
     /**
      * Retrieve this note from the server by clearing sync token

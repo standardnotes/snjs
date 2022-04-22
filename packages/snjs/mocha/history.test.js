@@ -159,17 +159,9 @@ describe('history manager', () => {
        * Delete just 1 character. It should now retain the previous revision, as well as the
        * one previous to that.
        */
-      item = await setTextAndSync(
-        this.application,
-        item,
-        deleteCharsFromString(item.content.text, 1),
-      )
+      item = await setTextAndSync(this.application, item, deleteCharsFromString(item.content.text, 1))
       expect(this.historyManager.sessionHistoryForItem(item).length).to.equal(4)
-      item = await setTextAndSync(
-        this.application,
-        item,
-        deleteCharsFromString(item.content.text, 1),
-      )
+      item = await setTextAndSync(this.application, item, deleteCharsFromString(item.content.text, 1))
       expect(this.historyManager.sessionHistoryForItem(item).length).to.equal(5)
     })
 
@@ -179,19 +171,12 @@ describe('history manager', () => {
           text: Factory.randomString(100),
         }),
       )
-      let item = await this.application.itemManager.emitItemFromPayload(
-        payload,
-        PayloadEmitSource.LocalChanged,
-      )
+      let item = await this.application.itemManager.emitItemFromPayload(payload, PayloadEmitSource.LocalChanged)
       await this.application.itemManager.setItemDirty(item)
       await this.application.syncService.sync(syncOptions)
       /** It should keep the first and last by default */
       item = await setTextAndSync(this.application, item, item.content.text)
-      item = await setTextAndSync(
-        this.application,
-        item,
-        item.content.text + Factory.randomString(1),
-      )
+      item = await setTextAndSync(this.application, item, item.content.text + Factory.randomString(1))
       expect(this.historyManager.sessionHistoryForItem(item).length).to.equal(2)
       item = await setTextAndSync(
         this.application,
@@ -199,11 +184,7 @@ describe('history manager', () => {
         deleteCharsFromString(item.content.text, largeCharacterChange + 1),
       )
       expect(this.historyManager.sessionHistoryForItem(item).length).to.equal(2)
-      item = await setTextAndSync(
-        this.application,
-        item,
-        item.content.text + Factory.randomString(1),
-      )
+      item = await setTextAndSync(this.application, item, item.content.text + Factory.randomString(1))
       expect(this.historyManager.sessionHistoryForItem(item).length).to.equal(3)
       item = await setTextAndSync(
         this.application,
@@ -220,19 +201,12 @@ describe('history manager', () => {
         }),
       )
 
-      let item = await this.application.itemManager.emitItemFromPayload(
-        payload,
-        PayloadEmitSource.LocalChanged,
-      )
+      let item = await this.application.itemManager.emitItemFromPayload(payload, PayloadEmitSource.LocalChanged)
 
       await this.application.itemManager.setItemDirty(item)
       await this.application.syncService.sync(syncOptions)
 
-      item = await setTextAndSync(
-        this.application,
-        item,
-        item.content.text + Factory.randomString(1),
-      )
+      item = await setTextAndSync(this.application, item, item.content.text + Factory.randomString(1))
 
       item = await setTextAndSync(
         this.application,
@@ -240,11 +214,7 @@ describe('history manager', () => {
         deleteCharsFromString(item.content.text, largeCharacterChange + 1),
       )
 
-      item = await setTextAndSync(
-        this.application,
-        item,
-        item.content.text + Factory.randomString(1),
-      )
+      item = await setTextAndSync(this.application, item, item.content.text + Factory.randomString(1))
 
       item = await setTextAndSync(
         this.application,
@@ -256,9 +226,7 @@ describe('history manager', () => {
       const latestRevision = this.historyManager.sessionHistoryForItem(item)[0]
       /** Last entry should be the initial revision. */
       const initialRevision =
-        this.historyManager.sessionHistoryForItem(item)[
-          this.historyManager.sessionHistoryForItem(item).length - 1
-        ]
+        this.historyManager.sessionHistoryForItem(item)[this.historyManager.sessionHistoryForItem(item).length - 1]
 
       expect(latestRevision).to.not.equal(initialRevision)
 

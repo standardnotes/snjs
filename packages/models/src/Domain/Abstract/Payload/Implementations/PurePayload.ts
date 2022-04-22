@@ -4,10 +4,7 @@ import { PayloadInterface } from '../Interfaces/PayloadInterface'
 import { PayloadSource } from '../Types/PayloadSource'
 import { TransferPayload } from '../../TransferPayload/Interfaces/TransferPayload'
 import { ItemContent } from '../../Content/ItemContent'
-import {
-  SyncResolvedParams,
-  SyncResolvedPayload,
-} from '../../../Runtime/Deltas/Utilities/SyncResolvedPayload'
+import { SyncResolvedParams, SyncResolvedPayload } from '../../../Runtime/Deltas/Utilities/SyncResolvedPayload'
 
 type RequiredKeepUndefined<T> = { [K in keyof T]-?: [T[K]] } extends infer U
   ? U extends Record<keyof U, [unknown]>
@@ -102,8 +99,5 @@ export abstract class PurePayload<T extends TransferPayload<C>, C extends ItemCo
 
   abstract copy(override?: Partial<TransferPayload>, source?: PayloadSource): this
 
-  abstract copyAsSyncResolved(
-    override?: Partial<T> & SyncResolvedParams,
-    source?: PayloadSource,
-  ): SyncResolvedPayload
+  abstract copyAsSyncResolved(override?: Partial<T> & SyncResolvedParams, source?: PayloadSource): SyncResolvedPayload
 }

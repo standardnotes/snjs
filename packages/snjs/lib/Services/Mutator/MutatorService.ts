@@ -12,13 +12,7 @@ import { SNSyncService, SyncOptions } from '../Sync'
 import { Strings } from '../../Strings'
 import { TagsToFoldersMigrationApplicator } from '@Lib/Migrations/Applicators/TagsToFolders'
 import * as Models from '@standardnotes/models'
-import {
-  Challenge,
-  ChallengeValidation,
-  ChallengePrompt,
-  ChallengeReason,
-  ChallengeService,
-} from '../Challenge'
+import { Challenge, ChallengeValidation, ChallengePrompt, ChallengeReason, ChallengeService } from '../Challenge'
 import {
   CreateDecryptedBackupFileContextPayload,
   CreateEncryptedBackupFileContextPayload,
@@ -53,13 +47,8 @@ export class MutatorService extends AbstractService implements MutatorClientInte
     ;(this.historyService as unknown) = undefined
   }
 
-  public async insertItem(
-    item: Models.DecryptedItemInterface,
-  ): Promise<Models.DecryptedItemInterface> {
-    const mutator = Models.CreateDecryptedMutatorForItem(
-      item,
-      Models.MutationType.UpdateUserTimestamps,
-    )
+  public async insertItem(item: Models.DecryptedItemInterface): Promise<Models.DecryptedItemInterface> {
+    const mutator = Models.CreateDecryptedMutatorForItem(item, Models.MutationType.UpdateUserTimestamps)
     const dirtiedPayload = mutator.getResult()
     const insertedItem = await this.itemManager.emitItemFromPayload(
       dirtiedPayload,
@@ -68,9 +57,7 @@ export class MutatorService extends AbstractService implements MutatorClientInte
     return insertedItem
   }
 
-  public async changeAndSaveItem<
-    M extends Models.DecryptedItemMutator = Models.DecryptedItemMutator,
-  >(
+  public async changeAndSaveItem<M extends Models.DecryptedItemMutator = Models.DecryptedItemMutator>(
     itemToLookupUuidFor: Models.DecryptedItemInterface,
     mutate: (mutator: M) => void,
     updateTimestamps = true,
@@ -80,18 +67,14 @@ export class MutatorService extends AbstractService implements MutatorClientInte
     await this.itemManager.changeItems(
       [itemToLookupUuidFor],
       mutate,
-      updateTimestamps
-        ? Models.MutationType.UpdateUserTimestamps
-        : Models.MutationType.NoUpdateUserTimestamps,
+      updateTimestamps ? Models.MutationType.UpdateUserTimestamps : Models.MutationType.NoUpdateUserTimestamps,
       emitSource,
     )
     await this.syncService.sync(syncOptions)
     return this.itemManager.findItem(itemToLookupUuidFor.uuid)
   }
 
-  public async changeAndSaveItems<
-    M extends Models.DecryptedItemMutator = Models.DecryptedItemMutator,
-  >(
+  public async changeAndSaveItems<M extends Models.DecryptedItemMutator = Models.DecryptedItemMutator>(
     itemsToLookupUuidsFor: Models.DecryptedItemInterface[],
     mutate: (mutator: M) => void,
     updateTimestamps = true,
@@ -101,9 +84,7 @@ export class MutatorService extends AbstractService implements MutatorClientInte
     await this.itemManager.changeItems(
       itemsToLookupUuidsFor,
       mutate,
-      updateTimestamps
-        ? Models.MutationType.UpdateUserTimestamps
-        : Models.MutationType.NoUpdateUserTimestamps,
+      updateTimestamps ? Models.MutationType.UpdateUserTimestamps : Models.MutationType.NoUpdateUserTimestamps,
       emitSource,
     )
     await this.syncService.sync(syncOptions)
@@ -117,9 +98,7 @@ export class MutatorService extends AbstractService implements MutatorClientInte
     await this.itemManager.changeItems(
       [itemToLookupUuidFor],
       mutate,
-      updateTimestamps
-        ? Models.MutationType.UpdateUserTimestamps
-        : Models.MutationType.NoUpdateUserTimestamps,
+      updateTimestamps ? Models.MutationType.UpdateUserTimestamps : Models.MutationType.NoUpdateUserTimestamps,
     )
     return this.itemManager.findItem(itemToLookupUuidFor.uuid)
   }
@@ -132,9 +111,7 @@ export class MutatorService extends AbstractService implements MutatorClientInte
     return this.itemManager.changeItems(
       itemsToLookupUuidsFor,
       mutate,
-      updateTimestamps
-        ? Models.MutationType.UpdateUserTimestamps
-        : Models.MutationType.NoUpdateUserTimestamps,
+      updateTimestamps ? Models.MutationType.UpdateUserTimestamps : Models.MutationType.NoUpdateUserTimestamps,
     )
   }
 
@@ -154,10 +131,9 @@ export class MutatorService extends AbstractService implements MutatorClientInte
     return this.itemManager.runTransactionalMutation(transaction, emitSource, payloadSourceKey)
   }
 
-  private async protectItems<
-    M extends Models.DecryptedItemMutator,
-    I extends Models.DecryptedItemInterface,
-  >(items: I[]): Promise<I[]> {
+  private async protectItems<M extends Models.DecryptedItemMutator, I extends Models.DecryptedItemInterface>(
+    items: I[],
+  ): Promise<I[]> {
     const protectedItems = await this.itemManager.changeItems<M, I>(
       items,
       (mutator) => {
@@ -170,10 +146,10 @@ export class MutatorService extends AbstractService implements MutatorClientInte
     return protectedItems
   }
 
-  private async unprotectItems<
-    M extends Models.DecryptedItemMutator,
-    I extends Models.DecryptedItemInterface,
-  >(items: I[], reason: ChallengeReason): Promise<I[] | undefined> {
+  private async unprotectItems<M extends Models.DecryptedItemMutator, I extends Models.DecryptedItemInterface>(
+    items: I[],
+    reason: ChallengeReason,
+  ): Promise<I[] | undefined> {
     if (!(await this.protectionService.authorizeAction(reason))) {
       return undefined
     }
@@ -246,15 +222,11 @@ export class MutatorService extends AbstractService implements MutatorClientInte
     return this.itemManager.setItemsDirty(items)
   }
 
-  public async deleteItem(
-    item: Models.DecryptedItemInterface | Models.EncryptedItemInterface,
-  ): Promise<void> {
+  public async deleteItem(item: Models.DecryptedItemInterface | Models.EncryptedItemInterface): Promise<void> {
     return this.deleteItems([item])
   }
 
-  public async deleteItems(
-    items: (Models.DecryptedItemInterface | Models.EncryptedItemInterface)[],
-  ): Promise<void> {
+  public async deleteItems(items: (Models.DecryptedItemInterface | Models.EncryptedItemInterface)[]): Promise<void> {
     await this.itemManager.setItemsToBeDeleted(items)
     await this.syncService.sync()
   }
@@ -342,14 +314,7 @@ export class MutatorService extends AbstractService implements MutatorClientInte
     if (data.auth_params || data.keyParams) {
       /** Get import file password. */
       const challenge = new Challenge(
-        [
-          new ChallengePrompt(
-            ChallengeValidation.None,
-            Strings.Input.FileAccountPassword,
-            undefined,
-            true,
-          ),
-        ],
+        [new ChallengePrompt(ChallengeValidation.None, Strings.Input.FileAccountPassword, undefined, true)],
         ChallengeReason.DecryptEncryptedFile,
         true,
       )
@@ -370,9 +335,7 @@ export class MutatorService extends AbstractService implements MutatorClientInte
       if (isEncryptedTransferPayload(item)) {
         return CreateEncryptedBackupFileContextPayload(item)
       } else {
-        return CreateDecryptedBackupFileContextPayload(
-          item as Models.BackupFileDecryptedContextualPayload,
-        )
+        return CreateDecryptedBackupFileContextPayload(item as Models.BackupFileDecryptedContextualPayload)
       }
     })
 
@@ -385,10 +348,7 @@ export class MutatorService extends AbstractService implements MutatorClientInte
     const validPayloads = decryptedPayloadsOrError.filter(isDecryptedPayload).map((payload) => {
       /* Don't want to activate any components during import process in
        * case of exceptions breaking up the import proccess */
-      if (
-        payload.content_type === ContentType.Component &&
-        (payload.content as Models.ComponentContent).active
-      ) {
+      if (payload.content_type === ContentType.Component && (payload.content as Models.ComponentContent).active) {
         const typedContent = payload as Models.DecryptedPayloadInterface<Models.ComponentContent>
         return Models.CopyPayloadWithContentOverride(typedContent, {
           active: false,
@@ -409,9 +369,7 @@ export class MutatorService extends AbstractService implements MutatorClientInte
       await promise
     }
 
-    const affectedItems = this.itemManager.findItems(
-      affectedUuids,
-    ) as Models.DecryptedItemInterface[]
+    const affectedItems = this.itemManager.findItems(affectedUuids) as Models.DecryptedItemInterface[]
 
     return {
       affectedItems: affectedItems,

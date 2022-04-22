@@ -70,8 +70,7 @@ describe('Timer', () => {
   })
 
   it('should convert microseconds to string date', () => {
-    expect(createTimer().convertMicrosecondsToStringDate(1617004805233123))
-      .toEqual('2021-03-29T08:00:05.233123Z')
+    expect(createTimer().convertMicrosecondsToStringDate(1617004805233123)).toEqual('2021-03-29T08:00:05.233123Z')
   })
 
   it('should convert a string date to milliseconds', () => {

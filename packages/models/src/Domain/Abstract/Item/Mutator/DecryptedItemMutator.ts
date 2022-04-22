@@ -105,11 +105,7 @@ export class DecryptedItemMutator<C extends ItemContent = ItemContent> extends I
    * First gets the domain data for the input domain.
    * Then sets data[key] = value
    */
-  public setDomainDataKey(
-    key: keyof DomainDataValueType,
-    value: unknown,
-    domain: ItemDomainKey,
-  ): void {
+  public setDomainDataKey(key: keyof DomainDataValueType, value: unknown, domain: ItemDomainKey): void {
     if (!this.content.appData) {
       this.content.appData = {
         [DefaultAppDomain]: {},

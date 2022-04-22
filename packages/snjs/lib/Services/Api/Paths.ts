@@ -26,15 +26,13 @@ const ItemsPaths = {
   checkIntegrity: '/v1/items/check-integrity',
   getSingleItem: (uuid: Uuid) => `/v1/items/${uuid}`,
   itemRevisions: (itemUuid: string) => `/v1/items/${itemUuid}/revisions`,
-  itemRevision: (itemUuid: string, revisionUuid: string) =>
-    `/v1/items/${itemUuid}/revisions/${revisionUuid}`,
+  itemRevision: (itemUuid: string, revisionUuid: string) => `/v1/items/${itemUuid}/revisions/${revisionUuid}`,
   sync: '/v1/items',
 }
 
 const SettingsPaths = {
   settings: (userUuid: Uuid) => `/v1/users/${userUuid}/settings`,
-  setting: (userUuid: Uuid, settingName: SettingName) =>
-    `/v1/users/${userUuid}/settings/${settingName}`,
+  setting: (userUuid: Uuid, settingName: SettingName) => `/v1/users/${userUuid}/settings/${settingName}`,
   subscriptionSetting: (userUuid: Uuid, settingName: SubscriptionSettingName) =>
     `/v1/users/${userUuid}/subscription-settings/${settingName}`,
 }

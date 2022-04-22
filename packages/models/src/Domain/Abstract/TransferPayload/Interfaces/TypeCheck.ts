@@ -4,32 +4,21 @@ import { DeletedTransferPayload } from './DeletedTransferPayload'
 import { EncryptedTransferPayload } from './EncryptedTransferPayload'
 import { TransferPayload } from './TransferPayload'
 
-export type FullyFormedTransferPayload =
-  | DecryptedTransferPayload
-  | EncryptedTransferPayload
-  | DeletedTransferPayload
+export type FullyFormedTransferPayload = DecryptedTransferPayload | EncryptedTransferPayload | DeletedTransferPayload
 
-export function isDecryptedTransferPayload(
-  payload: TransferPayload,
-): payload is DecryptedTransferPayload {
+export function isDecryptedTransferPayload(payload: TransferPayload): payload is DecryptedTransferPayload {
   return isObject(payload.content)
 }
 
-export function isEncryptedTransferPayload(
-  payload: TransferPayload,
-): payload is EncryptedTransferPayload {
+export function isEncryptedTransferPayload(payload: TransferPayload): payload is EncryptedTransferPayload {
   return 'content' in payload && isString(payload.content)
 }
 
-export function isErrorDecryptingTransferPayload(
-  payload: TransferPayload,
-): payload is EncryptedTransferPayload {
+export function isErrorDecryptingTransferPayload(payload: TransferPayload): payload is EncryptedTransferPayload {
   return isEncryptedTransferPayload(payload) && payload.errorDecrypting === true
 }
 
-export function isDeletedTransferPayload(
-  payload: TransferPayload,
-): payload is DeletedTransferPayload {
+export function isDeletedTransferPayload(payload: TransferPayload): payload is DeletedTransferPayload {
   return 'deleted' in payload && payload.deleted === true
 }
 

@@ -1,13 +1,7 @@
 import { AccountEvent, UserService } from '../User/UserService'
 import { ApiServiceEvent, MetaReceivedData, SNApiService } from '../Api/ApiService'
 import { ApplicationStage } from '@standardnotes/services'
-import {
-  arraysEqual,
-  convertTimestampToMilliseconds,
-  removeFromArray,
-  Copy,
-  lastElement,
-} from '@standardnotes/utils'
+import { arraysEqual, convertTimestampToMilliseconds, removeFromArray, Copy, lastElement } from '@standardnotes/utils'
 import { ButtonType, SNAlertService } from '@Lib/Services/Alert/AlertService'
 import { ClientDisplayableError, UserFeaturesResponse } from '@standardnotes/responses'
 import { ContentType, RoleName } from '@standardnotes/common'
@@ -36,9 +30,7 @@ import {
   SetOfflineFeaturesFunctionResponse,
 } from './Types'
 
-type GetOfflineSubscriptionDetailsResponse =
-  | OfflineSubscriptionEntitlements
-  | ClientDisplayableError
+type GetOfflineSubscriptionDetailsResponse = OfflineSubscriptionEntitlements | ClientDisplayableError
 
 export class SNFeaturesService
   extends Services.AbstractService<FeaturesEvent>
@@ -69,16 +61,14 @@ export class SNFeaturesService
   ) {
     super(internalEventBus)
 
-    this.removeWebSocketsServiceObserver = webSocketsService.addEventObserver(
-      async (eventName, data) => {
-        if (eventName === WebSocketsServiceEvent.UserRoleMessageReceived) {
-          const {
-            payload: { userUuid, currentRoles },
-          } = data as UserRolesChangedEvent
-          await this.updateRolesAndFetchFeatures(userUuid, currentRoles)
-        }
-      },
-    )
+    this.removeWebSocketsServiceObserver = webSocketsService.addEventObserver(async (eventName, data) => {
+      if (eventName === WebSocketsServiceEvent.UserRoleMessageReceived) {
+        const {
+          payload: { userUuid, currentRoles },
+        } = data as UserRolesChangedEvent
+        await this.updateRolesAndFetchFeatures(userUuid, currentRoles)
+      }
+    })
 
     this.removefeatureReposObserver = this.itemManager.addObserver(
       ContentType.ExtensionRepo,
@@ -104,9 +94,7 @@ export class SNFeaturesService
 
     this.removeSignInObserver = this.userService.addEventObserver((eventName: AccountEvent) => {
       if (eventName === AccountEvent.SignedInOrRegistered) {
-        const featureRepos = this.itemManager.getItems(
-          ContentType.ExtensionRepo,
-        ) as Models.SNFeatureRepo[]
+        const featureRepos = this.itemManager.getItems(ContentType.ExtensionRepo) as Models.SNFeatureRepo[]
 
         if (!this.apiService.isThirdPartyHostUsed()) {
           void this.migrateFeatureRepoToUserSetting(featureRepos)
@@ -118,10 +106,7 @@ export class SNFeaturesService
   async handleEvent(event: Services.InternalEventInterface): Promise<void> {
     if (event.type === ApiServiceEvent.MetaReceived) {
       if (!this.syncService) {
-        this.log(
-          '[Features Service] Handling events interrupted. Sync service is not yet initialized.',
-          event,
-        )
+        this.log('[Features Service] Handling events interrupted. Sync service is not yet initialized.', event)
 
         return
       }
@@ -163,10 +148,7 @@ export class SNFeaturesService
 
     this.enabledExperimentalFeatures.push(identifier)
 
-    void this.storageService.setValue(
-      Services.StorageKey.ExperimentalFeatures,
-      this.enabledExperimentalFeatures,
-    )
+    void this.storageService.setValue(Services.StorageKey.ExperimentalFeatures, this.enabledExperimentalFeatures)
 
     void this.mapRemoteNativeFeaturesToItems([feature])
     void this.notifyEvent(FeaturesEvent.FeaturesUpdated)
@@ -180,10 +162,7 @@ export class SNFeaturesService
 
     removeFromArray(this.enabledExperimentalFeatures, identifier)
 
-    void this.storageService.setValue(
-      Services.StorageKey.ExperimentalFeatures,
-      this.enabledExperimentalFeatures,
-    )
+    void this.storageService.setValue(Services.StorageKey.ExperimentalFeatures, this.enabledExperimentalFeatures)
 
     const component = this.itemManager
       .getItems<Models.SNComponent | Models.SNTheme>([ContentType.Component, ContentType.Theme])
@@ -266,9 +245,7 @@ export class SNFeaturesService
     await this.storageService.removeValue(Services.StorageKey.UserFeatures)
   }
 
-  private parseOfflineEntitlementsCode(
-    code: string,
-  ): GetOfflineSubscriptionDetailsResponse | ClientDisplayableError {
+  private parseOfflineEntitlementsCode(code: string): GetOfflineSubscriptionDetailsResponse | ClientDisplayableError {
     try {
       const { featuresUrl, extensionKey } = JSON.parse(code)
       return {
@@ -291,9 +268,7 @@ export class SNFeaturesService
     return undefined
   }
 
-  public async migrateFeatureRepoToUserSetting(
-    featureRepos: Models.SNFeatureRepo[] = [],
-  ): Promise<void> {
+  public async migrateFeatureRepoToUserSetting(featureRepos: Models.SNFeatureRepo[] = []): Promise<void> {
     for (const item of featureRepos) {
       if (item.migratedToUserSetting) {
         continue
@@ -312,9 +287,7 @@ export class SNFeaturesService
     }
   }
 
-  public async migrateFeatureRepoToOfflineEntitlements(
-    featureRepos: Models.SNFeatureRepo[] = [],
-  ): Promise<void> {
+  public async migrateFeatureRepoToOfflineEntitlements(featureRepos: Models.SNFeatureRepo[] = []): Promise<void> {
     for (const item of featureRepos) {
       if (item.migratedToOfflineEntitlements) {
         continue
@@ -343,11 +316,7 @@ export class SNFeaturesService
   }
 
   public initializeFromDisk(): void {
-    this.roles = this.storageService.getValue<RoleName[]>(
-      Services.StorageKey.UserRoles,
-      undefined,
-      [],
-    )
+    this.roles = this.storageService.getValue<RoleName[]>(Services.StorageKey.UserRoles, undefined, [])
 
     this.features = this.storageService.getValue(Services.StorageKey.UserFeatures, undefined, [])
 
@@ -403,9 +372,7 @@ export class SNFeaturesService
   }
 
   public isThirdPartyFeature(identifier: string): boolean {
-    const isNativeFeature = !!FeaturesImports.FindNativeFeature(
-      identifier as FeaturesImports.FeatureIdentifier,
-    )
+    const isNativeFeature = !!FeaturesImports.FindNativeFeature(identifier as FeaturesImports.FeatureIdentifier)
     return !isNativeFeature
   }
 
@@ -421,9 +388,7 @@ export class SNFeaturesService
 
     const nativeFeature = FeaturesImports.FindNativeFeature(remoteFeature.identifier)
     if (!nativeFeature) {
-      throw Error(
-        `Attempting to map remote native to unfound static feature ${remoteFeature.identifier}`,
-      )
+      throw Error(`Attempting to map remote native to unfound static feature ${remoteFeature.identifier}`)
     }
 
     const nativeFeatureCopy = Copy(nativeFeature) as FeaturesImports.FeatureDescription
@@ -438,9 +403,7 @@ export class SNFeaturesService
     return nativeFeatureCopy
   }
 
-  public getUserFeature(
-    featureId: FeaturesImports.FeatureIdentifier,
-  ): FeaturesImports.FeatureDescription | undefined {
+  public getUserFeature(featureId: FeaturesImports.FeatureIdentifier): FeaturesImports.FeatureDescription | undefined {
     return this.features.find((feature) => feature.identifier === featureId)
   }
 
@@ -486,9 +449,7 @@ export class SNFeaturesService
 
     const isThirdParty = FeaturesImports.FindNativeFeature(featureId) == undefined
     if (isThirdParty) {
-      const component = this.itemManager.components.find(
-        (candidate) => candidate.identifier === featureId,
-      )
+      const component = this.itemManager.components.find((candidate) => candidate.identifier === featureId)
       if (!component) {
         return FeatureStatus.NoUserSubscription
       }
@@ -515,8 +476,7 @@ export class SNFeaturesService
       return FeatureStatus.NotInCurrentPlan
     }
 
-    const expired =
-      feature.expires_at && new Date(feature.expires_at).getTime() < new Date().getTime()
+    const expired = feature.expires_at && new Date(feature.expires_at).getTime() < new Date().getTime()
     if (expired) {
       if (!this.roles.includes(feature.role_name as RoleName)) {
         return FeatureStatus.NotInCurrentPlan
@@ -529,15 +489,10 @@ export class SNFeaturesService
   }
 
   private haveRolesChanged(roles: RoleName[]): boolean {
-    return (
-      roles.some((role) => !this.roles.includes(role)) ||
-      this.roles.some((role) => !roles.includes(role))
-    )
+    return roles.some((role) => !this.roles.includes(role)) || this.roles.some((role) => !roles.includes(role))
   }
 
-  private componentContentForNativeFeatureDescription(
-    feature: FeaturesImports.FeatureDescription,
-  ): Models.ItemContent {
+  private componentContentForNativeFeatureDescription(feature: FeaturesImports.FeatureDescription): Models.ItemContent {
     const componentContent: Partial<Models.ComponentContent> = {
       area: feature.area,
       name: feature.name,
@@ -547,13 +502,8 @@ export class SNFeaturesService
     return FillItemContent(componentContent)
   }
 
-  private async mapRemoteNativeFeaturesToItems(
-    features: FeaturesImports.FeatureDescription[],
-  ): Promise<void> {
-    const currentItems = this.itemManager.getItems<Models.SNComponent>([
-      ContentType.Component,
-      ContentType.Theme,
-    ])
+  private async mapRemoteNativeFeaturesToItems(features: FeaturesImports.FeatureDescription[]): Promise<void> {
+    const currentItems = this.itemManager.getItems<Models.SNComponent>([ContentType.Component, ContentType.Theme])
     const itemsToDelete: Models.SNComponent[] = []
     let hasChanges = false
 
@@ -579,10 +529,7 @@ export class SNFeaturesService
       return false
     }
 
-    if (
-      this.isExperimentalFeature(feature.identifier) &&
-      !this.isExperimentalFeatureEnabled(feature.identifier)
-    ) {
+    if (this.isExperimentalFeature(feature.identifier) && !this.isExperimentalFeatureEnabled(feature.identifier)) {
       return false
     }
 
@@ -641,10 +588,7 @@ export class SNFeaturesService
     } catch (err) {}
 
     try {
-      const trustedCustomExtensionsUrls = [
-        ...TRUSTED_FEATURE_HOSTS,
-        ...TRUSTED_CUSTOM_EXTENSIONS_HOSTS,
-      ]
+      const trustedCustomExtensionsUrls = [...TRUSTED_FEATURE_HOSTS, ...TRUSTED_CUSTOM_EXTENSIONS_HOSTS]
       const { host } = new URL(url)
       if (!trustedCustomExtensionsUrls.includes(host)) {
         const didConfirm = await this.alertService.confirm(
@@ -667,9 +611,7 @@ export class SNFeaturesService
     return undefined
   }
 
-  private async performDownloadExternalFeature(
-    url: string,
-  ): Promise<Models.SNComponent | undefined> {
+  private async performDownloadExternalFeature(url: string): Promise<Models.SNComponent | undefined> {
     const response = await this.apiService.downloadFeatureUrl(url)
     if (response.error) {
       await this.alertService.alert(Messages.API_MESSAGE_FAILED_DOWNLOADING_EXTENSION)

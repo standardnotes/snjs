@@ -7,12 +7,7 @@ import { Collection } from '../Collection'
 import { DeletedPayloadInterface } from '../../../Abstract/Payload'
 
 export class PayloadCollection<P extends FullyFormedPayloadInterface = FullyFormedPayloadInterface>
-  extends Collection<
-    P,
-    DecryptedPayloadInterface,
-    EncryptedPayloadInterface,
-    DeletedPayloadInterface
-  >
+  extends Collection<P, DecryptedPayloadInterface, EncryptedPayloadInterface, DeletedPayloadInterface>
   implements CollectionInterface
 {
   public integrityPayloads(): IntegrityPayload[] {

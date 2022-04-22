@@ -22,9 +22,7 @@ export class SNMfaService extends AbstractService {
   }
 
   async isMfaActivated(): Promise<boolean> {
-    const mfaSetting = await this.settingsService.getDoesSensitiveSettingExist(
-      SettingName.MfaSecret,
-    )
+    const mfaSetting = await this.settingsService.getDoesSensitiveSettingExist(SettingName.MfaSecret)
     return mfaSetting != false
   }
 
