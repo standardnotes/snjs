@@ -1,6 +1,6 @@
 {
   "name": "@standardnotes/encryption",
-  "version": "1.4.8",
+  "version": "1.4.9",
   "engines": {
     "node": ">=14.0.0 <17.0.0"
   },
@@ -39,6 +39,6 @@
   "dependencies": {
     "@standardnotes/models": "^1.4.8",
     "@standardnotes/responses": "^1.6.10",
-    "@standardnotes/services": "^1.9.9"
+    "@standardnotes/services": "^1.9.10"
   }
 }
