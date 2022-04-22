@@ -3,6 +3,36 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.98.1](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.98.0...@standardnotes/snjs@2.98.1) (2022-04-22)
+
+**Note:** Version bump only for package @standardnotes/snjs
+
+
+
+
+
+# [2.98.0](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.97.10...@standardnotes/snjs@2.98.0) (2022-04-22)
+
+
+### Features
+
+* in memory file cache ([#705](https://github.com/standardnotes/snjs/issues/705)) ([fca294a](https://github.com/standardnotes/snjs/commit/fca294a84256e03272e3b1b29b3dc478cddf9c28))
+
+
+
+
+
+## [2.97.10](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.97.9...@standardnotes/snjs@2.97.10) (2022-04-22)
+
+
+### Bug Fixes
+
+* update auth to allow expired token session sign outs ([#706](https://github.com/standardnotes/snjs/issues/706)) ([25f9bc3](https://github.com/standardnotes/snjs/commit/25f9bc3e8b0ced41f249bd57ed4c3fbfe66a0127))
+
+
+
+
+
 ## [2.97.9](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.97.8...@standardnotes/snjs@2.97.9) (2022-04-21)
 
 **Note:** Version bump only for package @standardnotes/snjs

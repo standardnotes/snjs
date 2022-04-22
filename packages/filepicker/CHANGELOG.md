@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.13.0](https://github.com/standardnotes/snjs/compare/@standardnotes/filepicker@1.12.0...@standardnotes/filepicker@1.13.0) (2022-04-22)
+
+
+### Features
+
+* in memory file cache ([#705](https://github.com/standardnotes/snjs/issues/705)) ([fca294a](https://github.com/standardnotes/snjs/commit/fca294a84256e03272e3b1b29b3dc478cddf9c28))
+
+
+
+
+
 # [1.12.0](https://github.com/standardnotes/snjs/compare/@standardnotes/filepicker@1.11.0...@standardnotes/filepicker@1.12.0) (2022-04-21)
 
 

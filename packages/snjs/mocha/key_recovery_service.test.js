@@ -29,9 +29,7 @@ describe('key recovery service', function () {
     const application = context.application
     const receiveChallenge = (challenge) => {
       /** Give unassociated password when prompted */
-      application.submitValuesForChallenge(challenge, [
-        new ChallengeValue(challenge.prompts[0], unassociatedPassword),
-      ])
+      application.submitValuesForChallenge(challenge, [new ChallengeValue(challenge.prompts[0], unassociatedPassword)])
     }
     await application.prepareForLaunch({ receiveChallenge })
     await application.launch(true)
@@ -48,9 +46,7 @@ describe('key recovery service', function () {
       unassociatedPassword,
       KeyParamsOrigination.Registration,
     )
-    const randomItemsKey = await application.protocolService.operatorManager
-      .defaultOperator()
-      .createItemsKey()
+    const randomItemsKey = await application.protocolService.operatorManager.defaultOperator().createItemsKey()
 
     const encrypted = await application.protocolService.encryptSplitSingle({
       usesRootKey: {
@@ -92,9 +88,7 @@ describe('key recovery service', function () {
     const receiveChallenge = (challenge) => {
       totalPromptCount++
       /** Give unassociated password when prompted */
-      application.submitValuesForChallenge(challenge, [
-        new ChallengeValue(challenge.prompts[0], unassociatedPassword),
-      ])
+      application.submitValuesForChallenge(challenge, [new ChallengeValue(challenge.prompts[0], unassociatedPassword)])
     }
     await application.prepareForLaunch({ receiveChallenge })
     await application.launch(true)
@@ -111,12 +105,8 @@ describe('key recovery service', function () {
       unassociatedPassword,
       KeyParamsOrigination.Registration,
     )
-    const randomItemsKey = await application.protocolService.operatorManager
-      .defaultOperator()
-      .createItemsKey()
-    const randomItemsKey2 = await application.protocolService.operatorManager
-      .defaultOperator()
-      .createItemsKey()
+    const randomItemsKey = await application.protocolService.operatorManager.defaultOperator().createItemsKey()
+    const randomItemsKey2 = await application.protocolService.operatorManager.defaultOperator().createItemsKey()
 
     const encrypted = await application.protocolService.encryptSplit({
       usesRootKey: {
@@ -151,50 +141,51 @@ describe('key recovery service', function () {
     const contextA = await Factory.createAppContextWithFakeCrypto()
     await contextA.launch()
     await contextA.register()
+    const originalItemsKey = contextA.application.items.itemsKeys()[0]
 
-    /** Create simultaneous appB signed into same account */
     const contextB = await Factory.createAppContextWithFakeCrypto(
       'another-namespace',
       contextA.email,
       contextA.password,
     )
+
     contextB.ignoreChallenges()
     await contextB.launch()
     await contextB.signIn()
 
     const newPassword = `${Math.random()}`
 
-    /** Change password on appB */
-    const appB = contextB.application
-    const result = await appB.changePassword(contextA.password, newPassword)
+    const result = await contextB.application.changePassword(contextA.password, newPassword)
+
     expect(result.error).to.not.be.ok
-    expect(appB.items.getAnyItems(ContentType.ItemsKey).length).to.equal(2)
+    expect(contextB.application.items.getAnyItems(ContentType.ItemsKey).length).to.equal(2)
 
-    const note = await Factory.createSyncedNote(appB)
+    const newItemsKey = contextB.application.items.itemsKeys().find((k) => k.uuid !== originalItemsKey.uuid)
 
-    /** Sync appA and expect a new items key to be downloaded and errored */
+    const note = await Factory.createSyncedNote(contextB.application)
+
+    const recoveryPromise = contextA.resolveWhenKeyRecovered(newItemsKey.uuid)
+
     contextA.password = newPassword
-    const syncPromise = contextA.sync(syncOptions)
-    await contextA.awaitNextSucessfulSync()
-    await syncPromise
 
-    const appA = contextA.application
+    await contextA.sync(syncOptions)
+    await recoveryPromise
 
     /** Same previously errored key should now no longer be errored, */
-    expect(appA.items.getAnyItems(ContentType.ItemsKey).length).to.equal(2)
-    for (const key of appA.itemManager.itemsKeys()) {
+    expect(contextA.application.items.getAnyItems(ContentType.ItemsKey).length).to.equal(2)
+    for (const key of contextA.application.itemManager.itemsKeys()) {
       expect(key.errorDecrypting).to.not.be.ok
     }
 
-    const aKey = await appA.protocolService.getRootKey()
-    const bKey = await appB.protocolService.getRootKey()
+    const aKey = await contextA.application.protocolService.getRootKey()
+    const bKey = await contextB.application.protocolService.getRootKey()
     expect(aKey.compare(bKey)).to.equal(true)
 
-    expect(appA.items.findItem(note.uuid).errorDecrypting).to.not.be.ok
-    expect(appB.items.findItem(note.uuid).errorDecrypting).to.not.be.ok
+    expect(contextA.application.items.findItem(note.uuid).errorDecrypting).to.not.be.ok
+    expect(contextB.application.items.findItem(note.uuid).errorDecrypting).to.not.be.ok
 
-    expect(appA.syncService.isOutOfSync()).to.equal(false)
-    expect(appB.syncService.isOutOfSync()).to.equal(false)
+    expect(contextA.application.syncService.isOutOfSync()).to.equal(false)
+    expect(contextB.application.syncService.isOutOfSync()).to.equal(false)
 
     await contextA.deinit()
     await contextB.deinit()
@@ -294,9 +285,7 @@ describe('key recovery service', function () {
       KeyParamsOrigination.Registration,
     )
     await application.protocolService.setRootKey(randomRootKey)
-    const correctItemsKey = await application.protocolService.operatorManager
-      .defaultOperator()
-      .createItemsKey()
+    const correctItemsKey = await application.protocolService.operatorManager.defaultOperator().createItemsKey()
     const encrypted = await application.protocolService.encryptSplitSingle({
       usesRootKey: {
         items: [correctItemsKey.payload],
@@ -425,9 +414,7 @@ describe('key recovery service', function () {
     })
 
     /** Allow enough time to persist to disk, but not enough to complete recovery wizard */
-    console.warn(
-      'Expecting some error below because we are destroying app in the middle of processing.',
-    )
+    console.warn('Expecting some error below because we are destroying app in the middle of processing.')
 
     await Factory.sleep(0.1)
 
@@ -435,11 +422,7 @@ describe('key recovery service', function () {
 
     await context.deinit()
 
-    const recreatedContext = await Factory.createAppContextWithFakeCrypto(
-      namespace,
-      context.email,
-      context.password,
-    )
+    const recreatedContext = await Factory.createAppContextWithFakeCrypto(namespace, context.email, context.password)
 
     const recreatedApp = recreatedContext.application
 
@@ -461,9 +444,7 @@ describe('key recovery service', function () {
     const application = context.application
     const receiveChallenge = (challenge) => {
       /** Give unassociated password when prompted */
-      application.submitValuesForChallenge(challenge, [
-        new ChallengeValue(challenge.prompts[0], unassociatedPassword),
-      ])
+      application.submitValuesForChallenge(challenge, [new ChallengeValue(challenge.prompts[0], unassociatedPassword)])
     }
     await application.prepareForLaunch({ receiveChallenge })
     await application.launch(true)
@@ -528,6 +509,7 @@ describe('key recovery service', function () {
       contextA.email,
       contextA.password,
     )
+
     contextB.ignoreChallenges()
     await contextB.launch()
     await contextB.signIn()
@@ -556,26 +538,19 @@ describe('key recovery service', function () {
       PayloadEmitSource.LocalInserted,
     )
 
-    await Factory.awaitFunctionInvokation(
-      appA.keyRecoveryService,
-      'handleDecryptionOfAllKeysMatchingCorrectRootKey',
-    )
+    await Factory.awaitFunctionInvokation(appA.keyRecoveryService, 'handleDecryptionOfAllKeysMatchingCorrectRootKey')
 
     /** Stored version of items key should use new root key */
     const stored = (await appA.deviceInterface.getAllRawDatabasePayloads(appA.identifier)).find(
       (payload) => payload.uuid === newDefaultKey.uuid,
     )
-    const storedParams = await appA.protocolService.getKeyEmbeddedKeyParams(
-      new EncryptedPayload(stored),
+    const storedParams = await appA.protocolService.getKeyEmbeddedKeyParams(new EncryptedPayload(stored))
+
+    const correctStored = (await appB.deviceInterface.getAllRawDatabasePayloads(appB.identifier)).find(
+      (payload) => payload.uuid === newDefaultKey.uuid,
     )
 
-    const correctStored = (
-      await appB.deviceInterface.getAllRawDatabasePayloads(appB.identifier)
-    ).find((payload) => payload.uuid === newDefaultKey.uuid)
-
-    const correctParams = await appB.protocolService.getKeyEmbeddedKeyParams(
-      new EncryptedPayload(correctStored),
-    )
+    const correctParams = await appB.protocolService.getKeyEmbeddedKeyParams(new EncryptedPayload(correctStored))
 
     expect(storedParams).to.eql(correctParams)
 
