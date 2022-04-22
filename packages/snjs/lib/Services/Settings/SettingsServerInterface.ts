@@ -18,5 +18,7 @@ export interface SettingsServerInterface {
 
   getSetting(userUuid: UuidString, settingName: string): Promise<GetSettingResponse>
 
+  getSubscriptionSetting(userUuid: UuidString, settingName: string): Promise<GetSettingResponse>
+
   deleteSetting(userUuid: UuidString, settingName: string): Promise<DeleteSettingResponse>
 }
