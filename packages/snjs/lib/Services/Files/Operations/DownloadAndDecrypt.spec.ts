@@ -43,9 +43,7 @@ describe('download and decrypt', () => {
       state: {},
     } as StreamEncryptor)
 
-    crypto.xchacha20StreamDecryptorPush = jest
-      .fn()
-      .mockReturnValue({ message: new Uint8Array([0xaa]), tag: 0 })
+    crypto.xchacha20StreamDecryptorPush = jest.fn().mockReturnValue({ message: new Uint8Array([0xaa]), tag: 0 })
 
     file = {
       chunkSizes: [100_000],
@@ -58,36 +56,15 @@ describe('download and decrypt', () => {
   it('run should resolve when operation is complete', async () => {
     let receivedBytes = new Uint8Array()
 
-    file = {
-      chunkSizes: [100_000],
-      remoteIdentifier: '123',
-      key: 'secret',
-      encryptionHeader: 'some-header',
-    }
+    operation = new DownloadAndDecryptFileOperation(file, crypto, apiService, 'api-token')
 
-    operation = new DownloadAndDecryptFileOperation(
-      file,
-      crypto,
-      apiService,
-      'api-token',
-      // eslint-disable-next-line @typescript-eslint/require-await
-      async (decryptedBytes) => {
-        if (decryptedBytes) {
-          receivedBytes = new Uint8Array([...receivedBytes, ...decryptedBytes])
-        }
-      },
-      // eslint-disable-next-line @typescript-eslint/no-empty-function
-      () => {},
-    )
-
-    operation['decryptor'].decryptBytes = jest.fn().mockImplementation(() => {
-      return {
-        decryptedBytes: new Uint8Array([0xaa]),
-        isFinalChunk: receivedBytes.length === NumChunks - 1,
+    await operation.run(async (decryptedBytes) => {
+      if (decryptedBytes) {
+        receivedBytes = new Uint8Array([...receivedBytes, ...decryptedBytes])
       }
-    })
 
-    await operation.run()
+      await Promise.resolve()
+    })
 
     expect(receivedBytes.length).toEqual(NumChunks)
   })
