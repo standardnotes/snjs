@@ -1,45 +1,53 @@
 import { ClientDisplayableError } from '@standardnotes/responses'
-import { FileDownloader } from '../UseCase/FileDownloader'
+import { AbortFunction, FileDownloader } from '../UseCase/FileDownloader'
 import { FileDecryptor } from '../UseCase/FileDecryptor'
 import { RemoteFileInterface, EncryptedFileInterface } from '../Types'
 import { FilesServerInterface } from '../FilesServerInterface'
 import { SNPureCrypto } from '@standardnotes/sncrypto-common'
 
+type Result = { success: boolean; error?: ClientDisplayableError; aborted?: boolean }
+
 export class DownloadAndDecryptFileOperation {
-  private readonly decryptor: FileDecryptor
-  private readonly downloader: FileDownloader
-
   constructor(
-    file: RemoteFileInterface & EncryptedFileInterface,
-    crypto: SNPureCrypto,
-    api: FilesServerInterface,
-    apiToken: string,
+    private readonly file: RemoteFileInterface & EncryptedFileInterface,
+    private readonly crypto: SNPureCrypto,
+    private readonly api: FilesServerInterface,
+    private readonly apiToken: string,
     private onDecryptedBytes: (decryptedBytes: Uint8Array) => Promise<void>,
-    private onError: (error: ClientDisplayableError) => void,
-  ) {
-    this.decryptor = new FileDecryptor(file, crypto)
-    this.downloader = new FileDownloader(file, apiToken, api, this.onDownloadedBytes.bind(this))
-  }
+  ) {}
 
-  public async run(): Promise<void> {
-    this.decryptor.initialize()
+  public async run(): Promise<Result> {
+    const decryptor = new FileDecryptor(this.file, this.crypto)
 
-    const result = await this.downloader.download()
+    decryptor.initialize()
 
-    if (result instanceof ClientDisplayableError) {
-      this.onError(result)
+    let decryptError: ClientDisplayableError | undefined
+
+    const downloader = new FileDownloader(
+      this.file,
+      this.apiToken,
+      this.api,
+      async (encryptedBytes: Uint8Array, abortDownload: AbortFunction) => {
+        const result = decryptor.decryptBytes(encryptedBytes)
+
+        if (!result || result.decryptedBytes.length === 0) {
+          decryptError = new ClientDisplayableError('Failed to decrypt chunk')
+
+          abortDownload()
+
+          return
+        }
+
+        await this.onDecryptedBytes(result.decryptedBytes)
+      },
+    )
+
+    const downloadResult = await downloader.download()
+
+    return {
+      success: downloadResult instanceof ClientDisplayableError ? false : true,
+      error: downloadResult === 'aborted' ? undefined : downloadResult || decryptError,
+      aborted: downloadResult === 'aborted',
     }
-  }
-
-  private async onDownloadedBytes(encryptedBytes: Uint8Array): Promise<void> {
-    const result = this.decryptor.decryptBytes(encryptedBytes)
-
-    if (!result || result.decryptedBytes.length === 0) {
-      this.downloader.abort()
-      this.onError(new ClientDisplayableError('Failed to decrypt chunk'))
-      return
-    }
-
-    await this.onDecryptedBytes(result.decryptedBytes)
   }
 }

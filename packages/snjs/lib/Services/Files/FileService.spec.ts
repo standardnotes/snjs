@@ -17,11 +17,14 @@ describe('fileService', () => {
   beforeEach(() => {
     apiService = {} as jest.Mocked<SNApiService>
     apiService.addEventObserver = jest.fn()
+    apiService.createFileValetToken = jest.fn()
+    apiService.downloadFile = jest.fn()
+    apiService.deleteFile = jest.fn().mockReturnValue({})
 
     itemManager = {} as jest.Mocked<ItemManager>
     itemManager.createItem = jest.fn()
     itemManager.createTemplateItem = jest.fn().mockReturnValue({})
-    itemManager.setItemsToBeDeleted = jest.fn()
+    itemManager.setItemToBeDeleted = jest.fn()
     itemManager.addObserver = jest.fn()
     itemManager.changeItem = jest.fn()
 
@@ -37,22 +40,13 @@ describe('fileService', () => {
     internalEventBus = {} as jest.Mocked<InternalEventBusInterface>
     internalEventBus.publish = jest.fn()
 
-    fileService = new SNFileService(
-      apiService,
-      itemManager,
-      syncService,
-      alertService,
-      crypto,
-      internalEventBus,
-    )
+    fileService = new SNFileService(apiService, itemManager, syncService, alertService, crypto, internalEventBus)
 
     crypto.xchacha20StreamInitDecryptor = jest.fn().mockReturnValue({
       state: {},
     } as StreamEncryptor)
 
-    crypto.xchacha20StreamDecryptorPush = jest
-      .fn()
-      .mockReturnValue({ message: new Uint8Array([0xaa]), tag: 0 })
+    crypto.xchacha20StreamDecryptorPush = jest.fn().mockReturnValue({ message: new Uint8Array([0xaa]), tag: 0 })
 
     crypto.xchacha20StreamInitEncryptor = jest.fn().mockReturnValue({
       header: 'some-header',
@@ -68,8 +62,7 @@ describe('fileService', () => {
       size: 100_000,
     } as jest.Mocked<SNFile>
 
-    let downloadMock = (apiService.downloadFile = jest.fn())
-    apiService.createFileValetToken = jest.fn()
+    let downloadMock = apiService.downloadFile as jest.Mock
 
     await fileService.downloadFile(file, async () => {
       return Promise.resolve()
@@ -86,5 +79,20 @@ describe('fileService', () => {
     expect(downloadMock).toHaveBeenCalledTimes(0)
 
     expect(fileService['cache'].get(file.uuid)).toBeTruthy()
+  })
+
+  it('deleting file should remove it from cache', async () => {
+    const file = {
+      uuid: '1',
+      size: 100_000,
+    } as jest.Mocked<SNFile>
+
+    await fileService.downloadFile(file, async () => {
+      return Promise.resolve()
+    })
+
+    await fileService.deleteFile(file)
+
+    expect(fileService['cache'].get(file.uuid)).toBeFalsy()
   })
 })

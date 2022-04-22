@@ -52,9 +52,7 @@ export class SNFileService extends AbstractService implements FilesClientInterfa
     return 5_000_000
   }
 
-  public async beginNewFileUpload(): Promise<
-    EncryptAndUploadFileOperation | ClientDisplayableError
-  > {
+  public async beginNewFileUpload(): Promise<EncryptAndUploadFileOperation | ClientDisplayableError> {
     const remoteIdentifier = UuidGenerator.GenerateUuid()
     const tokenResult = await this.api.createFileValetToken(remoteIdentifier, 'write')
 
@@ -68,12 +66,7 @@ export class SNFileService extends AbstractService implements FilesClientInterfa
       remoteIdentifier,
     }
 
-    const uploadOperation = new EncryptAndUploadFileOperation(
-      fileParams,
-      tokenResult,
-      this.crypto,
-      this.api,
-    )
+    const uploadOperation = new EncryptAndUploadFileOperation(fileParams, tokenResult, this.crypto, this.api)
 
     uploadOperation.initializeHeader()
 
@@ -135,10 +128,11 @@ export class SNFileService extends AbstractService implements FilesClientInterfa
     onDecryptedBytes: (bytes: Uint8Array) => Promise<void>,
   ): Promise<ClientDisplayableError | undefined> {
     const cachedFile = this.cache.get(file.uuid)
+
     if (cachedFile) {
       await onDecryptedBytes(cachedFile)
 
-      return
+      return undefined
     }
 
     const tokenResult = await this.api.createFileValetToken(file.remoteIdentifier, 'read')
@@ -157,26 +151,15 @@ export class SNFileService extends AbstractService implements FilesClientInterfa
       return onDecryptedBytes(bytes)
     }
 
-    await new Promise((resolve) => {
-      const operation = new DownloadAndDecryptFileOperation(
-        file,
-        this.crypto,
-        this.api,
-        tokenResult,
-        bytesWrapper,
-        (error) => {
-          resolve(error)
-        },
-      )
+    const operation = new DownloadAndDecryptFileOperation(file, this.crypto, this.api, tokenResult, bytesWrapper)
 
-      return operation.run().then(() => resolve(undefined))
-    })
+    const result = await operation.run()
 
     if (addToCache) {
       this.cache.add(file.uuid, cacheEntryAggregate)
     }
 
-    return undefined
+    return result.error
   }
 
   public async deleteFile(file: SNFile): Promise<ClientDisplayableError | undefined> {
