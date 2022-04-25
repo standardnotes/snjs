@@ -436,12 +436,12 @@ function serverFeatures(): ServerFeatureDescription[] {
       permission_name: PermissionName.DailyOneDriveBackup,
     },
     {
-      identifier: FeatureIdentifier.Files25GB,
-      permission_name: PermissionName.Files25GB,
+      identifier: FeatureIdentifier.FilesMaximumStorageTier,
+      permission_name: PermissionName.FilesMaximumStorageTier,
     },
     {
-      identifier: FeatureIdentifier.Files5GB,
-      permission_name: PermissionName.Files5GB,
+      identifier: FeatureIdentifier.FilesLowStorageTier,
+      permission_name: PermissionName.FilesLowStorageTier,
     },
   ]
 }
