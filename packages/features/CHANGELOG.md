@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.38.0](https://github.com/standardnotes/snjs/compare/@standardnotes/features@1.37.9...@standardnotes/features@1.38.0) (2022-04-25)
+
+
+### Features
+
+* rename feature and permissions related to storage tiers ([b4c18b9](https://github.com/standardnotes/snjs/commit/b4c18b91516d771e5c6bf3f510ab09ca621896ea))
+
+
+
+
+
 ## [1.37.9](https://github.com/standardnotes/snjs/compare/@standardnotes/features@1.37.8...@standardnotes/features@1.37.9) (2022-04-22)
 
 **Note:** Version bump only for package @standardnotes/features
