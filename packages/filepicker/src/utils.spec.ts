@@ -32,31 +32,31 @@ describe('utils', () => {
 
   describe('formatSizeToReadableString', () => {
     it('should show as bytes if less than 1KB', () => {
-      const size = 999
+      const size = 1_023
 
       const formattedSize = formatSizeToReadableString(size)
 
-      expect(formattedSize).toBe('999 B')
+      expect(formattedSize).toBe('1023 B')
     })
 
-    it('should format as KB if more than 1000 bytes', () => {
-      const size = 1_000
+    it('should format as KB', () => {
+      const size = 1_024
 
       const formattedSize = formatSizeToReadableString(size)
 
       expect(formattedSize).toBe('1 KB')
     })
 
-    it('should format as MB if more than 1000000 bytes', () => {
-      const size = 1_000_000
+    it('should format as MB', () => {
+      const size = 1_048_576
 
       const formattedSize = formatSizeToReadableString(size)
 
       expect(formattedSize).toBe('1 MB')
     })
 
-    it('should format as GB if more than 1000000000 bytes', () => {
-      const size = 1_000_000_000
+    it('should format as GB', () => {
+      const size = 1_073_741_824
 
       const formattedSize = formatSizeToReadableString(size)
 
@@ -64,8 +64,8 @@ describe('utils', () => {
     })
 
     it('should only show fixed-point notation if calculated size is not an integer', () => {
-      const size1 = 1_000_000
-      const size2 = 1_500_000
+      const size1 = 1_048_576
+      const size2 = 1_572_864
 
       const formattedSize1 = formatSizeToReadableString(size1)
       const formattedSize2 = formatSizeToReadableString(size2)

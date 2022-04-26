@@ -35,9 +35,9 @@ export function saveFile(name: string, bytes: Uint8Array): void {
   window.URL.revokeObjectURL(link.href)
 }
 
-const BYTES_IN_ONE_KILOBYTE = 1_000
-const BYTES_IN_ONE_MEGABYTE = 1_000_000
-const BYTES_IN_ONE_GIGABYTE = 1_000_000_000
+const BYTES_IN_ONE_KILOBYTE = 1_024
+const BYTES_IN_ONE_MEGABYTE = 1_048_576
+const BYTES_IN_ONE_GIGABYTE = 1_073_741_824
 
 export function formatSizeToReadableString(bytes: number): string {
   let size = bytes
