@@ -97,10 +97,9 @@ describe('application group', function () {
      * next tick
      */
     await Factory.sleep(0)
-    expect(group.applications.length).to.equal(1)
 
     /** Expect a new application to have been created */
-    expect(group.applications[0].identifier).to.not.equal(identifier)
+    expect(group.primaryApplication.identifier).to.not.equal(identifier)
   })
 
   it('should be notified when application changes', async function () {
