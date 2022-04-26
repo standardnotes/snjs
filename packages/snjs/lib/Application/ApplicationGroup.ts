@@ -29,7 +29,6 @@ export class SNApplicationGroup<D extends DeviceInterface = DeviceInterface> ext
   private descriptorRecord!: DescriptorRecord
   private changeObservers: AppGroupChangeCallback[] = []
   callback!: AppGroupCallback<D>
-  private applications: SNApplication[] = []
 
   constructor(public deviceInterface: D, internalEventBus?: InternalEventBusInterface) {
     if (internalEventBus === undefined) {
@@ -63,8 +62,6 @@ export class SNApplicationGroup<D extends DeviceInterface = DeviceInterface> ext
 
     const application = this.buildApplication(primaryDescriptor)
 
-    this.applications.push(application)
-
     void this.setPrimaryApplication(application, false)
   }
 
@@ -87,10 +84,6 @@ export class SNApplicationGroup<D extends DeviceInterface = DeviceInterface> ext
     void this.persistDescriptors()
   }
 
-  public getApplications() {
-    return this.applications
-  }
-
   public getDescriptors() {
     return Object.values(this.descriptorRecord)
   }
@@ -104,24 +97,36 @@ export class SNApplicationGroup<D extends DeviceInterface = DeviceInterface> ext
     return undefined
   }
 
-  /** @callback */
+  async signOutAllWorkspaces() {
+    if (this.primaryApplication) {
+      await this.primaryApplication.user.signOut(false, DeinitSource.AppGroupUnload)
+    }
+
+    this.removeAllDescriptors()
+
+    this.handleAllWorkspacesSignedOut()
+
+    void this.addNewApplication()
+  }
+
   onApplicationDeinit = (application: SNApplication, source: DeinitSource) => {
-    /** If we are initiaitng this unloading via function below,
-     * we don't want any side-effects */
+    /** If we are initiaitng this unloading via function below, we don't want any side-effects */
     const sideffects = source !== DeinitSource.AppGroupUnload
+
     if (this.primaryApplication === application) {
       this.primaryApplication = undefined
     }
 
-    removeFromArray(this.applications, application)
-
     if (source === DeinitSource.SignOut) {
       this.removeDescriptor(this.descriptorForApplication(application))
+
       if (sideffects) {
-        /** If there are no more descriptors (all accounts have been signed out),
-         * create a new blank slate app */
+        /** If there are no more descriptors (all accounts have been signed out), create a new blank slate app */
         const descriptors = this.getDescriptors()
+
         if (descriptors.length === 0) {
+          this.handleAllWorkspacesSignedOut()
+
           void this.addNewApplication()
         } else {
           void this.loadApplicationForDescriptor(descriptors[0])
@@ -132,6 +137,10 @@ export class SNApplicationGroup<D extends DeviceInterface = DeviceInterface> ext
       const descriptor = this.descriptorForApplication(application)
       void this.loadApplicationForDescriptor(descriptor)
     }
+  }
+
+  handleAllWorkspacesSignedOut(): void {
+    /** Optional override */
   }
 
   /**
@@ -155,13 +164,9 @@ export class SNApplicationGroup<D extends DeviceInterface = DeviceInterface> ext
     }
   }
 
-  public async setPrimaryApplication(application: SNApplication, persist = true): Promise<void> {
+  public setPrimaryApplication(application: SNApplication, persist = true): void {
     if (this.primaryApplication === application) {
       return
-    }
-
-    if (!this.applications.includes(application)) {
-      throw Error('Application must be inserted before attempting to switch to it')
     }
 
     if (this.primaryApplication) {
@@ -176,7 +181,7 @@ export class SNApplicationGroup<D extends DeviceInterface = DeviceInterface> ext
     this.notifyObserversOfAppChange()
 
     if (persist) {
-      await this.persistDescriptors()
+      this.persistDescriptors()
     }
   }
 
@@ -190,9 +195,9 @@ export class SNApplicationGroup<D extends DeviceInterface = DeviceInterface> ext
     void this.deviceInterface.setRawStorageValue(RawStorageKey.DescriptorRecord, JSON.stringify(this.descriptorRecord))
   }
 
-  public async renameDescriptor(descriptor: ApplicationDescriptor, label: string) {
+  public renameDescriptor(descriptor: ApplicationDescriptor, label: string) {
     descriptor.label = label
-    await this.persistDescriptors()
+    this.persistDescriptors()
   }
 
   public removeDescriptor(descriptor: ApplicationDescriptor) {
@@ -200,11 +205,17 @@ export class SNApplicationGroup<D extends DeviceInterface = DeviceInterface> ext
     return this.persistDescriptors()
   }
 
+  public removeAllDescriptors() {
+    this.descriptorRecord = {}
+
+    return this.persistDescriptors()
+  }
+
   private descriptorForApplication(application: SNApplication) {
     return this.descriptorRecord[application.identifier]
   }
 
-  public async addNewApplication(label?: string): Promise<SNApplication> {
+  public addNewApplication(label?: string): SNApplication {
     const identifier = UuidGenerator.GenerateUuid()
     const index = this.getDescriptors().length + 1
     const descriptor: ApplicationDescriptor = {
@@ -213,27 +224,19 @@ export class SNApplicationGroup<D extends DeviceInterface = DeviceInterface> ext
       primary: false,
     }
     const application = this.buildApplication(descriptor)
-    this.applications.push(application)
 
     this.descriptorRecord[identifier] = descriptor
 
-    await this.setPrimaryApplication(application)
+    this.setPrimaryApplication(application)
     this.persistDescriptors()
 
     return application
   }
 
-  private applicationForDescriptor(descriptor: ApplicationDescriptor) {
-    return this.applications.find((app) => app.identifier === descriptor.identifier)
-  }
+  public loadApplicationForDescriptor(descriptor: ApplicationDescriptor) {
+    const application = this.buildApplication(descriptor)
 
-  public async loadApplicationForDescriptor(descriptor: ApplicationDescriptor) {
-    let application = this.applicationForDescriptor(descriptor)
-    if (!application) {
-      application = this.buildApplication(descriptor)
-      this.applications.push(application)
-    }
-    await this.setPrimaryApplication(application)
+    this.setPrimaryApplication(application)
   }
 
   private buildApplication(descriptor: ApplicationDescriptor) {

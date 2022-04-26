@@ -1110,7 +1110,7 @@ export class SNApplication implements InternalServices.ListedClientInterface {
       this.internalEventBus,
     )
     this.serviceObservers.push(
-      this.userService.addEventObserver(async (event) => {
+      this.userService.addEventObserver(async (event, data) => {
         switch (event) {
           case InternalServices.AccountEvent.SignedInOrRegistered: {
             void this.notifyEvent(ApplicationEvent.SignedIn)
@@ -1119,7 +1119,7 @@ export class SNApplication implements InternalServices.ListedClientInterface {
           case InternalServices.AccountEvent.SignedOut: {
             await this.notifyEvent(ApplicationEvent.SignedOut)
             await this.prepareForDeinit()
-            this.deinit(DeinitSource.SignOut)
+            this.deinit(data?.source || DeinitSource.SignOut)
             break
           }
           default: {

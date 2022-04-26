@@ -15,6 +15,7 @@ import { UserClientInterface } from './UserClientInterface'
 import { UuidGenerator } from '@standardnotes/utils'
 import * as Messages from '../Api/Messages'
 import * as Services from '@standardnotes/services'
+import { DeinitSource } from '@Lib/Types'
 
 const MINIMUM_PASSCODE_LENGTH = 1
 
@@ -26,7 +27,14 @@ export enum AccountEvent {
   SignedOut = 'SignedOut',
 }
 
-export class UserService extends Services.AbstractService<AccountEvent> implements UserClientInterface {
+type AccountEventData = {
+  source: DeinitSource
+}
+
+export class UserService
+  extends Services.AbstractService<AccountEvent, AccountEventData>
+  implements UserClientInterface
+{
   private signingIn = false
   private registering = false
 
@@ -249,16 +257,17 @@ export class UserService extends Services.AbstractService<AccountEvent> implemen
     return result
   }
 
-  public async signOut(force = false): Promise<void> {
+  public async signOut(force = false, source = DeinitSource.SignOut): Promise<void> {
     const performSignOut = async () => {
       await this.sessionManager.signOut()
       await this.protocolService.clearLocalKeyState()
       await this.storageService.clearAllData()
-      await this.notifyEvent(AccountEvent.SignedOut)
+      await this.notifyEvent(AccountEvent.SignedOut, { source })
     }
 
     if (force) {
       await performSignOut()
+
       return
     }
 
