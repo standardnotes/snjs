@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.100.0](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.99.3...@standardnotes/snjs@2.100.0) (2022-04-26)
+
+
+### Features
+
+* sign out all workspaces option ([#710](https://github.com/standardnotes/snjs/issues/710)) ([5d44b9f](https://github.com/standardnotes/snjs/commit/5d44b9f5c4bb2d871db974ec8f06eddcf4419275))
+
+
+
+
+
 ## [2.99.3](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.99.2...@standardnotes/snjs@2.99.3) (2022-04-26)
 
 **Note:** Version bump only for package @standardnotes/snjs
