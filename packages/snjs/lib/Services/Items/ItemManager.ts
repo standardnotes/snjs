@@ -1203,7 +1203,9 @@ export class ItemManager
   }
 
   public getFilesForNote(note: Models.SNNote): Models.SNFile[] {
-    return this.itemsReferencingItem(note).filter((ref) => ref.content_type === ContentType.File) as Models.SNFile[]
+    return (
+      this.itemsReferencingItem(note).filter((ref) => ref.content_type === ContentType.File) as Models.SNFile[]
+    ).sort((a, b) => (a.name.toLowerCase() > b.name.toLowerCase() ? 1 : -1))
   }
 
   public renameFile(file: Models.SNFile, name: string): Promise<Models.SNFile> {
