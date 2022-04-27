@@ -9,6 +9,10 @@ describe('encrypt and upload', () => {
   let file: DecryptedFileInterface
   let crypto: SNPureCrypto
 
+  const chunkOfSize = (size: number) => {
+    return new TextEncoder().encode('a'.repeat(size))
+  }
+
   beforeEach(() => {
     apiService = {} as jest.Mocked<FilesServerInterface>
     apiService.uploadFileBytes = jest.fn().mockReturnValue(true)
@@ -25,23 +29,36 @@ describe('encrypt and upload', () => {
     file = {
       remoteIdentifier: '123',
       key: 'secret',
+      decryptedSize: 100,
     }
   })
 
   it('should initialize encryption header', () => {
     operation = new EncryptAndUploadFileOperation(file, 'api-token', crypto, apiService)
-    const header = operation.initializeHeader()
 
-    expect(header.length).toBeGreaterThan(0)
+    expect(operation.getResult().encryptionHeader.length).toBeGreaterThan(0)
   })
 
   it('should return true when a chunk is uploaded', async () => {
     operation = new EncryptAndUploadFileOperation(file, 'api-token', crypto, apiService)
-    operation.initializeHeader()
 
     const bytes = new Uint8Array()
     const success = await operation.pushBytes(bytes, 2, false)
 
     expect(success).toEqual(true)
+  })
+
+  it('should correctly report progress', async () => {
+    operation = new EncryptAndUploadFileOperation(file, 'api-token', crypto, apiService)
+
+    const bytes = chunkOfSize(60)
+    await operation.pushBytes(bytes, 2, false)
+
+    const progress = operation.getProgress()
+
+    expect(progress.decryptedFileSize).toEqual(100)
+    expect(progress.decryptedBytesUploaded).toEqual(60)
+    expect(progress.decryptedBytesRemaining).toEqual(40)
+    expect(progress.percentComplete).toEqual(60.0)
   })
 })

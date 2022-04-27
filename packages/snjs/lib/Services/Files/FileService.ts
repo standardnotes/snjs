@@ -52,25 +52,28 @@ export class SNFileService extends AbstractService implements FilesClientInterfa
     return 5_000_000
   }
 
-  public async beginNewFileUpload(): Promise<EncryptAndUploadFileOperation | ClientDisplayableError> {
+  public async beginNewFileUpload(
+    sizeInBytes: number,
+  ): Promise<EncryptAndUploadFileOperation | ClientDisplayableError> {
     const remoteIdentifier = UuidGenerator.GenerateUuid()
-    const tokenResult = await this.api.createFileValetToken(remoteIdentifier, 'write')
+    const tokenResult = await this.api.createFileValetToken(remoteIdentifier, 'write', sizeInBytes)
 
     if (tokenResult instanceof ClientDisplayableError) {
       return tokenResult
     }
 
     const key = this.crypto.generateRandomKey(FileProtocolV1Constants.KeySize)
+
     const fileParams: DecryptedFileInterface = {
       key,
       remoteIdentifier,
+      decryptedSize: sizeInBytes,
     }
 
     const uploadOperation = new EncryptAndUploadFileOperation(fileParams, tokenResult, this.crypto, this.api)
 
-    uploadOperation.initializeHeader()
-
     const uploadSessionStarted = await this.api.startUploadSession(tokenResult)
+
     if (!uploadSessionStarted.uploadId) {
       return new ClientDisplayableError('Could not start upload session')
     }
@@ -98,18 +101,21 @@ export class SNFileService extends AbstractService implements FilesClientInterfa
     fileMetadata: FileMetadata,
   ): Promise<SNFile | ClientDisplayableError> {
     const uploadSessionClosed = await this.api.closeUploadSession(operation.getApiToken())
+
     if (!uploadSessionClosed) {
       return new ClientDisplayableError('Could not close upload session')
     }
 
+    const result = operation.getResult()
+
     const fileContent: FileContentSpecialized = {
-      chunkSizes: operation.chunkSizes,
-      encryptionHeader: operation.getEncryptionHeader(),
-      key: operation.getKey(),
-      name: fileMetadata.name,
-      remoteIdentifier: operation.getRemoteIdentifier(),
-      size: operation.getRawSize(),
+      decryptedSize: result.finalDecryptedSize,
+      encryptedChunkSizes: operation.encryptedChunkSizes,
+      encryptionHeader: result.encryptionHeader,
+      key: result.key,
       mimeType: fileMetadata.mimeType,
+      name: fileMetadata.name,
+      remoteIdentifier: result.remoteIdentifier,
     }
 
     const file = await this.itemManager.createItem<SNFile>(
@@ -141,7 +147,7 @@ export class SNFileService extends AbstractService implements FilesClientInterfa
       return tokenResult
     }
 
-    const addToCache = file.size < this.cache.maxSize
+    const addToCache = file.decryptedSize < this.cache.maxSize
     let cacheEntryAggregate = new Uint8Array()
 
     const bytesWrapper = async (bytes: Uint8Array): Promise<void> => {

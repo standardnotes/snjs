@@ -1,49 +1,61 @@
 import { ClientDisplayableError } from '@standardnotes/responses'
-import { EncryptedFileInterface } from '../Types'
+import { EncryptedFileInterface, FileDownloadProgress } from '../Types'
 import { FilesServerInterface } from '../FilesServerInterface'
+import { Deferred } from './Deferred'
 
 export type AbortSignal = 'aborted'
 export type AbortFunction = () => void
-
-export const Deferred = <T>() => {
-  let resolve!: (value: T | PromiseLike<T>) => void
-  let reject!: () => void
-
-  const promise = new Promise<T>((res, rej) => {
-    resolve = res
-    reject = rej
-  })
-
-  return {
-    resolve,
-    reject,
-    promise,
-  }
-}
 
 export class FileDownloader {
   private aborted = false
   private abortDeferred = Deferred<AbortSignal>()
 
+  private totalBytesDownloaded = 0
+
   constructor(
     private file: EncryptedFileInterface,
     private apiToken: string,
     private apiService: FilesServerInterface,
-    private onEncryptedBytes?: (encryptedBytes: Uint8Array, abort: AbortFunction) => Promise<void>,
   ) {}
 
-  public async download(): Promise<ClientDisplayableError | AbortSignal | undefined> {
+  private getProgress(): FileDownloadProgress {
+    const encryptedSize = this.file.encryptedSize
+
+    return {
+      encryptedFileSize: encryptedSize,
+      encryptedBytesDownloaded: this.totalBytesDownloaded,
+      encryptedBytesRemaining: encryptedSize - this.totalBytesDownloaded,
+      percentComplete: (this.totalBytesDownloaded / encryptedSize) * 100.0,
+    }
+  }
+
+  public async beginDownload(
+    onEncryptedBytes: (
+      encryptedBytes: Uint8Array,
+      progress: FileDownloadProgress,
+      abort: AbortFunction,
+    ) => Promise<void>,
+  ): Promise<ClientDisplayableError | AbortSignal | undefined> {
     const chunkIndex = 0
     const startRange = 0
 
-    const result = await Promise.race([
-      this.abortDeferred.promise,
-      this.apiService.downloadFile(this.file, chunkIndex, this.apiToken, startRange, async (bytes) => {
-        if (!this.aborted && this.onEncryptedBytes) {
-          await this.onEncryptedBytes(bytes, this.abort)
+    const downloadPromise = this.apiService.downloadFile(
+      this.file,
+      chunkIndex,
+      this.apiToken,
+      startRange,
+      async (bytes) => {
+        if (this.aborted) {
+          return
         }
-      }),
-    ])
+
+        this.totalBytesDownloaded += bytes.byteLength
+
+        await onEncryptedBytes(bytes, this.getProgress(), this.abort)
+      },
+    )
+
+    const result = await Promise.race([this.abortDeferred.promise, downloadPromise])
 
     return result
   }
@@ -52,7 +64,5 @@ export class FileDownloader {
     this.aborted = true
 
     this.abortDeferred.resolve('aborted')
-
-    this.onEncryptedBytes = undefined
   }
 }

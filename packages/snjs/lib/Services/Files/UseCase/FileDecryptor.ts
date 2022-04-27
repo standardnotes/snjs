@@ -2,11 +2,9 @@ import { SNPureCrypto, StreamDecryptor, SodiumConstant } from '@standardnotes/sn
 import { EncryptedFileInterface } from '../Types'
 
 export class FileDecryptor {
-  private decryptor!: StreamDecryptor
+  private decryptor: StreamDecryptor
 
-  constructor(private file: EncryptedFileInterface, private crypto: SNPureCrypto) {}
-
-  public initialize(): void {
+  constructor(private file: EncryptedFileInterface, private crypto: SNPureCrypto) {
     this.decryptor = this.crypto.xchacha20StreamInitDecryptor(this.file.encryptionHeader, this.file.key)
   }
 

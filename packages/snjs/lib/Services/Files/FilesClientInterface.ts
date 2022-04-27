@@ -3,7 +3,7 @@ import { SNFile, FileMetadata } from '@standardnotes/models'
 import { ClientDisplayableError } from '@standardnotes/responses'
 
 export interface FilesClientInterface {
-  beginNewFileUpload(): Promise<EncryptAndUploadFileOperation | ClientDisplayableError>
+  beginNewFileUpload(sizeInBytes: number): Promise<EncryptAndUploadFileOperation | ClientDisplayableError>
 
   pushBytesForUpload(
     operation: EncryptAndUploadFileOperation,

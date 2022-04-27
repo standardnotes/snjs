@@ -19,6 +19,7 @@ describe('file encryptor', () => {
     file = {
       remoteIdentifier: '123',
       key: 'secret',
+      decryptedSize: 100,
     }
 
     encryptor = new FileEncryptor(file, crypto)
