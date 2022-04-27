@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.103.0](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.102.0...@standardnotes/snjs@2.103.0) (2022-04-27)
+
+
+### Features
+
+* make files sortable using setDisplayOptions ([#713](https://github.com/standardnotes/snjs/issues/713)) ([b2088bf](https://github.com/standardnotes/snjs/commit/b2088bfa169ddea9aeddf9dfb20a098991aed875))
+
+
+
+
+
 # [2.102.0](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.101.1...@standardnotes/snjs@2.102.0) (2022-04-27)
 
 
