@@ -1,3 +1,5 @@
+import { ClientDisplayableError } from '@standardnotes/responses'
+
 export enum ButtonType {
   Info = 0,
   Danger = 1,
@@ -5,14 +7,20 @@ export enum ButtonType {
 
 export type DismissBlockingDialog = () => void
 
-export type SNAlertService = {
-  confirm(
+export abstract class SNAlertService {
+  abstract confirm(
     text: string,
     title?: string,
     confirmButtonText?: string,
     confirmButtonType?: ButtonType,
     cancelButtonText?: string,
   ): Promise<boolean>
-  alert(text: string, title?: string, closeButtonText?: string): Promise<void>
-  blockingDialog(text: string, title?: string): DismissBlockingDialog | Promise<DismissBlockingDialog>
+
+  abstract alert(text: string, title?: string, closeButtonText?: string): Promise<void>
+
+  abstract blockingDialog(text: string, title?: string): DismissBlockingDialog | Promise<DismissBlockingDialog>
+
+  showErrorAlert(error: ClientDisplayableError): Promise<void> {
+    return this.alert(error.text, error.title)
+  }
 }

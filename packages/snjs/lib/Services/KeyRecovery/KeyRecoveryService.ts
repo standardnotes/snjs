@@ -9,6 +9,7 @@ import {
   ItemsKeyContent,
   DecryptedPayloadInterface,
   PayloadEmitSource,
+  EncryptedItemInterface,
 } from '@standardnotes/models'
 import { SNSyncService } from '../Sync/SyncService'
 import { KeyRecoveryStrings } from '../Api/Messages'
@@ -20,7 +21,7 @@ import { SNApiService } from '@Lib/Services/Api/ApiService'
 import { ContentType, leftVersionGreaterThanOrEqualToRight } from '@standardnotes/common'
 import { ItemManager } from '../Items/ItemManager'
 import { dateSorted, removeFromArray } from '@standardnotes/utils'
-import { KeyParamsResponse } from '@standardnotes/responses'
+import { ClientDisplayableError, KeyParamsResponse } from '@standardnotes/responses'
 import {
   AbstractService,
   InternalEventBusInterface,
@@ -182,6 +183,24 @@ export class SNKeyRecoveryService extends AbstractService<KeyRecoveryEvent, Decr
       .map((i) => i.payload)
 
     void this.handleIgnoredItemsKeys(invalidKeys, false)
+  }
+
+  public canAttemptDecryptionOfItem(item: EncryptedItemInterface): ClientDisplayableError | true {
+    const keyId = item.payload.items_key_id
+
+    if (!keyId) {
+      return new ClientDisplayableError('This item cannot be recovered.')
+    }
+
+    const key = this.payloadManager.findOne(keyId)
+
+    if (!key) {
+      return new ClientDisplayableError(
+        `Unable to find key ${keyId} for this item. You may try signing out and back in; if that doesn't help, check your backup files for a key with this ID and import it.`,
+      )
+    }
+
+    return true
   }
 
   public async processPersistedUndecryptables() {
