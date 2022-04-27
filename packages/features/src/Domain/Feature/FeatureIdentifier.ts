@@ -36,7 +36,6 @@ export enum FeatureIdentifier {
   TitaniumTheme = 'org.standardnotes.theme-titanium',
   TokenVaultEditor = 'org.standardnotes.token-vault',
   TwoFactorAuth = 'org.standardnotes.two-factor-auth',
-  TwoFactorAuthManager = 'org.standardnotes.mfa-link',
 
   DeprecatedFoldersComponent = 'org.standardnotes.folders',
   DeprecatedFileSafe = 'org.standardnotes.file-safe',
