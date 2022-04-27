@@ -253,7 +253,7 @@ export class SNApplication implements InternalServices.ListedClientInterface {
 
     this.apiService.loadHost()
     this.webSocketsService.loadWebSocketUrl()
-    await this.sessionManager.initializeFromDisk()
+    this.sessionManager.initializeFromDisk()
 
     this.settingsService.initializeFromDisk()
 

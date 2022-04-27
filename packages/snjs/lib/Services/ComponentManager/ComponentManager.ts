@@ -9,7 +9,7 @@ import { SNSyncService } from '@Lib/Services/Sync/SyncService'
 import find from 'lodash/find'
 import uniq from 'lodash/uniq'
 import { ComponentArea, ComponentAction, ComponentPermission, FindNativeFeature } from '@standardnotes/features'
-import { Copy, filterFromArray, removeFromArray, sleep } from '@standardnotes/utils'
+import { Copy, filterFromArray, removeFromArray, sleep, assert } from '@standardnotes/utils'
 import { UuidString } from '@Lib/Types/UuidString'
 import {
   PermissionDialog,
@@ -247,20 +247,22 @@ export class SNComponentManager extends AbstractService<ComponentManagerEvent, E
   }
 
   urlForComponent(component: SNComponent): string | undefined {
-    /* offlineOnly is available only on desktop, and not on web or mobile. */
-    if (component.offlineOnly && !this.isDesktop) {
+    const platformSupportsOfflineOnly = this.isDesktop
+    if (component.offlineOnly && !platformSupportsOfflineOnly) {
       return undefined
     }
 
     const nativeFeature = FindNativeFeature(component.identifier)
 
     if (this.isDesktop) {
+      assert(this.desktopManager)
+
       if (nativeFeature) {
-        return `${this.desktopManager!.getExtServerHost()}/components/${component.identifier}/${
+        return `${this.desktopManager.getExtServerHost()}/components/${component.identifier}/${
           nativeFeature.index_path
         }`
       } else if (component.local_url) {
-        return component.local_url.replace(DESKTOP_URL_PREFIX, this.desktopManager!.getExtServerHost() + '/')
+        return component.local_url.replace(DESKTOP_URL_PREFIX, this.desktopManager.getExtServerHost() + '/')
       } else {
         return component.hosted_url || component.legacy_url
       }
@@ -297,8 +299,8 @@ export class SNComponentManager extends AbstractService<ComponentManagerEvent, E
     return urls
   }
 
-  private findComponent(uuid: UuidString) {
-    return this.itemManager.findItem(uuid) as SNComponent
+  private findComponent(uuid: UuidString): SNComponent | undefined {
+    return this.itemManager.findItem<SNComponent>(uuid)
   }
 
   findComponentViewer(identifier: string): ComponentViewer | undefined {
@@ -334,10 +336,20 @@ export class SNComponentManager extends AbstractService<ComponentManagerEvent, E
   ): void {
     const component = this.findComponent(componentUuid)
 
+    if (!component) {
+      void this.alertService.alert(
+        `Unable to find component with ID ${componentUuid}. Please restart the app and try again.`,
+        'An unexpected error occurred',
+      )
+
+      return
+    }
+
     if (!this.areRequestedPermissionsValid(component, requiredPermissions)) {
       console.error('Component is requesting invalid permissions', componentUuid, requiredPermissions)
       return
     }
+
     const nativeFeature = FindNativeFeature(component.identifier)
     const acquiredPermissions = nativeFeature?.component_permissions || component.permissions
 
@@ -403,6 +415,11 @@ export class SNComponentManager extends AbstractService<ComponentManagerEvent, E
       actionBlock: callback,
       callback: async (approved: boolean) => {
         const latestComponent = this.findComponent(component.uuid)
+
+        if (!latestComponent) {
+          return
+        }
+
         if (approved) {
           this.log('Changing component to expand permissions', component)
           const componentPermissions = Copy(latestComponent.permissions) as ComponentPermission[]
@@ -508,7 +525,13 @@ export class SNComponentManager extends AbstractService<ComponentManagerEvent, E
 
   async toggleComponent(uuid: UuidString): Promise<void> {
     this.log('Toggling component', uuid)
+
     const component = this.findComponent(uuid)
+
+    if (!component) {
+      return
+    }
+
     await this.itemManager.changeComponent(component, (mutator) => {
       mutator.active = !(mutator.getItem() as SNComponent).active
     })
