@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.102.0](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.101.1...@standardnotes/snjs@2.102.0) (2022-04-27)
+
+
+### Features
+
+* add canaAttemptDecryptionOfItem method ([#712](https://github.com/standardnotes/snjs/issues/712)) ([f7b93ca](https://github.com/standardnotes/snjs/commit/f7b93ca1e7ac6dee684025ebf2b89a0ba04059dd))
+
+
+
+
+
 ## [2.101.1](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.101.0...@standardnotes/snjs@2.101.1) (2022-04-27)
 
 **Note:** Version bump only for package @standardnotes/snjs
