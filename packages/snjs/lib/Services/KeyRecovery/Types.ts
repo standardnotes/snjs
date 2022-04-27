@@ -1,23 +1,33 @@
 import { SNRootKey, SNRootKeyParams } from '@standardnotes/encryption'
-import { EncryptedTransferPayload, EncryptedPayloadInterface } from '@standardnotes/models'
+import {
+  EncryptedTransferPayload,
+  EncryptedPayloadInterface,
+  DecryptedPayloadInterface,
+  ItemsKeyContent,
+} from '@standardnotes/models'
 import { UuidString } from '@Lib/Types'
 
 export type UndecryptableItemsStorage = Record<UuidString, EncryptedTransferPayload>
 
-export type DecryptionCallback = (key: EncryptedPayloadInterface, result: DecryptionResponse) => void
+export type KeyRecoveryOperationSuccessResult = {
+  rootKey: SNRootKey
+  decryptedItemsKey: DecryptedPayloadInterface<ItemsKeyContent>
+  replaceLocalRootKeyWithResult: boolean
+}
 
-export type DecryptionResponse = {
-  success: boolean
-  aborted?: boolean
-  rootKey?: SNRootKey
+export type KeyRecoveryOperationFailResult = {
+  aborted: boolean
+}
+
+export type KeyRecoveryOperationResult = KeyRecoveryOperationSuccessResult | KeyRecoveryOperationFailResult
+
+export function isSuccessResult(x: KeyRecoveryOperationResult): x is KeyRecoveryOperationSuccessResult {
+  return 'rootKey' in x
 }
 
 export type DecryptionQueueItem = {
-  key: EncryptedPayloadInterface
+  encryptedKey: EncryptedPayloadInterface
   keyParams: SNRootKeyParams
-  callback?: DecryptionCallback
-  promise?: Promise<DecryptionResponse>
-  resolve?: (result: DecryptionResponse) => void
 }
 
 export enum KeyRecoveryEvent {

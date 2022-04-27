@@ -4,7 +4,7 @@ import * as Factory from './lib/factory.js'
 chai.use(chaiAsPromised)
 const expect = chai.expect
 
-describe('key recovery service', function () {
+describe.only('key recovery service', function () {
   this.timeout(Factory.TwentySecondTimeout)
 
   const syncOptions = {
