@@ -4,7 +4,7 @@ import * as Factory from './lib/factory.js'
 chai.use(chaiAsPromised)
 const expect = chai.expect
 
-describe.only('key recovery service', function () {
+describe('key recovery service', function () {
   this.timeout(Factory.TwentySecondTimeout)
 
   const syncOptions = {
@@ -27,20 +27,16 @@ describe.only('key recovery service', function () {
     const unassociatedIdentifier = 'foorand'
 
     const application = context.application
-    const receiveChallenge = (challenge) => {
-      /** Give unassociated password when prompted */
-      application.submitValuesForChallenge(challenge, [new ChallengeValue(challenge.prompts[0], unassociatedPassword)])
-    }
-    await application.prepareForLaunch({ receiveChallenge })
-    await application.launch(true)
-
-    await Factory.registerUserToApplication({
-      application: application,
-      email: context.email,
-      password: context.password,
+    await context.launch({
+      receiveChallenge: (challenge) => {
+        application.submitValuesForChallenge(challenge, [
+          new ChallengeValue(challenge.prompts[0], unassociatedPassword),
+        ])
+      },
     })
 
-    /** Create items key associated with a random root key */
+    await context.register()
+
     const randomRootKey = await application.protocolService.createRootKey(
       unassociatedIdentifier,
       unassociatedPassword,
@@ -55,25 +51,84 @@ describe.only('key recovery service', function () {
       },
     })
 
-    /** Attempt decryption and insert into rotation in errored state  */
-    const decrypted = await application.protocolService.decryptSplitSingle({
+    const errored = await application.protocolService.decryptSplitSingle({
       usesRootKeyWithKeyLookup: {
         items: [encrypted],
       },
     })
-    /** Expect to be errored */
-    expect(decrypted.errorDecrypting).to.equal(true)
 
-    /** Insert into rotation */
-    await application.payloadManager.emitPayload(decrypted, PayloadEmitSource.LocalInserted)
+    expect(errored.errorDecrypting).to.equal(true)
 
-    /** Wait and allow recovery wizard to complete */
-    await Factory.sleep(0.3)
+    await application.payloadManager.emitPayload(errored, PayloadEmitSource.LocalInserted)
 
-    /** Should be decrypted now */
-    expect(application.items.findItem(encrypted.uuid).errorDecrypting).to.not.be.ok
+    await context.resolveWhenKeyRecovered(errored.uuid)
+
+    expect(application.items.findItem(errored.uuid).errorDecrypting).to.not.be.ok
 
     expect(application.syncService.isOutOfSync()).to.equal(false)
+    await context.deinit()
+  })
+
+  it('recovered keys should be synced if their key params do not match servers', async function () {
+    /**
+     * This helps ensure server always has the most valid state,
+     * in case the recovery is being initiated from a server value in the first place
+     */
+    const context = await Factory.createAppContextWithFakeCrypto()
+    const unassociatedPassword = 'randfoo'
+    const unassociatedIdentifier = 'foorand'
+
+    const application = context.application
+
+    await context.launch({
+      receiveChallenge: (challenge) => {
+        application.submitValuesForChallenge(challenge, [
+          new ChallengeValue(challenge.prompts[0], unassociatedPassword),
+        ])
+      },
+    })
+    await context.register()
+
+    const randomRootKey = await application.protocolService.createRootKey(
+      unassociatedIdentifier,
+      unassociatedPassword,
+      KeyParamsOrigination.Registration,
+    )
+
+    const randomItemsKey = await application.protocolService.operatorManager.defaultOperator().createItemsKey()
+
+    await application.payloadManager.emitPayload(
+      randomItemsKey.payload.copy({ dirty: true, dirtiedDate: new Date() }),
+      PayloadEmitSource.LocalInserted,
+    )
+
+    await context.sync()
+
+    const originalSyncTime = application.payloadManager.findOne(randomItemsKey.uuid).lastSyncEnd.getTime()
+
+    const encrypted = await application.protocolService.encryptSplitSingle({
+      usesRootKey: {
+        items: [randomItemsKey.payload],
+        key: randomRootKey,
+      },
+    })
+
+    const errored = await application.protocolService.decryptSplitSingle({
+      usesRootKeyWithKeyLookup: {
+        items: [encrypted],
+      },
+    })
+
+    await application.payloadManager.emitPayload(errored, PayloadEmitSource.LocalInserted)
+
+    const recoveryPromise = context.resolveWhenKeyRecovered(errored.uuid)
+
+    await context.sync()
+
+    await recoveryPromise
+
+    expect(application.payloadManager.findOne(errored.uuid).lastSyncEnd.getTime()).to.be.above(originalSyncTime)
+
     await context.deinit()
   })
 

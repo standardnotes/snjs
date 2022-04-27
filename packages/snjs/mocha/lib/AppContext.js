@@ -155,9 +155,9 @@ export class AppContext {
     })
   }
 
-  async launch({ awaitDatabaseLoad = true } = {}) {
+  async launch({ awaitDatabaseLoad = true, receiveChallenge } = { awaitDatabaseLoad: true }) {
     await this.application.prepareForLaunch({
-      receiveChallenge: this.handleChallenge,
+      receiveChallenge: receiveChallenge || this.handleChallenge,
     })
     await this.application.launch(awaitDatabaseLoad)
   }

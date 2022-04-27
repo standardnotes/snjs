@@ -360,7 +360,7 @@ export class SNKeyRecoveryService extends AbstractService<KeyRecoveryEvent, Decr
 
       if (rootKey) {
         const replaceLocalRootKeyWithResult = true
-        await this.handleDecryptionOfAllKeysMatchingCorrectRootKey(rootKey, replaceLocalRootKeyWithResult)
+        await this.handleDecryptionOfAllKeysMatchingCorrectRootKey(rootKey, replaceLocalRootKeyWithResult, serverParams)
       }
     }
 
@@ -435,7 +435,11 @@ export class SNKeyRecoveryService extends AbstractService<KeyRecoveryEvent, Decr
       return result
     }
 
-    await this.handleDecryptionOfAllKeysMatchingCorrectRootKey(result.rootKey, result.replaceLocalRootKeyWithResult)
+    await this.handleDecryptionOfAllKeysMatchingCorrectRootKey(
+      result.rootKey,
+      result.replaceLocalRootKeyWithResult,
+      serverParams,
+    )
 
     return result
   }
@@ -443,6 +447,7 @@ export class SNKeyRecoveryService extends AbstractService<KeyRecoveryEvent, Decr
   private async handleDecryptionOfAllKeysMatchingCorrectRootKey(
     rootKey: SNRootKey,
     replacesRootKey: boolean,
+    serverParams?: SNRootKeyParams,
   ): Promise<void> {
     if (replacesRootKey) {
       const wrappingKey = await this.getWrappingKeyIfApplicable()
@@ -450,11 +455,19 @@ export class SNKeyRecoveryService extends AbstractService<KeyRecoveryEvent, Decr
       await this.protocolService.setRootKey(rootKey, wrappingKey)
     }
 
-    const matching = this.removeElementsFromQueueForMatchingKeyParams(rootKey.keyParams)
+    const clientKeyParams = this.getClientKeyParams()
+    const matchingKeys = this.removeElementsFromQueueForMatchingKeyParams(rootKey.keyParams).map((qItem) => {
+      const needsResync =
+        clientKeyParams &&
+        serverParams &&
+        clientKeyParams.compare(serverParams) &&
+        !serverParams.compare(qItem.keyParams)
+      return needsResync ? qItem.encryptedKey.copy({ dirty: true, dirtiedDate: new Date() }) : qItem.encryptedKey
+    })
 
     const matchingResults = await this.protocolService.decryptSplit({
       usesRootKey: {
-        items: matching.map((m) => m.encryptedKey),
+        items: matchingKeys,
         key: rootKey,
       },
     })
@@ -469,6 +482,10 @@ export class SNKeyRecoveryService extends AbstractService<KeyRecoveryEvent, Decr
       void this.alertService.alert(KeyRecoveryStrings.KeyRecoveryRootKeyReplaced)
     } else {
       void this.alertService.alert(KeyRecoveryStrings.KeyRecoveryKeyRecovered)
+    }
+
+    if (decryptedMatching.some((p) => p.dirty)) {
+      await this.syncService.sync()
     }
 
     await this.notifyEvent(KeyRecoveryEvent.KeysRecovered, decryptedMatching)
