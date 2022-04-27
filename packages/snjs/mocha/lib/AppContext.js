@@ -48,7 +48,7 @@ export class AppContext {
   }
 
   disableKeyRecovery() {
-    this.application.keyRecoveryService.beginProcessingQueue = () => {
+    this.application.keyRecoveryService.beginKeyRecovery = () => {
       console.warn('Key recovery is disabled for this test')
     }
   }
@@ -105,6 +105,16 @@ export class AppContext {
     return new Promise((resolve) => {
       this.application.keyRecoveryService.addEventObserver((_eventName, keys) => {
         if (Uuids(keys).includes(uuid)) {
+          resolve()
+        }
+      })
+    })
+  }
+
+  async awaitSignInEvent() {
+    return new Promise((resolve) => {
+      this.application.userService.addEventObserver((eventName) => {
+        if (eventName === AccountEvent.SignedInOrRegistered) {
           resolve()
         }
       })

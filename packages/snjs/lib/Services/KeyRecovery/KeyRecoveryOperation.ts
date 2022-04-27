@@ -21,25 +21,25 @@ export class KeyRecoveryOperation {
   public async run(): Promise<KeyRecoveryOperationResult> {
     let replaceLocalRootKeyWithResult = false
 
-    const serverKeyParamsAreBetterOrEqualToClients =
+    const queueItemKeyParamsAreBetterOrEqualToClients =
       this.serverParams &&
       this.clientParams &&
       !this.clientParams.compare(this.serverParams) &&
       this.queueItem.keyParams.compare(this.serverParams) &&
       serverKeyParamsAreSafe(this.serverParams, this.clientParams)
 
-    if (serverKeyParamsAreBetterOrEqualToClients) {
+    if (queueItemKeyParamsAreBetterOrEqualToClients) {
       const latestDecryptedItemsKey = dateSorted(
         this.itemManager.getItems<ItemsKeyInterface>(ContentType.ItemsKey),
         'created_at',
         false,
       )[0]
 
-      const hasLocalItemsKey = latestDecryptedItemsKey != undefined
-      const isNewerThanLatest =
-        hasLocalItemsKey && this.queueItem.encryptedKey.created_at > latestDecryptedItemsKey.created_at
-
-      replaceLocalRootKeyWithResult = !hasLocalItemsKey || isNewerThanLatest
+      if (!latestDecryptedItemsKey) {
+        replaceLocalRootKeyWithResult = true
+      } else {
+        replaceLocalRootKeyWithResult = this.queueItem.encryptedKey.created_at > latestDecryptedItemsKey.created_at
+      }
     }
 
     const challenge = new Challenge(

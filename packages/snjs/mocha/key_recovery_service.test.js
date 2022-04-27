@@ -240,34 +240,28 @@ describe.only('key recovery service', function () {
     await Factory.safeDeinit(recreatedAppA)
   })
 
-  it('when client key params differ from server, and no matching items key exists, should perform sign in flow', async function () {
+  it('when client key params differ from server, and no matching items key exists to compare against, should perform sign in flow', async function () {
     /**
-     * If we encounter an undecryptable items key, whose key params do not match the server's,
-     * and the server's key params do not match our own, we have no way to validate a new
-     * root key other than by signing in.
+     * When a user changes password/email on client A, client B must update their root key to the new one.
+     * To do this, we can potentially avoid making a new sign in request (and creating a new session) by instead
+     * reading one of the undecryptable items key (which is potentially the new one that client A created). If the keyParams
+     * of that items key matches the servers, it means we can use those key params to compute our new local root key,
+     * instead of having to sign in.
      */
     const unassociatedPassword = 'randfoo'
     const context = await Factory.createAppContextWithFakeCrypto('some-namespace')
     const application = context.application
+
     const receiveChallenge = (challenge) => {
-      /** This is the sign in prompt, return proper value */
+      const isKeyRecoveryPrompt = challenge.subheading?.includes(KeyRecoveryStrings.KeyRecoveryPasswordRequired)
       application.submitValuesForChallenge(challenge, [
-        new ChallengeValue(
-          challenge.prompts[0],
-          challenge.subheading.includes(KeyRecoveryStrings.KeyRecoveryLoginFlowReason)
-            ? context.password
-            : unassociatedPassword,
-        ),
+        new ChallengeValue(challenge.prompts[0], isKeyRecoveryPrompt ? unassociatedPassword : context.password),
       ])
     }
+
     await application.prepareForLaunch({ receiveChallenge })
     await application.launch(true)
-
-    await Factory.registerUserToApplication({
-      application: application,
-      email: context.email,
-      password: context.password,
-    })
+    await context.register()
 
     const correctRootKey = await application.protocolService.getRootKey()
 
@@ -278,14 +272,20 @@ describe.only('key recovery service', function () {
      */
 
     const unassociatedIdentifier = 'foorand'
+
     /** Create items key associated with a random root key */
     const randomRootKey = await application.protocolService.createRootKey(
       unassociatedIdentifier,
       unassociatedPassword,
       KeyParamsOrigination.Registration,
     )
+
+    const signInFunction = sinon.spy(application.keyRecoveryService, 'performServerSignIn')
+
     await application.protocolService.setRootKey(randomRootKey)
+
     const correctItemsKey = await application.protocolService.operatorManager.defaultOperator().createItemsKey()
+
     const encrypted = await application.protocolService.encryptSplitSingle({
       usesRootKey: {
         items: [correctItemsKey.payload],
@@ -293,20 +293,31 @@ describe.only('key recovery service', function () {
       },
     })
 
+    const resolvePromise = Promise.all([
+      context.awaitSignInEvent(),
+      context.resolveWhenKeyRecovered(correctItemsKey.uuid),
+    ])
+
     await application.payloadManager.emitPayload(
       encrypted.copy({
         errorDecrypting: true,
+        dirty: true,
       }),
       PayloadEmitSource.LocalInserted,
     )
 
-    /** At this point key recovery wizard will encounter an undecryptable items key,
-     * whose key params do not match the server's. Key recovery wizard should prompt for sign in,
-     * but will also prompt for detached recovery of this key, so we must await both */
-    await Factory.sleep(5.0)
+    await context.sync()
+
+    await resolvePromise
+
+    expect(signInFunction.callCount).to.equal(1)
 
     const clientRootKey = await application.protocolService.getRootKey()
     expect(clientRootKey.compare(correctRootKey)).to.equal(true)
+
+    const decryptedKey = application.items.findItem(correctItemsKey.uuid)
+    expect(decryptedKey).to.be.ok
+    expect(decryptedKey.content.itemsKey).to.equal(correctItemsKey.content.itemsKey)
 
     expect(application.syncService.isOutOfSync()).to.equal(false)
     await context.deinit()

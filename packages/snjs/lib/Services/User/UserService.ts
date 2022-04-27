@@ -222,16 +222,23 @@ export class UserService
    */
   public async correctiveSignIn(rootKey: SNRootKey): Promise<HttpResponse | SignInResponse> {
     this.lockSyncing()
+
     const response = await this.sessionManager.bypassChecksAndSignInWithRootKey(rootKey.keyParams.identifier, rootKey)
+
     if (!response.error) {
       await this.notifyEvent(AccountEvent.SignedInOrRegistered)
+
       this.unlockSyncing()
+
       void this.syncService.downloadFirstSync(1_000, {
         checkIntegrity: true,
       })
+
       void this.protocolService.decryptErroredPayloads()
     }
+
     this.unlockSyncing()
+
     return response
   }
 
