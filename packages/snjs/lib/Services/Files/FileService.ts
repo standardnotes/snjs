@@ -109,13 +109,13 @@ export class SNFileService extends AbstractService implements FilesClientInterfa
     const result = operation.getResult()
 
     const fileContent: FileContentSpecialized = {
-      chunkSizes: operation.encryptedChunkSizes,
+      decryptedSize: result.finalDecryptedSize,
+      encryptedChunkSizes: operation.encryptedChunkSizes,
       encryptionHeader: result.encryptionHeader,
       key: result.key,
       mimeType: fileMetadata.mimeType,
       name: fileMetadata.name,
       remoteIdentifier: result.remoteIdentifier,
-      size: result.finalDecryptedSize,
     }
 
     const file = await this.itemManager.createItem<SNFile>(
@@ -147,7 +147,7 @@ export class SNFileService extends AbstractService implements FilesClientInterfa
       return tokenResult
     }
 
-    const addToCache = file.size < this.cache.maxSize
+    const addToCache = file.decryptedSize < this.cache.maxSize
     let cacheEntryAggregate = new Uint8Array()
 
     const bytesWrapper = async (bytes: Uint8Array): Promise<void> => {

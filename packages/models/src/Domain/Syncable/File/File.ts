@@ -4,16 +4,17 @@ import { DecryptedPayloadInterface } from '../../Abstract/Payload/Interfaces/Dec
 import { FileMetadata } from './FileMetadata'
 import { FileProtocolV1 } from './FileProtocolV1'
 
+type EncryptedBytesLength = number
+type DecryptedBytesLength = number
+
 interface SizesDeprecatedDueToAmbiguousNaming {
-  /** Decrypted size in bytes */
-  size?: number
-  /** Encrypted chunk sizes */
-  chunkSizes?: number[]
+  size?: DecryptedBytesLength
+  chunkSizes?: EncryptedBytesLength[]
 }
 
 interface Sizes {
-  decryptedSize: number
-  encryptedChunkSizes: number[]
+  decryptedSize: DecryptedBytesLength
+  encryptedChunkSizes: EncryptedBytesLength[]
 }
 
 interface FileContentWithoutSize {
@@ -24,7 +25,7 @@ interface FileContentWithoutSize {
   mimeType: string
 }
 
-type FileContentSpecialized = FileContentWithoutSize & FileMetadata & SizesDeprecatedDueToAmbiguousNaming & Sizes
+export type FileContentSpecialized = FileContentWithoutSize & FileMetadata & SizesDeprecatedDueToAmbiguousNaming & Sizes
 
 export type FileContent = FileContentSpecialized & ItemContent
 
@@ -38,8 +39,8 @@ export class SNFile
   public readonly encryptionHeader: string
   public readonly mimeType: string
 
-  public readonly decryptedSize: number
-  public readonly encryptedChunkSizes: number[]
+  public readonly decryptedSize: DecryptedBytesLength
+  public readonly encryptedChunkSizes: EncryptedBytesLength[]
 
   constructor(payload: DecryptedPayloadInterface<FileContent>) {
     super(payload)

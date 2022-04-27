@@ -59,7 +59,7 @@ describe('fileService', () => {
   it('should cache file after download', async () => {
     const file = {
       uuid: '1',
-      size: 100_000,
+      decryptedSize: 100_000,
     } as jest.Mocked<SNFile>
 
     let downloadMock = apiService.downloadFile as jest.Mock
@@ -84,7 +84,7 @@ describe('fileService', () => {
   it('deleting file should remove it from cache', async () => {
     const file = {
       uuid: '1',
-      size: 100_000,
+      decryptedSize: 100_000,
     } as jest.Mocked<SNFile>
 
     await fileService.downloadFile(file, async () => {
