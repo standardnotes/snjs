@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.38.1](https://github.com/standardnotes/snjs/compare/@standardnotes/features@1.38.0...@standardnotes/features@1.38.1) (2022-04-27)
+
+
+### Bug Fixes
+
+* remove deprecated 2FA manager permission and feature ([47df3e4](https://github.com/standardnotes/snjs/commit/47df3e41ea9e5b6b721d47b6319ccd590b6f566c))
+
+
+
+
+
 # [1.38.0](https://github.com/standardnotes/snjs/compare/@standardnotes/features@1.37.9...@standardnotes/features@1.38.0) (2022-04-25)
 
 
