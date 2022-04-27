@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.5.0](https://github.com/standardnotes/snjs/compare/@standardnotes/models@1.4.9...@standardnotes/models@1.5.0) (2022-04-27)
+
+
+### Features
+
+* file upload and download progress ([#711](https://github.com/standardnotes/snjs/issues/711)) ([79fceed](https://github.com/standardnotes/snjs/commit/79fceeda4066dc66142f18c9c7b110757ca67e69))
+
+
+
+
+
 ## [1.4.9](https://github.com/standardnotes/snjs/compare/@standardnotes/models@1.4.8...@standardnotes/models@1.4.9) (2022-04-25)
 
 **Note:** Version bump only for package @standardnotes/models
