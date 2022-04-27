@@ -59,6 +59,7 @@ export class ItemManager
     this.collection.setDisplayOptions(ContentType.Component, Models.CollectionSort.CreatedAt, 'asc')
     this.collection.setDisplayOptions(ContentType.Theme, Models.CollectionSort.Title, 'asc')
     this.collection.setDisplayOptions(ContentType.SmartView, Models.CollectionSort.Title, 'dsc')
+    this.collection.setDisplayOptions(ContentType.File, Models.CollectionSort.Title, 'asc')
 
     this.notesCollection = new Models.NotesCollection(this.collection)
     this.tagNotesIndex = new Models.TagNotesIndex(this.collection, this.tagNotesIndex?.observers)
@@ -77,7 +78,7 @@ export class ItemManager
   }
 
   setDisplayOptions(
-    contentType: ContentType.Tag | ContentType.SmartView | ContentType.Theme | ContentType.Component,
+    contentType: ContentType.Tag | ContentType.SmartView | ContentType.Theme | ContentType.Component | ContentType.File,
     sortBy?: Models.CollectionSortProperty,
     direction?: Models.CollectionSortDirection,
     filter?: (element: Models.SortableItem) => boolean,
@@ -122,7 +123,7 @@ export class ItemManager
   }
 
   public getDisplayableItems<T extends Models.DecryptedItemInterface>(
-    contentType: ContentType.Tag | ContentType.SmartView | ContentType.Theme | ContentType.Component,
+    contentType: ContentType.Tag | ContentType.SmartView | ContentType.Theme | ContentType.Component | ContentType.File,
   ): T[] {
     return this.collection.displayElements(contentType)
   }
@@ -1202,7 +1203,9 @@ export class ItemManager
   }
 
   public getFilesForNote(note: Models.SNNote): Models.SNFile[] {
-    return this.itemsReferencingItem(note).filter((ref) => ref.content_type === ContentType.File) as Models.SNFile[]
+    return (
+      this.itemsReferencingItem(note).filter((ref) => ref.content_type === ContentType.File) as Models.SNFile[]
+    ).sort((a, b) => (a.name.toLowerCase() > b.name.toLowerCase() ? 1 : -1))
   }
 
   public renameFile(file: Models.SNFile, name: string): Promise<Models.SNFile> {

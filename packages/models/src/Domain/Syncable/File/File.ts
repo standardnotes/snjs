@@ -3,6 +3,7 @@ import { ItemContent } from '../../Abstract/Content/ItemContent'
 import { DecryptedPayloadInterface } from '../../Abstract/Payload/Interfaces/DecryptedPayload'
 import { FileMetadata } from './FileMetadata'
 import { FileProtocolV1 } from './FileProtocolV1'
+import { SortableItem } from '../../Runtime/Collection/CollectionSort'
 
 type EncryptedBytesLength = number
 type DecryptedBytesLength = number
@@ -31,7 +32,7 @@ export type FileContent = FileContentSpecialized & ItemContent
 
 export class SNFile
   extends DecryptedItem<FileContent>
-  implements FileContentWithoutSize, Sizes, FileProtocolV1, FileMetadata
+  implements FileContentWithoutSize, Sizes, FileProtocolV1, FileMetadata, SortableItem
 {
   public readonly remoteIdentifier: string
   public readonly name: string
@@ -62,5 +63,9 @@ export class SNFile
 
   public get encryptedSize(): number {
     return this.encryptedChunkSizes.reduce((total, chunk) => total + chunk, 0)
+  }
+
+  public get title(): string {
+    return this.name
   }
 }

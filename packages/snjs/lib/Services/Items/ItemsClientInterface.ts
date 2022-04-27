@@ -40,7 +40,7 @@ export interface ItemsClientInterface {
   get trashedItems(): SNNote[]
 
   setDisplayOptions(
-    contentType: ContentType.Tag | ContentType.SmartView | ContentType.Theme | ContentType.Component,
+    contentType: ContentType.Tag | ContentType.SmartView | ContentType.Theme | ContentType.Component | ContentType.File,
     sortBy?: CollectionSortProperty,
     direction?: CollectionSortDirection,
     filter?: (element: SortableItem) => boolean,
@@ -49,7 +49,7 @@ export interface ItemsClientInterface {
   setNotesDisplayCriteria(criteria: NotesDisplayCriteria): void
 
   getDisplayableItems<T extends DecryptedItemInterface>(
-    contentType: ContentType.Tag | ContentType.SmartView | ContentType.Theme | ContentType.Component,
+    contentType: ContentType.Tag | ContentType.SmartView | ContentType.Theme | ContentType.Component | ContentType.File,
   ): T[]
 
   getDisplayableNotes(): SNNote[]
