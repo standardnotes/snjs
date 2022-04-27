@@ -31,24 +31,25 @@ describe('file downloader', () => {
       )
 
     file = {
-      chunkSizes: [100_000],
+      encryptedChunkSizes: [100_000],
       remoteIdentifier: '123',
       encryptionHeader: 'header',
       key: 'secret',
+      encryptedSize: 100_000,
     }
   })
 
   it('should pass back bytes as they are received', async () => {
     let receivedBytes = new Uint8Array()
 
-    // eslint-disable-next-line @typescript-eslint/require-await
-    downloader = new FileDownloader(file, 'api-token', apiService, async (encryptedBytes) => {
-      receivedBytes = new Uint8Array([...receivedBytes, ...encryptedBytes])
-    })
+    downloader = new FileDownloader(file, 'api-token', apiService)
 
     expect(receivedBytes.length).toBe(0)
 
-    await downloader.download()
+    // eslint-disable-next-line @typescript-eslint/require-await
+    await downloader.beginDownload(async (encryptedBytes) => {
+      receivedBytes = new Uint8Array([...receivedBytes, ...encryptedBytes])
+    })
 
     expect(receivedBytes.length).toEqual(numChunks)
   })

@@ -730,10 +730,12 @@ export class SNApiService
     unencryptedFileSize?: number,
   ): Promise<string | ClientDisplayableError> {
     const url = joinPaths(this.host, Paths.v1.createFileValetToken)
+
     const params: CreateValetTokenPayload = {
       operation,
       resources: [{ remoteIdentifier, unencryptedFileSize: unencryptedFileSize || 0 }],
     }
+
     const response = await this.tokenRefreshableRequest<Responses.CreateValetTokenResponse>({
       verb: HttpVerb.Post,
       url: url,
@@ -817,7 +819,7 @@ export class SNApiService
     onBytesReceived: (bytes: Uint8Array) => Promise<void>,
   ): Promise<ClientDisplayableError | undefined> {
     const url = joinPaths(this.getFilesHost(), Paths.v1.downloadFileChunk)
-    const pullChunkSize = file.chunkSizes[chunkIndex]
+    const pullChunkSize = file.encryptedChunkSizes[chunkIndex]
 
     const response: Responses.HttpResponse | Responses.DownloadFileChunkResponse =
       await this.tokenRefreshableRequest<Responses.DownloadFileChunkResponse>({

@@ -18,23 +18,21 @@ describe('file decryptor', () => {
     crypto.xchacha20StreamDecryptorPush = jest.fn().mockReturnValue({ message: new Uint8Array([0xaa]), tag: 0 })
 
     file = {
-      chunkSizes: [100_000],
+      encryptedChunkSizes: [100_000],
       remoteIdentifier: '123',
       encryptionHeader: 'some-header',
       key: 'secret',
+      encryptedSize: 100_000,
     }
 
     decryptor = new FileDecryptor(file, crypto)
   })
 
   it('initialize', () => {
-    decryptor.initialize()
-
     expect(crypto.xchacha20StreamInitDecryptor).toHaveBeenCalledWith(file.encryptionHeader, file.key)
   })
 
   it('decryptBytes should return decrypted bytes', () => {
-    decryptor.initialize()
     const encryptedBytes = new Uint8Array([0xaa])
     const result = decryptor.decryptBytes(encryptedBytes)
 
