@@ -103,7 +103,7 @@ describe('settings service', function () {
       offline: false,
     })
 
-    await Factory.sleep(0.25)
+    await Factory.sleep(0.5)
 
     const setting = await application.settings.getSubscriptionSetting('FILE_UPLOAD_BYTES_LIMIT')
     expect(setting).to.be.a('string')
