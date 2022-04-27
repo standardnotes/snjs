@@ -456,12 +456,12 @@ export class SNKeyRecoveryService extends AbstractService<KeyRecoveryEvent, Decr
     }
 
     const clientKeyParams = this.getClientKeyParams()
+
+    const clientParamsMatchServer = clientKeyParams && serverParams && clientKeyParams.compare(serverParams)
+
     const matchingKeys = this.removeElementsFromQueueForMatchingKeyParams(rootKey.keyParams).map((qItem) => {
-      const needsResync =
-        clientKeyParams &&
-        serverParams &&
-        clientKeyParams.compare(serverParams) &&
-        !serverParams.compare(qItem.keyParams)
+      const needsResync = clientParamsMatchServer && !serverParams.compare(qItem.keyParams)
+
       return needsResync ? qItem.encryptedKey.copy({ dirty: true, dirtiedDate: new Date() }) : qItem.encryptedKey
     })
 

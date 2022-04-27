@@ -62,20 +62,23 @@ export class AppContext {
 
     const responses = []
 
+    const accountPassword = this.passwordToUseForAccountPasswordChallenge || this.password
+
     for (const prompt of challenge.prompts) {
       if (prompt.validation === ChallengeValidation.LocalPasscode) {
         responses.push(new ChallengeValue(prompt, this.passcode))
       } else if (prompt.validation === ChallengeValidation.AccountPassword) {
-        responses.push(new ChallengeValue(prompt, this.password))
+        responses.push(new ChallengeValue(prompt, accountPassword))
       } else if (prompt.validation === ChallengeValidation.ProtectionSessionDuration) {
         responses.push(new ChallengeValue(prompt, 0))
       } else if (prompt.placeholder === 'Email') {
         responses.push(new ChallengeValue(prompt, this.email))
       } else if (prompt.placeholder === 'Password') {
-        responses.push(new ChallengeValue(prompt, this.password))
-      } else if (challenge.heading.includes('Enter your account password')) {
-        responses.push(new ChallengeValue(prompt, this.password))
+        responses.push(new ChallengeValue(prompt, accountPassword))
+      } else if (challenge.heading.includes('account password')) {
+        responses.push(new ChallengeValue(prompt, accountPassword))
       } else {
+        console.log('challenge', challenge)
         throw Error(`Unhandled custom challenge in Factory.createAppContext`)
       }
     }
@@ -168,5 +171,59 @@ export class AppContext {
 
   async sync(options) {
     await this.application.sync.sync(options)
+  }
+
+  async changePassword(newPassword) {
+    await this.application.changePassword(this.password, newPassword)
+
+    this.password = newPassword
+  }
+
+  findItem(uuid) {
+    return this.application.items.findItem(uuid)
+  }
+
+  findPayload(uuid) {
+    return this.application.payloadManager.findPayload(uuid)
+  }
+
+  get itemsKeys() {
+    return this.application.items.itemsKeys()
+  }
+
+  disableSyncingOfItems(uuids) {
+    const originalImpl = this.application.items.getDirtyItems
+
+    this.application.items.getDirtyItems = function () {
+      const result = originalImpl.apply(this)
+
+      return result.filter((i) => !uuids.includes(i.uuid))
+    }
+  }
+
+  disableKeyRecoveryServerSignIn() {
+    this.application.keyRecoveryService.performServerSignIn = () => {
+      console.warn('application.keyRecoveryService.performServerSignIn has been stubbed with an empty implementation')
+    }
+  }
+
+  preventKeyRecoveryOfKeys(ids) {
+    const originalImpl = this.application.keyRecoveryService.handleUndecryptableItemsKeys
+
+    this.application.keyRecoveryService.handleUndecryptableItemsKeys = function (keys) {
+      const filtered = keys.filter((k) => !ids.includes(k.uuid))
+
+      originalImpl.apply(this, [filtered])
+    }
+  }
+
+  respondToAccountPasswordChallengeWith(password) {
+    this.passwordToUseForAccountPasswordChallenge = password
+  }
+
+  spyOnChangedItems(callback) {
+    this.application.items.addObserver(ContentType.Any, ({ changed, unerrored }) => {
+      callback([...changed, ...unerrored])
+    })
   }
 }

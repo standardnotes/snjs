@@ -69,7 +69,7 @@ describe('key recovery service', function () {
     await context.deinit()
   })
 
-  it('recovered keys should be synced if their key params do not match servers', async function () {
+  it('recovered keys with key params not matching servers should be synced if local root key does matches server', async function () {
     /**
      * This helps ensure server always has the most valid state,
      * in case the recovery is being initiated from a server value in the first place
@@ -130,6 +130,63 @@ describe('key recovery service', function () {
     expect(application.payloadManager.findOne(errored.uuid).lastSyncEnd.getTime()).to.be.above(originalSyncTime)
 
     await context.deinit()
+  })
+
+  it('recovered keys with key params not matching servers should not be synced if local root key does not match server', async function () {
+    /**
+     * Assume Application A has been through these states:
+     * 1. Registration + Items Key A + Root Key A
+     * 2. Password change + Items Key B + Root Key B
+     * 3. Password change + Items Key C + Root Key C + Failure to correctly re-encrypt Items Key A and B with Root Key C
+     *
+     * Application B is not correctly in sync, and is only at State 1 (Registration + Items Key A)
+     *
+     * Application B receives Items Key B of Root Key B but for whatever reason ignores Items Key C of Root Key C.
+     *
+     * When it recovers Items Key B, it should not re-upload it to the server, because Application B's Root Key is not
+     * the current account's root key.
+     */
+
+    const contextA = await Factory.createAppContextWithFakeCrypto()
+    await contextA.launch()
+    await contextA.register()
+    contextA.preventKeyRecoveryOfKeys()
+
+    const contextB = await Factory.createAppContextWithFakeCrypto('app-b', contextA.email, contextA.password)
+    await contextB.launch()
+    await contextB.signIn()
+
+    await contextA.changePassword('new-password-1')
+    const itemsKeyARootKeyB = contextA.itemsKeys[0]
+    const itemsKeyBRootKeyB = contextA.itemsKeys[1]
+
+    contextA.disableSyncingOfItems([itemsKeyARootKeyB.uuid, itemsKeyBRootKeyB.uuid])
+    await contextA.changePassword('new-password-2')
+    const itemsKeyCRootKeyC = contextA.itemsKeys[2]
+
+    contextB.disableKeyRecoveryServerSignIn()
+    contextB.preventKeyRecoveryOfKeys([itemsKeyCRootKeyC.uuid])
+    contextB.respondToAccountPasswordChallengeWith('new-password-1')
+
+    const recoveryPromise = Promise.all([
+      contextB.resolveWhenKeyRecovered(itemsKeyARootKeyB.uuid),
+      contextB.resolveWhenKeyRecovered(itemsKeyBRootKeyB.uuid),
+    ])
+
+    const observedDirtyItemUuids = []
+    contextB.spyOnChangedItems((changed) => {
+      const dirty = changed.filter((i) => i.dirty)
+      extendArray(observedDirtyItemUuids, Uuids(dirty))
+    })
+
+    await contextB.sync()
+    await recoveryPromise
+
+    expect(observedDirtyItemUuids.includes(itemsKeyARootKeyB.uuid)).to.equal(false)
+    expect(observedDirtyItemUuids.includes(itemsKeyBRootKeyB.uuid)).to.equal(false)
+
+    await contextA.deinit()
+    await contextB.deinit()
   })
 
   it('when encountering many undecryptable items key with same key params, should only prompt once', async function () {
