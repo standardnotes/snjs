@@ -14,7 +14,8 @@ import { ApplicationEvent, applicationEventForSyncEvent } from '@Lib/Application
 import { Environment, Platform } from '@standardnotes/services'
 import { SNLog } from '../Log'
 import { useBoolean } from '@standardnotes/utils'
-import { DecryptedItemInterface } from '@standardnotes/models'
+import { DecryptedItemInterface, EncryptedItemInterface } from '@standardnotes/models'
+import { ClientDisplayableError } from '@standardnotes/responses'
 
 /** How often to automatically sync, in milliseconds */
 const DEFAULT_AUTO_SYNC_INTERVAL = 30_000
@@ -252,7 +253,7 @@ export class SNApplication implements InternalServices.ListedClientInterface {
 
     this.apiService.loadHost()
     this.webSocketsService.loadWebSocketUrl()
-    await this.sessionManager.initializeFromDisk()
+    this.sessionManager.initializeFromDisk()
 
     this.settingsService.initializeFromDisk()
 
@@ -870,6 +871,10 @@ export class SNApplication implements InternalServices.ListedClientInterface {
 
   public presentKeyRecoveryWizard(): void {
     return this.keyRecoveryService.presentKeyRecoveryWizard()
+  }
+
+  public canAttemptDecryptionOfItem(item: EncryptedItemInterface): ClientDisplayableError | true {
+    return this.keyRecoveryService.canAttemptDecryptionOfItem(item)
   }
 
   /**
