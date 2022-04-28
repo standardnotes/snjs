@@ -1,5 +1,5 @@
 import { BackupFile } from '../../Backups/BackupFile'
-import { CreateAnyKeyParams } from '../../RootKey/KeyParams'
+import { CreateAnyKeyParams } from '../../Keys/RootKey/KeyParams'
 import { DecryptBackupFile } from '../../Backups/BackupFileDecryptor'
 import { EncryptionProvider } from './EncryptionProvider'
 import { findDefaultItemsKey } from '../Functions'
@@ -7,8 +7,8 @@ import { ItemsEncryptionService } from '../Items/ItemsEncryption'
 import { KeyMode } from '../RootKey/KeyMode'
 import { OperatorManager } from '../../Operator/OperatorManager'
 import { PureCryptoInterface } from '@standardnotes/sncrypto-common'
-import { SNRootKey } from '../../RootKey/RootKey'
-import { SNRootKeyParams } from '../../RootKey/RootKeyParams'
+import { SNRootKey } from '../../Keys/RootKey/RootKey'
+import { SNRootKeyParams } from '../../Keys/RootKey/RootKeyParams'
 import { V001Algorithm, V002Algorithm } from '../../Algorithm'
 import * as Common from '@standardnotes/common'
 import {
@@ -17,7 +17,7 @@ import {
   FindPayloadInEncryptionSplit,
   KeyedDecryptionSplit,
   KeyedEncryptionSplit,
-} from '../../Encryption/Split/EncryptionSplit'
+} from '../../Split/EncryptionSplit'
 import * as Models from '@standardnotes/models'
 import * as RootKeyEncryption from '../RootKey/RootKeyEncryption'
 import * as Services from '@standardnotes/services'
@@ -28,10 +28,10 @@ import {
   ErrorDecryptingParameters,
   isErrorDecryptingParameters,
   encryptedParametersFromPayload,
-} from '../../Encryption/EncryptedParameters'
-import { RootKeyEncryptedAuthenticatedData } from '../../Encryption/RootKeyEncryptedAuthenticatedData'
-import { ItemAuthenticatedData } from '../../Encryption/ItemAuthenticatedData'
-import { LegacyAttachedData } from '../../Encryption/LegacyAttachedData'
+} from '../../Types/EncryptedParameters'
+import { RootKeyEncryptedAuthenticatedData } from '../../Types/RootKeyEncryptedAuthenticatedData'
+import { ItemAuthenticatedData } from '../../Types/ItemAuthenticatedData'
+import { LegacyAttachedData } from '../../Types/LegacyAttachedData'
 import {
   CreateDecryptedBackupFileContextPayload,
   CreateEncryptedBackupFileContextPayload,
@@ -39,7 +39,7 @@ import {
   isDecryptedPayload,
   isEncryptedPayload,
 } from '@standardnotes/models'
-import { SplitPayloadsByEncryptionType } from '../../Encryption/Split/EncryptionTypeSplit'
+import { SplitPayloadsByEncryptionType } from '../../Split/EncryptionTypeSplit'
 import { ClientDisplayableError } from '@standardnotes/responses'
 import { isNotUndefined } from '@standardnotes/utils'
 

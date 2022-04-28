@@ -10,7 +10,7 @@ import {
   EncryptedParameters,
   ErrorDecryptingParameters,
   isErrorDecryptingParameters,
-} from '../../Encryption/EncryptedParameters'
+} from '../../Types/EncryptedParameters'
 import { isEncryptedPayload } from '@standardnotes/models'
 
 export class ItemsEncryptionService extends Services.AbstractService {

@@ -24,11 +24,11 @@ import {
   CreatePayloadSplit,
 } from '@standardnotes/models'
 import { ClientDisplayableError } from '@standardnotes/responses'
-import { CreateAnyKeyParams } from '../RootKey/KeyParams'
-import { SNRootKeyParams } from '../RootKey/RootKeyParams'
-import { SNRootKey } from '../RootKey/RootKey'
-import { ContentTypeUsesRootKeyEncryption } from '../Intent/Functions'
-import { isItemsKey, SNItemsKey } from '../ItemsKey'
+import { CreateAnyKeyParams } from '../Keys/RootKey/KeyParams'
+import { SNRootKeyParams } from '../Keys/RootKey/RootKeyParams'
+import { SNRootKey } from '../Keys/RootKey/RootKey'
+import { ContentTypeUsesRootKeyEncryption } from '../Keys/RootKey/Functions'
+import { isItemsKey, SNItemsKey } from '../Keys/ItemsKey'
 
 export async function DecryptBackupFile(
   file: BackupFile,

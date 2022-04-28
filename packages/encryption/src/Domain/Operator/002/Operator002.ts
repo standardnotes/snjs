@@ -1,7 +1,7 @@
-import { Create002KeyParams } from '../../RootKey/KeyParams'
+import { Create002KeyParams } from '../../Keys/RootKey/KeyParams'
 import { SNProtocolOperator001 } from '../001/Operator001'
-import { SNRootKey } from '../../RootKey/RootKey'
-import { SNRootKeyParams } from '../../RootKey/RootKeyParams'
+import { SNRootKey } from '../../Keys/RootKey/RootKey'
+import { SNRootKeyParams } from '../../Keys/RootKey/RootKeyParams'
 import { UuidGenerator } from '@standardnotes/utils'
 import { V002Algorithm } from '../../Algorithm'
 import * as Common from '@standardnotes/common'
@@ -11,12 +11,12 @@ import {
   DecryptedParameters,
   EncryptedParameters,
   ErrorDecryptingParameters,
-} from '../../Encryption/EncryptedParameters'
-import { RootKeyEncryptedAuthenticatedData } from '../../Encryption/RootKeyEncryptedAuthenticatedData'
-import { ItemAuthenticatedData } from '../../Encryption/ItemAuthenticatedData'
-import { LegacyAttachedData } from '../../Encryption/LegacyAttachedData'
-import { isItemsKey } from '../../ItemsKey'
-import { CreateNewRootKey } from '../../RootKey/Functions'
+} from '../../Types/EncryptedParameters'
+import { RootKeyEncryptedAuthenticatedData } from '../../Types/RootKeyEncryptedAuthenticatedData'
+import { ItemAuthenticatedData } from '../../Types/ItemAuthenticatedData'
+import { LegacyAttachedData } from '../../Types/LegacyAttachedData'
+import { isItemsKey } from '../../Keys/ItemsKey'
+import { CreateNewRootKey } from '../../Keys/RootKey/Functions'
 import { ItemContent, PayloadTimestampDefaults } from '@standardnotes/models'
 
 /**

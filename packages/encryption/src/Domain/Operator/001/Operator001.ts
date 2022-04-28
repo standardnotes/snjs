@@ -1,5 +1,5 @@
 import { ContentType, KeyParamsOrigination, ProtocolVersion, ProtocolVersionLength } from '@standardnotes/common'
-import { Create001KeyParams } from '../../RootKey/KeyParams'
+import { Create001KeyParams } from '../../Keys/RootKey/KeyParams'
 import { firstHalfOfString, secondHalfOfString, splitString, UuidGenerator } from '@standardnotes/utils'
 import { AsynchronousOperator } from '../Operator'
 import {
@@ -13,19 +13,19 @@ import {
   PayloadTimestampDefaults,
 } from '@standardnotes/models'
 import { PureCryptoInterface } from '@standardnotes/sncrypto-common'
-import { SNRootKey } from '../../RootKey/RootKey'
-import { SNRootKeyParams } from '../../RootKey/RootKeyParams'
+import { SNRootKey } from '../../Keys/RootKey/RootKey'
+import { SNRootKeyParams } from '../../Keys/RootKey/RootKeyParams'
 import { V001Algorithm } from '../../Algorithm'
 import {
   DecryptedParameters,
   EncryptedParameters,
   ErrorDecryptingParameters,
-} from '../../Encryption/EncryptedParameters'
-import { RootKeyEncryptedAuthenticatedData } from '../../Encryption/RootKeyEncryptedAuthenticatedData'
-import { ItemAuthenticatedData } from '../../Encryption/ItemAuthenticatedData'
-import { LegacyAttachedData } from '../../Encryption/LegacyAttachedData'
-import { isItemsKey } from '../../ItemsKey'
-import { CreateNewRootKey } from '../../RootKey/Functions'
+} from '../../Types/EncryptedParameters'
+import { RootKeyEncryptedAuthenticatedData } from '../../Types/RootKeyEncryptedAuthenticatedData'
+import { ItemAuthenticatedData } from '../../Types/ItemAuthenticatedData'
+import { LegacyAttachedData } from '../../Types/LegacyAttachedData'
+import { isItemsKey } from '../../Keys/ItemsKey'
+import { CreateNewRootKey } from '../../Keys/RootKey/Functions'
 
 const NO_IV = '00000000000000000000000000000000'
 

@@ -1,4 +1,4 @@
-import { V001Algorithm, V002Algorithm } from '../Algorithm'
+import { V001Algorithm, V002Algorithm } from '../../Algorithm'
 import { KeyParamsData } from '@standardnotes/responses'
 import { AnyKeyParamsContent, ProtocolVersion } from '@standardnotes/common'
 

@@ -114,6 +114,7 @@ export class SNApplication implements InternalServices.ListedClientInterface {
     if (!SNLog.onError) {
       throw Error('SNLog.onError must be set.')
     }
+
     const requiredOptions: (keyof Options.ApplicationOptions)[] = [
       'deviceInterface',
       'environment',
@@ -124,6 +125,7 @@ export class SNApplication implements InternalServices.ListedClientInterface {
       'defaultHost',
       'appVersion',
     ]
+
     for (const optionName of requiredOptions) {
       if (!fullyResovledOptions[optionName]) {
         throw Error(`${optionName} must be supplied when creating an application.`)

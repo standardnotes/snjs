@@ -7,13 +7,13 @@ import {
   FillItemContent,
   PayloadTimestampDefaults,
 } from '@standardnotes/models'
-import { SNRootKey } from '../../RootKey/RootKey'
+import { SNRootKey } from '../../Keys/RootKey/RootKey'
 import { V003Algorithm } from '../../Algorithm'
-import { Create003KeyParams } from '../../RootKey/KeyParams'
+import { Create003KeyParams } from '../../Keys/RootKey/KeyParams'
 import { SNProtocolOperator002 } from '../002/Operator002'
 import { ContentType, KeyParamsOrigination, ProtocolVersion } from '@standardnotes/common'
-import { SNRootKeyParams } from '../../RootKey/RootKeyParams'
-import { CreateNewRootKey } from '../../RootKey/Functions'
+import { SNRootKeyParams } from '../../Keys/RootKey/RootKeyParams'
+import { CreateNewRootKey } from '../../Keys/RootKey/Functions'
 
 /**
  * @legacy
