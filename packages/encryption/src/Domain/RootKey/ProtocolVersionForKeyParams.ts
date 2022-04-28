@@ -2,7 +2,7 @@ import { V001Algorithm, V002Algorithm } from '../Algorithm'
 import { KeyParamsData } from '@standardnotes/responses'
 import { AnyKeyParamsContent, ProtocolVersion } from '@standardnotes/common'
 
-export function protocolVersionForKeyParams(response: KeyParamsData | AnyKeyParamsContent): ProtocolVersion {
+export function ProtocolVersionForKeyParams(response: KeyParamsData | AnyKeyParamsContent): ProtocolVersion {
   if (response.version) {
     return response.version
   }

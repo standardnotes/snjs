@@ -7,7 +7,7 @@ import {
   AnyKeyParamsContent,
 } from '@standardnotes/common'
 import { SNRootKeyParams } from './RootKeyParams'
-import { protocolVersionForKeyParams } from './ProtocolVersionForKeyParams'
+import { ProtocolVersionForKeyParams } from './ProtocolVersionForKeyParams'
 
 /**
  *  001, 002:
@@ -52,7 +52,7 @@ export function KeyParamsFromApiResponse(response: KeyParamsResponse, identifier
     pw_cost: response.data.pw_cost!,
     pw_nonce: response.data.pw_nonce!,
     pw_salt: response.data.pw_salt!,
-    version: protocolVersionForKeyParams(response.data),
+    version: ProtocolVersionForKeyParams(response.data),
     origination: response.data.origination,
     created: response.data.created,
   }

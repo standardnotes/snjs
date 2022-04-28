@@ -8,7 +8,7 @@ import {
   KeyParamsOrigination,
 } from '@standardnotes/common'
 import { pickByCopy } from '@standardnotes/utils'
-import { protocolVersionForKeyParams } from './ProtocolVersionForKeyParams'
+import { ProtocolVersionForKeyParams } from './ProtocolVersionForKeyParams'
 import { ValidKeyParamsKeys } from './ValidKeyParamsKeys'
 
 /**
@@ -24,7 +24,7 @@ export class SNRootKeyParams {
     this.content = {
       ...content,
       origination: content.origination || KeyParamsOrigination.Registration,
-      version: content.version || protocolVersionForKeyParams(content),
+      version: content.version || ProtocolVersionForKeyParams(content),
     }
   }
 
