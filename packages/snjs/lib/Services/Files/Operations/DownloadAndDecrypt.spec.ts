@@ -1,5 +1,5 @@
 import { sleep } from '@standardnotes/utils'
-import { SNPureCryptoInterface, StreamEncryptor } from '@standardnotes/sncrypto-common'
+import { PureCryptoInterface, StreamEncryptor } from '@standardnotes/sncrypto-common'
 import { RemoteFileInterface, EncryptedFileInterface, FileDownloadProgress } from '../Types'
 import { FilesServerInterface } from '../FilesServerInterface'
 import { DownloadAndDecryptFileOperation } from './DownloadAndDecrypt'
@@ -8,7 +8,7 @@ describe('download and decrypt', () => {
   let apiService: FilesServerInterface
   let operation: DownloadAndDecryptFileOperation
   let file: RemoteFileInterface & EncryptedFileInterface
-  let crypto: SNPureCryptoInterface
+  let crypto: PureCryptoInterface
 
   const NumChunks = 5
 
@@ -46,7 +46,7 @@ describe('download and decrypt', () => {
     apiService = {} as jest.Mocked<FilesServerInterface>
     downloadChunksOfSize(5)
 
-    crypto = {} as jest.Mocked<SNPureCryptoInterface>
+    crypto = {} as jest.Mocked<PureCryptoInterface>
 
     crypto.xchacha20StreamInitDecryptor = jest.fn().mockReturnValue({
       state: {},

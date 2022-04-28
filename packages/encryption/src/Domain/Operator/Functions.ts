@@ -1,4 +1,4 @@
-import { SNPureCryptoInterface } from '@standardnotes/sncrypto-common'
+import { PureCryptoInterface } from '@standardnotes/sncrypto-common'
 import { SNProtocolOperator001 } from '../Operator/001/Operator001'
 import { SNProtocolOperator002 } from '../Operator/002/Operator002'
 import { SNProtocolOperator003 } from '../Operator/003/Operator003'
@@ -7,7 +7,7 @@ import { AsynchronousOperator, SynchronousOperator } from '../Operator/Operator'
 import { AnyOperator } from '../Operator/AnyOperator'
 import { ProtocolVersion } from '@standardnotes/common'
 
-export function createOperatorForVersion(version: ProtocolVersion, crypto: SNPureCryptoInterface): AnyOperator {
+export function createOperatorForVersion(version: ProtocolVersion, crypto: PureCryptoInterface): AnyOperator {
   if (version === ProtocolVersion.V001) {
     return new SNProtocolOperator001(crypto)
   } else if (version === ProtocolVersion.V002) {

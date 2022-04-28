@@ -1,15 +1,15 @@
 import { FileDecryptor } from './FileDecryptor'
-import { SNPureCryptoInterface, StreamEncryptor } from '@standardnotes/sncrypto-common'
+import { PureCryptoInterface, StreamEncryptor } from '@standardnotes/sncrypto-common'
 import { EncryptedFileInterface } from '../Types'
 import { assert } from '@standardnotes/utils'
 
 describe('file decryptor', () => {
   let decryptor: FileDecryptor
   let file: EncryptedFileInterface
-  let crypto: SNPureCryptoInterface
+  let crypto: PureCryptoInterface
 
   beforeEach(() => {
-    crypto = {} as jest.Mocked<SNPureCryptoInterface>
+    crypto = {} as jest.Mocked<PureCryptoInterface>
 
     crypto.xchacha20StreamInitDecryptor = jest.fn().mockReturnValue({
       state: {},

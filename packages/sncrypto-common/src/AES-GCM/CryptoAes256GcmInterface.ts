@@ -2,7 +2,7 @@ import { HexString } from '../Types/HexString'
 import { Aes256GcmEncrypted } from './Aes256GcmEncrypted'
 import { Aes256GcmInput } from './Aes256GcmInput'
 
-export interface SNCryptoAes256GcmInterface<EncodingType> {
+export interface CryptoAes256GcmInterface<EncodingType> {
   /**
    * Encrypts a string using AES-GCM.
    * @param input

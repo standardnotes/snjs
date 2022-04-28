@@ -8,7 +8,7 @@ import { Utf8String } from '../Types/Utf8String'
 /**
  * Interface that clients have to implement to use snjs
  */
-export interface SNPureCryptoInterface {
+export interface PureCryptoInterface {
   initialize(): Promise<void>
 
   /**

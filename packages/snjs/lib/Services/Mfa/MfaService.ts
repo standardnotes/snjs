@@ -2,7 +2,7 @@ import { SettingName } from '@standardnotes/settings'
 
 import { SNSettingsService } from '../Settings'
 import * as messages from '../Api/Messages'
-import { SNPureCryptoInterface } from '@standardnotes/sncrypto-common'
+import { PureCryptoInterface } from '@standardnotes/sncrypto-common'
 import { SNFeaturesService } from '../Features/FeaturesService'
 import { FeatureIdentifier } from '@standardnotes/features'
 import { AbstractService, InternalEventBusInterface } from '@standardnotes/services'
@@ -10,7 +10,7 @@ import { AbstractService, InternalEventBusInterface } from '@standardnotes/servi
 export class SNMfaService extends AbstractService {
   constructor(
     private settingsService: SNSettingsService,
-    private crypto: SNPureCryptoInterface,
+    private crypto: PureCryptoInterface,
     private featuresService: SNFeaturesService,
     protected override internalEventBus: InternalEventBusInterface,
   ) {

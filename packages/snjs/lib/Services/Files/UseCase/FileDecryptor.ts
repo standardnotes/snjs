@@ -1,10 +1,10 @@
-import { SNPureCryptoInterface, StreamDecryptor, SodiumConstant } from '@standardnotes/sncrypto-common'
+import { PureCryptoInterface, StreamDecryptor, SodiumConstant } from '@standardnotes/sncrypto-common'
 import { EncryptedFileInterface } from '../Types'
 
 export class FileDecryptor {
   private decryptor: StreamDecryptor
 
-  constructor(private file: EncryptedFileInterface, private crypto: SNPureCryptoInterface) {
+  constructor(private file: EncryptedFileInterface, private crypto: PureCryptoInterface) {
     this.decryptor = this.crypto.xchacha20StreamInitDecryptor(this.file.encryptionHeader, this.file.key)
   }
 

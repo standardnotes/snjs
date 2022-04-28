@@ -1,7 +1,7 @@
 import { Base64String } from '../Types/Base64String'
 import { Utf8String } from '../Types/Utf8String'
 
-export interface SNCryptoBase64Interface {
+export interface CryptoBase64Interface {
   /**
    * Converts a plain string into base64
    * @param text - A plain string

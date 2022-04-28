@@ -2,9 +2,9 @@ import {
   Aes256GcmEncrypted,
   Aes256GcmInput,
   HexString,
-  SNCryptoAes256GcmInterface,
-  SNCryptoSha256Interface,
-  SNCryptoBase64Interface,
+  CryptoAes256GcmInterface,
+  CryptoSha256Interface,
+  CryptoBase64Interface,
   Utf8String,
   Base64String,
 } from '@standardnotes/sncrypto-common'
@@ -13,9 +13,9 @@ import { createCipheriv, createDecipheriv, randomBytes, createHash } from 'crypt
 import { getBufferWithEncoding } from './Utils'
 
 export class SnCryptoNode implements
-  SNCryptoAes256GcmInterface<BufferEncoding>,
-  SNCryptoSha256Interface,
-  SNCryptoBase64Interface {
+  CryptoAes256GcmInterface<BufferEncoding>,
+  CryptoSha256Interface,
+  CryptoBase64Interface {
   async aes256GcmEncrypt({
     unencrypted,
     iv,

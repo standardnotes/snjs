@@ -5,7 +5,7 @@ import {
   StreamDecryptorResult,
   Base64String,
   HexString,
-  SNPureCryptoInterface,
+  PureCryptoInterface,
   Utf8String,
   timingSafeEqual,
 } from '@standardnotes/sncrypto-common'
@@ -39,7 +39,7 @@ type WebCryptoParams = {
  * — Built-in browser WebCrypto
  * — Libsodium.js library integration
  */
-export class SNWebCrypto implements SNPureCryptoInterface {
+export class SNWebCrypto implements PureCryptoInterface {
   private ready: Promise<void> | null
 
   constructor() {
