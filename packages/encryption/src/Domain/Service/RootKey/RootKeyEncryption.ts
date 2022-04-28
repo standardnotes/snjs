@@ -1,10 +1,10 @@
-import { NamespacedRootKeyInKeychain } from './../../RootKey/Types'
-import { CreateAnyKeyParams } from '../../RootKey/KeyParams'
+import { NamespacedRootKeyInKeychain } from '../../Keys/RootKey/Types'
+import { CreateAnyKeyParams } from '../../Keys/RootKey/KeyParams'
 import { findDefaultItemsKey } from '../Functions'
 import { KeyMode } from './KeyMode'
 import { OperatorManager } from '../../Operator/OperatorManager'
-import { SNRootKey } from '../../RootKey/RootKey'
-import { SNRootKeyParams } from '../../RootKey/RootKeyParams'
+import { SNRootKey } from '../../Keys/RootKey/RootKey'
+import { SNRootKeyParams } from '../../Keys/RootKey/RootKeyParams'
 import { UuidGenerator } from '@standardnotes/utils'
 import * as Common from '@standardnotes/common'
 import * as Models from '@standardnotes/models'
@@ -15,9 +15,9 @@ import {
   EncryptedParameters,
   ErrorDecryptingParameters,
   isErrorDecryptingParameters,
-} from '../../Encryption/EncryptedParameters'
-import { ItemsKeyMutator } from '../../ItemsKey'
-import { CreateNewRootKey } from '../../RootKey/Functions'
+} from '../../Types/EncryptedParameters'
+import { ItemsKeyMutator } from '../../Keys/ItemsKey'
+import { CreateNewRootKey } from '../../Keys/RootKey/Functions'
 import {
   DecryptedPayload,
   FillItemContentSpecialized,

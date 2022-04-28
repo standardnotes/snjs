@@ -1,5 +1,5 @@
 import { ContentType, KeyParamsOrigination, ProtocolVersion } from '@standardnotes/common'
-import { Create004KeyParams } from '../../RootKey/KeyParams'
+import { Create004KeyParams } from '../../Keys/RootKey/KeyParams'
 import { SynchronousOperator } from '../Operator'
 import {
   CreateDecryptedItemFromPayload,
@@ -10,22 +10,26 @@ import {
   PayloadTimestampDefaults,
 } from '@standardnotes/models'
 import { PureCryptoInterface } from '@standardnotes/sncrypto-common'
-import { SNRootKey } from '../../RootKey/RootKey'
-import { SNRootKeyParams } from '../../RootKey/RootKeyParams'
+import { SNRootKey } from '../../Keys/RootKey/RootKey'
+import { SNRootKeyParams } from '../../Keys/RootKey/RootKeyParams'
 import { V004Algorithm } from '../../Algorithm'
 import * as Models from '@standardnotes/models'
 import * as Utils from '@standardnotes/utils'
-import { ContentTypeUsesRootKeyEncryption } from '../../Intent/Functions'
-import {
-  DecryptedParameters,
-  EncryptedParameters,
-  ErrorDecryptingParameters,
-} from '../../Encryption/EncryptedParameters'
-import { RootKeyEncryptedAuthenticatedData } from '../../Encryption/RootKeyEncryptedAuthenticatedData'
-import { ItemAuthenticatedData } from '../../Encryption/ItemAuthenticatedData'
-import { LegacyAttachedData } from '../../Encryption/LegacyAttachedData'
-import { isItemsKey } from '../../ItemsKey'
-import { CreateNewRootKey } from '../../RootKey/Functions'
+import { ContentTypeUsesRootKeyEncryption, CreateNewRootKey } from '../../Keys/RootKey/Functions'
+import { DecryptedParameters, EncryptedParameters, ErrorDecryptingParameters } from '../../Types/EncryptedParameters'
+import { RootKeyEncryptedAuthenticatedData } from '../../Types/RootKeyEncryptedAuthenticatedData'
+import { ItemAuthenticatedData } from '../../Types/ItemAuthenticatedData'
+import { LegacyAttachedData } from '../../Types/LegacyAttachedData'
+import { isItemsKey } from '../../Keys/ItemsKey'
+
+type V004StringComponents = [version: string, nonce: string, ciphertext: string, authenticatedData: string]
+
+type V004Components = {
+  version: V004StringComponents[0]
+  nonce: V004StringComponents[1]
+  ciphertext: V004StringComponents[2]
+  authenticatedData: V004StringComponents[3]
+}
 
 const PARTITION_CHARACTER = ':'
 
@@ -119,7 +123,7 @@ export class SNProtocolOperator004 implements SynchronousOperator {
    * @param authenticatedData - JavaScript object (will be stringified) representing
                 'Additional authenticated data': data you want to be included in authentication.
    */
-  private encryptString004(plaintext: string, rawKey: string, nonce: string, authenticatedData: ItemAuthenticatedData) {
+  encryptString004(plaintext: string, rawKey: string, nonce: string, authenticatedData: ItemAuthenticatedData) {
     if (!nonce) {
       throw 'encryptString null nonce'
     }
@@ -140,29 +144,47 @@ export class SNProtocolOperator004 implements SynchronousOperator {
     return this.crypto.xchacha20Decrypt(ciphertext, nonce, rawKey, rawAuthenticatedData)
   }
 
+  generateEncryptionNonce(): string {
+    return this.crypto.generateRandomKey(V004Algorithm.EncryptionNonceLength)
+  }
+
   /**
    * @param plaintext  The plaintext text to decrypt.
    * @param rawKey  The key to use to encrypt the plaintext.
    */
-  private generateEncryptedProtocolString(plaintext: string, rawKey: string, authenticatedData: ItemAuthenticatedData) {
-    const nonce = this.crypto.generateRandomKey(V004Algorithm.EncryptionNonceLength)
-    const version = ProtocolVersion.V004
+  generateEncryptedProtocolString(plaintext: string, rawKey: string, authenticatedData: ItemAuthenticatedData) {
+    const nonce = this.generateEncryptionNonce()
+
     const ciphertext = this.encryptString004(plaintext, rawKey, nonce, authenticatedData)
-    const components: string[] = [
-      version as string,
+
+    const components: V004StringComponents = [
+      ProtocolVersion.V004 as string,
       nonce,
       ciphertext,
       this.authenticatedDataToString(authenticatedData),
     ]
+
     return components.join(PARTITION_CHARACTER)
+  }
+
+  deconstructEncryptedPayloadString(payloadString: string): V004Components {
+    const components = payloadString.split(PARTITION_CHARACTER) as V004StringComponents
+
+    return {
+      version: components[0],
+      nonce: components[1],
+      ciphertext: components[2],
+      authenticatedData: components[3],
+    }
   }
 
   public getPayloadAuthenticatedData(
     encrypted: EncryptedParameters,
   ): RootKeyEncryptedAuthenticatedData | ItemAuthenticatedData | LegacyAttachedData | undefined {
     const itemKeyComponents = this.deconstructEncryptedPayloadString(encrypted.enc_item_key)
-    const authenticatedData = itemKeyComponents.rawAuthenticatedData
-    const result = this.stringToAuthenticatedData(authenticatedData)
+    const authenticatedDataString = itemKeyComponents.authenticatedData
+    const result = this.stringToAuthenticatedData(authenticatedDataString)
+
     return result
   }
 
@@ -213,12 +235,10 @@ export class SNProtocolOperator004 implements SynchronousOperator {
   ): EncryptedParameters {
     const itemKey = this.crypto.generateRandomKey(V004Algorithm.EncryptionKeyLength)
 
-    /** Encrypt content with item_key */
     const contentPlaintext = JSON.stringify(payload.content)
     const authenticatedData = this.generateAuthenticatedDataForPayload(payload, key)
     const encryptedContentString = this.generateEncryptedProtocolString(contentPlaintext, itemKey, authenticatedData)
 
-    /** Encrypt item_key with master itemEncryptionKey */
     const encryptedItemKey = this.generateEncryptedProtocolString(itemKey, key.itemsKey, authenticatedData)
 
     return {
@@ -235,7 +255,7 @@ export class SNProtocolOperator004 implements SynchronousOperator {
     key: ItemsKeyInterface | SNRootKey,
   ): DecryptedParameters<C> | ErrorDecryptingParameters {
     const itemKeyComponents = this.deconstructEncryptedPayloadString(encrypted.enc_item_key)
-    const authenticatedData = this.stringToAuthenticatedData(itemKeyComponents.rawAuthenticatedData, {
+    const authenticatedData = this.stringToAuthenticatedData(itemKeyComponents.authenticatedData, {
       u: encrypted.uuid,
       v: encrypted.version,
     })
@@ -256,7 +276,6 @@ export class SNProtocolOperator004 implements SynchronousOperator {
       }
     }
 
-    /** Decrypt content payload. */
     const contentComponents = this.deconstructEncryptedPayloadString(encrypted.content)
     const content = this.decryptString004(
       contentComponents.ciphertext,
@@ -274,16 +293,6 @@ export class SNProtocolOperator004 implements SynchronousOperator {
         uuid: encrypted.uuid,
         content: JSON.parse(content),
       }
-    }
-  }
-
-  private deconstructEncryptedPayloadString(payloadString: string) {
-    const components = payloadString.split(PARTITION_CHARACTER)
-    return {
-      version: components[0],
-      nonce: components[1],
-      ciphertext: components[2],
-      rawAuthenticatedData: components[3],
     }
   }
 

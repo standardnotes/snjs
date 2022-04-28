@@ -1,13 +1,13 @@
 import { isAsyncOperator } from './Functions'
 import { OperatorManager } from './OperatorManager'
-import { SNRootKey } from '../RootKey/RootKey'
+import { SNRootKey } from '../Keys/RootKey/RootKey'
 import * as Models from '@standardnotes/models'
 import {
   DecryptedParameters,
   EncryptedParameters,
   encryptedParametersFromPayload,
   ErrorDecryptingParameters,
-} from '../Encryption/EncryptedParameters'
+} from '../Types/EncryptedParameters'
 
 export async function encryptPayload(
   payload: Models.DecryptedPayloadInterface,

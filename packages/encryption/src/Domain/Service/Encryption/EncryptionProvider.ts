@@ -2,7 +2,7 @@ import { ProtocolVersion } from '@standardnotes/common'
 import { DecryptedPayloadInterface, EncryptedPayloadInterface, ItemContent } from '@standardnotes/models'
 import { ClientDisplayableError } from '@standardnotes/responses'
 import { BackupFile } from '../../Backups/BackupFile'
-import { KeyedDecryptionSplit, KeyedEncryptionSplit } from '../../Encryption/Split/EncryptionSplit'
+import { KeyedDecryptionSplit, KeyedEncryptionSplit } from '../../Split/EncryptionSplit'
 
 export interface EncryptionProvider {
   encryptSplitSingle(split: KeyedEncryptionSplit): Promise<EncryptedPayloadInterface>

@@ -1,5 +1,5 @@
 import { DecryptedPayloadInterface, EncryptedPayloadInterface } from '@standardnotes/models'
-import { ItemContentTypeUsesRootKeyEncryption } from '../../Intent/Functions'
+import { ItemContentTypeUsesRootKeyEncryption } from '../Keys/RootKey/Functions'
 
 export interface EncryptionTypeSplit<T = EncryptedPayloadInterface | DecryptedPayloadInterface> {
   rootKeyEncryption?: T[]
