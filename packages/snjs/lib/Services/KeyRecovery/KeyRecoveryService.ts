@@ -15,7 +15,7 @@ import { KeyRecoveryStrings } from '../Api/Messages'
 import { SNStorageService } from '../Storage/StorageService'
 import { PayloadManager } from '../Payloads/PayloadManager'
 import { Challenge, ChallengeValidation, ChallengeReason, ChallengePrompt, ChallengeService } from '../Challenge'
-import { SNAlertService } from '../Alert/AlertService'
+import { AlertService } from '@standardnotes/services'
 import { SNApiService } from '@Lib/Services/Api/ApiService'
 import { ContentType, Uuid } from '@standardnotes/common'
 import { ItemManager } from '../Items/ItemManager'
@@ -83,7 +83,7 @@ export class SNKeyRecoveryService extends AbstractService<KeyRecoveryEvent, Decr
     private apiService: SNApiService,
     private protocolService: EncryptionService,
     private challengeService: ChallengeService,
-    private alertService: SNAlertService,
+    private alertService: AlertService,
     private storageService: SNStorageService,
     private syncService: SNSyncService,
     private userService: UserService,

@@ -17,6 +17,7 @@ packages/encryption/dist
 packages/features/dist
 packages/filepicker/dist
 packages/filepicker/example/dist
+packages/files/dist
 packages/models/dist
 packages/responses/dist
 packages/services/dist

@@ -17,7 +17,7 @@ import { Session } from './Sessions/Session'
 import { SessionFromRawStorageValue } from './Sessions/Generator'
 import { SessionsClientInterface } from './SessionsClientInterface'
 import { ShareToken } from './ShareToken'
-import { SNAlertService } from '@Lib/Services/Alert/AlertService'
+import { AlertService } from '@standardnotes/services'
 import { SNApiService } from '../Api/ApiService'
 import { SNStorageService } from '../Storage/StorageService'
 import { SNWebSocketsService } from '../Api/WebsocketsService'
@@ -60,7 +60,7 @@ export class SNSessionManager extends AbstractService<SessionEvent> implements S
   constructor(
     private storageService: SNStorageService,
     private apiService: SNApiService,
-    private alertService: SNAlertService,
+    private alertService: AlertService,
     private protocolService: EncryptionService,
     private challengeService: Challenge.ChallengeService,
     private webSocketsService: SNWebSocketsService,

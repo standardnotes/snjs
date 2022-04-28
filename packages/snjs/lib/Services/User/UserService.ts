@@ -4,7 +4,7 @@ import { EncryptionService, SNRootKey, SNRootKeyParams } from '@standardnotes/en
 import { HttpResponse, SignInResponse, User } from '@standardnotes/responses'
 import { ItemManager } from '@Lib/Services/Items/ItemManager'
 import { KeyParamsOrigination } from '@standardnotes/common'
-import { SNAlertService } from '@Lib/Services/Alert/AlertService'
+import { AlertService } from '@standardnotes/services'
 import { SNApiService } from './../Api/ApiService'
 import { SNProtectionService } from '../Protection/ProtectionService'
 import { SNSessionManager, MINIMUM_PASSWORD_LENGTH } from '../Session/SessionManager'
@@ -44,7 +44,7 @@ export class UserService
     private storageService: SNStorageService,
     private itemManager: ItemManager,
     private protocolService: EncryptionService,
-    private alertService: SNAlertService,
+    private alertService: AlertService,
     private challengeService: ChallengeService,
     private protectionService: SNProtectionService,
     private apiService: SNApiService,

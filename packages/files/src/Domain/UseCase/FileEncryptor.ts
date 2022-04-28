@@ -1,4 +1,4 @@
-import { DecryptedFileInterface } from '../Types'
+import { DecryptedFileInterface } from '@standardnotes/models'
 import { PureCryptoInterface, StreamEncryptor, SodiumConstant } from '@standardnotes/sncrypto-common'
 
 export class FileEncryptor {

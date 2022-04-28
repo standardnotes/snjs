@@ -1,5 +1,5 @@
 import { SyncOpStatus } from './SyncOpStatus'
-import { SyncOptions } from './Types'
+import { SyncOptions } from '@standardnotes/services'
 
 export interface SyncClientInterface {
   sync(options?: Partial<SyncOptions>): Promise<unknown>

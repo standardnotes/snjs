@@ -4,7 +4,7 @@ import { SNFeaturesService } from '@Lib/Services/Features/FeaturesService'
 import { ContentType, DisplayStringForContentType } from '@standardnotes/common'
 import { ItemManager } from '@Lib/Services/Items/ItemManager'
 import { SNNote, SNTheme, SNComponent, ComponentMutator, PayloadEmitSource } from '@standardnotes/models'
-import { SNAlertService } from '@Lib/Services/Alert/AlertService'
+import { AlertService } from '@standardnotes/services'
 import { SNSyncService } from '@Lib/Services/Sync/SyncService'
 import find from 'lodash/find'
 import uniq from 'lodash/uniq'
@@ -56,7 +56,7 @@ export class SNComponentManager extends AbstractService<ComponentManagerEvent, E
     private syncService: SNSyncService,
     private featuresService: SNFeaturesService,
     private preferencesSerivce: SNPreferencesService,
-    protected alertService: SNAlertService,
+    protected alertService: AlertService,
     private environment: Environment,
     private platform: Platform,
     protected override internalEventBus: InternalEventBusInterface,

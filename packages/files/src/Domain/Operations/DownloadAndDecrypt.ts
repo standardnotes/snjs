@@ -1,9 +1,10 @@
 import { ClientDisplayableError } from '@standardnotes/responses'
 import { AbortFunction, FileDownloader } from '../UseCase/FileDownloader'
 import { FileDecryptor } from '../UseCase/FileDecryptor'
-import { RemoteFileInterface, EncryptedFileInterface, FileDownloadProgress } from '../Types'
+import { FileDownloadProgress } from '../Types/FileDownloadProgress'
 import { FilesServerInterface } from '../FilesServerInterface'
 import { PureCryptoInterface } from '@standardnotes/sncrypto-common'
+import { RemoteFileInterface, EncryptedFileInterface } from '@standardnotes/models'
 
 type Result = { success: boolean; error?: ClientDisplayableError; aborted?: boolean }
 

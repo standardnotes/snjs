@@ -1,8 +1,6 @@
 import { AccountEvent, UserService } from '../User/UserService'
-import { ApiServiceEvent, MetaReceivedData, SNApiService } from '../Api/ApiService'
-import { ApplicationStage } from '@standardnotes/services'
+import { SNApiService } from '../Api/ApiService'
 import { arraysEqual, convertTimestampToMilliseconds, removeFromArray, Copy, lastElement } from '@standardnotes/utils'
-import { ButtonType, SNAlertService } from '@Lib/Services/Alert/AlertService'
 import { ClientDisplayableError, UserFeaturesResponse } from '@standardnotes/responses'
 import { ContentType, RoleName } from '@standardnotes/common'
 import { FeaturesClientInterface } from './ClientInterface'
@@ -54,7 +52,7 @@ export class SNFeaturesService
     private settingsService: SNSettingsService,
     private userService: UserService,
     private syncService: SNSyncService,
-    private alertService: SNAlertService,
+    private alertService: Services.AlertService,
     private sessionManager: SNSessionManager,
     private crypto: PureCryptoInterface,
     protected override internalEventBus: Services.InternalEventBusInterface,
@@ -104,7 +102,7 @@ export class SNFeaturesService
   }
 
   async handleEvent(event: Services.InternalEventInterface): Promise<void> {
-    if (event.type === ApiServiceEvent.MetaReceived) {
+    if (event.type === Services.ApiServiceEvent.MetaReceived) {
       if (!this.syncService) {
         this.log('[Features Service] Handling events interrupted. Sync service is not yet initialized.', event)
 
@@ -120,7 +118,7 @@ export class SNFeaturesService
         return
       }
 
-      const { userUuid, userRoles } = event.payload as MetaReceivedData
+      const { userUuid, userRoles } = event.payload as Services.MetaReceivedData
       await this.updateRolesAndFetchFeatures(
         userUuid,
         userRoles.map((role) => role.name),
@@ -128,9 +126,9 @@ export class SNFeaturesService
     }
   }
 
-  override async handleApplicationStage(stage: ApplicationStage): Promise<void> {
+  override async handleApplicationStage(stage: Services.ApplicationStage): Promise<void> {
     await super.handleApplicationStage(stage)
-    if (stage === ApplicationStage.FullSyncCompleted_13) {
+    if (stage === Services.ApplicationStage.FullSyncCompleted_13) {
       if (!this.hasOnlineSubscription()) {
         const offlineRepo = this.getOfflineRepo()
         if (offlineRepo) {
@@ -595,7 +593,7 @@ export class SNFeaturesService
           Messages.API_MESSAGE_UNTRUSTED_EXTENSIONS_WARNING,
           'Install extension from an untrusted source?',
           'Proceed to install',
-          ButtonType.Danger,
+          Services.ButtonType.Danger,
           'Cancel',
         )
         if (didConfirm) {

@@ -1,4 +1,4 @@
-import { RemoteFileInterface, EncryptedFileInterface } from '../Types'
+import { RemoteFileInterface, EncryptedFileInterface } from '@standardnotes/models'
 import { FilesServerInterface } from '../FilesServerInterface'
 import { FileDownloader } from './FileDownloader'
 

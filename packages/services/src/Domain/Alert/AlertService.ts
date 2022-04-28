@@ -7,7 +7,7 @@ export enum ButtonType {
 
 export type DismissBlockingDialog = () => void
 
-export abstract class SNAlertService {
+export abstract class AlertService {
   abstract confirm(
     text: string,
     title?: string,

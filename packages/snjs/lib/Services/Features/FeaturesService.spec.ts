@@ -3,7 +3,7 @@ import { SNSyncService } from '../Sync/SyncService'
 import { SettingName } from '@standardnotes/settings'
 import {
   ItemManager,
-  SNAlertService,
+  AlertService,
   SNApiService,
   UserService,
   SNSessionManager,
@@ -27,7 +27,7 @@ describe('featuresService', () => {
   let settingsService: SNSettingsService
   let userService: UserService
   let syncService: SNSyncService
-  let alertService: SNAlertService
+  let alertService: AlertService
   let sessionManager: SNSessionManager
   let crypto: PureCryptoInterface
   let roles: RoleName[]
@@ -113,7 +113,7 @@ describe('featuresService', () => {
     syncService = {} as jest.Mocked<SNSyncService>
     syncService.sync = jest.fn()
 
-    alertService = {} as jest.Mocked<SNAlertService>
+    alertService = {} as jest.Mocked<AlertService>
     alertService.confirm = jest.fn().mockReturnValue(true)
     alertService.alert = jest.fn()
 

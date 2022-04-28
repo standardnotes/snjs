@@ -3,7 +3,6 @@ import { FilesServerInterface } from './FilesServerInterface'
 import { ClientDisplayableError } from '@standardnotes/responses'
 import { ContentType } from '@standardnotes/common'
 import { DownloadAndDecryptFileOperation } from './Operations/DownloadAndDecrypt'
-import { DecryptedFileInterface } from './Types'
 import { EncryptAndUploadFileOperation } from './Operations/EncryptAndUpload'
 import {
   SNFile,
@@ -11,25 +10,29 @@ import {
   FileMetadata,
   FileContentSpecialized,
   FillItemContentSpecialized,
+  DecryptedFileInterface,
 } from '@standardnotes/models'
 import { PureCryptoInterface } from '@standardnotes/sncrypto-common'
-import { SNAlertService } from '../Alert/AlertService'
-import { SNSyncService } from '../Sync/SyncService'
-import { ItemManager } from '@Lib/Services/Items/ItemManager'
 import { UuidGenerator } from '@standardnotes/utils'
-import { AbstractService, InternalEventBusInterface } from '@standardnotes/services'
+import {
+  AbstractService,
+  InternalEventBusInterface,
+  ItemManagerInterface,
+  SyncServiceInterface,
+  AlertService,
+} from '@standardnotes/services'
 import { FilesClientInterface } from './FilesClientInterface'
 
 const OneHundredMb = 100 * 1_000_000
 
-export class SNFileService extends AbstractService implements FilesClientInterface {
+export class FileService extends AbstractService implements FilesClientInterface {
   private cache: FileMemoryCache = new FileMemoryCache(OneHundredMb)
 
   constructor(
     private api: FilesServerInterface,
-    private itemManager: ItemManager,
-    private syncService: SNSyncService,
-    private alertService: SNAlertService,
+    private itemManager: ItemManagerInterface,
+    private syncService: SyncServiceInterface,
+    private alertService: AlertService,
     private crypto: PureCryptoInterface,
     protected override internalEventBus: InternalEventBusInterface,
   ) {

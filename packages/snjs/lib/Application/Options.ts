@@ -1,6 +1,5 @@
 import { Runtime, ApplicationIdentifier } from '@standardnotes/common'
-import { SNAlertService } from '../Services/Alert/AlertService'
-import { DeviceInterface, Environment, Platform } from '@standardnotes/services'
+import { AlertService, DeviceInterface, Environment, Platform } from '@standardnotes/services'
 import { PureCryptoInterface } from '@standardnotes/sncrypto-common'
 
 export interface ApplicationSyncOptions {
@@ -32,7 +31,7 @@ export interface ConstructorOptions {
   /**
    * The platform-dependent implementation of alert service.
    */
-  alertService: SNAlertService
+  alertService: AlertService
   /**
    * A unique persistent identifier to namespace storage and other
    * persistent properties. For an ephemeral runtime identifier, use ephemeralIdentifier.

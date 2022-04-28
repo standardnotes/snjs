@@ -1,8 +1,9 @@
 import { sleep } from '@standardnotes/utils'
 import { PureCryptoInterface, StreamEncryptor } from '@standardnotes/sncrypto-common'
-import { RemoteFileInterface, EncryptedFileInterface, FileDownloadProgress } from '../Types'
+import { FileDownloadProgress } from '../Types/FileDownloadProgress'
 import { FilesServerInterface } from '../FilesServerInterface'
 import { DownloadAndDecryptFileOperation } from './DownloadAndDecrypt'
+import { RemoteFileInterface, EncryptedFileInterface } from '@standardnotes/models'
 
 describe('download and decrypt', () => {
   let apiService: FilesServerInterface
