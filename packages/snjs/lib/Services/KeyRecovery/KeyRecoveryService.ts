@@ -15,13 +15,13 @@ import { KeyRecoveryStrings } from '../Api/Messages'
 import { SNStorageService } from '../Storage/StorageService'
 import { PayloadManager } from '../Payloads/PayloadManager'
 import { Challenge, ChallengeValidation, ChallengeReason, ChallengePrompt, ChallengeService } from '../Challenge'
-import { AlertService } from '@standardnotes/services'
 import { SNApiService } from '@Lib/Services/Api/ApiService'
 import { ContentType, Uuid } from '@standardnotes/common'
 import { ItemManager } from '../Items/ItemManager'
 import { removeFromArray, Uuids } from '@standardnotes/utils'
 import { ClientDisplayableError, KeyParamsResponse } from '@standardnotes/responses'
 import {
+  AlertService,
   AbstractService,
   InternalEventBusInterface,
   StorageValueModes,

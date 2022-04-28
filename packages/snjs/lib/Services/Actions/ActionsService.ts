@@ -22,8 +22,7 @@ import {
 import { SNSyncService } from '../Sync/SyncService'
 import { PayloadManager } from '../Payloads/PayloadManager'
 import { SNHttpService } from '../Api/HttpService'
-import { AlertService } from '@standardnotes/services'
-import { AbstractService, DeviceInterface, InternalEventBusInterface } from '@standardnotes/services'
+import { AbstractService, DeviceInterface, InternalEventBusInterface, AlertService } from '@standardnotes/services'
 
 /**
  * The Actions Service allows clients to interact with action-based extensions.
