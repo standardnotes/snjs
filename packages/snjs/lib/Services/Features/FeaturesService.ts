@@ -10,7 +10,7 @@ import { FillItemContent, PayloadEmitSource } from '@standardnotes/models'
 import { ItemManager } from '../Items/ItemManager'
 import { LEGACY_PROD_EXT_ORIGIN, PROD_OFFLINE_FEATURES_URL } from '../../Hosts'
 import { SettingName } from '@standardnotes/settings'
-import { SNPureCrypto } from '@standardnotes/sncrypto-common'
+import { PureCryptoInterface } from '@standardnotes/sncrypto-common'
 import { SNSessionManager } from '@Lib/Services/Session/SessionManager'
 import { SNSettingsService } from '../Settings'
 import { SNStorageService } from '../Storage/StorageService'
@@ -56,7 +56,7 @@ export class SNFeaturesService
     private syncService: SNSyncService,
     private alertService: SNAlertService,
     private sessionManager: SNSessionManager,
-    private crypto: SNPureCrypto,
+    private crypto: PureCryptoInterface,
     protected override internalEventBus: Services.InternalEventBusInterface,
   ) {
     super(internalEventBus)

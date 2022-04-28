@@ -2,13 +2,21 @@ import {
   Aes256GcmEncrypted,
   Aes256GcmInput,
   HexString,
-  SnCryptoAes256Gcm,
-  Unencrypted,
+  CryptoAes256GcmInterface,
+  CryptoSha256Interface,
+  CryptoBase64Interface,
+  Utf8String,
+  Base64String,
 } from '@standardnotes/sncrypto-common'
-import { createCipheriv, createDecipheriv, randomBytes } from 'crypto'
+import { createCipheriv, createDecipheriv, randomBytes, createHash } from 'crypto'
 
-export class SnCryptoNode implements SnCryptoAes256Gcm<BufferEncoding> {
-  public async aes256GcmEncrypt({
+import { getBufferWithEncoding } from './Utils'
+
+export class SnCryptoNode implements
+  CryptoAes256GcmInterface<BufferEncoding>,
+  CryptoSha256Interface,
+  CryptoBase64Interface {
+  async aes256GcmEncrypt({
     unencrypted,
     iv,
     key,
@@ -28,7 +36,7 @@ export class SnCryptoNode implements SnCryptoAes256Gcm<BufferEncoding> {
     return { iv, tag, aad, ciphertext, encoding }
   }
 
-  public async aes256GcmDecrypt(encrypted: Aes256GcmEncrypted<BufferEncoding>, key: HexString): Promise<string> {
+  async aes256GcmDecrypt(encrypted: Aes256GcmEncrypted<BufferEncoding>, key: HexString): Promise<string> {
     const { iv, tag, ciphertext, encoding, aad } = encrypted
 
     const decipher = createDecipheriv('aes-256-gcm', Buffer.from(key, 'hex'), Buffer.from(iv, 'hex'))
@@ -41,28 +49,36 @@ export class SnCryptoNode implements SnCryptoAes256Gcm<BufferEncoding> {
     return decrypted.toString(encoding)
   }
 
-  public async generateRandomKey(bits: number): Promise<HexString> {
+  async generateRandomKey(bits: number): Promise<HexString> {
     const bytes = bits / 8
     const buf = randomBytes(bytes)
+
     return buf.toString('hex')
   }
-}
 
-/**
- * Turns `unencrypted` into a `buffer` with `encoding`.
- * @param unencrypted
- */
-function getBufferWithEncoding(unencrypted: Unencrypted<BufferEncoding>): {
-  buffer: Buffer
-  encoding: BufferEncoding
-} {
-  if (typeof unencrypted === 'string') {
-    const encoding: BufferEncoding = 'utf-8'
-    const buffer = Buffer.from(unencrypted, encoding)
-    return { buffer, encoding }
+  sha256(text: Utf8String): HexString {
+    const textData = Buffer.from(text, 'utf8')
+
+    const hash = createHash('sha256', textData)
+
+    return hash.digest('hex')
   }
 
-  const { string, encoding } = unencrypted
-  const buffer = Buffer.from(string, encoding)
-  return { buffer, encoding }
+  base64Encode(text: Utf8String): Base64String {
+    const { buffer } = getBufferWithEncoding({ string: text, encoding: 'utf8' })
+
+    return buffer.toString('base64')
+  }
+
+  base64URLEncode(text: Utf8String): Base64String {
+    const { buffer } = getBufferWithEncoding({ string: text, encoding: 'utf8' })
+
+    return buffer.toString('base64url')
+  }
+
+  base64Decode(base64String: Base64String): Utf8String {
+    const { buffer } = getBufferWithEncoding({ string: base64String, encoding: 'base64' })
+
+    return buffer.toString('utf8')
+  }
 }

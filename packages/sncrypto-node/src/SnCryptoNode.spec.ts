@@ -1,6 +1,6 @@
-import { SnCryptoNode } from './crypto'
+import { SnCryptoNode } from './SnCryptoNode'
 
-describe('crypto operations', function () {
+describe('SnCryptoNode', function () {
   const crypto = new SnCryptoNode()
 
   it('aes gcm', async function () {
@@ -154,5 +154,23 @@ describe('crypto operations', function () {
 
       expect(decrypted).toEqual(string)
     }
+  })
+
+  it('should encrypt data with SHA256', () => {
+    expect(crypto.sha256('hello world 🌍')).toEqual(
+      'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'
+    )
+  })
+
+  it ('should base64 encode a utf8 string', () => {
+    expect(crypto.base64Encode('Hello World')).toEqual('SGVsbG8gV29ybGQ=')
+  })
+
+  it ('should base64 encode a utf8 string with url safe option', () => {
+    expect(crypto.base64URLEncode('Hello World')).toEqual('SGVsbG8gV29ybGQ')
+  })
+
+  it ('should base64 decode a utf8 string', () => {
+    expect(crypto.base64Decode('SGVsbG8gV29ybGQ=')).toEqual('Hello World')
   })
 })

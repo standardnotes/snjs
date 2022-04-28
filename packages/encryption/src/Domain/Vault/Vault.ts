@@ -1,7 +1,7 @@
-import { SNPureCrypto } from '@standardnotes/sncrypto-common'
+import { PureCryptoInterface } from '@standardnotes/sncrypto-common'
 
 export async function vaultToEmail(
-  crypto: SNPureCrypto,
+  crypto: PureCryptoInterface,
   name: string,
   userphrase: string,
 ): Promise<string | undefined> {

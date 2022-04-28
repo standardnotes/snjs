@@ -3,7 +3,7 @@ import { AbortFunction, FileDownloader } from '../UseCase/FileDownloader'
 import { FileDecryptor } from '../UseCase/FileDecryptor'
 import { RemoteFileInterface, EncryptedFileInterface, FileDownloadProgress } from '../Types'
 import { FilesServerInterface } from '../FilesServerInterface'
-import { SNPureCrypto } from '@standardnotes/sncrypto-common'
+import { PureCryptoInterface } from '@standardnotes/sncrypto-common'
 
 type Result = { success: boolean; error?: ClientDisplayableError; aborted?: boolean }
 
@@ -12,7 +12,7 @@ export class DownloadAndDecryptFileOperation {
 
   constructor(
     private readonly file: RemoteFileInterface & EncryptedFileInterface,
-    private readonly crypto: SNPureCrypto,
+    private readonly crypto: PureCryptoInterface,
     private readonly api: FilesServerInterface,
     private readonly apiToken: string,
   ) {

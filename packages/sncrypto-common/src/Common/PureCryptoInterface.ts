@@ -1,39 +1,14 @@
-export type HexString = string
-export type Utf8String = string
-export type Base64String = string
-
-type SodiumStateAddress = unknown
-
-export type StreamEncryptor = {
-  state: SodiumStateAddress
-  header: Base64String
-}
-
-export type StreamDecryptor = {
-  state: SodiumStateAddress
-}
-
-export type StreamDecryptorResult = {
-  message: Uint8Array
-  tag: SodiumConstant
-}
-
-export enum SodiumConstant {
-  CRYPTO_SECRETSTREAM_XCHACHA20POLY1305_STATEBYTES = 52,
-  CRYPTO_SECRETSTREAM_XCHACHA20POLY1305_ABYTES = 17,
-  CRYPTO_SECRETSTREAM_XCHACHA20POLY1305_HEADERBYTES = 24,
-  CRYPTO_SECRETSTREAM_XCHACHA20POLY1305_KEYBYTES = 32,
-  CRYPTO_SECRETSTREAM_XCHACHA20POLY1305_TAG_PUSH = 0,
-  CRYPTO_SECRETSTREAM_XCHACHA20POLY1305_TAG_PULL = 1,
-  CRYPTO_SECRETSTREAM_XCHACHA20POLY1305_TAG_REKEY = 2,
-  CRYPTO_SECRETSTREAM_XCHACHA20POLY1305_TAG_FINAL = 3,
-  CRYPTO_SECRETSTREAM_XCHACHA20POLY1305_MESSAGEBYTES_MAX = 0x3fffffff80,
-}
+import { Base64String } from '../Types/Base64String'
+import { HexString } from '../Types/HexString'
+import { SodiumConstant } from '../Types/SodiumConstant'
+import { StreamDecryptor } from '../Types/StreamDecryptor'
+import { StreamEncryptor } from '../Types/StreamEncryptor'
+import { Utf8String } from '../Types/Utf8String'
 
 /**
  * Interface that clients have to implement to use snjs
  */
-export interface SNPureCrypto {
+export interface PureCryptoInterface {
   initialize(): Promise<void>
 
   /**
