@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.8.0](https://github.com/standardnotes/snjs/compare/@standardnotes/sncrypto-common@1.7.7...@standardnotes/sncrypto-common@1.8.0) (2022-04-28)
+
+
+### Features
+
+* refactor sncrypto to add unified sha256 and base64 usage  ([#715](https://github.com/standardnotes/snjs/issues/715)) ([93aef4d](https://github.com/standardnotes/snjs/commit/93aef4d39228a63f01aa90a88e5d28c3375ed707))
+
+
+
+
+
 ## [1.7.7](https://github.com/standardnotes/snjs/compare/@standardnotes/sncrypto-common@1.7.6...@standardnotes/sncrypto-common@1.7.7) (2022-04-22)
 
 **Note:** Version bump only for package @standardnotes/sncrypto-common
