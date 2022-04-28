@@ -1,10 +1,8 @@
-import {
-  Challenge,
-  ChallengeValidation,
-  ChallengeReason,
-  ChallengePrompt,
-  ChallengeService,
-} from '@Lib/Services/Challenge'
+import { ChallengeValidation } from './../Challenge/Types'
+import { ChallengePrompt } from './../Challenge/ChallengePrompt'
+import { Challenge } from './../Challenge/Challenge'
+import { ChallengeReason } from '@Lib/Services/Challenge/Types'
+import { ChallengeService } from './../Challenge/ChallengeService'
 import { SNLog } from '@Lib/Log'
 import { SNFile, SNNote } from '@standardnotes/models'
 import { EncryptionService } from '@standardnotes/encryption'

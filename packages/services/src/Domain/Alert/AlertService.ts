@@ -1,5 +1,7 @@
 import { ClientDisplayableError } from '@standardnotes/responses'
 
+/* istanbul ignore file */
+
 export enum ButtonType {
   Info = 0,
   Danger = 1,

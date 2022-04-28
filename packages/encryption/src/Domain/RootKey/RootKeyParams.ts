@@ -8,7 +8,8 @@ import {
   KeyParamsOrigination,
 } from '@standardnotes/common'
 import { pickByCopy } from '@standardnotes/utils'
-import { protocolVersionForKeyParams, ValidKeyParamsKeys } from './KeyParams'
+import { protocolVersionForKeyParams } from './ProtocolVersionForKeyParams'
+import { ValidKeyParamsKeys } from './ValidKeyParamsKeys'
 
 /**
  * Key params are public data that contain information about how a root key was created.

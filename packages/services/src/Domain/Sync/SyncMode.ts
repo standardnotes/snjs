@@ -1,3 +1,5 @@
+/* istanbul ignore file */
+
 export enum SyncMode {
   /**
    * Performs a standard sync, uploading any dirty items and retrieving items.

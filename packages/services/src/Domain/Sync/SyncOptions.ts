@@ -1,3 +1,5 @@
+/* istanbul ignore file */
+
 import { SyncMode } from './SyncMode'
 import { SyncQueueStrategy } from './SyncQueueStrategy'
 import { SyncSource } from './SyncSource'

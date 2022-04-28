@@ -1,4 +1,5 @@
 /* istanbul ignore file */
+
 export enum SyncSource {
   External = 1,
   SpawnQueue = 2,

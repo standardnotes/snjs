@@ -1,5 +1,7 @@
 import { LocalStorageEncryptedContextualPayload, LocalStorageDecryptedContextualPayload } from '@standardnotes/models'
 
+/* istanbul ignore file */
+
 export enum StoragePersistencePolicies {
   Default = 1,
   Ephemeral = 2,

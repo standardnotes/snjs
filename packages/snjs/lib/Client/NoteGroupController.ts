@@ -1,8 +1,9 @@
+import { ApplicationEvent } from './../Application/Event'
+import { PrefKey } from '@standardnotes/models'
 import { removeFromArray } from '@standardnotes/utils'
 import { UuidString } from '@Lib/Types/UuidString'
 import { SNApplication } from '../Application/Application'
 import { NoteViewController } from './NoteViewController'
-import { ApplicationEvent, PrefKey } from '..'
 
 type NoteControllerGroupChangeCallback = (activeController: NoteViewController) => void
 

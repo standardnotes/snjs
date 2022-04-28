@@ -4,6 +4,8 @@ import { EncryptedFileInterface } from '@standardnotes/models'
 import { Uuid } from '@standardnotes/common'
 import { Role } from '@standardnotes/auth'
 
+/* istanbul ignore file */
+
 export enum ApiServiceEvent {
   MetaReceived = 'MetaReceived',
 }

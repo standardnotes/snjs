@@ -1,3 +1,5 @@
+/* istanbul ignore file */
+
 import { SyncOptions } from './SyncOptions'
 
 export interface SyncServiceInterface {

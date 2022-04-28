@@ -1,18 +1,14 @@
 import { EncryptionService } from '@standardnotes/encryption'
-import {
-  Challenge,
-  ChallengeArtifacts,
-  ChallengeOperation,
-  ChallengePrompt,
-  ChallengeReason,
-  ChallengeResponse,
-  ChallengeValidation,
-  ChallengeValue,
-} from '.'
 import { SNStorageService } from '../Storage/StorageService'
 import { removeFromArray } from '@standardnotes/utils'
 import { isValidProtectionSessionLength } from '../Protection/ProtectionService'
 import { AbstractService, InternalEventBusInterface } from '@standardnotes/services'
+import { ChallengeArtifacts, ChallengeReason, ChallengeValidation } from './Types'
+import { ChallengeValue } from './ChallengeValue'
+import { ChallengeResponse } from './ChallengeResponse'
+import { ChallengeOperation } from './ChallengeOperation'
+import { Challenge } from './Challenge'
+import { ChallengePrompt } from './ChallengePrompt'
 
 type ChallengeValidationResponse = {
   valid: boolean

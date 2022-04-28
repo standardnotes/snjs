@@ -1,3 +1,5 @@
+/* istanbul ignore file */
+
 export enum SyncQueueStrategy {
   /**
    * Promise will be resolved on the next sync request after the current one completes.
