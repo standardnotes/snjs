@@ -274,7 +274,7 @@ describe('keys', function () {
     const itemsKeyPayload = new EncryptedPayload(itemsKeyRawPayload)
     const operator = this.application.protocolService.operatorManager.operatorForVersion(ProtocolVersion.V004)
     const comps = operator.deconstructEncryptedPayloadString(itemsKeyPayload.content)
-    const rawAuthenticatedData = comps.rawAuthenticatedData
+    const rawAuthenticatedData = comps.authenticatedData
     const authenticatedData = await operator.stringToAuthenticatedData(rawAuthenticatedData)
     const rootKeyParams = await this.application.protocolService.getRootKeyParams()
 

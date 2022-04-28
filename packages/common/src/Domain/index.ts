@@ -1,4 +1,3 @@
-export * from './Application/ApplicationInfo'
 export * from './Content/ContentType'
 export * from './Content/ContentDecoder'
 export * from './Content/ContentDecoderInterface'

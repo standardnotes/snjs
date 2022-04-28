@@ -7,11 +7,7 @@ import { V002Algorithm } from '../../Algorithm'
 import * as Common from '@standardnotes/common'
 import * as Models from '@standardnotes/models'
 import * as Utils from '@standardnotes/utils'
-import {
-  DecryptedParameters,
-  EncryptedParameters,
-  ErrorDecryptingParameters,
-} from '../../Types/EncryptedParameters'
+import { DecryptedParameters, EncryptedParameters, ErrorDecryptingParameters } from '../../Types/EncryptedParameters'
 import { RootKeyEncryptedAuthenticatedData } from '../../Types/RootKeyEncryptedAuthenticatedData'
 import { ItemAuthenticatedData } from '../../Types/ItemAuthenticatedData'
 import { LegacyAttachedData } from '../../Types/LegacyAttachedData'
