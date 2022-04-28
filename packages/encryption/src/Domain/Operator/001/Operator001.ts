@@ -12,7 +12,7 @@ import {
   DecryptedPayloadInterface,
   PayloadTimestampDefaults,
 } from '@standardnotes/models'
-import { SNPureCrypto } from '@standardnotes/sncrypto-common'
+import { SNPureCryptoInterface } from '@standardnotes/sncrypto-common'
 import { SNRootKey } from '../../RootKey/RootKey'
 import { SNRootKeyParams } from '../../RootKey/RootKeyParams'
 import { V001Algorithm } from '../../Algorithm'
@@ -34,9 +34,9 @@ const NO_IV = '00000000000000000000000000000000'
  * A legacy operator no longer used to generate new accounts
  */
 export class SNProtocolOperator001 implements AsynchronousOperator {
-  protected readonly crypto: SNPureCrypto
+  protected readonly crypto: SNPureCryptoInterface
 
-  constructor(crypto: SNPureCrypto) {
+  constructor(crypto: SNPureCryptoInterface) {
     this.crypto = crypto
   }
 

@@ -1,7 +1,7 @@
 import { Runtime, ApplicationIdentifier } from '@standardnotes/common'
 import { SNAlertService } from '../Services/Alert/AlertService'
 import { DeviceInterface, Environment, Platform } from '@standardnotes/services'
-import { SNPureCrypto } from '@standardnotes/sncrypto-common'
+import { SNPureCryptoInterface } from '@standardnotes/sncrypto-common'
 
 export interface ApplicationSyncOptions {
   /**
@@ -28,7 +28,7 @@ export interface ConstructorOptions {
    * The platform-dependent implementation of SNPureCrypto to use.
    * Web uses SNWebCrypto, mobile uses SNReactNativeCrypto.
    */
-  crypto: SNPureCrypto
+  crypto: SNPureCryptoInterface
   /**
    * The platform-dependent implementation of alert service.
    */

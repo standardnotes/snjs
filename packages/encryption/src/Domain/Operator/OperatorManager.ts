@@ -1,4 +1,4 @@
-import { SNPureCrypto } from '@standardnotes/sncrypto-common'
+import { SNPureCryptoInterface } from '@standardnotes/sncrypto-common'
 import { ProtocolVersion, ProtocolVersionLatest } from '@standardnotes/common'
 import { createOperatorForVersion } from './Functions'
 import { AnyOperator } from './AnyOperator'
@@ -6,7 +6,7 @@ import { AnyOperator } from './AnyOperator'
 export class OperatorManager {
   private operators: Record<string, AnyOperator> = {}
 
-  constructor(private crypto: SNPureCrypto) {
+  constructor(private crypto: SNPureCryptoInterface) {
     this.crypto = crypto
   }
 

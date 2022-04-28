@@ -1,5 +1,5 @@
 import { EncryptAndUploadFileOperation } from './EncryptAndUpload'
-import { SNPureCrypto, StreamEncryptor } from '@standardnotes/sncrypto-common'
+import { SNPureCryptoInterface, StreamEncryptor } from '@standardnotes/sncrypto-common'
 import { DecryptedFileInterface } from '../Types'
 import { FilesServerInterface } from '../FilesServerInterface'
 
@@ -7,7 +7,7 @@ describe('encrypt and upload', () => {
   let apiService: FilesServerInterface
   let operation: EncryptAndUploadFileOperation
   let file: DecryptedFileInterface
-  let crypto: SNPureCrypto
+  let crypto: SNPureCryptoInterface
 
   const chunkOfSize = (size: number) => {
     return new TextEncoder().encode('a'.repeat(size))
@@ -17,7 +17,7 @@ describe('encrypt and upload', () => {
     apiService = {} as jest.Mocked<FilesServerInterface>
     apiService.uploadFileBytes = jest.fn().mockReturnValue(true)
 
-    crypto = {} as jest.Mocked<SNPureCrypto>
+    crypto = {} as jest.Mocked<SNPureCryptoInterface>
 
     crypto.xchacha20StreamInitEncryptor = jest.fn().mockReturnValue({
       header: 'some-header',

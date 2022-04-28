@@ -6,7 +6,7 @@ import { findDefaultItemsKey } from '../Functions'
 import { ItemsEncryptionService } from '../Items/ItemsEncryption'
 import { KeyMode } from '../RootKey/KeyMode'
 import { OperatorManager } from '../../Operator/OperatorManager'
-import { SNPureCrypto } from '@standardnotes/sncrypto-common'
+import { SNPureCryptoInterface } from '@standardnotes/sncrypto-common'
 import { SNRootKey } from '../../RootKey/RootKey'
 import { SNRootKeyParams } from '../../RootKey/RootKeyParams'
 import { V001Algorithm, V002Algorithm } from '../../Algorithm'
@@ -86,7 +86,7 @@ export class EncryptionService extends Services.AbstractService<EncryptionServic
     public deviceInterface: Services.DeviceInterface,
     private storageService: Services.StorageServiceInterface,
     private identifier: Common.ApplicationIdentifier,
-    public crypto: SNPureCrypto,
+    public crypto: SNPureCryptoInterface,
     protected override internalEventBus: Services.InternalEventBusInterface,
   ) {
     super(internalEventBus)

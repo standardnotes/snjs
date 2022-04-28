@@ -1,7 +1,7 @@
 import { DecryptedFileInterface, FileUploadProgress, FileUploadResult } from '../Types'
 import { FilesServerInterface } from '../FilesServerInterface'
 import { FileUploader } from '../UseCase/FileUploader'
-import { SNPureCrypto } from '@standardnotes/sncrypto-common'
+import { SNPureCryptoInterface } from '@standardnotes/sncrypto-common'
 import { FileEncryptor } from '../UseCase/FileEncryptor'
 
 export class EncryptAndUploadFileOperation {
@@ -17,7 +17,7 @@ export class EncryptAndUploadFileOperation {
   constructor(
     private file: DecryptedFileInterface,
     private apiToken: string,
-    private crypto: SNPureCrypto,
+    private crypto: SNPureCryptoInterface,
     private api: FilesServerInterface,
   ) {
     this.encryptor = new FileEncryptor(file, this.crypto)

@@ -12,7 +12,7 @@ import {
   FileContentSpecialized,
   FillItemContentSpecialized,
 } from '@standardnotes/models'
-import { SNPureCrypto } from '@standardnotes/sncrypto-common'
+import { SNPureCryptoInterface } from '@standardnotes/sncrypto-common'
 import { SNAlertService } from '../Alert/AlertService'
 import { SNSyncService } from '../Sync/SyncService'
 import { ItemManager } from '@Lib/Services/Items/ItemManager'
@@ -30,7 +30,7 @@ export class SNFileService extends AbstractService implements FilesClientInterfa
     private itemManager: ItemManager,
     private syncService: SNSyncService,
     private alertService: SNAlertService,
-    private crypto: SNPureCrypto,
+    private crypto: SNPureCryptoInterface,
     protected override internalEventBus: InternalEventBusInterface,
   ) {
     super(internalEventBus)

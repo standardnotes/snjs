@@ -2,7 +2,7 @@ import { InternalEventBusInterface } from '@standardnotes/services'
 import { SNFileService } from './FileService'
 import { SNSyncService } from '../Sync/SyncService'
 import { ItemManager, SNAlertService, SNApiService } from '@Lib/index'
-import { SNPureCrypto, StreamEncryptor } from '@standardnotes/sncrypto-common'
+import { SNPureCryptoInterface, StreamEncryptor } from '@standardnotes/sncrypto-common'
 import { SNFile } from '@standardnotes/models'
 
 describe('fileService', () => {
@@ -10,7 +10,7 @@ describe('fileService', () => {
   let itemManager: ItemManager
   let syncService: SNSyncService
   let alertService: SNAlertService
-  let crypto: SNPureCrypto
+  let crypto: SNPureCryptoInterface
   let fileService: SNFileService
   let internalEventBus: InternalEventBusInterface
 
@@ -35,7 +35,7 @@ describe('fileService', () => {
     alertService.confirm = jest.fn().mockReturnValue(true)
     alertService.alert = jest.fn()
 
-    crypto = {} as jest.Mocked<SNPureCrypto>
+    crypto = {} as jest.Mocked<SNPureCryptoInterface>
     crypto.base64Decode = jest.fn()
     internalEventBus = {} as jest.Mocked<InternalEventBusInterface>
     internalEventBus.publish = jest.fn()

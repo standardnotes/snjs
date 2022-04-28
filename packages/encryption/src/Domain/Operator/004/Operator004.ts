@@ -9,7 +9,7 @@ import {
   ItemsKeyInterface,
   PayloadTimestampDefaults,
 } from '@standardnotes/models'
-import { SNPureCrypto } from '@standardnotes/sncrypto-common'
+import { SNPureCryptoInterface } from '@standardnotes/sncrypto-common'
 import { SNRootKey } from '../../RootKey/RootKey'
 import { SNRootKeyParams } from '../../RootKey/RootKeyParams'
 import { V004Algorithm } from '../../Algorithm'
@@ -30,9 +30,9 @@ import { CreateNewRootKey } from '../../RootKey/Functions'
 const PARTITION_CHARACTER = ':'
 
 export class SNProtocolOperator004 implements SynchronousOperator {
-  protected readonly crypto: SNPureCrypto
+  protected readonly crypto: SNPureCryptoInterface
 
-  constructor(crypto: SNPureCrypto) {
+  constructor(crypto: SNPureCryptoInterface) {
     this.crypto = crypto
   }
 

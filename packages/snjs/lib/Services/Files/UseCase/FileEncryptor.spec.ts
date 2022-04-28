@@ -1,14 +1,14 @@
-import { SNPureCrypto, StreamEncryptor, SodiumConstant } from '@standardnotes/sncrypto-common'
+import { SNPureCryptoInterface, StreamEncryptor, SodiumConstant } from '@standardnotes/sncrypto-common'
 import { DecryptedFileInterface } from '../Types'
 import { FileEncryptor } from './FileEncryptor'
 
 describe('file encryptor', () => {
   let encryptor: FileEncryptor
   let file: DecryptedFileInterface
-  let crypto: SNPureCrypto
+  let crypto: SNPureCryptoInterface
 
   beforeEach(() => {
-    crypto = {} as jest.Mocked<SNPureCrypto>
+    crypto = {} as jest.Mocked<SNPureCryptoInterface>
     crypto.xchacha20StreamInitEncryptor = jest.fn().mockReturnValue({
       header: 'some-header',
       state: {},

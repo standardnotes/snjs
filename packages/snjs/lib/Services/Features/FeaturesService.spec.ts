@@ -15,7 +15,7 @@ import { ContentType, RoleName } from '@standardnotes/common'
 import { FeatureDescription, FeatureIdentifier, GetFeatures } from '@standardnotes/features'
 import { SNWebSocketsService } from '../Api/WebsocketsService'
 import { SNSettingsService } from '../Settings'
-import { SNPureCrypto } from '@standardnotes/sncrypto-common'
+import { SNPureCryptoInterface } from '@standardnotes/sncrypto-common'
 import { convertTimestampToMilliseconds } from '@standardnotes/utils'
 import { InternalEventBusInterface } from '@standardnotes/services'
 
@@ -29,7 +29,7 @@ describe('featuresService', () => {
   let syncService: SNSyncService
   let alertService: SNAlertService
   let sessionManager: SNSessionManager
-  let crypto: SNPureCrypto
+  let crypto: SNPureCryptoInterface
   let roles: RoleName[]
   let features: FeatureDescription[]
   let items: ItemInterface[]
@@ -121,7 +121,7 @@ describe('featuresService', () => {
     sessionManager.isSignedIntoFirstPartyServer = jest.fn()
     sessionManager.getUser = jest.fn()
 
-    crypto = {} as jest.Mocked<SNPureCrypto>
+    crypto = {} as jest.Mocked<SNPureCryptoInterface>
     crypto.base64Decode = jest.fn()
 
     internalEventBus = {} as jest.Mocked<InternalEventBusInterface>
