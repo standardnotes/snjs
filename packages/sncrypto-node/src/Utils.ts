@@ -4,7 +4,7 @@ import { Unencrypted } from '@standardnotes/sncrypto-common'
  * Turns `unencrypted` into a `buffer` with `encoding`.
  * @param unencrypted
  */
- export function getBufferWithEncoding(unencrypted: Unencrypted<BufferEncoding>): {
+export function getBufferWithEncoding(unencrypted: Unencrypted<BufferEncoding>): {
   buffer: Buffer
   encoding: BufferEncoding
 } {
