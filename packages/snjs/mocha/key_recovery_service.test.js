@@ -27,20 +27,16 @@ describe('key recovery service', function () {
     const unassociatedIdentifier = 'foorand'
 
     const application = context.application
-    const receiveChallenge = (challenge) => {
-      /** Give unassociated password when prompted */
-      application.submitValuesForChallenge(challenge, [new ChallengeValue(challenge.prompts[0], unassociatedPassword)])
-    }
-    await application.prepareForLaunch({ receiveChallenge })
-    await application.launch(true)
-
-    await Factory.registerUserToApplication({
-      application: application,
-      email: context.email,
-      password: context.password,
+    await context.launch({
+      receiveChallenge: (challenge) => {
+        application.submitValuesForChallenge(challenge, [
+          new ChallengeValue(challenge.prompts[0], unassociatedPassword),
+        ])
+      },
     })
 
-    /** Create items key associated with a random root key */
+    await context.register()
+
     const randomRootKey = await application.protocolService.createRootKey(
       unassociatedIdentifier,
       unassociatedPassword,
@@ -55,26 +51,142 @@ describe('key recovery service', function () {
       },
     })
 
-    /** Attempt decryption and insert into rotation in errored state  */
-    const decrypted = await application.protocolService.decryptSplitSingle({
+    const errored = await application.protocolService.decryptSplitSingle({
       usesRootKeyWithKeyLookup: {
         items: [encrypted],
       },
     })
-    /** Expect to be errored */
-    expect(decrypted.errorDecrypting).to.equal(true)
 
-    /** Insert into rotation */
-    await application.payloadManager.emitPayload(decrypted, PayloadEmitSource.LocalInserted)
+    expect(errored.errorDecrypting).to.equal(true)
 
-    /** Wait and allow recovery wizard to complete */
-    await Factory.sleep(0.3)
+    await application.payloadManager.emitPayload(errored, PayloadEmitSource.LocalInserted)
 
-    /** Should be decrypted now */
-    expect(application.items.findItem(encrypted.uuid).errorDecrypting).to.not.be.ok
+    await context.resolveWhenKeyRecovered(errored.uuid)
+
+    expect(application.items.findItem(errored.uuid).errorDecrypting).to.not.be.ok
 
     expect(application.syncService.isOutOfSync()).to.equal(false)
     await context.deinit()
+  })
+
+  it('recovered keys with key params not matching servers should be synced if local root key does matches server', async function () {
+    /**
+     * This helps ensure server always has the most valid state,
+     * in case the recovery is being initiated from a server value in the first place
+     */
+    const context = await Factory.createAppContextWithFakeCrypto()
+    const unassociatedPassword = 'randfoo'
+    const unassociatedIdentifier = 'foorand'
+
+    const application = context.application
+
+    await context.launch({
+      receiveChallenge: (challenge) => {
+        application.submitValuesForChallenge(challenge, [
+          new ChallengeValue(challenge.prompts[0], unassociatedPassword),
+        ])
+      },
+    })
+    await context.register()
+
+    const randomRootKey = await application.protocolService.createRootKey(
+      unassociatedIdentifier,
+      unassociatedPassword,
+      KeyParamsOrigination.Registration,
+    )
+
+    const randomItemsKey = await application.protocolService.operatorManager.defaultOperator().createItemsKey()
+
+    await application.payloadManager.emitPayload(
+      randomItemsKey.payload.copy({ dirty: true, dirtiedDate: new Date() }),
+      PayloadEmitSource.LocalInserted,
+    )
+
+    await context.sync()
+
+    const originalSyncTime = application.payloadManager.findOne(randomItemsKey.uuid).lastSyncEnd.getTime()
+
+    const encrypted = await application.protocolService.encryptSplitSingle({
+      usesRootKey: {
+        items: [randomItemsKey.payload],
+        key: randomRootKey,
+      },
+    })
+
+    const errored = await application.protocolService.decryptSplitSingle({
+      usesRootKeyWithKeyLookup: {
+        items: [encrypted],
+      },
+    })
+
+    await application.payloadManager.emitPayload(errored, PayloadEmitSource.LocalInserted)
+
+    const recoveryPromise = context.resolveWhenKeyRecovered(errored.uuid)
+
+    await context.sync()
+
+    await recoveryPromise
+
+    expect(application.payloadManager.findOne(errored.uuid).lastSyncEnd.getTime()).to.be.above(originalSyncTime)
+
+    await context.deinit()
+  })
+
+  it('recovered keys with key params not matching servers should not be synced if local root key does not match server', async function () {
+    /**
+     * Assume Application A has been through these states:
+     * 1. Registration + Items Key A + Root Key A
+     * 2. Password change + Items Key B + Root Key B
+     * 3. Password change + Items Key C + Root Key C + Failure to correctly re-encrypt Items Key A and B with Root Key C
+     *
+     * Application B is not correctly in sync, and is only at State 1 (Registration + Items Key A)
+     *
+     * Application B receives Items Key B of Root Key B but for whatever reason ignores Items Key C of Root Key C.
+     *
+     * When it recovers Items Key B, it should not re-upload it to the server, because Application B's Root Key is not
+     * the current account's root key.
+     */
+
+    const contextA = await Factory.createAppContextWithFakeCrypto()
+    await contextA.launch()
+    await contextA.register()
+    contextA.preventKeyRecoveryOfKeys()
+
+    const contextB = await Factory.createAppContextWithFakeCrypto('app-b', contextA.email, contextA.password)
+    await contextB.launch()
+    await contextB.signIn()
+
+    await contextA.changePassword('new-password-1')
+    const itemsKeyARootKeyB = contextA.itemsKeys[0]
+    const itemsKeyBRootKeyB = contextA.itemsKeys[1]
+
+    contextA.disableSyncingOfItems([itemsKeyARootKeyB.uuid, itemsKeyBRootKeyB.uuid])
+    await contextA.changePassword('new-password-2')
+    const itemsKeyCRootKeyC = contextA.itemsKeys[2]
+
+    contextB.disableKeyRecoveryServerSignIn()
+    contextB.preventKeyRecoveryOfKeys([itemsKeyCRootKeyC.uuid])
+    contextB.respondToAccountPasswordChallengeWith('new-password-1')
+
+    const recoveryPromise = Promise.all([
+      contextB.resolveWhenKeyRecovered(itemsKeyARootKeyB.uuid),
+      contextB.resolveWhenKeyRecovered(itemsKeyBRootKeyB.uuid),
+    ])
+
+    const observedDirtyItemUuids = []
+    contextB.spyOnChangedItems((changed) => {
+      const dirty = changed.filter((i) => i.dirty)
+      extendArray(observedDirtyItemUuids, Uuids(dirty))
+    })
+
+    await contextB.sync()
+    await recoveryPromise
+
+    expect(observedDirtyItemUuids.includes(itemsKeyARootKeyB.uuid)).to.equal(false)
+    expect(observedDirtyItemUuids.includes(itemsKeyBRootKeyB.uuid)).to.equal(false)
+
+    await contextA.deinit()
+    await contextB.deinit()
   })
 
   it('when encountering many undecryptable items key with same key params, should only prompt once', async function () {
@@ -240,34 +352,28 @@ describe('key recovery service', function () {
     await Factory.safeDeinit(recreatedAppA)
   })
 
-  it('when client key params differ from server, and no matching items key exists, should perform sign in flow', async function () {
+  it('when client key params differ from server, and no matching items key exists to compare against, should perform sign in flow', async function () {
     /**
-     * If we encounter an undecryptable items key, whose key params do not match the server's,
-     * and the server's key params do not match our own, we have no way to validate a new
-     * root key other than by signing in.
+     * When a user changes password/email on client A, client B must update their root key to the new one.
+     * To do this, we can potentially avoid making a new sign in request (and creating a new session) by instead
+     * reading one of the undecryptable items key (which is potentially the new one that client A created). If the keyParams
+     * of that items key matches the servers, it means we can use those key params to compute our new local root key,
+     * instead of having to sign in.
      */
     const unassociatedPassword = 'randfoo'
     const context = await Factory.createAppContextWithFakeCrypto('some-namespace')
     const application = context.application
+
     const receiveChallenge = (challenge) => {
-      /** This is the sign in prompt, return proper value */
+      const isKeyRecoveryPrompt = challenge.subheading?.includes(KeyRecoveryStrings.KeyRecoveryPasswordRequired)
       application.submitValuesForChallenge(challenge, [
-        new ChallengeValue(
-          challenge.prompts[0],
-          challenge.subheading.includes(KeyRecoveryStrings.KeyRecoveryLoginFlowReason)
-            ? context.password
-            : unassociatedPassword,
-        ),
+        new ChallengeValue(challenge.prompts[0], isKeyRecoveryPrompt ? unassociatedPassword : context.password),
       ])
     }
+
     await application.prepareForLaunch({ receiveChallenge })
     await application.launch(true)
-
-    await Factory.registerUserToApplication({
-      application: application,
-      email: context.email,
-      password: context.password,
-    })
+    await context.register()
 
     const correctRootKey = await application.protocolService.getRootKey()
 
@@ -278,14 +384,20 @@ describe('key recovery service', function () {
      */
 
     const unassociatedIdentifier = 'foorand'
+
     /** Create items key associated with a random root key */
     const randomRootKey = await application.protocolService.createRootKey(
       unassociatedIdentifier,
       unassociatedPassword,
       KeyParamsOrigination.Registration,
     )
+
+    const signInFunction = sinon.spy(application.keyRecoveryService, 'performServerSignIn')
+
     await application.protocolService.setRootKey(randomRootKey)
+
     const correctItemsKey = await application.protocolService.operatorManager.defaultOperator().createItemsKey()
+
     const encrypted = await application.protocolService.encryptSplitSingle({
       usesRootKey: {
         items: [correctItemsKey.payload],
@@ -293,20 +405,31 @@ describe('key recovery service', function () {
       },
     })
 
+    const resolvePromise = Promise.all([
+      context.awaitSignInEvent(),
+      context.resolveWhenKeyRecovered(correctItemsKey.uuid),
+    ])
+
     await application.payloadManager.emitPayload(
       encrypted.copy({
         errorDecrypting: true,
+        dirty: true,
       }),
       PayloadEmitSource.LocalInserted,
     )
 
-    /** At this point key recovery wizard will encounter an undecryptable items key,
-     * whose key params do not match the server's. Key recovery wizard should prompt for sign in,
-     * but will also prompt for detached recovery of this key, so we must await both */
-    await Factory.sleep(5.0)
+    await context.sync()
+
+    await resolvePromise
+
+    expect(signInFunction.callCount).to.equal(1)
 
     const clientRootKey = await application.protocolService.getRootKey()
     expect(clientRootKey.compare(correctRootKey)).to.equal(true)
+
+    const decryptedKey = application.items.findItem(correctItemsKey.uuid)
+    expect(decryptedKey).to.be.ok
+    expect(decryptedKey.content.itemsKey).to.equal(correctItemsKey.content.itemsKey)
 
     expect(application.syncService.isOutOfSync()).to.equal(false)
     await context.deinit()

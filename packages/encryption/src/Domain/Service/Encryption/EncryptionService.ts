@@ -645,9 +645,11 @@ export class EncryptionService extends Services.AbstractService<EncryptionServic
     }
 
     const itemsKeys = this.itemsEncryption.getItemsKeys()
+
     const neverSyncedKeys = itemsKeys.filter((key) => {
       return key.neverSynced
     })
+
     const syncedKeys = itemsKeys.filter((key) => {
       return !key.neverSynced
     })

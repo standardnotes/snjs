@@ -1,12 +1,11 @@
+import { KeyRecoveryOperation } from './KeyRecoveryOperation'
 import { SNRootKeyParams, EncryptionService, SNRootKey, KeyParamsFromApiResponse } from '@standardnotes/encryption'
 import { UserService } from '../User/UserService'
 import {
-  ItemsKeyInterface,
   isErrorDecryptingPayload,
   EncryptedPayloadInterface,
   EncryptedPayload,
   isDecryptedPayload,
-  ItemsKeyContent,
   DecryptedPayloadInterface,
   PayloadEmitSource,
   EncryptedItemInterface,
@@ -18,9 +17,9 @@ import { PayloadManager } from '../Payloads/PayloadManager'
 import { Challenge, ChallengeValidation, ChallengeReason, ChallengePrompt, ChallengeService } from '../Challenge'
 import { SNAlertService } from '../Alert/AlertService'
 import { SNApiService } from '@Lib/Services/Api/ApiService'
-import { ContentType, leftVersionGreaterThanOrEqualToRight } from '@standardnotes/common'
+import { ContentType, Uuid } from '@standardnotes/common'
 import { ItemManager } from '../Items/ItemManager'
-import { dateSorted, removeFromArray } from '@standardnotes/utils'
+import { removeFromArray, Uuids } from '@standardnotes/utils'
 import { ClientDisplayableError, KeyParamsResponse } from '@standardnotes/responses'
 import {
   AbstractService,
@@ -31,11 +30,12 @@ import {
 } from '@standardnotes/services'
 import {
   UndecryptableItemsStorage,
-  DecryptionCallback,
-  DecryptionResponse,
   DecryptionQueueItem,
   KeyRecoveryEvent,
+  isSuccessResult,
+  KeyRecoveryOperationResult,
 } from './Types'
+import { serverKeyParamsAreSafe } from './Utils'
 
 /**
  * The key recovery service listens to items key changes to detect any that cannot be decrypted.
@@ -75,7 +75,6 @@ import {
 export class SNKeyRecoveryService extends AbstractService<KeyRecoveryEvent, DecryptedPayloadInterface[]> {
   private removeItemObserver: () => void
   private decryptionQueue: DecryptionQueueItem[] = []
-  private serverParams?: SNRootKeyParams
   private isProcessingQueue = false
 
   constructor(
@@ -162,19 +161,15 @@ export class SNKeyRecoveryService extends AbstractService<KeyRecoveryEvent, Decr
       this.saveToUndecryptables(keys)
     }
 
-    this.addKeysToQueue(keys, (key, result) => {
-      if (result.success) {
-        void this.removeFromUndecryptables(key)
-      }
-    })
+    this.addKeysToQueue(keys)
 
-    await this.beginProcessingQueue()
+    await this.beginKeyRecovery()
   }
 
   private async handleUndecryptableItemsKeys(keys: EncryptedPayloadInterface[]) {
     this.addKeysToQueue(keys)
 
-    await this.beginProcessingQueue()
+    await this.beginKeyRecovery()
   }
 
   public presentKeyRecoveryWizard(): void {
@@ -239,54 +234,57 @@ export class SNKeyRecoveryService extends AbstractService<KeyRecoveryEvent, Decr
     this.persistUndecryptables(record)
   }
 
-  private removeFromUndecryptables(key: EncryptedPayloadInterface) {
+  private removeFromUndecryptables(keyIds: Uuid[]) {
     const record = this.getUndecryptables()
 
-    delete record[key.uuid]
+    for (const id of keyIds) {
+      delete record[id]
+    }
 
     this.persistUndecryptables(record)
-  }
-
-  private get queuePromise() {
-    return Promise.all(this.decryptionQueue.map((q) => q.promise))
   }
 
   private getClientKeyParams() {
     return this.protocolService.getAccountKeyParams()
   }
 
-  private serverKeyParamsAreSafe(clientParams: SNRootKeyParams) {
-    return leftVersionGreaterThanOrEqualToRight(this.serverParams!.version, clientParams.version)
-  }
-
-  private async performServerSignIn(keyParams: SNRootKeyParams): Promise<SNRootKey | undefined> {
-    /** Get the user's account password */
-    const challenge = new Challenge(
+  private async performServerSignIn(): Promise<SNRootKey | undefined> {
+    const accountPasswordChallenge = new Challenge(
       [new ChallengePrompt(ChallengeValidation.None, undefined, undefined, true)],
       ChallengeReason.Custom,
       true,
-      KeyRecoveryStrings.KeyRecoveryLoginFlowPrompt(keyParams),
       KeyRecoveryStrings.KeyRecoveryLoginFlowReason,
     )
 
-    const challengeResponse = await this.challengeService.promptForChallengeResponse(challenge)
+    const challengeResponse = await this.challengeService.promptForChallengeResponse(accountPasswordChallenge)
     if (!challengeResponse) {
       return undefined
     }
 
-    this.challengeService.completeChallenge(challenge)
+    this.challengeService.completeChallenge(accountPasswordChallenge)
+
     const password = challengeResponse.values[0].value as string
 
-    /** Generate a root key using the input */
-    const rootKey = await this.protocolService.computeRootKey(password, keyParams)
+    const clientParams = this.getClientKeyParams() as SNRootKeyParams
+
+    const serverParams = await this.getLatestKeyParamsFromServer(clientParams.identifier)
+
+    if (!serverParams || !serverKeyParamsAreSafe(serverParams, clientParams)) {
+      return
+    }
+
+    const rootKey = await this.protocolService.computeRootKey(password, serverParams)
 
     const signInResponse = await this.userService.correctiveSignIn(rootKey)
+
     if (!signInResponse.error) {
       void this.alertService.alert(KeyRecoveryStrings.KeyRecoveryRootKeyReplaced)
+
       return rootKey
     } else {
       await this.alertService.alert(KeyRecoveryStrings.KeyRecoveryLoginFlowInvalidPassword)
-      return this.performServerSignIn(keyParams)
+
+      return this.performServerSignIn()
     }
   }
 
@@ -306,7 +304,7 @@ export class SNKeyRecoveryService extends AbstractService<KeyRecoveryEvent, Decr
     return wrappingKey
   }
 
-  private addKeysToQueue(keys: EncryptedPayloadInterface[], callback?: DecryptionCallback) {
+  private addKeysToQueue(keys: EncryptedPayloadInterface[]) {
     for (const key of keys) {
       const keyParams = this.protocolService.getKeyEmbeddedKeyParams(key)
       if (!keyParams) {
@@ -314,32 +312,29 @@ export class SNKeyRecoveryService extends AbstractService<KeyRecoveryEvent, Decr
       }
 
       const queueItem: DecryptionQueueItem = {
-        key,
+        encryptedKey: key,
         keyParams,
-        callback,
       }
-
-      const promise: Promise<DecryptionResponse> = new Promise((resolve) => {
-        queueItem.resolve = resolve
-      })
-
-      queueItem.promise = promise
 
       this.decryptionQueue.push(queueItem)
     }
   }
 
   private readdQueueItem(queueItem: DecryptionQueueItem) {
-    const promise: Promise<DecryptionResponse> = new Promise((resolve) => {
-      queueItem.resolve = resolve
-    })
-
-    queueItem.promise = promise
-
     this.decryptionQueue.unshift(queueItem)
   }
 
-  private async beginProcessingQueue() {
+  private async getLatestKeyParamsFromServer(identifier: string): Promise<SNRootKeyParams | undefined> {
+    const paramsResponse = await this.apiService.getAccountKeyParams(identifier)
+
+    if (!paramsResponse.error && paramsResponse.data) {
+      return KeyParamsFromApiResponse(paramsResponse as KeyParamsResponse)
+    } else {
+      return undefined
+    }
+  }
+
+  private async beginKeyRecovery() {
     if (this.isProcessingQueue) {
       return
     }
@@ -348,192 +343,140 @@ export class SNKeyRecoveryService extends AbstractService<KeyRecoveryEvent, Decr
 
     const clientParams = this.getClientKeyParams()
 
-    if (!this.serverParams && clientParams) {
-      /** Get the user's latest key params from the server */
-      const paramsResponse = await this.apiService.getAccountKeyParams(clientParams.identifier)
-      if (!paramsResponse.error && paramsResponse.data) {
-        this.serverParams = KeyParamsFromApiResponse(paramsResponse as KeyParamsResponse)
-      }
-
-      const deallocedAfterNetworkRequest = this.protocolService == undefined
-      if (deallocedAfterNetworkRequest) {
-        return
-      }
+    let serverParams: SNRootKeyParams | undefined = undefined
+    if (clientParams) {
+      serverParams = await this.getLatestKeyParamsFromServer(clientParams.identifier)
     }
 
-    const hasAccount = this.protocolService.hasAccount()
-    const hasPasscode = this.protocolService.hasPasscode()
-    const credentialsMissing = !hasAccount && !hasPasscode
+    const deallocedAfterNetworkRequest = this.protocolService == undefined
+    if (deallocedAfterNetworkRequest) {
+      return
+    }
 
-    let queueItem = this.decryptionQueue[0]
+    const credentialsMissing = !this.protocolService.hasAccount() && !this.protocolService.hasPasscode()
 
     if (credentialsMissing) {
-      const rootKey = await this.performServerSignIn(queueItem.keyParams)
+      const rootKey = await this.performServerSignIn()
 
       if (rootKey) {
-        await this.handleDecryptionOfAllKeysMatchingCorrectRootKey(rootKey, true)
-
-        removeFromArray(this.decryptionQueue, queueItem)
-
-        queueItem = this.decryptionQueue[0]
+        const replaceLocalRootKeyWithResult = true
+        await this.handleDecryptionOfAllKeysMatchingCorrectRootKey(rootKey, replaceLocalRootKeyWithResult, serverParams)
       }
     }
 
+    await this.processQueue(serverParams)
+
+    if (serverParams) {
+      await this.potentiallyPerformFallbackSignInToUpdateOutdatedLocalRootKey(serverParams)
+    }
+
+    if (this.syncService.isOutOfSync()) {
+      void this.syncService.sync({ checkIntegrity: true })
+    }
+  }
+
+  private async potentiallyPerformFallbackSignInToUpdateOutdatedLocalRootKey(serverParams: SNRootKeyParams) {
+    const latestClientParamsAfterAllRecoveryOperations = this.getClientKeyParams()
+
+    if (!latestClientParamsAfterAllRecoveryOperations) {
+      return
+    }
+
+    const serverParamsDiffer = !serverParams.compare(latestClientParamsAfterAllRecoveryOperations)
+
+    if (serverParamsDiffer && serverKeyParamsAreSafe(serverParams, latestClientParamsAfterAllRecoveryOperations)) {
+      await this.performServerSignIn()
+    }
+  }
+
+  private async processQueue(serverParams?: SNRootKeyParams): Promise<void> {
+    let queueItem = this.decryptionQueue[0]
+
     while (queueItem) {
-      void this.popQueueItem(queueItem)
+      const result = await this.processQueueItem(queueItem, serverParams)
 
-      const result = await queueItem.promise
+      removeFromArray(this.decryptionQueue, queueItem)
 
-      if (result?.aborted) {
+      if (!isSuccessResult(result) && result.aborted) {
         this.isProcessingQueue = false
 
         return
       }
 
-      /** Always start from the beginning */
       queueItem = this.decryptionQueue[0]
     }
 
-    void this.queuePromise.then(async () => {
-      this.isProcessingQueue = false
-
-      if (this.serverParams) {
-        const latestClientParams = this.getClientKeyParams()
-        const serverParamsDifferFromClients = latestClientParams && !this.serverParams.compare(latestClientParams)
-        if (latestClientParams && this.serverKeyParamsAreSafe(latestClientParams) && serverParamsDifferFromClients) {
-          /**
-           * The only way left to validate our password is to sign in with the server,
-           * creating an all new session.
-           */
-          await this.performServerSignIn(this.serverParams)
-        }
-      }
-
-      if (this.syncService.isOutOfSync()) {
-        void this.syncService.sync({ checkIntegrity: true })
-      }
-    })
+    this.isProcessingQueue = false
   }
 
-  private async popQueueItem(queueItem: DecryptionQueueItem): Promise<void> {
-    if (!queueItem.resolve) {
-      throw Error('Attempting to pop queue element with no resolve function')
-    }
-
-    removeFromArray(this.decryptionQueue, queueItem)
-    const keyParams = queueItem.keyParams
-    const key = queueItem.key
-    const resolve = queueItem.resolve
-
-    /**
-     * We replace our current root key if the server params differ from our own params,
-     * and if we can validate the params based on this items key's params.
-     * */
-    let replacesRootKey = false
+  private async processQueueItem(
+    queueItem: DecryptionQueueItem,
+    serverParams?: SNRootKeyParams,
+  ): Promise<KeyRecoveryOperationResult> {
     const clientParams = this.getClientKeyParams()
 
-    if (
-      this.serverParams &&
-      clientParams &&
-      !clientParams.compare(this.serverParams) &&
-      keyParams.compare(this.serverParams) &&
-      this.serverKeyParamsAreSafe(this.serverParams)
-    ) {
-      /** Get the latest items key we _can_ decrypt */
-      const latest = dateSorted(
-        this.itemManager.getItems<ItemsKeyInterface>(ContentType.ItemsKey),
-        'created_at',
-        false,
-      )[0]
-
-      const hasLocalItemsKey = latest != undefined
-      const isNewerThanLatest = hasLocalItemsKey && key.created_at > latest.created_at
-      replacesRootKey = !hasLocalItemsKey || isNewerThanLatest
-    }
-
-    const challenge = new Challenge(
-      [new ChallengePrompt(ChallengeValidation.None, undefined, undefined, true)],
-      ChallengeReason.Custom,
-      true,
-      KeyRecoveryStrings.KeyRecoveryLoginFlowPrompt(keyParams),
-      KeyRecoveryStrings.KeyRecoveryPasswordRequired,
+    const operation = new KeyRecoveryOperation(
+      queueItem,
+      this.itemManager,
+      this.protocolService,
+      this.challengeService,
+      clientParams,
+      serverParams,
     )
 
-    const response = await this.challengeService.promptForChallengeResponse(challenge)
+    const result = await operation.run()
 
-    if (!response) {
-      const result: DecryptionResponse = { success: false, aborted: true }
-
-      resolve(result)
-
-      queueItem.callback?.(key, result)
-
-      return
-    }
-
-    const password = response.values[0].value as string
-
-    const rootKey = await this.protocolService.computeRootKey(password, keyParams)
-
-    const decryptedPayload = await this.protocolService.decryptSplitSingle<ItemsKeyContent>({
-      usesRootKey: {
-        items: [key],
-        key: rootKey,
-      },
-    })
-
-    this.challengeService.completeChallenge(challenge)
-
-    if (!isErrorDecryptingPayload(decryptedPayload)) {
-      const matching = await this.handleDecryptionOfAllKeysMatchingCorrectRootKey(rootKey, replacesRootKey, [
-        decryptedPayload,
-      ])
-
-      const result = { success: true }
-
-      resolve(result)
-
-      queueItem.callback?.(key, result)
-
-      for (const match of matching) {
-        match.resolve?.(result)
-        match.callback?.(match.key, result)
+    if (!isSuccessResult(result)) {
+      if (!result.aborted) {
+        await this.alertService.alert(KeyRecoveryStrings.KeyRecoveryUnableToRecover)
+        this.readdQueueItem(queueItem)
       }
-    } else {
-      await this.alertService.alert(KeyRecoveryStrings.KeyRecoveryUnableToRecover)
 
-      this.readdQueueItem(queueItem)
-
-      resolve({ success: false })
+      return result
     }
+
+    await this.handleDecryptionOfAllKeysMatchingCorrectRootKey(
+      result.rootKey,
+      result.replaceLocalRootKeyWithResult,
+      serverParams,
+    )
+
+    return result
   }
 
   private async handleDecryptionOfAllKeysMatchingCorrectRootKey(
     rootKey: SNRootKey,
     replacesRootKey: boolean,
-    additionalKeys: DecryptedPayloadInterface<ItemsKeyContent>[] = [],
-  ): Promise<DecryptionQueueItem[]> {
+    serverParams?: SNRootKeyParams,
+  ): Promise<void> {
     if (replacesRootKey) {
       const wrappingKey = await this.getWrappingKeyIfApplicable()
+
       await this.protocolService.setRootKey(rootKey, wrappingKey)
     }
 
-    const matching = this.popQueueForKeyParams(rootKey.keyParams)
+    const clientKeyParams = this.getClientKeyParams()
+
+    const clientParamsMatchServer = clientKeyParams && serverParams && clientKeyParams.compare(serverParams)
+
+    const matchingKeys = this.removeElementsFromQueueForMatchingKeyParams(rootKey.keyParams).map((qItem) => {
+      const needsResync = clientParamsMatchServer && !serverParams.compare(qItem.keyParams)
+
+      return needsResync ? qItem.encryptedKey.copy({ dirty: true, dirtiedDate: new Date() }) : qItem.encryptedKey
+    })
 
     const matchingResults = await this.protocolService.decryptSplit({
       usesRootKey: {
-        items: matching.map((m) => m.key),
+        items: matchingKeys,
         key: rootKey,
       },
     })
 
     const decryptedMatching = matchingResults.filter(isDecryptedPayload)
 
-    const allRelevantKeyPayloads = [...additionalKeys, ...decryptedMatching]
+    void this.payloadManager.emitPayloads(decryptedMatching, PayloadEmitSource.LocalChanged)
 
-    void this.payloadManager.emitPayloads(allRelevantKeyPayloads, PayloadEmitSource.LocalChanged)
-
-    await this.storageService.savePayloads(allRelevantKeyPayloads)
+    await this.storageService.savePayloads(decryptedMatching)
 
     if (replacesRootKey) {
       void this.alertService.alert(KeyRecoveryStrings.KeyRecoveryRootKeyReplaced)
@@ -541,12 +484,16 @@ export class SNKeyRecoveryService extends AbstractService<KeyRecoveryEvent, Decr
       void this.alertService.alert(KeyRecoveryStrings.KeyRecoveryKeyRecovered)
     }
 
-    await this.notifyEvent(KeyRecoveryEvent.KeysRecovered, allRelevantKeyPayloads)
+    if (decryptedMatching.some((p) => p.dirty)) {
+      await this.syncService.sync()
+    }
 
-    return matching
+    await this.notifyEvent(KeyRecoveryEvent.KeysRecovered, decryptedMatching)
+
+    void this.removeFromUndecryptables(Uuids(decryptedMatching))
   }
 
-  private popQueueForKeyParams(keyParams: SNRootKeyParams) {
+  private removeElementsFromQueueForMatchingKeyParams(keyParams: SNRootKeyParams) {
     const matching = []
     const nonmatching = []
 
