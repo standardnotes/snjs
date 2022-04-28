@@ -3,7 +3,7 @@
  * @param a
  * @param b
  */
- export function timingSafeEqual(a: string, b: string): boolean {
+export function timingSafeEqual(a: string, b: string): boolean {
   const strA = String(a)
   let strB = String(b)
   const lenA = strA.length
