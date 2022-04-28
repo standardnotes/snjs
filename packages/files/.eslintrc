@@ -1,6 +1,3 @@
 {
-  "extends": ["../../node_modules/@standardnotes/config/src/.eslintrc"],
-  "rules": {
-    "@typescript-eslint/no-explicit-any": ["warn", { "ignoreRestArgs": true }]
-  }
+  "extends": ["../../node_modules/@standardnotes/config/src/.eslintrc"]
 }
