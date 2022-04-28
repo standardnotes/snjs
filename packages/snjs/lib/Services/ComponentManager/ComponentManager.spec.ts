@@ -13,8 +13,7 @@ import {
 import { DesktopManagerInterface } from '@Lib/Services/ComponentManager/Types'
 import { ContentType } from '@standardnotes/common'
 import { GenericItem, SNComponent } from '@standardnotes/models'
-import { InternalEventBusInterface, Environment, Platform } from '@standardnotes/services'
-import { SNAlertService } from '@Lib/Services/Alert/AlertService'
+import { InternalEventBusInterface, Environment, Platform, AlertService } from '@standardnotes/services'
 import { ItemManager } from '@Lib/Services/Items/ItemManager'
 import { SNFeaturesService } from '@Lib/Services/Features/FeaturesService'
 import { SNComponentManager } from './ComponentManager'
@@ -23,7 +22,7 @@ import { SNSyncService } from '../Sync/SyncService'
 describe('featuresService', () => {
   let itemManager: ItemManager
   let featureService: SNFeaturesService
-  let alertService: SNAlertService
+  let alertService: AlertService
   let syncService: SNSyncService
   let prefsService: SNPreferencesService
   let internalEventBus: InternalEventBusInterface
@@ -73,7 +72,7 @@ describe('featuresService', () => {
 
     prefsService = {} as jest.Mocked<SNPreferencesService>
 
-    alertService = {} as jest.Mocked<SNAlertService>
+    alertService = {} as jest.Mocked<AlertService>
     alertService.confirm = jest.fn()
     alertService.alert = jest.fn()
 

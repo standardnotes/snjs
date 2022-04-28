@@ -8,6 +8,7 @@ import * as InternalServices from '../Services'
 import * as Utils from '@standardnotes/utils'
 import * as Options from './Options'
 import * as Settings from '@standardnotes/settings'
+import * as Files from '@standardnotes/files'
 import { Subscription } from '@standardnotes/auth'
 import { UuidString, DeinitSource, ApplicationEventPayload } from '../Types'
 import { ApplicationEvent, applicationEventForSyncEvent } from '@Lib/Application/Event'
@@ -36,7 +37,6 @@ type ItemStream<I extends DecryptedItemInterface> = (data: {
 }) => void
 type ObserverRemover = () => void
 
-/** The main entrypoint of an application. */
 export class SNApplication implements InternalServices.ListedClientInterface {
   private onDeinit?: (app: SNApplication, source: DeinitSource) => void
 
@@ -70,7 +70,7 @@ export class SNApplication implements InternalServices.ListedClientInterface {
   private settingsService!: InternalServices.SNSettingsService
   private mfaService!: InternalServices.SNMfaService
   private listedService!: InternalServices.ListedService
-  private fileService!: InternalServices.SNFileService
+  private fileService!: Files.FileService
   private mutatorService!: InternalServices.MutatorService
   private integrityService!: ExternalServices.IntegrityService
 
@@ -98,7 +98,7 @@ export class SNApplication implements InternalServices.ListedClientInterface {
   public readonly environment: Environment
   public readonly platform: Platform
   public deviceInterface: ExternalServices.DeviceInterface
-  public alertService: InternalServices.SNAlertService
+  public alertService: ExternalServices.AlertService
   public readonly identifier: Common.ApplicationIdentifier
   public readonly options: Options.FullyResolvedApplicationOptions
 
@@ -144,7 +144,7 @@ export class SNApplication implements InternalServices.ListedClientInterface {
     this.defineInternalEventHandlers()
   }
 
-  public get files(): InternalServices.FilesClientInterface {
+  public get files(): Files.FilesClientInterface {
     return this.fileService
   }
 
@@ -281,7 +281,7 @@ export class SNApplication implements InternalServices.ListedClientInterface {
       await this.handleStage(ExternalServices.ApplicationStage.LoadedDatabase_12)
       this.beginAutoSyncTimer()
       await this.syncService.sync({
-        mode: InternalServices.SyncMode.DownloadFirst,
+        mode: ExternalServices.SyncMode.DownloadFirst,
         source: ExternalServices.SyncSource.External,
       })
     })
@@ -997,7 +997,7 @@ export class SNApplication implements InternalServices.ListedClientInterface {
   }
 
   private defineInternalEventHandlers(): void {
-    this.internalEventBus.addEventHandler(this.featuresService, InternalServices.ApiServiceEvent.MetaReceived)
+    this.internalEventBus.addEventHandler(this.featuresService, ExternalServices.ApiServiceEvent.MetaReceived)
     this.internalEventBus.addEventHandler(this.integrityService, ExternalServices.SyncEvent.SyncRequestsIntegrityCheck)
     this.internalEventBus.addEventHandler(this.syncService, ExternalServices.IntegrityEvent.IntegrityCheckCompleted)
   }
@@ -1018,7 +1018,7 @@ export class SNApplication implements InternalServices.ListedClientInterface {
   }
 
   private createFileService() {
-    this.fileService = new InternalServices.SNFileService(
+    this.fileService = new Files.FileService(
       this.apiService,
       this.itemManager,
       this.syncService,

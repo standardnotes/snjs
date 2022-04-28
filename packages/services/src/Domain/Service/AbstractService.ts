@@ -1,10 +1,11 @@
 /* istanbul ignore file */
+
 import { log, removeFromArray } from '@standardnotes/utils'
 import { EventObserver } from '../Event/EventObserver'
 import { ServiceInterface } from './ServiceInterface'
 import { InternalEventBusInterface } from '../Internal/InternalEventBusInterface'
-import { InternalEventPublishStrategy } from '..'
 import { ApplicationStage } from '../Application/ApplicationStage'
+import { InternalEventPublishStrategy } from '../Internal/InternalEventPublishStrategy'
 
 export abstract class AbstractService<EventName = string, EventData = undefined>
   implements ServiceInterface<EventName, EventData>

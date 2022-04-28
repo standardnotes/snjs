@@ -1,6 +1,6 @@
 import { SNPreferencesService } from '../Preferences/PreferencesService'
 import { FeatureStatus, FeaturesEvent } from '@Lib/Services/Features'
-import { Environment, Platform } from '@standardnotes/services'
+import { Environment, Platform, AlertService } from '@standardnotes/services'
 import { SNFeaturesService } from '@Lib/Services'
 import {
   SNComponent,
@@ -25,7 +25,6 @@ import {
 import find from 'lodash/find'
 import uniq from 'lodash/uniq'
 import remove from 'lodash/remove'
-import { SNAlertService } from '@Lib/Services/Alert/AlertService'
 import { SNSyncService } from '@Lib/Services/Sync/SyncService'
 import { environmentToString, platformToString } from '@Lib/Application/Platforms'
 import {
@@ -112,7 +111,7 @@ export class ComponentViewer {
     public component: SNComponent,
     private itemManager: ItemManager,
     private syncService: SNSyncService,
-    private alertService: SNAlertService,
+    private alertService: AlertService,
     private preferencesSerivce: SNPreferencesService,
     featuresService: SNFeaturesService,
     private environment: Environment,

@@ -20,7 +20,7 @@ import { SNSessionManager } from '../Session/SessionManager'
 import { SNStorageService } from '../Storage/StorageService'
 import { SortPayloadsByRecentAndContentPriority } from '@Lib/Services/Sync/Utils'
 import { SyncClientInterface } from './SyncClientInterface'
-import { SyncMode, SyncOptions, SyncPromise, SyncQueueStrategy } from './Types'
+import { SyncPromise } from './Types'
 import { SyncOpStatus } from '@Lib/Services/Sync/SyncOpStatus'
 import { ServerSyncResponse } from '@Lib/Services/Sync/Account/Response'
 import { ServerSyncResponseResolver } from '@Lib/Services/Sync/Account/ResponseResolver'
@@ -66,6 +66,10 @@ import {
   InternalEventInterface,
   IntegrityEvent,
   IntegrityEventPayload,
+  SyncMode,
+  SyncOptions,
+  SyncQueueStrategy,
+  SyncServiceInterface,
 } from '@standardnotes/services'
 import { OfflineSyncResponse } from './Offline/Response'
 import { KeyedDecryptionSplit, SplitPayloadsByEncryptionType } from '@standardnotes/encryption'
@@ -85,7 +89,7 @@ const INVALID_SESSION_RESPONSE_STATUS = 401
  */
 export class SNSyncService
   extends AbstractService<SyncEvent, ServerSyncResponse | OfflineSyncResponse | { source: SyncSource }>
-  implements InternalEventHandlerInterface, SyncClientInterface
+  implements SyncServiceInterface, InternalEventHandlerInterface, SyncClientInterface
 {
   private lastPreSyncSave?: Date
   private lastSyncDate?: Date

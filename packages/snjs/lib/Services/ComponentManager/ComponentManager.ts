@@ -4,7 +4,6 @@ import { SNFeaturesService } from '@Lib/Services/Features/FeaturesService'
 import { ContentType, DisplayStringForContentType } from '@standardnotes/common'
 import { ItemManager } from '@Lib/Services/Items/ItemManager'
 import { SNNote, SNTheme, SNComponent, ComponentMutator, PayloadEmitSource } from '@standardnotes/models'
-import { SNAlertService } from '@Lib/Services/Alert/AlertService'
 import { SNSyncService } from '@Lib/Services/Sync/SyncService'
 import find from 'lodash/find'
 import uniq from 'lodash/uniq'
@@ -17,7 +16,13 @@ import {
   AllowedBatchContentTypes,
 } from '@Lib/Services/ComponentManager/Types'
 import { ActionObserver, ComponentViewer } from '@Lib/Services/ComponentManager/ComponentViewer'
-import { AbstractService, InternalEventBusInterface, Environment, Platform } from '@standardnotes/services'
+import {
+  AbstractService,
+  InternalEventBusInterface,
+  Environment,
+  Platform,
+  AlertService,
+} from '@standardnotes/services'
 
 const DESKTOP_URL_PREFIX = 'sn://'
 const LOCAL_HOST = 'localhost'
@@ -56,7 +61,7 @@ export class SNComponentManager extends AbstractService<ComponentManagerEvent, E
     private syncService: SNSyncService,
     private featuresService: SNFeaturesService,
     private preferencesSerivce: SNPreferencesService,
-    protected alertService: SNAlertService,
+    protected alertService: AlertService,
     private environment: Environment,
     private platform: Platform,
     protected override internalEventBus: InternalEventBusInterface,

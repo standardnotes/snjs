@@ -1,21 +1,22 @@
 import { FeatureDescription } from '@standardnotes/features'
 import { isNullOrUndefined, joinPaths } from '@standardnotes/utils'
-import { Role } from '@standardnotes/auth'
 import { SettingName, SubscriptionSettingName } from '@standardnotes/settings'
 import { Uuid, ErrorTag } from '@standardnotes/common'
 import {
   AbstractService,
+  ApiServiceInterface,
   InternalEventBusInterface,
   IntegrityApiInterface,
   ItemsServerInterface,
   StorageKey,
+  ApiServiceEvent,
+  MetaReceivedData,
 } from '@standardnotes/services'
-import { ServerSyncPushContextualPayload, SNFeatureRepo } from '@standardnotes/models'
+import { ServerSyncPushContextualPayload, SNFeatureRepo, EncryptedFileInterface } from '@standardnotes/models'
 import * as Responses from '@standardnotes/responses'
 import { API_MESSAGE_FAILED_OFFLINE_ACTIVATION } from '@Lib/Services/Api/Messages'
-import { EncryptedFileInterface } from '../Files/Types'
 import { HttpParams, HttpRequest, HttpVerb, SNHttpService } from './HttpService'
-import { FilesServerInterface } from '../Files/FilesServerInterface'
+import { FilesServerInterface } from '@standardnotes/files'
 import { isUrlFirstParty, TRUSTED_FEATURE_HOSTS } from '@Lib/Hosts'
 import { Paths } from './Paths'
 import { Session } from '../Session/Sessions/Session'
@@ -35,18 +36,10 @@ const V0_API_VERSION = '20200115'
 
 type InvalidSessionObserver = (revoked: boolean) => void
 
-export enum ApiServiceEvent {
-  MetaReceived = 'MetaReceived',
-}
-
-export type MetaReceivedData = {
-  userUuid: UuidString
-  userRoles: Role[]
-}
-
 export class SNApiService
   extends AbstractService<ApiServiceEvent.MetaReceived, MetaReceivedData>
   implements
+    ApiServiceInterface,
     FilesServerInterface,
     IntegrityApiInterface,
     ItemsServerInterface,

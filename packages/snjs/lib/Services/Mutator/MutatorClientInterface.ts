@@ -1,5 +1,5 @@
 import { ContentType } from '@standardnotes/common'
-import { SyncOptions } from '../Sync'
+import { SyncOptions } from '@standardnotes/services'
 import { TransactionalMutation } from '../Items'
 import * as Models from '@standardnotes/models'
 import { ClientDisplayableError } from '@standardnotes/responses'

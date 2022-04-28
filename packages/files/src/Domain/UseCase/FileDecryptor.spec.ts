@@ -1,6 +1,6 @@
 import { FileDecryptor } from './FileDecryptor'
 import { PureCryptoInterface, StreamEncryptor } from '@standardnotes/sncrypto-common'
-import { EncryptedFileInterface } from '../Types'
+import { EncryptedFileInterface } from '@standardnotes/models'
 import { assert } from '@standardnotes/utils'
 
 describe('file decryptor', () => {

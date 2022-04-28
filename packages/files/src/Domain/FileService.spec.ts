@@ -1,37 +1,41 @@
-import { InternalEventBusInterface } from '@standardnotes/services'
-import { SNFileService } from './FileService'
-import { SNSyncService } from '../Sync/SyncService'
-import { ItemManager, SNAlertService, SNApiService } from '@Lib/index'
+import {
+  InternalEventBusInterface,
+  SyncServiceInterface,
+  ItemManagerInterface,
+  AlertService,
+  ApiServiceInterface,
+} from '@standardnotes/services'
+import { FileService } from './FileService'
 import { PureCryptoInterface, StreamEncryptor } from '@standardnotes/sncrypto-common'
 import { SNFile } from '@standardnotes/models'
 
 describe('fileService', () => {
-  let apiService: SNApiService
-  let itemManager: ItemManager
-  let syncService: SNSyncService
-  let alertService: SNAlertService
+  let apiService: ApiServiceInterface
+  let itemManager: ItemManagerInterface
+  let syncService: SyncServiceInterface
+  let alertService: AlertService
   let crypto: PureCryptoInterface
-  let fileService: SNFileService
+  let fileService: FileService
   let internalEventBus: InternalEventBusInterface
 
   beforeEach(() => {
-    apiService = {} as jest.Mocked<SNApiService>
+    apiService = {} as jest.Mocked<ApiServiceInterface>
     apiService.addEventObserver = jest.fn()
     apiService.createFileValetToken = jest.fn()
     apiService.downloadFile = jest.fn()
     apiService.deleteFile = jest.fn().mockReturnValue({})
 
-    itemManager = {} as jest.Mocked<ItemManager>
+    itemManager = {} as jest.Mocked<ItemManagerInterface>
     itemManager.createItem = jest.fn()
     itemManager.createTemplateItem = jest.fn().mockReturnValue({})
     itemManager.setItemToBeDeleted = jest.fn()
     itemManager.addObserver = jest.fn()
     itemManager.changeItem = jest.fn()
 
-    syncService = {} as jest.Mocked<SNSyncService>
+    syncService = {} as jest.Mocked<SyncServiceInterface>
     syncService.sync = jest.fn()
 
-    alertService = {} as jest.Mocked<SNAlertService>
+    alertService = {} as jest.Mocked<AlertService>
     alertService.confirm = jest.fn().mockReturnValue(true)
     alertService.alert = jest.fn()
 
@@ -40,7 +44,7 @@ describe('fileService', () => {
     internalEventBus = {} as jest.Mocked<InternalEventBusInterface>
     internalEventBus.publish = jest.fn()
 
-    fileService = new SNFileService(apiService, itemManager, syncService, alertService, crypto, internalEventBus)
+    fileService = new FileService(apiService, itemManager, syncService, alertService, crypto, internalEventBus)
 
     crypto.xchacha20StreamInitDecryptor = jest.fn().mockReturnValue({
       state: {},

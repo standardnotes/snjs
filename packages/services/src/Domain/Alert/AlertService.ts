@@ -1,5 +1,7 @@
 import { ClientDisplayableError } from '@standardnotes/responses'
 
+/* istanbul ignore file */
+
 export enum ButtonType {
   Info = 0,
   Danger = 1,
@@ -7,7 +9,7 @@ export enum ButtonType {
 
 export type DismissBlockingDialog = () => void
 
-export abstract class SNAlertService {
+export abstract class AlertService {
   abstract confirm(
     text: string,
     title?: string,

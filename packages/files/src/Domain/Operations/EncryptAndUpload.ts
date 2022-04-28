@@ -1,8 +1,10 @@
-import { DecryptedFileInterface, FileUploadProgress, FileUploadResult } from '../Types'
+import { FileUploadProgress } from '../Types/FileUploadProgress'
+import { FileUploadResult } from '../Types/FileUploadResult'
 import { FilesServerInterface } from '../FilesServerInterface'
 import { FileUploader } from '../UseCase/FileUploader'
 import { PureCryptoInterface } from '@standardnotes/sncrypto-common'
 import { FileEncryptor } from '../UseCase/FileEncryptor'
+import { DecryptedFileInterface } from '@standardnotes/models'
 
 export class EncryptAndUploadFileOperation {
   public readonly encryptedChunkSizes: number[] = []

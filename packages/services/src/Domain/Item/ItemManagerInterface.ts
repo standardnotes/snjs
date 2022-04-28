@@ -9,6 +9,7 @@ import {
   PayloadEmitSource,
   EncryptedItemInterface,
   DeletedItemInterface,
+  ItemContent,
 } from '@standardnotes/models'
 import { AbstractService } from '../Service/AbstractService'
 
@@ -69,6 +70,27 @@ export interface ItemManagerInterface extends AbstractService {
    * Returns all non-deleted items keys
    */
   itemsKeys(): ItemsKeyInterface[]
+
+  /**
+   * Creates an item and conditionally maps it and marks it as dirty.
+   * @param needsSync - Whether to mark the item as needing sync
+   */
+  createItem<T extends DecryptedItemInterface, C extends ItemContent = ItemContent>(
+    contentType: ContentType,
+    content: C,
+    needsSync?: boolean,
+  ): Promise<T>
+
+  /**
+   * Create an unmanaged item that can later be inserted via `insertItem`
+   */
+  createTemplateItem<
+    C extends ItemContent = ItemContent,
+    I extends DecryptedItemInterface<C> = DecryptedItemInterface<C>,
+  >(
+    contentType: ContentType,
+    content?: C,
+  ): I
 
   /**
    * Consumers wanting to modify an item should run it through this block,

@@ -1,5 +1,5 @@
 import { StartUploadSessionResponse, MinimalHttpResponse, ClientDisplayableError } from '@standardnotes/responses'
-import { EncryptedFileInterface } from './Types'
+import { EncryptedFileInterface } from '@standardnotes/models'
 
 export interface FilesServerInterface {
   startUploadSession(apiToken: string): Promise<StartUploadSessionResponse>

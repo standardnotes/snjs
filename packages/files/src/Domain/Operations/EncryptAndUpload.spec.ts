@@ -1,6 +1,6 @@
 import { EncryptAndUploadFileOperation } from './EncryptAndUpload'
 import { PureCryptoInterface, StreamEncryptor } from '@standardnotes/sncrypto-common'
-import { DecryptedFileInterface } from '../Types'
+import { DecryptedFileInterface } from '@standardnotes/models'
 import { FilesServerInterface } from '../FilesServerInterface'
 
 describe('encrypt and upload', () => {

@@ -684,10 +684,6 @@ export class ItemManager
     return duplicate
   }
 
-  /**
-   * Creates an item and conditionally maps it and marks it as dirty.
-   * @param needsSync - Whether to mark the item as needing sync
-   */
   public async createItem<T extends Models.DecryptedItemInterface, C extends Models.ItemContent = Models.ItemContent>(
     contentType: ContentType,
     content: C,
@@ -706,9 +702,6 @@ export class ItemManager
     return this.findSureItem<T>(payload.uuid)
   }
 
-  /**
-   * Create an unmanaged item that can later be inserted via `insertItem`
-   */
   public createTemplateItem<
     C extends Models.ItemContent = Models.ItemContent,
     I extends Models.DecryptedItemInterface<C> = Models.DecryptedItemInterface<C>,

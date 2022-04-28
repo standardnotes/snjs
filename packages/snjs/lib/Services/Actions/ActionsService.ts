@@ -22,8 +22,7 @@ import {
 import { SNSyncService } from '../Sync/SyncService'
 import { PayloadManager } from '../Payloads/PayloadManager'
 import { SNHttpService } from '../Api/HttpService'
-import { SNAlertService } from '../Alert/AlertService'
-import { AbstractService, DeviceInterface, InternalEventBusInterface } from '@standardnotes/services'
+import { AbstractService, DeviceInterface, InternalEventBusInterface, AlertService } from '@standardnotes/services'
 
 /**
  * The Actions Service allows clients to interact with action-based extensions.
@@ -44,7 +43,7 @@ export class SNActionsService extends AbstractService {
 
   constructor(
     private itemManager: ItemManager,
-    private alertService: SNAlertService,
+    private alertService: AlertService,
     public deviceInterface: DeviceInterface,
     private httpService: SNHttpService,
     private payloadManager: PayloadManager,
