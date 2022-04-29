@@ -1,4 +1,3 @@
-import { ServiceDiagnostics } from './../Diagnostics/ServiceDiagnostics'
 import { Environment } from './Environments'
 import { ApplicationIdentifier } from '@standardnotes/common'
 import { FullyFormedTransferPayload, TransferPayload } from '@standardnotes/models'
@@ -9,7 +8,7 @@ import { LegacyRawKeychainValue, NamespacedRootKeyInKeychain } from './KeychainT
  * and access to the migration service, such as exposing an interface to read
  * raw values from the database or value storage.
  */
-export interface DeviceInterface extends ServiceDiagnostics {
+export interface DeviceInterface {
   environment: Environment
 
   deinit(): void

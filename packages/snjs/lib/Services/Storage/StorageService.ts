@@ -475,6 +475,7 @@ export class SNStorageService extends Services.AbstractService implements Servic
         currentPersistPromise: this.currentPersistPromise != undefined,
         isStorageWrapped: this.isStorageWrapped(),
         allRawPayloadsCount: (await this.getAllRawPayloads()).length,
+        databaseKeys: await this.deviceInterface.getDatabaseKeys(),
       },
     }
   }

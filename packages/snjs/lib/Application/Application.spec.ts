@@ -35,12 +35,8 @@ describe('application', () => {
       }
       return undefined
     })
-    device.getDiagnostics = async () => {
-      return Promise.resolve({
-        device: {
-          databaseKeys: [1, 2, 3],
-        },
-      })
+    device.getDatabaseKeys = async () => {
+      return Promise.resolve(['1', '2', '3'])
     }
 
     application = new SNApplication({
@@ -67,13 +63,12 @@ describe('application', () => {
           environment: 3,
           platform: 1,
         }),
-        device: { databaseKeys: [1, 2, 3] },
         payloads: {
           integrityPayloads: [],
           nonDeletedItemCount: 0,
           invalidPayloadsCount: 0,
         },
-        items: { all: [] },
+        items: { allIds: [] },
         storage: {
           storagePersistable: false,
           persistencePolicy: 'Default',
@@ -82,6 +77,7 @@ describe('application', () => {
           currentPersistPromise: false,
           isStorageWrapped: false,
           allRawPayloadsCount: 0,
+          databaseKeys: ['1', '2', '3'],
         },
         encryption: expect.objectContaining({
           getLatestVersion: '004',
@@ -93,10 +89,10 @@ describe('application', () => {
           hasPasscode: false,
           isPasscodeLocked: false,
           itemsEncryption: expect.objectContaining({
-            itemsKeys: [],
+            itemsKeysIds: [],
           }),
           rootKeyEncryption: expect.objectContaining({
-            rootKey: false,
+            hasRootKey: false,
             keyMode: 'RootKeyNone',
             hasRootKeyWrapper: false,
             hasAccount: false,

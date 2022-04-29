@@ -358,7 +358,6 @@ export class SNApplication implements InternalServices.ListedClientInterface {
         environment: this.options.environment,
         platform: this.options.platform,
       },
-      ...(await this.options.deviceInterface.getDiagnostics()),
     }
 
     for (const service of this.services) {
@@ -828,7 +827,7 @@ export class SNApplication implements InternalServices.ListedClientInterface {
   /**
    * @returns whether the operation was successful or not
    */
-  public enableBiometrics(): Promise<boolean> {
+  public enableBiometrics(): boolean {
     return this.protectionService.enableBiometrics()
   }
 
