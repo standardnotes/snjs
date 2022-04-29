@@ -1,4 +1,5 @@
 import { Base64String } from '../Types/Base64String'
+import { Base64URLSafeString } from '../Types/Base64URLSafeString'
 import { HexString } from '../Types/HexString'
 import { SodiumConstant } from '../Types/SodiumConstant'
 import { StreamDecryptor } from '../Types/StreamDecryptor'
@@ -137,6 +138,13 @@ export interface PureCryptoInterface {
    * @returns  A base64 encoded string
    */
   base64Encode(text: Utf8String): Base64String
+
+  /**
+   * Converts a plain string into url safe base64
+   * @param text - A plain string
+   * @returns  A base64 url safe encoded string
+   */
+   base64URLEncode(text: Utf8String): Base64URLSafeString
 
   /**
    * Converts a base64 string into a plain string

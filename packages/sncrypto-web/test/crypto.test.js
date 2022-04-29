@@ -30,6 +30,12 @@ describe('crypto operations', async function () {
     expect(await base64Encode(source)).to.equal(target)
   })
 
+  it('properly encodes base64 in url safe mode', async function () {
+    const source = 'hello world 🌍'
+    const target = 'aGVsbG8gd29ybGQg8J-MjQ'
+    expect(await base64URLEncode(source)).to.equal(target)
+  })
+
   it('properly decodes base64', async function () {
     const source = 'aGVsbG8gd29ybGQg8J+MjQ=='
     const target = 'hello world 🌍'

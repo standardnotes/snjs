@@ -10,7 +10,7 @@ import {
   ChallengeReason,
   ChallengePromptTitle,
 } from '@standardnotes/services'
-import { Base64String } from '@standardnotes/sncrypto-common'
+import { Base64String, PureCryptoInterface } from '@standardnotes/sncrypto-common'
 import { ClientDisplayableError } from '@standardnotes/responses'
 import { CopyPayloadWithContentOverride } from '@standardnotes/models'
 import { isNullOrUndefined } from '@standardnotes/utils'
@@ -74,6 +74,7 @@ export class SNSessionManager extends AbstractService<SessionEvent> implements S
     private protocolService: EncryptionService,
     private challengeService: ChallengeService,
     private webSocketsService: SNWebSocketsService,
+    private crypto: PureCryptoInterface,
     protected override internalEventBus: InternalEventBusInterface,
   ) {
     super(internalEventBus)
@@ -93,6 +94,7 @@ export class SNSessionManager extends AbstractService<SessionEvent> implements S
     ;(this.alertService as unknown) = undefined
     ;(this.challengeService as unknown) = undefined
     ;(this.webSocketsService as unknown) = undefined
+    ;(this.crypto as unknown) = undefined
     this.user = undefined
     super.deinit()
   }
@@ -300,7 +302,20 @@ export class SNSessionManager extends AbstractService<SessionEvent> implements S
     mfaKeyPath?: string
     mfaCode?: string
   }> {
-    const response = await this.apiService.getAccountKeyParams(email, mfaKeyPath, mfaCode)
+    const codeVerifier = this.crypto.generateRandomKey(256)
+    this.storageService.setValue(StorageKey.CodeVerifier, codeVerifier)
+
+    const codeChallenge = this.crypto.base64URLEncode(
+      await this.crypto.sha256(codeVerifier)
+    )
+
+    const response = await this.apiService.getAccountKeyParams({
+      email,
+      mfaKeyPath,
+      mfaCode,
+      codeChallenge,
+    })
+
     if (response.error || isNullOrUndefined(response.data)) {
       if (mfaCode) {
         await this.alertService.alert(SignInStrings.IncorrectMfa)
@@ -431,8 +446,6 @@ export class SNSessionManager extends AbstractService<SessionEvent> implements S
     const signInResponse = await this.bypassChecksAndSignInWithRootKey(
       email,
       rootKey,
-      paramsResult.mfaKeyPath,
-      paramsResult.mfaCode,
       ephemeral,
     )
     return {
@@ -443,8 +456,6 @@ export class SNSessionManager extends AbstractService<SessionEvent> implements S
   public async bypassChecksAndSignInWithRootKey(
     email: string,
     rootKey: SNRootKey,
-    mfaKeyPath?: string,
-    mfaCode?: string,
     ephemeral = false,
   ): Promise<Responses.SignInResponse | Responses.HttpResponse> {
     const { wrappingKey, canceled } = await this.challengeService.getWrappingKeyIfApplicable()
@@ -456,39 +467,27 @@ export class SNSessionManager extends AbstractService<SessionEvent> implements S
       )
     }
 
-    const signInResponse = await this.apiService.signIn(email, rootKey.serverPassword!, mfaKeyPath, mfaCode, ephemeral)
+    const signInResponse = await this.apiService.signIn({
+      email,
+      serverPassword: rootKey.serverPassword!,
+      ephemeral,
+      codeVerifier: this.storageService.getValue(StorageKey.CodeVerifier),
+    })
 
-    if (!signInResponse.error && signInResponse.data) {
-      const updatedKeyParams = (signInResponse as Responses.SignInResponse).data.key_params
-      const expandedRootKey = new SNRootKey(
-        CopyPayloadWithContentOverride(rootKey.payload, {
-          keyParams: updatedKeyParams || rootKey.keyParams.getPortableValue(),
-        }),
-      )
-
-      await this.handleSuccessAuthResponse(signInResponse as Responses.SignInResponse, expandedRootKey, wrappingKey)
-
+    if (signInResponse.error || !signInResponse.data) {
       return signInResponse
-    } else {
-      if (signInResponse.error?.payload?.mfa_key) {
-        if (mfaCode) {
-          await this.alertService.alert(SignInStrings.IncorrectMfa)
-        }
-        /** Prompt for MFA code and try again */
-        const inputtedCode = await this.promptForMfaValue()
-        if (!inputtedCode) {
-          /** User dismissed window without input */
-          return this.apiService.createErrorResponse(
-            SignInStrings.SignInCanceledMissingMfa,
-            Responses.StatusCode.CanceledMfa,
-          )
-        }
-        return this.bypassChecksAndSignInWithRootKey(email, rootKey, signInResponse.error.payload.mfa_key, inputtedCode)
-      } else {
-        /** Some other error, return to caller */
-        return signInResponse
-      }
     }
+
+    const updatedKeyParams = (signInResponse as Responses.SignInResponse).data.key_params
+    const expandedRootKey = new SNRootKey(
+      CopyPayloadWithContentOverride(rootKey.payload, {
+        keyParams: updatedKeyParams || rootKey.keyParams.getPortableValue(),
+      }),
+    )
+
+    await this.handleSuccessAuthResponse(signInResponse as Responses.SignInResponse, expandedRootKey, wrappingKey)
+
+    return signInResponse
   }
 
   public async changeCredentials(parameters: {

@@ -4,6 +4,7 @@ import {
   SodiumConstant,
   StreamDecryptorResult,
   Base64String,
+  Base64URLSafeString,
   HexString,
   PureCryptoInterface,
   Utf8String,
@@ -66,6 +67,10 @@ export class SNWebCrypto implements PureCryptoInterface {
 
   public base64Encode(text: Utf8String): string {
     return Utils.base64Encode(text)
+  }
+
+  public base64URLEncode(text: Utf8String): Base64URLSafeString {
+    return Utils.base64URLEncode(text)
   }
 
   public base64Decode(base64String: Base64String): string {

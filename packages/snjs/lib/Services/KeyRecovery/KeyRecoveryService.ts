@@ -335,7 +335,9 @@ export class SNKeyRecoveryService extends AbstractService<KeyRecoveryEvent, Decr
   }
 
   private async getLatestKeyParamsFromServer(identifier: string): Promise<SNRootKeyParams | undefined> {
-    const paramsResponse = await this.apiService.getAccountKeyParams(identifier)
+    const paramsResponse = await this.apiService.getAccountKeyParams({
+      email: identifier,
+    })
 
     if (!paramsResponse.error && paramsResponse.data) {
       return KeyParamsFromApiResponse(paramsResponse as KeyParamsResponse)

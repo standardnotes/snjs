@@ -204,17 +204,22 @@ export class SNApiService
    *                    would receive parameters as params['foo'] with value equal to mfaCode.
    * @param mfaCode     The mfa challenge response value.
    */
-  getAccountKeyParams(
+  getAccountKeyParams(dto: {
     email: string,
+    codeChallenge?: string,
     mfaKeyPath?: string,
     mfaCode?: string,
-  ): Promise<Responses.KeyParamsResponse | Responses.HttpResponse> {
+  }): Promise<Responses.KeyParamsResponse | Responses.HttpResponse> {
     const params = this.params({
-      email: email,
+      email: dto.email,
     })
 
-    if (mfaKeyPath && mfaCode) {
-      params[mfaKeyPath] = mfaCode
+    if (dto.codeChallenge !== undefined) {
+      params['code_challenge'] = dto.codeChallenge
+    }
+
+    if (dto.mfaKeyPath !== undefined && dto.mfaCode !== undefined) {
+      params[dto.mfaKeyPath] = dto.mfaCode
     }
 
     return this.request({
@@ -254,26 +259,23 @@ export class SNApiService
     return response
   }
 
-  async signIn(
+  async signIn(dto: {
     email: string,
     serverPassword: string,
-    mfaKeyPath?: string,
-    mfaCode?: string,
-    ephemeral = false,
-  ): Promise<Responses.SignInResponse | Responses.HttpResponse> {
+    codeVerifier: string,
+    ephemeral: boolean,
+  }): Promise<Responses.SignInResponse | Responses.HttpResponse> {
     if (this.authenticating) {
       return this.createErrorResponse(messages.API_MESSAGE_LOGIN_IN_PROGRESS) as Responses.SignInResponse
     }
     this.authenticating = true
-    const url = joinPaths(this.host, Paths.v1.signIn)
+    const url = joinPaths(this.host, Paths.v2.signIn)
     const params = this.params({
-      email,
-      password: serverPassword,
-      ephemeral,
+      email: dto.email,
+      password: dto.serverPassword,
+      ephemeral: dto.ephemeral,
+      code_verifier: dto.codeVerifier,
     })
-    if (mfaKeyPath && mfaCode) {
-      params[mfaKeyPath] = mfaCode
-    }
     const response = await this.request({
       verb: HttpVerb.Post,
       url,
@@ -282,6 +284,7 @@ export class SNApiService
     })
 
     this.authenticating = false
+
     return response
   }
 
