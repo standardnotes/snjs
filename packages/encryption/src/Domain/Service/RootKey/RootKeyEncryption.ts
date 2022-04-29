@@ -55,7 +55,7 @@ export class RootKeyEncryptionService extends Services.AbstractService<RootKeySe
   }
 
   public async initialize() {
-    const wrappedRootKey = await this.getWrappedRootKey()
+    const wrappedRootKey = this.getWrappedRootKey()
     const accountKeyParams = await this.recomputeAccountKeyParams()
     const hasWrapper = await this.hasRootKeyWrapper()
     const hasRootKey = wrappedRootKey != undefined || accountKeyParams != undefined
@@ -620,5 +620,20 @@ export class RootKeyEncryptionService extends Services.AbstractService<RootKeySe
     }
 
     return rollback
+  }
+
+  override async getDiagnostics(): Promise<Services.DiagnosticInfo | undefined> {
+    return {
+      rootKeyEncryption: {
+        hasRootKey: this.rootKey != undefined,
+        keyMode: KeyMode[this.keyMode],
+        hasRootKeyWrapper: await this.hasRootKeyWrapper(),
+        hasAccount: this.hasAccount(),
+        hasRootKeyEncryptionSource: this.hasRootKeyEncryptionSource(),
+        hasPasscode: this.hasPasscode(),
+        getEncryptionSourceVersion: this.hasRootKeyEncryptionSource() && (await this.getEncryptionSourceVersion()),
+        getUserVersion: this.getUserVersion(),
+      },
+    }
   }
 }

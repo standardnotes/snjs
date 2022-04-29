@@ -1,4 +1,10 @@
-import { AlertService, AbstractService, InternalEventBusInterface, StorageKey } from '@standardnotes/services'
+import {
+  AlertService,
+  AbstractService,
+  InternalEventBusInterface,
+  StorageKey,
+  DiagnosticInfo,
+} from '@standardnotes/services'
 import { Base64String } from '@standardnotes/sncrypto-common'
 import { ClientDisplayableError } from '@standardnotes/responses'
 import { CopyPayloadWithContentOverride } from '@standardnotes/models'
@@ -649,5 +655,17 @@ export class SNSessionManager extends AbstractService<SessionEvent> implements S
       const session = TokenSession.FromApiResponse(response)
       await this.populateSession(rootKey, user, session, this.apiService.getHost(), wrappingKey)
     }
+  }
+
+  override getDiagnostics(): Promise<DiagnosticInfo | undefined> {
+    return Promise.resolve({
+      session: {
+        isSessionRenewChallengePresented: this.isSessionRenewChallengePresented,
+        online: this.online(),
+        offline: this.offline(),
+        isSignedIn: this.isSignedIn(),
+        isSignedIntoFirstPartyServer: this.isSignedIntoFirstPartyServer(),
+      },
+    })
   }
 }

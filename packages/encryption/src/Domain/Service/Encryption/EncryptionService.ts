@@ -42,6 +42,7 @@ import {
 import { SplitPayloadsByEncryptionType } from '../../Split/EncryptionTypeSplit'
 import { ClientDisplayableError } from '@standardnotes/responses'
 import { isNotUndefined } from '@standardnotes/utils'
+import { DiagnosticInfo } from '@standardnotes/services'
 
 export enum EncryptionServiceEvent {
   RootKeyStatusChanged = 'RootKeyStatusChanged',
@@ -149,6 +150,7 @@ export class EncryptionService extends Services.AbstractService<EncryptionServic
    */
   public async getEncryptionDisplayName(): Promise<string> {
     const version = await this.rootKeyEncryption.getEncryptionSourceVersion()
+
     if (version) {
       return this.operatorManager.operatorForVersion(version).getEncryptionDisplayName()
     }
@@ -724,6 +726,25 @@ export class EncryptionService extends Services.AbstractService<EncryptionServic
     const unsyncedKeys = this.itemsEncryption.getItemsKeys().filter((key) => key.neverSynced && !key.dirty)
     if (unsyncedKeys.length > 0) {
       void this.itemManager.setItemsDirty(unsyncedKeys)
+    }
+  }
+
+  override async getDiagnostics(): Promise<DiagnosticInfo | undefined> {
+    return {
+      encryption: {
+        getLatestVersion: this.getLatestVersion(),
+        hasAccount: this.hasAccount(),
+        hasRootKeyEncryptionSource: this.hasRootKeyEncryptionSource(),
+        getUserVersion: this.getUserVersion(),
+        upgradeAvailable: await this.upgradeAvailable(),
+        accountUpgradeAvailable: this.accountUpgradeAvailable(),
+        passcodeUpgradeAvailable: await this.passcodeUpgradeAvailable(),
+        hasPasscode: this.hasPasscode(),
+        isPasscodeLocked: await this.isPasscodeLocked(),
+        needsNewRootKeyBasedItemsKey: this.needsNewRootKeyBasedItemsKey(),
+        ...(await this.itemsEncryption.getDiagnostics()),
+        ...(await this.rootKeyEncryption.getDiagnostics()),
+      },
     }
   }
 }

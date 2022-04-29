@@ -4,7 +4,7 @@ import { SNLog } from '../../Log'
 import { isErrorDecryptingParameters, SNRootKey } from '@standardnotes/encryption'
 import * as Encryption from '@standardnotes/encryption'
 import * as Services from '@standardnotes/services'
-import { Environment } from '@standardnotes/services'
+import { DiagnosticInfo, Environment } from '@standardnotes/services'
 import {
   CreateDecryptedLocalStorageContextPayload,
   CreateDeletedLocalStorageContextPayload,
@@ -463,5 +463,20 @@ export class SNStorageService extends Services.AbstractService implements Servic
 
       await this.deviceInterface.removeRawStorageValue(this.getPersistenceKey())
     })
+  }
+
+  override async getDiagnostics(): Promise<DiagnosticInfo | undefined> {
+    return {
+      storage: {
+        storagePersistable: this.storagePersistable,
+        persistencePolicy: Services.StoragePersistencePolicies[this.persistencePolicy],
+        encryptionPolicy: Services.StorageEncryptionPolicy[this.encryptionPolicy],
+        needsPersist: this.needsPersist,
+        currentPersistPromise: this.currentPersistPromise != undefined,
+        isStorageWrapped: this.isStorageWrapped(),
+        allRawPayloadsCount: (await this.getAllRawPayloads()).length,
+        databaseKeys: await this.deviceInterface.getDatabaseKeys(),
+      },
+    }
   }
 }

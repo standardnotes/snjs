@@ -34,6 +34,11 @@ export interface DeviceInterface {
    */
   openDatabase(identifier: ApplicationIdentifier): Promise<{ isNewDatabase?: boolean } | undefined>
 
+  /**
+   * In a key/value database, this function returns just the keys.
+   */
+  getDatabaseKeys(): Promise<string[]>
+
   getAllRawDatabasePayloads<T extends FullyFormedTransferPayload = FullyFormedTransferPayload>(
     identifier: ApplicationIdentifier,
   ): Promise<T[]>

@@ -57,6 +57,7 @@ export interface ConstructorOptions {
    * URL for WebSocket providing permissions and roles information.
    */
   webSocketUrl?: string
+
   runtime?: Runtime
 }
 

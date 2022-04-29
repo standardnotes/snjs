@@ -27,6 +27,7 @@ import {
   OfflineSubscriptionEntitlements,
   SetOfflineFeaturesFunctionResponse,
 } from './Types'
+import { DiagnosticInfo } from '@standardnotes/services'
 
 type GetOfflineSubscriptionDetailsResponse = OfflineSubscriptionEntitlements | ClientDisplayableError
 
@@ -642,10 +643,7 @@ export class SNFeaturesService
       valid_until: new Date(rawFeature.expires_at || 0),
       hosted_url: rawFeature.url,
     } as Partial<Models.ComponentContent>)
-    const component = (await this.itemManager.createTemplateItem(
-      rawFeature.content_type,
-      content,
-    )) as Models.SNComponent
+    const component = this.itemManager.createTemplateItem(rawFeature.content_type, content) as Models.SNComponent
     return component
   }
 
@@ -669,5 +667,17 @@ export class SNFeaturesService
     ;(this.sessionManager as unknown) = undefined
     ;(this.crypto as unknown) = undefined
     this.deinited = true
+  }
+
+  override getDiagnostics(): Promise<DiagnosticInfo | undefined> {
+    return Promise.resolve({
+      features: {
+        roles: this.roles,
+        features: this.features,
+        enabledExperimentalFeatures: this.enabledExperimentalFeatures,
+        needsInitialFeaturesUpdate: this.needsInitialFeaturesUpdate,
+        completedSuccessfulFeaturesRetrieval: this.completedSuccessfulFeaturesRetrieval,
+      },
+    })
   }
 }

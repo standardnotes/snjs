@@ -9,6 +9,7 @@ import {
   sleep,
   subtractFromArray,
   useBoolean,
+  Uuids,
 } from '@standardnotes/utils'
 import { ItemManager } from '@Lib/Services/Items/ItemManager'
 import { OfflineSyncOperation } from '@Lib/Services/Sync/Offline/Operation'
@@ -70,6 +71,7 @@ import {
   SyncOptions,
   SyncQueueStrategy,
   SyncServiceInterface,
+  DiagnosticInfo,
 } from '@standardnotes/services'
 import { OfflineSyncResponse } from './Offline/Response'
 import { KeyedDecryptionSplit, SplitPayloadsByEncryptionType } from '@standardnotes/encryption'
@@ -1167,6 +1169,28 @@ export class SNSyncService
     await this.payloadManager.emitDeltaEmit(emit)
 
     await this.persistPayloads(emit.emits)
+  }
+
+  override async getDiagnostics(): Promise<DiagnosticInfo | undefined> {
+    const dirtyUuids = Uuids(this.itemsNeedingSync())
+
+    return {
+      sync: {
+        syncToken: await this.getLastSyncToken(),
+        cursorToken: await this.getPaginationToken(),
+        lastPreSyncSave: this.lastPreSyncSave,
+        lastSyncDate: this.lastSyncDate,
+        outOfSync: this.outOfSync,
+        completedOnlineDownloadFirstSync: this.completedOnlineDownloadFirstSync,
+        clientLocked: this.clientLocked,
+        databaseLoaded: this.databaseLoaded,
+        syncLock: this.syncLock,
+        dealloced: this.dealloced,
+        itemsNeedingSync: dirtyUuids,
+        itemsNeedingSyncCount: dirtyUuids.length,
+        pendingRequestCount: this.resolveQueue.length + this.spawnQueue.length,
+      },
+    }
   }
 
   /** @e2e_testing */

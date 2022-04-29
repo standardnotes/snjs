@@ -12,6 +12,8 @@ import {
   isErrorDecryptingParameters,
 } from '../../Types/EncryptedParameters'
 import { isEncryptedPayload } from '@standardnotes/models'
+import { DiagnosticInfo } from '@standardnotes/services'
+import { Uuids } from '@standardnotes/utils'
 
 export class ItemsEncryptionService extends Services.AbstractService {
   private removeItemsObserver!: () => void
@@ -233,5 +235,16 @@ export class ItemsEncryptionService extends Services.AbstractService {
     return searchKeys.find((key) => {
       return key.keyVersion === version
     })
+  }
+
+  override async getDiagnostics(): Promise<DiagnosticInfo | undefined> {
+    const keyForItems = this.keyToUseForItemEncryption()
+    return {
+      itemsEncryption: {
+        itemsKeysIds: Uuids(this.getItemsKeys()),
+        defaultItemsKeyId: this.getDefaultItemsKey()?.uuid,
+        keyToUseForItemEncryptionId: keyForItems instanceof StandardException ? undefined : keyForItems.uuid,
+      },
+    }
   }
 }

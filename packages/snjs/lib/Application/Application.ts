@@ -1,3 +1,4 @@
+import { SnjsVersion } from './../Version'
 import * as Challenges from '../Services/Challenge'
 import * as Common from '@standardnotes/common'
 import * as ExternalServices from '@standardnotes/services'
@@ -12,7 +13,7 @@ import * as Files from '@standardnotes/files'
 import { Subscription } from '@standardnotes/auth'
 import { UuidString, DeinitSource, ApplicationEventPayload } from '../Types'
 import { ApplicationEvent, applicationEventForSyncEvent } from '@Lib/Application/Event'
-import { Environment, Platform } from '@standardnotes/services'
+import { DiagnosticInfo, Environment, Platform } from '@standardnotes/services'
 import { SNLog } from '../Log'
 import { useBoolean } from '@standardnotes/utils'
 import { DecryptedItemInterface, EncryptedItemInterface } from '@standardnotes/models'
@@ -347,6 +348,30 @@ export class SNApplication implements InternalServices.ListedClientInterface {
       }
     }
     return this.addEventObserver(filteredCallback, event)
+  }
+
+  public async getDiagnostics(): Promise<DiagnosticInfo> {
+    let result: DiagnosticInfo = {
+      application: {
+        snjsVersion: SnjsVersion,
+        appVersion: this.options.appVersion,
+        environment: this.options.environment,
+        platform: this.options.platform,
+      },
+    }
+
+    for (const service of this.services) {
+      const diagnostics = await service.getDiagnostics()
+
+      if (diagnostics) {
+        result = {
+          ...result,
+          ...diagnostics,
+        }
+      }
+    }
+
+    return result
   }
 
   private async notifyEvent(event: ApplicationEvent, data?: ApplicationEventPayload) {
@@ -802,7 +827,7 @@ export class SNApplication implements InternalServices.ListedClientInterface {
   /**
    * @returns whether the operation was successful or not
    */
-  public enableBiometrics(): Promise<boolean> {
+  public enableBiometrics(): boolean {
     return this.protectionService.enableBiometrics()
   }
 

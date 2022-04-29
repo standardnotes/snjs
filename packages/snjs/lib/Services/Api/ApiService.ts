@@ -11,6 +11,7 @@ import {
   StorageKey,
   ApiServiceEvent,
   MetaReceivedData,
+  DiagnosticInfo,
 } from '@standardnotes/services'
 import { ServerSyncPushContextualPayload, SNFeatureRepo, EncryptedFileInterface } from '@standardnotes/models'
 import * as Responses from '@standardnotes/responses'
@@ -893,5 +894,20 @@ export class SNApiService
     if (response.status === Responses.StatusCode.HttpStatusInvalidSession && this.session) {
       this.invalidSessionObserver?.(response.error?.tag === ErrorTag.RevokedSession)
     }
+  }
+
+  override getDiagnostics(): Promise<DiagnosticInfo | undefined> {
+    return Promise.resolve({
+      api: {
+        hasSession: this.session != undefined,
+        user: this.user,
+        registering: this.registering,
+        authenticating: this.authenticating,
+        changing: this.changing,
+        refreshingSession: this.refreshingSession,
+        filesHost: this.filesHost,
+        host: this.host,
+      },
+    })
   }
 }
