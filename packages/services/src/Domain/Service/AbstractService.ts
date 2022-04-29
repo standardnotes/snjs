@@ -6,6 +6,7 @@ import { ServiceInterface } from './ServiceInterface'
 import { InternalEventBusInterface } from '../Internal/InternalEventBusInterface'
 import { ApplicationStage } from '../Application/ApplicationStage'
 import { InternalEventPublishStrategy } from '../Internal/InternalEventPublishStrategy'
+import { DiagnosticInfo } from '../Diagnostics/ServiceDiagnostics'
 
 export abstract class AbstractService<EventName = string, EventData = undefined>
   implements ServiceInterface<EventName, EventData>
@@ -46,6 +47,10 @@ export abstract class AbstractService<EventName = string, EventData = undefined>
       },
       InternalEventPublishStrategy.SEQUENCE,
     )
+  }
+
+  getDiagnostics(): Promise<DiagnosticInfo | undefined> {
+    return Promise.resolve(undefined)
   }
 
   /**

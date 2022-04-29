@@ -431,7 +431,7 @@ export class UserService
   }
 
   private async setPasscodeWithoutWarning(passcode: string, origination: KeyParamsOrigination) {
-    const identifier = await UuidGenerator.GenerateUuid()
+    const identifier = UuidGenerator.GenerateUuid()
     const key = await this.protocolService.createRootKey(identifier, passcode, origination)
     await this.protocolService.setNewRootKeyWrapper(key)
     await this.rewriteItemsKeys()
@@ -466,7 +466,7 @@ export class UserService
     this.syncService.unlockSyncing()
   }
 
-  private async clearDatabase(): Promise<void> {
+  private clearDatabase(): Promise<void> {
     return this.storageService.clearAllPayloads()
   }
 

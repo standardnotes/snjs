@@ -27,6 +27,7 @@ import {
   StorageValueModes,
   ApplicationStage,
   StorageKey,
+  DiagnosticInfo,
 } from '@standardnotes/services'
 import {
   UndecryptableItemsStorage,
@@ -508,5 +509,14 @@ export class SNKeyRecoveryService extends AbstractService<KeyRecoveryEvent, Decr
     this.decryptionQueue = nonmatching
 
     return matching
+  }
+
+  override getDiagnostics(): Promise<DiagnosticInfo | undefined> {
+    return Promise.resolve({
+      keyRecovery: {
+        queueLength: this.decryptionQueue.length,
+        isProcessingQueue: this.isProcessingQueue,
+      },
+    })
   }
 }

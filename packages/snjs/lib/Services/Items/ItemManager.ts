@@ -9,6 +9,7 @@ import * as Models from '@standardnotes/models'
 import * as Services from '@standardnotes/services'
 import { ItemsClientInterface } from './ItemsClientInterface'
 import { PayloadManagerChangeData } from '../Payloads'
+import { DiagnosticInfo } from '@standardnotes/services'
 
 type ItemsChangeObserver<I extends Models.DecryptedItemInterface = Models.DecryptedItemInterface> = {
   contentType: ContentType[]
@@ -1229,5 +1230,13 @@ export class ItemManager
     }
 
     await this.payloadManager.emitPayloads(payloads, Models.PayloadEmitSource.PreSyncSave)
+  }
+
+  override getDiagnostics(): Promise<DiagnosticInfo | undefined> {
+    return Promise.resolve({
+      items: {
+        allIds: Uuids(this.collection.all()),
+      },
+    })
   }
 }

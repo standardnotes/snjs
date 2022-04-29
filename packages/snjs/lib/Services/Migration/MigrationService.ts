@@ -4,7 +4,13 @@ import { compareSemVersions } from '@Lib/Version'
 import { lastElement } from '@standardnotes/utils'
 import { Migration } from '@Lib/Migrations/Migration'
 import { MigrationServices } from '../../Migrations/MigrationServices'
-import { RawStorageKey, namespacedKey, ApplicationStage, AbstractService } from '@standardnotes/services'
+import {
+  RawStorageKey,
+  namespacedKey,
+  ApplicationStage,
+  AbstractService,
+  DiagnosticInfo,
+} from '@standardnotes/services'
 import { SnjsVersion, isRightVersionGreaterThanLeft } from '../../Version'
 import { SNLog } from '@Lib/Log'
 import { MigrationClasses } from '@Lib/Migrations/Versions'
@@ -133,5 +139,13 @@ export class SNMigrationService extends AbstractService {
     for (const migration of this.activeMigrations) {
       await migration.handleStage(stage)
     }
+  }
+
+  override getDiagnostics(): Promise<DiagnosticInfo | undefined> {
+    return Promise.resolve({
+      migrations: {
+        activeMigrations: this.activeMigrations && this.activeMigrations.map((m) => typeof m),
+      },
+    })
   }
 }

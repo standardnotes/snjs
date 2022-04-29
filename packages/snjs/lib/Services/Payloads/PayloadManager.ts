@@ -18,7 +18,12 @@ import {
   HistoryMap,
   DeltaEmit,
 } from '@standardnotes/models'
-import { AbstractService, PayloadManagerInterface, InternalEventBusInterface } from '@standardnotes/services'
+import {
+  AbstractService,
+  PayloadManagerInterface,
+  InternalEventBusInterface,
+  DiagnosticInfo,
+} from '@standardnotes/services'
 import { IntegrityPayload } from '@standardnotes/responses'
 
 /**
@@ -305,5 +310,15 @@ export class PayloadManager extends AbstractService implements PayloadManagerInt
     )
 
     await this.emitPayloads(deleted, PayloadEmitSource.LocalChanged)
+  }
+
+  override getDiagnostics(): Promise<DiagnosticInfo | undefined> {
+    return Promise.resolve({
+      payloads: {
+        integrityPayloads: this.integrityPayloads,
+        nonDeletedItemCount: this.nonDeletedItems.length,
+        invalidPayloadsCount: this.invalidPayloads.length,
+      },
+    })
   }
 }

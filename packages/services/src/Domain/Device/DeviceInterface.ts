@@ -1,3 +1,4 @@
+import { ServiceDiagnostics } from './../Diagnostics/ServiceDiagnostics'
 import { Environment } from './Environments'
 import { ApplicationIdentifier } from '@standardnotes/common'
 import { FullyFormedTransferPayload, TransferPayload } from '@standardnotes/models'
@@ -8,7 +9,7 @@ import { LegacyRawKeychainValue, NamespacedRootKeyInKeychain } from './KeychainT
  * and access to the migration service, such as exposing an interface to read
  * raw values from the database or value storage.
  */
-export interface DeviceInterface {
+export interface DeviceInterface extends ServiceDiagnostics {
   environment: Environment
 
   deinit(): void
@@ -33,6 +34,11 @@ export interface DeviceInterface {
    * @returns { isNewDatabase } - True if the database was newly created
    */
   openDatabase(identifier: ApplicationIdentifier): Promise<{ isNewDatabase?: boolean } | undefined>
+
+  /**
+   * In a key/value database, this function returns just the keys.
+   */
+  getDatabaseKeys(): Promise<string[]>
 
   getAllRawDatabasePayloads<T extends FullyFormedTransferPayload = FullyFormedTransferPayload>(
     identifier: ApplicationIdentifier,

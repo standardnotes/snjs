@@ -14,6 +14,7 @@ import {
   StorageValueModes,
   ApplicationStage,
   StorageKey,
+  DiagnosticInfo,
 } from '@standardnotes/services'
 import { ProtectionsClientInterface } from './ClientInterface'
 
@@ -102,12 +103,14 @@ export class SNProtectionService extends AbstractService<ProtectionEvent> implem
     return Boolean(biometricsState)
   }
 
-  public async enableBiometrics(): Promise<boolean> {
+  public enableBiometrics(): boolean {
     if (this.hasBiometricsEnabled()) {
       SNLog.onError(Error('Tried to enable biometrics when they already are enabled.'))
       return false
     }
-    await this.storageService.setValue(StorageKey.BiometricsState, true, StorageValueModes.Nonwrapped)
+
+    this.storageService.setValue(StorageKey.BiometricsState, true, StorageValueModes.Nonwrapped)
+
     return true
   }
 
@@ -116,8 +119,9 @@ export class SNProtectionService extends AbstractService<ProtectionEvent> implem
       SNLog.onError(Error('Tried to disable biometrics when they already are disabled.'))
       return false
     }
+
     if (await this.validateOrRenewSession(ChallengeReason.DisableBiometrics)) {
-      await this.storageService.setValue(StorageKey.BiometricsState, false, StorageValueModes.Nonwrapped)
+      this.storageService.setValue(StorageKey.BiometricsState, false, StorageValueModes.Nonwrapped)
       return true
     } else {
       return false
@@ -311,11 +315,11 @@ export class SNProtectionService extends AbstractService<ProtectionEvent> implem
     return this.storageService.getValue(StorageKey.ProtectionSessionLength)
   }
 
-  private async setSessionLength(length: UnprotectedAccessSecondsDuration): Promise<void> {
+  private setSessionLength(length: UnprotectedAccessSecondsDuration): void {
     this.storageService.setValue(StorageKey.ProtectionSessionLength, length)
     const expiresAt = new Date()
     expiresAt.setSeconds(expiresAt.getSeconds() + length)
-    await this.setSessionExpiryDate(expiresAt)
+    this.setSessionExpiryDate(expiresAt)
     this.updateSessionExpiryTimer(expiresAt)
     void this.notifyEvent(ProtectionEvent.UnprotectedSessionBegan)
   }
@@ -326,5 +330,17 @@ export class SNProtectionService extends AbstractService<ProtectionEvent> implem
       void this.clearSession()
     }
     this.sessionExpiryTimeout = setTimeout(timer, expiryDate.getTime() - Date.now())
+  }
+
+  override getDiagnostics(): Promise<DiagnosticInfo | undefined> {
+    return Promise.resolve({
+      protections: {
+        getSessionExpiryDate: this.getSessionExpiryDate(),
+        getLastSessionLength: this.getLastSessionLength(),
+        hasProtectionSources: this.hasProtectionSources(),
+        hasUnprotectedAccessSession: this.hasUnprotectedAccessSession(),
+        hasBiometricsEnabled: this.hasBiometricsEnabled(),
+      },
+    })
   }
 }

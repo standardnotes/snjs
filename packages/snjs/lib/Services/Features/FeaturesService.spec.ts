@@ -416,7 +416,7 @@ describe('featuresService', () => {
       const featuresService = createService()
       const nativeFeature = featuresService['mapRemoteNativeFeatureToStaticFeature'](remoteFeature)
       featuresService['mapNativeFeatureToItem'] = jest.fn()
-      await featuresService.initializeFromDisk()
+      featuresService.initializeFromDisk()
       await featuresService.updateRolesAndFetchFeatures('123', newRoles)
       expect(featuresService['mapNativeFeatureToItem']).toHaveBeenCalledWith(
         nativeFeature,
