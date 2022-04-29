@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.105.0](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.104.2...@standardnotes/snjs@2.105.0) (2022-04-29)
+
+
+### Features
+
+* service diagnostics ([#718](https://github.com/standardnotes/snjs/issues/718)) ([17cf40f](https://github.com/standardnotes/snjs/commit/17cf40f4489c8f1915b19c0318d252cf83bc050d))
+
+
+
+
+
 ## [2.104.2](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.104.1...@standardnotes/snjs@2.104.2) (2022-04-28)
 
 **Note:** Version bump only for package @standardnotes/snjs

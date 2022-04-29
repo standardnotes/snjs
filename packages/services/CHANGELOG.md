@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.10.0](https://github.com/standardnotes/snjs/compare/@standardnotes/services@1.9.15...@standardnotes/services@1.10.0) (2022-04-29)
+
+
+### Features
+
+* service diagnostics ([#718](https://github.com/standardnotes/snjs/issues/718)) ([17cf40f](https://github.com/standardnotes/snjs/commit/17cf40f4489c8f1915b19c0318d252cf83bc050d))
+
+
+
+
+
 ## [1.9.15](https://github.com/standardnotes/snjs/compare/@standardnotes/services@1.9.14...@standardnotes/services@1.9.15) (2022-04-28)
 
 **Note:** Version bump only for package @standardnotes/services
