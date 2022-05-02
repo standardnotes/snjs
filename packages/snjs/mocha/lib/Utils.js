@@ -8,7 +8,7 @@ export async function safeDeinit(application) {
     return
   }
 
-  await application.storageService.awaitPersist()
+  await application.diskStorageService.awaitPersist()
 
   /** Limit waiting to 1s */
   await Promise.race([sleep(1), application.syncService?.awaitCurrentSyncs()])

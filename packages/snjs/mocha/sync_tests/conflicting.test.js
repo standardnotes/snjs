@@ -33,7 +33,7 @@ describe('online conflict handling', function () {
       expect(this.application.syncService.isOutOfSync()).to.equal(false)
       const items = this.application.itemManager.items
       expect(items.length).to.equal(this.expectedItemCount)
-      const rawPayloads = await this.application.storageService.getAllRawPayloads()
+      const rawPayloads = await this.application.diskStorageService.getAllRawPayloads()
       expect(rawPayloads.length).to.equal(this.expectedItemCount)
     }
   })
@@ -174,7 +174,7 @@ describe('online conflict handling', function () {
     await this.application.itemManager.setItemDirty(note)
     await this.application.syncService.sync(syncOptions)
 
-    const rawPayloads = await this.application.storageService.getAllRawPayloads()
+    const rawPayloads = await this.application.diskStorageService.getAllRawPayloads()
     expect(rawPayloads.length).to.equal(this.expectedItemCount)
 
     const originalValue = note.title
@@ -214,7 +214,7 @@ describe('online conflict handling', function () {
     expect(duplicateItem.title).to.equal(originalValue)
     expect(originalItem.title).to.not.equal(duplicateItem.title)
 
-    const newRawPayloads = await this.application.storageService.getAllRawPayloads()
+    const newRawPayloads = await this.application.diskStorageService.getAllRawPayloads()
     expect(newRawPayloads.length).to.equal(this.expectedItemCount)
     await this.sharedFinalAssertions()
   })
@@ -225,7 +225,7 @@ describe('online conflict handling', function () {
     await Factory.markDirtyAndSyncItem(this.application, note)
     this.expectedItemCount++
 
-    const rawPayloads = await this.application.storageService.getAllRawPayloads()
+    const rawPayloads = await this.application.diskStorageService.getAllRawPayloads()
     expect(rawPayloads.length).to.equal(this.expectedItemCount)
     /** First modify the item without saving so that
      * our local contents digress from the server's */
@@ -279,7 +279,7 @@ describe('online conflict handling', function () {
 
     // clear sync token, clear storage, download all items, and ensure none of them have error decrypting
     await this.application.syncService.clearSyncPositionTokens()
-    await this.application.storageService.clearAllPayloads()
+    await this.application.diskStorageService.clearAllPayloads()
     await this.application.payloadManager.resetState()
     await this.application.itemManager.resetState()
     await this.application.syncService.sync(syncOptions)
@@ -505,7 +505,7 @@ describe('online conflict handling', function () {
     // We expect now that the item was conflicted
     this.expectedItemCount++
 
-    const rawPayloads = await this.application.storageService.getAllRawPayloads()
+    const rawPayloads = await this.application.diskStorageService.getAllRawPayloads()
     expect(rawPayloads.length).to.equal(this.expectedItemCount)
     for (const payload of rawPayloads) {
       expect(payload.dirty).to.not.be.ok
@@ -617,7 +617,7 @@ describe('online conflict handling', function () {
     // fooItem should now be conflicted and a copy created
     this.expectedItemCount++
     expect(this.application.itemManager.items.length).to.equal(this.expectedItemCount)
-    const rawPayloads = await this.application.storageService.getAllRawPayloads()
+    const rawPayloads = await this.application.diskStorageService.getAllRawPayloads()
     expect(rawPayloads.length).to.equal(this.expectedItemCount)
 
     const fooItems = this.application.itemManager.getItems(ContentType.Tag)
