@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.39.0](https://github.com/standardnotes/snjs/compare/@standardnotes/features@1.38.1...@standardnotes/features@1.39.0) (2022-05-02)
+
+
+### Features
+
+* take Markdown Visual out of beta ([#720](https://github.com/standardnotes/snjs/issues/720)) ([e03acf7](https://github.com/standardnotes/snjs/commit/e03acf700d7a29b8504af548381131f55696726b))
+
+
+
+
+
 ## [1.38.1](https://github.com/standardnotes/snjs/compare/@standardnotes/features@1.38.0...@standardnotes/features@1.38.1) (2022-04-27)
 
 

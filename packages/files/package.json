@@ -1,6 +1,6 @@
 {
   "name": "@standardnotes/files",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "engines": {
     "node": ">=14.0.0 <17.0.0"
   },
@@ -35,9 +35,9 @@
     "preset": "../../node_modules/@standardnotes/config/src/jest.json"
   },
   "dependencies": {
-    "@standardnotes/models": "^1.6.1",
-    "@standardnotes/responses": "^1.6.12",
-    "@standardnotes/services": "^1.10.0",
+    "@standardnotes/models": "^1.6.2",
+    "@standardnotes/responses": "^1.6.13",
+    "@standardnotes/services": "^1.10.1",
     "@standardnotes/utils": "^1.6.3"
   }
 }

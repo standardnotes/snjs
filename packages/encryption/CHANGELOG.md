@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.6.1](https://github.com/standardnotes/snjs/compare/@standardnotes/encryption@1.6.0...@standardnotes/encryption@1.6.1) (2022-05-02)
+
+**Note:** Version bump only for package @standardnotes/encryption
+
+
+
+
+
 # [1.6.0](https://github.com/standardnotes/snjs/compare/@standardnotes/encryption@1.5.2...@standardnotes/encryption@1.6.0) (2022-04-29)
 
 
