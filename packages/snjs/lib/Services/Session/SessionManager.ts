@@ -70,7 +70,7 @@ export class SNSessionManager extends AbstractService<SessionEvent> implements S
 
   constructor(
     private diskStorageService: DiskStorageService,
-    private localStorageService: StorageServiceInterface,
+    private inMemoryStorageService: StorageServiceInterface,
     private apiService: SNApiService,
     private alertService: AlertService,
     private protocolService: EncryptionService,
@@ -92,7 +92,7 @@ export class SNSessionManager extends AbstractService<SessionEvent> implements S
   override deinit(): void {
     ;(this.protocolService as unknown) = undefined
     ;(this.diskStorageService as unknown) = undefined
-    ;(this.localStorageService as unknown) = undefined
+    ;(this.inMemoryStorageService as unknown) = undefined
     ;(this.apiService as unknown) = undefined
     ;(this.alertService as unknown) = undefined
     ;(this.challengeService as unknown) = undefined
@@ -306,7 +306,7 @@ export class SNSessionManager extends AbstractService<SessionEvent> implements S
     mfaCode?: string
   }> {
     const codeVerifier = this.crypto.generateRandomKey(256)
-    this.localStorageService.setValue(StorageKey.CodeVerifier, codeVerifier)
+    this.inMemoryStorageService.setValue(StorageKey.CodeVerifier, codeVerifier)
 
     const codeChallenge = this.crypto.base64URLEncode(
       await this.crypto.sha256(codeVerifier)
@@ -474,10 +474,10 @@ export class SNSessionManager extends AbstractService<SessionEvent> implements S
       email,
       serverPassword: rootKey.serverPassword!,
       ephemeral,
-      codeVerifier: this.localStorageService.getValue(StorageKey.CodeVerifier),
+      codeVerifier: this.inMemoryStorageService.getValue(StorageKey.CodeVerifier),
     })
 
-    await this.localStorageService.removeValue(StorageKey.CodeVerifier)
+    await this.inMemoryStorageService.removeValue(StorageKey.CodeVerifier)
 
     if (signInResponse.error || !signInResponse.data) {
       return signInResponse

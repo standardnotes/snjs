@@ -71,7 +71,7 @@ export class SNApplication
   private payloadManager!: InternalServices.PayloadManager
   public protocolService!: Encryption.EncryptionService
   private diskStorageService!: InternalServices.DiskStorageService
-  private localStorageService!: InternalServices.LocalStorageService
+  private inMemoryStorageService!: InternalServices.InMemoryStorageService
   private apiService!: InternalServices.SNApiService
   private sessionManager!: InternalServices.SNSessionManager
   private syncService!: InternalServices.SNSyncService
@@ -1002,7 +1002,7 @@ export class SNApplication
     this.createPayloadManager()
     this.createItemManager()
     this.createDiskStorageManager()
-    this.createLocalStorageManager()
+    this.createInMemoryStorageManager()
     this.createProtocolService()
     this.diskStorageService.provideEncryptionProvider(this.protocolService)
     this.createChallengeService()
@@ -1041,7 +1041,7 @@ export class SNApplication
     ;(this.payloadManager as unknown) = undefined
     ;(this.protocolService as unknown) = undefined
     ;(this.diskStorageService as unknown) = undefined
-    ;(this.localStorageService as unknown) = undefined
+    ;(this.inMemoryStorageService as unknown) = undefined
     ;(this.apiService as unknown) = undefined
     ;(this.sessionManager as unknown) = undefined
     ;(this.syncService as unknown) = undefined
@@ -1281,13 +1281,12 @@ export class SNApplication
     this.services.push(this.diskStorageService)
   }
 
-  private createLocalStorageManager() {
-    this.localStorageService = new InternalServices.LocalStorageService(
-      localStorage,
+  private createInMemoryStorageManager() {
+    this.inMemoryStorageService = new InternalServices.InMemoryStorageService(
       this.internalEventBus,
     )
 
-    this.services.push(this.localStorageService)
+    this.services.push(this.inMemoryStorageService)
   }
 
   private createProtocolService() {
@@ -1329,7 +1328,7 @@ export class SNApplication
   private createSessionManager() {
     this.sessionManager = new InternalServices.SNSessionManager(
       this.diskStorageService,
-      this.localStorageService,
+      this.inMemoryStorageService,
       this.apiService,
       this.alertService,
       this.protocolService,
