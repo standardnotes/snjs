@@ -22,6 +22,7 @@ import {
   AlertService,
 } from '@standardnotes/services'
 import { FilesClientInterface } from './FilesClientInterface'
+import { FileDownloadProgress } from './Types/FileDownloadProgress'
 
 const OneHundredMb = 100 * 1_000_000
 
@@ -134,12 +135,12 @@ export class FileService extends AbstractService implements FilesClientInterface
 
   public async downloadFile(
     file: SNFile,
-    onDecryptedBytes: (bytes: Uint8Array) => Promise<void>,
+    onDecryptedBytes: (bytes: Uint8Array, progress: FileDownloadProgress | undefined) => Promise<void>,
   ): Promise<ClientDisplayableError | undefined> {
     const cachedFile = this.cache.get(file.uuid)
 
     if (cachedFile) {
-      await onDecryptedBytes(cachedFile)
+      await onDecryptedBytes(cachedFile, undefined)
 
       return undefined
     }
@@ -153,11 +154,11 @@ export class FileService extends AbstractService implements FilesClientInterface
     const addToCache = file.decryptedSize < this.cache.maxSize
     let cacheEntryAggregate = new Uint8Array()
 
-    const bytesWrapper = async (bytes: Uint8Array): Promise<void> => {
+    const bytesWrapper = async (bytes: Uint8Array, progress: FileDownloadProgress): Promise<void> => {
       if (addToCache) {
         cacheEntryAggregate = new Uint8Array([...cacheEntryAggregate, ...bytes])
       }
-      return onDecryptedBytes(bytes)
+      return onDecryptedBytes(bytes, progress)
     }
 
     const operation = new DownloadAndDecryptFileOperation(file, this.crypto, this.api, tokenResult)
