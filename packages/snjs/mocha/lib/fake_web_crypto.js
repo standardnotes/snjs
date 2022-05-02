@@ -57,9 +57,7 @@ export default class FakeWebCrypto {
   }
 
   base64URLEncode(text) {
-    const buffer = Buffer.from(text, 'utf8')
-
-    return buffer.toString('base64url')
+    return this.base64Encode(text).replace(/\+/g, '-').replace(/\//g, '_').replace(/\=+$/, '')
   }
 
   base64Decode(base64String) {
