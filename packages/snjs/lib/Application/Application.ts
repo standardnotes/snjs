@@ -71,7 +71,7 @@ export class SNApplication
   private payloadManager!: InternalServices.PayloadManager
   public protocolService!: Encryption.EncryptionService
   private diskStorageService!: InternalServices.DiskStorageService
-  private inMemoryStorageService!: InternalServices.InMemoryStorageService
+  private inMemoryStore!: ExternalServices.KeyValueStoreInterface<string>
   private apiService!: InternalServices.SNApiService
   private sessionManager!: InternalServices.SNSessionManager
   private syncService!: InternalServices.SNSyncService
@@ -1041,7 +1041,7 @@ export class SNApplication
     ;(this.payloadManager as unknown) = undefined
     ;(this.protocolService as unknown) = undefined
     ;(this.diskStorageService as unknown) = undefined
-    ;(this.inMemoryStorageService as unknown) = undefined
+    ;(this.inMemoryStore as unknown) = undefined
     ;(this.apiService as unknown) = undefined
     ;(this.sessionManager as unknown) = undefined
     ;(this.syncService as unknown) = undefined
@@ -1282,11 +1282,7 @@ export class SNApplication
   }
 
   private createInMemoryStorageManager() {
-    this.inMemoryStorageService = new InternalServices.InMemoryStorageService(
-      this.internalEventBus,
-    )
-
-    this.services.push(this.inMemoryStorageService)
+    this.inMemoryStore = new ExternalServices.InMemoryStore()
   }
 
   private createProtocolService() {
@@ -1328,7 +1324,7 @@ export class SNApplication
   private createSessionManager() {
     this.sessionManager = new InternalServices.SNSessionManager(
       this.diskStorageService,
-      this.inMemoryStorageService,
+      this.inMemoryStore,
       this.apiService,
       this.alertService,
       this.protocolService,
