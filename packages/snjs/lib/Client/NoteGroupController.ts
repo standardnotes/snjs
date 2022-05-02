@@ -35,11 +35,13 @@ export class NoteGroupController {
     }
   }
 
-  async createNoteView(noteUuid?: string, noteTitle?: string, noteTag?: UuidString): Promise<void> {
+  async createNoteView(noteUuid?: string, noteTitle?: string, noteTag?: UuidString): Promise<NoteViewController> {
     const controller = new NoteViewController(this.application, noteUuid, noteTitle, noteTag)
     await controller.initialize(this.addTagHierarchy)
     this.noteControllers.push(controller)
     this.notifyObservers()
+
+    return controller
   }
 
   closeNoteView(controller: NoteViewController, notifyObservers = true): void {
