@@ -238,7 +238,7 @@ describe('storage manager', function () {
     const identifier = this.application.identifier
 
     const app = await Factory.createAndInitializeApplication(identifier, Environment.Mobile)
-    expect(app.storageService.encryptionPolicy).to.equal(StorageEncryptionPolicy.Disabled)
+    expect(app.diskStorageService.encryptionPolicy).to.equal(StorageEncryptionPolicy.Disabled)
   })
 
   it('stored payloads should not contain metadata fields', async function () {

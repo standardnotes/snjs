@@ -837,7 +837,7 @@ describe('keys', function () {
     })
     expect(defaultKeys.length).to.equal(1)
 
-    const rawPayloads = await otherClient.storageService.getAllRawPayloads()
+    const rawPayloads = await otherClient.diskStorageService.getAllRawPayloads()
     const notePayload = rawPayloads.find((p) => p.content_type === ContentType.Note)
 
     expect(notePayload.items_key_id).to.equal(itemsKey.uuid)
