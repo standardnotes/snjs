@@ -1,6 +1,6 @@
 {
   "name": "@standardnotes/snjs",
-  "version": "2.105.2",
+  "version": "2.105.3",
   "engines": {
     "node": ">=14.0.0 <17.0.0"
   },
@@ -85,7 +85,7 @@
     "@standardnotes/encryption": "^1.6.1",
     "@standardnotes/features": "^1.39.0",
     "@standardnotes/filepicker": "^1.13.4",
-    "@standardnotes/files": "^1.0.4",
+    "@standardnotes/files": "^1.0.5",
     "@standardnotes/models": "^1.6.2",
     "@standardnotes/responses": "^1.6.13",
     "@standardnotes/services": "^1.10.1",

@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.0.5](https://github.com/standardnotes/snjs/compare/@standardnotes/files@1.0.4...@standardnotes/files@1.0.5) (2022-05-02)
+
+
+### Bug Fixes
+
+* expose download progress ([#721](https://github.com/standardnotes/snjs/issues/721)) ([db7d205](https://github.com/standardnotes/snjs/commit/db7d20516ab918723b1a1d07e664d6f2ccccab75))
+
+
+
+
+
 ## [1.0.4](https://github.com/standardnotes/snjs/compare/@standardnotes/files@1.0.3...@standardnotes/files@1.0.4) (2022-05-02)
 
 **Note:** Version bump only for package @standardnotes/files
