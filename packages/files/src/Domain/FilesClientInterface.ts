@@ -1,6 +1,7 @@
 import { EncryptAndUploadFileOperation } from './Operations/EncryptAndUpload'
 import { SNFile, FileMetadata } from '@standardnotes/models'
 import { ClientDisplayableError } from '@standardnotes/responses'
+import { FileDownloadProgress } from './Types/FileDownloadProgress'
 
 export interface FilesClientInterface {
   beginNewFileUpload(sizeInBytes: number): Promise<EncryptAndUploadFileOperation | ClientDisplayableError>
@@ -19,7 +20,7 @@ export interface FilesClientInterface {
 
   downloadFile(
     file: SNFile,
-    onDecryptedBytes: (bytes: Uint8Array) => Promise<void>,
+    onDecryptedBytes: (bytes: Uint8Array, progress: FileDownloadProgress | undefined) => Promise<void>,
   ): Promise<ClientDisplayableError | undefined>
 
   deleteFile(file: SNFile): Promise<ClientDisplayableError | undefined>
