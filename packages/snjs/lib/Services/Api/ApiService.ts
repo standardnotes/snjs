@@ -22,7 +22,7 @@ import { isUrlFirstParty, TRUSTED_FEATURE_HOSTS } from '@Lib/Hosts'
 import { Paths } from './Paths'
 import { Session } from '../Session/Sessions/Session'
 import { TokenSession } from '../Session/Sessions/TokenSession'
-import { SNStorageService } from '../Storage/StorageService'
+import { DiskStorageService } from '../Storage/DiskStorageService'
 import { UserServerInterface } from '../User/UserServerInterface'
 import { UuidString } from '../../Types/UuidString'
 import * as messages from '@Lib/Services/Api/Messages'
@@ -58,7 +58,7 @@ export class SNApiService
 
   constructor(
     private httpService: SNHttpService,
-    private storageService: SNStorageService,
+    private storageService: DiskStorageService,
     private host: string,
     protected override internalEventBus: InternalEventBusInterface,
   ) {

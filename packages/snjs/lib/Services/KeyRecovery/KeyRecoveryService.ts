@@ -18,7 +18,8 @@ import {
   getIncrementedDirtyIndex,
 } from '@standardnotes/models'
 import { SNSyncService } from '../Sync/SyncService'
-import { SNStorageService } from '../Storage/StorageService'
+import { KeyRecoveryStrings } from '../Api/Messages'
+import { DiskStorageService } from '../Storage/DiskStorageService'
 import { PayloadManager } from '../Payloads/PayloadManager'
 import { Challenge, ChallengeService } from '../Challenge'
 import { SNApiService } from '@Lib/Services/Api/ApiService'
@@ -94,7 +95,7 @@ export class SNKeyRecoveryService extends AbstractService<KeyRecoveryEvent, Decr
     private protocolService: EncryptionService,
     private challengeService: ChallengeService,
     private alertService: AlertService,
-    private storageService: SNStorageService,
+    private storageService: DiskStorageService,
     private syncService: SNSyncService,
     private userService: UserService,
     protected override internalEventBus: InternalEventBusInterface,

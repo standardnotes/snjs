@@ -56,6 +56,12 @@ export default class FakeWebCrypto {
     return btoa(text)
   }
 
+  base64URLEncode(text) {
+    const buffer = Buffer.from(text, 'utf8')
+
+    return buffer.toString('base64url')
+  }
+
   base64Decode(base64String) {
     return atob(base64String)
   }

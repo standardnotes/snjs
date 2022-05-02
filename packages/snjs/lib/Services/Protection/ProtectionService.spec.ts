@@ -1,6 +1,6 @@
 import { ChallengeService } from '../Challenge'
 import { EncryptionService } from '@standardnotes/encryption'
-import { SNStorageService } from '../Storage/StorageService'
+import { DiskStorageService } from '../Storage/DiskStorageService'
 import { SNProtectionService } from './ProtectionService'
 import { InternalEventBus, InternalEventBusInterface, ChallengeReason } from '@standardnotes/services'
 import { UuidGenerator } from '@standardnotes/utils'
@@ -20,7 +20,7 @@ const setupRandomUuid = () => {
 describe('protectionService', () => {
   let protocolService: EncryptionService
   let challengeService: ChallengeService
-  let storageService: SNStorageService
+  let storageService: DiskStorageService
   let internalEventBus: InternalEventBusInterface
   let protectionService: SNProtectionService
 
@@ -50,7 +50,7 @@ describe('protectionService', () => {
     challengeService = {} as jest.Mocked<ChallengeService>
     challengeService.promptForChallengeResponse = jest.fn()
 
-    storageService = {} as jest.Mocked<SNStorageService>
+    storageService = {} as jest.Mocked<DiskStorageService>
     storageService.getValue = jest.fn()
 
     protocolService = {} as jest.Mocked<EncryptionService>

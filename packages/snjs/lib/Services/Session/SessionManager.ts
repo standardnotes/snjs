@@ -9,6 +9,7 @@ import {
   ChallengeKeyboardType,
   ChallengeReason,
   ChallengePromptTitle,
+  StorageServiceInterface,
 } from '@standardnotes/services'
 import { Base64String, PureCryptoInterface } from '@standardnotes/sncrypto-common'
 import { ClientDisplayableError } from '@standardnotes/responses'
@@ -29,7 +30,7 @@ import { SessionFromRawStorageValue } from './Sessions/Generator'
 import { SessionsClientInterface } from './SessionsClientInterface'
 import { ShareToken } from './ShareToken'
 import { SNApiService } from '../Api/ApiService'
-import { SNStorageService } from '../Storage/StorageService'
+import { DiskStorageService } from '../Storage/DiskStorageService'
 import { SNWebSocketsService } from '../Api/WebsocketsService'
 import { Strings } from '@Lib/Strings'
 import { Subscription } from '@standardnotes/auth'
@@ -68,7 +69,8 @@ export class SNSessionManager extends AbstractService<SessionEvent> implements S
   private isSessionRenewChallengePresented = false
 
   constructor(
-    private storageService: SNStorageService,
+    private diskStorageService: DiskStorageService,
+    private localStorageService: StorageServiceInterface,
     private apiService: SNApiService,
     private alertService: AlertService,
     private protocolService: EncryptionService,
@@ -89,7 +91,8 @@ export class SNSessionManager extends AbstractService<SessionEvent> implements S
 
   override deinit(): void {
     ;(this.protocolService as unknown) = undefined
-    ;(this.storageService as unknown) = undefined
+    ;(this.diskStorageService as unknown) = undefined
+    ;(this.localStorageService as unknown) = undefined
     ;(this.apiService as unknown) = undefined
     ;(this.alertService as unknown) = undefined
     ;(this.challengeService as unknown) = undefined
@@ -105,16 +108,16 @@ export class SNSessionManager extends AbstractService<SessionEvent> implements S
   }
 
   public initializeFromDisk() {
-    this.setUser(this.storageService.getValue(StorageKey.User))
+    this.setUser(this.diskStorageService.getValue(StorageKey.User))
 
     if (!this.user) {
-      const legacyUuidLookup = this.storageService.getValue<string>(StorageKey.LegacyUuid)
+      const legacyUuidLookup = this.diskStorageService.getValue<string>(StorageKey.LegacyUuid)
       if (legacyUuidLookup) {
         this.setUser({ uuid: legacyUuidLookup, email: legacyUuidLookup })
       }
     }
 
-    const rawSession = this.storageService.getValue<RawStorageValue>(StorageKey.Session)
+    const rawSession = this.diskStorageService.getValue<RawStorageValue>(StorageKey.Session)
     if (rawSession) {
       const session = SessionFromRawStorageValue(rawSession)
       this.setSession(session, false)
@@ -197,7 +200,7 @@ export class SNSessionManager extends AbstractService<SessionEvent> implements S
             email,
             password,
             false,
-            this.storageService.isEphemeralSession(),
+            this.diskStorageService.isEphemeralSession(),
             currentKeyParams?.version,
           )
           if (signInResult.response.error) {
@@ -303,7 +306,7 @@ export class SNSessionManager extends AbstractService<SessionEvent> implements S
     mfaCode?: string
   }> {
     const codeVerifier = this.crypto.generateRandomKey(256)
-    this.storageService.setValue(StorageKey.CodeVerifier, codeVerifier)
+    this.localStorageService.setValue(StorageKey.CodeVerifier, codeVerifier)
 
     const codeChallenge = this.crypto.base64URLEncode(
       await this.crypto.sha256(codeVerifier)
@@ -471,8 +474,10 @@ export class SNSessionManager extends AbstractService<SessionEvent> implements S
       email,
       serverPassword: rootKey.serverPassword!,
       ephemeral,
-      codeVerifier: this.storageService.getValue(StorageKey.CodeVerifier),
+      codeVerifier: this.localStorageService.getValue(StorageKey.CodeVerifier),
     })
+
+    await this.localStorageService.removeValue(StorageKey.CodeVerifier)
 
     if (signInResponse.error || !signInResponse.data) {
       return signInResponse
@@ -625,7 +630,7 @@ export class SNSessionManager extends AbstractService<SessionEvent> implements S
 
     this.setUser(user)
 
-    this.storageService.setValue(StorageKey.User, user)
+    this.diskStorageService.setValue(StorageKey.User, user)
 
     void this.apiService.setHost(host)
 

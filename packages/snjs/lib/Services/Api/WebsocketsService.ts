@@ -1,5 +1,5 @@
 import { UserRolesChangedEvent } from '@standardnotes/domain-events'
-import { SNStorageService } from '../Storage/StorageService'
+import { DiskStorageService } from '../Storage/DiskStorageService'
 import { AbstractService, InternalEventBusInterface, StorageKey } from '@standardnotes/services'
 
 export enum WebSocketsServiceEvent {
@@ -10,7 +10,7 @@ export class SNWebSocketsService extends AbstractService<WebSocketsServiceEvent,
   private webSocket?: WebSocket
 
   constructor(
-    private storageService: SNStorageService,
+    private storageService: DiskStorageService,
     private webSocketUrl: string | undefined,
     protected override internalEventBus: InternalEventBusInterface,
   ) {

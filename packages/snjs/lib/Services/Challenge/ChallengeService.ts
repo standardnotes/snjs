@@ -1,6 +1,6 @@
 import { RootKeyInterface } from '@standardnotes/models'
 import { EncryptionService } from '@standardnotes/encryption'
-import { SNStorageService } from '../Storage/StorageService'
+import { DiskStorageService } from '../Storage/DiskStorageService'
 import { removeFromArray } from '@standardnotes/utils'
 import { isValidProtectionSessionLength } from '../Protection/ProtectionService'
 import {
@@ -51,7 +51,7 @@ export class ChallengeService extends AbstractService implements ChallengeServic
   private challengeObservers: Record<string, ChallengeObserver[]> = {}
 
   constructor(
-    private storageService: SNStorageService,
+    private storageService: DiskStorageService,
     private protocolService: EncryptionService,
     protected override internalEventBus: InternalEventBusInterface,
   ) {
