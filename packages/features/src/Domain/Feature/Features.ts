@@ -322,6 +322,22 @@ function editors(): EditorFeatureDescription[] {
     thumbnail_url: 'https://s3.amazonaws.com/standard-notes/screenshots/models/editors/fancy-markdown.jpg',
   })
 
+  const markdownVisual: EditorFeatureDescription = FillEditorComponentDefaults({
+    name: 'Markdown Visual',
+    identifier: FeatureIdentifier.MarkdownVisualEditor,
+    version: '1.0.6',
+    note_type: NoteType.Markdown,
+    file_type: 'md',
+    permission_name: PermissionName.MarkdownVisualEditor,
+    spellcheckControl: true,
+    description:
+      'A WYSIWYG-style Markdown editor that renders Markdown in preview-mode while you type without displaying any syntax.',
+    git_repo_url: 'https://github.com/standardnotes/markdown-visual',
+    marketing_url: 'https://github.com/standardnotes/markdown-visual',
+    static_files: ['build'],
+    index_path: 'build/index.html',
+  })
+
   const task: EditorFeatureDescription = FillEditorComponentDefaults({
     name: 'Task Editor',
     identifier: FeatureIdentifier.TaskEditor,
@@ -368,27 +384,23 @@ function editors(): EditorFeatureDescription[] {
     thumbnail_url: 'https://s3.amazonaws.com/standard-notes/screenshots/models/editors/spreadsheets.png',
   })
 
-  return [code, bold, plus, markdownBasic, markdownPro, markdownMinimist, markdownMath, task, tokenvault, spreadsheets]
+  return [
+    code,
+    bold,
+    plus,
+    markdownBasic,
+    markdownPro,
+    markdownMinimist,
+    markdownMath,
+    markdownVisual,
+    task,
+    tokenvault,
+    spreadsheets,
+  ]
 }
 
 function experimentalFeatures(): FeatureDescription[] {
-  const markdownVisual: EditorFeatureDescription = FillEditorComponentDefaults({
-    name: 'Markdown Visual (Beta)',
-    identifier: FeatureIdentifier.MarkdownVisualEditor,
-    version: '1.0.6',
-    note_type: NoteType.Markdown,
-    file_type: 'md',
-    permission_name: PermissionName.MarkdownVisualEditor,
-    spellcheckControl: true,
-    description:
-      'A WYSIWYG-style Markdown editor that renders Markdown in preview-mode while you type without displaying any syntax.',
-    git_repo_url: 'https://github.com/standardnotes/markdown-visual',
-    marketing_url: 'https://github.com/standardnotes/markdown-visual',
-    static_files: ['build'],
-    index_path: 'build/index.html',
-  })
-
-  return [markdownVisual]
+  return []
 }
 
 function serverFeatures(): ServerFeatureDescription[] {

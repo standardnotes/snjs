@@ -46,4 +46,4 @@ export const LegacyFileSafeIdentifier = 'org.standardnotes.legacy.file-safe'
 
 export const DeprecatedFeatures = [FeatureIdentifier.DeprecatedFileSafe, FeatureIdentifier.DeprecatedFoldersComponent]
 
-export const ExperimentalFeatures = [FeatureIdentifier.MarkdownVisualEditor]
+export const ExperimentalFeatures = []
