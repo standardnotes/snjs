@@ -20,7 +20,7 @@ export function editors(): EditorFeatureDescription[] {
     static_files: ['vendor'],
     description:
       'Syntax highlighting and convenient keyboard shortcuts for over 120 programming' +
-      'languages. Ideal for code snippets and procedures.',
+      ' languages. Ideal for code snippets and procedures.',
     git_repo_url: 'https://github.com/standardnotes/code-editor',
     marketing_url: 'https://standardnotes.com/extensions/code-editor',
     thumbnail_url: 'https://s3.amazonaws.com/standard-notes/screenshots/models/editors/code.jpg',
