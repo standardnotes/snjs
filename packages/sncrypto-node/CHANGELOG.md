@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.8.0](https://github.com/standardnotes/snjs/compare/@standardnotes/sncrypto-node@1.7.0...@standardnotes/sncrypto-node@1.8.0) (2022-05-03)
+
+
+### Features
+
+* rename SNCryptoNode to CryptoNode and fix sha256 function ([2c0cd81](https://github.com/standardnotes/snjs/commit/2c0cd81f952edfbe1f770534a269ddcaf9fa6678))
+
+
+
+
+
 # [1.7.0](https://github.com/standardnotes/snjs/compare/@standardnotes/sncrypto-node@1.6.8...@standardnotes/sncrypto-node@1.7.0) (2022-04-28)
 
 
