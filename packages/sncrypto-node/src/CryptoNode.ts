@@ -12,7 +12,7 @@ import { createCipheriv, createDecipheriv, randomBytes, createHash } from 'crypt
 
 import { getBufferWithEncoding } from './Utils'
 
-export class SnCryptoNode implements
+export class CryptoNode implements
   CryptoAes256GcmInterface<BufferEncoding>,
   CryptoSha256Interface,
   CryptoBase64Interface {
@@ -57,9 +57,7 @@ export class SnCryptoNode implements
   }
 
   sha256(text: Utf8String): HexString {
-    const textData = Buffer.from(text, 'utf8')
-
-    const hash = createHash('sha256', textData)
+    const hash = createHash('sha256').update(text)
 
     return hash.digest('hex')
   }
