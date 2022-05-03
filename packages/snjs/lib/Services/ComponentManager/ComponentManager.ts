@@ -657,7 +657,7 @@ export class SNComponentManager extends AbstractService<ComponentManagerEvent, E
   async showEditorChangeAlert(): Promise<boolean> {
     const shouldChangeEditor = await this.alertService.confirm(
       'Doing so might result in minor formatting changes.',
-      'Are you sure you want to change the editor?',
+      "Are you sure you want to change this note's type?",
       'Yes, change it',
     )
 
