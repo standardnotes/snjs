@@ -224,7 +224,7 @@ export class SNApiService
 
     return this.request({
       verb: HttpVerb.Get,
-      url: joinPaths(this.host, Paths.v1.keyParams),
+      url: joinPaths(this.host, Paths.v2.keyParams),
       fallbackErrorMessage: messages.API_MESSAGE_GENERIC_INVALID_LOGIN,
       params,
       /** A session is optional here, if valid, endpoint bypasses 2FA and returns additional params */
