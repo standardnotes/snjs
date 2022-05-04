@@ -144,7 +144,7 @@ export interface PureCryptoInterface {
    * @param text - A plain string
    * @returns  A base64 url safe encoded string
    */
-   base64URLEncode(text: Utf8String): Base64URLSafeString
+  base64URLEncode(text: Utf8String): Base64URLSafeString
 
   /**
    * Converts a base64 string into a plain string
