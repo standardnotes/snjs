@@ -7,19 +7,19 @@ export interface CryptoBase64Interface {
    * @param text - A plain string
    * @returns  A base64 encoded string
    */
-   base64Encode(text: Utf8String): Base64String
+  base64Encode(text: Utf8String): Base64String
 
   /**
    * Converts a plain string into url-safe base64
    * @param text - A plain string
    * @returns  A base64 encoded string
    */
-   base64URLEncode(text: Utf8String): Base64String
+  base64URLEncode(text: Utf8String): Base64String
 
-   /**
-    * Converts a base64 string into a plain string
-    * @param base64String - A base64 encoded string
-    * @returns A plain string
-    */
-   base64Decode(base64String: Base64String): Utf8String
+  /**
+   * Converts a base64 string into a plain string
+   * @param base64String - A base64 encoded string
+   * @returns A plain string
+   */
+  base64Decode(base64String: Base64String): Utf8String
 }

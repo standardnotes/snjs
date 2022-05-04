@@ -158,19 +158,19 @@ describe('CryptoNode', function () {
 
   it('should encrypt data with SHA256', () => {
     expect(crypto.sha256('eSyM3G8TkyzaCxDlQwXo0X7nkdrRkjEHN3TREmW7iQc4sKVibWj4pyQYZLacKAee')).toEqual(
-      '97e65d4c20152373cb0f787d73f480c6890076fec1753098768f60c93f8ef63a'
+      '97e65d4c20152373cb0f787d73f480c6890076fec1753098768f60c93f8ef63a',
     )
   })
 
-  it ('should base64 encode a utf8 string', () => {
+  it('should base64 encode a utf8 string', () => {
     expect(crypto.base64Encode('Hello World')).toEqual('SGVsbG8gV29ybGQ=')
   })
 
-  it ('should base64 encode a utf8 string with url safe option', () => {
+  it('should base64 encode a utf8 string with url safe option', () => {
     expect(crypto.base64URLEncode('Hello World')).toEqual('SGVsbG8gV29ybGQ')
   })
 
-  it ('should base64 decode a utf8 string', () => {
+  it('should base64 decode a utf8 string', () => {
     expect(crypto.base64Decode('SGVsbG8gV29ybGQ=')).toEqual('Hello World')
   })
 })

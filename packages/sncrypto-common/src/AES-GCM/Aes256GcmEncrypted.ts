@@ -8,7 +8,7 @@ import { HexString } from '../Types/HexString'
  * @param encoding that will be applied after decrypting
  * @param aad additional authenticated data as a hex string
  */
- export type Aes256GcmEncrypted<EncodingType> = {
+export type Aes256GcmEncrypted<EncodingType> = {
   iv: HexString
   tag: HexString
   ciphertext: Base64String
