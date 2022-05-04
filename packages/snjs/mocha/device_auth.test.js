@@ -156,7 +156,7 @@ describe('device authentication', function () {
     })
     expect(await tmpApplication.protocolService.getRootKey()).to.not.be.ok
     await tmpApplication.launch(true)
-    expect(await tmpapplication.diskStorageService.getValue(sampleStorageKey)).to.equal(sampleStorageValue)
+    expect(await tmpApplication.diskStorageService.getValue(sampleStorageKey)).to.equal(sampleStorageValue)
     expect(await tmpApplication.protocolService.getRootKey()).to.be.ok
     expect(tmpApplication.protocolService.rootKeyEncryption.keyMode).to.equal(KeyMode.RootKeyPlusWrapper)
     await Factory.safeDeinit(tmpApplication)
