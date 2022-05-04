@@ -1220,6 +1220,8 @@ export class SNApplication
       this.httpService,
       this.diskStorageService,
       this.options.defaultHost,
+      this.inMemoryStore,
+      this.options.crypto,
       this.internalEventBus,
     )
     this.services.push(this.apiService)
@@ -1324,13 +1326,11 @@ export class SNApplication
   private createSessionManager() {
     this.sessionManager = new InternalServices.SNSessionManager(
       this.diskStorageService,
-      this.inMemoryStore,
       this.apiService,
       this.alertService,
       this.protocolService,
       this.challengeService,
       this.webSocketsService,
-      this.options.crypto,
       this.internalEventBus,
     )
     this.serviceObservers.push(

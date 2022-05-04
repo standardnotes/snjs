@@ -4,14 +4,8 @@ import {
   InternalEventBusInterface,
   StorageKey,
   DiagnosticInfo,
-  ChallengePrompt,
-  ChallengeValidation,
-  ChallengeKeyboardType,
-  ChallengeReason,
-  ChallengePromptTitle,
-  KeyValueStoreInterface,
 } from '@standardnotes/services'
-import { Base64String, PureCryptoInterface } from '@standardnotes/sncrypto-common'
+import { Base64String } from '@standardnotes/sncrypto-common'
 import { ClientDisplayableError } from '@standardnotes/responses'
 import { CopyPayloadWithContentOverride } from '@standardnotes/models'
 import { isNullOrUndefined } from '@standardnotes/utils'
@@ -70,13 +64,11 @@ export class SNSessionManager extends AbstractService<SessionEvent> implements S
 
   constructor(
     private diskStorageService: DiskStorageService,
-    private inMemoryStore: KeyValueStoreInterface<string>,
     private apiService: SNApiService,
     private alertService: AlertService,
     private protocolService: EncryptionService,
     private challengeService: ChallengeService,
     private webSocketsService: SNWebSocketsService,
-    private crypto: PureCryptoInterface,
     protected override internalEventBus: InternalEventBusInterface,
   ) {
     super(internalEventBus)
@@ -92,12 +84,10 @@ export class SNSessionManager extends AbstractService<SessionEvent> implements S
   override deinit(): void {
     ;(this.protocolService as unknown) = undefined
     ;(this.diskStorageService as unknown) = undefined
-    ;(this.inMemoryStore as unknown) = undefined
     ;(this.apiService as unknown) = undefined
     ;(this.alertService as unknown) = undefined
     ;(this.challengeService as unknown) = undefined
     ;(this.webSocketsService as unknown) = undefined
-    ;(this.crypto as unknown) = undefined
     this.user = undefined
     super.deinit()
   }
@@ -305,18 +295,10 @@ export class SNSessionManager extends AbstractService<SessionEvent> implements S
     mfaKeyPath?: string
     mfaCode?: string
   }> {
-    const codeVerifier = this.crypto.generateRandomKey(256)
-    this.inMemoryStore.setValue(StorageKey.CodeVerifier, codeVerifier)
-
-    const codeChallenge = this.crypto.base64URLEncode(
-      await this.crypto.sha256(codeVerifier)
-    )
-
     const response = await this.apiService.getAccountKeyParams({
       email,
       mfaKeyPath,
       mfaCode,
-      codeChallenge,
     })
 
     if (response.error || isNullOrUndefined(response.data)) {
@@ -474,10 +456,7 @@ export class SNSessionManager extends AbstractService<SessionEvent> implements S
       email,
       serverPassword: rootKey.serverPassword!,
       ephemeral,
-      codeVerifier: this.inMemoryStore.getValue(StorageKey.CodeVerifier) as string,
     })
-
-    await this.inMemoryStore.removeValue(StorageKey.CodeVerifier)
 
     if (signInResponse.error || !signInResponse.data) {
       return signInResponse

@@ -13,6 +13,7 @@ import {
   MetaReceivedData,
   DiagnosticInfo,
   FilesApiInterface,
+  KeyValueStoreInterface,
 } from '@standardnotes/services'
 import { ServerSyncPushContextualPayload, SNFeatureRepo, FileContent } from '@standardnotes/models'
 import * as Responses from '@standardnotes/responses'
@@ -31,6 +32,7 @@ import { SettingsServerInterface } from '../Settings/SettingsServerInterface'
 import { Strings } from '@Lib/Strings'
 import { SNRootKeyParams } from '@standardnotes/encryption'
 import { ApiEndpointParam, ClientDisplayableError, CreateValetTokenPayload } from '@standardnotes/responses'
+import { PureCryptoInterface } from '@standardnotes/sncrypto-common'
 
 /** Legacy api version field to be specified in params when calling v0 APIs. */
 const V0_API_VERSION = '20200115'
@@ -60,6 +62,8 @@ export class SNApiService
     private httpService: SNHttpService,
     private storageService: DiskStorageService,
     private host: string,
+    private inMemoryStore: KeyValueStoreInterface<string>,
+    private crypto: PureCryptoInterface,
     protected override internalEventBus: InternalEventBusInterface,
   ) {
     super(internalEventBus)
@@ -204,26 +208,29 @@ export class SNApiService
    *                    would receive parameters as params['foo'] with value equal to mfaCode.
    * @param mfaCode     The mfa challenge response value.
    */
-  getAccountKeyParams(dto: {
+  async getAccountKeyParams(dto: {
     email: string,
-    codeChallenge?: string,
     mfaKeyPath?: string,
     mfaCode?: string,
   }): Promise<Responses.KeyParamsResponse | Responses.HttpResponse> {
+    const codeVerifier = this.crypto.generateRandomKey(256)
+    this.inMemoryStore.setValue(StorageKey.CodeVerifier, codeVerifier)
+
+    const codeChallenge = this.crypto.base64URLEncode(
+      await this.crypto.sha256(codeVerifier)
+    )
+
     const params = this.params({
       email: dto.email,
+      code_challenge: codeChallenge,
     })
-
-    if (dto.codeChallenge !== undefined) {
-      params['code_challenge'] = dto.codeChallenge
-    }
 
     if (dto.mfaKeyPath !== undefined && dto.mfaCode !== undefined) {
       params[dto.mfaKeyPath] = dto.mfaCode
     }
 
     return this.request({
-      verb: HttpVerb.Get,
+      verb: HttpVerb.Post,
       url: joinPaths(this.host, Paths.v2.keyParams),
       fallbackErrorMessage: messages.API_MESSAGE_GENERIC_INVALID_LOGIN,
       params,
@@ -262,7 +269,6 @@ export class SNApiService
   async signIn(dto: {
     email: string,
     serverPassword: string,
-    codeVerifier: string,
     ephemeral: boolean,
   }): Promise<Responses.SignInResponse | Responses.HttpResponse> {
     if (this.authenticating) {
@@ -274,8 +280,9 @@ export class SNApiService
       email: dto.email,
       password: dto.serverPassword,
       ephemeral: dto.ephemeral,
-      code_verifier: dto.codeVerifier,
+      code_verifier: this.inMemoryStore.getValue(StorageKey.CodeVerifier) as string,
     })
+
     const response = await this.request({
       verb: HttpVerb.Post,
       url,
@@ -284,6 +291,8 @@ export class SNApiService
     })
 
     this.authenticating = false
+
+    this.inMemoryStore.removeValue(StorageKey.CodeVerifier)
 
     return response
   }
