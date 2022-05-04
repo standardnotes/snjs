@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.106.1](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.106.0...@standardnotes/snjs@2.106.1) (2022-05-04)
+
+
+### Bug Fixes
+
+* config package missing dependencies ([3dec12f](https://github.com/standardnotes/snjs/commit/3dec12fa4a83a8aed8419819eafb7c34795cb09f))
+
+
+
+
+
 # [2.106.0](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.105.3...@standardnotes/snjs@2.106.0) (2022-05-03)
 
 

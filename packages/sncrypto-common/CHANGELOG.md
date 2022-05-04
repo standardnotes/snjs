@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.8.1](https://github.com/standardnotes/snjs/compare/@standardnotes/sncrypto-common@1.8.0...@standardnotes/sncrypto-common@1.8.1) (2022-05-04)
+
+
+### Bug Fixes
+
+* config package missing dependencies ([3dec12f](https://github.com/standardnotes/snjs/commit/3dec12fa4a83a8aed8419819eafb7c34795cb09f))
+
+
+
+
+
 # [1.8.0](https://github.com/standardnotes/snjs/compare/@standardnotes/sncrypto-common@1.7.7...@standardnotes/sncrypto-common@1.8.0) (2022-04-28)
 
 

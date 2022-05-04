@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.4.2](https://github.com/standardnotes/snjs/compare/@standardnotes/config@2.4.1...@standardnotes/config@2.4.2) (2022-05-04)
+
+
+### Bug Fixes
+
+* config package missing dependencies ([3dec12f](https://github.com/standardnotes/snjs/commit/3dec12fa4a83a8aed8419819eafb7c34795cb09f))
+* prettier dependency on config ([be70531](https://github.com/standardnotes/snjs/commit/be70531ee07c8a0a363cfcb22930b540f97f5f2d))
+
+
+
+
+
 ## [2.4.1](https://github.com/standardnotes/snjs/compare/@standardnotes/config@2.4.0...@standardnotes/config@2.4.1) (2022-04-22)
 
 **Note:** Version bump only for package @standardnotes/config
