@@ -43,6 +43,17 @@
     "object-curly-spacing": ["error", "always"],
     "quotes": ["error", "single", { "avoidEscape": true }],
     "semi": ["error", "never"],
-    "prettier/prettier": ["error"]
+    "prettier/prettier": [
+      "error",
+      {
+        "singleQuote": true,
+        "trailingComma": "all",
+        "printWidth": 120,
+        "semi": false
+      },
+      {
+        "usePrettierrc": false
+      }
+    ]
   }
 }
