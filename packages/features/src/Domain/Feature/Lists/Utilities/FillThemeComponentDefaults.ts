@@ -4,7 +4,11 @@ import { ComponentArea } from '../../../Component/ComponentArea'
 import { FeatureIdentifier } from '../../FeatureIdentifier'
 import { getGithubDownloadUrl } from './GithubDownloadUrl'
 
-export function FillThemeComponentDefaults(theme: Partial<ThemeFeatureDescription>): ThemeFeatureDescription {
+type RequiredThemeFields = Pick<ThemeFeatureDescription, 'availableInSubscriptions'>
+
+export function FillThemeComponentDefaults(
+  theme: Partial<ThemeFeatureDescription> & RequiredThemeFields,
+): ThemeFeatureDescription {
   if (!theme.static_files) {
     theme.static_files = ['dist', 'package.json']
   }

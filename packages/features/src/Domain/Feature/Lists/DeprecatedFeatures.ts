@@ -1,5 +1,5 @@
 import { ComponentAction } from '../../Component/ComponentAction'
-import { ContentType } from '@standardnotes/common'
+import { ContentType, SubscriptionName } from '@standardnotes/common'
 import { FeatureDescription, IframeComponentFeatureDescription } from '../FeatureDescription'
 import { ComponentArea } from '../../Component/ComponentArea'
 import { PermissionName } from '../../Permission/PermissionName'
@@ -8,6 +8,7 @@ import { FillEditorComponentDefaults } from './Utilities/FillEditorComponentDefa
 
 export function GetDeprecatedFeatures(): FeatureDescription[] {
   const filesafe: IframeComponentFeatureDescription = FillEditorComponentDefaults({
+    availableInSubscriptions: [SubscriptionName.PlusPlan, SubscriptionName.ProPlan],
     name: 'FileSafe',
     identifier: FeatureIdentifier.DeprecatedFileSafe,
     version: '2.0.10',

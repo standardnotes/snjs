@@ -2,9 +2,11 @@ import { ThemeFeatureDescription } from '../FeatureDescription'
 import { PermissionName } from '../../Permission/PermissionName'
 import { FeatureIdentifier } from '../FeatureIdentifier'
 import { FillThemeComponentDefaults } from './Utilities/FillThemeComponentDefaults'
+import { SubscriptionName } from '@standardnotes/common'
 
 export function themes(): ThemeFeatureDescription[] {
   const midnight: ThemeFeatureDescription = FillThemeComponentDefaults({
+    availableInSubscriptions: [SubscriptionName.PlusPlan, SubscriptionName.ProPlan],
     name: 'Midnight',
     identifier: FeatureIdentifier.MidnightTheme,
     permission_name: PermissionName.MidnightTheme,
@@ -22,6 +24,7 @@ export function themes(): ThemeFeatureDescription[] {
   })
 
   const futura: ThemeFeatureDescription = FillThemeComponentDefaults({
+    availableInSubscriptions: [SubscriptionName.PlusPlan, SubscriptionName.ProPlan],
     name: 'Futura',
     identifier: FeatureIdentifier.FuturaTheme,
     permission_name: PermissionName.FuturaTheme,
@@ -39,6 +42,7 @@ export function themes(): ThemeFeatureDescription[] {
   })
 
   const solarizedDark: ThemeFeatureDescription = FillThemeComponentDefaults({
+    availableInSubscriptions: [SubscriptionName.PlusPlan, SubscriptionName.ProPlan],
     name: 'Solarized Dark',
     identifier: FeatureIdentifier.SolarizedDarkTheme,
     permission_name: PermissionName.SolarizedDarkTheme,
@@ -56,6 +60,7 @@ export function themes(): ThemeFeatureDescription[] {
   })
 
   const autobiography: ThemeFeatureDescription = FillThemeComponentDefaults({
+    availableInSubscriptions: [SubscriptionName.PlusPlan, SubscriptionName.ProPlan],
     name: 'Autobiography',
     identifier: FeatureIdentifier.AutobiographyTheme,
     permission_name: PermissionName.AutobiographyTheme,
@@ -73,6 +78,7 @@ export function themes(): ThemeFeatureDescription[] {
   })
 
   const focus: ThemeFeatureDescription = FillThemeComponentDefaults({
+    availableInSubscriptions: [SubscriptionName.PlusPlan, SubscriptionName.ProPlan],
     name: 'Focus',
     identifier: FeatureIdentifier.FocusedTheme,
     permission_name: PermissionName.FocusedTheme,
@@ -90,6 +96,7 @@ export function themes(): ThemeFeatureDescription[] {
   })
 
   const titanium: ThemeFeatureDescription = FillThemeComponentDefaults({
+    availableInSubscriptions: [SubscriptionName.PlusPlan, SubscriptionName.ProPlan],
     name: 'Titanium',
     version: '1.2.6',
     identifier: FeatureIdentifier.TitaniumTheme,
@@ -107,6 +114,7 @@ export function themes(): ThemeFeatureDescription[] {
   })
 
   const dynamic: ThemeFeatureDescription = FillThemeComponentDefaults({
+    availableInSubscriptions: [SubscriptionName.PlusPlan, SubscriptionName.ProPlan],
     name: 'Dynamic',
     identifier: FeatureIdentifier.DynamicTheme,
     permission_name: PermissionName.ThemeDynamic,

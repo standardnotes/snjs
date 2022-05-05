@@ -1,5 +1,5 @@
 import { ComponentPermission } from '../Component/ComponentPermission'
-import { ContentType, RoleName } from '@standardnotes/common'
+import { ContentType, RoleName, SubscriptionName } from '@standardnotes/common'
 import { ComponentArea } from '../Component/ComponentArea'
 import { PermissionName } from '../Permission/PermissionName'
 import { FeatureIdentifier } from './FeatureIdentifier'
@@ -7,13 +7,21 @@ import { ComponentFlag } from '../Component/ComponentFlag'
 import { NoteType } from '../Component/NoteType'
 import { ThemeDockIcon } from '../Component/ThemeDockIcon'
 
-export type BaseFeatureDescription = {
+type RoleFields = {
+  /** Server populated */
+  role_name?: RoleName
+
+  /** Statically populated. Non-influencing; used as a reference by other static consumers (such as email service) */
+  availableInSubscriptions: SubscriptionName[]
+}
+
+export type BaseFeatureDescription = RoleFields & {
   deletion_warning?: string
   deprecated?: boolean
   deprecation_message?: string
   description?: string
   expires_at?: number
-  role_name?: RoleName
+
   flags?: ComponentFlag[]
   identifier: FeatureIdentifier
   marketing_url?: string
@@ -24,13 +32,13 @@ export type BaseFeatureDescription = {
   permission_name: PermissionName
 }
 
-export type ServerFeatureDescription = {
+export type ServerFeatureDescription = RoleFields & {
   name?: string
   identifier: FeatureIdentifier
   permission_name: PermissionName
 }
 
-export type ClientFeatureDescription = {
+export type ClientFeatureDescription = RoleFields & {
   identifier: FeatureIdentifier
   permission_name: PermissionName
   description: string
