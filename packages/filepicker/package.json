@@ -1,6 +1,6 @@
 {
   "name": "@standardnotes/filepicker",
-  "version": "1.13.4",
+  "version": "1.13.6",
   "engines": {
     "node": ">=14.0.0 <17.0.0"
   },
@@ -24,7 +24,7 @@
     "test:unit": "jest"
   },
   "devDependencies": {
-    "@standardnotes/config": "^2.4.1",
+    "@standardnotes/config": "^2.4.3",
     "@types/jest": "^27.4.1",
     "@types/wicg-file-system-access": "^2020.9.5",
     "jest": "^27.5.1",
@@ -40,7 +40,7 @@
     ]
   },
   "dependencies": {
-    "@standardnotes/common": "^1.19.6",
-    "@standardnotes/utils": "^1.6.3"
+    "@standardnotes/common": "^1.19.8",
+    "@standardnotes/utils": "^1.6.5"
   }
 }

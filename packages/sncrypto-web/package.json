@@ -1,6 +1,6 @@
 {
   "name": "@standardnotes/sncrypto-web",
-  "version": "1.9.0",
+  "version": "1.9.2",
   "description": "SNCrypto Web",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -18,13 +18,13 @@
     "test:e2e": "node test-server.js"
   },
   "dependencies": {
-    "@standardnotes/sncrypto-common": "^1.8.0",
+    "@standardnotes/sncrypto-common": "^1.8.2",
     "buffer": "^6.0.3",
     "libsodium-wrappers": "^0.7.9"
   },
   "devDependencies": {
     "@babel/plugin-syntax-dynamic-import": "^7.8.3",
-    "@standardnotes/config": "^2.4.1",
+    "@standardnotes/config": "^2.4.3",
     "@types/uuid": "^8.3.4",
     "babel-loader": "^8.2.3",
     "chai": "^4.3.6",

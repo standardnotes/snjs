@@ -1,6 +1,6 @@
 {
   "name": "@standardnotes/config",
-  "version": "2.4.1",
+  "version": "2.4.3",
   "engines": {
     "node": ">=14.0.0 <17.0.0"
   },
@@ -17,9 +17,9 @@
   },
   "dependencies": {
     "@typescript-eslint/eslint-plugin": "^5.12.1",
-    "@typescript-eslint/parser": "^5.12.1"
-  },
-  "devDependencies": {
-    "prettier": "^2.5.1"
+    "@typescript-eslint/parser": "^5.12.1",
+    "eslint-config-prettier": "^8.5.0",
+    "eslint-plugin-prettier": "^4.0.0",
+    "prettier": "^2.6.2"
   }
 }

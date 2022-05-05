@@ -7,7 +7,7 @@ import { Unencrypted } from '../Types/Unencrypted'
  * @param key encryption key as a hex string
  * @param aad additional authenticated data as a hex string
  */
- export type Aes256GcmInput<EncodingType> = {
+export type Aes256GcmInput<EncodingType> = {
   unencrypted: Unencrypted<EncodingType>
   iv: HexString
   key: HexString

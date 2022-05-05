@@ -12,10 +12,9 @@ import { createCipheriv, createDecipheriv, randomBytes, createHash } from 'crypt
 
 import { getBufferWithEncoding } from './Utils'
 
-export class CryptoNode implements
-  CryptoAes256GcmInterface<BufferEncoding>,
-  CryptoSha256Interface,
-  CryptoBase64Interface {
+export class CryptoNode
+  implements CryptoAes256GcmInterface<BufferEncoding>, CryptoSha256Interface, CryptoBase64Interface
+{
   async aes256GcmEncrypt({
     unencrypted,
     iv,

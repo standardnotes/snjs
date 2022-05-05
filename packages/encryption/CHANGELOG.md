@@ -3,6 +3,28 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.6.4](https://github.com/standardnotes/snjs/compare/@standardnotes/encryption@1.6.2...@standardnotes/encryption@1.6.4) (2022-05-04)
+
+
+### Bug Fixes
+
+* config package missing dependencies ([3dec12f](https://github.com/standardnotes/snjs/commit/3dec12fa4a83a8aed8419819eafb7c34795cb09f))
+
+
+
+
+
+## [1.6.3](https://github.com/standardnotes/snjs/compare/@standardnotes/encryption@1.6.2...@standardnotes/encryption@1.6.3) (2022-05-04)
+
+
+### Bug Fixes
+
+* config package missing dependencies ([3dec12f](https://github.com/standardnotes/snjs/commit/3dec12fa4a83a8aed8419819eafb7c34795cb09f))
+
+
+
+
+
 ## [1.6.2](https://github.com/standardnotes/snjs/compare/@standardnotes/encryption@1.6.1...@standardnotes/encryption@1.6.2) (2022-05-03)
 
 **Note:** Version bump only for package @standardnotes/encryption

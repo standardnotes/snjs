@@ -3,6 +3,22 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.0.7](https://github.com/standardnotes/snjs/compare/@standardnotes/analytics@1.0.5...@standardnotes/analytics@1.0.7) (2022-05-04)
+
+**Note:** Version bump only for package @standardnotes/analytics
+
+
+
+
+
+## [1.0.6](https://github.com/standardnotes/snjs/compare/@standardnotes/analytics@1.0.5...@standardnotes/analytics@1.0.6) (2022-05-04)
+
+**Note:** Version bump only for package @standardnotes/analytics
+
+
+
+
+
 ## [1.0.5](https://github.com/standardnotes/snjs/compare/@standardnotes/analytics@1.0.4...@standardnotes/analytics@1.0.5) (2022-04-22)
 
 **Note:** Version bump only for package @standardnotes/analytics

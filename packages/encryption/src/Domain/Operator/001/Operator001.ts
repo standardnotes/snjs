@@ -16,11 +16,7 @@ import { PureCryptoInterface } from '@standardnotes/sncrypto-common'
 import { SNRootKey } from '../../Keys/RootKey/RootKey'
 import { SNRootKeyParams } from '../../Keys/RootKey/RootKeyParams'
 import { V001Algorithm } from '../../Algorithm'
-import {
-  DecryptedParameters,
-  EncryptedParameters,
-  ErrorDecryptingParameters,
-} from '../../Types/EncryptedParameters'
+import { DecryptedParameters, EncryptedParameters, ErrorDecryptingParameters } from '../../Types/EncryptedParameters'
 import { RootKeyEncryptedAuthenticatedData } from '../../Types/RootKeyEncryptedAuthenticatedData'
 import { ItemAuthenticatedData } from '../../Types/ItemAuthenticatedData'
 import { LegacyAttachedData } from '../../Types/LegacyAttachedData'

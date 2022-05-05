@@ -1,6 +1,6 @@
 {
   "name": "@standardnotes/snjs",
-  "version": "2.106.0",
+  "version": "2.106.3",
   "engines": {
     "node": ">=14.0.0 <17.0.0"
   },
@@ -28,7 +28,8 @@
   "devDependencies": {
     "@babel/core": "^7.17.5",
     "@babel/preset-env": "^7.16.11",
-    "@standardnotes/sncrypto-web": "^1.9.0",
+    "@standardnotes/config": "^2.4.3",
+    "@standardnotes/sncrypto-web": "^1.9.2",
     "@types/crypto-js": "^4.1.1",
     "@types/jest": "^27.4.1",
     "@types/jsdom": "^16.2.14",
@@ -47,12 +48,10 @@
     "docdash": "^1.2.0",
     "dom-storage": "^2.1.0",
     "eslint": "^8.10.0",
-    "eslint-config-prettier": "^8.4.0",
     "eslint-config-semistandard": "^16.0.0",
     "eslint-config-standard": "^16.0.3",
     "eslint-plugin-import": "^2.25.4",
     "eslint-plugin-node": "^11.1.0",
-    "eslint-plugin-prettier": "^4.0.0",
     "eslint-plugin-promise": "^6.0.0",
     "eslint-plugin-standard": "^4.1.0",
     "exports-loader": "^3.1.0",
@@ -79,18 +78,18 @@
     "webpack-merge": "^5.8.0"
   },
   "dependencies": {
-    "@standardnotes/auth": "^3.18.11",
-    "@standardnotes/common": "^1.19.6",
-    "@standardnotes/domain-events": "^2.27.14",
-    "@standardnotes/encryption": "^1.6.2",
-    "@standardnotes/features": "^1.40.0",
-    "@standardnotes/filepicker": "^1.13.4",
-    "@standardnotes/files": "^1.0.6",
-    "@standardnotes/models": "^1.6.3",
-    "@standardnotes/responses": "^1.6.14",
-    "@standardnotes/services": "^1.10.2",
-    "@standardnotes/settings": "^1.14.1",
-    "@standardnotes/sncrypto-common": "^1.8.0",
-    "@standardnotes/utils": "^1.6.3"
+    "@standardnotes/auth": "^3.18.13",
+    "@standardnotes/common": "^1.19.8",
+    "@standardnotes/domain-events": "^2.27.16",
+    "@standardnotes/encryption": "^1.6.4",
+    "@standardnotes/features": "^1.40.2",
+    "@standardnotes/filepicker": "^1.13.6",
+    "@standardnotes/files": "^1.0.8",
+    "@standardnotes/models": "^1.6.5",
+    "@standardnotes/responses": "^1.6.16",
+    "@standardnotes/services": "^1.10.4",
+    "@standardnotes/settings": "^1.14.3",
+    "@standardnotes/sncrypto-common": "^1.8.2",
+    "@standardnotes/utils": "^1.6.5"
   }
 }
