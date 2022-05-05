@@ -4,8 +4,7 @@ import { StorageKey } from './StorageKeys'
 export class InMemoryStore implements KeyValueStoreInterface<string> {
   private values: Map<StorageKey, string>
 
-  constructor(
-  ) {
+  constructor() {
     this.values = new Map<StorageKey, string>()
   }
 

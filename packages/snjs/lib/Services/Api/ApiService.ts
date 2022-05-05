@@ -209,16 +209,14 @@ export class SNApiService
    * @param mfaCode     The mfa challenge response value.
    */
   async getAccountKeyParams(dto: {
-    email: string,
-    mfaKeyPath?: string,
-    mfaCode?: string,
+    email: string
+    mfaKeyPath?: string
+    mfaCode?: string
   }): Promise<Responses.KeyParamsResponse | Responses.HttpResponse> {
     const codeVerifier = this.crypto.generateRandomKey(256)
     this.inMemoryStore.setValue(StorageKey.CodeVerifier, codeVerifier)
 
-    const codeChallenge = this.crypto.base64URLEncode(
-      await this.crypto.sha256(codeVerifier)
-    )
+    const codeChallenge = this.crypto.base64URLEncode(await this.crypto.sha256(codeVerifier))
 
     const params = this.params({
       email: dto.email,
@@ -267,9 +265,9 @@ export class SNApiService
   }
 
   async signIn(dto: {
-    email: string,
-    serverPassword: string,
-    ephemeral: boolean,
+    email: string
+    serverPassword: string
+    ephemeral: boolean
   }): Promise<Responses.SignInResponse | Responses.HttpResponse> {
     if (this.authenticating) {
       return this.createErrorResponse(messages.API_MESSAGE_LOGIN_IN_PROGRESS) as Responses.SignInResponse

@@ -428,11 +428,7 @@ export class SNSessionManager extends AbstractService<SessionEvent> implements S
       }
     }
     const rootKey = await this.protocolService.computeRootKey(password, keyParams)
-    const signInResponse = await this.bypassChecksAndSignInWithRootKey(
-      email,
-      rootKey,
-      ephemeral,
-    )
+    const signInResponse = await this.bypassChecksAndSignInWithRootKey(email, rootKey, ephemeral)
     return {
       response: signInResponse,
     }
