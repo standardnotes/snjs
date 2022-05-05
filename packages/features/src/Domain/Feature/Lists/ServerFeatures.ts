@@ -57,7 +57,7 @@ export function serverFeatures(): ServerFeatureDescription[] {
       permission_name: PermissionName.DailyOneDriveBackup,
     },
     {
-      availableInSubscriptions: [SubscriptionName.PlusPlan, SubscriptionName.ProPlan],
+      availableInSubscriptions: [SubscriptionName.ProPlan],
       identifier: FeatureIdentifier.FilesMaximumStorageTier,
       permission_name: PermissionName.FilesMaximumStorageTier,
     },
