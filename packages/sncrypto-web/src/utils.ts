@@ -141,7 +141,7 @@ export function base64Encode(text: string): string {
  * @param text - A plain string
  * @returns  A base64 url safe encoded string
  */
- export function base64URLEncode(text: string): string {
+export function base64URLEncode(text: string): string {
   return to_base64(text, base64_variants.URLSAFE)
 }
 
