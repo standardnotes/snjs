@@ -1,5 +1,5 @@
 import { ComponentAction } from '../../Component/ComponentAction'
-import { ContentType } from '@standardnotes/common'
+import { ContentType, SubscriptionName } from '@standardnotes/common'
 import { EditorFeatureDescription } from '../FeatureDescription'
 import { PermissionName } from '../../Permission/PermissionName'
 import { FeatureIdentifier } from '../FeatureIdentifier'
@@ -8,6 +8,7 @@ import { FillEditorComponentDefaults } from './Utilities/FillEditorComponentDefa
 
 export function editors(): EditorFeatureDescription[] {
   const code: EditorFeatureDescription = FillEditorComponentDefaults({
+    availableInSubscriptions: [SubscriptionName.PlusPlan, SubscriptionName.ProPlan],
     name: 'Code',
     version: '1.3.12',
     spellcheckControl: true,
@@ -27,6 +28,7 @@ export function editors(): EditorFeatureDescription[] {
   })
 
   const bold: EditorFeatureDescription = FillEditorComponentDefaults({
+    availableInSubscriptions: [SubscriptionName.PlusPlan, SubscriptionName.ProPlan],
     name: 'Alternative Rich Text',
     identifier: FeatureIdentifier.BoldEditor,
     version: '1.3.5',
@@ -56,6 +58,7 @@ export function editors(): EditorFeatureDescription[] {
   })
 
   const plus: EditorFeatureDescription = FillEditorComponentDefaults({
+    availableInSubscriptions: [SubscriptionName.PlusPlan, SubscriptionName.ProPlan],
     name: 'Classic Rich Text',
     note_type: NoteType.RichText,
     file_type: 'html',
@@ -71,6 +74,7 @@ export function editors(): EditorFeatureDescription[] {
   })
 
   const markdownBasic: EditorFeatureDescription = FillEditorComponentDefaults({
+    availableInSubscriptions: [SubscriptionName.PlusPlan, SubscriptionName.ProPlan],
     name: 'Basic Markdown',
     identifier: FeatureIdentifier.MarkdownBasicEditor,
     note_type: NoteType.Markdown,
@@ -85,6 +89,7 @@ export function editors(): EditorFeatureDescription[] {
   })
 
   const markdownPro: EditorFeatureDescription = FillEditorComponentDefaults({
+    availableInSubscriptions: [SubscriptionName.PlusPlan, SubscriptionName.ProPlan],
     name: 'Hybrid Markdown',
     identifier: FeatureIdentifier.MarkdownProEditor,
     version: '1.5.0',
@@ -100,6 +105,7 @@ export function editors(): EditorFeatureDescription[] {
   })
 
   const markdownMinimist: EditorFeatureDescription = FillEditorComponentDefaults({
+    availableInSubscriptions: [SubscriptionName.PlusPlan, SubscriptionName.ProPlan],
     name: 'Minimal Markdown',
     identifier: FeatureIdentifier.MarkdownMinimistEditor,
     note_type: NoteType.Markdown,
@@ -112,9 +118,10 @@ export function editors(): EditorFeatureDescription[] {
     git_repo_url: 'https://github.com/standardnotes/minimal-markdown-editor',
     marketing_url: 'https://standardnotes.com/extensions/minimal-markdown-editor',
     thumbnail_url: 'https://s3.amazonaws.com/standard-notes/screenshots/models/editors/min-markdown.jpg',
-  } as EditorFeatureDescription)
+  })
 
   const markdownMath: EditorFeatureDescription = FillEditorComponentDefaults({
+    availableInSubscriptions: [SubscriptionName.PlusPlan, SubscriptionName.ProPlan],
     name: 'Markdown with Math',
     identifier: FeatureIdentifier.MarkdownMathEditor,
     version: '1.3.6',
@@ -130,6 +137,7 @@ export function editors(): EditorFeatureDescription[] {
   })
 
   const markdownVisual: EditorFeatureDescription = FillEditorComponentDefaults({
+    availableInSubscriptions: [SubscriptionName.PlusPlan, SubscriptionName.ProPlan],
     name: 'Dynamic Markdown',
     identifier: FeatureIdentifier.MarkdownVisualEditor,
     version: '1.0.6',
@@ -146,6 +154,7 @@ export function editors(): EditorFeatureDescription[] {
   })
 
   const task: EditorFeatureDescription = FillEditorComponentDefaults({
+    availableInSubscriptions: [SubscriptionName.PlusPlan, SubscriptionName.ProPlan],
     name: 'Basic Checklist',
     identifier: FeatureIdentifier.TaskEditor,
     note_type: NoteType.Task,
@@ -162,6 +171,7 @@ export function editors(): EditorFeatureDescription[] {
   })
 
   const tokenvault: EditorFeatureDescription = FillEditorComponentDefaults({
+    availableInSubscriptions: [SubscriptionName.PlusPlan, SubscriptionName.ProPlan],
     name: 'Passwords and Tokens',
     note_type: NoteType.Authentication,
     file_type: 'json',
@@ -177,6 +187,7 @@ export function editors(): EditorFeatureDescription[] {
   })
 
   const spreadsheets: EditorFeatureDescription = FillEditorComponentDefaults({
+    availableInSubscriptions: [SubscriptionName.PlusPlan, SubscriptionName.ProPlan],
     name: 'Spreadsheet',
     identifier: FeatureIdentifier.SheetsEditor,
     version: '1.4.4',

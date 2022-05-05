@@ -1,5 +1,4 @@
 import { SubscriptionName } from '@standardnotes/common'
-import { FeatureDescription } from '@standardnotes/features'
 
 export interface ExtensionKeyGrantedEventPayload {
   userEmail: string
@@ -8,7 +7,6 @@ export interface ExtensionKeyGrantedEventPayload {
   offline: boolean
   origin: 'create-user' | 'update-subscription'
   subscriptionName: SubscriptionName | null
-  subscriptionFeatures: FeatureDescription[] | null
   offlineFeaturesToken: string | null
   payAmount: number | null
   billingEveryNMonths: number | null

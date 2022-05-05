@@ -5,7 +5,11 @@ import { ComponentArea } from '../../../Component/ComponentArea'
 import { FeatureIdentifier } from '../../FeatureIdentifier'
 import { getGithubDownloadUrl } from './GithubDownloadUrl'
 
-export function FillEditorComponentDefaults(component: Partial<EditorFeatureDescription>): EditorFeatureDescription {
+export type RequiredEditorFields = Pick<EditorFeatureDescription, 'availableInSubscriptions'>
+
+export function FillEditorComponentDefaults(
+  component: Partial<EditorFeatureDescription> & RequiredEditorFields,
+): EditorFeatureDescription {
   component.static_files = ['index.html', 'dist', 'package.json'].concat(component.static_files || [])
 
   if (component.git_repo_url && !component.download_url) {

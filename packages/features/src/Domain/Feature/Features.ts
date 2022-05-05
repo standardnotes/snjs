@@ -6,9 +6,14 @@ import { serverFeatures } from './Lists/ServerFeatures'
 import { clientFeatures } from './Lists/ClientFeatures'
 import { GetDeprecatedFeatures } from './Lists/DeprecatedFeatures'
 import { experimentalFeatures } from './Lists/ExperimentalFeatures'
+import { SubscriptionName } from '@standardnotes/common'
 
 export function GetFeatures(): FeatureDescription[] {
   return [...themes(), ...editors(), ...serverFeatures(), ...clientFeatures(), ...experimentalFeatures()]
+}
+
+export function GetFeaturesForSubscription(subscription: SubscriptionName): FeatureDescription[] {
+  return GetFeatures().filter((feature) => feature.availableInSubscriptions.includes(subscription))
 }
 
 export function FindNativeFeature(identifier: FeatureIdentifier): FeatureDescription | undefined {
