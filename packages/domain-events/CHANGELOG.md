@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.28.0](https://github.com/standardnotes/snjs/compare/@standardnotes/domain-events@2.27.16...@standardnotes/domain-events@2.28.0) (2022-05-05)
+
+
+### Features
+
+* availableInSubscriptions in each feature description ([#723](https://github.com/standardnotes/snjs/issues/723)) ([2f0527c](https://github.com/standardnotes/snjs/commit/2f0527c6ff5e9dc70a61fa6d189aad9e60d09ab0))
+
+
+
+
+
 ## [2.27.16](https://github.com/standardnotes/snjs/compare/@standardnotes/domain-events@2.27.14...@standardnotes/domain-events@2.27.16) (2022-05-04)
 
 **Note:** Version bump only for package @standardnotes/domain-events
