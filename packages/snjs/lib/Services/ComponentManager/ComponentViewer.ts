@@ -311,7 +311,7 @@ export class ComponentViewer {
 
   private log(message: string, ...args: unknown[]): void {
     if (this.loggingEnabled) {
-      log(this, message, args)
+      log('ComponentViewer', message, args)
     }
   }
 
