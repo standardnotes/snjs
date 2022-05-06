@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.106.6](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.106.5...@standardnotes/snjs@2.106.6) (2022-05-06)
+
+
+### Bug Fixes
+
+* update note count after remote delete ([#725](https://github.com/standardnotes/snjs/issues/725)) ([043edce](https://github.com/standardnotes/snjs/commit/043edcea9dfc7a8b234363910791f173880efdb9))
+
+
+
+
+
 ## [2.106.5](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.106.4...@standardnotes/snjs@2.106.5) (2022-05-06)
 
 **Note:** Version bump only for package @standardnotes/snjs
