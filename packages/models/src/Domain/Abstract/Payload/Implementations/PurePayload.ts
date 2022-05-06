@@ -26,7 +26,7 @@ export abstract class PurePayload<T extends TransferPayload<C>, C extends ItemCo
   readonly created_at_timestamp: number
   readonly updated_at_timestamp: number
   readonly dirtyIndex?: number
-  readonly dirtyIndexAtLastSync?: number
+  readonly globalDirtyIndexAtLastSync?: number
   readonly dirty?: boolean
 
   readonly lastSyncBegan?: Date
@@ -61,7 +61,7 @@ export abstract class PurePayload<T extends TransferPayload<C>, C extends ItemCo
     this.lastSyncEnd = rawPayload.lastSyncEnd ? new Date(rawPayload.lastSyncEnd) : undefined
 
     this.dirtyIndex = rawPayload.dirtyIndex
-    this.dirtyIndexAtLastSync = rawPayload.dirtyIndexAtLastSync
+    this.globalDirtyIndexAtLastSync = rawPayload.globalDirtyIndexAtLastSync
 
     const timeToAllowSubclassesToFinishConstruction = 0
     setTimeout(() => {
@@ -82,7 +82,7 @@ export abstract class PurePayload<T extends TransferPayload<C>, C extends ItemCo
       dirty: this.dirty,
       duplicate_of: this.duplicate_of,
       dirtyIndex: this.dirtyIndex,
-      dirtyIndexAtLastSync: this.dirtyIndexAtLastSync,
+      globalDirtyIndexAtLastSync: this.globalDirtyIndexAtLastSync,
       lastSyncBegan: this.lastSyncBegan,
       lastSyncEnd: this.lastSyncEnd,
     }

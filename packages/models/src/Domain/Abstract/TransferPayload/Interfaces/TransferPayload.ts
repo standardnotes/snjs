@@ -13,7 +13,7 @@ export interface TransferPayload<C extends ItemContent = ItemContent> {
   updated_at_timestamp: number
 
   dirtyIndex?: number
-  dirtyIndexAtLastSync?: number
+  globalDirtyIndexAtLastSync?: number
   dirty?: boolean
 
   lastSyncBegan?: Date

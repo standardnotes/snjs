@@ -739,7 +739,7 @@ describe('online syncing', function () {
      * If you begin a sync request that takes 20s to complete, then begin modifying an item
      * many times and attempt to sync, it will await the initial sync to complete.
      * When that completes, it will decide whether an item is still dirty or not.
-     * It will do based on comparing whether item.dirtyIndex > item.dirtyIndexAtLastSync
+     * It will do based on comparing whether item.dirtyIndex > item.globalDirtyIndexAtLastSync
      */
     let note = await Factory.createMappedNote(this.application)
     await this.application.itemManager.setItemDirty(note)
@@ -759,7 +759,7 @@ describe('online syncing', function () {
     await this.application.itemManager.setItemDirty(note)
     await this.application.itemManager.setItemDirty(note)
     await this.application.itemManager.setItemDirty(note)
-    expect(note.payload.dirtyIndex).to.be.above(note.payload.dirtyIndexAtLastSync)
+    expect(note.payload.dirtyIndex).to.be.above(note.payload.globalDirtyIndexAtLastSync)
 
     // Now do a regular sync with no latency.
     this.application.syncService.ut_endLatencySimulator()
@@ -832,7 +832,7 @@ describe('online syncing', function () {
     /**
      * There is a twilight zone where items needing sync are popped, and then say about 100ms of processing before
      * we set those items' lastSyncBegan. If the item is dirtied in between these times, then item.dirtyIndex will be less than
-     * item.dirtyIndexAtLastSync, and it will not by synced again.
+     * item.globalDirtyIndexAtLastSync, and it will not by synced again.
      */
 
     const expectedSaveCount = 2
@@ -889,7 +889,7 @@ describe('online syncing', function () {
         const mutated = changed[0].payload.copy({
           content: { ...note.payload.content, text: newText },
           dirty: true,
-          dirtyIndex: changed[0].payload.dirtyIndexAtLastSync + 1,
+          dirtyIndex: changed[0].payload.globalDirtyIndexAtLastSync + 1,
         })
 
         await this.application.itemManager.emitItemFromPayload(mutated)

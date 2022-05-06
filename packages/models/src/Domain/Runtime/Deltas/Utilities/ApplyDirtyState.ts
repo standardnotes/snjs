@@ -17,8 +17,8 @@ export function payloadByFinalizingSyncState(
   }
 
   const stillDirty =
-    basePayload.dirtyIndex && basePayload.dirtyIndexAtLastSync
-      ? basePayload.dirtyIndex > basePayload.dirtyIndexAtLastSync
+    basePayload.dirtyIndex && basePayload.globalDirtyIndexAtLastSync
+      ? basePayload.dirtyIndex > basePayload.globalDirtyIndexAtLastSync
       : false
 
   return payload.copyAsSyncResolved({

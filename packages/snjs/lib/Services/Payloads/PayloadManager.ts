@@ -186,8 +186,8 @@ export class PayloadManager extends AbstractService implements PayloadManagerInt
       this.log(
         'applying payload',
         apply.uuid,
-        'dirtyIndexAtLastSync',
-        apply.dirtyIndexAtLastSync,
+        'globalDirtyIndexAtLastSync',
+        apply.globalDirtyIndexAtLastSync,
         'dirtyIndex',
         apply.dirtyIndex,
         'dirty',

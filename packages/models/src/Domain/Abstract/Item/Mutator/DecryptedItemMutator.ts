@@ -53,7 +53,7 @@ export class DecryptedItemMutator<C extends ItemContent = ItemContent> extends I
     this.payload = this.payload.copy({
       content: this.content,
       lastSyncBegan: began,
-      dirtyIndexAtLastSync: globalDirtyIndex,
+      globalDirtyIndexAtLastSync: globalDirtyIndex,
     })
   }
 

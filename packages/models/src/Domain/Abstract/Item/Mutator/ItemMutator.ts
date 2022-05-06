@@ -47,7 +47,7 @@ export class ItemMutator<
   public setBeginSync(began: Date, globalDirtyIndex: number) {
     this.payload = this.payload.copy({
       lastSyncBegan: began,
-      dirtyIndexAtLastSync: globalDirtyIndex,
+      globalDirtyIndexAtLastSync: globalDirtyIndex,
     })
   }
 
