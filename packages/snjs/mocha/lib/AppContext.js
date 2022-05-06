@@ -272,6 +272,10 @@ export class AppContext {
     return note
   }
 
+  async deleteItemAndSync(item) {
+    await this.application.mutator.deleteItem(item)
+  }
+
   async changeNoteTitle(note, title) {
     return this.application.items.changeNote(note, (mutator) => {
       mutator.title = title
