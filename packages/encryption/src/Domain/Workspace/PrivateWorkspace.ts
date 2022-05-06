@@ -1,18 +1,18 @@
 import { PureCryptoInterface } from '@standardnotes/sncrypto-common'
 
-export async function vaultToEmail(
+export async function ComputePrivateWorkspaceIdentifier(
   crypto: PureCryptoInterface,
-  name: string,
   userphrase: string,
+  name: string,
 ): Promise<string | undefined> {
-  const result = await crypto.hmac256(
+  const identifier = await crypto.hmac256(
     await crypto.sha256(name.trim().toLowerCase()),
     await crypto.sha256(userphrase.trim().toLowerCase()),
   )
 
-  if (result == undefined) {
+  if (identifier == undefined) {
     return undefined
   }
 
-  return result
+  return identifier
 }

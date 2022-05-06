@@ -183,8 +183,8 @@ export class SNApplication implements InternalServices.ListedClientInterface {
     return this.sessionManager
   }
 
-  public vaultToEmail(name: string, userphrase: string): Promise<string | undefined> {
-    return Encryption.vaultToEmail(this.options.crypto, name, userphrase)
+  public computePrivateWorkspaceIdentifier(userphrase: string, name: string): Promise<string | undefined> {
+    return Encryption.ComputePrivateWorkspaceIdentifier(this.options.crypto, userphrase, name)
   }
 
   /**
