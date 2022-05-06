@@ -12,7 +12,8 @@ export interface TransferPayload<C extends ItemContent = ItemContent> {
   created_at_timestamp: number
   updated_at_timestamp: number
 
-  dirtiedDate?: Date
+  dirtyIndex?: number
+  dirtyIndexAtLastSync?: number
   dirty?: boolean
 
   lastSyncBegan?: Date

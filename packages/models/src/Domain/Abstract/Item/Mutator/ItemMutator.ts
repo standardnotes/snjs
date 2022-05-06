@@ -2,6 +2,7 @@ import { MutationType } from '../Types/MutationType'
 import { PayloadInterface } from '../../Payload'
 import { ItemInterface } from '../Interfaces/ItemInterface'
 import { TransferPayload } from '../../TransferPayload'
+import { getIncrementedDirtyIndex } from '../../../Runtime/DirtyCounter/DirtyCounter'
 
 /**
  * An item mutator takes in an item, and an operation, and returns the resulting payload.
@@ -37,15 +38,16 @@ export class ItemMutator<
 
     const result = this.payload.copy({
       dirty: true,
-      dirtiedDate: new Date(),
+      dirtyIndex: getIncrementedDirtyIndex(),
     })
 
     return result
   }
 
-  public set lastSyncBegan(began: Date) {
+  public setBeginSync(began: Date, globalDirtyIndex: number) {
     this.payload = this.payload.copy({
       lastSyncBegan: began,
+      dirtyIndexAtLastSync: globalDirtyIndex,
     })
   }
 

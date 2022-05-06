@@ -157,6 +157,10 @@ export class ItemManager
     return itemFromCollection || this.findSystemSmartView(uuid)
   }
 
+  findAnyItems(uuids: UuidString[]): Models.ItemInterface[] {
+    return this.collection.findAll(uuids)
+  }
+
   private findSystemSmartView(uuid: Uuid): Models.SmartView | undefined {
     return this.systemSmartViews.find((view) => view.uuid === uuid)
   }
@@ -1211,8 +1215,11 @@ export class ItemManager
   public async setLastSyncBeganForItems(
     itemsToLookupUuidsFor: (Models.DecryptedItemInterface | Models.DeletedItemInterface)[],
     date: Date,
-  ): Promise<void> {
-    const items = this.collection.findAll(Uuids(itemsToLookupUuidsFor)).filter(Models.isDecryptedOrDeletedItem)
+    globalDirtyIndex: number,
+  ): Promise<(Models.DecryptedItemInterface | Models.DeletedItemInterface)[]> {
+    const uuids = Uuids(itemsToLookupUuidsFor)
+
+    const items = this.collection.findAll(uuids).filter(Models.isDecryptedOrDeletedItem)
 
     const payloads: (Models.DecryptedPayloadInterface | Models.DeletedPayloadInterface)[] = []
 
@@ -1222,7 +1229,7 @@ export class ItemManager
         Models.MutationType.NonDirtying,
       )
 
-      mutator.lastSyncBegan = date
+      mutator.setBeginSync(date, globalDirtyIndex)
 
       const payload = mutator.getResult()
 
@@ -1230,6 +1237,8 @@ export class ItemManager
     }
 
     await this.payloadManager.emitPayloads(payloads, Models.PayloadEmitSource.PreSyncSave)
+
+    return this.findAnyItems(uuids) as (Models.DecryptedItemInterface | Models.DeletedItemInterface)[]
   }
 
   override getDiagnostics(): Promise<DiagnosticInfo | undefined> {

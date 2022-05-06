@@ -110,7 +110,7 @@ describe('backups', function () {
 
     expect(rawItem.fields).to.not.be.ok
     expect(rawItem.source).to.not.be.ok
-    expect(rawItem.dirtiedDate).to.not.be.ok
+    expect(rawItem.dirtyIndex).to.not.be.ok
     expect(rawItem.format).to.not.be.ok
     expect(rawItem.uuid).to.be.ok
     expect(rawItem.content_type).to.be.ok
@@ -129,7 +129,7 @@ describe('backups', function () {
 
     expect(rawItem.fields).to.not.be.ok
     expect(rawItem.source).to.not.be.ok
-    expect(rawItem.dirtiedDate).to.not.be.ok
+    expect(rawItem.dirtyIndex).to.not.be.ok
     expect(rawItem.format).to.not.be.ok
     expect(rawItem.uuid).to.be.ok
     expect(rawItem.content_type).to.be.ok

@@ -104,7 +104,7 @@ describe('payload', () => {
       content_type: ContentType.Note,
       updated_at: new Date(),
       dirty: true,
-      dirtiedDate: new Date(),
+      dirtyIndex: getIncrementedDirtyIndex(),
     })
 
     expect(merged.content).to.eql(payload.content)

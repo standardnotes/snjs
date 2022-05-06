@@ -6,6 +6,7 @@ import { HistoryMap } from '../History'
 import { extendSyncDelta, SourcelessSyncDeltaEmit, SyncDeltaEmit } from './Abstract/DeltaEmit'
 import { DeltaInterface } from './Abstract/DeltaInterface'
 import { SyncResolvedPayload } from './Utilities/SyncResolvedPayload'
+import { getIncrementedDirtyIndex } from '../DirtyCounter/DirtyCounter'
 
 export class DeltaFileImport implements DeltaInterface {
   constructor(
@@ -74,7 +75,7 @@ export class DeltaFileImport implements DeltaInterface {
         emits: [
           payload.copyAsSyncResolved({
             dirty: true,
-            dirtiedDate: new Date(),
+            dirtyIndex: getIncrementedDirtyIndex(),
             lastSyncEnd: new Date(0),
           }),
         ],

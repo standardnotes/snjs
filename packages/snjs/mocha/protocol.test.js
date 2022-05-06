@@ -115,7 +115,7 @@ describe('protocol', function () {
     expect(result.fields).to.not.be.ok
     expect(result.source).to.not.be.ok
     expect(result.format).to.not.be.ok
-    expect(result.dirtiedDate).to.not.be.ok
+    expect(result.dirtyIndex).to.not.be.ok
   })
 
   it('encrypted payload for server should include duplicate_of field', async function () {

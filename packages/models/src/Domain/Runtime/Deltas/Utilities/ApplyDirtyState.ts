@@ -1,6 +1,7 @@
 import { ImmutablePayloadCollection } from '../../Collection/Payload/ImmutablePayloadCollection'
 import { FullyFormedPayloadInterface } from '../../../Abstract/Payload/Interfaces/UnionTypes'
 import { SyncResolvedPayload } from './SyncResolvedPayload'
+import { getIncrementedDirtyIndex } from '../../DirtyCounter/DirtyCounter'
 
 export function payloadByFinalizingSyncState(
   payload: FullyFormedPayloadInterface,
@@ -11,17 +12,18 @@ export function payloadByFinalizingSyncState(
   if (!basePayload) {
     return payload.copyAsSyncResolved({
       dirty: false,
-      dirtiedDate: undefined,
       lastSyncEnd: new Date(),
     })
   }
 
   const stillDirty =
-    basePayload.dirtiedDate && basePayload.lastSyncBegan && basePayload.dirtiedDate >= basePayload.lastSyncBegan
+    basePayload.dirtyIndex && basePayload.dirtyIndexAtLastSync
+      ? basePayload.dirtyIndex > basePayload.dirtyIndexAtLastSync
+      : false
 
   return payload.copyAsSyncResolved({
-    dirty: stillDirty != undefined ? stillDirty : false,
-    dirtiedDate: stillDirty != undefined ? new Date() : undefined,
+    dirty: stillDirty,
+    dirtyIndex: stillDirty ? getIncrementedDirtyIndex() : undefined,
     lastSyncEnd: new Date(),
   })
 }

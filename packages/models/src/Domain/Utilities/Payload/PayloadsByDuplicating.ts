@@ -7,6 +7,7 @@ import { PayloadsByUpdatingReferencingPayloadReferences } from './PayloadsByUpda
 import { isDecryptedPayload } from '../../Abstract/Payload/Interfaces/TypeCheck'
 import { FullyFormedPayloadInterface } from '../../Abstract/Payload/Interfaces/UnionTypes'
 import { SyncResolvedPayload } from '../../Runtime/Deltas/Utilities/SyncResolvedPayload'
+import { getIncrementedDirtyIndex } from '../../Runtime/DirtyCounter/DirtyCounter'
 
 /**
  * Copies payload and assigns it a new uuid.
@@ -26,7 +27,7 @@ export function PayloadsByDuplicating<C extends ItemContent = ItemContent>(dto: 
   const override = {
     uuid: UuidGenerator.GenerateUuid(),
     dirty: true,
-    dirtiedDate: new Date(),
+    dirtyIndex: getIncrementedDirtyIndex(),
     lastSyncBegan: undefined,
     lastSyncEnd: new Date(),
     duplicate_of: payload.uuid,

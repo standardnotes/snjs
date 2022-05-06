@@ -8,6 +8,7 @@ import { payloadByFinalizingSyncState } from './Utilities/ApplyDirtyState'
 import { SyncDeltaEmit } from './Abstract/DeltaEmit'
 import { SyncDeltaInterface } from './Abstract/SyncDeltaInterface'
 import { BuildSyncResolvedParams, SyncResolvedPayload } from './Utilities/SyncResolvedPayload'
+import { getIncrementedDirtyIndex } from '../DirtyCounter/DirtyCounter'
 
 export class DeltaRemoteSaved implements SyncDeltaInterface {
   constructor(
@@ -52,7 +53,7 @@ export class DeltaRemoteSaved implements SyncDeltaInterface {
               ...apply,
               deleted: true,
               content: undefined,
-              dirtiedDate: new Date(),
+              dirtyIndex: getIncrementedDirtyIndex(),
               ...BuildSyncResolvedParams({
                 dirty: true,
                 lastSyncEnd: new Date(),

@@ -19,7 +19,6 @@ export interface ItemInterface<P extends PayloadInterface = PayloadInterface> {
   created_at: Date
   serverUpdatedAt: Date
   serverUpdatedAtTimestamp: number | undefined
-  dirtiedDate: Date | undefined
   dirty: boolean | undefined
 
   lastSyncBegan: Date | undefined

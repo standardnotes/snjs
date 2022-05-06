@@ -18,7 +18,6 @@ export interface LocalStorageEncryptedContextualPayload extends ContextPayload {
   deleted: false
   created_at_timestamp: number
   created_at: Date
-  dirtiedDate: Date | undefined
   dirty: boolean
   duplicate_of: Uuid | undefined
   enc_item_key: string
@@ -34,7 +33,6 @@ export interface LocalStorageDecryptedContextualPayload<C extends ItemContent = 
   created_at_timestamp: number
   created_at: Date
   deleted: false
-  dirtiedDate: Date | undefined
   dirty: boolean
   duplicate_of?: Uuid
   updated_at_timestamp: number
@@ -46,7 +44,6 @@ export interface LocalStorageDeletedContextualPayload extends ContextPayload {
   created_at_timestamp: number
   created_at: Date
   deleted: true
-  dirtiedDate: Date | undefined
   dirty: true
   duplicate_of?: Uuid
   updated_at_timestamp: number
@@ -63,7 +60,6 @@ export function CreateEncryptedLocalStorageContextPayload(
     created_at_timestamp: fromPayload.created_at_timestamp,
     created_at: fromPayload.created_at,
     deleted: false,
-    dirtiedDate: fromPayload.dirtiedDate,
     dirty: fromPayload.dirty != undefined ? fromPayload.dirty : false,
     duplicate_of: fromPayload.duplicate_of,
     enc_item_key: fromPayload.enc_item_key,
@@ -90,7 +86,6 @@ export function CreateDecryptedLocalStorageContextPayload(
     updated_at: fromPayload.updated_at,
     uuid: fromPayload.uuid,
     dirty: useBoolean(fromPayload.dirty, false),
-    dirtiedDate: fromPayload.dirtiedDate,
   }
 }
 
@@ -103,7 +98,6 @@ export function CreateDeletedLocalStorageContextPayload(
     created_at_timestamp: fromPayload.created_at_timestamp,
     created_at: fromPayload.created_at,
     deleted: true,
-    dirtiedDate: fromPayload.dirtiedDate,
     dirty: true,
     duplicate_of: fromPayload.duplicate_of,
     updated_at_timestamp: fromPayload.updated_at_timestamp,

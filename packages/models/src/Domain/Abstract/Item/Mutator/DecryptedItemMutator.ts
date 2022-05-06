@@ -9,6 +9,7 @@ import { DefaultAppDomain, DomainDataValueType, ItemDomainKey } from '../Types/D
 import { ItemMutator } from './ItemMutator'
 import { DecryptedPayloadInterface } from '../../Payload/Interfaces/DecryptedPayload'
 import { ItemInterface } from '../Interfaces/ItemInterface'
+import { getIncrementedDirtyIndex } from '../../../Runtime/DirtyCounter/DirtyCounter'
 
 export class DecryptedItemMutator<C extends ItemContent = ItemContent> extends ItemMutator<
   DecryptedPayloadInterface<C>,
@@ -42,16 +43,17 @@ export class DecryptedItemMutator<C extends ItemContent = ItemContent> extends I
     const result = this.payload.copy({
       content: this.content,
       dirty: true,
-      dirtiedDate: new Date(),
+      dirtyIndex: getIncrementedDirtyIndex(),
     })
 
     return result
   }
 
-  public override set lastSyncBegan(began: Date) {
+  public override setBeginSync(began: Date, globalDirtyIndex: number) {
     this.payload = this.payload.copy({
       content: this.content,
       lastSyncBegan: began,
+      dirtyIndexAtLastSync: globalDirtyIndex,
     })
   }
 

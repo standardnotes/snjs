@@ -1,6 +1,7 @@
 /* eslint-disable no-unused-expressions */
 /* eslint-disable no-undef */
 import * as Factory from './lib/factory.js'
+import { createRelatedNoteTagPairPayload } from './lib/Items.js'
 chai.use(chaiAsPromised)
 const expect = chai.expect
 
@@ -29,7 +30,7 @@ describe('payload collections', () => {
   })
 
   it('references', async () => {
-    const payloads = Factory.createRelatedNoteTagPairPayload()
+    const payloads = createRelatedNoteTagPairPayload()
     const notePayload = payloads[0]
     const tagPayload = payloads[1]
     const collection = ImmutablePayloadCollection.WithPayloads([notePayload, tagPayload])
@@ -38,7 +39,7 @@ describe('payload collections', () => {
   })
 
   it('references by content type', async () => {
-    const [notePayload1, tagPayload1] = Factory.createRelatedNoteTagPairPayload()
+    const [notePayload1, tagPayload1] = createRelatedNoteTagPairPayload()
     const collection = ImmutablePayloadCollection.WithPayloads([notePayload1, tagPayload1])
     const referencingTags = collection.elementsReferencingElement(notePayload1, ContentType.Tag)
     expect(referencingTags.length).to.equal(1)

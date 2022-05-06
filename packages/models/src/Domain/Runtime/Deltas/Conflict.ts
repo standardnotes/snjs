@@ -15,6 +15,7 @@ import { ContentType } from '@standardnotes/common'
 import { SyncResolvedPayload } from './Utilities/SyncResolvedPayload'
 import { ItemsKeyDelta } from './ItemsKeyDelta'
 import { SourcelessSyncDeltaEmit } from './Abstract/DeltaEmit'
+import { getIncrementedDirtyIndex } from '../DirtyCounter/DirtyCounter'
 
 export class ConflictDelta {
   constructor(
@@ -121,7 +122,7 @@ export class ConflictDelta {
       {
         updated_at: updatedAt,
         updated_at_timestamp: updatedAtTimestamp,
-        dirtiedDate: new Date(),
+        dirtyIndex: getIncrementedDirtyIndex(),
         dirty: true,
         lastSyncEnd: new Date(),
       },
@@ -154,7 +155,7 @@ export class ConflictDelta {
         updated_at: updatedAt,
         updated_at_timestamp: updatedAtTimestamp,
         dirty: true,
-        dirtiedDate: new Date(),
+        dirtyIndex: getIncrementedDirtyIndex(),
         lastSyncEnd: new Date(),
       },
       this.applyPayload.source,
@@ -209,7 +210,7 @@ export class ConflictDelta {
         updated_at: updatedAt,
         updated_at_timestamp: updatedAtTimestamp,
         dirty: true,
-        dirtiedDate: new Date(),
+        dirtyIndex: getIncrementedDirtyIndex(),
         lastSyncEnd: new Date(),
         content: {
           ...this.basePayload.content,

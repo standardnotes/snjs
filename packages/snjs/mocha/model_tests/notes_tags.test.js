@@ -1,6 +1,8 @@
 /* eslint-disable no-unused-expressions */
 /* eslint-disable no-undef */
 import * as Factory from '../lib/factory.js'
+import * as Utils from '../lib/Utils.js'
+import { createRelatedNoteTagPairPayload } from '../lib/Items.js'
 chai.use(chaiAsPromised)
 const expect = chai.expect
 
@@ -48,7 +50,7 @@ describe('notes and tags', () => {
 
   it('properly handles legacy relationships', async function () {
     // legacy relationships are when a note has a reference to a tag
-    const pair = Factory.createRelatedNoteTagPairPayload()
+    const pair = createRelatedNoteTagPairPayload()
     const notePayload = pair[0]
     const tagPayload = pair[1]
 
@@ -80,7 +82,7 @@ describe('notes and tags', () => {
   })
 
   it('creates relationship between note and tag', async function () {
-    const pair = Factory.createRelatedNoteTagPairPayload({ dirty: false })
+    const pair = createRelatedNoteTagPairPayload({ dirty: false })
     const notePayload = pair[0]
     const tagPayload = pair[1]
 
@@ -124,7 +126,7 @@ describe('notes and tags', () => {
   })
 
   it('handles remote deletion of relationship', async function () {
-    const pair = Factory.createRelatedNoteTagPairPayload()
+    const pair = createRelatedNoteTagPairPayload()
     const notePayload = pair[0]
     const tagPayload = pair[1]
 
@@ -171,7 +173,7 @@ describe('notes and tags', () => {
   })
 
   it('handles removing relationship between note and tag', async function () {
-    const pair = Factory.createRelatedNoteTagPairPayload()
+    const pair = createRelatedNoteTagPairPayload()
     const notePayload = pair[0]
     const tagPayload = pair[1]
 
@@ -197,7 +199,7 @@ describe('notes and tags', () => {
   })
 
   it('properly handles tag duplication', async function () {
-    const pair = Factory.createRelatedNoteTagPairPayload()
+    const pair = createRelatedNoteTagPairPayload()
     await this.application.itemManager.emitItemsFromPayloads(pair, PayloadEmitSource.LocalChanged)
     let note = this.application.itemManager.notes[0]
     let tag = this.application.itemManager.tags[0]
@@ -227,7 +229,7 @@ describe('notes and tags', () => {
   })
 
   it('duplicating a note should maintain its tag references', async function () {
-    const pair = Factory.createRelatedNoteTagPairPayload()
+    const pair = createRelatedNoteTagPairPayload()
     const notePayload = pair[0]
     const tagPayload = pair[1]
     await this.application.itemManager.emitItemsFromPayloads([notePayload, tagPayload], PayloadEmitSource.LocalChanged)
@@ -241,7 +243,7 @@ describe('notes and tags', () => {
   })
 
   it('deleting a note should update tag references', async function () {
-    const pair = Factory.createRelatedNoteTagPairPayload()
+    const pair = createRelatedNoteTagPairPayload()
     const notePayload = pair[0]
     const tagPayload = pair[1]
     await this.application.itemManager.emitItemsFromPayloads([notePayload, tagPayload], PayloadEmitSource.LocalChanged)
@@ -279,7 +281,7 @@ describe('notes and tags', () => {
     // Tags now reference notes, but it used to be that tags referenced notes and notes referenced tags.
     // After the change, there was an issue where removing an old tag relationship from a note would only
     // remove one way, and thus keep it intact on the visual level.
-    const pair = Factory.createRelatedNoteTagPairPayload()
+    const pair = createRelatedNoteTagPairPayload()
     const notePayload = pair[0]
     const tagPayload = pair[1]
 
@@ -582,8 +584,8 @@ describe('notes and tags', () => {
     it('"updated_at", ">", "1.days.ago"', async function () {
       await Factory.registerUserToApplication({
         application: this.application,
-        email: Factory.generateUuid(),
-        password: Factory.generateUuid(),
+        email: Utils.generateUuid(),
+        password: Utils.generateUuid(),
       })
 
       const recentNote = await this.application.mutator.insertItem(
@@ -819,7 +821,7 @@ describe('notes and tags', () => {
   })
 
   it('include notes that have tag titles that match search query', async function () {
-    const [notePayload1, tagPayload1] = Factory.createRelatedNoteTagPairPayload({
+    const [notePayload1, tagPayload1] = createRelatedNoteTagPairPayload({
       noteTitle: 'A simple note',
       noteText: 'This is just a note.',
       tagTitle: 'Test',
@@ -850,7 +852,7 @@ describe('notes and tags', () => {
   })
 
   it('search query should be case insensitive and match notes and tags title', async function () {
-    const [notePayload1, tagPayload1] = Factory.createRelatedNoteTagPairPayload({
+    const [notePayload1, tagPayload1] = createRelatedNoteTagPairPayload({
       noteTitle: 'A simple note',
       noteText: 'Just a note. Nothing to see.',
       tagTitle: 'Foo',

@@ -17,6 +17,7 @@ import {
   isDecryptedPayload,
   HistoryMap,
   DeltaEmit,
+  getIncrementedDirtyIndex,
 } from '@standardnotes/models'
 import {
   AbstractService,
@@ -182,6 +183,17 @@ export class PayloadManager extends AbstractService implements PayloadManagerInt
         continue
       }
 
+      this.log(
+        'applying payload',
+        apply.uuid,
+        'dirtyIndexAtLastSync',
+        apply.dirtyIndexAtLastSync,
+        'dirtyIndex',
+        apply.dirtyIndex,
+        'dirty',
+        apply.dirty,
+      )
+
       const base = this.collection.find(apply.uuid)
 
       if (isDeletedPayload(apply) && apply.discardable) {
@@ -303,7 +315,7 @@ export class PayloadManager extends AbstractService implements PayloadManagerInt
             deleted: true,
             content: undefined,
             dirty: true,
-            dirtiedDate: new Date(),
+            dirtyIndex: getIncrementedDirtyIndex(),
           },
           payload.source,
         ),

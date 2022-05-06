@@ -1,6 +1,7 @@
 /* eslint-disable no-unused-expressions */
 /* eslint-disable no-undef */
 import * as Factory from './lib/factory.js'
+import * as Utils from './lib/Utils.js'
 chai.use(chaiAsPromised)
 const expect = chai.expect
 
@@ -119,7 +120,7 @@ describe('keys', function () {
 
     const dirtied = notePayload.copy({
       dirty: true,
-      dirtiedDate: new Date(),
+      dirtyIndex: getIncrementedDirtyIndex(),
     })
     await this.application.payloadManager.emitPayload(dirtied, PayloadEmitSource.LocalChanged)
     await this.application.sync.sync()
@@ -613,8 +614,8 @@ describe('keys', function () {
      */
     const contextA = this.context
 
-    const email = Factory.generateUuid()
-    const password = Factory.generateUuid()
+    const email = Utils.generateUuid()
+    const password = Utils.generateUuid()
     await Factory.registerUserToApplication({
       application: contextA.application,
       email,
@@ -628,7 +629,7 @@ describe('keys', function () {
     contextA.ignoreChallenges()
     contextB.ignoreChallenges()
 
-    const newPassword = Factory.generateUuid()
+    const newPassword = Utils.generateUuid()
 
     await contextA.application.userService.changeCredentials({
       currentPassword: password,

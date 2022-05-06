@@ -1,6 +1,7 @@
 /* eslint-disable no-unused-expressions */
 /* eslint-disable no-undef */
 import * as Factory from '../lib/factory.js'
+import { createRelatedNoteTagPairPayload } from '../lib/Items.js'
 chai.use(chaiAsPromised)
 const expect = chai.expect
 
@@ -47,7 +48,7 @@ describe('notes + tags syncing', function () {
   })
 
   it('syncing a note many times does not cause duplication', async function () {
-    const pair = Factory.createRelatedNoteTagPairPayload()
+    const pair = createRelatedNoteTagPairPayload()
     const notePayload = pair[0]
     const tagPayload = pair[1]
 
@@ -72,7 +73,7 @@ describe('notes + tags syncing', function () {
   }).timeout(20000)
 
   it('handles signing in and merging data', async function () {
-    const pair = Factory.createRelatedNoteTagPairPayload()
+    const pair = createRelatedNoteTagPairPayload()
     const notePayload = pair[0]
     const tagPayload = pair[1]
     await this.application.itemManager.emitItemsFromPayloads([notePayload, tagPayload], PayloadEmitSource.LocalChanged)
@@ -105,7 +106,7 @@ describe('notes + tags syncing', function () {
   })
 
   it('duplicating a tag should maintian its relationships', async function () {
-    const pair = Factory.createRelatedNoteTagPairPayload()
+    const pair = createRelatedNoteTagPairPayload()
     const notePayload = pair[0]
     const tagPayload = pair[1]
     await this.application.itemManager.emitItemsFromPayloads([notePayload, tagPayload], PayloadEmitSource.LocalChanged)

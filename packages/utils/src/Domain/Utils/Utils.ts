@@ -654,25 +654,20 @@ export function secondHalfOfString(string: string): string {
   return string.substring(string.length / 2, string.length)
 }
 
-export function log(instance: any, message: string, ...args: unknown[]): void {
-  const service = instance.constructor.name
+export function log(namespace: string, ...args: any[]): void {
   const date = new Date()
-  const timeString = date.toLocaleTimeString().replace(' PM', '').replace(' AM', '')
-  const string = `${service}:${timeString}.${date.getMilliseconds()}`
-  if (args) {
-    args = args.map((arg) => {
-      if (Array.isArray(arg)) {
-        return arg.slice()
-      } else {
-        return arg
-      }
-    })
-    // eslint-disable-next-line no-console
-    console.log(string, message, ...args)
-  } else {
-    // eslint-disable-next-line no-console
-    console.log(string, message)
-  }
+  const timeString = `${date.toLocaleTimeString().replace(' PM', '').replace(' AM', '')}.${date.getMilliseconds()}`
+  customLog(
+    `%c${namespace}%c${timeString}`,
+    'color: black; font-weight: bold; margin-right: 4px',
+    'color: gray',
+    ...args,
+  )
+}
+
+function customLog(..._args: any[]) {
+  // eslint-disable-next-line no-console, prefer-rest-params
+  Function.prototype.apply.call(console.log, console, arguments)
 }
 
 export function assert(value: unknown): asserts value {

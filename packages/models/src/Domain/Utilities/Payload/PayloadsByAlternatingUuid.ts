@@ -8,6 +8,7 @@ import { FullyFormedPayloadInterface } from '../../Abstract/Payload/Interfaces/U
 import { EncryptedPayloadInterface } from '../../Abstract/Payload/Interfaces/EncryptedPayload'
 import { PayloadsByUpdatingReferencingPayloadReferences } from './PayloadsByUpdatingReferencingPayloadReferences'
 import { SyncResolvedPayload } from '../../Runtime/Deltas/Utilities/SyncResolvedPayload'
+import { getIncrementedDirtyIndex } from '../../Runtime/DirtyCounter/DirtyCounter'
 
 /**
  * Return the payloads that result if you alternated the uuid for the payload.
@@ -28,7 +29,7 @@ export function PayloadsByAlternatingUuid<P extends DecryptedPayloadInterface = 
   const copy = payload.copyAsSyncResolved({
     uuid: UuidGenerator.GenerateUuid(),
     dirty: true,
-    dirtiedDate: new Date(),
+    dirtyIndex: getIncrementedDirtyIndex(),
     lastSyncBegan: undefined,
     lastSyncEnd: new Date(),
     duplicate_of: payload.uuid,
@@ -61,7 +62,7 @@ export function PayloadsByAlternatingUuid<P extends DecryptedPayloadInterface = 
       a.copyAsSyncResolved({
         items_key_id: copy.uuid,
         dirty: true,
-        dirtiedDate: new Date(),
+        dirtyIndex: getIncrementedDirtyIndex(),
         lastSyncEnd: new Date(),
       }),
     )
@@ -77,7 +78,6 @@ export function PayloadsByAlternatingUuid<P extends DecryptedPayloadInterface = 
       updated_at: payload.updated_at,
       created_at_timestamp: payload.created_at_timestamp,
       updated_at_timestamp: payload.updated_at_timestamp,
-      dirtiedDate: undefined,
       /**
        * Do not set as dirty; this item is non-syncable
        * and should be immediately discarded

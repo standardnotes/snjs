@@ -1,6 +1,7 @@
-/* eslint-disable no-unused-expressions */
 /* eslint-disable no-undef */
 import * as Factory from '../lib/factory.js'
+import { createItemParams, createSyncedNoteWithTag } from '../lib/Items.js'
+import * as Utils from '../lib/Utils.js'
 chai.use(chaiAsPromised)
 const expect = chai.expect
 
@@ -17,7 +18,7 @@ describe('online conflict handling', function () {
     localStorage.clear()
     this.expectedItemCount = BASE_ITEM_COUNT
 
-    this.context = await Factory.createAppContext()
+    this.context = await Factory.createAppContextWithFakeCrypto('AppA')
     await this.context.launch()
 
     this.application = this.context.application
@@ -26,11 +27,7 @@ describe('online conflict handling', function () {
 
     Factory.disableIntegrityAutoHeal(this.application)
 
-    await Factory.registerUserToApplication({
-      application: this.application,
-      email: this.email,
-      password: this.password,
-    })
+    await this.context.register()
 
     this.sharedFinalAssertions = async function () {
       expect(this.application.syncService.isOutOfSync()).to.equal(false)
@@ -59,7 +56,7 @@ describe('online conflict handling', function () {
     const payload = new DecryptedPayload({
       ...params,
       dirty: true,
-      dirtiedDate: new Date(),
+      dirtyIndex: getIncrementedDirtyIndex(),
     })
     return payload
   }
@@ -807,8 +804,8 @@ describe('online conflict handling', function () {
     const newApp = await Factory.signOutApplicationAndReturnNew(this.application)
     await Factory.registerUserToApplication({
       application: newApp,
-      email: Factory.generateUuid(),
-      password: Factory.generateUuid(),
+      email: Utils.generateUuid(),
+      password: Utils.generateUuid(),
     })
     await newApp.itemManager.emitItemsFromPayloads(priorData.map((i) => i.payload))
     await newApp.syncService.markAllItemsAsNeedingSyncAndPersist()
@@ -819,7 +816,7 @@ describe('online conflict handling', function () {
 
   it('importing data belonging to another account should not result in duplication', async function () {
     /** Create primary account and export data */
-    await Factory.createSyncedNoteWithTag(this.application)
+    await createSyncedNoteWithTag(this.application)
     let backupFile = await this.application.createEncryptedBackupFileForAutomatedDesktopBackups()
     /** Sort matters, and is the cause of the original issue, where tag comes before the note */
     backupFile.items = [
@@ -833,7 +830,7 @@ describe('online conflict handling', function () {
     const password = this.password
     await Factory.registerUserToApplication({
       application: newApp,
-      email: Factory.generateUuid(),
+      email: Utils.generateUuid(),
       password: password,
     })
     Factory.handlePasswordChallenges(newApp, password)
@@ -849,7 +846,7 @@ describe('online conflict handling', function () {
      * where the two notes are first listed in the backup, then the tag.
      */
     /** Create primary account and export data */
-    await Factory.createSyncedNoteWithTag(this.application)
+    await createSyncedNoteWithTag(this.application)
     const tag = this.application.itemManager.tags[0]
     const note2 = await Factory.createMappedNote(this.application)
     await this.application.mutator.changeAndSaveItem(tag, (mutator) => {
@@ -868,7 +865,7 @@ describe('online conflict handling', function () {
     const password = this.password
     await Factory.registerUserToApplication({
       application: newApp,
-      email: Factory.generateUuid(),
+      email: Utils.generateUuid(),
       password: password,
     })
     Factory.handlePasswordChallenges(newApp, password)
@@ -935,4 +932,68 @@ describe('online conflict handling', function () {
     expect(this.application.itemManager.notes.length).to.equal(2)
     await this.sharedFinalAssertions()
   })
+
+  it('conflicting should not over resolve', async function () {
+    /**
+     * Before refactoring to use dirtyIndex instead of dirtiedDate, sometimes an item could be dirtied
+     * and begin sync at the exact same millisecond count (at least in the tests). In which case, the item
+     * would be stillDirty after sync and would sync again. This test ensures that an item is only synced once
+     * after it saves changes from conflicted items.
+     */
+    const contextA = this.context
+    const contextB = await Factory.createAppContextWithFakeCrypto('AppB', contextA.email, contextA.password)
+
+    contextA.disableIntegrityAutoHeal()
+    contextB.disableIntegrityAutoHeal()
+
+    await contextB.launch()
+    await contextB.signIn()
+
+    const note = await contextA.createSyncedNote()
+    await contextB.sync()
+
+    await contextA.changeNoteTitleAndSync(note, 'title-A')
+    await contextB.changeNoteTitleAndSync(note, 'title-B')
+
+    this.expectedItemCount += 2
+
+    const noteAExpectedTimestamp = contextB.findNoteByTitle('title-A').payload.updated_at_timestamp
+    const noteBExpectedTimestamp = contextB.findNoteByTitle('title-B').payload.updated_at_timestamp
+
+    await contextA.sync()
+
+    expect(contextA.findNoteByTitle('title-A').payload.updated_at_timestamp).to.equal(noteAExpectedTimestamp)
+    expect(contextA.findNoteByTitle('title-B').payload.updated_at_timestamp).to.equal(noteBExpectedTimestamp)
+
+    await this.sharedFinalAssertions()
+  }).timeout(20000)
+
+  it('editing original note many times after conflict on other client should only result in 2 cumulative notes', async function () {
+    const contextA = this.context
+    const contextB = await Factory.createAppContextWithFakeCrypto('AppB', contextA.email, contextA.password)
+    contextA.disableIntegrityAutoHeal()
+    contextB.disableIntegrityAutoHeal()
+
+    await contextB.launch()
+    await contextB.signIn()
+
+    const { original } = await contextA.createConflictedNotes(contextB)
+    this.expectedItemCount += 2
+
+    expect(contextA.noteCount).to.equal(2)
+    expect(contextB.noteCount).to.equal(2)
+
+    const allSyncs = []
+
+    await contextA.changeNoteTitle(original, `${Math.random()}`)
+    allSyncs.push(contextA.sync())
+    allSyncs.push(contextB.sync())
+
+    await Promise.all(allSyncs)
+
+    expect(contextA.noteCount).to.equal(2)
+    expect(contextB.noteCount).to.equal(2)
+
+    await this.sharedFinalAssertions()
+  }).timeout(20000)
 })

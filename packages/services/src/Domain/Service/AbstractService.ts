@@ -92,9 +92,14 @@ export abstract class AbstractService<EventName = string, EventData = undefined>
     // optional override
   }
 
-  log(message: string, ...args: unknown[]): void {
+  getServiceName(): string {
+    return this.constructor.name
+  }
+
+  log(..._args: unknown[]): void {
     if (this.loggingEnabled) {
-      log(this, message, args)
+      // eslint-disable-next-line prefer-rest-params
+      log(this.getServiceName(), ...arguments)
     }
   }
 }

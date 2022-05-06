@@ -56,6 +56,8 @@ import {
   DeltaOfflineSaved,
   FilteredServerItem,
   PayloadEmitSource,
+  getIncrementedDirtyIndex,
+  getCurrentDirtyIndex,
 } from '@standardnotes/models'
 import {
   AbstractService,
@@ -93,7 +95,7 @@ export class SNSyncService
   extends AbstractService<SyncEvent, ServerSyncResponse | OfflineSyncResponse | { source: SyncSource }>
   implements SyncServiceInterface, InternalEventHandlerInterface, SyncClientInterface
 {
-  private lastPreSyncSave?: Date
+  private dirtyIndexAtLastPresyncSave?: number
   private lastSyncDate?: Date
   private outOfSync = false
   private opStatus: SyncOpStatus
@@ -196,7 +198,7 @@ export class SNSyncService
    * Called by application when sign in or registration occurs.
    */
   public resetSyncState(): void {
-    this.lastPreSyncSave = undefined
+    this.dirtyIndexAtLastPresyncSave = undefined
     this.lastSyncDate = undefined
     this.outOfSync = false
   }
@@ -367,7 +369,7 @@ export class SNSyncService
       return new DecryptedPayload({
         ...item.payload.ejected(),
         dirty: true,
-        dirtiedDate: new Date(),
+        dirtyIndex: getIncrementedDirtyIndex(),
       })
     })
 
@@ -381,17 +383,16 @@ export class SNSyncService
    * pending data will be saved to disk, and synced the next time the app opens.
    */
   private popPayloadsNeedingPreSyncSave(from: (DecryptedPayloadInterface | DeletedPayloadInterface)[]) {
-    const lastPreSyncSave = this.lastPreSyncSave
-    if (!lastPreSyncSave) {
+    const lastPreSyncSave = this.dirtyIndexAtLastPresyncSave
+    if (lastPreSyncSave == undefined) {
       return from
     }
 
-    /** dirtiedDate can be null if the payload was created as dirty */
     const payloads = from.filter((candidate) => {
-      return !candidate.dirtiedDate || candidate.dirtiedDate > lastPreSyncSave
+      return !candidate.dirtyIndex || candidate.dirtyIndex > lastPreSyncSave
     })
 
-    this.lastPreSyncSave = new Date()
+    this.dirtyIndexAtLastPresyncSave = getCurrentDirtyIndex()
 
     return payloads
   }
@@ -502,6 +503,7 @@ export class SNSyncService
      * item dirtied at any point after this date is marked as needing another sync
      */
     const beginDate = new Date()
+    const frozenDirtyIndex = getCurrentDirtyIndex()
 
     /**
      * Items that have never been synced and marked as deleted should not be
@@ -525,7 +527,7 @@ export class SNSyncService
       options.onPresyncSave()
     }
 
-    return { items, beginDate, decryptedPayloads, neverSyncedDeleted }
+    return { items, beginDate, frozenDirtyIndex, neverSyncedDeleted }
   }
 
   /**
@@ -583,6 +585,7 @@ export class SNSyncService
     items: (DecryptedItemInterface | DeletedItemInterface)[],
     inTimeResolveQueue: SyncPromise[],
     beginDate: Date,
+    frozenDirtyIndex: number,
   ) {
     this.opStatus.setDidBegin()
 
@@ -599,7 +602,9 @@ export class SNSyncService
      * Setting this value means the item was 100% sent to the server.
      */
     if (items.length > 0) {
-      await this.itemManager.setLastSyncBeganForItems(items, beginDate)
+      return this.itemManager.setLastSyncBeganForItems(items, beginDate, frozenDirtyIndex)
+    } else {
+      return items
     }
   }
 
@@ -700,13 +705,19 @@ export class SNSyncService
 
     this.log(
       'Syncing online user',
-      `source: ${SyncSource[source]}`,
-      `operation id: ${operation.id}`,
-      `integrity check: ${checkIntegrity}`,
-      `mode: ${mode}`,
-      `syncToken: ${syncToken}`,
-      `cursorToken: ${paginationToken}`,
-      'payloads:',
+      'source',
+      SyncSource[source],
+      'operation id',
+      operation.id,
+      'integrity check',
+      checkIntegrity,
+      'mode',
+      SyncMode[mode],
+      'syncToken',
+      syncToken,
+      'cursorToken',
+      paginationToken,
+      'payloads',
       payloads,
     )
 
@@ -743,7 +754,7 @@ export class SNSyncService
   private async performSync(options: SyncOptions): Promise<unknown> {
     const { shouldExecuteSync, releaseLock } = this.configureSyncLock()
 
-    const { items, beginDate, decryptedPayloads, neverSyncedDeleted } = await this.prepareForSync(options)
+    const { items, beginDate, frozenDirtyIndex, neverSyncedDeleted } = await this.prepareForSync(options)
 
     const inTimeResolveQueue = this.getPendingRequestsMadeInTimeToPiggyBackOnCurrentRequest()
 
@@ -755,11 +766,15 @@ export class SNSyncService
       return
     }
 
-    await this.prepareForSyncExecution(items, inTimeResolveQueue, beginDate)
+    const latestItems = await this.prepareForSyncExecution(items, inTimeResolveQueue, beginDate, frozenDirtyIndex)
 
     const online = this.sessionManager.online()
 
-    const { operation, mode: syncMode } = await this.createSyncOperation(decryptedPayloads, online, options)
+    const { operation, mode: syncMode } = await this.createSyncOperation(
+      latestItems.map((i) => i.payloadRepresentation()),
+      online,
+      options,
+    )
 
     const operationPromise = operation.run()
 
@@ -837,7 +852,6 @@ export class SNSyncService
     if (this._simulate_latency) {
       await sleep(this._simulate_latency.latency)
     }
-    this.log('Online Sync Response', 'operation id', operation.id, response.rawResponse)
 
     this.opStatus.clearError()
 
@@ -864,6 +878,15 @@ export class SNSyncService
       masterCollection,
       operation.payloadsSavedOrSaving,
       historyMap,
+    )
+
+    this.log(
+      'Online Sync Response',
+      'Operator ID',
+      operation.id,
+      response.rawResponse.data,
+      'Decrypted payloads',
+      resolver['payloadSet'],
     )
 
     const emits = resolver.result()
@@ -1178,7 +1201,7 @@ export class SNSyncService
       sync: {
         syncToken: await this.getLastSyncToken(),
         cursorToken: await this.getPaginationToken(),
-        lastPreSyncSave: this.lastPreSyncSave,
+        dirtyIndexAtLastPresyncSave: this.dirtyIndexAtLastPresyncSave,
         lastSyncDate: this.lastSyncDate,
         outOfSync: this.outOfSync,
         completedOnlineDownloadFirstSync: this.completedOnlineDownloadFirstSync,

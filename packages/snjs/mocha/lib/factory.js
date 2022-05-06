@@ -5,12 +5,13 @@ import { AppContext } from './AppContext.js'
 import * as Applications from './Applications.js'
 import * as Defaults from './Defaults.js'
 import * as Utils from './Utils.js'
+import { createItemParams, createNoteParams, createTagParams } from './Items.js'
 
 export const TenSecondTimeout = 10_000
 export const TwentySecondTimeout = 20_000
 export const ThirtySecondTimeout = 30_000
 
-const syncOptions = {
+export const syncOptions = {
   checkIntegrity: true,
   awaitAll: true,
 }
@@ -113,8 +114,8 @@ export async function initializeApplication(application) {
 }
 
 export function registerUserToApplication({ application, email, password, ephemeral, mergeLocal = true }) {
-  if (!email) email = generateUuid()
-  if (!password) password = generateUuid()
+  if (!email) email = Utils.generateUuid()
+  if (!password) password = Utils.generateUuid()
   return application.register(email, password, ephemeral, mergeLocal)
 }
 
@@ -132,8 +133,8 @@ export async function setOldVersionPasscode({ application, passcode, version }) 
  * To use older version, use this method.
  */
 export async function registerOldUser({ application, email, password, version }) {
-  if (!email) email = generateUuid()
-  if (!password) password = generateUuid()
+  if (!email) email = Utils.generateUuid()
+  if (!password) password = Utils.generateUuid()
   const operator = application.protocolService.operatorManager.operatorForVersion(version)
   const accountKey = await operator.createRootKey(email, password, KeyParamsOrigination.Registration)
 
@@ -263,71 +264,6 @@ export async function restartApplication(application) {
   await safeDeinit(application)
   const newApplication = await createAndInitializeApplication(id)
   return newApplication
-}
-
-export function createItemParams(contentType) {
-  const params = {
-    uuid: generateUuid(),
-    content_type: contentType,
-    content: {
-      title: 'hello',
-      text: 'world',
-    },
-  }
-  return params
-}
-
-export function generateUuid() {
-  const crypto = new FakeWebCrypto()
-  return crypto.generateUUID()
-}
-
-export function createNoteParams({ title, text, dirty = true } = {}) {
-  const params = {
-    uuid: generateUuid(),
-    content_type: ContentType.Note,
-    dirty: dirty,
-    content: FillItemContent({
-      title: title || 'hello',
-      text: text || 'world',
-    }),
-  }
-  return params
-}
-
-export function createTagParams({ title, dirty = true, uuid = undefined } = {}) {
-  const params = {
-    uuid: uuid || generateUuid(),
-    content_type: ContentType.Tag,
-    dirty: dirty,
-    content: FillItemContent({
-      title: title || 'thoughts',
-    }),
-  }
-  return params
-}
-
-export function createRelatedNoteTagPairPayload({ noteTitle, noteText, tagTitle, dirty = true } = {}) {
-  const noteParams = createNoteParams({
-    title: noteTitle,
-    text: noteText,
-    dirty,
-  })
-  const tagParams = createTagParams({ title: tagTitle, dirty })
-  tagParams.content.references = [
-    {
-      uuid: noteParams.uuid,
-      content_type: noteParams.content_type,
-    },
-  ]
-  noteParams.content.references = []
-  return [new DecryptedPayload(noteParams), new DecryptedPayload(tagParams)]
-}
-
-export async function createSyncedNoteWithTag(application) {
-  const payloads = createRelatedNoteTagPairPayload()
-  await application.itemManager.emitItemsFromPayloads(payloads)
-  return application.sync.sync(syncOptions)
 }
 
 export async function storagePayloadCount(application) {
@@ -508,7 +444,7 @@ export async function changePayloadTimeStamp(application, payload, timestamp, co
   const changedPayload = new DecryptedPayload({
     ...payload,
     dirty: true,
-    dirtiedDate: new Date(),
+    dirtyIndex: getIncrementedDirtyIndex(),
     content: {
       ...payload.content,
       ...contentOverride,
@@ -526,7 +462,7 @@ export async function changePayloadUpdatedAt(application, payload, updatedAt) {
   const changedPayload = new DecryptedPayload({
     ...latestPayload,
     dirty: true,
-    dirtiedDate: new Date(),
+    dirtyIndex: getIncrementedDirtyIndex(),
     updated_at: updatedAt,
   })
 
@@ -541,7 +477,7 @@ export async function changePayloadTimeStampDeleteAndSync(application, payload, 
     ...payload,
     content: undefined,
     dirty: true,
-    dirtiedDate: new Date(),
+    dirtyIndex: getIncrementedDirtyIndex(),
     deleted: true,
     updated_at_timestamp: timestamp,
   })
