@@ -1029,4 +1029,22 @@ describe('online syncing', function () {
 
     expect(conditionMet).to.equal(true)
   })
+
+  it('deleting a note on one client should update notes count on the other', async function () {
+    const contextA = this.context
+    const contextB = await Factory.createAppContextWithFakeCrypto('AppB', contextA.email, contextA.password)
+
+    await contextB.launch()
+    await contextB.signIn()
+
+    const note = await contextA.createSyncedNote()
+    await contextB.sync()
+
+    expect(contextB.application.items.allCountableNotesCount()).to.equal(1)
+
+    await contextA.deleteItemAndSync(note)
+    await contextB.sync()
+
+    expect(contextB.application.items.allCountableNotesCount()).to.equal(0)
+  })
 })

@@ -45,9 +45,10 @@ export class TagNotesIndex implements SNIndex {
   }
 
   public onChange(delta: ItemDelta): void {
-    const changedOrInserted = delta.changed.concat(delta.inserted)
-    const notes = changedOrInserted.filter((i) => i.content_type === ContentType.Note)
-    const tags = changedOrInserted.filter(isDecryptedItem).filter(isTag)
+    const notes = [...delta.changed, ...delta.inserted, ...delta.discarded].filter(
+      (i) => i.content_type === ContentType.Note,
+    )
+    const tags = [...delta.changed, ...delta.inserted].filter(isDecryptedItem).filter(isTag)
 
     this.receiveNoteChanges(notes)
     this.receiveTagChanges(tags)
