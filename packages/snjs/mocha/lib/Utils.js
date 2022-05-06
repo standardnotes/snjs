@@ -1,3 +1,5 @@
+import FakeWebCrypto from './fake_web_crypto.js'
+
 export async function safeDeinit(application) {
   if (application.dealloced) {
     console.warn(
@@ -24,4 +26,9 @@ export async function sleep(seconds) {
       resolve()
     }, seconds * 1000)
   })
+}
+
+export function generateUuid() {
+  const crypto = new FakeWebCrypto()
+  return crypto.generateUUID()
 }

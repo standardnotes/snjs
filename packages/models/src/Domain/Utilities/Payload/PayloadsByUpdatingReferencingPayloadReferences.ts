@@ -6,6 +6,7 @@ import { DecryptedPayloadInterface } from '../../Abstract/Payload/Interfaces/Dec
 import { FullyFormedPayloadInterface } from '../../Abstract/Payload/Interfaces/UnionTypes'
 import { isDecryptedPayload } from '../../Abstract/Payload'
 import { SyncResolvedPayload } from '../../Runtime/Deltas/Utilities/SyncResolvedPayload'
+import { getIncrementedDirtyIndex } from '../../Runtime/DirtyCounter/DirtyCounter'
 
 export function PayloadsByUpdatingReferencingPayloadReferences(
   payload: DecryptedPayloadInterface,
@@ -36,7 +37,7 @@ export function PayloadsByUpdatingReferencingPayloadReferences(
 
     const result = referencingPayload.copyAsSyncResolved({
       dirty: true,
-      dirtiedDate: new Date(),
+      dirtyIndex: getIncrementedDirtyIndex(),
       lastSyncEnd: new Date(),
       content: {
         ...referencingPayload.content,

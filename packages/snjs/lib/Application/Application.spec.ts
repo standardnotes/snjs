@@ -119,7 +119,6 @@ describe('application', () => {
         sync: {
           syncToken: undefined,
           cursorToken: undefined,
-          lastPreSyncSave: undefined,
           lastSyncDate: undefined,
           outOfSync: false,
           completedOnlineDownloadFirstSync: false,

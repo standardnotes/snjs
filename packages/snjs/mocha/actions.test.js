@@ -1,6 +1,7 @@
 /* eslint-disable no-unused-expressions */
 /* eslint-disable no-undef */
 import * as Factory from './lib/factory.js'
+import * as Utils from './lib/Utils.js'
 chai.use(chaiAsPromised)
 const expect = chai.expect
 
@@ -108,7 +109,7 @@ describe('actions service', () => {
     })
 
     const payload = new DecryptedPayload({
-      uuid: Factory.generateUuid(),
+      uuid: Utils.generateUuid(),
       content_type: ContentType.Note,
       content: {
         title: 'Testing',

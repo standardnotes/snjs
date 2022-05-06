@@ -98,7 +98,7 @@ describe('key recovery service', function () {
     const randomItemsKey = await application.protocolService.operatorManager.defaultOperator().createItemsKey()
 
     await application.payloadManager.emitPayload(
-      randomItemsKey.payload.copy({ dirty: true, dirtiedDate: new Date() }),
+      randomItemsKey.payload.copy({ dirty: true, dirtyIndex: getIncrementedDirtyIndex() }),
       PayloadEmitSource.LocalInserted,
     )
 

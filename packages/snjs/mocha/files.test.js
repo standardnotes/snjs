@@ -1,4 +1,5 @@
 import * as Factory from './lib/factory.js'
+import * as Utils from './lib/Utils.js'
 chai.use(chaiAsPromised)
 const expect = chai.expect
 
@@ -85,7 +86,7 @@ describe('files', function () {
 
   it('should create valet token from server', async function () {
     await setup({ fakeCrypto: true, subscription: true })
-    const remoteIdentifier = Factory.generateUuid()
+    const remoteIdentifier = Utils.generateUuid()
     const token = await application.apiService.createFileValetToken(remoteIdentifier, 'write')
 
     expect(token.length).to.be.above(0)
@@ -94,7 +95,7 @@ describe('files', function () {
   it('should not create valet token from server when user has no subscription', async function () {
     await setup({ fakeCrypto: true, subscription: false })
 
-    const remoteIdentifier = Factory.generateUuid()
+    const remoteIdentifier = Utils.generateUuid()
     const tokenOrError = await application.apiService.createFileValetToken(remoteIdentifier, 'write')
 
     expect(tokenOrError.tag).to.equal('no-subscription')
@@ -114,7 +115,7 @@ describe('files', function () {
 
     await Factory.sleep(0.25)
 
-    const remoteIdentifier = Factory.generateUuid()
+    const remoteIdentifier = Utils.generateUuid()
     const tokenOrError = await application.apiService.createFileValetToken(remoteIdentifier, 'write')
 
     expect(tokenOrError.tag).to.equal('expired-subscription')
@@ -123,12 +124,12 @@ describe('files', function () {
   it('creating two upload sessions successively should succeed', async function () {
     await setup({ fakeCrypto: true, subscription: true })
 
-    const firstToken = await application.apiService.createFileValetToken(Factory.generateUuid(), 'write')
+    const firstToken = await application.apiService.createFileValetToken(Utils.generateUuid(), 'write')
     const firstSession = await application.apiService.startUploadSession(firstToken)
 
     expect(firstSession.uploadId).to.be.ok
 
-    const secondToken = await application.apiService.createFileValetToken(Factory.generateUuid(), 'write')
+    const secondToken = await application.apiService.createFileValetToken(Utils.generateUuid(), 'write')
     const secondSession = await application.apiService.startUploadSession(secondToken)
 
     expect(secondSession.uploadId).to.be.ok

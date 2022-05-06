@@ -10,7 +10,7 @@ import * as Models from '@standardnotes/models'
 import * as Services from '@standardnotes/services'
 import * as Utils from '@standardnotes/utils'
 import { isEnvironmentMobile, isEnvironmentWebOrDesktop } from '@Lib/Application/Platforms'
-import { PayloadTimestampDefaults } from '@standardnotes/models'
+import { getIncrementedDirtyIndex, PayloadTimestampDefaults } from '@standardnotes/models'
 import { isMobileDevice } from '@standardnotes/services'
 
 interface LegacyStorageContent extends Models.ItemContent {
@@ -705,7 +705,7 @@ export class Migration2_0_0 extends Migration {
           version: rootKeyParams?.version || fallbackVersion,
         }),
         dirty: true,
-        dirtiedDate: new Date(),
+        dirtyIndex: getIncrementedDirtyIndex(),
         ...PayloadTimestampDefaults(),
       })
 

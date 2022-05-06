@@ -19,7 +19,8 @@ export interface PayloadInterface<T extends TransferPayload = TransferPayload, C
   get serverUpdatedAt(): Date
   get serverUpdatedAtTimestamp(): number
 
-  readonly dirtiedDate?: Date
+  readonly dirtyIndex?: number
+  readonly globalDirtyIndexAtLastSync?: number
   readonly dirty?: boolean
 
   readonly lastSyncBegan?: Date

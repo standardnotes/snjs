@@ -3,6 +3,7 @@ import { DeletedPayloadInterface, PayloadInterface } from '../../Payload'
 import { ItemInterface } from '../Interfaces/ItemInterface'
 import { ItemMutator } from './ItemMutator'
 import { MutationType } from '../Types/MutationType'
+import { getIncrementedDirtyIndex } from '../../../Runtime/DirtyCounter/DirtyCounter'
 
 export class DeleteItemMutator<
   I extends ItemInterface<PayloadInterface> = ItemInterface<PayloadInterface>,
@@ -15,7 +16,7 @@ export class DeleteItemMutator<
         deleted: true,
         content: undefined,
         dirty: dirtying ? true : this.payload.dirty,
-        dirtiedDate: dirtying ? new Date() : this.payload.dirtiedDate,
+        dirtyIndex: dirtying ? getIncrementedDirtyIndex() : this.payload.dirtyIndex,
       },
       this.payload.source,
     )

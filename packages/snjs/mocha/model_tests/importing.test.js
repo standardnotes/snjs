@@ -1,6 +1,7 @@
 /* eslint-disable no-unused-expressions */
 /* eslint-disable no-undef */
 import * as Factory from '../lib/factory.js'
+import { createRelatedNoteTagPairPayload } from '../lib/Items.js'
 chai.use(chaiAsPromised)
 const expect = chai.expect
 
@@ -60,7 +61,7 @@ describe('importing', function () {
 
   it('importing existing data should keep relationships valid', async function () {
     await setup({ fakeCrypto: true })
-    const pair = Factory.createRelatedNoteTagPairPayload()
+    const pair = createRelatedNoteTagPairPayload()
     const notePayload = pair[0]
     const tagPayload = pair[1]
 
@@ -121,7 +122,7 @@ describe('importing', function () {
 
   it('importing a tag with lesser references should not create duplicate', async function () {
     await setup({ fakeCrypto: true })
-    const pair = Factory.createRelatedNoteTagPairPayload()
+    const pair = createRelatedNoteTagPairPayload()
     const tagPayload = pair[1]
     await application.itemManager.emitItemsFromPayloads(pair, PayloadEmitSource.LocalChanged)
     const mutatedTag = new DecryptedPayload({
@@ -143,7 +144,7 @@ describe('importing', function () {
 
   it('importing data with differing content should create duplicates', async function () {
     await setup({ fakeCrypto: true })
-    const pair = Factory.createRelatedNoteTagPairPayload()
+    const pair = createRelatedNoteTagPairPayload()
     const notePayload = pair[0]
     const tagPayload = pair[1]
     await application.itemManager.emitItemsFromPayloads(pair, PayloadEmitSource.LocalChanged)
@@ -840,7 +841,7 @@ describe('importing', function () {
 
     Factory.handlePasswordChallenges(application, password)
 
-    const pair = Factory.createRelatedNoteTagPairPayload()
+    const pair = createRelatedNoteTagPairPayload()
     await application.itemManager.emitItemsFromPayloads(pair, PayloadEmitSource.LocalChanged)
 
     await application.sync.sync()

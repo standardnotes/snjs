@@ -1,6 +1,6 @@
-/* eslint-disable no-unused-expressions */
 /* eslint-disable no-undef */
 import * as Factory from '../lib/factory.js'
+import * as Utils from '../lib/Utils.js'
 chai.use(chaiAsPromised)
 const expect = chai.expect
 
@@ -703,7 +703,7 @@ describe('online syncing', function () {
     this.expectedItemCount++
 
     expect(note.dirty).to.equal(true)
-    expect(note.dirtiedDate).to.be.at.most(new Date())
+    expect(note.payload.dirtyIndex).to.be.at.most(getCurrentDirtyIndex())
 
     note = await this.application.itemManager.changeItem(note, (mutator) => {
       mutator.text = `${Math.random()}`
@@ -739,7 +739,7 @@ describe('online syncing', function () {
      * If you begin a sync request that takes 20s to complete, then begin modifying an item
      * many times and attempt to sync, it will await the initial sync to complete.
      * When that completes, it will decide whether an item is still dirty or not.
-     * It will do based on comparing whether item.dirtiedDate > item.lastSyncBegan
+     * It will do based on comparing whether item.dirtyIndex > item.globalDirtyIndexAtLastSync
      */
     let note = await Factory.createMappedNote(this.application)
     await this.application.itemManager.setItemDirty(note)
@@ -759,7 +759,7 @@ describe('online syncing', function () {
     await this.application.itemManager.setItemDirty(note)
     await this.application.itemManager.setItemDirty(note)
     await this.application.itemManager.setItemDirty(note)
-    expect(note.dirtiedDate).to.be.above(note.lastSyncBegan)
+    expect(note.payload.dirtyIndex).to.be.above(note.payload.globalDirtyIndexAtLastSync)
 
     // Now do a regular sync with no latency.
     this.application.syncService.ut_endLatencySimulator()
@@ -829,27 +829,32 @@ describe('online syncing', function () {
   })
 
   it('marking item dirty after dirty items are prepared for sync but before they are synced should sync again', async function () {
-    this.retries(2)
     /**
      * There is a twilight zone where items needing sync are popped, and then say about 100ms of processing before
-     * we set those items' lastSyncBegan. If the item is dirtied in between these times, then item.dirtiedDate will be less than
-     * item.lastSyncBegan, and it will not by synced again.
+     * we set those items' lastSyncBegan. If the item is dirtied in between these times, then item.dirtyIndex will be less than
+     * item.globalDirtyIndexAtLastSync, and it will not by synced again.
      */
+
     const expectedSaveCount = 2
     let actualSaveCount = 0
+
     /** Create an item and sync it */
     let note = await Factory.createMappedNote(this.application)
+
     this.application.itemManager.addObserver(ContentType.Note, ({ source }) => {
       if (source === PayloadEmitSource.RemoteSaved) {
         actualSaveCount++
       }
     })
     this.expectedItemCount++
+
     /** Dont await */
     const syncRequest = this.application.syncService.sync(syncOptions)
+
     /** Dirty the item before lastSyncBegan is set */
     let didPerformMutatation = false
     const newText = `${Math.random()}`
+
     this.application.syncService.addEventObserver(async (eventName) => {
       if (eventName === SyncEvent.SyncWillBegin && !didPerformMutatation) {
         didPerformMutatation = true
@@ -858,20 +863,15 @@ describe('online syncing', function () {
         })
       }
     })
+
     await syncRequest
+
     expect(actualSaveCount).to.equal(expectedSaveCount)
     note = this.application.items.findItem(note.uuid)
     expect(note.text).to.equal(newText)
   })
 
-  it('marking item dirty at exact same time as lastSyncBegan should sync again', async function () {
-    this.retries(2)
-
-    /**
-     * Due to lack of nanosecond support in JS, it's possible that two operations complete
-     * within the same millisecond cycle. What happens if you mark an item as dirty at time A and also begin
-     * syncing at time A? It should sync again.
-     */
+  it('marking item dirty during presync save should sync again', async function () {
     const expectedSaveCount = 2
     let actualSaveCount = 0
 
@@ -889,7 +889,7 @@ describe('online syncing', function () {
         const mutated = changed[0].payload.copy({
           content: { ...note.payload.content, text: newText },
           dirty: true,
-          dirtiedDate: changed[0].lastSyncBegan,
+          dirtyIndex: changed[0].payload.globalDirtyIndexAtLastSync + 1,
         })
 
         await this.application.itemManager.emitItemFromPayload(mutated)
@@ -983,7 +983,7 @@ describe('online syncing', function () {
      * be returned by the server as an error conflict.
      */
     const payload = new DecryptedPayload({
-      uuid: Factory.generateUuid(),
+      uuid: Utils.generateUuid(),
       content_type: 'Foo',
       dirty: true,
       content: {},

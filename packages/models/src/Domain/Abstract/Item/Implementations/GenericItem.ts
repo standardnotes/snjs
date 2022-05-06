@@ -60,10 +60,6 @@ export abstract class GenericItem<P extends PayloadInterface = PayloadInterface>
     return this.serverUpdatedAt
   }
 
-  get dirtiedDate() {
-    return this.payload.dirtiedDate
-  }
-
   get dirty() {
     return this.payload.dirty
   }

@@ -1,5 +1,6 @@
 /* eslint-disable no-undef */
 import * as Factory from '../lib/factory.js'
+import * as Utils from '../lib/Utils.js'
 import FakeWebCrypto from '../lib/fake_web_crypto.js'
 chai.use(chaiAsPromised)
 const expect = chai.expect
@@ -51,7 +52,7 @@ describe('2020-01-15 mobile migration', () => {
       })
       /** Wrap account key with passcode key and store in storage */
       const keyPayload = new DecryptedPayload({
-        uuid: Factory.generateUuid(),
+        uuid: Utils.generateUuid(),
         content_type: 'SN|Mobile|EncryptedKeys',
         content: {
           accountKeys: {
@@ -904,7 +905,7 @@ describe('2020-01-15 mobile migration', () => {
       )
       /** Wrap account key with passcode key and store in storage */
       const keyPayload = new DecryptedPayload({
-        uuid: Factory.generateUuid(),
+        uuid: Utils.generateUuid(),
         content_type: 'SN|Mobile|EncryptedKeys',
         content: {
           accountKeys: {

@@ -1,6 +1,7 @@
 /* eslint-disable no-unused-expressions */
 /* eslint-disable no-undef */
 import * as Factory from './lib/factory.js'
+import { createRelatedNoteTagPairPayload } from './lib/Items.js'
 chai.use(chaiAsPromised)
 const expect = chai.expect
 
@@ -35,7 +36,7 @@ describe('payload encryption', function () {
     const notePayload = new DecryptedPayload({
       ...rawPayload,
       dirty: true,
-      dirtiedDate: new Date(),
+      dirtyIndex: getIncrementedDirtyIndex(),
       lastSyncBegan: new Date(),
     })
 
@@ -96,7 +97,7 @@ describe('payload encryption', function () {
   })
 
   it('copying payload with override should copy empty arrays', function () {
-    const pair = Factory.createRelatedNoteTagPairPayload()
+    const pair = createRelatedNoteTagPairPayload()
     const tagPayload = pair[1]
     expect(tagPayload.content.references.length).to.equal(1)
 

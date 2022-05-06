@@ -9,6 +9,7 @@ import {
   PredicateInterface,
   PayloadEmitSource,
   PayloadTimestampDefaults,
+  getIncrementedDirtyIndex,
 } from '@standardnotes/models'
 import { arrayByRemovingFromIndex, extendArray, UuidGenerator } from '@standardnotes/utils'
 import { SNSyncService } from '../Sync/SyncService'
@@ -217,7 +218,7 @@ export class SNSingletonManager extends AbstractService {
       content_type: contentType,
       content: createContent,
       dirty: true,
-      dirtiedDate: new Date(),
+      dirtyIndex: getIncrementedDirtyIndex(),
       ...PayloadTimestampDefaults(),
     })
 

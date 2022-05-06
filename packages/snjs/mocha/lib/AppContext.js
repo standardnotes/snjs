@@ -1,8 +1,14 @@
 import FakeWebCrypto from './fake_web_crypto.js'
 import * as Applications from './Applications.js'
 import * as Utils from './Utils.js'
+import { createNotePayload } from './Items.js'
 
 UuidGenerator.SetGenerator(new FakeWebCrypto().generateUUID)
+
+const MaximumSyncOptions = {
+  checkIntegrity: true,
+  awaitAll: true,
+}
 
 export class AppContext {
   constructor({ identifier, crypto, email, password, passcode } = {}) {
@@ -29,6 +35,21 @@ export class AppContext {
     this.passcode = passcode
   }
 
+  enableLogging() {
+    const syncService = this.application.syncService
+    const payloadManager = this.application.payloadManager
+
+    syncService.getServiceName = () => {
+      return `${this.identifier}—SyncService`
+    }
+    payloadManager.getServiceName = () => {
+      return `${this.identifier}-PayloadManager`
+    }
+
+    syncService.loggingEnabled = true
+    payloadManager.loggingEnabled = true
+  }
+
   async initialize() {
     this.application = await Applications.createApplication(
       this.identifier,
@@ -45,6 +66,12 @@ export class AppContext {
 
   resumeChallenges() {
     this.ignoringChallenges = false
+  }
+
+  disableIntegrityAutoHeal() {
+    this.application.syncService.emitOutOfSyncRemotePayloads = () => {
+      console.warn('Integrity self-healing is disabled for this test')
+    }
   }
 
   disableKeyRecovery() {
@@ -78,7 +105,7 @@ export class AppContext {
       } else if (challenge.heading.includes('account password')) {
         responses.push(new ChallengeValue(prompt, accountPassword))
       } else {
-        console.log('challenge', challenge)
+        console.log('Unhandled challenge', challenge)
         throw Error(`Unhandled custom challenge in Factory.createAppContext`)
       }
     }
@@ -87,7 +114,11 @@ export class AppContext {
   }
 
   signIn() {
-    return this.application.signIn(this.email, this.password)
+    const strict = false
+    const ephemeral = false
+    const mergeLocal = true
+    const awaitSync = true
+    return this.application.signIn(this.email, this.password, strict, ephemeral, mergeLocal, awaitSync)
   }
 
   register() {
@@ -170,7 +201,11 @@ export class AppContext {
   }
 
   async sync(options) {
-    await this.application.sync.sync(options)
+    await this.application.sync.sync(options || { awaitAll: true })
+  }
+
+  async maximumSync() {
+    await this.sync(MaximumSyncOptions)
   }
 
   async changePassword(newPassword) {
@@ -225,5 +260,53 @@ export class AppContext {
     this.application.items.addObserver(ContentType.Any, ({ changed, unerrored }) => {
       callback([...changed, ...unerrored])
     })
+  }
+
+  async createSyncedNote(title, text) {
+    const payload = createNotePayload(title, text)
+    const item = await this.application.items.emitItemFromPayload(payload, PayloadEmitSource.LocalChanged)
+    await this.application.items.setItemDirty(item)
+    await this.application.syncService.sync(MaximumSyncOptions)
+    const note = this.application.items.findItem(payload.uuid)
+
+    return note
+  }
+
+  async changeNoteTitle(note, title) {
+    return this.application.items.changeNote(note, (mutator) => {
+      mutator.title = title
+    })
+  }
+
+  async changeNoteTitleAndSync(note, title) {
+    await this.changeNoteTitle(note, title)
+    await this.sync()
+
+    return this.findItem(note.uuid)
+  }
+
+  findNoteByTitle(title) {
+    return this.application.items.notes.find((note) => note.title === title)
+  }
+
+  get noteCount() {
+    return this.application.items.notes.length
+  }
+
+  async createConflictedNotes(otherContext) {
+    const note = await this.createSyncedNote()
+
+    await otherContext.sync()
+
+    await this.changeNoteTitleAndSync(note, 'title-1')
+
+    await otherContext.changeNoteTitleAndSync(note, 'title-2')
+
+    await this.sync()
+
+    return {
+      original: note,
+      conflict: this.findNoteByTitle('title-2'),
+    }
   }
 }

@@ -9,6 +9,7 @@ import {
   DecryptedPayloadInterface,
   PayloadEmitSource,
   EncryptedItemInterface,
+  getIncrementedDirtyIndex,
 } from '@standardnotes/models'
 import { SNSyncService } from '../Sync/SyncService'
 import { KeyRecoveryStrings } from '../Api/Messages'
@@ -463,7 +464,9 @@ export class SNKeyRecoveryService extends AbstractService<KeyRecoveryEvent, Decr
     const matchingKeys = this.removeElementsFromQueueForMatchingKeyParams(rootKey.keyParams).map((qItem) => {
       const needsResync = clientParamsMatchServer && !serverParams.compare(qItem.keyParams)
 
-      return needsResync ? qItem.encryptedKey.copy({ dirty: true, dirtiedDate: new Date() }) : qItem.encryptedKey
+      return needsResync
+        ? qItem.encryptedKey.copy({ dirty: true, dirtyIndex: getIncrementedDirtyIndex() })
+        : qItem.encryptedKey
     })
 
     const matchingResults = await this.protocolService.decryptSplit({

@@ -1,6 +1,7 @@
 /* eslint-disable no-unused-expressions */
 /* eslint-disable no-undef */
 import * as Factory from './lib/factory.js'
+import { createNoteParams } from './lib/Items.js'
 chai.use(chaiAsPromised)
 const expect = chai.expect
 
@@ -167,7 +168,7 @@ describe('history manager', () => {
 
     it('should keep the entry right before a large deletion, regardless of its delta', async function () {
       const payload = new DecryptedPayload(
-        Factory.createNoteParams({
+        createNoteParams({
           text: Factory.randomString(100),
         }),
       )
@@ -196,7 +197,7 @@ describe('history manager', () => {
 
     it('entries should be ordered from newest to oldest', async function () {
       const payload = new DecryptedPayload(
-        Factory.createNoteParams({
+        createNoteParams({
           text: Factory.randomString(200),
         }),
       )

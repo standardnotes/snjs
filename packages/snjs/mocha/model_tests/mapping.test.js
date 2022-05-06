@@ -1,6 +1,7 @@
 /* eslint-disable no-unused-expressions */
 /* eslint-disable no-undef */
 import * as Factory from '../lib/factory.js'
+import { createNoteParams } from '../lib/Items.js'
 chai.use(chaiAsPromised)
 const expect = chai.expect
 
@@ -25,7 +26,7 @@ describe('model manager mapping', () => {
 
   it('mapping nonexistent deleted item doesnt create it', async function () {
     const payload = new DeletedPayload({
-      ...Factory.createNoteParams(),
+      ...createNoteParams(),
       dirty: false,
       deleted: true,
     })
