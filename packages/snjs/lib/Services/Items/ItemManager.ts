@@ -1030,14 +1030,16 @@ export class ItemManager
 
   public async addTagToNote(note: Models.SNNote, tag: Models.SNTag, addHierarchy: boolean): Promise<Models.SNTag[]> {
     let tagsToAdd = [tag]
+
     if (addHierarchy) {
       const parentChainTags = this.getTagParentChain(tag)
       tagsToAdd = [...parentChainTags, tag]
     }
+
     return Promise.all(
       tagsToAdd.map((tagToAdd) => {
-        return this.changeItem(tagToAdd, (mutator) => {
-          mutator.addItemAsRelationship(note)
+        return this.changeTag(tagToAdd, (mutator) => {
+          mutator.addNote(note)
         }) as Promise<Models.SNTag>
       }),
     )

@@ -591,7 +591,7 @@ describe('online conflict handling', function () {
     expect(userPrefs).to.be.ok
 
     tag = await this.application.itemManager.changeItem(tag, (mutator) => {
-      mutator.addItemAsRelationship(userPrefs)
+      mutator.e2ePendingRefactor_addItemAsRelationship(userPrefs)
     })
 
     await this.application.itemManager.setItemDirty(userPrefs)
@@ -655,7 +655,7 @@ describe('online conflict handling', function () {
     tag = await this.application.mutator.changeAndSaveItem(
       tag,
       (mutator) => {
-        mutator.addItemAsRelationship(note)
+        mutator.e2ePendingRefactor_addItemAsRelationship(note)
       },
       undefined,
       undefined,
@@ -855,7 +855,7 @@ describe('online conflict handling', function () {
     const tag = this.application.itemManager.tags[0]
     const note2 = await Factory.createMappedNote(this.application)
     await this.application.mutator.changeAndSaveItem(tag, (mutator) => {
-      mutator.addItemAsRelationship(note2)
+      mutator.e2ePendingRefactor_addItemAsRelationship(note2)
     })
     let backupFile = await this.application.createEncryptedBackupFileForAutomatedDesktopBackups()
     backupFile.items = [

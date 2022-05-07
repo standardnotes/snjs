@@ -65,7 +65,7 @@ export class NotesDisplayCriteria {
 
     if (this.tags.length > 0) {
       for (const tag of this.tags) {
-        filters.push((note) => tag.hasRelationshipWithItem(note))
+        filters.push((note) => tag.isReferencingItem(note))
       }
     }
 

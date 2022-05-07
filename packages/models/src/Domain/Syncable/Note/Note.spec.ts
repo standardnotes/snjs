@@ -1,29 +1,8 @@
-import { PayloadSource } from './../../Abstract/Payload/Types/PayloadSource'
-import { DecryptedPayload } from './../../Abstract/Payload/Implementations/DecryptedPayload'
-import { SNNote } from './Note'
-import { NoteContent } from './NoteContent'
-import { ContentType } from '@standardnotes/common'
-import { FillItemContent } from '../../Abstract/Content/ItemContent'
-import { PayloadTimestampDefaults } from '../../Abstract/Payload'
-
-const randUuid = () => String(Math.random())
-
-const create = (payload?: Partial<NoteContent>): SNNote =>
-  new SNNote(
-    new DecryptedPayload(
-      {
-        uuid: randUuid(),
-        content_type: ContentType.Note,
-        content: FillItemContent({ ...payload }),
-        ...PayloadTimestampDefaults(),
-      },
-      PayloadSource.Constructor,
-    ),
-  )
+import { createNote } from './../../Utilities/Test/SpecUtils'
 
 describe('SNNote Tests', () => {
   it('should safely type required fields of Note when creating from PayloadContent', () => {
-    const note = create({
+    const note = createNote({
       title: 'Expected string',
       text: ['unexpected array'] as never,
       preview_plain: 'Expected preview',
@@ -41,7 +20,7 @@ describe('SNNote Tests', () => {
   })
 
   it('should preserve falsy values when casting from PayloadContent', () => {
-    const note = create({
+    const note = createNote({
       preview_plain: null as never,
       preview_html: undefined,
     })
@@ -51,11 +30,11 @@ describe('SNNote Tests', () => {
   })
 
   it('should set mobilePrefersPlainEditor when given a valid choice', () => {
-    const selected = create({
+    const selected = createNote({
       mobilePrefersPlainEditor: true,
     })
 
-    const unselected = create()
+    const unselected = createNote()
 
     expect(selected.mobilePrefersPlainEditor).toBeTruthy()
     expect(unselected.mobilePrefersPlainEditor).toBe(undefined)

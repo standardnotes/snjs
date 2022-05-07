@@ -127,7 +127,7 @@ describe('items', () => {
     item1 = await this.application.mutator.changeAndSaveItem(
       item1,
       (mutator) => {
-        mutator.addItemAsRelationship(item2)
+        mutator.e2ePendingRefactor_addItemAsRelationship(item2)
       },
       undefined,
       undefined,
@@ -136,7 +136,7 @@ describe('items', () => {
     item2 = await this.application.mutator.changeAndSaveItem(
       item2,
       (mutator) => {
-        mutator.addItemAsRelationship(item1)
+        mutator.e2ePendingRefactor_addItemAsRelationship(item1)
       },
       undefined,
       undefined,

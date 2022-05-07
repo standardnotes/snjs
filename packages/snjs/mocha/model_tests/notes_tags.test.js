@@ -99,8 +99,8 @@ describe('notes and tags', () => {
     expect(note.content.references.length).to.equal(0)
     expect(tag.content.references.length).to.equal(1)
 
-    expect(note.hasRelationshipWithItem(tag)).to.equal(false)
-    expect(tag.hasRelationshipWithItem(note)).to.equal(true)
+    expect(note.isReferencingItem(tag)).to.equal(false)
+    expect(tag.isReferencingItem(note)).to.equal(true)
 
     expect(this.application.itemManager.itemsReferencingItem(note).length).to.equal(1)
     expect(note.payload.references.length).to.equal(0)
@@ -349,7 +349,7 @@ describe('notes and tags', () => {
       const taggedNote = await Factory.createMappedNote(this.application)
       const tag = await this.application.mutator.findOrCreateTag('A')
       await this.application.mutator.changeItem(tag, (mutator) => {
-        mutator.addItemAsRelationship(taggedNote)
+        mutator.e2ePendingRefactor_addItemAsRelationship(taggedNote)
       })
       await this.application.mutator.insertItem(
         await this.application.mutator.createTemplateItem(ContentType.Note, {
@@ -373,8 +373,8 @@ describe('notes and tags', () => {
       const trashedNote = await Factory.createMappedNote(this.application)
       const tag = await this.application.mutator.findOrCreateTag('A')
       await this.application.mutator.changeItem(tag, (mutator) => {
-        mutator.addItemAsRelationship(taggedNote)
-        mutator.addItemAsRelationship(trashedNote)
+        mutator.e2ePendingRefactor_addItemAsRelationship(taggedNote)
+        mutator.e2ePendingRefactor_addItemAsRelationship(trashedNote)
       })
       await this.application.mutator.changeItem(trashedNote, (mutator) => {
         mutator.trashed = true
@@ -409,7 +409,7 @@ describe('notes and tags', () => {
       const tag = await this.application.mutator.findOrCreateTag('A')
       await this.application.mutator.changeItem(tag, (mutator) => {
         for (const note of this.application.itemManager.notes) {
-          mutator.addItemAsRelationship(note)
+          mutator.e2ePendingRefactor_addItemAsRelationship(note)
         }
       })
 
@@ -646,7 +646,7 @@ describe('notes and tags', () => {
       const taggedNote = await Factory.createMappedNote(this.application)
       const tag = await this.application.mutator.findOrCreateTag('A')
       await this.application.mutator.changeItem(tag, (mutator) => {
-        mutator.addItemAsRelationship(taggedNote)
+        mutator.e2ePendingRefactor_addItemAsRelationship(taggedNote)
       })
 
       const view = await this.application.mutator.insertItem(
@@ -677,7 +677,7 @@ describe('notes and tags', () => {
       const taggedNote = await Factory.createMappedNote(this.application)
       const tag = await this.application.mutator.findOrCreateTag('B')
       await this.application.mutator.changeItem(tag, (mutator) => {
-        mutator.addItemAsRelationship(taggedNote)
+        mutator.e2ePendingRefactor_addItemAsRelationship(taggedNote)
       })
       await this.application.mutator.insertItem(
         await this.application.mutator.createTemplateItem(ContentType.Note, {

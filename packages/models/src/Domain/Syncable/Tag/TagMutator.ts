@@ -1,21 +1,24 @@
 import { ContentType } from '@standardnotes/common'
 import { TagContent, SNTag } from './Tag'
+import { SNFile } from '../File'
+import { SNNote } from '../Note'
 import { isTagToParentTagReference } from '../../Abstract/Reference/Functions'
 import { TagToParentTagReference } from '../../Abstract/Reference/TagToParentTagReference'
 import { ContenteReferenceType } from '../../Abstract/Reference/ContenteReferenceType'
 import { DecryptedItemMutator } from '../../Abstract/Item/Mutator/DecryptedItemMutator'
+import { TagToFileReference } from '../../Abstract/Reference/TagToFileReference'
 
 export class TagMutator extends DecryptedItemMutator<TagContent> {
   set title(title: string) {
-    this.content.title = title
+    this.mutableContent.title = title
   }
 
   set expanded(expanded: boolean) {
-    this.content.expanded = expanded
+    this.mutableContent.expanded = expanded
   }
 
   public makeChildOf(tag: SNTag): void {
-    const references = this.item.references.filter((ref) => !isTagToParentTagReference(ref))
+    const references = this.immutableItem.references.filter((ref) => !isTagToParentTagReference(ref))
 
     const reference: TagToParentTagReference = {
       reference_type: ContenteReferenceType.TagToParentTag,
@@ -25,11 +28,43 @@ export class TagMutator extends DecryptedItemMutator<TagContent> {
 
     references.push(reference)
 
-    this.content.references = references
+    this.mutableContent.references = references
   }
 
   public unsetParent(): void {
-    const references = this.item.references.filter((ref) => !isTagToParentTagReference(ref))
-    this.content.references = references
+    this.mutableContent.references = this.immutableItem.references.filter((ref) => !isTagToParentTagReference(ref))
+  }
+
+  public addFile(file: SNFile): void {
+    if (this.immutableItem.isReferencingItem(file)) {
+      return
+    }
+
+    const reference: TagToFileReference = {
+      reference_type: ContenteReferenceType.TagToFile,
+      content_type: ContentType.File,
+      uuid: file.uuid,
+    }
+
+    this.mutableContent.references.push(reference)
+  }
+
+  public removeFile(file: SNFile): void {
+    this.mutableContent.references = this.mutableContent.references.filter((r) => r.uuid !== file.uuid)
+  }
+
+  public addNote(note: SNNote): void {
+    if (this.immutableItem.isReferencingItem(note)) {
+      return
+    }
+
+    this.mutableContent.references.push({
+      uuid: note.uuid,
+      content_type: note.content_type,
+    })
+  }
+
+  public removeNote(note: SNNote): void {
+    this.mutableContent.references = this.mutableContent.references.filter((r) => r.uuid !== note.uuid)
   }
 }

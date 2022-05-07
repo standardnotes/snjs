@@ -498,7 +498,7 @@ describe('item manager', function () {
 
       const note = await this.createNote()
       await this.itemManager.changeItem(firstTag, (mutator) => {
-        mutator.addItemAsRelationship(note)
+        mutator.e2ePendingRefactor_addItemAsRelationship(note)
       })
 
       const results = this.itemManager.searchTags('tag', note)
@@ -572,7 +572,7 @@ describe('item manager', function () {
 
       tags.map(async (tag) => {
         await this.itemManager.changeItem(tag, (mutator) => {
-          mutator.addItemAsRelationship(note)
+          mutator.e2ePendingRefactor_addItemAsRelationship(note)
         })
       })
 

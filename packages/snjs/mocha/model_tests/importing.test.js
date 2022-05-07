@@ -212,7 +212,7 @@ describe('importing', function () {
     expectedItemCount += 2
 
     await application.itemManager.changeItem(tag, (mutator) => {
-      mutator.addItemAsRelationship(note)
+      mutator.e2ePendingRefactor_addItemAsRelationship(note)
     })
 
     const externalNote = Object.assign(
