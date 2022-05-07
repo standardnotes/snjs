@@ -49,11 +49,8 @@ export class DecryptedItem<C extends ItemContent = ItemContent>
     return this.payload.content.references || []
   }
 
-  public hasRelationshipWithItem(item: DecryptedItemInterface): boolean {
-    const target = this.references?.find((r) => {
-      return r.uuid === item.uuid
-    })
-    return !!target
+  public isReferencingItem(item: DecryptedItemInterface): boolean {
+    return this.references.find((r) => r.uuid === item.uuid) != undefined
   }
 
   /**

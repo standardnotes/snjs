@@ -7,27 +7,27 @@ import { DecryptedItemMutator } from '../../Abstract/Item/Mutator/DecryptedItemM
 
 export class FileMutator extends DecryptedItemMutator<FileContent> {
   set name(newName: string) {
-    this.content.name = newName
+    this.mutableContent.name = newName
   }
 
   set encryptionHeader(encryptionHeader: string) {
-    this.content.encryptionHeader = encryptionHeader
+    this.mutableContent.encryptionHeader = encryptionHeader
   }
 
-  public associateWithNote(note: SNNote): void {
+  public addNote(note: SNNote): void {
     const reference: FileToNoteReference = {
       reference_type: ContenteReferenceType.FileToNote,
       content_type: ContentType.Note,
       uuid: note.uuid,
     }
 
-    const references = this.content.references || []
+    const references = this.mutableContent.references || []
     references.push(reference)
-    this.content.references = references
+    this.mutableContent.references = references
   }
 
-  public disassociateWithNote(note: SNNote): void {
-    const references = this.item.references.filter((ref) => ref.uuid !== note.uuid)
-    this.content.references = references
+  public removeNote(note: SNNote): void {
+    const references = this.immutableItem.references.filter((ref) => ref.uuid !== note.uuid)
+    this.mutableContent.references = references
   }
 }

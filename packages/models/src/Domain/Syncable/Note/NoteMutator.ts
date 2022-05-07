@@ -4,23 +4,23 @@ import { DecryptedItemMutator } from '../../Abstract/Item/Mutator/DecryptedItemM
 
 export class NoteMutator extends DecryptedItemMutator<NoteContent> {
   set title(title: string) {
-    this.content.title = title
+    this.mutableContent.title = title
   }
 
   set text(text: string) {
-    this.content.text = text
+    this.mutableContent.text = text
   }
 
   set hidePreview(hidePreview: boolean) {
-    this.content.hidePreview = hidePreview
+    this.mutableContent.hidePreview = hidePreview
   }
 
   set preview_plain(preview_plain: string) {
-    this.content.preview_plain = preview_plain
+    this.mutableContent.preview_plain = preview_plain
   }
 
   set preview_html(preview_html: string | undefined) {
-    this.content.preview_html = preview_html
+    this.mutableContent.preview_html = preview_html
   }
 
   set prefersPlainEditor(prefersPlainEditor: boolean) {
@@ -28,14 +28,14 @@ export class NoteMutator extends DecryptedItemMutator<NoteContent> {
   }
 
   set spellcheck(spellcheck: boolean) {
-    this.content.spellcheck = spellcheck
+    this.mutableContent.spellcheck = spellcheck
   }
 
   toggleSpellcheck(): void {
-    if (this.content.spellcheck == undefined) {
-      this.content.spellcheck = false
+    if (this.mutableContent.spellcheck == undefined) {
+      this.mutableContent.spellcheck = false
     } else {
-      this.content.spellcheck = !this.content.spellcheck
+      this.mutableContent.spellcheck = !this.mutableContent.spellcheck
     }
   }
 }

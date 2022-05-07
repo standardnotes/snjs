@@ -12,7 +12,7 @@ export class ThemeMutator extends DecryptedItemMutator<ComponentContent> {
   }
 
   set local_url(local_url: string) {
-    this.content.local_url = local_url
+    this.mutableContent.local_url = local_url
   }
 
   /**

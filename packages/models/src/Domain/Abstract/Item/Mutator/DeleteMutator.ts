@@ -12,13 +12,13 @@ export class DeleteItemMutator<
     const dirtying = this.type !== MutationType.NonDirtying
     const result = new DeletedPayload(
       {
-        ...this.payload.ejected(),
+        ...this.immutablePayload.ejected(),
         deleted: true,
         content: undefined,
-        dirty: dirtying ? true : this.payload.dirty,
-        dirtyIndex: dirtying ? getIncrementedDirtyIndex() : this.payload.dirtyIndex,
+        dirty: dirtying ? true : this.immutablePayload.dirty,
+        dirtyIndex: dirtying ? getIncrementedDirtyIndex() : this.immutablePayload.dirtyIndex,
       },
-      this.payload.source,
+      this.immutablePayload.source,
     )
 
     return result
