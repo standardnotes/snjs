@@ -452,7 +452,7 @@ export class UserService
    * https://github.com/standardnotes/desktop/issues/131
    */
   private async rewriteItemsKeys(): Promise<void> {
-    const itemsKeys = this.itemManager.itemsKeys()
+    const itemsKeys = this.itemManager.getDisplayableItemsKeys()
     const payloads = itemsKeys.map((key) => key.payloadRepresentation())
     await this.storageService.forceDeletePayloads(payloads)
     await this.syncService.persistPayloads(payloads)

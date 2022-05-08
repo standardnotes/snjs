@@ -34,11 +34,6 @@ export class SNTag extends DecryptedItem<TagContent> implements TagInterface {
     return references.filter((ref) => ref.content_type === ContentType.Note)
   }
 
-  get fileReferences(): ContentReference[] {
-    const references = this.payload.references
-    return references.filter((ref) => ref === ContentType.Note)
-  }
-
   get noteCount(): number {
     return this.noteReferences.length
   }

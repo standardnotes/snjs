@@ -204,7 +204,7 @@ export class SNActionsService extends AbstractService {
       }
     }
 
-    for (const itemsKey of this.itemManager.itemsKeys()) {
+    for (const itemsKey of this.itemManager.getDisplayableItemsKeys()) {
       const decryptedPayload = await this.protocolService.decryptSplitSingle<ActionExtensionContent>({
         usesItemsKey: {
           items: [payload],

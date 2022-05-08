@@ -69,7 +69,7 @@ export interface ItemManagerInterface extends AbstractService {
   /**
    * Returns all non-deleted items keys
    */
-  itemsKeys(): ItemsKeyInterface[]
+  getDisplayableItemsKeys(): ItemsKeyInterface[]
 
   /**
    * Creates an item and conditionally maps it and marks it as dirty.

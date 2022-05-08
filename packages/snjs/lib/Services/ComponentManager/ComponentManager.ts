@@ -83,7 +83,7 @@ export class SNComponentManager extends AbstractService<ComponentManagerEvent, E
   }
 
   get components(): SNComponent[] {
-    return this.itemManager.components
+    return this.itemManager.getDisplayableComponents()
   }
 
   componentsForArea(area: ComponentArea): SNComponent[] {

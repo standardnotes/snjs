@@ -116,7 +116,7 @@ describe('upgrading', () => {
      */
     this.application = await Factory.signOutApplicationAndReturnNew(this.application)
     await this.application.signIn(this.email, this.password, undefined, undefined, undefined, true)
-    expect(this.application.itemManager.notes.length).to.equal(1)
+    expect(this.application.itemManager.getDisplayableNotes().length).to.equal(1)
     expect(this.application.payloadManager.invalidPayloads).to.be.empty
   }).timeout(15000)
 
@@ -170,7 +170,7 @@ describe('upgrading', () => {
     /** Delete default items key that is created on launch */
     const itemsKey = await this.application.protocolService.getSureDefaultItemsKey()
     await this.application.itemManager.setItemToBeDeleted(itemsKey)
-    expect(this.application.itemManager.itemsKeys().length).to.equal(0)
+    expect(this.application.itemManager.getDisplayableItemsKeys().length).to.equal(0)
 
     Factory.createMappedNote(this.application)
 
@@ -182,7 +182,7 @@ describe('upgrading', () => {
       version: ProtocolVersion.V003,
     })
 
-    expect(this.application.itemManager.itemsKeys().length).to.equal(1)
+    expect(this.application.itemManager.getDisplayableItemsKeys().length).to.equal(1)
 
     expect((await this.application.protocolService.getRootKeyParams()).version).to.equal(ProtocolVersion.V003)
     expect((await this.application.protocolService.getRootKey()).keyVersion).to.equal(ProtocolVersion.V003)
@@ -204,7 +204,7 @@ describe('upgrading', () => {
 
     /** After change, note should now be encrypted with latest protocol version */
 
-    const note = this.application.itemManager.notes[0]
+    const note = this.application.itemManager.getDisplayableNotes()[0]
     await Factory.markDirtyAndSyncItem(this.application, note)
 
     const refreshedNotePayloads = await Factory.getStoragePayloadsOfType(this.application, ContentType.Note)

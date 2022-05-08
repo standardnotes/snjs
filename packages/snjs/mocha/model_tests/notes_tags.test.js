@@ -90,8 +90,8 @@ describe('notes and tags', () => {
     expect(tagPayload.content.references.length).to.equal(1)
 
     await this.application.itemManager.emitItemsFromPayloads([notePayload, tagPayload], PayloadEmitSource.LocalChanged)
-    let note = this.application.itemManager.notes[0]
-    let tag = this.application.itemManager.tags[0]
+    let note = this.application.itemManager.getDisplayableNotes()[0]
+    let tag = this.application.itemManager.getDisplayableTags()[0]
 
     expect(note.dirty).to.not.be.ok
     expect(tag.dirty).to.not.be.ok
@@ -108,7 +108,7 @@ describe('notes and tags', () => {
 
     await this.application.itemManager.setItemToBeDeleted(note)
 
-    tag = this.application.itemManager.tags[0]
+    tag = this.application.itemManager.getDisplayableTags()[0]
 
     const deletedNotePayload = this.application.payloadManager.findOne(note.uuid)
     expect(deletedNotePayload.dirty).to.be.true
@@ -120,8 +120,8 @@ describe('notes and tags', () => {
     expect(this.application.itemManager.itemsReferencingItem(note).length).to.equal(0)
     expect(tag.noteCount).to.equal(0)
 
-    tag = this.application.itemManager.tags[0]
-    expect(this.application.itemManager.notes.length).to.equal(0)
+    tag = this.application.itemManager.getDisplayableTags()[0]
+    expect(this.application.itemManager.getDisplayableNotes().length).to.equal(0)
     expect(tag.dirty).to.be.false
   })
 
@@ -201,8 +201,8 @@ describe('notes and tags', () => {
   it('properly handles tag duplication', async function () {
     const pair = createRelatedNoteTagPairPayload()
     await this.application.itemManager.emitItemsFromPayloads(pair, PayloadEmitSource.LocalChanged)
-    let note = this.application.itemManager.notes[0]
-    let tag = this.application.itemManager.tags[0]
+    let note = this.application.itemManager.getDisplayableNotes()[0]
+    let tag = this.application.itemManager.getDisplayableTags()[0]
 
     const duplicateTag = await this.application.itemManager.duplicateItem(tag, true)
     await this.application.syncService.sync(syncOptions)
@@ -330,9 +330,7 @@ describe('notes and tags', () => {
       const titles = ['1', 'A', 'b', '2']
       const sortedTitles = titles.sort((a, b) => a.localeCompare(b))
       await Promise.all(titles.map((title) => this.application.mutator.findOrCreateTag(title)))
-      expect(this.application.items.getDisplayableItems(ContentType.Tag).map((t) => t.title)).to.deep.equal(
-        sortedTitles,
-      )
+      expect(this.application.items.tagDisplayController.items().map((t) => t.title)).to.deep.equal(sortedTitles)
     })
 
     it('should sort tags in reverse alphabetical order', async function () {
@@ -340,9 +338,7 @@ describe('notes and tags', () => {
       const sortedTitles = titles.sort((a, b) => b.localeCompare(a))
       await Promise.all(titles.map((title) => this.application.mutator.findOrCreateTag(title)))
       this.application.items.setDisplayOptions(ContentType.Tag, 'title', 'asc')
-      expect(this.application.items.getDisplayableItems(ContentType.Tag).map((t) => t.title)).to.deep.equal(
-        sortedTitles,
-      )
+      expect(this.application.items.tagDisplayController.items().map((t) => t.title)).to.deep.equal(sortedTitles)
     })
 
     it('should match a tag', async function () {
@@ -402,13 +398,13 @@ describe('notes and tags', () => {
           )
         }),
       )
-      const Bnote = this.application.itemManager.notes.find((note) => note.title === 'B')
+      const Bnote = this.application.itemManager.getDisplayableNotes().find((note) => note.title === 'B')
       await this.application.mutator.changeItem(Bnote, (mutator) => {
         mutator.pinned = true
       })
       const tag = await this.application.mutator.findOrCreateTag('A')
       await this.application.mutator.changeItem(tag, (mutator) => {
-        for (const note of this.application.itemManager.notes) {
+        for (const note of this.application.itemManager.getDisplayableNotes()) {
           mutator.e2ePendingRefactor_addItemAsRelationship(note)
         }
       })

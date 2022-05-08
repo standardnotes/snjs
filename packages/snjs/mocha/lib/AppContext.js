@@ -223,7 +223,7 @@ export class AppContext {
   }
 
   get itemsKeys() {
-    return this.application.items.itemsKeys()
+    return this.application.items.getDisplayableItemsKeys()
   }
 
   disableSyncingOfItems(uuids) {
@@ -290,11 +290,11 @@ export class AppContext {
   }
 
   findNoteByTitle(title) {
-    return this.application.items.notes.find((note) => note.title === title)
+    return this.application.items.getDisplayableNotes().find((note) => note.title === title)
   }
 
   get noteCount() {
-    return this.application.items.notes.length
+    return this.application.items.getDisplayableNotes().length
   }
 
   async createConflictedNotes(otherContext) {
