@@ -26,6 +26,20 @@ export const createNote = (payload?: Partial<NoteContent>): SNNote => {
   )
 }
 
+export const createNoteWithContent = (content: Partial<NoteContent>): SNNote => {
+  return new SNNote(
+    new DecryptedPayload(
+      {
+        uuid: mockUuid(),
+        content_type: ContentType.Note,
+        content: FillItemContent<NoteContent>(content),
+        ...PayloadTimestampDefaults(),
+      },
+      PayloadSource.Constructor,
+    ),
+  )
+}
+
 export const createTag = (title = 'photos') => {
   return new SNTag(
     new DecryptedPayload(

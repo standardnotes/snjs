@@ -418,7 +418,7 @@ describe('itemManager', () => {
       expect(!!item).toEqual(true)
       /* Template items should never be added to the record */
       expect(itemManager.items).toHaveLength(0)
-      expect(itemManager.notes).toHaveLength(0)
+      expect(itemManager.getDisplayableNotes()).toHaveLength(0)
     })
 
     it('isTemplateItem return the correct value', async () => {

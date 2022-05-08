@@ -106,8 +106,8 @@ describe('2020-01-15 web migration', () => {
     expect(application.protocolService.rootKeyEncryption.keyMode).to.equal(KeyMode.RootKeyPlusWrapper)
 
     /** Expect note is decrypted */
-    expect(application.itemManager.notes.length).to.equal(1)
-    const retrievedNote = application.itemManager.notes[0]
+    expect(application.itemManager.getDisplayableNotes().length).to.equal(1)
+    const retrievedNote = application.itemManager.getDisplayableNotes()[0]
     expect(retrievedNote.uuid).to.equal(notePayload.uuid)
     expect(retrievedNote.content.text).to.equal(notePayload.content.text)
 
@@ -194,8 +194,8 @@ describe('2020-01-15 web migration', () => {
     expect(application.protocolService.rootKeyEncryption.keyMode).to.equal(KeyMode.WrapperOnly)
 
     /** Expect note is decrypted */
-    expect(application.itemManager.notes.length).to.equal(1)
-    const retrievedNote = application.itemManager.notes[0]
+    expect(application.itemManager.getDisplayableNotes().length).to.equal(1)
+    const retrievedNote = application.itemManager.getDisplayableNotes()[0]
     expect(retrievedNote.uuid).to.equal(notePayload.uuid)
     expect(retrievedNote.content.text).to.equal(notePayload.content.text)
 
@@ -301,8 +301,8 @@ describe('2020-01-15 web migration', () => {
     expect(application.protocolService.rootKeyEncryption.keyMode).to.equal(KeyMode.RootKeyOnly)
 
     /** Expect note is decrypted */
-    expect(application.itemManager.notes.length).to.equal(1)
-    const retrievedNote = application.itemManager.notes[0]
+    expect(application.itemManager.getDisplayableNotes().length).to.equal(1)
+    const retrievedNote = application.itemManager.getDisplayableNotes()[0]
     expect(retrievedNote.uuid).to.equal(notePayload.uuid)
     expect(retrievedNote.content.text).to.equal(notePayload.content.text)
 
@@ -359,8 +359,8 @@ describe('2020-01-15 web migration', () => {
     expect(await application.deviceInterface.getRawStorageValue('migrations')).to.not.be.ok
 
     /** Expect note is decrypted */
-    expect(application.itemManager.notes.length).to.equal(1)
-    const retrievedNote = application.itemManager.notes[0]
+    expect(application.itemManager.getDisplayableNotes().length).to.equal(1)
+    const retrievedNote = application.itemManager.getDisplayableNotes()[0]
     expect(retrievedNote.uuid).to.equal(notePayload.uuid)
     expect(retrievedNote.content.text).to.equal(notePayload.content.text)
 
@@ -464,8 +464,8 @@ describe('2020-01-15 web migration', () => {
     expect(application.protocolService.rootKeyEncryption.keyMode).to.equal(KeyMode.RootKeyOnly)
 
     /** Expect note is decrypted */
-    expect(application.itemManager.notes.length).to.equal(1)
-    const retrievedNote = application.itemManager.notes[0]
+    expect(application.itemManager.getDisplayableNotes().length).to.equal(1)
+    const retrievedNote = application.itemManager.getDisplayableNotes()[0]
     expect(retrievedNote.uuid).to.equal(notePayload.uuid)
     expect(retrievedNote.content.text).to.equal(notePayload.content.text)
 
@@ -574,8 +574,8 @@ describe('2020-01-15 web migration', () => {
     expect(rootKey.keyVersion).to.equal(ProtocolVersion.V002)
 
     /** Expect note is decrypted */
-    expect(application.itemManager.notes.length).to.equal(1)
-    const retrievedNote = application.itemManager.notes[0]
+    expect(application.itemManager.getDisplayableNotes().length).to.equal(1)
+    const retrievedNote = application.itemManager.getDisplayableNotes()[0]
     expect(retrievedNote.uuid).to.equal(notePayload.uuid)
     expect(retrievedNote.content.text).to.equal(notePayload.content.text)
 

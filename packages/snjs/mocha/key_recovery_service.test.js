@@ -253,7 +253,7 @@ describe('key recovery service', function () {
     const contextA = await Factory.createAppContextWithFakeCrypto()
     await contextA.launch()
     await contextA.register()
-    const originalItemsKey = contextA.application.items.itemsKeys()[0]
+    const originalItemsKey = contextA.application.items.getDisplayableItemsKeys()[0]
 
     const contextB = await Factory.createAppContextWithFakeCrypto(
       'another-namespace',
@@ -272,7 +272,7 @@ describe('key recovery service', function () {
     expect(result.error).to.not.be.ok
     expect(contextB.application.items.getAnyItems(ContentType.ItemsKey).length).to.equal(2)
 
-    const newItemsKey = contextB.application.items.itemsKeys().find((k) => k.uuid !== originalItemsKey.uuid)
+    const newItemsKey = contextB.application.items.getDisplayableItemsKeys().find((k) => k.uuid !== originalItemsKey.uuid)
 
     const note = await Factory.createSyncedNote(contextB.application)
 
@@ -285,7 +285,7 @@ describe('key recovery service', function () {
 
     /** Same previously errored key should now no longer be errored, */
     expect(contextA.application.items.getAnyItems(ContentType.ItemsKey).length).to.equal(2)
-    for (const key of contextA.application.itemManager.itemsKeys()) {
+    for (const key of contextA.application.itemManager.getDisplayableItemsKeys()) {
       expect(key.errorDecrypting).to.not.be.ok
     }
 

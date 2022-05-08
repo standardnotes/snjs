@@ -99,7 +99,7 @@ describe('app models', () => {
     item = items[0]
 
     expect(item.content.foo).to.equal('bar')
-    expect(this.application.itemManager.notes.length).to.equal(1)
+    expect(this.application.itemManager.getDisplayableNotes().length).to.equal(1)
   })
 
   it('mapping item twice should preserve references', async function () {
@@ -256,7 +256,7 @@ describe('app models', () => {
     const refreshedItem1_2 = this.application.itemManager.findItem(item1.uuid)
     expect(refreshedItem1_2).to.not.be.ok
 
-    expect(this.application.itemManager.notes.length).to.equal(2)
+    expect(this.application.itemManager.getDisplayableNotes().length).to.equal(2)
 
     expect(alternatedItem.content.references.length).to.equal(1)
     expect(this.application.itemManager.itemsReferencingItem(alternatedItem.uuid).length).to.equal(0)
@@ -275,7 +275,7 @@ describe('app models', () => {
 
   it('alterating itemskey uuid should update errored items encrypted with that key', async function () {
     const item1 = await Factory.createMappedNote(this.application)
-    const itemsKey = this.application.itemManager.itemsKeys()[0]
+    const itemsKey = this.application.itemManager.getDisplayableItemsKeys()[0]
 
     /** Encrypt item1 and emit as errored so it persists with items_key_id */
     const encrypted = await this.application.protocolService.encryptSplitSingle({
@@ -346,8 +346,8 @@ describe('app models', () => {
     const noteCopy = await this.application.itemManager.duplicateItem(note)
     expect(note.uuid).to.not.equal(noteCopy.uuid)
 
-    expect(this.application.itemManager.notes.length).to.equal(2)
-    expect(this.application.itemManager.tags.length).to.equal(1)
+    expect(this.application.itemManager.getDisplayableNotes().length).to.equal(2)
+    expect(this.application.itemManager.getDisplayableTags().length).to.equal(1)
 
     expect(note.content.references.length).to.equal(0)
     expect(noteCopy.content.references.length).to.equal(0)

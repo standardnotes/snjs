@@ -1,3 +1,4 @@
+import { SNItemsKey } from '@standardnotes/encryption'
 import { ContentType } from '@standardnotes/common'
 import {
   SNNote,
@@ -14,6 +15,8 @@ import {
   PredicateInterface,
   DecryptedItemInterface,
   SortableItem,
+  SNComponent,
+  SNTheme,
 } from '@standardnotes/models'
 import { UuidString } from '@Lib/Types'
 
@@ -40,7 +43,13 @@ export interface ItemsClientInterface {
   get trashedItems(): SNNote[]
 
   setDisplayOptions(
-    contentType: ContentType.Tag | ContentType.SmartView | ContentType.Theme | ContentType.Component | ContentType.File,
+    contentType:
+      | ContentType.Note
+      | ContentType.Tag
+      | ContentType.SmartView
+      | ContentType.Theme
+      | ContentType.Component
+      | ContentType.File,
     sortBy?: CollectionSortProperty,
     direction?: CollectionSortDirection,
     filter?: (element: SortableItem) => boolean,
@@ -48,11 +57,10 @@ export interface ItemsClientInterface {
 
   setNotesDisplayCriteria(criteria: NotesDisplayCriteria): void
 
-  getDisplayableItems<T extends DecryptedItemInterface>(
-    contentType: ContentType.Tag | ContentType.SmartView | ContentType.Theme | ContentType.Component | ContentType.File,
-  ): T[]
-
   getDisplayableNotes(): SNNote[]
+  getDisplayableTags(): SNTag[]
+  getDisplayableItemsKeys(): SNItemsKey[]
+  getDisplayableComponents(): (SNComponent | SNTheme)[]
 
   getItems<T extends DecryptedItemInterface>(contentType: ContentType | ContentType[]): T[]
 

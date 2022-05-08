@@ -70,7 +70,7 @@ describe('auth fringe cases', () => {
       await restartedApplication.signIn(context.email, context.password, undefined, undefined, undefined, awaitSync)
       const refreshedNote = restartedApplication.itemManager.findItem(note.uuid)
       expect(isDecryptedItem(refreshedNote)).to.equal(true)
-      expect(restartedApplication.itemManager.notes.length).to.equal(1)
+      expect(restartedApplication.itemManager.getDisplayableNotes().length).to.equal(1)
       await Factory.safeDeinit(restartedApplication)
     }).timeout(10000)
   })
@@ -98,11 +98,11 @@ describe('auth fringe cases', () => {
       /** Sign in and merge local data */
       await newApplication.signIn(context.email, context.password, undefined, undefined, true, true)
 
-      expect(newApplication.itemManager.notes.length).to.equal(2)
+      expect(newApplication.itemManager.getDisplayableNotes().length).to.equal(2)
 
-      expect(newApplication.itemManager.notes.find((n) => n.uuid === firstVersionOfNote.uuid).text).to.equal(staleText)
+      expect(newApplication.itemManager.getDisplayableNotes().find((n) => n.uuid === firstVersionOfNote.uuid).text).to.equal(staleText)
 
-      const conflictedCopy = newApplication.itemManager.notes.find((n) => n.uuid !== firstVersionOfNote.uuid)
+      const conflictedCopy = newApplication.itemManager.getDisplayableNotes().find((n) => n.uuid !== firstVersionOfNote.uuid)
       expect(conflictedCopy.text).to.equal(serverText)
       expect(conflictedCopy.duplicate_of).to.equal(firstVersionOfNote.uuid)
       await Factory.safeDeinit(newApplication)

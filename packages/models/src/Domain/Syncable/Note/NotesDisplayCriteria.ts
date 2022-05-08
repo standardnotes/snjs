@@ -1,16 +1,24 @@
-import { CollectionSortDirection, CollectionSortProperty } from './../../Runtime/Collection/CollectionSort'
+import {
+  CollectionSortDirection,
+  CollectionSortProperty,
+  SortableItem,
+} from './../../Runtime/Collection/CollectionSort'
 import { ContentType } from '@standardnotes/common'
 import { NoteWithTags } from './NoteWithTags'
-import { DecryptedItem } from '../../Abstract/Item'
+import { DecryptedItem, DecryptedItemInterface } from '../../Abstract/Item'
 import { SNTag } from '../Tag'
 import { SNNote } from '.'
 import { SmartView } from '../SmartView'
-import { ItemCollection } from '../../Runtime/Collection/Item/ItemCollection'
 import { CompoundPredicate } from '../../Runtime/Predicate/CompoundPredicate'
+import { AnyItemInterface } from '../../Abstract/Item/Interfaces/UnionTypes'
 
 export type SearchQuery = {
   query: string
   includeProtectedNoteText: boolean
+}
+
+interface ReferenceLookupCollection {
+  elementsReferencingElement(element: DecryptedItemInterface, contentType?: ContentType): AnyItemInterface[]
 }
 
 type NoteFilter = (note: SNNote) => boolean
@@ -39,7 +47,15 @@ export class NotesDisplayCriteria {
     return Object.freeze(copy)
   }
 
-  computeFilters(collection: ItemCollection): NoteFilter[] {
+  unifiedFilterRepresentation(collection: ReferenceLookupCollection): (note: SortableItem) => boolean {
+    const filters = this.computeFilters(collection)
+
+    return (note: SortableItem) => {
+      return notePassesFilters(note as SNNote, filters)
+    }
+  }
+
+  computeFilters(collection: ReferenceLookupCollection): NoteFilter[] {
     const filters: NoteFilter[] = []
 
     let viewsPredicate: CompoundPredicate<DecryptedItem> | undefined = undefined
@@ -101,10 +117,13 @@ export function criteriaForSmartView(view: SmartView): NotesDisplayCriteria {
   return criteria
 }
 
-export function notesMatchingCriteria(criteria: NotesDisplayCriteria, collection: ItemCollection): SNNote[] {
+export function notesMatchingCriteria(
+  criteria: NotesDisplayCriteria,
+  fromNotes: SNNote[],
+  collection: ReferenceLookupCollection,
+): SNNote[] {
   const filters = criteria.computeFilters(collection)
-  const allNotes = collection.displayElements(ContentType.Note) as SNNote[]
-  return allNotes.filter((note) => {
+  return fromNotes.filter((note) => {
     return notePassesFilters(note, filters)
   })
 }
@@ -118,7 +137,11 @@ function notePassesFilters(note: SNNote, filters: NoteFilter[]) {
   return true
 }
 
-export function noteMatchesQuery(noteToMatch: SNNote, searchQuery: SearchQuery, collection: ItemCollection): boolean {
+export function noteMatchesQuery(
+  noteToMatch: SNNote,
+  searchQuery: SearchQuery,
+  collection: ReferenceLookupCollection,
+): boolean {
   const noteTags = collection.elementsReferencingElement(noteToMatch, ContentType.Tag) as SNTag[]
   const someTagsMatches = noteTags.some((tag) => matchTypeForTagAndStringQuery(tag, searchQuery.query) !== Match.None)
 

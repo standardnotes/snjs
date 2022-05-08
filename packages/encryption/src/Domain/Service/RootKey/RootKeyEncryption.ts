@@ -478,7 +478,7 @@ export class RootKeyEncryptionService extends Services.AbstractService<RootKeySe
   }
 
   private getItemsKeys() {
-    return this.itemManager.itemsKeys()
+    return this.itemManager.getDisplayableItemsKeys()
   }
 
   public async encrypPayloadWithKeyLookup(payload: Models.DecryptedPayloadInterface): Promise<EncryptedParameters> {

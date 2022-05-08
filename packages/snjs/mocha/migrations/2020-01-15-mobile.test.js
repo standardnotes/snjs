@@ -135,8 +135,8 @@ describe('2020-01-15 mobile migration', () => {
       expect(keychainValue).to.not.be.ok
 
       /** Expect note is decrypted */
-      expect(application.itemManager.notes.length).to.equal(1)
-      const retrievedNote = application.itemManager.notes[0]
+      expect(application.itemManager.getDisplayableNotes().length).to.equal(1)
+      const retrievedNote = application.itemManager.getDisplayableNotes()[0]
       expect(retrievedNote.uuid).to.equal(notePayload.uuid)
       expect(retrievedNote.content.text).to.equal(notePayload.content.text)
 
@@ -271,8 +271,8 @@ describe('2020-01-15 mobile migration', () => {
     expect(keychainValue).to.not.be.ok
 
     /** Expect note is decrypted */
-    expect(application.itemManager.notes.length).to.equal(1)
-    const retrievedNote = application.itemManager.notes[0]
+    expect(application.itemManager.getDisplayableNotes().length).to.equal(1)
+    const retrievedNote = application.itemManager.getDisplayableNotes()[0]
     expect(retrievedNote.uuid).to.equal(notePayload.uuid)
     expect(retrievedNote.content.text).to.equal(notePayload.content.text)
     expect(
@@ -366,7 +366,7 @@ describe('2020-01-15 mobile migration', () => {
     expect(application.protocolService.rootKeyEncryption.keyMode).to.equal(KeyMode.WrapperOnly)
     await application.launch(true)
 
-    const retrievedNote = application.itemManager.notes[0]
+    const retrievedNote = application.itemManager.getDisplayableNotes()[0]
     expect(retrievedNote.errorDecrypting).to.not.be.ok
 
     /** application should not crash */
@@ -463,8 +463,8 @@ describe('2020-01-15 mobile migration', () => {
     expect(typeof keyParams).to.equal('object')
 
     /** Expect note is decrypted */
-    expect(application.itemManager.notes.length).to.equal(1)
-    const retrievedNote = application.itemManager.notes[0]
+    expect(application.itemManager.getDisplayableNotes().length).to.equal(1)
+    const retrievedNote = application.itemManager.getDisplayableNotes()[0]
     expect(retrievedNote.uuid).to.equal(notePayload.uuid)
     expect(retrievedNote.content.text).to.equal(notePayload.content.text)
     expect(
@@ -576,8 +576,8 @@ describe('2020-01-15 mobile migration', () => {
     expect(application.protocolService.rootKeyEncryption.keyMode).to.equal(KeyMode.RootKeyOnly)
 
     /** Expect note is decrypted */
-    expect(application.itemManager.notes.length).to.equal(1)
-    const retrievedNote = application.itemManager.notes[0]
+    expect(application.itemManager.getDisplayableNotes().length).to.equal(1)
+    const retrievedNote = application.itemManager.getDisplayableNotes()[0]
     expect(retrievedNote.uuid).to.equal(notePayload.uuid)
     expect(retrievedNote.content.text).to.equal(notePayload.content.text)
     expect(await application.getUser().email).to.equal(email)
@@ -640,12 +640,12 @@ describe('2020-01-15 mobile migration', () => {
     })
     await application.launch(true)
 
-    const itemsKey = application.itemManager.itemsKeys()[0]
+    const itemsKey = application.itemManager.getDisplayableItemsKeys()[0]
     expect(itemsKey.keyVersion).to.equal(ProtocolVersion.V002)
 
     /** Expect note is decrypted */
-    expect(application.itemManager.notes.length).to.equal(1)
-    const retrievedNote = application.itemManager.notes[0]
+    expect(application.itemManager.getDisplayableNotes().length).to.equal(1)
+    const retrievedNote = application.itemManager.getDisplayableNotes()[0]
     expect(retrievedNote.uuid).to.equal(notePayload.uuid)
     expect(retrievedNote.content.text).to.equal(notePayload.content.text)
 
@@ -710,12 +710,12 @@ describe('2020-01-15 mobile migration', () => {
     })
     await application.launch(true)
 
-    const itemsKey = application.itemManager.itemsKeys()[0]
+    const itemsKey = application.itemManager.getDisplayableItemsKeys()[0]
     expect(itemsKey.keyVersion).to.equal(ProtocolVersion.V001)
 
     /** Expect note is decrypted */
-    expect(application.itemManager.notes.length).to.equal(1)
-    const retrievedNote = application.itemManager.notes[0]
+    expect(application.itemManager.getDisplayableNotes().length).to.equal(1)
+    const retrievedNote = application.itemManager.getDisplayableNotes()[0]
     expect(retrievedNote.uuid).to.equal(notePayload.uuid)
     expect(retrievedNote.content.text).to.equal(notePayload.content.text)
 
@@ -846,8 +846,8 @@ describe('2020-01-15 mobile migration', () => {
     expect(application.protocolService.rootKeyEncryption.keyMode).to.equal(KeyMode.RootKeyNone)
 
     /** Expect note is decrypted */
-    expect(application.itemManager.notes.length).to.equal(1)
-    const retrievedNote = application.itemManager.notes[0]
+    expect(application.itemManager.getDisplayableNotes().length).to.equal(1)
+    const retrievedNote = application.itemManager.getDisplayableNotes()[0]
     expect(retrievedNote.uuid).to.equal(notePayload.uuid)
     expect(retrievedNote.content.text).to.equal(notePayload.content.text)
     expect(
@@ -994,8 +994,8 @@ describe('2020-01-15 mobile migration', () => {
       expect(keychainValue).to.not.be.ok
 
       /** Expect note is decrypted */
-      expect(application.itemManager.notes.length).to.equal(1)
-      const retrievedNote = application.itemManager.notes[0]
+      expect(application.itemManager.getDisplayableNotes().length).to.equal(1)
+      const retrievedNote = application.itemManager.getDisplayableNotes()[0]
       expect(retrievedNote.uuid).to.equal(notePayload.uuid)
       expect(retrievedNote.content.text).to.equal(notePayload.content.text)
 

@@ -448,7 +448,9 @@ export class SNFeaturesService
 
     const isThirdParty = FeaturesImports.FindNativeFeature(featureId) == undefined
     if (isThirdParty) {
-      const component = this.itemManager.components.find((candidate) => candidate.identifier === featureId)
+      const component = this.itemManager
+        .getDisplayableComponents()
+        .find((candidate) => candidate.identifier === featureId)
       if (!component) {
         return FeatureStatus.NoUserSubscription
       }
