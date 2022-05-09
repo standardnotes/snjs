@@ -4,7 +4,7 @@ import { NotesDisplayCriteria, notesMatchingCriteria } from './NotesDisplayCrite
 import { SNNote } from './Note'
 
 describe('notes display criteria', () => {
-  const collectionWithNotes = function (titles: string[] = [], bodies: string[] = []) {
+  const collectionWithNotes = function (titles: (string | undefined)[] = [], bodies: string[] = []) {
     const collection = new ItemCollection()
     const notes: SNNote[] = []
     titles.forEach((title, index) => {
@@ -33,6 +33,27 @@ describe('notes display criteria', () => {
       searchQuery: { query: query, includeProtectedNoteText: true },
     })
     const collection = collectionWithNotes(['hello', 'fobar', 'foobar', 'foo'])
+    expect(notesMatchingCriteria(criteria, collection.all() as SNNote[], collection)).toHaveLength(2)
+  })
+
+  it('string query text', async function () {
+    const query = 'foo'
+    const criteria = NotesDisplayCriteria.Create({
+      searchQuery: { query: query, includeProtectedNoteText: true },
+    })
+    const collection = collectionWithNotes(
+      [undefined, undefined, undefined, undefined],
+      ['hello', 'fobar', 'foobar', 'foo'],
+    )
+    expect(notesMatchingCriteria(criteria, collection.all() as SNNote[], collection)).toHaveLength(2)
+  })
+
+  it('string query title and text', async function () {
+    const query = 'foo'
+    const criteria = NotesDisplayCriteria.Create({
+      searchQuery: { query: query, includeProtectedNoteText: true },
+    })
+    const collection = collectionWithNotes(['hello', 'foobar'], ['foo', 'fobar'])
     expect(notesMatchingCriteria(criteria, collection.all() as SNNote[], collection)).toHaveLength(2)
   })
 })

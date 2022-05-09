@@ -12,3 +12,13 @@ export interface ItemDelta<C extends ItemContent = ItemContent> {
   /** Items which were previously error decrypting which have now been successfully decrypted */
   unerrored: DecryptedItemInterface<C>[]
 }
+
+export function CreateItemDelta(partial: Partial<ItemDelta>): ItemDelta {
+  return {
+    changed: partial.changed || [],
+    inserted: partial.inserted || [],
+    discarded: partial.discarded || [],
+    ignored: partial.ignored || [],
+    unerrored: partial.unerrored || [],
+  }
+}

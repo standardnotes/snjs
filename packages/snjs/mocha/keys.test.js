@@ -191,13 +191,13 @@ describe('keys', function () {
 
     await this.application.itemManager.removeItemLocally(itemsKey)
 
-    const decryptedPayload = await this.application.protocolService.decryptSplitSingle({
+    const erroredPayload = await this.application.protocolService.decryptSplitSingle({
       usesItemsKeyWithKeyLookup: {
         items: [encryptedPayload],
       },
     })
 
-    await this.application.itemManager.emitItemsFromPayloads([decryptedPayload], PayloadEmitSource.LocalChanged)
+    await this.application.itemManager.emitItemsFromPayloads([erroredPayload], PayloadEmitSource.LocalChanged)
 
     const note = this.application.itemManager.findAnyItem(notePayload.uuid)
     expect(note.errorDecrypting).to.equal(true)
