@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.6.9](https://github.com/standardnotes/snjs/compare/@standardnotes/models@1.6.8...@standardnotes/models@1.6.9) (2022-05-09)
+
+**Note:** Version bump only for package @standardnotes/models
+
+
+
+
+
 ## [1.6.8](https://github.com/standardnotes/snjs/compare/@standardnotes/models@1.6.7...@standardnotes/models@1.6.8) (2022-05-06)
 
 
