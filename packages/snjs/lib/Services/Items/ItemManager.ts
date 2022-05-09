@@ -1231,7 +1231,11 @@ export class ItemManager
       views: [view],
     }
 
-    return Models.itemsMatchingOptions(criteria, this.collection.allDecrypted(ContentType.Note), this.collection)
+    return Models.itemsMatchingOptions(
+      criteria,
+      this.collection.allDecrypted(ContentType.Note),
+      this.collection,
+    ) as Models.SNNote[]
   }
 
   public get allNotesSmartView(): Models.SmartView {
