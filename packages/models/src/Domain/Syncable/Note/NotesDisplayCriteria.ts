@@ -27,6 +27,7 @@ export class NotesDisplayCriteria {
   public searchQuery?: SearchQuery
   public tags: SNTag[] = []
   public views: SmartView[] = []
+  public showFiles?: boolean
   public includePinned?: boolean
   public includeProtected?: boolean
   public includeTrashed?: boolean
