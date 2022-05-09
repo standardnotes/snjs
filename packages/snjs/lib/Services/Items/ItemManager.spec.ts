@@ -170,10 +170,11 @@ describe('itemManager', () => {
       await itemManager.insertItems([tag, note])
       await itemManager.addTagToNote(note, tag, false)
 
-      const criteria = {
+      itemManager.setPrimaryItemDisplayOptions({
         tags: [tag],
-      }
-      itemManager.setPrimaryItemDisplayOptions(criteria)
+        sortBy: 'title',
+        sortDirection: 'asc',
+      })
 
       const notes = itemManager.getDisplayableNotes()
       expect(notes).toHaveLength(1)
@@ -360,10 +361,11 @@ describe('itemManager', () => {
       await itemManager.addTagToNote(parentNote, parentTag, false)
       await itemManager.addTagToNote(childNote, childTag, false)
 
-      const criteria = {
+      itemManager.setPrimaryItemDisplayOptions({
         tags: [parentTag],
-      }
-      itemManager.setPrimaryItemDisplayOptions(criteria)
+        sortBy: 'title',
+        sortDirection: 'asc',
+      })
 
       const notes = itemManager.getDisplayableNotes()
       expect(notes).toHaveLength(1)
