@@ -4,6 +4,7 @@ import { DecryptedPayloadInterface } from '../../Abstract/Payload/Interfaces/Dec
 import { FileMetadata } from './FileMetadata'
 import { FileProtocolV1 } from './FileProtocolV1'
 import { SortableItem } from '../../Runtime/Collection/CollectionSort'
+import { ConflictStrategy } from '../../Abstract/Item'
 
 type EncryptedBytesLength = number
 type DecryptedBytesLength = number
@@ -59,6 +60,19 @@ export class SNFile
 
     this.encryptionHeader = this.content.encryptionHeader
     this.mimeType = this.content.mimeType
+  }
+
+  public override strategyWhenConflictingWithItem(item: SNFile): ConflictStrategy {
+    if (
+      item.key !== this.key ||
+      item.encryptionHeader !== this.encryptionHeader ||
+      item.remoteIdentifier !== this.remoteIdentifier ||
+      JSON.stringify(item.encryptedChunkSizes) !== JSON.stringify(this.encryptedChunkSizes)
+    ) {
+      return ConflictStrategy.KeepBaseDuplicateApply
+    }
+
+    return ConflictStrategy.KeepBase
   }
 
   public get encryptedSize(): number {
