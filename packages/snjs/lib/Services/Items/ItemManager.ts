@@ -1207,7 +1207,7 @@ export class ItemManager
   }
 
   public notesMatchingSmartView(view: Models.SmartView): Models.SNNote[] {
-    const criteria: Models.DisplayOptions = {
+    const criteria: Models.FilterDisplayOptions = {
       views: [view],
     }
 
