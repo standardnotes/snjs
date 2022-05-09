@@ -10,7 +10,6 @@ export class ItemDisplayController<I extends DisplayItem> {
   private sortMap: UuidToSortedPositionMap = {}
   private sortedItems: I[] = []
   private needsSort = true
-
   private holdChanges = false
 
   constructor(

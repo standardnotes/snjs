@@ -48,12 +48,12 @@ export class ItemManager
   ) {
     super(internalEventBus)
     this.payloadManager = payloadManager
-    this.systemSmartViews = this.rebuildSystemSmartViews(Models.NotesDisplayCriteria.Create({}))
+    this.systemSmartViews = this.rebuildSystemSmartViews({})
     this.createCollection()
     this.unsubChangeObserver = this.payloadManager.addObserver(ContentType.Any, this.setPayloads.bind(this))
   }
 
-  private rebuildSystemSmartViews(criteria: Models.NotesDisplayCriteria): Models.SmartView[] {
+  private rebuildSystemSmartViews(criteria: Models.DisplayOptions): Models.SmartView[] {
     this.systemSmartViews = Models.BuildSmartViews(criteria)
     return this.systemSmartViews
   }
@@ -132,38 +132,38 @@ export class ItemManager
     return new Models.DecryptedPayload(object)
   }
 
-  public setNotesDisplayCriteria(criteria: Models.NotesDisplayCriteria): void {
-    const override: Partial<Models.NotesDisplayCriteria> = {}
+  public setPrimaryItemDisplayOptions(options: Models.DisplayOptions): void {
+    const override: Models.DisplayOptions = {}
 
-    if (criteria.views.find((view) => view.uuid === Models.SystemViewId.AllNotes)) {
-      if (criteria.includeArchived == undefined) {
+    if (options.views && options.views.find((view) => view.uuid === Models.SystemViewId.AllNotes)) {
+      if (options.includeArchived == undefined) {
         override.includeArchived = false
       }
-      if (criteria.includeTrashed == undefined) {
+      if (options.includeTrashed == undefined) {
         override.includeTrashed = false
       }
     }
-    if (criteria.views.find((view) => view.uuid === Models.SystemViewId.ArchivedNotes)) {
-      if (criteria.includeTrashed == undefined) {
+    if (options.views && options.views.find((view) => view.uuid === Models.SystemViewId.ArchivedNotes)) {
+      if (options.includeTrashed == undefined) {
         override.includeTrashed = false
       }
     }
-    if (criteria.views.find((view) => view.uuid === Models.SystemViewId.TrashedNotes)) {
-      if (criteria.includeArchived == undefined) {
+    if (options.views && options.views.find((view) => view.uuid === Models.SystemViewId.TrashedNotes)) {
+      if (options.includeArchived == undefined) {
         override.includeArchived = true
       }
     }
 
-    this.rebuildSystemSmartViews(Models.NotesDisplayCriteria.Copy(criteria, override))
+    this.rebuildSystemSmartViews({ ...options, ...override })
 
-    const mostRecentVersionOfTags = criteria.tags
-      .map((tag) => {
+    const mostRecentVersionOfTags = options.tags
+      ?.map((tag) => {
         return this.collection.find(tag.uuid) as Models.SNTag
       })
       .filter((tag) => tag != undefined)
 
-    const mostRecentVersionOfViews = criteria.views
-      .map((view) => {
+    const mostRecentVersionOfViews = options.views
+      ?.map((view) => {
         if (Models.isSystemView(view)) {
           return this.systemSmartViews.find((systemView) => systemView.uuid === view.uuid) as Models.SmartView
         }
@@ -171,21 +171,26 @@ export class ItemManager
       })
       .filter((view) => view != undefined)
 
-    const updatedCriteria = Models.NotesDisplayCriteria.Copy(criteria, {
-      tags: mostRecentVersionOfTags,
-      views: mostRecentVersionOfViews,
+    const updatedOptions: Models.DisplayOptions = {
+      ...options,
       ...override,
-    })
+      ...{
+        tags: mostRecentVersionOfTags,
+        views: mostRecentVersionOfViews,
+      },
+    }
 
     this.noteAndFilesDisplayController.beginBatchPropertyChange()
     {
-      this.noteAndFilesDisplayController.setCustomFilter(updatedCriteria.unifiedFilterRepresentation(this.collection))
-      this.noteAndFilesDisplayController.setHiddenContentTypes(updatedCriteria.showFiles ? [] : [ContentType.File])
-      if (updatedCriteria.sortProperty) {
-        this.noteAndFilesDisplayController.setSortBy(updatedCriteria.sortProperty)
+      this.noteAndFilesDisplayController.setCustomFilter(
+        Models.computeUnifiedFilterForDisplayOptions(updatedOptions, this.collection),
+      )
+      this.noteAndFilesDisplayController.setHiddenContentTypes(updatedOptions.hiddenContentTypes || [])
+      if (updatedOptions.sortBy) {
+        this.noteAndFilesDisplayController.setSortBy(updatedOptions.sortBy)
       }
-      if (updatedCriteria.sortDirection) {
-        this.noteAndFilesDisplayController.setSortDirection(updatedCriteria.sortDirection)
+      if (updatedOptions.sortDirection) {
+        this.noteAndFilesDisplayController.setSortDirection(updatedOptions.sortDirection)
       }
     }
     this.noteAndFilesDisplayController.endBatchPropertyChange()
@@ -1223,8 +1228,11 @@ export class ItemManager
   }
 
   public notesMatchingSmartView(view: Models.SmartView): Models.SNNote[] {
-    const criteria = Models.criteriaForSmartView(view)
-    return Models.notesMatchingCriteria(criteria, this.collection.allDecrypted(ContentType.Note), this.collection)
+    const criteria: Models.DisplayOptions = {
+      views: [view],
+    }
+
+    return Models.itemsMatchingOptions(criteria, this.collection.allDecrypted(ContentType.Note), this.collection)
   }
 
   public get allNotesSmartView(): Models.SmartView {

@@ -3,11 +3,8 @@ export * from './Abstract/Contextual'
 export * from './Abstract/Item'
 export * from './Abstract/Payload'
 export * from './Abstract/TransferPayload'
-<<<<<<< HEAD
 export * from './Local/KeyParams/RootKeyParamsInterface'
 export * from './Local/RootKey/KeychainTypes'
-=======
->>>>>>> 3fb0d563 (feat(wip): display controllers)
 export * from './Local/RootKey/RootKeyContent'
 export * from './Local/RootKey/RootKeyInterface'
 export * from './Runtime/Collection/CollectionSort'
@@ -17,11 +14,9 @@ export * from './Runtime/Collection/Payload/ImmutablePayloadCollection'
 export * from './Runtime/Collection/Payload/PayloadCollection'
 export * from './Runtime/Deltas'
 export * from './Runtime/DirtyCounter/DirtyCounter'
-<<<<<<< HEAD
-=======
 export * from './Runtime/Display/ItemDisplayController'
 export * from './Runtime/Display/Types'
->>>>>>> 3fb0d563 (feat(wip): display controllers)
+export * from './Runtime/Display'
 export * from './Runtime/History'
 export * from './Runtime/Index/ItemDelta'
 export * from './Runtime/Index/SNIndex'

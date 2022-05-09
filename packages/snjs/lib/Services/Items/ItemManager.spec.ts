@@ -170,10 +170,10 @@ describe('itemManager', () => {
       await itemManager.insertItems([tag, note])
       await itemManager.addTagToNote(note, tag, false)
 
-      const criteria = Models.NotesDisplayCriteria.Create({
+      const criteria = {
         tags: [tag],
-      })
-      itemManager.setNotesDisplayCriteria(criteria)
+      }
+      itemManager.setPrimaryItemDisplayOptions(criteria)
 
       const notes = itemManager.getDisplayableNotes()
       expect(notes).toHaveLength(1)
@@ -360,10 +360,10 @@ describe('itemManager', () => {
       await itemManager.addTagToNote(parentNote, parentTag, false)
       await itemManager.addTagToNote(childNote, childTag, false)
 
-      const criteria = Models.NotesDisplayCriteria.Create({
+      const criteria = {
         tags: [parentTag],
-      })
-      itemManager.setNotesDisplayCriteria(criteria)
+      }
+      itemManager.setPrimaryItemDisplayOptions(criteria)
 
       const notes = itemManager.getDisplayableNotes()
       expect(notes).toHaveLength(1)

@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-expressions */
 /* eslint-disable no-undef */
 import * as Factory from '../lib/factory.js'
 import * as Utils from '../lib/Utils.js'
@@ -306,12 +305,10 @@ describe('notes and tags', () => {
         )
       }),
     )
-    this.application.items.setNotesDisplayCriteria(
-      NotesDisplayCriteria.Create({
-        sortProperty: 'title',
-        sortDirection: 'dsc',
-      }),
-    )
+    this.application.items.setPrimaryItemDisplayOptions({
+      sortBy: 'title',
+      sortDirection: 'dsc',
+    })
     const titles = this.application.items.getDisplayableNotes().map((note) => note.title)
     expect(titles).to.deep.equal(['Z', 'Y', 'B', 'A'])
   })
@@ -344,13 +341,11 @@ describe('notes and tags', () => {
           title: 'A',
         }),
       )
-      this.application.items.setNotesDisplayCriteria(
-        NotesDisplayCriteria.Create({
-          sortProperty: 'title',
-          sortDirection: 'dsc',
-          tags: [tag],
-        }),
-      )
+      this.application.items.setPrimaryItemDisplayOptions({
+        sortBy: 'title',
+        sortDirection: 'dsc',
+        tags: [tag],
+      })
       const displayedNotes = this.application.items.getDisplayableNotes()
       expect(displayedNotes.length).to.equal(1)
       expect(displayedNotes[0].uuid).to.equal(taggedNote.uuid)
@@ -367,14 +362,12 @@ describe('notes and tags', () => {
       await this.application.mutator.changeItem(trashedNote, (mutator) => {
         mutator.trashed = true
       })
-      this.application.items.setNotesDisplayCriteria(
-        NotesDisplayCriteria.Create({
-          sortProperty: 'title',
-          sortDirection: 'dsc',
-          tags: [tag],
-          includeTrashed: false,
-        }),
-      )
+      this.application.items.setPrimaryItemDisplayOptions({
+        sortBy: 'title',
+        sortDirection: 'dsc',
+        tags: [tag],
+        includeTrashed: false,
+      })
       const displayedNotes = this.application.items.getDisplayableNotes()
       expect(displayedNotes.length).to.equal(1)
       expect(displayedNotes[0].uuid).to.equal(taggedNote.uuid)
@@ -401,13 +394,11 @@ describe('notes and tags', () => {
         }
       })
 
-      this.application.items.setNotesDisplayCriteria(
-        NotesDisplayCriteria.Create({
-          sortProperty: 'title',
-          sortDirection: 'dsc',
-          tags: [tag],
-        }),
-      )
+      this.application.items.setPrimaryItemDisplayOptions({
+        sortBy: 'title',
+        sortDirection: 'dsc',
+        tags: [tag],
+      })
 
       const displayedNotes = this.application.items.getDisplayableNotes()
       expect(displayedNotes).to.have.length(4)
@@ -439,13 +430,11 @@ describe('notes and tags', () => {
         }),
       )
       const matches = this.application.items.notesMatchingSmartView(view)
-      this.application.items.setNotesDisplayCriteria(
-        NotesDisplayCriteria.Create({
-          sortProperty: 'title',
-          sortDirection: 'asc',
-          views: [view],
-        }),
-      )
+      this.application.items.setPrimaryItemDisplayOptions({
+        sortBy: 'title',
+        sortDirection: 'asc',
+        views: [view],
+      })
 
       const displayedNotes = this.application.items.getDisplayableNotes()
       expect(displayedNotes).to.deep.equal(matches)
@@ -479,13 +468,11 @@ describe('notes and tags', () => {
         }),
       )
       const matches = this.application.items.notesMatchingSmartView(view)
-      this.application.items.setNotesDisplayCriteria(
-        NotesDisplayCriteria.Create({
-          sortProperty: 'title',
-          sortDirection: 'asc',
-          views: [view],
-        }),
-      )
+      this.application.items.setPrimaryItemDisplayOptions({
+        sortBy: 'title',
+        sortDirection: 'asc',
+        views: [view],
+      })
 
       const displayedNotes = this.application.items.getDisplayableNotes()
       expect(displayedNotes).to.deep.equal(matches)
@@ -518,13 +505,11 @@ describe('notes and tags', () => {
         }),
       )
       const matches = this.application.items.notesMatchingSmartView(view)
-      this.application.items.setNotesDisplayCriteria(
-        NotesDisplayCriteria.Create({
-          sortProperty: 'title',
-          sortDirection: 'asc',
-          views: [view],
-        }),
-      )
+      this.application.items.setPrimaryItemDisplayOptions({
+        sortBy: 'title',
+        sortDirection: 'asc',
+        views: [view],
+      })
 
       const displayedNotes = this.application.items.getDisplayableNotes()
       expect(displayedNotes).to.deep.equal(matches)
@@ -556,13 +541,11 @@ describe('notes and tags', () => {
         }),
       )
       const matches = this.application.items.notesMatchingSmartView(view)
-      this.application.items.setNotesDisplayCriteria(
-        NotesDisplayCriteria.Create({
-          sortProperty: 'title',
-          sortDirection: 'asc',
-          views: [view],
-        }),
-      )
+      this.application.items.setPrimaryItemDisplayOptions({
+        sortBy: 'title',
+        sortDirection: 'asc',
+        views: [view],
+      })
       const displayedNotes = this.application.items.getDisplayableNotes()
       expect(displayedNotes).to.deep.equal(matches)
       expect(matches.length).to.equal(1)
@@ -612,13 +595,11 @@ describe('notes and tags', () => {
         }),
       )
       const matches = this.application.items.notesMatchingSmartView(view)
-      this.application.items.setNotesDisplayCriteria(
-        NotesDisplayCriteria.Create({
-          sortProperty: 'title',
-          sortDirection: 'asc',
-          views: [view],
-        }),
-      )
+      this.application.items.setPrimaryItemDisplayOptions({
+        sortBy: 'title',
+        sortDirection: 'asc',
+        views: [view],
+      })
       const displayedNotes = this.application.items.getDisplayableNotes()
       expect(displayedNotes).to.deep.equal(matches)
       expect(matches.length).to.equal(1)
@@ -648,13 +629,11 @@ describe('notes and tags', () => {
         }),
       )
       const matches = this.application.items.notesMatchingSmartView(view)
-      this.application.items.setNotesDisplayCriteria(
-        NotesDisplayCriteria.Create({
-          sortProperty: 'title',
-          sortDirection: 'asc',
-          views: [view],
-        }),
-      )
+      this.application.items.setPrimaryItemDisplayOptions({
+        sortBy: 'title',
+        sortDirection: 'asc',
+        views: [view],
+      })
       const displayedNotes = this.application.items.getDisplayableNotes()
       expect(displayedNotes).to.deep.equal(matches)
       expect(matches.length).to.equal(1)
@@ -684,13 +663,11 @@ describe('notes and tags', () => {
         }),
       )
       const matches = this.application.items.notesMatchingSmartView(view)
-      this.application.items.setNotesDisplayCriteria(
-        NotesDisplayCriteria.Create({
-          sortProperty: 'title',
-          sortDirection: 'asc',
-          views: [view],
-        }),
-      )
+      this.application.items.setPrimaryItemDisplayOptions({
+        sortBy: 'title',
+        sortDirection: 'asc',
+        views: [view],
+      })
       const displayedNotes = this.application.items.getDisplayableNotes()
       expect(displayedNotes).to.deep.equal(matches)
       expect(matches.length).to.equal(1)
@@ -735,13 +712,11 @@ describe('notes and tags', () => {
         }),
       )
       const matches = this.application.items.notesMatchingSmartView(view)
-      this.application.items.setNotesDisplayCriteria(
-        NotesDisplayCriteria.Create({
-          sortProperty: 'title',
-          sortDirection: 'asc',
-          views: [view],
-        }),
-      )
+      this.application.items.setPrimaryItemDisplayOptions({
+        sortBy: 'title',
+        sortDirection: 'asc',
+        views: [view],
+      })
       const displayedNotes = this.application.items.getDisplayableNotes()
       expect(displayedNotes).to.deep.equal(matches)
       expect(matches.length).to.equal(1)
@@ -792,13 +767,11 @@ describe('notes and tags', () => {
         }),
       )
       const matches = this.application.items.notesMatchingSmartView(view)
-      this.application.items.setNotesDisplayCriteria(
-        NotesDisplayCriteria.Create({
-          sortProperty: 'created_at',
-          sortDirection: 'asc',
-          views: [view],
-        }),
-      )
+      this.application.items.setPrimaryItemDisplayOptions({
+        sortBy: 'created_at',
+        sortDirection: 'asc',
+        views: [view],
+      })
       const displayedNotes = this.application.items.getDisplayableNotes()
       expect(displayedNotes.length).to.equal(matches.length)
       expect(matches.length).to.equal(3)
@@ -823,15 +796,13 @@ describe('notes and tags', () => {
       PayloadEmitSource.LocalChanged,
     )
 
-    this.application.items.setNotesDisplayCriteria(
-      NotesDisplayCriteria.Create({
-        sortProperty: 'title',
-        sortDirection: 'dsc',
-        searchQuery: {
-          query: 'Test',
-        },
-      }),
-    )
+    this.application.items.setPrimaryItemDisplayOptions({
+      sortBy: 'title',
+      sortDirection: 'dsc',
+      searchQuery: {
+        query: 'Test',
+      },
+    })
 
     const displayedNotes = this.application.items.getDisplayableNotes()
     expect(displayedNotes.length).to.equal(2)
@@ -854,15 +825,13 @@ describe('notes and tags', () => {
       PayloadEmitSource.LocalChanged,
     )
 
-    this.application.items.setNotesDisplayCriteria(
-      NotesDisplayCriteria.Create({
-        sortProperty: 'title',
-        sortDirection: 'dsc',
-        searchQuery: {
-          query: 'foo',
-        },
-      }),
-    )
+    this.application.items.setPrimaryItemDisplayOptions({
+      sortBy: 'title',
+      sortDirection: 'dsc',
+      searchQuery: {
+        query: 'foo',
+      },
+    })
 
     const displayedNotes = this.application.items.getDisplayableNotes()
     expect(displayedNotes.length).to.equal(3)
