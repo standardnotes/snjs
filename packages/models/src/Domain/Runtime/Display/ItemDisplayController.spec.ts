@@ -16,12 +16,15 @@ describe('item display controller', () => {
     const noteB = createNoteWithContent({ title: 'b' })
     collection.set([noteA, noteB])
 
-    const controller = new ItemDisplayController(collection, [ContentType.Note], 'title', 'asc')
+    const controller = new ItemDisplayController(collection, [ContentType.Note], {
+      sortBy: 'title',
+      sortDirection: 'asc',
+    })
 
     expect(controller.items()[0]).toEqual(noteA)
     expect(controller.items()[1]).toEqual(noteB)
 
-    controller.setSortDirection('dsc')
+    controller.setDisplayOptions({ sortBy: 'title', sortDirection: 'dsc' })
 
     expect(controller.items()[0]).toEqual(noteB)
     expect(controller.items()[1]).toEqual(noteA)
@@ -33,9 +36,15 @@ describe('item display controller', () => {
     const noteB = createNoteWithContent({ title: 'b' })
     collection.set([noteA, noteB])
 
-    const controller = new ItemDisplayController(collection, [ContentType.Note], 'title', 'asc')
-    controller.setCustomFilter((note) => {
-      return note.title !== 'a'
+    const controller = new ItemDisplayController(collection, [ContentType.Note], {
+      sortBy: 'title',
+      sortDirection: 'asc',
+    })
+
+    controller.setDisplayOptions({
+      customFilter: (note) => {
+        return note.title !== 'a'
+      },
     })
 
     expect(controller.items()).toHaveLength(1)
@@ -47,7 +56,10 @@ describe('item display controller', () => {
     const noteA = createNoteWithContent({ title: 'a' })
     collection.set([noteA])
 
-    const controller = new ItemDisplayController(collection, [ContentType.Note], 'title', 'asc')
+    const controller = new ItemDisplayController(collection, [ContentType.Note], {
+      sortBy: 'title',
+      sortDirection: 'asc',
+    })
     expect(controller.items()).toHaveLength(1)
 
     const noteB = createNoteWithContent({ title: 'b' })
@@ -75,7 +87,10 @@ describe('item display controller', () => {
     )
     collection.set([noteA])
 
-    const controller = new ItemDisplayController(collection, [ContentType.Note], 'title', 'asc')
+    const controller = new ItemDisplayController(collection, [ContentType.Note], {
+      sortBy: 'title',
+      sortDirection: 'asc',
+    })
 
     expect(controller.items()).toHaveLength(0)
   })
@@ -86,7 +101,10 @@ describe('item display controller', () => {
     const noteB = createNoteWithContent({ title: 'b' })
     collection.set([noteA, noteB])
 
-    const controller = new ItemDisplayController(collection, [ContentType.Note], 'title', 'asc')
+    const controller = new ItemDisplayController(collection, [ContentType.Note], {
+      sortBy: 'title',
+      sortDirection: 'asc',
+    })
 
     expect(controller.items()[0]).toEqual(noteA)
     expect(controller.items()[1]).toEqual(noteB)
@@ -116,7 +134,10 @@ describe('item display controller', () => {
     const noteA = createNoteWithContent({ title: 'a' })
     collection.set([noteA])
 
-    const controller = new ItemDisplayController(collection, [ContentType.Note], 'title', 'asc')
+    const controller = new ItemDisplayController(collection, [ContentType.Note], {
+      sortBy: 'title',
+      sortDirection: 'asc',
+    })
 
     const deletedItem = new DeletedItem(
       new DeletedPayload({
@@ -138,7 +159,10 @@ describe('item display controller', () => {
     const noteA = createNoteWithContent({ title: 'a' })
     collection.set([noteA])
 
-    const controller = new ItemDisplayController(collection, [ContentType.Note], 'title', 'asc')
+    const controller = new ItemDisplayController(collection, [ContentType.Note], {
+      sortBy: 'title',
+      sortDirection: 'asc',
+    })
 
     const delta = CreateItemDelta({ discarded: [noteA] as unknown as DeletedItem[] })
     collection.onChange(delta)
@@ -153,7 +177,10 @@ describe('item display controller', () => {
     const tag = createTag()
     collection.set([note, tag])
 
-    const controller = new ItemDisplayController(collection, [ContentType.Note], 'title', 'asc')
+    const controller = new ItemDisplayController(collection, [ContentType.Note], {
+      sortBy: 'title',
+      sortDirection: 'asc',
+    })
     expect(controller.items()).toHaveLength(1)
   })
 
@@ -163,8 +190,11 @@ describe('item display controller', () => {
     const tag = createTag()
     collection.set([note, tag])
 
-    const controller = new ItemDisplayController(collection, [ContentType.Note], 'title', 'asc')
-    controller.setSortBy('created_at')
+    const controller = new ItemDisplayController(collection, [ContentType.Note], {
+      sortBy: 'title',
+      sortDirection: 'asc',
+    })
+    controller.setDisplayOptions({ sortBy: 'created_at', sortDirection: 'asc' })
     expect(controller.items()).toHaveLength(1)
   })
 
@@ -173,7 +203,10 @@ describe('item display controller', () => {
     const note = createNoteWithContent({ title: 'a' })
     collection.set([note])
 
-    const controller = new ItemDisplayController(collection, [ContentType.Note], 'title', 'asc')
+    const controller = new ItemDisplayController(collection, [ContentType.Note], {
+      sortBy: 'title',
+      sortDirection: 'asc',
+    })
     const tag = createTag()
 
     const delta = CreateItemDelta({ inserted: [tag], changed: [note] })
@@ -189,12 +222,15 @@ describe('item display controller', () => {
     const file = createFile('A')
     collection.set([note, file])
 
-    const controller = new ItemDisplayController(collection, [ContentType.Note, ContentType.File], 'title', 'asc')
+    const controller = new ItemDisplayController(collection, [ContentType.Note, ContentType.File], {
+      sortBy: 'title',
+      sortDirection: 'asc',
+    })
 
     expect(controller.items()[0]).toEqual(file)
     expect(controller.items()[1]).toEqual(note)
 
-    controller.setSortDirection('dsc')
+    controller.setDisplayOptions({ sortBy: 'title', sortDirection: 'dsc' })
 
     expect(controller.items()[0]).toEqual(note)
     expect(controller.items()[1]).toEqual(file)
@@ -206,31 +242,15 @@ describe('item display controller', () => {
     const file = createFile()
     collection.set([note, file])
 
-    const controller = new ItemDisplayController(collection, [ContentType.Note, ContentType.File], 'title', 'asc')
+    const controller = new ItemDisplayController(collection, [ContentType.Note, ContentType.File], {
+      sortBy: 'title',
+      sortDirection: 'asc',
+    })
 
     expect(controller.items()).toHaveLength(2)
 
-    controller.setHiddenContentTypes([ContentType.File])
+    controller.setDisplayOptions({ hiddenContentTypes: [ContentType.File] })
 
     expect(controller.items()).toHaveLength(1)
-  })
-
-  it('should hold changes when performing batch property change', () => {
-    const collection = new ItemCollection()
-    const note = createNote()
-    const file = createFile()
-    collection.set([note, file])
-
-    const controller = new ItemDisplayController(collection, [ContentType.Note, ContentType.File], 'title', 'asc')
-
-    const sortFn = (controller['filterThenSortElements'] = jest.fn())
-
-    controller.beginBatchPropertyChange()
-    controller.setSortBy('created_at')
-    controller.setSortDirection('asc')
-    controller.setHiddenContentTypes([ContentType.File])
-    controller.endBatchPropertyChange()
-
-    expect(sortFn).toHaveBeenCalledTimes(1)
   })
 })
