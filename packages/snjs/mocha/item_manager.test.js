@@ -515,11 +515,9 @@ describe('item manager', function () {
         mutator.archived = true
       })
 
-      this.itemManager.setNotesDisplayCriteria(
-        NotesDisplayCriteria.Create({
-          views: [this.itemManager.allNotesSmartView],
-        }),
-      )
+      this.itemManager.setPrimaryItemDisplayOptions({
+        views: [this.itemManager.allNotesSmartView],
+      })
 
       expect(this.itemManager.getDisplayableNotes().length).to.equal(0)
     })
@@ -532,11 +530,9 @@ describe('item manager', function () {
         mutator.trashed = true
       })
 
-      this.itemManager.setNotesDisplayCriteria(
-        NotesDisplayCriteria.Create({
-          views: [this.itemManager.archivedSmartView],
-        }),
-      )
+      this.itemManager.setPrimaryItemDisplayOptions({
+        views: [this.itemManager.archivedSmartView],
+      })
 
       expect(this.itemManager.getDisplayableNotes().length).to.equal(0)
     })
@@ -549,11 +545,9 @@ describe('item manager', function () {
         mutator.trashed = true
       })
 
-      this.itemManager.setNotesDisplayCriteria(
-        NotesDisplayCriteria.Create({
-          views: [this.itemManager.trashSmartView],
-        }),
-      )
+      this.itemManager.setPrimaryItemDisplayOptions({
+        views: [this.itemManager.trashSmartView],
+      })
 
       expect(this.itemManager.getDisplayableNotes().length).to.equal(1)
     })

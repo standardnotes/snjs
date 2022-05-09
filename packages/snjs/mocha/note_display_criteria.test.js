@@ -34,11 +34,11 @@ describe('note display criteria', function () {
     await this.itemManager.changeItem(pendingPin, (mutator) => {
       mutator.pinned = true
     })
-    const criteria = NotesDisplayCriteria.Create({
+    const criteria = {
       includePinned: false,
-    })
+    }
     expect(
-      notesMatchingCriteria(criteria, this.itemManager.collection.all(ContentType.Note), this.itemManager.collection)
+      itemsMatchingOptions(criteria, this.itemManager.collection.all(ContentType.Note), this.itemManager.collection)
         .length,
     ).to.equal(1)
   })
@@ -49,9 +49,9 @@ describe('note display criteria', function () {
     await this.itemManager.changeItem(pendingPin, (mutator) => {
       mutator.pinned = true
     })
-    const criteria = NotesDisplayCriteria.Create({ includePinned: true })
+    const criteria = { includePinned: true }
     expect(
-      notesMatchingCriteria(criteria, this.itemManager.collection.all(ContentType.Note), this.itemManager.collection)
+      itemsMatchingOptions(criteria, this.itemManager.collection.all(ContentType.Note), this.itemManager.collection)
         .length,
     ).to.equal(2)
   })
@@ -62,9 +62,9 @@ describe('note display criteria', function () {
     await this.itemManager.changeItem(pendingTrash, (mutator) => {
       mutator.trashed = true
     })
-    const criteria = NotesDisplayCriteria.Create({ includeTrashed: false })
+    const criteria = { includeTrashed: false }
     expect(
-      notesMatchingCriteria(criteria, this.itemManager.collection.all(ContentType.Note), this.itemManager.collection)
+      itemsMatchingOptions(criteria, this.itemManager.collection.all(ContentType.Note), this.itemManager.collection)
         .length,
     ).to.equal(1)
   })
@@ -75,9 +75,9 @@ describe('note display criteria', function () {
     await this.itemManager.changeItem(pendingTrash, (mutator) => {
       mutator.trashed = true
     })
-    const criteria = NotesDisplayCriteria.Create({ includeTrashed: true })
+    const criteria = { includeTrashed: true }
     expect(
-      notesMatchingCriteria(criteria, this.itemManager.collection.all(ContentType.Note), this.itemManager.collection)
+      itemsMatchingOptions(criteria, this.itemManager.collection.all(ContentType.Note), this.itemManager.collection)
         .length,
     ).to.equal(2)
   })
@@ -88,9 +88,9 @@ describe('note display criteria', function () {
     await this.itemManager.changeItem(pendingArchive, (mutator) => {
       mutator.archived = true
     })
-    const criteria = NotesDisplayCriteria.Create({ includeArchived: false })
+    const criteria = { includeArchived: false }
     expect(
-      notesMatchingCriteria(criteria, this.itemManager.collection.all(ContentType.Note), this.itemManager.collection)
+      itemsMatchingOptions(criteria, this.itemManager.collection.all(ContentType.Note), this.itemManager.collection)
         .length,
     ).to.equal(1)
   })
@@ -101,11 +101,11 @@ describe('note display criteria', function () {
     await this.itemManager.changeItem(pendingArchive, (mutator) => {
       mutator.archived = true
     })
-    const criteria = NotesDisplayCriteria.Create({
+    const criteria = {
       includeArchived: true,
-    })
+    }
     expect(
-      notesMatchingCriteria(criteria, this.itemManager.collection.all(ContentType.Note), this.itemManager.collection)
+      itemsMatchingOptions(criteria, this.itemManager.collection.all(ContentType.Note), this.itemManager.collection)
         .length,
     ).to.equal(2)
   })
@@ -116,9 +116,9 @@ describe('note display criteria', function () {
     await this.itemManager.changeItem(pendingProtected, (mutator) => {
       mutator.protected = true
     })
-    const criteria = NotesDisplayCriteria.Create({ includeProtected: false })
+    const criteria = { includeProtected: false }
     expect(
-      notesMatchingCriteria(criteria, this.itemManager.collection.all(ContentType.Note), this.itemManager.collection)
+      itemsMatchingOptions(criteria, this.itemManager.collection.all(ContentType.Note), this.itemManager.collection)
         .length,
     ).to.equal(1)
   })
@@ -129,11 +129,11 @@ describe('note display criteria', function () {
     await this.itemManager.changeItem(pendingProtected, (mutator) => {
       mutator.protected = true
     })
-    const criteria = NotesDisplayCriteria.Create({
+    const criteria = {
       includeProtected: true,
-    })
+    }
     expect(
-      notesMatchingCriteria(criteria, this.itemManager.collection.all(ContentType.Note), this.itemManager.collection)
+      itemsMatchingOptions(criteria, this.itemManager.collection.all(ContentType.Note), this.itemManager.collection)
         .length,
     ).to.equal(2)
   })
@@ -143,11 +143,11 @@ describe('note display criteria', function () {
     await this.itemManager.changeItem(normal, (mutator) => {
       mutator.protected = true
     })
-    const criteria = NotesDisplayCriteria.Create({
+    const criteria = {
       searchQuery: { query: 'world', includeProtectedNoteText: false },
-    })
+    }
     expect(
-      notesMatchingCriteria(criteria, this.itemManager.collection.all(ContentType.Note), this.itemManager.collection)
+      itemsMatchingOptions(criteria, this.itemManager.collection.all(ContentType.Note), this.itemManager.collection)
         .length,
     ).to.equal(0)
   })
@@ -157,11 +157,11 @@ describe('note display criteria', function () {
     await this.itemManager.changeItem(normal, (mutator) => {
       mutator.protected = true
     })
-    const criteria = NotesDisplayCriteria.Create({
+    const criteria = {
       searchQuery: { query: 'world', includeProtectedNoteText: true },
-    })
+    }
     expect(
-      notesMatchingCriteria(criteria, this.itemManager.collection.all(ContentType.Note), this.itemManager.collection)
+      itemsMatchingOptions(criteria, this.itemManager.collection.all(ContentType.Note), this.itemManager.collection)
         .length,
     ).to.equal(1)
   })
@@ -171,22 +171,22 @@ describe('note display criteria', function () {
     const tag = await this.createTag([note])
     const looseTag = await this.createTag([], 'loose')
 
-    const matchingCriteria = NotesDisplayCriteria.Create({
+    const matchingCriteria = {
       tags: [tag],
-    })
+    }
     expect(
-      notesMatchingCriteria(
+      itemsMatchingOptions(
         matchingCriteria,
         this.itemManager.collection.all(ContentType.Note),
         this.itemManager.collection,
       ).length,
     ).to.equal(1)
 
-    const nonmatchingCriteria = NotesDisplayCriteria.Create({
+    const nonmatchingCriteria = {
       tags: [looseTag],
-    })
+    }
     expect(
-      notesMatchingCriteria(
+      itemsMatchingOptions(
         nonmatchingCriteria,
         this.itemManager.collection.all(ContentType.Note),
         this.itemManager.collection,
@@ -198,30 +198,30 @@ describe('note display criteria', function () {
     it('normal note', async function () {
       await this.createNote()
       expect(
-        notesMatchingCriteria(
-          NotesDisplayCriteria.Create({
+        itemsMatchingOptions(
+          {
             views: [this.itemManager.allNotesSmartView],
-          }),
+          },
           this.itemManager.collection.all(ContentType.Note),
           this.itemManager.collection,
         ).length,
       ).to.equal(1)
 
       expect(
-        notesMatchingCriteria(
-          NotesDisplayCriteria.Create({
+        itemsMatchingOptions(
+          {
             views: [this.itemManager.trashSmartView],
-          }),
+          },
           this.itemManager.collection.all(ContentType.Note),
           this.itemManager.collection,
         ).length,
       ).to.equal(0)
 
       expect(
-        notesMatchingCriteria(
-          NotesDisplayCriteria.Create({
+        itemsMatchingOptions(
+          {
             views: [this.itemManager.archivedSmartView],
-          }),
+          },
           this.itemManager.collection.all(ContentType.Note),
           this.itemManager.collection,
         ).length,
@@ -235,31 +235,31 @@ describe('note display criteria', function () {
       })
 
       expect(
-        notesMatchingCriteria(
-          NotesDisplayCriteria.Create({
+        itemsMatchingOptions(
+          {
             views: [this.itemManager.allNotesSmartView],
             includeTrashed: false,
-          }),
+          },
           this.itemManager.collection.all(ContentType.Note),
           this.itemManager.collection,
         ).length,
       ).to.equal(0)
 
       expect(
-        notesMatchingCriteria(
-          NotesDisplayCriteria.Create({
+        itemsMatchingOptions(
+          {
             views: [this.itemManager.trashSmartView],
-          }),
+          },
           this.itemManager.collection.all(ContentType.Note),
           this.itemManager.collection,
         ).length,
       ).to.equal(1)
 
       expect(
-        notesMatchingCriteria(
-          NotesDisplayCriteria.Create({
+        itemsMatchingOptions(
+          {
             views: [this.itemManager.archivedSmartView],
-          }),
+          },
           this.itemManager.collection.all(ContentType.Note),
           this.itemManager.collection,
         ).length,
@@ -273,31 +273,31 @@ describe('note display criteria', function () {
         mutator.archived = true
       })
       expect(
-        notesMatchingCriteria(
-          NotesDisplayCriteria.Create({
+        itemsMatchingOptions(
+          {
             views: [this.itemManager.allNotesSmartView],
             includeArchived: false,
-          }),
+          },
           this.itemManager.collection.all(ContentType.Note),
           this.itemManager.collection,
         ).length,
       ).to.equal(0)
 
       expect(
-        notesMatchingCriteria(
-          NotesDisplayCriteria.Create({
+        itemsMatchingOptions(
+          {
             views: [this.itemManager.trashSmartView],
-          }),
+          },
           this.itemManager.collection.all(ContentType.Note),
           this.itemManager.collection,
         ).length,
       ).to.equal(0)
 
       expect(
-        notesMatchingCriteria(
-          NotesDisplayCriteria.Create({
+        itemsMatchingOptions(
+          {
             views: [this.itemManager.archivedSmartView],
-          }),
+          },
           this.itemManager.collection.all(ContentType.Note),
           this.itemManager.collection,
         ).length,
@@ -312,30 +312,30 @@ describe('note display criteria', function () {
       })
 
       expect(
-        notesMatchingCriteria(
-          NotesDisplayCriteria.Create({
+        itemsMatchingOptions(
+          {
             views: [this.itemManager.allNotesSmartView],
-          }),
+          },
           this.itemManager.collection.all(ContentType.Note),
           this.itemManager.collection,
         ).length,
       ).to.equal(1)
 
       expect(
-        notesMatchingCriteria(
-          NotesDisplayCriteria.Create({
+        itemsMatchingOptions(
+          {
             views: [this.itemManager.trashSmartView],
-          }),
+          },
           this.itemManager.collection.all(ContentType.Note),
           this.itemManager.collection,
         ).length,
       ).to.equal(1)
 
       expect(
-        notesMatchingCriteria(
-          NotesDisplayCriteria.Create({
+        itemsMatchingOptions(
+          {
             views: [this.itemManager.archivedSmartView],
-          }),
+          },
           this.itemManager.collection.all(ContentType.Note),
           this.itemManager.collection,
         ).length,
@@ -348,22 +348,22 @@ describe('note display criteria', function () {
       await this.createNote()
 
       expect(
-        notesMatchingCriteria(
-          NotesDisplayCriteria.Create({
+        itemsMatchingOptions(
+          {
             views: [this.itemManager.allNotesSmartView],
             includeTrashed: true,
-          }),
+          },
           this.itemManager.collection.all(ContentType.Note),
           this.itemManager.collection,
         ).length,
       ).to.equal(1)
 
       expect(
-        notesMatchingCriteria(
-          NotesDisplayCriteria.Create({
+        itemsMatchingOptions(
+          {
             views: [this.itemManager.trashSmartView],
             includeTrashed: true,
-          }),
+          },
           this.itemManager.collection.all(ContentType.Note),
           this.itemManager.collection,
         ).length,
@@ -378,44 +378,44 @@ describe('note display criteria', function () {
       })
 
       expect(
-        notesMatchingCriteria(
-          NotesDisplayCriteria.Create({
+        itemsMatchingOptions(
+          {
             views: [this.itemManager.allNotesSmartView],
             includeTrashed: false,
-          }),
+          },
           this.itemManager.collection.all(ContentType.Note),
           this.itemManager.collection,
         ).length,
       ).to.equal(0)
 
       expect(
-        notesMatchingCriteria(
-          NotesDisplayCriteria.Create({
+        itemsMatchingOptions(
+          {
             views: [this.itemManager.allNotesSmartView],
             includeTrashed: true,
-          }),
+          },
           this.itemManager.collection.all(ContentType.Note),
           this.itemManager.collection,
         ).length,
       ).to.equal(1)
 
       expect(
-        notesMatchingCriteria(
-          NotesDisplayCriteria.Create({
+        itemsMatchingOptions(
+          {
             views: [this.itemManager.trashSmartView],
             includeTrashed: true,
-          }),
+          },
           this.itemManager.collection.all(ContentType.Note),
           this.itemManager.collection,
         ).length,
       ).to.equal(1)
 
       expect(
-        notesMatchingCriteria(
-          NotesDisplayCriteria.Create({
+        itemsMatchingOptions(
+          {
             views: [this.itemManager.archivedSmartView],
             includeTrashed: true,
-          }),
+          },
           this.itemManager.collection.all(ContentType.Note),
           this.itemManager.collection,
         ).length,
@@ -431,30 +431,30 @@ describe('note display criteria', function () {
       })
 
       expect(
-        notesMatchingCriteria(
-          NotesDisplayCriteria.Create({
+        itemsMatchingOptions(
+          {
             views: [this.itemManager.allNotesSmartView],
-          }),
+          },
           this.itemManager.collection.all(ContentType.Note),
           this.itemManager.collection,
         ).length,
       ).to.equal(1)
 
       expect(
-        notesMatchingCriteria(
-          NotesDisplayCriteria.Create({
+        itemsMatchingOptions(
+          {
             views: [this.itemManager.trashSmartView],
-          }),
+          },
           this.itemManager.collection.all(ContentType.Note),
           this.itemManager.collection,
         ).length,
       ).to.equal(1)
 
       expect(
-        notesMatchingCriteria(
-          NotesDisplayCriteria.Create({
+        itemsMatchingOptions(
+          {
             views: [this.itemManager.archivedSmartView],
-          }),
+          },
           this.itemManager.collection.all(ContentType.Note),
           this.itemManager.collection,
         ).length,
@@ -467,22 +467,22 @@ describe('note display criteria', function () {
       await this.createNote()
 
       expect(
-        notesMatchingCriteria(
-          NotesDisplayCriteria.Create({
+        itemsMatchingOptions(
+          {
             views: [this.itemManager.allNotesSmartView],
             includeArchived: true,
-          }),
+          },
           this.itemManager.collection.all(ContentType.Note),
           this.itemManager.collection,
         ).length,
       ).to.equal(1)
 
       expect(
-        notesMatchingCriteria(
-          NotesDisplayCriteria.Create({
+        itemsMatchingOptions(
+          {
             views: [this.itemManager.trashSmartView],
             includeArchived: true,
-          }),
+          },
           this.itemManager.collection.all(ContentType.Note),
           this.itemManager.collection,
         ).length,
@@ -496,44 +496,44 @@ describe('note display criteria', function () {
       })
 
       expect(
-        notesMatchingCriteria(
-          NotesDisplayCriteria.Create({
+        itemsMatchingOptions(
+          {
             views: [this.itemManager.allNotesSmartView],
             includeArchived: false,
-          }),
+          },
           this.itemManager.collection.all(ContentType.Note),
           this.itemManager.collection,
         ).length,
       ).to.equal(0)
 
       expect(
-        notesMatchingCriteria(
-          NotesDisplayCriteria.Create({
+        itemsMatchingOptions(
+          {
             views: [this.itemManager.allNotesSmartView],
             includeArchived: true,
-          }),
+          },
           this.itemManager.collection.all(ContentType.Note),
           this.itemManager.collection,
         ).length,
       ).to.equal(1)
 
       expect(
-        notesMatchingCriteria(
-          NotesDisplayCriteria.Create({
+        itemsMatchingOptions(
+          {
             views: [this.itemManager.trashSmartView],
             includeArchived: true,
-          }),
+          },
           this.itemManager.collection.all(ContentType.Note),
           this.itemManager.collection,
         ).length,
       ).to.equal(0)
 
       expect(
-        notesMatchingCriteria(
-          NotesDisplayCriteria.Create({
+        itemsMatchingOptions(
+          {
             views: [this.itemManager.archivedSmartView],
             includeArchived: false,
-          }),
+          },
           this.itemManager.collection.all(ContentType.Note),
           this.itemManager.collection,
         ).length,
@@ -548,33 +548,33 @@ describe('note display criteria', function () {
       })
 
       expect(
-        notesMatchingCriteria(
-          NotesDisplayCriteria.Create({
+        itemsMatchingOptions(
+          {
             views: [this.itemManager.allNotesSmartView],
             includeArchived: true,
-          }),
+          },
           this.itemManager.collection.all(ContentType.Note),
           this.itemManager.collection,
         ).length,
       ).to.equal(1)
 
       expect(
-        notesMatchingCriteria(
-          NotesDisplayCriteria.Create({
+        itemsMatchingOptions(
+          {
             views: [this.itemManager.trashSmartView],
             includeArchived: true,
-          }),
+          },
           this.itemManager.collection.all(ContentType.Note),
           this.itemManager.collection,
         ).length,
       ).to.equal(1)
 
       expect(
-        notesMatchingCriteria(
-          NotesDisplayCriteria.Create({
+        itemsMatchingOptions(
+          {
             views: [this.itemManager.archivedSmartView],
             includeArchived: true,
-          }),
+          },
           this.itemManager.collection.all(ContentType.Note),
           this.itemManager.collection,
         ).length,
@@ -587,24 +587,24 @@ describe('note display criteria', function () {
       await this.createNote()
 
       expect(
-        notesMatchingCriteria(
-          NotesDisplayCriteria.Create({
+        itemsMatchingOptions(
+          {
             views: [
               this.itemManager.allNotesSmartView,
               this.itemManager.archivedSmartView,
               this.itemManager.trashSmartView,
             ],
-          }),
+          },
           this.itemManager.collection.all(ContentType.Note),
           this.itemManager.collection,
         ).length,
       ).to.equal(1)
 
       expect(
-        notesMatchingCriteria(
-          NotesDisplayCriteria.Create({
+        itemsMatchingOptions(
+          {
             views: [this.itemManager.trashSmartView],
-          }),
+          },
           this.itemManager.collection.all(ContentType.Note),
           this.itemManager.collection,
         ).length,
@@ -618,44 +618,44 @@ describe('note display criteria', function () {
       })
 
       expect(
-        notesMatchingCriteria(
-          NotesDisplayCriteria.Create({
+        itemsMatchingOptions(
+          {
             views: [this.itemManager.allNotesSmartView],
             includeArchived: false,
-          }),
+          },
           this.itemManager.collection.all(ContentType.Note),
           this.itemManager.collection,
         ).length,
       ).to.equal(0)
 
       expect(
-        notesMatchingCriteria(
-          NotesDisplayCriteria.Create({
+        itemsMatchingOptions(
+          {
             views: [this.itemManager.allNotesSmartView],
             includeArchived: true,
-          }),
+          },
           this.itemManager.collection.all(ContentType.Note),
           this.itemManager.collection,
         ).length,
       ).to.equal(1)
 
       expect(
-        notesMatchingCriteria(
-          NotesDisplayCriteria.Create({
+        itemsMatchingOptions(
+          {
             views: [this.itemManager.trashSmartView],
             includeArchived: true,
-          }),
+          },
           this.itemManager.collection.all(ContentType.Note),
           this.itemManager.collection,
         ).length,
       ).to.equal(0)
 
       expect(
-        notesMatchingCriteria(
-          NotesDisplayCriteria.Create({
+        itemsMatchingOptions(
+          {
             views: [this.itemManager.archivedSmartView],
             includeArchived: false,
-          }),
+          },
           this.itemManager.collection.all(ContentType.Note),
           this.itemManager.collection,
         ).length,
@@ -670,33 +670,33 @@ describe('note display criteria', function () {
       })
 
       expect(
-        notesMatchingCriteria(
-          NotesDisplayCriteria.Create({
+        itemsMatchingOptions(
+          {
             views: [this.itemManager.allNotesSmartView],
             includeArchived: true,
-          }),
+          },
           this.itemManager.collection.all(ContentType.Note),
           this.itemManager.collection,
         ).length,
       ).to.equal(0)
 
       expect(
-        notesMatchingCriteria(
-          NotesDisplayCriteria.Create({
+        itemsMatchingOptions(
+          {
             views: [this.itemManager.trashSmartView],
             includeArchived: true,
-          }),
+          },
           this.itemManager.collection.all(ContentType.Note),
           this.itemManager.collection,
         ).length,
       ).to.equal(1)
 
       expect(
-        notesMatchingCriteria(
-          NotesDisplayCriteria.Create({
+        itemsMatchingOptions(
+          {
             views: [this.itemManager.archivedSmartView],
             includeArchived: true,
-          }),
+          },
           this.itemManager.collection.all(ContentType.Note),
           this.itemManager.collection,
         ).length,

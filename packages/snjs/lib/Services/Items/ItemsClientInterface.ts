@@ -6,7 +6,6 @@ import {
   SNTag,
   SmartView,
   TagNoteCountChangeObserver,
-  NotesDisplayCriteria,
   DecryptedPayloadInterface,
   EncryptedItemInterface,
   DecryptedTransferPayload,
@@ -14,6 +13,7 @@ import {
   DecryptedItemInterface,
   SNComponent,
   SNTheme,
+  DisplayOptions,
 } from '@standardnotes/models'
 import { UuidString } from '@Lib/Types'
 
@@ -37,7 +37,7 @@ export interface ItemsClientInterface {
 
   get trashedItems(): SNNote[]
 
-  setNotesDisplayCriteria(criteria: NotesDisplayCriteria): void
+  setPrimaryItemDisplayOptions(options: DisplayOptions): void
 
   getDisplayableNotes(): SNNote[]
 
