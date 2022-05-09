@@ -11,11 +11,14 @@ export class ItemDisplayController<I extends DisplayItem> {
   private sortedItems: I[] = []
   private needsSort = true
 
+  private holdChanges = false
+
   constructor(
     private readonly collection: ReadonlyItemCollection,
     public readonly contentTypes: ContentType[],
     private sortBy: CollectionSortProperty,
     private sortDirection: CollectionSortDirection,
+    private hiddenContentTypes: ContentType[] = [],
     private customFilter?: DisplayControllerCustomFilter,
   ) {
     this.filterThenSortElements(this.collection.all(this.contentTypes) as I[])
@@ -28,18 +31,36 @@ export class ItemDisplayController<I extends DisplayItem> {
   setSortBy(sortBy: CollectionSortProperty): void {
     this.sortBy = sortBy
     this.needsSort = true
-    this.filterThenSortElements(this.collection.all(this.contentTypes) as I[])
+
+    if (!this.holdChanges) {
+      this.filterThenSortElements(this.collection.all(this.contentTypes) as I[])
+    }
   }
 
   setSortDirection(sortDirection: CollectionSortDirection): void {
     this.sortDirection = sortDirection
     this.needsSort = true
-    this.filterThenSortElements(this.collection.all(this.contentTypes) as I[])
+
+    if (!this.holdChanges) {
+      this.filterThenSortElements(this.collection.all(this.contentTypes) as I[])
+    }
+  }
+
+  setHiddenContentTypes(hiddenContentTypes: ContentType[]): void {
+    this.hiddenContentTypes = hiddenContentTypes
+    this.needsSort = true
+
+    if (!this.holdChanges) {
+      this.filterThenSortElements(this.collection.all(this.contentTypes) as I[])
+    }
   }
 
   setCustomFilter(customFilter: DisplayControllerCustomFilter): void {
     this.customFilter = customFilter
-    this.filterThenSortElements(this.collection.all(this.contentTypes) as I[])
+
+    if (!this.holdChanges) {
+      this.filterThenSortElements(this.collection.all(this.contentTypes) as I[])
+    }
   }
 
   onCollectionChange(delta: ItemDelta): void {
@@ -47,6 +68,16 @@ export class ItemDisplayController<I extends DisplayItem> {
       this.contentTypes.includes(i.content_type),
     )
     this.filterThenSortElements(items as I[])
+  }
+
+  public beginBatchPropertyChange(): void {
+    this.holdChanges = true
+  }
+
+  public endBatchPropertyChange(): void {
+    this.holdChanges = false
+
+    this.filterThenSortElements(this.collection.all(this.contentTypes) as I[])
   }
 
   private filterThenSortElements(elements: I[]): void {
@@ -73,7 +104,13 @@ export class ItemDisplayController<I extends DisplayItem> {
         continue
       }
 
-      const passes = !this.collection.has(element.uuid) ? false : this.customFilter ? this.customFilter(element) : true
+      const passes = !this.collection.has(element.uuid)
+        ? false
+        : this.hiddenContentTypes.includes(element.content_type)
+        ? false
+        : this.customFilter
+        ? this.customFilter(element)
+        : true
 
       if (passes) {
         if (previousElement != undefined) {

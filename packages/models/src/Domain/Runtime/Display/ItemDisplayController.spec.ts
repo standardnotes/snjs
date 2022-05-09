@@ -1,6 +1,6 @@
 import { CreateItemDelta } from './../Index/ItemDelta'
 import { DeletedPayload } from './../../Abstract/Payload/Implementations/DeletedPayload'
-import { createTag, mockUuid, pinnedContent } from './../../Utilities/Test/SpecUtils'
+import { createFile, createNote, createTag, mockUuid, pinnedContent } from './../../Utilities/Test/SpecUtils'
 import { ContentType } from '@standardnotes/common'
 import { DeletedItem, EncryptedItem } from '../../Abstract/Item'
 import { EncryptedPayload, PayloadTimestampDefaults } from '../../Abstract/Payload'
@@ -181,5 +181,56 @@ describe('item display controller', () => {
     controller.onCollectionChange(delta)
 
     expect(controller.items()).toHaveLength(1)
+  })
+
+  it('should display compound item types', () => {
+    const collection = new ItemCollection()
+    const note = createNoteWithContent({ title: 'Z' })
+    const file = createFile('A')
+    collection.set([note, file])
+
+    const controller = new ItemDisplayController(collection, [ContentType.Note, ContentType.File], 'title', 'asc')
+
+    expect(controller.items()[0]).toEqual(file)
+    expect(controller.items()[1]).toEqual(note)
+
+    controller.setSortDirection('dsc')
+
+    expect(controller.items()[0]).toEqual(note)
+    expect(controller.items()[1]).toEqual(file)
+  })
+
+  it('should hide hidden types', () => {
+    const collection = new ItemCollection()
+    const note = createNote()
+    const file = createFile()
+    collection.set([note, file])
+
+    const controller = new ItemDisplayController(collection, [ContentType.Note, ContentType.File], 'title', 'asc')
+
+    expect(controller.items()).toHaveLength(2)
+
+    controller.setHiddenContentTypes([ContentType.File])
+
+    expect(controller.items()).toHaveLength(1)
+  })
+
+  it('should hold changes when performing batch property change', () => {
+    const collection = new ItemCollection()
+    const note = createNote()
+    const file = createFile()
+    collection.set([note, file])
+
+    const controller = new ItemDisplayController(collection, [ContentType.Note, ContentType.File], 'title', 'asc')
+
+    const sortFn = (controller['filterThenSortElements'] = jest.fn())
+
+    controller.beginBatchPropertyChange()
+    controller.setSortBy('created_at')
+    controller.setSortDirection('asc')
+    controller.setHiddenContentTypes([ContentType.File])
+    controller.endBatchPropertyChange()
+
+    expect(sortFn).toHaveBeenCalledTimes(1)
   })
 })

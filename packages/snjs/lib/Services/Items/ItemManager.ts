@@ -34,9 +34,8 @@ export class ItemManager
   private systemSmartViews: Models.SmartView[]
   private tagNotesIndex!: Models.TagNotesIndex
 
-  private noteDisplayController!: Models.ItemDisplayController<Models.SNNote>
-  private tagDisplayController!: Models.ItemDisplayController<Models.SNTag>
   private noteAndFilesDisplayController!: Models.ItemDisplayController<Models.SNNote | Models.SNFile>
+  private tagDisplayController!: Models.ItemDisplayController<Models.SNTag>
   private itemsKeyDisplayController!: Models.ItemDisplayController<SNItemsKey>
   private componentDisplayController!: Models.ItemDisplayController<Models.SNComponent>
   private themeDisplayController!: Models.ItemDisplayController<Models.SNTheme>
@@ -62,17 +61,12 @@ export class ItemManager
   private createCollection() {
     this.collection = new Models.ItemCollection()
 
-    this.noteDisplayController = new Models.ItemDisplayController(
-      this.collection,
-      [ContentType.Note],
-      Models.CollectionSort.CreatedAt,
-      'dsc',
-    )
     this.noteAndFilesDisplayController = new Models.ItemDisplayController(
       this.collection,
       [ContentType.Note, ContentType.File],
       Models.CollectionSort.CreatedAt,
       'dsc',
+      [ContentType.File],
     )
     this.tagDisplayController = new Models.ItemDisplayController(
       this.collection,
@@ -116,9 +110,8 @@ export class ItemManager
 
   private get allDisplayControllers(): Models.ItemDisplayController<Models.DisplayItem>[] {
     return [
-      this.noteDisplayController,
-      this.tagDisplayController,
       this.noteAndFilesDisplayController,
+      this.tagDisplayController,
       this.itemsKeyDisplayController,
       this.componentDisplayController,
       this.themeDisplayController,
@@ -184,19 +177,26 @@ export class ItemManager
       ...override,
     })
 
-    for (const controller of [this.noteAndFilesDisplayController, this.noteDisplayController]) {
-      controller.setCustomFilter(updatedCriteria.unifiedFilterRepresentation(this.collection))
+    this.noteAndFilesDisplayController.beginBatchPropertyChange()
+    {
+      this.noteAndFilesDisplayController.setCustomFilter(updatedCriteria.unifiedFilterRepresentation(this.collection))
+      this.noteAndFilesDisplayController.setHiddenContentTypes(updatedCriteria.showFiles ? [] : [ContentType.File])
       if (updatedCriteria.sortProperty) {
-        controller.setSortBy(updatedCriteria.sortProperty)
+        this.noteAndFilesDisplayController.setSortBy(updatedCriteria.sortProperty)
       }
       if (updatedCriteria.sortDirection) {
-        controller.setSortDirection(updatedCriteria.sortDirection)
+        this.noteAndFilesDisplayController.setSortDirection(updatedCriteria.sortDirection)
       }
     }
+    this.noteAndFilesDisplayController.endBatchPropertyChange()
   }
 
   public getDisplayableNotes(): Models.SNNote[] {
-    return this.noteDisplayController.items()
+    return this.noteAndFilesDisplayController.items().filter(Models.isNote)
+  }
+
+  public getDisplayableFiles(): Models.SNFile[] {
+    return this.fileDisplayController.items()
   }
 
   public getDisplayableNotesAndFiles(): (Models.SNNote | Models.SNFile)[] {
