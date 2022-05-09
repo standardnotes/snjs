@@ -1,6 +1,6 @@
 import { TagContent } from './../../Syncable/Tag/Tag'
 import { ContentType } from '@standardnotes/common'
-import { FillItemContent } from '../../Abstract/Content/ItemContent'
+import { FillItemContent, ItemContent } from '../../Abstract/Content/ItemContent'
 import { DecryptedPayload, PayloadSource, PayloadTimestampDefaults } from '../../Abstract/Payload'
 import { FileContent, SNFile } from '../../Syncable/File'
 import { NoteContent, SNNote } from '../../Syncable/Note'
@@ -66,4 +66,14 @@ export const createFile = (name = 'screenshot.png') => {
       PayloadSource.Constructor,
     ),
   )
+}
+
+export const pinnedContent = (): Partial<ItemContent> => {
+  return {
+    appData: {
+      'org.standardnotes.sn': {
+        pinned: true,
+      },
+    },
+  }
 }

@@ -48,7 +48,6 @@ describe('tag notes index', () => {
 
   it('should decrement count after decrypted note becomes errored', () => {
     const collection = new ItemCollection()
-    collection.setDisplayOptions(ContentType.Note, 'title')
     const index = new TagNotesIndex(collection)
 
     const decryptedItem = createDecryptedItem()

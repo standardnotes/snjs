@@ -8,13 +8,10 @@ import {
   TagNoteCountChangeObserver,
   NotesDisplayCriteria,
   DecryptedPayloadInterface,
-  CollectionSortProperty,
   EncryptedItemInterface,
-  CollectionSortDirection,
   DecryptedTransferPayload,
   PredicateInterface,
   DecryptedItemInterface,
-  SortableItem,
   SNComponent,
   SNTheme,
 } from '@standardnotes/models'
@@ -33,33 +30,21 @@ export interface ItemsClientInterface {
 
   addTagToNote(note: SNNote, tag: SNTag, addHierarchy: boolean): Promise<SNTag[]>
 
-  /**
-   * Creates an unmanaged, un-inserted item from a payload.
-   */
+  /** Creates an unmanaged, un-inserted item from a payload. */
   createItemFromPayload(payload: DecryptedPayloadInterface): DecryptedItemInterface
 
   createPayloadFromObject(object: DecryptedTransferPayload): DecryptedPayloadInterface
 
   get trashedItems(): SNNote[]
 
-  setDisplayOptions(
-    contentType:
-      | ContentType.Note
-      | ContentType.Tag
-      | ContentType.SmartView
-      | ContentType.Theme
-      | ContentType.Component
-      | ContentType.File,
-    sortBy?: CollectionSortProperty,
-    direction?: CollectionSortDirection,
-    filter?: (element: SortableItem) => boolean,
-  ): void
-
   setNotesDisplayCriteria(criteria: NotesDisplayCriteria): void
 
   getDisplayableNotes(): SNNote[]
+
   getDisplayableTags(): SNTag[]
+
   getDisplayableItemsKeys(): SNItemsKey[]
+
   getDisplayableComponents(): (SNComponent | SNTheme)[]
 
   getItems<T extends DecryptedItemInterface>(contentType: ContentType | ContentType[]): T[]
