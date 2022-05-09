@@ -7,9 +7,9 @@ import { FillItemContent } from '../../Abstract/Content/ItemContent'
 import { Predicate } from '../../Runtime/Predicate/Predicate'
 import { CompoundPredicate } from '../../Runtime/Predicate/CompoundPredicate'
 import { PayloadTimestampDefaults } from '../../Abstract/Payload'
-import { DisplayOptions } from '../../Runtime/Display'
+import { FilterDisplayOptions } from '../../Runtime/Display'
 
-export function BuildSmartViews(options: DisplayOptions): SmartView[] {
+export function BuildSmartViews(options: FilterDisplayOptions): SmartView[] {
   const notes = new SmartView(
     new DecryptedPayload({
       uuid: SystemViewId.AllNotes,
@@ -61,7 +61,7 @@ export function BuildSmartViews(options: DisplayOptions): SmartView[] {
   return [notes, archived, trash, untagged]
 }
 
-function allNotesPredicate(options: DisplayOptions) {
+function allNotesPredicate(options: FilterDisplayOptions) {
   const subPredicates: Predicate<SNNote>[] = [new Predicate('content_type', '=', ContentType.Note)]
 
   if (options.includeTrashed === false) {
@@ -81,7 +81,7 @@ function allNotesPredicate(options: DisplayOptions) {
   return predicate
 }
 
-function archivedNotesPredicate(options: DisplayOptions) {
+function archivedNotesPredicate(options: FilterDisplayOptions) {
   const subPredicates: Predicate<SNNote>[] = [
     new Predicate('archived', '=', true),
     new Predicate('content_type', '=', ContentType.Note),
@@ -100,7 +100,7 @@ function archivedNotesPredicate(options: DisplayOptions) {
   return predicate
 }
 
-function trashedNotesPredicate(options: DisplayOptions) {
+function trashedNotesPredicate(options: FilterDisplayOptions) {
   const subPredicates: Predicate<SNNote>[] = [
     new Predicate('trashed', '=', true),
     new Predicate('content_type', '=', ContentType.Note),
@@ -119,7 +119,7 @@ function trashedNotesPredicate(options: DisplayOptions) {
   return predicate
 }
 
-function untaggedNotesPredicate(options: DisplayOptions) {
+function untaggedNotesPredicate(options: FilterDisplayOptions) {
   const subPredicates = [
     new Predicate('content_type', '=', ContentType.Note),
     new Predicate<ItemWithTags>('tagsCount', '=', 0),

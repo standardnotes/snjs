@@ -53,7 +53,7 @@ export class ItemManager
     this.unsubChangeObserver = this.payloadManager.addObserver(ContentType.Any, this.setPayloads.bind(this))
   }
 
-  private rebuildSystemSmartViews(criteria: Models.DisplayOptions): Models.SmartView[] {
+  private rebuildSystemSmartViews(criteria: Models.FilterDisplayOptions): Models.SmartView[] {
     this.systemSmartViews = Models.BuildSmartViews(criteria)
     return this.systemSmartViews
   }
@@ -64,46 +64,36 @@ export class ItemManager
     this.noteAndFilesDisplayController = new Models.ItemDisplayController(
       this.collection,
       [ContentType.Note, ContentType.File],
-      Models.CollectionSort.CreatedAt,
-      'dsc',
-      [ContentType.File],
+      {
+        sortBy: 'created_at',
+        sortDirection: 'dsc',
+        hiddenContentTypes: [ContentType.File],
+      },
     )
-    this.tagDisplayController = new Models.ItemDisplayController(
-      this.collection,
-      [ContentType.Tag],
-      Models.CollectionSort.Title,
-      'asc',
-    )
-    this.itemsKeyDisplayController = new Models.ItemDisplayController(
-      this.collection,
-      [ContentType.ItemsKey],
-      Models.CollectionSort.CreatedAt,
-      'asc',
-    )
-    this.componentDisplayController = new Models.ItemDisplayController(
-      this.collection,
-      [ContentType.Component],
-      Models.CollectionSort.CreatedAt,
-      'asc',
-    )
-    this.themeDisplayController = new Models.ItemDisplayController(
-      this.collection,
-      [ContentType.Theme],
-      Models.CollectionSort.Title,
-      'asc',
-    )
-    this.smartViewDisplayController = new Models.ItemDisplayController(
-      this.collection,
-      [ContentType.SmartView],
-      Models.CollectionSort.Title,
-      'asc',
-    )
-    this.fileDisplayController = new Models.ItemDisplayController(
-      this.collection,
-      [ContentType.File],
-      Models.CollectionSort.Title,
-      'asc',
-    )
+    this.tagDisplayController = new Models.ItemDisplayController(this.collection, [ContentType.Tag], {
+      sortBy: 'title',
+      sortDirection: 'asc',
+    })
+    this.itemsKeyDisplayController = new Models.ItemDisplayController(this.collection, [ContentType.ItemsKey], {
+      sortBy: 'created_at',
+      sortDirection: 'asc',
+    })
+    this.componentDisplayController = new Models.ItemDisplayController(this.collection, [ContentType.Component], {
+      sortBy: 'created_at',
+      sortDirection: 'asc',
+    })
+    this.themeDisplayController = new Models.ItemDisplayController(this.collection, [ContentType.Theme], {
+      sortBy: 'title',
+      sortDirection: 'asc',
+    })
+    this.smartViewDisplayController = new Models.ItemDisplayController(this.collection, [ContentType.SmartView], {
+      sortBy: 'title',
+      sortDirection: 'asc',
+    })
+    this.fileDisplayController = new Models.ItemDisplayController(this.collection, [ContentType.File], {
+      sortBy: 'title',
+      sortDirection: 'asc',
+    })
 
     this.tagNotesIndex = new Models.TagNotesIndex(this.collection, this.tagNotesIndex?.observers)
   }
@@ -133,7 +123,7 @@ export class ItemManager
   }
 
   public setPrimaryItemDisplayOptions(options: Models.DisplayOptions): void {
-    const override: Models.DisplayOptions = {}
+    const override: Models.FilterDisplayOptions = {}
 
     if (options.views && options.views.find((view) => view.uuid === Models.SystemViewId.AllNotes)) {
       if (options.includeArchived == undefined) {
@@ -180,20 +170,10 @@ export class ItemManager
       },
     }
 
-    this.noteAndFilesDisplayController.beginBatchPropertyChange()
-    {
-      this.noteAndFilesDisplayController.setCustomFilter(
-        Models.computeUnifiedFilterForDisplayOptions(updatedOptions, this.collection),
-      )
-      this.noteAndFilesDisplayController.setHiddenContentTypes(updatedOptions.hiddenContentTypes || [])
-      if (updatedOptions.sortBy) {
-        this.noteAndFilesDisplayController.setSortBy(updatedOptions.sortBy)
-      }
-      if (updatedOptions.sortDirection) {
-        this.noteAndFilesDisplayController.setSortDirection(updatedOptions.sortDirection)
-      }
-    }
-    this.noteAndFilesDisplayController.endBatchPropertyChange()
+    this.noteAndFilesDisplayController.setDisplayOptions({
+      customFilter: Models.computeUnifiedFilterForDisplayOptions(updatedOptions, this.collection),
+      ...updatedOptions,
+    })
   }
 
   public getDisplayableNotes(): Models.SNNote[] {

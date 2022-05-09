@@ -2,7 +2,7 @@ import { createNoteWithContent } from '../../Utilities/Test/SpecUtils'
 import { ItemCollection } from '../Collection/Item/ItemCollection'
 import { SNNote } from '../../Syncable/Note/Note'
 import { itemsMatchingOptions } from './Search/SearchUtilities'
-import { DisplayOptions } from './DisplayOptions'
+import { FilterDisplayOptions } from './DisplayOptions'
 
 describe('item display options', () => {
   const collectionWithNotes = function (titles: (string | undefined)[] = [], bodies: string[] = []) {
@@ -23,7 +23,7 @@ describe('item display options', () => {
   it('string query title', () => {
     const query = 'foo'
 
-    const options: DisplayOptions = {
+    const options: FilterDisplayOptions = {
       searchQuery: { query: query, includeProtectedNoteText: true },
     }
     const collection = collectionWithNotes(['hello', 'fobar', 'foobar', 'foo'])
@@ -32,7 +32,7 @@ describe('item display options', () => {
 
   it('string query text', async function () {
     const query = 'foo'
-    const options: DisplayOptions = {
+    const options: FilterDisplayOptions = {
       searchQuery: { query: query, includeProtectedNoteText: true },
     }
     const collection = collectionWithNotes(
@@ -44,7 +44,7 @@ describe('item display options', () => {
 
   it('string query title and text', async function () {
     const query = 'foo'
-    const options: DisplayOptions = {
+    const options: FilterDisplayOptions = {
       searchQuery: { query: query, includeProtectedNoteText: true },
     }
     const collection = collectionWithNotes(['hello', 'foobar'], ['foo', 'fobar'])

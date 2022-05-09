@@ -1,24 +1,20 @@
 import { ContentType } from '@standardnotes/common'
 import { compareValues } from '@standardnotes/utils'
 import { isDeletedItem, isEncryptedItem } from '../../Abstract/Item'
-import { CollectionSortDirection, CollectionSortProperty } from '../Collection/CollectionSort'
 import { ItemDelta } from '../Index/ItemDelta'
+import { DisplayControllerOptions } from './DisplayOptions'
 import { sortTwoItems } from './SortTwoItems'
-import { DisplayControllerCustomFilter, UuidToSortedPositionMap, DisplayItem, ReadonlyItemCollection } from './Types'
+import { UuidToSortedPositionMap, DisplayItem, ReadonlyItemCollection } from './Types'
 
 export class ItemDisplayController<I extends DisplayItem> {
   private sortMap: UuidToSortedPositionMap = {}
   private sortedItems: I[] = []
   private needsSort = true
-  private holdChanges = false
 
   constructor(
     private readonly collection: ReadonlyItemCollection,
     public readonly contentTypes: ContentType[],
-    private sortBy: CollectionSortProperty,
-    private sortDirection: CollectionSortDirection,
-    private hiddenContentTypes: ContentType[] = [],
-    private customFilter?: DisplayControllerCustomFilter,
+    private options: DisplayControllerOptions,
   ) {
     this.filterThenSortElements(this.collection.all(this.contentTypes) as I[])
   }
@@ -27,39 +23,11 @@ export class ItemDisplayController<I extends DisplayItem> {
     return this.sortedItems
   }
 
-  setSortBy(sortBy: CollectionSortProperty): void {
-    this.sortBy = sortBy
+  setDisplayOptions(displayOptions: Partial<DisplayControllerOptions>): void {
+    this.options = { ...this.options, ...displayOptions }
     this.needsSort = true
 
-    if (!this.holdChanges) {
-      this.filterThenSortElements(this.collection.all(this.contentTypes) as I[])
-    }
-  }
-
-  setSortDirection(sortDirection: CollectionSortDirection): void {
-    this.sortDirection = sortDirection
-    this.needsSort = true
-
-    if (!this.holdChanges) {
-      this.filterThenSortElements(this.collection.all(this.contentTypes) as I[])
-    }
-  }
-
-  setHiddenContentTypes(hiddenContentTypes: ContentType[]): void {
-    this.hiddenContentTypes = hiddenContentTypes
-    this.needsSort = true
-
-    if (!this.holdChanges) {
-      this.filterThenSortElements(this.collection.all(this.contentTypes) as I[])
-    }
-  }
-
-  setCustomFilter(customFilter: DisplayControllerCustomFilter): void {
-    this.customFilter = customFilter
-
-    if (!this.holdChanges) {
-      this.filterThenSortElements(this.collection.all(this.contentTypes) as I[])
-    }
+    this.filterThenSortElements(this.collection.all(this.contentTypes) as I[])
   }
 
   onCollectionChange(delta: ItemDelta): void {
@@ -67,16 +35,6 @@ export class ItemDisplayController<I extends DisplayItem> {
       this.contentTypes.includes(i.content_type),
     )
     this.filterThenSortElements(items as I[])
-  }
-
-  public beginBatchPropertyChange(): void {
-    this.holdChanges = true
-  }
-
-  public endBatchPropertyChange(): void {
-    this.holdChanges = false
-
-    this.filterThenSortElements(this.collection.all(this.contentTypes) as I[])
   }
 
   private filterThenSortElements(elements: I[]): void {
@@ -105,18 +63,18 @@ export class ItemDisplayController<I extends DisplayItem> {
 
       const passes = !this.collection.has(element.uuid)
         ? false
-        : this.hiddenContentTypes.includes(element.content_type)
+        : this.options.hiddenContentTypes?.includes(element.content_type)
         ? false
-        : this.customFilter
-        ? this.customFilter(element)
+        : this.options.customFilter
+        ? this.options.customFilter(element)
         : true
 
       if (passes) {
         if (previousElement != undefined) {
           /** Check to see if the element has changed its sort value. If so, we need to re-sort. */
-          const previousValue = previousElement[this.sortBy]
+          const previousValue = previousElement[this.options.sortBy]
 
-          const newValue = element[this.sortBy]
+          const newValue = element[this.options.sortBy]
 
           /** Replace the current element with the new one. */
           this.sortedItems[previousIndex] = element
@@ -151,7 +109,7 @@ export class ItemDisplayController<I extends DisplayItem> {
   /** Resort the sortedItems array, and update the saved positions */
   private resortItems() {
     const resorted = this.sortedItems.sort((a, b) => {
-      return sortTwoItems(a, b, this.sortBy, this.sortDirection)
+      return sortTwoItems(a, b, this.options.sortBy, this.options.sortDirection)
     })
 
     /**

@@ -1,6 +1,6 @@
 import { ContentType } from '@standardnotes/common'
 import { SNTag } from '../../../Syncable/Tag'
-import { DisplayOptions } from '../DisplayOptions'
+import { FilterDisplayOptions } from '../DisplayOptions'
 import { computeFiltersForDisplayOptions } from '../DisplayOptionsToFilters'
 import { SearchableItem } from './SearchableItem'
 import { ReferenceLookupCollection, ItemFilter, SearchQuery, SearchableDecryptedItem } from './Types'
@@ -14,7 +14,7 @@ enum MatchResult {
 }
 
 export function itemsMatchingOptions(
-  options: DisplayOptions,
+  options: FilterDisplayOptions,
   fromItems: SearchableDecryptedItem[],
   collection: ReferenceLookupCollection,
 ): SearchableItem[] {
