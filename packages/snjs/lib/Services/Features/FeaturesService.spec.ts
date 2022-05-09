@@ -514,31 +514,28 @@ describe('featuresService', () => {
 
       featuresService['features'] = features
 
-      Object.defineProperty(itemManager, 'components', {
-        get: jest.fn(() => [
-          new SNComponent({
-            uuid: '123',
-            content_type: ContentType.Theme,
-            content: {
-              valid_until: themeFeature.expires_at,
-              package_info: {
-                ...themeFeature,
-              },
+      itemManager.getDisplayableComponents = jest.fn().mockReturnValue([
+        new SNComponent({
+          uuid: '123',
+          content_type: ContentType.Theme,
+          content: {
+            valid_until: themeFeature.expires_at,
+            package_info: {
+              ...themeFeature,
             },
-          } as never),
-          new SNComponent({
-            uuid: '456',
-            content_type: ContentType.Component,
-            content: {
-              valid_until: new Date(editorFeature.expires_at),
-              package_info: {
-                ...editorFeature,
-              },
+          },
+        } as never),
+        new SNComponent({
+          uuid: '456',
+          content_type: ContentType.Component,
+          content: {
+            valid_until: new Date(editorFeature.expires_at),
+            package_info: {
+              ...editorFeature,
             },
-          } as never),
-        ]),
-        set: jest.fn(),
-      })
+          },
+        } as never),
+      ])
 
       await featuresService.updateRolesAndFetchFeatures('123', [RoleName.BasicUser])
 

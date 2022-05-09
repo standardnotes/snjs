@@ -139,15 +139,6 @@ export class ItemManager
     return new Models.DecryptedPayload(object)
   }
 
-  setDisplayOptions(
-    contentType: ContentType.Tag | ContentType.SmartView | ContentType.Theme | ContentType.Component | ContentType.File,
-    sortBy?: Models.CollectionSortProperty,
-    direction?: Models.CollectionSortDirection,
-    filter?: (element: Models.SortableItem) => boolean,
-  ): void {
-    this.collection.setDisplayOptions(contentType, sortBy, direction, filter)
-  }
-
   public setNotesDisplayCriteria(criteria: Models.NotesDisplayCriteria): void {
     const override: Partial<Models.NotesDisplayCriteria> = {}
 

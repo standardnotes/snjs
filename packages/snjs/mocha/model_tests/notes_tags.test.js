@@ -333,14 +333,6 @@ describe('notes and tags', () => {
       expect(this.application.items.tagDisplayController.items().map((t) => t.title)).to.deep.equal(sortedTitles)
     })
 
-    it('should sort tags in reverse alphabetical order', async function () {
-      const titles = ['1', 'A', 'b', '2']
-      const sortedTitles = titles.sort((a, b) => b.localeCompare(a))
-      await Promise.all(titles.map((title) => this.application.mutator.findOrCreateTag(title)))
-      this.application.items.setDisplayOptions(ContentType.Tag, 'title', 'asc')
-      expect(this.application.items.tagDisplayController.items().map((t) => t.title)).to.deep.equal(sortedTitles)
-    })
-
     it('should match a tag', async function () {
       const taggedNote = await Factory.createMappedNote(this.application)
       const tag = await this.application.mutator.findOrCreateTag('A')

@@ -32,7 +32,6 @@ describe('note display criteria', function () {
 
   const emptyCollection = function () {
     const collection = new ItemCollection()
-    collection.setDisplayOptions(ContentType.Note, CollectionSort.CreatedAt, 'asc')
     return collection
   }
 
@@ -53,14 +52,6 @@ describe('note display criteria', function () {
     expect(copy.includeTrashed).to.equal(true)
   })
 
-  it('string query title', async function () {
-    const query = 'foo'
-    const criteria = NotesDisplayCriteria.Create({
-      searchQuery: { query: query },
-    })
-    const collection = collectionWithNotes(['hello', 'fobar', 'foobar', 'foo'])
-    expect(notesMatchingCriteria(criteria, collection).length).to.equal(2)
-  })
 
   it('string query text', async function () {
     const query = 'foo'

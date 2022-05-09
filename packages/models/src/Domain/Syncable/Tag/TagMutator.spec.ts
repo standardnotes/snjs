@@ -16,7 +16,7 @@ describe('tag mutator', () => {
     expect(result.content.references[0]).toEqual({
       uuid: file.uuid,
       content_type: ContentType.File,
-      relationship_type: ContenteReferenceType.TagToFile,
+      reference_type: ContenteReferenceType.TagToFile,
     })
   })
 

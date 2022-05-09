@@ -816,7 +816,7 @@ describe('keys', function () {
   it('having key while offline then signing into account with key should only have 1 default items key', async function () {
     const otherClient = await Factory.createInitAppWithFakeCrypto()
     /** Invert order of keys */
-    otherClient.itemManager.collection.setDisplayOptions(ContentType.ItemsKey, CollectionSort.CreatedAt, 'dsc')
+    otherClient.itemManager.itemsKeyDisplayController.setSortDirection('dsc')
     /** On client A, create account and note */
     await Factory.registerUserToApplication({
       application: this.application,
