@@ -2,6 +2,7 @@ import { ContentType } from '@standardnotes/common'
 import { compareValues } from '@standardnotes/utils'
 import { isDeletedItem, isEncryptedItem } from '../../Abstract/Item'
 import { CollectionSortDirection, CollectionSortProperty } from '../Collection/CollectionSort'
+import { ItemDelta } from '../Index/ItemDelta'
 import { sortTwoItems } from './SortTwoItems'
 import { DisplayControllerCustomFilter, UuidToSortedPositionMap, DisplayItem, ReadonlyItemCollection } from './Types'
 
@@ -17,7 +18,7 @@ export class ItemDisplayController<I extends DisplayItem> {
     private sortDirection: CollectionSortDirection,
     private customFilter?: DisplayControllerCustomFilter,
   ) {
-    this.filterThenSortElements()
+    this.filterThenSortElements(this.collection.all(this.contentTypes) as I[])
   }
 
   public items(): I[] {
@@ -27,27 +28,28 @@ export class ItemDisplayController<I extends DisplayItem> {
   setSortBy(sortBy: CollectionSortProperty): void {
     this.sortBy = sortBy
     this.needsSort = true
-    this.filterThenSortElements()
+    this.filterThenSortElements(this.collection.all(this.contentTypes) as I[])
   }
 
   setSortDirection(sortDirection: CollectionSortDirection): void {
     this.sortDirection = sortDirection
     this.needsSort = true
-    this.filterThenSortElements()
+    this.filterThenSortElements(this.collection.all(this.contentTypes) as I[])
   }
 
   setCustomFilter(customFilter: DisplayControllerCustomFilter): void {
     this.customFilter = customFilter
-    this.filterThenSortElements()
+    this.filterThenSortElements(this.collection.all(this.contentTypes) as I[])
   }
 
-  onCollectionChange(): void {
-    this.filterThenSortElements()
+  onCollectionChange(delta: ItemDelta): void {
+    const items = [...delta.changed, ...delta.inserted, ...delta.discarded].filter((i) =>
+      this.contentTypes.includes(i.content_type),
+    )
+    this.filterThenSortElements(items as I[])
   }
 
-  private filterThenSortElements(): void {
-    const elements = this.collection.all(this.contentTypes) as I[]
-
+  private filterThenSortElements(elements: I[]): void {
     for (const element of elements) {
       const previousIndex = this.sortMap[element.uuid]
       const previousElement = previousIndex != undefined ? this.sortedItems[previousIndex] : undefined

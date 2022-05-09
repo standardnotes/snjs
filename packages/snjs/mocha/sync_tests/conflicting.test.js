@@ -72,7 +72,7 @@ describe('online conflict handling', function () {
 
     /** First modify the item without saving so that our local contents digress from the server's */
     await this.application.mutator.changeItem(item, (mutator) => {
-      mutator.content.foo = `${Math.random()}`
+      mutator.mutableContent.foo = `${Math.random()}`
     })
 
     await Factory.changePayloadTimeStampAndSync(
@@ -355,7 +355,7 @@ describe('online conflict handling', function () {
       note,
       (mutator) => {
         // client A
-        mutator.content.conflict_of = 'foo'
+        mutator.mutableContent.conflict_of = 'foo'
       },
       undefined,
       undefined,
@@ -367,7 +367,7 @@ describe('online conflict handling', function () {
     await this.application.itemManager.changeItem(
       note,
       (mutator) => {
-        mutator.content.conflict_of = 'bar'
+        mutator.mutableContent.conflict_of = 'bar'
       },
       undefined,
       undefined,
@@ -389,7 +389,7 @@ describe('online conflict handling', function () {
       note,
       (mutator) => {
         // client A
-        mutator.content.foo = 'foo'
+        mutator.mutableContent.foo = 'foo'
       },
       undefined,
       undefined,

@@ -78,7 +78,7 @@ export class ItemManager
       this.collection,
       [ContentType.Tag],
       Models.CollectionSort.Title,
-      'dsc',
+      'asc',
     )
     this.itemsKeyDisplayController = new Models.ItemDisplayController(
       this.collection,
@@ -102,7 +102,7 @@ export class ItemManager
       this.collection,
       [ContentType.SmartView],
       Models.CollectionSort.Title,
-      'dsc',
+      'asc',
     )
     this.fileDisplayController = new Models.ItemDisplayController(
       this.collection,
@@ -184,8 +184,15 @@ export class ItemManager
       ...override,
     })
 
-    this.noteAndFilesDisplayController.setCustomFilter(updatedCriteria.unifiedFilterRepresentation(this.collection))
-    this.noteDisplayController.setCustomFilter(updatedCriteria.unifiedFilterRepresentation(this.collection))
+    for (const controller of [this.noteAndFilesDisplayController, this.noteDisplayController]) {
+      controller.setCustomFilter(updatedCriteria.unifiedFilterRepresentation(this.collection))
+      if (updatedCriteria.sortProperty) {
+        controller.setSortBy(updatedCriteria.sortProperty)
+      }
+      if (updatedCriteria.sortDirection) {
+        controller.setSortDirection(updatedCriteria.sortDirection)
+      }
+    }
   }
 
   public getDisplayableNotes(): Models.SNNote[] {
@@ -406,7 +413,7 @@ export class ItemManager
     const affectedContentTypesArray = Array.from(affectedContentTypes.values())
     for (const controller of this.allDisplayControllers) {
       if (controller.contentTypes.some((ct) => affectedContentTypesArray.includes(ct))) {
-        controller.onCollectionChange()
+        controller.onCollectionChange(delta)
       }
     }
 
@@ -1290,6 +1297,13 @@ export class ItemManager
   public removeItemLocally(item: Models.DecryptedItemInterface | Models.DeletedItemInterface): void {
     this.collection.discard([item])
     this.payloadManager.removePayloadLocally(item.payload)
+
+    const delta = Models.CreateItemDelta({ discarded: [item] as Models.DeletedItemInterface[] })
+    for (const controller of this.allDisplayControllers) {
+      if (controller.contentTypes.some((ct) => ct === item.content_type)) {
+        controller.onCollectionChange(delta)
+      }
+    }
   }
 
   public getFilesForNote(note: Models.SNNote): Models.FileItem[] {

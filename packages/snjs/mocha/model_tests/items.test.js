@@ -102,7 +102,7 @@ describe('items', () => {
     item1 = await this.application.mutator.changeAndSaveItem(
       item1,
       (mutator) => {
-        mutator.content.foo = 'bar'
+        mutator.mutableContent.foo = 'bar'
       },
       undefined,
       undefined,
@@ -114,7 +114,7 @@ describe('items', () => {
     item2 = await this.application.mutator.changeAndSaveItem(
       item2,
       (mutator) => {
-        mutator.content.foo = 'bar'
+        mutator.mutableContent.foo = 'bar'
       },
       undefined,
       undefined,
@@ -183,7 +183,7 @@ describe('items', () => {
     item1 = await this.application.mutator.changeAndSaveItem(
       item1,
       (mutator) => {
-        mutator.content.foo = 'bar'
+        mutator.mutableContent.foo = 'bar'
       },
       undefined,
       undefined,

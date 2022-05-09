@@ -268,7 +268,7 @@ describe('notes and tags', () => {
     note = await this.application.mutator.changeAndSaveItem(
       note,
       (mutator) => {
-        mutator.content.title = Math.random()
+        mutator.mutableContent.title = Math.random()
       },
       undefined,
       undefined,
@@ -313,7 +313,7 @@ describe('notes and tags', () => {
       }),
     )
     const titles = this.application.items.getDisplayableNotes().map((note) => note.title)
-    expect(titles).to.deep.equal(['A', 'B', 'Y', 'Z'])
+    expect(titles).to.deep.equal(['Z', 'Y', 'B', 'A'])
   })
 
   it('setting a note dirty should collapse its properties into content', async function () {
@@ -390,8 +390,8 @@ describe('notes and tags', () => {
           )
         }),
       )
-      const Bnote = this.application.itemManager.getDisplayableNotes().find((note) => note.title === 'B')
-      await this.application.mutator.changeItem(Bnote, (mutator) => {
+      const pinnedNote = this.application.itemManager.getDisplayableNotes().find((note) => note.title === 'B')
+      await this.application.mutator.changeItem(pinnedNote, (mutator) => {
         mutator.pinned = true
       })
       const tag = await this.application.mutator.findOrCreateTag('A')
@@ -412,7 +412,7 @@ describe('notes and tags', () => {
       const displayedNotes = this.application.items.getDisplayableNotes()
       expect(displayedNotes).to.have.length(4)
       expect(displayedNotes[0].title).to.equal('B')
-      expect(displayedNotes[1].title).to.equal('A')
+      expect(displayedNotes[1].title).to.equal('Z')
     })
   })
 
@@ -835,8 +835,8 @@ describe('notes and tags', () => {
 
     const displayedNotes = this.application.items.getDisplayableNotes()
     expect(displayedNotes.length).to.equal(2)
-    expect(displayedNotes[0].uuid).to.equal(notePayload1.uuid)
-    expect(displayedNotes[1].uuid).to.equal(notePayload4.uuid)
+    expect(displayedNotes[0].uuid).to.equal(notePayload4.uuid)
+    expect(displayedNotes[1].uuid).to.equal(notePayload1.uuid)
   })
 
   it('search query should be case insensitive and match notes and tags title', async function () {
@@ -866,8 +866,8 @@ describe('notes and tags', () => {
 
     const displayedNotes = this.application.items.getDisplayableNotes()
     expect(displayedNotes.length).to.equal(3)
-    expect(displayedNotes[0].uuid).to.equal(notePayload1.uuid)
+    expect(displayedNotes[0].uuid).to.equal(notePayload3.uuid)
     expect(displayedNotes[1].uuid).to.equal(notePayload2.uuid)
-    expect(displayedNotes[2].uuid).to.equal(notePayload3.uuid)
+    expect(displayedNotes[2].uuid).to.equal(notePayload1.uuid)
   })
 })
