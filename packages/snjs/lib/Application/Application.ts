@@ -183,6 +183,17 @@ export class SNApplication implements InternalServices.ListedClientInterface {
     return this.sessionManager
   }
 
+  public createFilesBackupService(fileSystem: ExternalServices.FileSystemApi): Files.FilesBackupService {
+    return new Files.FilesBackupService(
+      this.itemManager,
+      this.apiService,
+      fileSystem,
+      this.protocolService,
+      this.preferencesService,
+      this.storageService,
+    )
+  }
+
   public computePrivateWorkspaceIdentifier(userphrase: string, name: string): Promise<string | undefined> {
     return Encryption.ComputePrivateWorkspaceIdentifier(this.options.crypto, userphrase, name)
   }

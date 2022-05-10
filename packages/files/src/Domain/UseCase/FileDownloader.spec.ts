@@ -42,12 +42,12 @@ describe('file downloader', () => {
   it('should pass back bytes as they are received', async () => {
     let receivedBytes = new Uint8Array()
 
-    downloader = new FileDownloader(file, 'api-token', apiService)
+    downloader = new FileDownloader(file, apiService)
 
     expect(receivedBytes.length).toBe(0)
 
     // eslint-disable-next-line @typescript-eslint/require-await
-    await downloader.beginDownload(async (encryptedBytes) => {
+    await downloader.run(async (encryptedBytes) => {
       receivedBytes = new Uint8Array([...receivedBytes, ...encryptedBytes])
     })
 

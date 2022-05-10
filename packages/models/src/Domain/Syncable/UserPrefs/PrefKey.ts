@@ -23,6 +23,7 @@ export enum PrefKey {
   AutoLightThemeIdentifier = 'autoLightThemeIdentifier',
   AutoDarkThemeIdentifier = 'autoDarkThemeIdentifier',
   NoteAddToParentFolders = 'noteAddToParentFolders',
+  TimestampOfLastFileBackedUpLocallyOnAnyDevice = 'timestampOfLastFileBackedUpLocallyOnAnyDevice',
 }
 
 export type PrefValue = {
@@ -47,4 +48,5 @@ export type PrefValue = {
   [PrefKey.AutoLightThemeIdentifier]: FeatureIdentifier | 'Default'
   [PrefKey.AutoDarkThemeIdentifier]: FeatureIdentifier | 'Default'
   [PrefKey.NoteAddToParentFolders]: boolean
+  [PrefKey.TimestampOfLastFileBackedUpLocallyOnAnyDevice]: number
 }

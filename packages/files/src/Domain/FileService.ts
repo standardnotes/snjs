@@ -135,7 +135,7 @@ export class FileService extends AbstractService implements FilesClientInterface
 
   public async downloadFile(
     file: SNFile,
-    onDecryptedBytes: (bytes: Uint8Array, progress: FileDownloadProgress | undefined) => Promise<void>,
+    onDecryptedBytes: (decryptedBytes: Uint8Array, progress?: FileDownloadProgress) => Promise<void>,
   ): Promise<ClientDisplayableError | undefined> {
     const cachedFile = this.cache.get(file.uuid)
 
@@ -143,12 +143,6 @@ export class FileService extends AbstractService implements FilesClientInterface
       await onDecryptedBytes(cachedFile, undefined)
 
       return undefined
-    }
-
-    const tokenResult = await this.api.createFileValetToken(file.remoteIdentifier, 'read')
-
-    if (tokenResult instanceof ClientDisplayableError) {
-      return tokenResult
     }
 
     const addToCache = file.decryptedSize < this.cache.maxSize
@@ -161,7 +155,7 @@ export class FileService extends AbstractService implements FilesClientInterface
       return onDecryptedBytes(bytes, progress)
     }
 
-    const operation = new DownloadAndDecryptFileOperation(file, this.crypto, this.api, tokenResult)
+    const operation = new DownloadAndDecryptFileOperation(file, this.crypto, this.api)
 
     const result = await operation.run(bytesWrapper)
 

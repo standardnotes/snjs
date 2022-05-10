@@ -3,12 +3,19 @@ import { ContentType } from '@standardnotes/common'
 import { ItemManager } from '../Items/ItemManager'
 import { SNSingletonManager } from '../Singleton/SingletonManager'
 import { SNSyncService } from '../Sync/SyncService'
-import { AbstractService, InternalEventBusInterface, SyncEvent, ApplicationStage } from '@standardnotes/services'
+import {
+  AbstractService,
+  InternalEventBusInterface,
+  SyncEvent,
+  ApplicationStage,
+  PreferenceServiceInterface,
+  PreferencesServiceEvent,
+} from '@standardnotes/services'
 
-const preferencesChangedEvent = 'preferencesChanged'
-type PreferencesChangedEvent = typeof preferencesChangedEvent
-
-export class SNPreferencesService extends AbstractService<PreferencesChangedEvent> {
+export class SNPreferencesService
+  extends AbstractService<PreferencesServiceEvent>
+  implements PreferenceServiceInterface
+{
   private shouldReload = true
   private reloading = false
   private preferences?: SNUserPrefs
@@ -54,7 +61,7 @@ export class SNPreferencesService extends AbstractService<PreferencesChangedEven
       )
 
       if (this.preferences) {
-        void this.notifyEvent(preferencesChangedEvent)
+        void this.notifyEvent(PreferencesServiceEvent.PreferencesChanged)
       }
     }
   }
@@ -74,7 +81,7 @@ export class SNPreferencesService extends AbstractService<PreferencesChangedEven
       m.setPref(key, value)
     })) as SNUserPrefs
 
-    void this.notifyEvent(preferencesChangedEvent)
+    void this.notifyEvent(PreferencesServiceEvent.PreferencesChanged)
 
     void this.syncService.sync()
   }
@@ -98,7 +105,7 @@ export class SNPreferencesService extends AbstractService<PreferencesChangedEven
         previousRef?.uuid !== this.preferences.uuid ||
         this.preferences.userModifiedDate > previousRef.userModifiedDate
       ) {
-        void this.notifyEvent('preferencesChanged')
+        void this.notifyEvent(PreferencesServiceEvent.PreferencesChanged)
       }
 
       this.shouldReload = false
