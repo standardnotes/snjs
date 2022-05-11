@@ -74,6 +74,7 @@ export class SNApplication implements InternalServices.ListedClientInterface {
   private fileService!: Files.FileService
   private mutatorService!: InternalServices.MutatorService
   private integrityService!: ExternalServices.IntegrityService
+  private statusService!: ExternalServices.StatusService
   private filesBackupService?: Files.FilesBackupService
 
   private internalEventBus!: ExternalServices.InternalEventBusInterface
@@ -182,6 +183,18 @@ export class SNApplication implements InternalServices.ListedClientInterface {
 
   public get sessions(): InternalServices.SessionsClientInterface {
     return this.sessionManager
+  }
+
+  public get status(): ExternalServices.StatusServiceInterface {
+    return this.statusService
+  }
+
+  public get fileBackups(): Files.FilesBackupService {
+    if (!isDesktopDevice(this.deviceInterface)) {
+      throw Error('Attempting to access file backups service on non-desktop device')
+    }
+
+    return this.filesBackupService as Files.FilesBackupService
   }
 
   public computePrivateWorkspaceIdentifier(userphrase: string, name: string): Promise<string | undefined> {
@@ -988,6 +1001,7 @@ export class SNApplication implements InternalServices.ListedClientInterface {
     this.createFileService()
     this.createIntegrityService()
     this.createMutatorService()
+    this.createStatusService()
 
     if (isDesktopDevice(this.deviceInterface)) {
       this.createFilesBackupService(this.deviceInterface)
@@ -1023,6 +1037,7 @@ export class SNApplication implements InternalServices.ListedClientInterface {
     ;(this.integrityService as unknown) = undefined
     ;(this.mutatorService as unknown) = undefined
     ;(this.filesBackupService as unknown) = undefined
+    ;(this.statusService as unknown) = undefined
 
     this.services = []
   }
@@ -1447,15 +1462,21 @@ export class SNApplication implements InternalServices.ListedClientInterface {
     this.services.push(this.mutatorService)
   }
 
-  public createFilesBackupService(device: ExternalServices.DesktopDeviceInterface): void {
+  private createFilesBackupService(device: ExternalServices.DesktopDeviceInterface): void {
     this.filesBackupService = new Files.FilesBackupService(
       this.itemManager,
       this.apiService,
       this.protocolService,
       device,
+      this.statusService,
       this.internalEventBus,
     )
     this.services.push(this.filesBackupService)
+  }
+
+  private createStatusService(): void {
+    this.statusService = new ExternalServices.StatusService(this.internalEventBus)
+    this.services.push(this.statusService)
   }
 
   private getClass<T>(base: T) {

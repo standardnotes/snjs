@@ -4,7 +4,6 @@ export interface FileBackupsMapping {
   files: Record<
     Uuid,
     {
-      uuid: string
       path: string
       backedUpOn: Date
     }
@@ -13,7 +12,6 @@ export interface FileBackupsMapping {
 
 export interface FileBackupsDevice {
   getFilesBackupsMappingFile(): Promise<FileBackupsMapping>
-  saveFilesBackupsMappingFile(file: FileBackupsMapping): Promise<'success' | 'failed'>
   saveFilesBackupsFile(
     uuid: Uuid,
     metaFile: string,

@@ -67,6 +67,8 @@ export interface ItemManagerInterface extends AbstractService {
 
   emitItemFromPayload(payload: DecryptedPayloadInterface, source: PayloadEmitSource): Promise<DecryptedItemInterface>
 
+  getItems<T extends DecryptedItemInterface>(contentType: ContentType | ContentType[]): T[]
+
   /**
    * Returns all non-deleted items keys
    */

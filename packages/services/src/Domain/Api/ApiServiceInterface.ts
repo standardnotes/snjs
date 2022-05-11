@@ -37,4 +37,6 @@ export interface ApiServiceInterface extends AbstractService<ApiServiceEvent.Met
   uploadFileBytes(apiToken: string, chunkId: number, encryptedBytes: Uint8Array): Promise<boolean>
 
   closeUploadSession(apiToken: string): Promise<boolean>
+
+  getFilesDownloadUrl(): string
 }
