@@ -1,4 +1,4 @@
-import { FilesServerInterface } from '../FilesServerInterface'
+import { FilesApiInterface } from '@standardnotes/services'
 import { FileUploader } from './FileUploader'
 
 describe('file uploader', () => {
@@ -6,7 +6,7 @@ describe('file uploader', () => {
   let uploader: FileUploader
 
   beforeEach(() => {
-    apiService = {} as jest.Mocked<FilesServerInterface>
+    apiService = {} as jest.Mocked<FilesApiInterface>
     apiService.uploadFileBytes = jest.fn().mockReturnValue(true)
 
     uploader = new FileUploader(apiService)

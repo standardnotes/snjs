@@ -1,14 +1,19 @@
 import { sleep } from '@standardnotes/utils'
 import { PureCryptoInterface, StreamEncryptor } from '@standardnotes/sncrypto-common'
 import { FileDownloadProgress } from '../Types/FileDownloadProgress'
-import { FilesServerInterface } from '../FilesServerInterface'
+import { FilesApiInterface } from '@standardnotes/services'
 import { DownloadAndDecryptFileOperation } from './DownloadAndDecrypt'
-import { RemoteFileInterface, EncryptedFileInterface } from '@standardnotes/models'
+import { FileContent } from '@standardnotes/models'
 
 describe('download and decrypt', () => {
-  let apiService: FilesServerInterface
+  let apiService: FilesApiInterface
   let operation: DownloadAndDecryptFileOperation
-  let file: RemoteFileInterface & EncryptedFileInterface
+  let file: {
+    encryptedChunkSizes: FileContent['encryptedChunkSizes']
+    encryptionHeader: FileContent['encryptionHeader']
+    remoteIdentifier: FileContent['remoteIdentifier']
+    key: FileContent['key']
+  }
   let crypto: PureCryptoInterface
 
   const NumChunks = 5
@@ -44,7 +49,7 @@ describe('download and decrypt', () => {
   }
 
   beforeEach(() => {
-    apiService = {} as jest.Mocked<FilesServerInterface>
+    apiService = {} as jest.Mocked<FilesApiInterface>
     downloadChunksOfSize(5)
 
     crypto = {} as jest.Mocked<PureCryptoInterface>
@@ -60,7 +65,6 @@ describe('download and decrypt', () => {
       remoteIdentifier: '123',
       key: 'secret',
       encryptionHeader: 'some-header',
-      encryptedSize: 100_000,
     }
   })
 
@@ -86,7 +90,6 @@ describe('download and decrypt', () => {
       remoteIdentifier: '123',
       key: 'secret',
       encryptionHeader: 'some-header',
-      encryptedSize: 500_000,
     }
 
     downloadChunksOfSize(100_000)

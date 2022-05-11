@@ -1,15 +1,19 @@
-import { RemoteFileInterface, EncryptedFileInterface } from '@standardnotes/models'
-import { FilesServerInterface } from '../FilesServerInterface'
+import { FileContent } from '@standardnotes/models'
+import { FilesApiInterface } from '@standardnotes/services'
 import { FileDownloader } from './FileDownloader'
 
 describe('file downloader', () => {
-  let apiService: FilesServerInterface
+  let apiService: FilesApiInterface
   let downloader: FileDownloader
-  let file: RemoteFileInterface & EncryptedFileInterface
+  let file: {
+    encryptedChunkSizes: FileContent['encryptedChunkSizes']
+    remoteIdentifier: FileContent['remoteIdentifier']
+  }
+
   const numChunks = 5
 
   beforeEach(() => {
-    apiService = {} as jest.Mocked<FilesServerInterface>
+    apiService = {} as jest.Mocked<FilesApiInterface>
     apiService.downloadFile = jest
       .fn()
       .mockImplementation(
@@ -33,9 +37,6 @@ describe('file downloader', () => {
     file = {
       encryptedChunkSizes: [100_000],
       remoteIdentifier: '123',
-      encryptionHeader: 'header',
-      key: 'secret',
-      encryptedSize: 100_000,
     }
   })
 

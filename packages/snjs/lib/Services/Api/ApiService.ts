@@ -12,12 +12,12 @@ import {
   ApiServiceEvent,
   MetaReceivedData,
   DiagnosticInfo,
+  FilesApiInterface,
 } from '@standardnotes/services'
-import { ServerSyncPushContextualPayload, SNFeatureRepo, EncryptedFileInterface } from '@standardnotes/models'
+import { ServerSyncPushContextualPayload, SNFeatureRepo, FileContent } from '@standardnotes/models'
 import * as Responses from '@standardnotes/responses'
 import { API_MESSAGE_FAILED_OFFLINE_ACTIVATION } from '@Lib/Services/Api/Messages'
 import { HttpParams, HttpRequest, HttpVerb, SNHttpService } from './HttpService'
-import { FilesServerInterface } from '@standardnotes/files'
 import { isUrlFirstParty, TRUSTED_FEATURE_HOSTS } from '@Lib/Hosts'
 import { Paths } from './Paths'
 import { Session } from '../Session/Sessions/Session'
@@ -41,7 +41,7 @@ export class SNApiService
   extends AbstractService<ApiServiceEvent.MetaReceived, MetaReceivedData>
   implements
     ApiServiceInterface,
-    FilesServerInterface,
+    FilesApiInterface,
     IntegrityApiInterface,
     ItemsServerInterface,
     UserServerInterface,
@@ -812,7 +812,7 @@ export class SNApiService
   }
 
   public async downloadFile(
-    file: EncryptedFileInterface,
+    file: { encryptedChunkSizes: FileContent['encryptedChunkSizes'] },
     chunkIndex = 0,
     apiToken: string,
     contentRangeStart: number,

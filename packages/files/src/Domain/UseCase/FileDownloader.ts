@@ -1,8 +1,8 @@
 import { ClientDisplayableError } from '@standardnotes/responses'
 import { FileDownloadProgress } from '../Types/FileDownloadProgress'
-import { FilesServerInterface } from '../FilesServerInterface'
+import { FilesApiInterface } from '@standardnotes/services'
 import { Deferred } from '@standardnotes/utils'
-import { EncryptedFileInterface } from '@standardnotes/models'
+import { FileContent } from '@standardnotes/models'
 
 export type AbortSignal = 'aborted'
 export type AbortFunction = () => void
@@ -19,10 +19,16 @@ export class FileDownloader {
   private abortDeferred = Deferred<AbortSignal>()
   private totalBytesDownloaded = 0
 
-  constructor(private file: EncryptedFileInterface, private readonly api: FilesServerInterface) {}
+  constructor(
+    private file: {
+      encryptedChunkSizes: FileContent['encryptedChunkSizes']
+      remoteIdentifier: FileContent['remoteIdentifier']
+    },
+    private readonly api: FilesApiInterface,
+  ) {}
 
   private getProgress(): FileDownloadProgress {
-    const encryptedSize = this.file.encryptedSize
+    const encryptedSize = this.file.encryptedChunkSizes.reduce((total, chunk) => total + chunk, 0)
 
     return {
       encryptedFileSize: encryptedSize,

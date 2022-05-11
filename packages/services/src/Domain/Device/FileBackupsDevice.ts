@@ -1,4 +1,11 @@
 import { Uuid } from '@standardnotes/common'
+import { EncryptedTransferPayload } from '@standardnotes/models'
+
+export interface FileBackupMetadataFile {
+  info: Record<string, string>
+  file: EncryptedTransferPayload
+  itemsKey: EncryptedTransferPayload
+}
 
 export interface FileBackupsMapping {
   files: Record<

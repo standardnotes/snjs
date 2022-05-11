@@ -1,12 +1,16 @@
 import { EncryptAndUploadFileOperation } from './EncryptAndUpload'
 import { PureCryptoInterface, StreamEncryptor } from '@standardnotes/sncrypto-common'
-import { DecryptedFileInterface } from '@standardnotes/models'
-import { FilesServerInterface } from '../FilesServerInterface'
+import { FilesApiInterface } from '@standardnotes/services'
+import { FileContent } from '@standardnotes/models'
 
 describe('encrypt and upload', () => {
-  let apiService: FilesServerInterface
+  let apiService: FilesApiInterface
   let operation: EncryptAndUploadFileOperation
-  let file: DecryptedFileInterface
+  let file: {
+    decryptedSize: FileContent['decryptedSize']
+    key: FileContent['key']
+    remoteIdentifier: FileContent['remoteIdentifier']
+  }
   let crypto: PureCryptoInterface
 
   const chunkOfSize = (size: number) => {
@@ -14,7 +18,7 @@ describe('encrypt and upload', () => {
   }
 
   beforeEach(() => {
-    apiService = {} as jest.Mocked<FilesServerInterface>
+    apiService = {} as jest.Mocked<FilesApiInterface>
     apiService.uploadFileBytes = jest.fn().mockReturnValue(true)
 
     crypto = {} as jest.Mocked<PureCryptoInterface>

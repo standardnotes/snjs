@@ -2,9 +2,9 @@ import { ClientDisplayableError } from '@standardnotes/responses'
 import { AbortFunction, FileDownloader } from '../UseCase/FileDownloader'
 import { FileDecryptor } from '../UseCase/FileDecryptor'
 import { FileDownloadProgress } from '../Types/FileDownloadProgress'
-import { FilesServerInterface } from '../FilesServerInterface'
+import { FilesApiInterface } from '@standardnotes/services'
 import { PureCryptoInterface } from '@standardnotes/sncrypto-common'
-import { RemoteFileInterface, EncryptedFileInterface } from '@standardnotes/models'
+import { FileContent } from '@standardnotes/models'
 
 export type DownloadAndDecryptResult = { success: boolean; error?: ClientDisplayableError; aborted?: boolean }
 
@@ -12,9 +12,14 @@ export class DownloadAndDecryptFileOperation {
   private downloader: FileDownloader
 
   constructor(
-    private readonly file: RemoteFileInterface & EncryptedFileInterface,
+    private readonly file: {
+      encryptedChunkSizes: FileContent['encryptedChunkSizes']
+      encryptionHeader: FileContent['encryptionHeader']
+      remoteIdentifier: FileContent['remoteIdentifier']
+      key: FileContent['key']
+    },
     private readonly crypto: PureCryptoInterface,
-    private readonly api: FilesServerInterface,
+    private readonly api: FilesApiInterface,
   ) {
     this.downloader = new FileDownloader(this.file, this.api)
   }

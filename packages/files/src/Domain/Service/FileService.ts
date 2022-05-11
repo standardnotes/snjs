@@ -1,16 +1,15 @@
 import { FileMemoryCache } from '@standardnotes/filepicker'
-import { FilesServerInterface } from './FilesServerInterface'
 import { ClientDisplayableError } from '@standardnotes/responses'
 import { ContentType } from '@standardnotes/common'
-import { DownloadAndDecryptFileOperation } from './Operations/DownloadAndDecrypt'
-import { EncryptAndUploadFileOperation } from './Operations/EncryptAndUpload'
+import { DownloadAndDecryptFileOperation } from '../Operations/DownloadAndDecrypt'
+import { EncryptAndUploadFileOperation } from '../Operations/EncryptAndUpload'
 import {
   SNFile,
   FileProtocolV1Constants,
   FileMetadata,
   FileContentSpecialized,
   FillItemContentSpecialized,
-  DecryptedFileInterface,
+  FileContent,
 } from '@standardnotes/models'
 import { PureCryptoInterface } from '@standardnotes/sncrypto-common'
 import { UuidGenerator } from '@standardnotes/utils'
@@ -20,9 +19,12 @@ import {
   ItemManagerInterface,
   SyncServiceInterface,
   AlertService,
+  FileSystemApi,
+  FilesApiInterface,
 } from '@standardnotes/services'
 import { FilesClientInterface } from './FilesClientInterface'
-import { FileDownloadProgress } from './Types/FileDownloadProgress'
+import { FileDownloadProgress } from '../Types/FileDownloadProgress'
+import { BackupSelectAndDecrypt } from '../Operations/BackupSelectAndDecrypt'
 
 const OneHundredMb = 100 * 1_000_000
 
@@ -30,7 +32,7 @@ export class FileService extends AbstractService implements FilesClientInterface
   private cache: FileMemoryCache = new FileMemoryCache(OneHundredMb)
 
   constructor(
-    private api: FilesServerInterface,
+    private api: FilesApiInterface,
     private itemManager: ItemManagerInterface,
     private syncService: SyncServiceInterface,
     private alertService: AlertService,
@@ -68,7 +70,7 @@ export class FileService extends AbstractService implements FilesClientInterface
 
     const key = this.crypto.generateRandomKey(FileProtocolV1Constants.KeySize)
 
-    const fileParams: DecryptedFileInterface = {
+    const fileParams = {
       key,
       remoteIdentifier,
       decryptedSize: sizeInBytes,
@@ -185,5 +187,62 @@ export class FileService extends AbstractService implements FilesClientInterface
     await this.syncService.sync()
 
     return undefined
+  }
+
+  public async selectFileBackupAndStream(
+    file: FileContent,
+    fileSystem: FileSystemApi,
+    onDecryptedBytes: (bytes: Uint8Array) => Promise<void>,
+  ): Promise<'success' | 'aborted' | 'failed'> {
+    const operation = new BackupSelectAndDecrypt(file, fileSystem, this.crypto)
+
+    const result = await operation.runSelectAndRead(onDecryptedBytes)
+
+    return result
+  }
+
+  public async selectFileBackupAndSaveDecrypted(
+    file: FileContent,
+    fileSystem: FileSystemApi,
+  ): Promise<'success' | 'aborted' | 'failed'> {
+    const operation = new BackupSelectAndDecrypt(file, fileSystem, this.crypto)
+
+    const encryptedFilePickStatus = await operation.runSelect()
+
+    if (encryptedFilePickStatus === 'aborted' || encryptedFilePickStatus === 'failed') {
+      return encryptedFilePickStatus
+    }
+
+    const destinationDirectoryHandle = await fileSystem.selectDirectory()
+
+    if (destinationDirectoryHandle === 'aborted' || destinationDirectoryHandle === 'failed') {
+      return destinationDirectoryHandle
+    }
+
+    const destinationFileHandle = await fileSystem.createFile(destinationDirectoryHandle, file.name)
+
+    if (destinationFileHandle === 'aborted' || destinationFileHandle === 'failed') {
+      return destinationFileHandle
+    }
+
+    const result = await operation.runRead(async (decryptedBytes) => {
+      await fileSystem.saveBytes(destinationFileHandle, decryptedBytes)
+    })
+
+    await fileSystem.closeFileWriteStream(destinationFileHandle)
+
+    return result
+  }
+
+  public async selectFileBackupAndReadAllBytes(file: FileContent, fileSystem: FileSystemApi): Promise<Uint8Array> {
+    const operation = new BackupSelectAndDecrypt(file, fileSystem, this.crypto)
+
+    let bytes = new Uint8Array()
+
+    await operation.runSelectAndRead(async (decryptedBytes) => {
+      bytes = new Uint8Array([...bytes, ...decryptedBytes])
+    })
+
+    return bytes
   }
 }

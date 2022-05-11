@@ -1,10 +1,10 @@
 import { FileUploadProgress } from '../Types/FileUploadProgress'
 import { FileUploadResult } from '../Types/FileUploadResult'
-import { FilesServerInterface } from '../FilesServerInterface'
+import { FilesApiInterface } from '@standardnotes/services'
 import { FileUploader } from '../UseCase/FileUploader'
 import { PureCryptoInterface } from '@standardnotes/sncrypto-common'
 import { FileEncryptor } from '../UseCase/FileEncryptor'
-import { DecryptedFileInterface } from '@standardnotes/models'
+import { FileContent } from '@standardnotes/models'
 
 export class EncryptAndUploadFileOperation {
   public readonly encryptedChunkSizes: number[] = []
@@ -17,10 +17,14 @@ export class EncryptAndUploadFileOperation {
   private totalBytesUploadedInDecryptedTerms = 0
 
   constructor(
-    private file: DecryptedFileInterface,
+    private file: {
+      decryptedSize: FileContent['decryptedSize']
+      key: FileContent['key']
+      remoteIdentifier: FileContent['remoteIdentifier']
+    },
     private apiToken: string,
     private crypto: PureCryptoInterface,
-    private api: FilesServerInterface,
+    private api: FilesApiInterface,
   ) {
     this.encryptor = new FileEncryptor(file, this.crypto)
     this.uploader = new FileUploader(this.api)
