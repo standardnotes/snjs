@@ -13,7 +13,7 @@ import * as Files from '@standardnotes/files'
 import { Subscription } from '@standardnotes/auth'
 import { UuidString, DeinitSource, ApplicationEventPayload } from '../Types'
 import { ApplicationEvent, applicationEventForSyncEvent } from '@Lib/Application/Event'
-import { DiagnosticInfo, Environment, Platform } from '@standardnotes/services'
+import { DiagnosticInfo, Environment, isDesktopDevice, Platform } from '@standardnotes/services'
 import { SNLog } from '../Log'
 import { useBoolean } from '@standardnotes/utils'
 import { DecryptedItemInterface, EncryptedItemInterface } from '@standardnotes/models'
@@ -74,6 +74,7 @@ export class SNApplication implements InternalServices.ListedClientInterface {
   private fileService!: Files.FileService
   private mutatorService!: InternalServices.MutatorService
   private integrityService!: ExternalServices.IntegrityService
+  private filesBackupService?: Files.FilesBackupService
 
   private internalEventBus!: ExternalServices.InternalEventBusInterface
 
@@ -181,17 +182,6 @@ export class SNApplication implements InternalServices.ListedClientInterface {
 
   public get sessions(): InternalServices.SessionsClientInterface {
     return this.sessionManager
-  }
-
-  public createFilesBackupService(fileSystem: ExternalServices.FileSystemApi): Files.FilesBackupService {
-    return new Files.FilesBackupService(
-      this.itemManager,
-      this.apiService,
-      fileSystem,
-      this.protocolService,
-      this.preferencesService,
-      this.storageService,
-    )
   }
 
   public computePrivateWorkspaceIdentifier(userphrase: string, name: string): Promise<string | undefined> {
@@ -971,9 +961,11 @@ export class SNApplication implements InternalServices.ListedClientInterface {
   private constructServices() {
     this.createPayloadManager()
     this.createItemManager()
+
     this.createStorageManager()
     this.createProtocolService()
     this.storageService.provideEncryptionProvider(this.protocolService)
+
     this.createChallengeService()
     this.createHttpManager()
     this.createApiService()
@@ -996,6 +988,10 @@ export class SNApplication implements InternalServices.ListedClientInterface {
     this.createFileService()
     this.createIntegrityService()
     this.createMutatorService()
+
+    if (isDesktopDevice(this.deviceInterface)) {
+      this.createFilesBackupService(this.deviceInterface)
+    }
   }
 
   private clearServices() {
@@ -1026,6 +1022,7 @@ export class SNApplication implements InternalServices.ListedClientInterface {
     ;(this.fileService as unknown) = undefined
     ;(this.integrityService as unknown) = undefined
     ;(this.mutatorService as unknown) = undefined
+    ;(this.filesBackupService as unknown) = undefined
 
     this.services = []
   }
@@ -1448,6 +1445,17 @@ export class SNApplication implements InternalServices.ListedClientInterface {
       this.internalEventBus,
     )
     this.services.push(this.mutatorService)
+  }
+
+  public createFilesBackupService(device: ExternalServices.DesktopDeviceInterface): void {
+    this.filesBackupService = new Files.FilesBackupService(
+      this.itemManager,
+      this.apiService,
+      this.protocolService,
+      device,
+      this.internalEventBus,
+    )
+    this.services.push(this.filesBackupService)
   }
 
   private getClass<T>(base: T) {

@@ -103,7 +103,7 @@ export class SNApiService
 
   public async setHost(host: string): Promise<void> {
     this.host = host
-    await this.storageService.setValue(StorageKey.ServerHost, host)
+    this.storageService.setValue(StorageKey.ServerHost, host)
   }
 
   public getHost(): string {
@@ -807,6 +807,10 @@ export class SNApiService
     return (response as Responses.CloseUploadSessionResponse).success
   }
 
+  public getFilesDownloadUrl(): string {
+    return joinPaths(this.getFilesHost(), Paths.v1.downloadFileChunk)
+  }
+
   public async downloadFile(
     file: EncryptedFileInterface,
     chunkIndex = 0,
@@ -814,7 +818,7 @@ export class SNApiService
     contentRangeStart: number,
     onBytesReceived: (bytes: Uint8Array) => Promise<void>,
   ): Promise<ClientDisplayableError | undefined> {
-    const url = joinPaths(this.getFilesHost(), Paths.v1.downloadFileChunk)
+    const url = this.getFilesDownloadUrl()
     const pullChunkSize = file.encryptedChunkSizes[chunkIndex]
 
     const response: Responses.HttpResponse | Responses.DownloadFileChunkResponse =

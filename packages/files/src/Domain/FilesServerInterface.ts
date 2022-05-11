@@ -23,4 +23,6 @@ export interface FilesServerInterface {
     operation: 'write' | 'read' | 'delete',
     unencryptedFileSize?: number,
   ): Promise<string | ClientDisplayableError>
+
+  getFilesDownloadUrl(): string
 }
