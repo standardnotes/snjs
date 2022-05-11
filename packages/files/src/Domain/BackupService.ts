@@ -30,16 +30,19 @@ export class FilesBackupService {
     private preferences: PreferenceServiceInterface,
     private storage: StorageServiceInterface,
   ) {
+    this.timestampLastAnyDeviceBackup = this.fetchTimestampLastAnyDeviceBackup()
+
     this.preferencesObserverDisposer = preferences.addEventObserver((event) => {
       if (event === PreferencesServiceEvent.PreferencesChanged) {
-        this.timestampLastAnyDeviceBackup = this.preferences.getValue(
-          PrefKey.TimestampOfLastFileBackedUpLocallyOnAnyDevice,
-          0,
-        ) as number
+        this.timestampLastAnyDeviceBackup = this.fetchTimestampLastAnyDeviceBackup()
       }
     })
 
     this.timestampLastThisDeviceBackup = this.storage.getValue(StorageKey.TimestampOfLastFileBackedUpOnThisDevice)
+  }
+
+  private fetchTimestampLastAnyDeviceBackup(): number {
+    return this.preferences.getValue(PrefKey.TimestampOfLastFileBackedUpLocallyOnAnyDevice, 0) as number
   }
 
   deinit(): void {

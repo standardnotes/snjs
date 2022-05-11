@@ -4,5 +4,5 @@
     "rootDir": "src",
     "outDir": "dist"
   },
-  "exclude": ["dist"]
+  "exclude": ["dist", "*/**/__mocks__"]
 }
