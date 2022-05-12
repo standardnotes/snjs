@@ -1,6 +1,8 @@
 import { PrefKey, PrefValue } from '@standardnotes/models'
 import { AbstractService } from '../Service/AbstractService'
 
+/* istanbul ignore file */
+
 export enum PreferencesServiceEvent {
   PreferencesChanged = 'PreferencesChanged',
 }

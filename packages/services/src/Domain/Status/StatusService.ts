@@ -2,6 +2,8 @@ import { removeFromArray } from '@standardnotes/utils'
 import { AbstractService } from '../Service/AbstractService'
 import { StatusServiceEvent, StatusServiceInterface } from './StatusServiceInterface'
 
+/* istanbul ignore file */
+
 export class StatusService extends AbstractService<StatusServiceEvent, string> implements StatusServiceInterface {
   private _message = ''
   private directSetMessage?: string

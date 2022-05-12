@@ -6,6 +6,8 @@ export interface ChallengeValue {
   readonly value: ChallengeRawValue
 }
 
+/* istanbul ignore file */
+
 export function CreateChallengeValue(prompt: ChallengePromptInterface, value: ChallengeRawValue): ChallengeValue {
   return { prompt, value }
 }

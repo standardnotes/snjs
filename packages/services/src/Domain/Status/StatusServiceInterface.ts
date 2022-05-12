@@ -1,5 +1,7 @@
 import { AbstractService } from '../Service/AbstractService'
 
+/* istanbul ignore file */
+
 export enum StatusServiceEvent {
   MessageChanged = 'MessageChanged',
 }

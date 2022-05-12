@@ -5,6 +5,8 @@ import { ChallengeValidation } from '../Types/ChallengeValidation'
 import { ChallengePromptInterface } from './ChallengePromptInterface'
 import { ChallengePromptTitle } from './PromptTitles'
 
+/* istanbul ignore file */
+
 export class ChallengePrompt implements ChallengePromptInterface {
   public readonly id = Math.random()
   public readonly placeholder: string

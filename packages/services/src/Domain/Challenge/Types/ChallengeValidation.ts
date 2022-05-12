@@ -1,3 +1,5 @@
+/* istanbul ignore file */
+
 export enum ChallengeValidation {
   None = 0,
   LocalPasscode = 1,

@@ -1,6 +1,8 @@
 import { Uuid } from '@standardnotes/common'
 import { EncryptedTransferPayload } from '@standardnotes/models'
 
+/* istanbul ignore file */
+
 export const FileBackupMetadataName = () => 'metadata.sn.json'
 
 export interface FileBackupMetadataFile {
