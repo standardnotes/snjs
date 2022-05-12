@@ -20,9 +20,14 @@ interface WebFileHandleRead extends FileHandleRead {
 }
 
 export class StreamingFileApi implements FileSystemApi {
-  async selectDirectory(): Promise<DirectoryHandle> {
-    const nativeHandle = await window.showDirectoryPicker()
-    return { nativeHandle }
+  async selectDirectory(): Promise<DirectoryHandle | FileSystemNoSelection> {
+    try {
+      const nativeHandle = await window.showDirectoryPicker()
+
+      return { nativeHandle }
+    } catch (error) {
+      return 'aborted'
+    }
   }
 
   async createFile(directory: WebDirectoryHandle, name: string): Promise<WebFileHandleReadWrite> {
@@ -62,12 +67,16 @@ export class StreamingFileApi implements FileSystemApi {
   }
 
   async selectFile(): Promise<WebFileHandleRead | FileSystemNoSelection> {
-    const selection = await window.showOpenFilePicker()
+    try {
+      const selection = await window.showOpenFilePicker()
 
-    const file = selection[0]
+      const file = selection[0]
 
-    return {
-      nativeHandle: file,
+      return {
+        nativeHandle: file,
+      }
+    } catch (_) {
+      return 'aborted'
     }
   }
 

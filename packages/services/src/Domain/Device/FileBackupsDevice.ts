@@ -33,7 +33,7 @@ export interface FileBackupsDevice {
   isFilesBackupsEnabled(): Promise<boolean>
   enableFilesBackups(): Promise<void>
   disableFilesBackups(): Promise<void>
-  changeFilesBackupsLocation(): Promise<string>
+  changeFilesBackupsLocation(): Promise<string | undefined>
   getFilesBackupsLocation(): Promise<string>
   openFilesBackupsLocation(): Promise<void>
 }
