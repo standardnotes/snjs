@@ -1,6 +1,6 @@
 export * from './Application/ApplicationStage'
+export * from './Challenge'
 export * from './Device/DeviceInterface'
-export * from './Device/KeychainTypes'
 export * from './Device/Environments'
 export * from './Device/FileBackupsDevice'
 export * from './Device/MobileDeviceInterface'

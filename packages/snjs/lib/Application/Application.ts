@@ -1,5 +1,4 @@
 import { SnjsVersion } from './../Version'
-import * as Challenges from '../Services/Challenge'
 import * as Common from '@standardnotes/common'
 import * as ExternalServices from '@standardnotes/services'
 import * as Encryption from '@standardnotes/encryption'
@@ -13,17 +12,18 @@ import * as Files from '@standardnotes/files'
 import { Subscription } from '@standardnotes/auth'
 import { UuidString, DeinitSource, ApplicationEventPayload } from '../Types'
 import { ApplicationEvent, applicationEventForSyncEvent } from '@Lib/Application/Event'
-import { DiagnosticInfo, Environment, isDesktopDevice, Platform } from '@standardnotes/services'
+import { ChallengeValidation, DiagnosticInfo, Environment, isDesktopDevice, Platform } from '@standardnotes/services'
 import { SNLog } from '../Log'
 import { useBoolean } from '@standardnotes/utils'
 import { DecryptedItemInterface, EncryptedItemInterface } from '@standardnotes/models'
 import { ClientDisplayableError } from '@standardnotes/responses'
+import { Challenge, ChallengeResponse } from '../Services'
 
 /** How often to automatically sync, in milliseconds */
 const DEFAULT_AUTO_SYNC_INTERVAL = 30_000
 
 type LaunchCallback = {
-  receiveChallenge: (challenge: Challenges.Challenge) => void
+  receiveChallenge: (challenge: Challenge) => void
 }
 type ApplicationEventCallback = (event: ApplicationEvent, data?: unknown) => Promise<void>
 type ApplicationObserver = {
@@ -315,15 +315,15 @@ export class SNApplication implements InternalServices.ListedClientInterface {
     // optional override
   }
 
-  public getLaunchChallenge(): Challenges.Challenge | undefined {
+  public getLaunchChallenge(): Challenge | undefined {
     return this.protectionService.createLaunchChallenge()
   }
 
-  private async handleLaunchChallengeResponse(response: Challenges.ChallengeResponse) {
-    if (response.challenge.hasPromptForValidationType(Challenges.ChallengeValidation.LocalPasscode)) {
+  private async handleLaunchChallengeResponse(response: ChallengeResponse) {
+    if (response.challenge.hasPromptForValidationType(ChallengeValidation.LocalPasscode)) {
       let wrappingKey = response.artifacts?.wrappingKey
       if (!wrappingKey) {
-        const value = response.getValueForType(Challenges.ChallengeValidation.LocalPasscode)
+        const value = response.getValueForType(ChallengeValidation.LocalPasscode)
         wrappingKey = await this.protocolService.computeWrappingKey(value.value as string)
       }
       await this.protocolService.unwrapRootKey(wrappingKey)
@@ -687,22 +687,19 @@ export class SNApplication implements InternalServices.ListedClientInterface {
     }
   }
 
-  public promptForCustomChallenge(challenge: Challenges.Challenge): Promise<Challenges.ChallengeResponse | undefined> {
+  public promptForCustomChallenge(challenge: Challenge): Promise<ChallengeResponse | undefined> {
     return this.challengeService?.promptForChallengeResponse(challenge)
   }
 
-  public addChallengeObserver(
-    challenge: Challenges.Challenge,
-    observer: InternalServices.ChallengeObserver,
-  ): () => void {
+  public addChallengeObserver(challenge: Challenge, observer: InternalServices.ChallengeObserver): () => void {
     return this.challengeService.addChallengeObserver(challenge, observer)
   }
 
-  public submitValuesForChallenge(challenge: Challenges.Challenge, values: Challenges.ChallengeValue[]): Promise<void> {
+  public submitValuesForChallenge(challenge: Challenge, values: ChallengeValue[]): Promise<void> {
     return this.challengeService.submitValuesForChallenge(challenge, values)
   }
 
-  public cancelChallenge(challenge: Challenges.Challenge): void {
+  public cancelChallenge(challenge: Challenge): void {
     this.challengeService.cancelChallenge(challenge)
   }
 
@@ -1073,6 +1070,7 @@ export class SNApplication implements InternalServices.ListedClientInterface {
       this.itemManager,
       this.syncService,
       this.protocolService,
+      this.challengeService,
       this.alertService,
       this.options.crypto,
       this.internalEventBus,

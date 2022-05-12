@@ -1,10 +1,18 @@
-import { Challenge, ChallengeValidation, ChallengeReason, ChallengePrompt } from '../Challenge'
+import { Challenge } from '../Challenge'
 import { ChallengeService } from '../Challenge/ChallengeService'
 import { EncryptionService, SNRootKey, SNRootKeyParams } from '@standardnotes/encryption'
 import { HttpResponse, SignInResponse, User } from '@standardnotes/responses'
 import { ItemManager } from '@Lib/Services/Items/ItemManager'
 import { KeyParamsOrigination } from '@standardnotes/common'
-import { AlertService } from '@standardnotes/services'
+import {
+  AbstractService,
+  AlertService,
+  ChallengePrompt,
+  ChallengeReason,
+  ChallengeValidation,
+  InternalEventBusInterface,
+  StoragePersistencePolicies,
+} from '@standardnotes/services'
 import { SNApiService } from './../Api/ApiService'
 import { SNProtectionService } from '../Protection/ProtectionService'
 import { SNSessionManager, MINIMUM_PASSWORD_LENGTH } from '../Session/SessionManager'
@@ -14,7 +22,6 @@ import { Strings } from '../../Strings/index'
 import { UserClientInterface } from './UserClientInterface'
 import { UuidGenerator } from '@standardnotes/utils'
 import * as Messages from '../Api/Messages'
-import * as Services from '@standardnotes/services'
 import { DeinitSource } from '@Lib/Types'
 
 const MINIMUM_PASSCODE_LENGTH = 1
@@ -31,10 +38,7 @@ type AccountEventData = {
   source: DeinitSource
 }
 
-export class UserService
-  extends Services.AbstractService<AccountEvent, AccountEventData>
-  implements UserClientInterface
-{
+export class UserService extends AbstractService<AccountEvent, AccountEventData> implements UserClientInterface {
   private signingIn = false
   private registering = false
 
@@ -48,7 +52,7 @@ export class UserService
     private challengeService: ChallengeService,
     private protectionService: SNProtectionService,
     private apiService: SNApiService,
-    protected override internalEventBus: Services.InternalEventBusInterface,
+    protected override internalEventBus: InternalEventBusInterface,
   ) {
     super(internalEventBus)
   }
@@ -89,7 +93,7 @@ export class UserService
       if (!result.response.error) {
         this.syncService.resetSyncState()
         await this.storageService.setPersistencePolicy(
-          ephemeral ? Services.StoragePersistencePolicies.Ephemeral : Services.StoragePersistencePolicies.Default,
+          ephemeral ? StoragePersistencePolicies.Ephemeral : StoragePersistencePolicies.Default,
         )
         if (mergeLocal) {
           await this.syncService.markAllItemsAsNeedingSyncAndPersist()
@@ -142,7 +146,7 @@ export class UserService
         this.syncService.resetSyncState()
 
         await this.storageService.setPersistencePolicy(
-          ephemeral ? Services.StoragePersistencePolicies.Ephemeral : Services.StoragePersistencePolicies.Default,
+          ephemeral ? StoragePersistencePolicies.Ephemeral : StoragePersistencePolicies.Default,
         )
 
         if (mergeLocal) {

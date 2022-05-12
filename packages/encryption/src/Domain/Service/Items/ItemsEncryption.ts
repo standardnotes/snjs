@@ -11,7 +11,7 @@ import {
   ErrorDecryptingParameters,
   isErrorDecryptingParameters,
 } from '../../Types/EncryptedParameters'
-import { isEncryptedPayload, ItemsKeyInterface } from '@standardnotes/models'
+import { isEncryptedPayload } from '@standardnotes/models'
 import { DiagnosticInfo } from '@standardnotes/services'
 import { Uuids } from '@standardnotes/utils'
 

@@ -1,6 +1,12 @@
-import { RootKeyContentInStorage, NamespacedRootKeyInKeychain } from './Types'
 import { SNRootKeyParams } from './RootKeyParams'
-import { RootKeyInterface, RootKeyContent, DecryptedItem, DecryptedPayloadInterface } from '@standardnotes/models'
+import {
+  RootKeyInterface,
+  RootKeyContent,
+  DecryptedItem,
+  DecryptedPayloadInterface,
+  RootKeyContentInStorage,
+  NamespacedRootKeyInKeychain,
+} from '@standardnotes/models'
 import { ProtocolVersion } from '@standardnotes/common'
 import { timingSafeEqual } from '@standardnotes/sncrypto-common'
 

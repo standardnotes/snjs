@@ -1,6 +1,5 @@
 import { isAsyncOperator } from './Functions'
 import { OperatorManager } from './OperatorManager'
-import { SNRootKey } from '../Keys/RootKey/RootKey'
 import * as Models from '@standardnotes/models'
 import {
   DecryptedParameters,
@@ -11,7 +10,7 @@ import {
 
 export async function encryptPayload(
   payload: Models.DecryptedPayloadInterface,
-  key: Models.ItemsKeyInterface | SNRootKey,
+  key: Models.ItemsKeyInterface | Models.RootKeyInterface,
   operatorManager: OperatorManager,
 ): Promise<EncryptedParameters> {
   const operator = operatorManager.operatorForVersion(key.keyVersion)
@@ -32,7 +31,7 @@ export async function encryptPayload(
 
 export async function decryptPayload<C extends Models.ItemContent = Models.ItemContent>(
   payload: Models.EncryptedPayloadInterface,
-  key: Models.ItemsKeyInterface | SNRootKey,
+  key: Models.ItemsKeyInterface | Models.RootKeyInterface,
   operatorManager: OperatorManager,
 ): Promise<DecryptedParameters<C> | ErrorDecryptingParameters> {
   const operator = operatorManager.operatorForVersion(payload.version)

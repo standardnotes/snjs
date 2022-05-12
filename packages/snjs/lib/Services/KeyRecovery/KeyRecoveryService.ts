@@ -1,5 +1,11 @@
 import { KeyRecoveryOperation } from './KeyRecoveryOperation'
-import { SNRootKeyParams, EncryptionService, SNRootKey, KeyParamsFromApiResponse } from '@standardnotes/encryption'
+import {
+  SNRootKeyParams,
+  EncryptionService,
+  SNRootKey,
+  KeyParamsFromApiResponse,
+  KeyRecoveryStrings,
+} from '@standardnotes/encryption'
 import { UserService } from '../User/UserService'
 import {
   isErrorDecryptingPayload,
@@ -12,10 +18,9 @@ import {
   getIncrementedDirtyIndex,
 } from '@standardnotes/models'
 import { SNSyncService } from '../Sync/SyncService'
-import { KeyRecoveryStrings } from '../Api/Messages'
 import { SNStorageService } from '../Storage/StorageService'
 import { PayloadManager } from '../Payloads/PayloadManager'
-import { Challenge, ChallengeValidation, ChallengeReason, ChallengePrompt, ChallengeService } from '../Challenge'
+import { Challenge, ChallengeService } from '../Challenge'
 import { SNApiService } from '@Lib/Services/Api/ApiService'
 import { ContentType, Uuid } from '@standardnotes/common'
 import { ItemManager } from '../Items/ItemManager'
@@ -29,6 +34,9 @@ import {
   ApplicationStage,
   StorageKey,
   DiagnosticInfo,
+  ChallengeValidation,
+  ChallengeReason,
+  ChallengePrompt,
 } from '@standardnotes/services'
 import {
   UndecryptableItemsStorage,

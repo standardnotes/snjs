@@ -1,5 +1,5 @@
 import { ContentType, KeyParamsOrigination, ProtocolVersion, ProtocolVersionLength } from '@standardnotes/common'
-import { Create001KeyParams } from '../../Keys/RootKey/KeyParams'
+import { Create001KeyParams } from '../../Keys/RootKey/KeyParamsFunctions'
 import { firstHalfOfString, secondHalfOfString, splitString, UuidGenerator } from '@standardnotes/utils'
 import { AsynchronousOperator } from '../Operator'
 import {

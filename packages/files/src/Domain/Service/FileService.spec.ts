@@ -4,6 +4,7 @@ import {
   ItemManagerInterface,
   AlertService,
   ApiServiceInterface,
+  ChallengeServiceInterface,
 } from '@standardnotes/services'
 import { FileService } from './FileService'
 import { PureCryptoInterface, StreamEncryptor } from '@standardnotes/sncrypto-common'
@@ -16,6 +17,7 @@ describe('fileService', () => {
   let syncService: SyncServiceInterface
   let alertService: AlertService
   let crypto: PureCryptoInterface
+  let challengor: ChallengeServiceInterface
   let fileService: FileService
   let encryptor: EncryptionProvider
   let internalEventBus: InternalEventBusInterface
@@ -33,6 +35,8 @@ describe('fileService', () => {
     itemManager.setItemToBeDeleted = jest.fn()
     itemManager.addObserver = jest.fn()
     itemManager.changeItem = jest.fn()
+
+    challengor = {} as jest.Mocked<ChallengeServiceInterface>
 
     syncService = {} as jest.Mocked<SyncServiceInterface>
     syncService.sync = jest.fn()
@@ -53,6 +57,7 @@ describe('fileService', () => {
       itemManager,
       syncService,
       encryptor,
+      challengor,
       alertService,
       crypto,
       internalEventBus,

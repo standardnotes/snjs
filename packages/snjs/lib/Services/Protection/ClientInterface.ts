@@ -1,4 +1,4 @@
-import { ChallengeReason } from '@Lib/Services/Challenge/Types'
+import { ChallengeReason } from '@standardnotes/services'
 import { SNFile } from '@standardnotes/models'
 
 export interface ProtectionsClientInterface {

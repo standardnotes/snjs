@@ -1,4 +1,4 @@
-import { AllKeyParamsContents } from './KeyParams'
+import { AllKeyParamsContents } from './KeyParamsFunctions'
 
 export const ValidKeyParamsKeys: (keyof AllKeyParamsContents)[] = [
   'identifier',

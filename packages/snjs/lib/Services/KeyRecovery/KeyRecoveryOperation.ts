@@ -1,19 +1,18 @@
 import { ContentType } from '@standardnotes/common'
-import { isErrorDecryptingPayload, ItemsKeyContent, ItemsKeyInterface } from '@standardnotes/models'
+import { ItemsKeyInterface } from '@standardnotes/models'
 import { dateSorted } from '@standardnotes/utils'
-import { EncryptionService, SNRootKeyParams } from '@standardnotes/encryption'
+import { SNRootKeyParams, DecryptItemsKeyByPromptingUser, EncryptionProvider } from '@standardnotes/encryption'
 import { DecryptionQueueItem, KeyRecoveryOperationResult } from './Types'
 import { serverKeyParamsAreSafe } from './Utils'
-import { Challenge, ChallengePrompt, ChallengeReason, ChallengeService, ChallengeValidation } from '../Challenge'
-import { KeyRecoveryStrings } from '../Api'
+import { ChallengeServiceInterface } from '@standardnotes/services'
 import { ItemManager } from '../Items'
 
 export class KeyRecoveryOperation {
   constructor(
     private queueItem: DecryptionQueueItem,
     private itemManager: ItemManager,
-    private protocolService: EncryptionService,
-    private challengeService: ChallengeService,
+    private protocolService: EncryptionProvider,
+    private challengeService: ChallengeServiceInterface,
     private clientParams: SNRootKeyParams | undefined,
     private serverParams: SNRootKeyParams | undefined,
   ) {}
@@ -42,37 +41,21 @@ export class KeyRecoveryOperation {
       }
     }
 
-    const challenge = new Challenge(
-      [new ChallengePrompt(ChallengeValidation.None, undefined, undefined, true)],
-      ChallengeReason.Custom,
-      true,
-      KeyRecoveryStrings.KeyRecoveryLoginFlowPrompt(this.queueItem.keyParams),
-      KeyRecoveryStrings.KeyRecoveryPasswordRequired,
+    const decryptionResult = await DecryptItemsKeyByPromptingUser(
+      this.queueItem.encryptedKey,
+      this.protocolService,
+      this.challengeService,
+      this.queueItem.keyParams,
     )
 
-    const response = await this.challengeService.promptForChallengeResponse(challenge)
-
-    if (!response) {
-      return { aborted: true }
+    if (decryptionResult === 'aborted' || decryptionResult === 'failed') {
+      return { aborted: false }
     }
 
-    const password = response.values[0].value as string
-
-    const rootKey = await this.protocolService.computeRootKey(password, this.queueItem.keyParams)
-
-    const decryptedItemsKey = await this.protocolService.decryptSplitSingle<ItemsKeyContent>({
-      usesRootKey: {
-        items: [this.queueItem.encryptedKey],
-        key: rootKey,
-      },
-    })
-
-    this.challengeService.completeChallenge(challenge)
-
-    if (!isErrorDecryptingPayload(decryptedItemsKey)) {
-      return { rootKey, replaceLocalRootKeyWithResult, decryptedItemsKey }
-    } else {
-      return { aborted: false }
+    return {
+      rootKey: decryptionResult.rootKey,
+      replaceLocalRootKeyWithResult,
+      decryptedItemsKey: decryptionResult.decryptedKey,
     }
   }
 }

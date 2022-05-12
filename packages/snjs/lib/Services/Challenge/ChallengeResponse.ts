@@ -1,9 +1,13 @@
 import { isNullOrUndefined } from '@standardnotes/utils'
 import { Challenge } from './Challenge'
-import { ChallengeValue } from './ChallengeValue'
-import { ChallengeArtifacts, ChallengeValidation } from './Types'
+import {
+  ChallengeResponseInterface,
+  ChallengeValidation,
+  ChallengeValue,
+  ChallengeArtifacts,
+} from '@standardnotes/services'
 
-export class ChallengeResponse {
+export class ChallengeResponse implements ChallengeResponseInterface {
   constructor(
     public readonly challenge: Challenge,
     public readonly values: ChallengeValue[],

@@ -24,11 +24,14 @@ import {
   FileSystemApi,
   FilesApiInterface,
   FileBackupMetadataFile,
+  FileHandleRead,
+  FileSystemNoSelection,
+  ChallengeServiceInterface,
 } from '@standardnotes/services'
 import { FilesClientInterface } from './FilesClientInterface'
 import { FileDownloadProgress } from '../Types/FileDownloadProgress'
-import { BackupSelectAndDecrypt } from '../Operations/BackupSelectAndDecrypt'
-import { EncryptionProvider } from '@standardnotes/encryption'
+import { readAndDecryptBackupFile } from '../Operations/BackupSelectAndDecrypt'
+import { DecryptItemsKeyWithUserFallback, EncryptionProvider } from '@standardnotes/encryption'
 
 const OneHundredMb = 100 * 1_000_000
 
@@ -40,6 +43,7 @@ export class FileService extends AbstractService implements FilesClientInterface
     private itemManager: ItemManagerInterface,
     private syncService: SyncServiceInterface,
     private encryptor: EncryptionProvider,
+    private challengor: ChallengeServiceInterface,
     private alertService: AlertService,
     private crypto: PureCryptoInterface,
     protected override internalEventBus: InternalEventBusInterface,
@@ -57,6 +61,7 @@ export class FileService extends AbstractService implements FilesClientInterface
     ;(this.encryptor as unknown) = undefined
     ;(this.syncService as unknown) = undefined
     ;(this.alertService as unknown) = undefined
+    ;(this.challengor as unknown) = undefined
     ;(this.crypto as unknown) = undefined
   }
 
@@ -198,13 +203,9 @@ export class FileService extends AbstractService implements FilesClientInterface
   public async decryptBackupMetadataFile(metdataFile: FileBackupMetadataFile): Promise<FileContent | undefined> {
     const encryptedItemsKey = new EncryptedPayload(metdataFile.itemsKey)
 
-    const decryptedItemsKey = await this.encryptor.decryptSplitSingle({
-      usesRootKeyWithKeyLookup: {
-        items: [encryptedItemsKey],
-      },
-    })
+    const decryptedItemsKey = await DecryptItemsKeyWithUserFallback(encryptedItemsKey, this.encryptor, this.challengor)
 
-    if (isEncryptedPayload(decryptedItemsKey)) {
+    if (!decryptedItemsKey) {
       return undefined
     }
 
@@ -223,30 +224,17 @@ export class FileService extends AbstractService implements FilesClientInterface
     return decryptedFile.content as FileContent
   }
 
-  public async selectFileBackupAndStream(
-    file: FileContent,
-    fileSystem: FileSystemApi,
-    onDecryptedBytes: (bytes: Uint8Array) => Promise<void>,
-  ): Promise<'success' | 'aborted' | 'failed'> {
-    const operation = new BackupSelectAndDecrypt(file, fileSystem, this.crypto)
-
-    const result = await operation.runSelectAndRead(onDecryptedBytes)
+  public async selectFile(fileSystem: FileSystemApi): Promise<FileHandleRead | FileSystemNoSelection> {
+    const result = await fileSystem.selectFile()
 
     return result
   }
 
-  public async selectFileBackupAndSaveDecrypted(
+  public async readBackupFileAndSaveDecrypted(
+    fileHandle: FileHandleRead,
     file: FileContent,
     fileSystem: FileSystemApi,
   ): Promise<'success' | 'aborted' | 'failed'> {
-    const operation = new BackupSelectAndDecrypt(file, fileSystem, this.crypto)
-
-    const encryptedFilePickStatus = await operation.runSelect()
-
-    if (encryptedFilePickStatus === 'aborted' || encryptedFilePickStatus === 'failed') {
-      return encryptedFilePickStatus
-    }
-
     const destinationDirectoryHandle = await fileSystem.selectDirectory()
 
     if (destinationDirectoryHandle === 'aborted' || destinationDirectoryHandle === 'failed') {
@@ -259,7 +247,7 @@ export class FileService extends AbstractService implements FilesClientInterface
       return destinationFileHandle
     }
 
-    const result = await operation.runRead(async (decryptedBytes) => {
+    const result = await readAndDecryptBackupFile(fileHandle, file, fileSystem, this.crypto, async (decryptedBytes) => {
       await fileSystem.saveBytes(destinationFileHandle, decryptedBytes)
     })
 
@@ -268,12 +256,14 @@ export class FileService extends AbstractService implements FilesClientInterface
     return result
   }
 
-  public async selectFileBackupAndReadAllBytes(file: FileContent, fileSystem: FileSystemApi): Promise<Uint8Array> {
-    const operation = new BackupSelectAndDecrypt(file, fileSystem, this.crypto)
-
+  public async readBackupFileBytesDecrypted(
+    fileHandle: FileHandleRead,
+    file: FileContent,
+    fileSystem: FileSystemApi,
+  ): Promise<Uint8Array> {
     let bytes = new Uint8Array()
 
-    await operation.runSelectAndRead(async (decryptedBytes) => {
+    await readAndDecryptBackupFile(fileHandle, file, fileSystem, this.crypto, async (decryptedBytes) => {
       bytes = new Uint8Array([...bytes, ...decryptedBytes])
     })
 

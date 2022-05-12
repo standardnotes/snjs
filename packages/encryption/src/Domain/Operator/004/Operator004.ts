@@ -1,5 +1,5 @@
 import { ContentType, KeyParamsOrigination, ProtocolVersion } from '@standardnotes/common'
-import { Create004KeyParams } from '../../Keys/RootKey/KeyParams'
+import { Create004KeyParams } from '../../Keys/RootKey/KeyParamsFunctions'
 import { SynchronousOperator } from '../Operator'
 import {
   CreateDecryptedItemFromPayload,

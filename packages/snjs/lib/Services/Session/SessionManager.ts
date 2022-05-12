@@ -4,6 +4,11 @@ import {
   InternalEventBusInterface,
   StorageKey,
   DiagnosticInfo,
+  ChallengePrompt,
+  ChallengeValidation,
+  ChallengeKeyboardType,
+  ChallengeReason,
+  ChallengePromptTitle,
 } from '@standardnotes/services'
 import { Base64String } from '@standardnotes/sncrypto-common'
 import { ClientDisplayableError } from '@standardnotes/responses'
@@ -17,7 +22,7 @@ import {
   EncryptionService,
   CreateNewRootKey,
 } from '@standardnotes/encryption'
-import { PromptTitles, RegisterStrings, SessionStrings, SignInStrings } from '../Api/Messages'
+import { RegisterStrings, SessionStrings, SignInStrings } from '../Api/Messages'
 import { RemoteSession, RawStorageValue } from './Sessions/Types'
 import { Session } from './Sessions/Session'
 import { SessionFromRawStorageValue } from './Sessions/Generator'
@@ -30,10 +35,10 @@ import { Strings } from '@Lib/Strings'
 import { Subscription } from '@standardnotes/auth'
 import { TokenSession } from './Sessions/TokenSession'
 import { UuidString } from '@Lib/Types/UuidString'
-import * as Challenge from '../Challenge'
 import * as Common from '@standardnotes/common'
 import * as Messages from '../Api/Messages'
 import * as Responses from '@standardnotes/responses'
+import { Challenge, ChallengeService } from '../Challenge'
 
 export const MINIMUM_PASSWORD_LENGTH = 8
 export const MissingAccountParams = 'missing-params'
@@ -67,7 +72,7 @@ export class SNSessionManager extends AbstractService<SessionEvent> implements S
     private apiService: SNApiService,
     private alertService: AlertService,
     private protocolService: EncryptionService,
-    private challengeService: Challenge.ChallengeService,
+    private challengeService: ChallengeService,
     private webSocketsService: SNWebSocketsService,
     protected override internalEventBus: InternalEventBusInterface,
   ) {
@@ -164,21 +169,12 @@ export class SNSessionManager extends AbstractService<SessionEvent> implements S
       return
     }
     this.isSessionRenewChallengePresented = true
-    const challenge = new Challenge.Challenge(
+    const challenge = new Challenge(
       [
-        new Challenge.ChallengePrompt(
-          Challenge.ChallengeValidation.None,
-          undefined,
-          SessionStrings.EmailInputPlaceholder,
-          false,
-        ),
-        new Challenge.ChallengePrompt(
-          Challenge.ChallengeValidation.None,
-          undefined,
-          SessionStrings.PasswordInputPlaceholder,
-        ),
+        new ChallengePrompt(ChallengeValidation.None, undefined, SessionStrings.EmailInputPlaceholder, false),
+        new ChallengePrompt(ChallengeValidation.None, undefined, SessionStrings.PasswordInputPlaceholder),
       ],
-      Challenge.ChallengeReason.Custom,
+      ChallengeReason.Custom,
       cancelable,
       SessionStrings.EnterEmailAndPassword,
       SessionStrings.RecoverSession(this.getUser()?.email),
@@ -194,7 +190,7 @@ export class SNSessionManager extends AbstractService<SessionEvent> implements S
         onNonvalidatedSubmit: async (challengeResponse) => {
           const email = challengeResponse.values[0].value as string
           const password = challengeResponse.values[1].value as string
-          const currentKeyParams = await this.protocolService.getAccountKeyParams()
+          const currentKeyParams = this.protocolService.getAccountKeyParams()
           const signInResult = await this.signIn(
             email,
             password,
@@ -240,17 +236,17 @@ export class SNSessionManager extends AbstractService<SessionEvent> implements S
   }
 
   private async promptForMfaValue(): Promise<string | undefined> {
-    const challenge = new Challenge.Challenge(
+    const challenge = new Challenge(
       [
-        new Challenge.ChallengePrompt(
-          Challenge.ChallengeValidation.None,
-          PromptTitles.Mfa,
+        new ChallengePrompt(
+          ChallengeValidation.None,
+          ChallengePromptTitle.Mfa,
           SessionStrings.MfaInputPlaceholder,
           false,
-          Challenge.ChallengeKeyboardType.Numeric,
+          ChallengeKeyboardType.Numeric,
         ),
       ],
-      Challenge.ChallengeReason.Custom,
+      ChallengeReason.Custom,
       true,
       SessionStrings.EnterMfa,
     )

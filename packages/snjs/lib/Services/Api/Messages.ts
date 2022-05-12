@@ -1,5 +1,4 @@
-import { SNRootKeyParams } from '@standardnotes/encryption'
-import { ProtocolVersion, KeyParamsOrigination } from '@standardnotes/common'
+import { ProtocolVersion } from '@standardnotes/common'
 
 export const API_MESSAGE_GENERIC_INVALID_LOGIN = 'A server error occurred while trying to sign in. Please try again.'
 export const API_MESSAGE_GENERIC_REGISTRATION_FAIL =
@@ -110,36 +109,6 @@ export const ProtocolUpgradeStrings = {
   UpgradingPasscode: 'Upgrading local encryption...',
 }
 
-export const KeyRecoveryStrings = {
-  KeyRecoveryLoginFlowPrompt: (keyParams: SNRootKeyParams) => {
-    const dateString = keyParams.createdDate?.toLocaleString()
-    switch (keyParams.origination) {
-      case KeyParamsOrigination.EmailChange:
-        return `Enter your account password as it was when you changed your email on ${dateString}.`
-      case KeyParamsOrigination.PasswordChange:
-        return `Enter your account password after it was changed on ${dateString}.`
-      case KeyParamsOrigination.Registration:
-        return `Enter your account password as it was when you registered ${dateString}.`
-      case KeyParamsOrigination.ProtocolUpgrade:
-        return `Enter your account password as it was when you upgraded your encryption version on ${dateString}.`
-      case KeyParamsOrigination.PasscodeChange:
-        return `Enter your application passcode after it was changed on ${dateString}.`
-      case KeyParamsOrigination.PasscodeCreate:
-        return `Enter your application passcode as it was when you created it on ${dateString}.`
-      default:
-        throw Error('Unhandled KeyParamsOrigination case for KeyRecoveryLoginFlowPrompt')
-    }
-  },
-  KeyRecoveryLoginFlowReason: 'Your account password is required to revalidate your session.',
-  KeyRecoveryLoginFlowInvalidPassword: 'Incorrect credentials entered. Please try again.',
-  KeyRecoveryRootKeyReplaced: 'Your credentials have successfully been updated.',
-  KeyRecoveryPasscodeRequiredTitle: 'Passcode Required',
-  KeyRecoveryPasscodeRequiredText: 'You must enter your passcode in order to save your new credentials.',
-  KeyRecoveryPasswordRequired: 'Your account password is required to recover an encryption key.',
-  KeyRecoveryKeyRecovered: 'Your key has successfully been recovered.',
-  KeyRecoveryUnableToRecover: 'Unable to recover your key with the attempted password. Please try again.',
-}
-
 export const ChallengeModalTitle = {
   Generic: 'Authentication Required',
   Migration: 'Storage Update',
@@ -198,14 +167,6 @@ export const ChallengeStrings = {
   SelectProtectedNote: 'Authentication is required to select a protected note',
   DisableMfa: 'Authentication is required to disable two-factor authentication',
   DeleteAccount: 'Authentication is required to delete your account',
-}
-
-export const PromptTitles = {
-  AccountPassword: 'Account Password',
-  LocalPasscode: 'Application Passcode',
-  Biometrics: 'Biometrics',
-  RememberFor: 'Remember For',
-  Mfa: 'Two-factor Authentication Code',
 }
 
 export const ErrorAlertStrings = {

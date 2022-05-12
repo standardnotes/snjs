@@ -1,4 +1,4 @@
-import { ItemsKeyInterface } from '@standardnotes/models'
+import { ItemsKeyInterface, RootKeyInterface } from '@standardnotes/models'
 import * as Models from '@standardnotes/models'
 import { SNRootKey } from '../Keys/RootKey/RootKey'
 import { SNRootKeyParams } from '../Keys/RootKey/RootKeyParams'
@@ -57,12 +57,12 @@ export interface SynchronousOperator extends OperatorCommon {
    */
   generateEncryptedParametersSync(
     payload: Models.DecryptedPayloadInterface,
-    key: ItemsKeyInterface | SNRootKey,
+    key: ItemsKeyInterface | RootKeyInterface,
   ): EncryptedParameters
 
   generateDecryptedParametersSync<C extends Models.ItemContent = Models.ItemContent>(
     encrypted: EncryptedParameters,
-    key: ItemsKeyInterface | SNRootKey,
+    key: ItemsKeyInterface | RootKeyInterface,
   ): DecryptedParameters<C> | ErrorDecryptingParameters
 }
 
@@ -76,11 +76,11 @@ export interface AsynchronousOperator extends OperatorCommon {
    */
   generateEncryptedParametersAsync(
     payload: Models.DecryptedPayloadInterface,
-    key: ItemsKeyInterface | SNRootKey,
+    key: ItemsKeyInterface | RootKeyInterface,
   ): Promise<EncryptedParameters>
 
   generateDecryptedParametersAsync<C extends Models.ItemContent = Models.ItemContent>(
     encrypted: EncryptedParameters,
-    key: ItemsKeyInterface | SNRootKey,
+    key: ItemsKeyInterface | RootKeyInterface,
   ): Promise<DecryptedParameters<C> | ErrorDecryptingParameters>
 }

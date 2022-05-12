@@ -1,5 +1,5 @@
 import { BackupFile } from '../../Backups/BackupFile'
-import { CreateAnyKeyParams } from '../../Keys/RootKey/KeyParams'
+import { CreateAnyKeyParams } from '../../Keys/RootKey/KeyParamsFunctions'
 import { DecryptBackupFile } from '../../Backups/BackupFileDecryptor'
 import { EncryptionProvider } from './EncryptionProvider'
 import { findDefaultItemsKey } from '../Functions'
@@ -38,6 +38,7 @@ import {
   EncryptedPayload,
   isDecryptedPayload,
   isEncryptedPayload,
+  RootKeyInterface,
 } from '@standardnotes/models'
 import { SplitPayloadsByEncryptionType } from '../../Split/EncryptionTypeSplit'
 import { ClientDisplayableError } from '@standardnotes/responses'
@@ -400,7 +401,7 @@ export class EncryptionService extends Services.AbstractService<EncryptionServic
    * Computes a root key given a password and key params.
    * Delegates computation to respective protocol operator.
    */
-  public async computeRootKey(password: string, keyParams: SNRootKeyParams) {
+  public async computeRootKey(password: string, keyParams: SNRootKeyParams): Promise<SNRootKey> {
     return this.rootKeyEncryption.computeRootKey(password, keyParams)
   }
 
@@ -512,7 +513,7 @@ export class EncryptionService extends Services.AbstractService<EncryptionServic
    * If so, they must generate the unwrapping key by getting our saved wrapping key keyParams.
    * After unwrapping, the root key is automatically loaded.
    */
-  public async unwrapRootKey(wrappingKey: SNRootKey) {
+  public async unwrapRootKey(wrappingKey: RootKeyInterface) {
     return this.rootKeyEncryption.unwrapRootKey(wrappingKey)
   }
   /**

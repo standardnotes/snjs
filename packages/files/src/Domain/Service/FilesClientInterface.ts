@@ -2,7 +2,7 @@ import { EncryptAndUploadFileOperation } from '../Operations/EncryptAndUpload'
 import { SNFile, FileMetadata, FileContent } from '@standardnotes/models'
 import { ClientDisplayableError } from '@standardnotes/responses'
 import { FileDownloadProgress } from '../Types/FileDownloadProgress'
-import { FileSystemApi, FileBackupMetadataFile } from '@standardnotes/services'
+import { FileSystemApi, FileBackupMetadataFile, FileHandleRead, FileSystemNoSelection } from '@standardnotes/services'
 
 export interface FilesClientInterface {
   beginNewFileUpload(sizeInBytes: number): Promise<EncryptAndUploadFileOperation | ClientDisplayableError>
@@ -30,16 +30,17 @@ export interface FilesClientInterface {
 
   decryptBackupMetadataFile(metdataFile: FileBackupMetadataFile): Promise<FileContent | undefined>
 
-  selectFileBackupAndStream(
-    file: FileContent,
-    fileSystem: FileSystemApi,
-    onDecryptedBytes: (bytes: Uint8Array) => Promise<void>,
-  ): Promise<'success' | 'aborted' | 'failed'>
+  selectFile(fileSystem: FileSystemApi): Promise<FileHandleRead | FileSystemNoSelection>
 
-  selectFileBackupAndReadAllBytes(file: FileContent, fileSystem: FileSystemApi): Promise<Uint8Array>
-
-  selectFileBackupAndSaveDecrypted(
+  readBackupFileAndSaveDecrypted(
+    fileHandle: FileHandleRead,
     file: FileContent,
     fileSystem: FileSystemApi,
   ): Promise<'success' | 'aborted' | 'failed'>
+
+  readBackupFileBytesDecrypted(
+    fileHandle: FileHandleRead,
+    file: FileContent,
+    fileSystem: FileSystemApi,
+  ): Promise<Uint8Array>
 }

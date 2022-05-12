@@ -1,68 +1,36 @@
 import { FileContent } from '@standardnotes/models'
-import { FileSystemApi } from '@standardnotes/services'
+import { FileSystemApi, FileHandleRead } from '@standardnotes/services'
 import { PureCryptoInterface } from '@standardnotes/sncrypto-common'
 import { OrderedByteChunker } from '../Utils/OrderedByteChunker'
-import { BackupReader } from '../UseCase/BackupReader'
 import { FileDecryptor } from '../UseCase/FileDecryptor'
 
-export class BackupSelectAndDecrypt {
-  private selector!: BackupReader
+export async function readAndDecryptBackupFile(
+  fileHandle: FileHandleRead,
+  file: {
+    encryptionHeader: FileContent['encryptionHeader']
+    remoteIdentifier: FileContent['remoteIdentifier']
+    encryptedChunkSizes: FileContent['encryptedChunkSizes']
+    key: FileContent['key']
+  },
+  fileSystem: FileSystemApi,
+  crypto: PureCryptoInterface,
+  onDecryptedBytes: (decryptedBytes: Uint8Array) => Promise<void>,
+): Promise<'aborted' | 'failed' | 'success'> {
+  const decryptor = new FileDecryptor(file, crypto)
 
-  constructor(
-    private file: {
-      encryptionHeader: FileContent['encryptionHeader']
-      remoteIdentifier: FileContent['remoteIdentifier']
-      encryptedChunkSizes: FileContent['encryptedChunkSizes']
-      key: FileContent['key']
-    },
-    private fileSystem: FileSystemApi,
-    private crypto: PureCryptoInterface,
-  ) {}
+  const byteChunker = new OrderedByteChunker(file.encryptedChunkSizes, async (chunk: Uint8Array) => {
+    const decryptResult = decryptor.decryptBytes(chunk)
 
-  public async runSelectAndRead(
-    onDecryptedBytes: (decryptedBytes: Uint8Array) => Promise<void>,
-  ): Promise<'aborted' | 'failed' | 'success'> {
-    const selectStatus = await this.runSelect()
-
-    if (selectStatus !== 'success') {
-      return selectStatus
+    if (!decryptResult) {
+      return
     }
 
-    return this.runRead(onDecryptedBytes)
-  }
+    await onDecryptedBytes(decryptResult.decryptedBytes)
+  })
 
-  public async runSelect(): Promise<'aborted' | 'failed' | 'success'> {
-    const selector = new BackupReader(this.fileSystem)
-    const selectionStatus = await selector.promptForSelection()
+  const readResult = await fileSystem.readFile(fileHandle, async (encryptedBytes: Uint8Array, isLast: boolean) => {
+    await byteChunker.addBytes(encryptedBytes, isLast)
+  })
 
-    if (selectionStatus !== 'success') {
-      return selectionStatus
-    }
-
-    this.selector = selector
-
-    return 'success'
-  }
-
-  public async runRead(
-    onDecryptedBytes: (decryptedBytes: Uint8Array) => Promise<void>,
-  ): Promise<'aborted' | 'failed' | 'success'> {
-    const decryptor = new FileDecryptor(this.file, this.crypto)
-
-    const byteChunker = new OrderedByteChunker(this.file.encryptedChunkSizes, async (chunk: Uint8Array) => {
-      const decryptResult = decryptor.decryptBytes(chunk)
-
-      if (!decryptResult) {
-        return
-      }
-
-      await onDecryptedBytes(decryptResult.decryptedBytes)
-    })
-
-    const readResult = await this.selector.readSelectedFile(async (encryptedBytes: Uint8Array, isLast: boolean) => {
-      await byteChunker.addBytes(encryptedBytes, isLast)
-    })
-
-    return readResult
-  }
+  return readResult
 }

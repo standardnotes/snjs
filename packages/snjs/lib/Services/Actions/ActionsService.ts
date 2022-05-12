@@ -1,5 +1,5 @@
 import { EncryptionService, SNRootKey } from '@standardnotes/encryption'
-import { Challenge, ChallengeValidation, ChallengeService, ChallengeReason, ChallengePrompt } from '../Challenge'
+import { Challenge, ChallengeService } from '../Challenge'
 import { ListedService } from '../Listed/ListedService'
 import { ActionResponse, HttpResponse } from '@standardnotes/responses'
 import { ContentType } from '@standardnotes/common'
@@ -22,7 +22,15 @@ import {
 import { SNSyncService } from '../Sync/SyncService'
 import { PayloadManager } from '../Payloads/PayloadManager'
 import { SNHttpService } from '../Api/HttpService'
-import { AbstractService, DeviceInterface, InternalEventBusInterface, AlertService } from '@standardnotes/services'
+import {
+  AbstractService,
+  DeviceInterface,
+  InternalEventBusInterface,
+  AlertService,
+  ChallengeValidation,
+  ChallengeReason,
+  ChallengePrompt,
+} from '@standardnotes/services'
 
 /**
  * The Actions Service allows clients to interact with action-based extensions.

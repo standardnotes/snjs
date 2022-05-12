@@ -9,7 +9,7 @@ import {
 } from '@standardnotes/models'
 import { SNRootKey } from '../../Keys/RootKey/RootKey'
 import { V003Algorithm } from '../../Algorithm'
-import { Create003KeyParams } from '../../Keys/RootKey/KeyParams'
+import { Create003KeyParams } from '../../Keys/RootKey/KeyParamsFunctions'
 import { SNProtocolOperator002 } from '../002/Operator002'
 import { ContentType, KeyParamsOrigination, ProtocolVersion } from '@standardnotes/common'
 import { SNRootKeyParams } from '../../Keys/RootKey/RootKeyParams'

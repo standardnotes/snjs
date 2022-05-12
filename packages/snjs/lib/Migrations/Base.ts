@@ -1,11 +1,18 @@
 import { AnyKeyParamsContent } from '@standardnotes/common'
 import { SNLog } from '@Lib/Log'
 import { EncryptedPayload, EncryptedTransferPayload, isErrorDecryptingPayload } from '@standardnotes/models'
-import { ChallengeValidation, ChallengeReason, Challenge, ChallengePrompt } from '../Services/Challenge'
+import { Challenge } from '../Services/Challenge'
 import { KeychainRecoveryStrings, SessionStrings } from '../Services/Api/Messages'
 import { PreviousSnjsVersion1_0_0, PreviousSnjsVersion2_0_0, SnjsVersion } from '../Version'
 import { Migration } from '@Lib/Migrations/Migration'
-import { RawStorageKey, namespacedKey, ApplicationStage } from '@standardnotes/services'
+import {
+  RawStorageKey,
+  namespacedKey,
+  ApplicationStage,
+  ChallengeValidation,
+  ChallengeReason,
+  ChallengePrompt,
+} from '@standardnotes/services'
 import { isNullOrUndefined } from '@standardnotes/utils'
 import { CreateReader } from './StorageReaders/Functions'
 import { StorageReader } from './StorageReaders/Reader'

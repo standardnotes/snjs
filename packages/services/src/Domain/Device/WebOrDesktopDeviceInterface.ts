@@ -1,5 +1,5 @@
 import { DeviceInterface } from './DeviceInterface'
-import { RawKeychainValue } from './KeychainTypes'
+import { RawKeychainValue } from '@standardnotes/models'
 
 export interface WebOrDesktopDeviceInterface extends DeviceInterface {
   readonly appVersion: string
