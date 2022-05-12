@@ -30,7 +30,7 @@ describe('key recovery service', function () {
     await context.launch({
       receiveChallenge: (challenge) => {
         application.submitValuesForChallenge(challenge, [
-          new ChallengeValue(challenge.prompts[0], unassociatedPassword),
+          CreateChallengeValue(challenge.prompts[0], unassociatedPassword),
         ])
       },
     })
@@ -83,7 +83,7 @@ describe('key recovery service', function () {
     await context.launch({
       receiveChallenge: (challenge) => {
         application.submitValuesForChallenge(challenge, [
-          new ChallengeValue(challenge.prompts[0], unassociatedPassword),
+          CreateChallengeValue(challenge.prompts[0], unassociatedPassword),
         ])
       },
     })
@@ -200,7 +200,7 @@ describe('key recovery service', function () {
     const receiveChallenge = (challenge) => {
       totalPromptCount++
       /** Give unassociated password when prompted */
-      application.submitValuesForChallenge(challenge, [new ChallengeValue(challenge.prompts[0], unassociatedPassword)])
+      application.submitValuesForChallenge(challenge, [CreateChallengeValue(challenge.prompts[0], unassociatedPassword)])
     }
     await application.prepareForLaunch({ receiveChallenge })
     await application.launch(true)
@@ -367,7 +367,7 @@ describe('key recovery service', function () {
     const receiveChallenge = (challenge) => {
       const isKeyRecoveryPrompt = challenge.subheading?.includes(KeyRecoveryStrings.KeyRecoveryPasswordRequired)
       application.submitValuesForChallenge(challenge, [
-        new ChallengeValue(challenge.prompts[0], isKeyRecoveryPrompt ? unassociatedPassword : context.password),
+        CreateChallengeValue(challenge.prompts[0], isKeyRecoveryPrompt ? unassociatedPassword : context.password),
       ])
     }
 
@@ -567,7 +567,7 @@ describe('key recovery service', function () {
     const application = context.application
     const receiveChallenge = (challenge) => {
       /** Give unassociated password when prompted */
-      application.submitValuesForChallenge(challenge, [new ChallengeValue(challenge.prompts[0], unassociatedPassword)])
+      application.submitValuesForChallenge(challenge, [CreateChallengeValue(challenge.prompts[0], unassociatedPassword)])
     }
     await application.prepareForLaunch({ receiveChallenge })
     await application.launch(true)

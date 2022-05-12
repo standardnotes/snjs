@@ -595,7 +595,7 @@ describe('keys', function () {
     const expectedChallenges = 1
     const receiveChallenge = (challenge) => {
       totalChallenges++
-      recreatedApp.submitValuesForChallenge(challenge, [new ChallengeValue(challenge.prompts[0], this.password)])
+      recreatedApp.submitValuesForChallenge(challenge, [CreateChallengeValue(challenge.prompts[0], this.password)])
     }
     await recreatedApp.prepareForLaunch({ receiveChallenge })
     await recreatedApp.launch(true)
@@ -674,8 +674,8 @@ describe('keys', function () {
         receiveChallenge: (challenge) => {
           /** Reauth session challenge */
           newClient.submitValuesForChallenge(challenge, [
-            new ChallengeValue(challenge.prompts[0], this.email),
-            new ChallengeValue(challenge.prompts[1], this.password),
+            CreateChallengeValue(challenge.prompts[0], this.email),
+            CreateChallengeValue(challenge.prompts[1], this.password),
           ])
         },
       })

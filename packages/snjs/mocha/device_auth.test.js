@@ -76,10 +76,10 @@ describe('device authentication', function () {
       const values = []
       for (const prompt of prompts) {
         if (prompt.validation === ChallengeValidation.LocalPasscode) {
-          const response = new ChallengeValue(prompt, numPasscodeAttempts < 2 ? wrongPasscode : passcode)
+          const response = { prompt, value: numPasscodeAttempts < 2 ? wrongPasscode : passcode }
           values.push(response)
         } else if (prompt.validation === ChallengeValidation.Biometric) {
-          values.push(new ChallengeValue(prompt, true))
+          values.push({ prompt, value: true })
         }
       }
       return values
@@ -135,7 +135,7 @@ describe('device authentication', function () {
       const values = []
       for (const prompt of prompts) {
         if (prompt.validation === ChallengeValidation.LocalPasscode) {
-          values.push(new ChallengeValue(prompt, numPasscodeAttempts < 2 ? wrongPasscode : passcode))
+          values.push({ prompt, value: numPasscodeAttempts < 2 ? wrongPasscode : passcode })
         }
       }
       return values

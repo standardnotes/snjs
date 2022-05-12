@@ -16,9 +16,9 @@ describe('upgrading', () => {
       const values = []
       for (const prompt of prompts) {
         if (prompt.validation === ChallengeValidation.LocalPasscode) {
-          values.push(new ChallengeValue(prompt, this.passcode))
+          values.push(CreateChallengeValue(prompt, this.passcode))
         } else {
-          values.push(new ChallengeValue(prompt, this.password))
+          values.push(CreateChallengeValue(prompt, this.password))
         }
       }
       return values

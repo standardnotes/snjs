@@ -601,7 +601,7 @@ describe('importing', function () {
       receiveChallenge: (challenge) => {
         const values = challenge.prompts.map(
           (prompt) =>
-            new ChallengeValue(
+            CreateChallengeValue(
               prompt,
               prompt.validation === ChallengeValidation.None ? 'incorrect password' : password,
             ),
@@ -637,7 +637,7 @@ describe('importing', function () {
     application = await Factory.createInitAppWithFakeCrypto()
     application.setLaunchCallback({
       receiveChallenge: (challenge) => {
-        const values = challenge.prompts.map((prompt) => new ChallengeValue(prompt, 'incorrect password'))
+        const values = challenge.prompts.map((prompt) => CreateChallengeValue(prompt, 'incorrect password'))
         application.submitValuesForChallenge(challenge, values)
       },
     })
@@ -784,7 +784,7 @@ describe('importing', function () {
             challenge,
             challenge.prompts.map(
               (prompt) =>
-                new ChallengeValue(
+                CreateChallengeValue(
                   prompt,
                   prompt.validation !== ChallengeValidation.ProtectionSessionDuration
                     ? password
@@ -794,7 +794,7 @@ describe('importing', function () {
           )
         } else {
           const prompt = challenge.prompts[0]
-          application.submitValuesForChallenge(challenge, [new ChallengeValue(prompt, password)])
+          application.submitValuesForChallenge(challenge, [CreateChallengeValue(prompt, password)])
         }
       },
     })

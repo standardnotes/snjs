@@ -74,7 +74,7 @@ describe('2020-01-15 web migration', () => {
     /** Run migration */
     await application.prepareForLaunch({
       receiveChallenge: async (challenge) => {
-        application.submitValuesForChallenge(challenge, [new ChallengeValue(challenge.prompts[0], passcode)])
+        application.submitValuesForChallenge(challenge, [CreateChallengeValue(challenge.prompts[0], passcode)])
       },
     })
 
@@ -167,7 +167,7 @@ describe('2020-01-15 web migration', () => {
 
     await application.prepareForLaunch({
       receiveChallenge: async (challenge) => {
-        application.submitValuesForChallenge(challenge, [new ChallengeValue(challenge.prompts[0], passcode)])
+        application.submitValuesForChallenge(challenge, [CreateChallengeValue(challenge.prompts[0], passcode)])
       },
     })
     await application.launch(true)
@@ -248,12 +248,12 @@ describe('2020-01-15 web migration', () => {
       const values = []
       for (const prompt of prompts) {
         if (prompt.validation === ChallengeValidation.LocalPasscode) {
-          values.push(new ChallengeValue(prompt, passcode))
+          values.push(CreateChallengeValue(prompt, passcode))
         } else {
           /** We will be prompted to reauthetnicate our session, not relevant to this test
            * but pass any value to avoid exception
            */
-          values.push(new ChallengeValue(prompt, 'foo'))
+          values.push(CreateChallengeValue(prompt, 'foo'))
         }
       }
       return values
@@ -413,7 +413,7 @@ describe('2020-01-15 web migration', () => {
         /** We will be prompted to reauthetnicate our session, not relevant to this test
          * but pass any value to avoid exception
          */
-        values.push(new ChallengeValue(prompt, 'foo'))
+        values.push(CreateChallengeValue(prompt, 'foo'))
       }
       return values
     }
@@ -538,7 +538,7 @@ describe('2020-01-15 web migration', () => {
     /** Runs migration */
     await application.prepareForLaunch({
       receiveChallenge: async (challenge) => {
-        application.submitValuesForChallenge(challenge, [new ChallengeValue(challenge.prompts[0], passcode)])
+        application.submitValuesForChallenge(challenge, [CreateChallengeValue(challenge.prompts[0], passcode)])
       },
     })
     await application.launch(true)
