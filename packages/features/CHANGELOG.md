@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.42.1](https://github.com/standardnotes/snjs/compare/@standardnotes/features@1.42.0...@standardnotes/features@1.42.1) (2022-05-12)
+
+
+### Bug Fixes
+
+* remove "Unlimited history" from Plus plan features list ([#729](https://github.com/standardnotes/snjs/issues/729)) ([a4d5c64](https://github.com/standardnotes/snjs/commit/a4d5c6424753ae22ebb46ab31666396c28fcd77f))
+
+
+
+
+
 # [1.42.0](https://github.com/standardnotes/snjs/compare/@standardnotes/features@1.41.0...@standardnotes/features@1.42.0) (2022-05-09)
 
 

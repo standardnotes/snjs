@@ -3,6 +3,25 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.7.1](https://github.com/standardnotes/snjs/compare/@standardnotes/models@1.7.0...@standardnotes/models@1.7.1) (2022-05-12)
+
+**Note:** Version bump only for package @standardnotes/models
+
+
+
+
+
+# [1.7.0](https://github.com/standardnotes/snjs/compare/@standardnotes/models@1.6.10...@standardnotes/models@1.7.0) (2022-05-12)
+
+
+### Features
+
+* new mobile-specific pref keys ([#730](https://github.com/standardnotes/snjs/issues/730)) ([cbf86a3](https://github.com/standardnotes/snjs/commit/cbf86a310e48a238ec8d8a5fd3d5c79da9120bd3))
+
+
+
+
+
 ## [1.6.10](https://github.com/standardnotes/snjs/compare/@standardnotes/models@1.6.9...@standardnotes/models@1.6.10) (2022-05-09)
 
 
