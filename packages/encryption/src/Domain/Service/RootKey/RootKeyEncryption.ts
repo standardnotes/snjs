@@ -204,7 +204,7 @@ export class RootKeyEncryptionService extends Services.AbstractService<RootKeySe
     return this.getRootKeyParams() as Promise<SNRootKeyParams>
   }
 
-  public async computeRootKey(password: string, keyParams: SNRootKeyParams) {
+  public async computeRootKey(password: string, keyParams: SNRootKeyParams): Promise<RootKeyInterface> {
     const version = keyParams.version
     const operator = this.operatorManager.operatorForVersion(version)
     return operator.computeRootKey(password, keyParams)

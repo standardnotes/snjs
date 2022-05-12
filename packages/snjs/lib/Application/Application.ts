@@ -12,7 +12,15 @@ import * as Files from '@standardnotes/files'
 import { Subscription } from '@standardnotes/auth'
 import { UuidString, DeinitSource, ApplicationEventPayload } from '../Types'
 import { ApplicationEvent, applicationEventForSyncEvent } from '@Lib/Application/Event'
-import { ChallengeValidation, DiagnosticInfo, Environment, isDesktopDevice, Platform } from '@standardnotes/services'
+import {
+  ChallengeReason,
+  ChallengeValidation,
+  DiagnosticInfo,
+  Environment,
+  isDesktopDevice,
+  Platform,
+  ChallengeValue,
+} from '@standardnotes/services'
 import { SNLog } from '../Log'
 import { useBoolean } from '@standardnotes/utils'
 import { DecryptedItemInterface, EncryptedItemInterface } from '@standardnotes/models'
@@ -190,11 +198,7 @@ export class SNApplication implements InternalServices.ListedClientInterface {
   }
 
   public get fileBackups(): Files.FilesBackupService | undefined {
-    if (!isDesktopDevice(this.deviceInterface)) {
-      return undefined
-    }
-
-    return this.filesBackupService as Files.FilesBackupService
+    return this.filesBackupService
   }
 
   public computePrivateWorkspaceIdentifier(userphrase: string, name: string): Promise<string | undefined> {
@@ -584,7 +588,7 @@ export class SNApplication implements InternalServices.ListedClientInterface {
 
   public async authorizeProtectedActionForNotes(
     notes: Models.SNNote[],
-    challengeReason: InternalServices.ChallengeReason,
+    challengeReason: ChallengeReason,
   ): Promise<Models.SNNote[]> {
     return await this.protectionService.authorizeProtectedActionForNotes(notes, challengeReason)
   }

@@ -30,7 +30,7 @@ import {
 } from '@standardnotes/services'
 import { FilesClientInterface } from './FilesClientInterface'
 import { FileDownloadProgress } from '../Types/FileDownloadProgress'
-import { readAndDecryptBackupFile } from '../Operations/BackupSelectAndDecrypt'
+import { readAndDecryptBackupFile } from './ReadAndDecryptBackupFile'
 import { DecryptItemsKeyWithUserFallback, EncryptionProvider } from '@standardnotes/encryption'
 
 const OneHundredMb = 100 * 1_000_000

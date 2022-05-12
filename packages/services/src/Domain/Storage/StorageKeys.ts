@@ -36,7 +36,6 @@ export enum StorageKey {
   UserRoles = 'user_roles',
   UserFeatures = 'user_features',
   ExperimentalFeatures = 'experimental_features',
-  TimestampOfLastFileBackedUpOnThisDevice = 'timestampOfLastFileBackedUpOnThisDevice',
 }
 
 export enum NonwrappedStorageKey {

@@ -401,7 +401,7 @@ export class EncryptionService extends Services.AbstractService<EncryptionServic
    * Computes a root key given a password and key params.
    * Delegates computation to respective protocol operator.
    */
-  public async computeRootKey(password: string, keyParams: SNRootKeyParams): Promise<SNRootKey> {
+  public async computeRootKey(password: string, keyParams: SNRootKeyParams): Promise<RootKeyInterface> {
     return this.rootKeyEncryption.computeRootKey(password, keyParams)
   }
 
