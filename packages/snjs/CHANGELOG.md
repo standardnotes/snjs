@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.107.1](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.107.0...@standardnotes/snjs@2.107.1) (2022-05-12)
+
+
+### Bug Fixes
+
+* do not send custom headers for external request ([#732](https://github.com/standardnotes/snjs/issues/732)) ([372a306](https://github.com/standardnotes/snjs/commit/372a306938e16f2463f4f0434bf287af7809d264))
+
+
+
+
+
 # [2.107.0](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.106.12...@standardnotes/snjs@2.107.0) (2022-05-12)
 
 
