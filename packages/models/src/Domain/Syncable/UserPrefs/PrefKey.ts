@@ -1,4 +1,4 @@
-import { CollectionSortProperty } from './../../Runtime/Collection/CollectionSort'
+import { CollectionSortProperty } from '../../Runtime/Collection/CollectionSort'
 import { FeatureIdentifier } from '@standardnotes/features'
 
 export enum PrefKey {
@@ -23,6 +23,15 @@ export enum PrefKey {
   AutoLightThemeIdentifier = 'autoLightThemeIdentifier',
   AutoDarkThemeIdentifier = 'autoDarkThemeIdentifier',
   NoteAddToParentFolders = 'noteAddToParentFolders',
+  MobileSortNotesBy = 'mobileSortBy',
+  MobileSortNotesReverse = 'mobileSortReverse',
+  MobileNotesHideNotePreview = 'mobileHideNotePreview',
+  MobileNotesHideDate = 'mobileHideDate',
+  MobileNotesHideTags = 'mobileHideTags',
+  MobileLastExportDate = 'mobileLastExportDate',
+  MobileDoNotShowAgainUnsupportedEditors = 'mobileDoNotShowAgainUnsupportedEditors',
+  MobileSelectedTagUuid = 'mobileSelectedTagUuid',
+  MobileNotesHideEditorIcon = 'mobileHideEditorIcon',
 }
 
 export type PrefValue = {
@@ -47,4 +56,13 @@ export type PrefValue = {
   [PrefKey.AutoLightThemeIdentifier]: FeatureIdentifier | 'Default'
   [PrefKey.AutoDarkThemeIdentifier]: FeatureIdentifier | 'Default'
   [PrefKey.NoteAddToParentFolders]: boolean
+  [PrefKey.MobileSortNotesBy]: CollectionSortProperty
+  [PrefKey.MobileSortNotesReverse]: boolean
+  [PrefKey.MobileNotesHideNotePreview]: boolean
+  [PrefKey.MobileNotesHideDate]: boolean
+  [PrefKey.MobileNotesHideTags]: boolean
+  [PrefKey.MobileLastExportDate]: Date | undefined
+  [PrefKey.MobileDoNotShowAgainUnsupportedEditors]: boolean
+  [PrefKey.MobileSelectedTagUuid]: string | undefined
+  [PrefKey.MobileNotesHideEditorIcon]: boolean
 }
