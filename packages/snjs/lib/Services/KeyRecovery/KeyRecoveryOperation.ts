@@ -48,7 +48,11 @@ export class KeyRecoveryOperation {
       this.queueItem.keyParams,
     )
 
-    if (decryptionResult === 'aborted' || decryptionResult === 'failed') {
+    if (decryptionResult === 'aborted') {
+      return { aborted: true }
+    }
+
+    if (decryptionResult === 'failed') {
       return { aborted: false }
     }
 
