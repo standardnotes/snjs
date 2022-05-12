@@ -344,9 +344,9 @@ describe('basic auth', function () {
       const values = []
       for (const prompt of prompts) {
         if (prompt.validation === ChallengeValidation.LocalPasscode) {
-          values.push(new ChallengeValue(prompt, passcode))
+          values.push(CreateChallengeValue(prompt, passcode))
         } else {
-          values.push(new ChallengeValue(prompt, this.password))
+          values.push(CreateChallengeValue(prompt, this.password))
         }
       }
       return values

@@ -32,7 +32,7 @@ describe('device authentication', function () {
       const values = []
       for (const prompt of prompts) {
         if (prompt.validation === ChallengeValidation.LocalPasscode) {
-          values.push(new ChallengeValue(prompt, numPasscodeAttempts < 2 ? wrongPasscode : passcode))
+          values.push(CreateChallengeValue(prompt, numPasscodeAttempts < 2 ? wrongPasscode : passcode))
         }
       }
       return values
