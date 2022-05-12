@@ -189,9 +189,9 @@ export class SNApplication implements InternalServices.ListedClientInterface {
     return this.statusService
   }
 
-  public get fileBackups(): Files.FilesBackupService {
+  public get fileBackups(): Files.FilesBackupService | undefined {
     if (!isDesktopDevice(this.deviceInterface)) {
-      throw Error('Attempting to access file backups service on non-desktop device')
+      return undefined
     }
 
     return this.filesBackupService as Files.FilesBackupService
@@ -1072,6 +1072,7 @@ export class SNApplication implements InternalServices.ListedClientInterface {
       this.apiService,
       this.itemManager,
       this.syncService,
+      this.protocolService,
       this.alertService,
       this.options.crypto,
       this.internalEventBus,

@@ -75,6 +75,14 @@ export class FilesBackupService extends AbstractService {
     return this.device.getFilesBackupsLocation()
   }
 
+  public openFilesBackupsLocation(): Promise<void> {
+    return this.device.openFilesBackupsLocation()
+  }
+
+  public isFileNameMetadataFile(name: string): boolean {
+    return name === 'metadata.sn.json'
+  }
+
   private async getBackupsMapping(): Promise<FileBackupsMapping['files']> {
     return (await this.device.getFilesBackupsMappingFile()).files
   }

@@ -1,6 +1,8 @@
 import { Uuid } from '@standardnotes/common'
 import { EncryptedTransferPayload } from '@standardnotes/models'
 
+export const FileBackupMetadataName = () => 'metadata.sn.json'
+
 export interface FileBackupMetadataFile {
   info: Record<string, string>
   file: EncryptedTransferPayload
@@ -33,4 +35,5 @@ export interface FileBackupsDevice {
   disableFilesBackups(): Promise<void>
   changeFilesBackupsLocation(): Promise<string>
   getFilesBackupsLocation(): Promise<string>
+  openFilesBackupsLocation(): Promise<void>
 }

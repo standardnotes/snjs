@@ -10,6 +10,8 @@ import {
   FileContentSpecialized,
   FillItemContentSpecialized,
   FileContent,
+  EncryptedPayload,
+  isEncryptedPayload,
 } from '@standardnotes/models'
 import { PureCryptoInterface } from '@standardnotes/sncrypto-common'
 import { UuidGenerator } from '@standardnotes/utils'
@@ -21,10 +23,12 @@ import {
   AlertService,
   FileSystemApi,
   FilesApiInterface,
+  FileBackupMetadataFile,
 } from '@standardnotes/services'
 import { FilesClientInterface } from './FilesClientInterface'
 import { FileDownloadProgress } from '../Types/FileDownloadProgress'
 import { BackupSelectAndDecrypt } from '../Operations/BackupSelectAndDecrypt'
+import { EncryptionProvider } from '@standardnotes/encryption'
 
 const OneHundredMb = 100 * 1_000_000
 
@@ -35,6 +39,7 @@ export class FileService extends AbstractService implements FilesClientInterface
     private api: FilesApiInterface,
     private itemManager: ItemManagerInterface,
     private syncService: SyncServiceInterface,
+    private encryptor: EncryptionProvider,
     private alertService: AlertService,
     private crypto: PureCryptoInterface,
     protected override internalEventBus: InternalEventBusInterface,
@@ -49,6 +54,7 @@ export class FileService extends AbstractService implements FilesClientInterface
     ;(this.cache as unknown) = undefined
     ;(this.api as unknown) = undefined
     ;(this.itemManager as unknown) = undefined
+    ;(this.encryptor as unknown) = undefined
     ;(this.syncService as unknown) = undefined
     ;(this.alertService as unknown) = undefined
     ;(this.crypto as unknown) = undefined
@@ -187,6 +193,34 @@ export class FileService extends AbstractService implements FilesClientInterface
     await this.syncService.sync()
 
     return undefined
+  }
+
+  public async decryptBackupMetadataFile(metdataFile: FileBackupMetadataFile): Promise<FileContent | undefined> {
+    const encryptedItemsKey = new EncryptedPayload(metdataFile.itemsKey)
+
+    const decryptedItemsKey = await this.encryptor.decryptSplitSingle({
+      usesRootKeyWithKeyLookup: {
+        items: [encryptedItemsKey],
+      },
+    })
+
+    if (isEncryptedPayload(decryptedItemsKey)) {
+      return undefined
+    }
+
+    const encryptedFile = new EncryptedPayload(metdataFile.file)
+
+    const decryptedFile = await this.encryptor.decryptSplitSingle({
+      usesItemsKeyWithKeyLookup: {
+        items: [encryptedFile],
+      },
+    })
+
+    if (isEncryptedPayload(decryptedFile)) {
+      return undefined
+    }
+
+    return decryptedFile.content as FileContent
   }
 
   public async selectFileBackupAndStream(

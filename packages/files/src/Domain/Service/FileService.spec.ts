@@ -8,6 +8,7 @@ import {
 import { FileService } from './FileService'
 import { PureCryptoInterface, StreamEncryptor } from '@standardnotes/sncrypto-common'
 import { SNFile } from '@standardnotes/models'
+import { EncryptionProvider } from '@standardnotes/encryption'
 
 describe('fileService', () => {
   let apiService: ApiServiceInterface
@@ -16,6 +17,7 @@ describe('fileService', () => {
   let alertService: AlertService
   let crypto: PureCryptoInterface
   let fileService: FileService
+  let encryptor: EncryptionProvider
   let internalEventBus: InternalEventBusInterface
 
   beforeEach(() => {
@@ -35,6 +37,8 @@ describe('fileService', () => {
     syncService = {} as jest.Mocked<SyncServiceInterface>
     syncService.sync = jest.fn()
 
+    encryptor = {} as jest.Mocked<EncryptionProvider>
+
     alertService = {} as jest.Mocked<AlertService>
     alertService.confirm = jest.fn().mockReturnValue(true)
     alertService.alert = jest.fn()
@@ -44,7 +48,15 @@ describe('fileService', () => {
     internalEventBus = {} as jest.Mocked<InternalEventBusInterface>
     internalEventBus.publish = jest.fn()
 
-    fileService = new FileService(apiService, itemManager, syncService, alertService, crypto, internalEventBus)
+    fileService = new FileService(
+      apiService,
+      itemManager,
+      syncService,
+      encryptor,
+      alertService,
+      crypto,
+      internalEventBus,
+    )
 
     crypto.xchacha20StreamInitDecryptor = jest.fn().mockReturnValue({
       state: {},

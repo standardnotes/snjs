@@ -2,7 +2,7 @@ import { EncryptAndUploadFileOperation } from '../Operations/EncryptAndUpload'
 import { SNFile, FileMetadata, FileContent } from '@standardnotes/models'
 import { ClientDisplayableError } from '@standardnotes/responses'
 import { FileDownloadProgress } from '../Types/FileDownloadProgress'
-import { FileSystemApi } from '@standardnotes/services'
+import { FileSystemApi, FileBackupMetadataFile } from '@standardnotes/services'
 
 export interface FilesClientInterface {
   beginNewFileUpload(sizeInBytes: number): Promise<EncryptAndUploadFileOperation | ClientDisplayableError>
@@ -27,6 +27,8 @@ export interface FilesClientInterface {
   deleteFile(file: SNFile): Promise<ClientDisplayableError | undefined>
 
   minimumChunkSize(): number
+
+  decryptBackupMetadataFile(metdataFile: FileBackupMetadataFile): Promise<FileContent | undefined>
 
   selectFileBackupAndStream(
     file: FileContent,
