@@ -28,6 +28,8 @@ export interface FilesClientInterface {
 
   minimumChunkSize(): number
 
+  isFileNameFileBackupMetadataFile(name: string): boolean
+
   decryptBackupMetadataFile(metdataFile: FileBackupMetadataFile): Promise<FileContent | undefined>
 
   selectFile(fileSystem: FileSystemApi): Promise<FileHandleRead | FileSystemNoSelection>

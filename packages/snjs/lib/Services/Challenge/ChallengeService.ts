@@ -1,3 +1,4 @@
+import { RootKeyInterface } from '@standardnotes/models'
 import { EncryptionService } from '@standardnotes/encryption'
 import { SNStorageService } from '../Storage/StorageService'
 import { removeFromArray } from '@standardnotes/utils'
@@ -109,16 +110,31 @@ export class ChallengeService extends AbstractService implements ChallengeServic
    * @param passcode - If the consumer already has access to the passcode,
    * they can pass it here so that the user is not prompted again.
    */
-  async getWrappingKeyIfApplicable(passcode?: string) {
+  async getWrappingKeyIfApplicable(passcode?: string): Promise<
+    | {
+        canceled?: undefined
+        wrappingKey?: undefined
+      }
+    | {
+        canceled: boolean
+        wrappingKey?: undefined
+      }
+    | {
+        wrappingKey: RootKeyInterface
+        canceled?: undefined
+      }
+  > {
     if (!this.protocolService.hasPasscode()) {
       return {}
     }
+
     if (!passcode) {
       passcode = await this.promptForCorrectPasscode(ChallengeReason.ResaveRootKey)
       if (!passcode) {
         return { canceled: true }
       }
     }
+
     const wrappingKey = await this.protocolService.computeWrappingKey(passcode)
     return { wrappingKey }
   }

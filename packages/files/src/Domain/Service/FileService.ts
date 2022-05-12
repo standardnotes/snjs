@@ -200,6 +200,10 @@ export class FileService extends AbstractService implements FilesClientInterface
     return undefined
   }
 
+  public isFileNameFileBackupMetadataFile(name: string): boolean {
+    return name === 'metadata.sn.json'
+  }
+
   public async decryptBackupMetadataFile(metdataFile: FileBackupMetadataFile): Promise<FileContent | undefined> {
     const encryptedItemsKey = new EncryptedPayload(metdataFile.itemsKey)
 
