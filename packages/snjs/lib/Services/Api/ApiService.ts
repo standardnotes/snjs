@@ -12,12 +12,12 @@ import {
   ApiServiceEvent,
   MetaReceivedData,
   DiagnosticInfo,
+  FilesApiInterface,
 } from '@standardnotes/services'
-import { ServerSyncPushContextualPayload, SNFeatureRepo, EncryptedFileInterface } from '@standardnotes/models'
+import { ServerSyncPushContextualPayload, SNFeatureRepo, FileContent } from '@standardnotes/models'
 import * as Responses from '@standardnotes/responses'
 import { API_MESSAGE_FAILED_OFFLINE_ACTIVATION } from '@Lib/Services/Api/Messages'
 import { HttpParams, HttpRequest, HttpVerb, SNHttpService } from './HttpService'
-import { FilesServerInterface } from '@standardnotes/files'
 import { isUrlFirstParty, TRUSTED_FEATURE_HOSTS } from '@Lib/Hosts'
 import { Paths } from './Paths'
 import { Session } from '../Session/Sessions/Session'
@@ -41,7 +41,7 @@ export class SNApiService
   extends AbstractService<ApiServiceEvent.MetaReceived, MetaReceivedData>
   implements
     ApiServiceInterface,
-    FilesServerInterface,
+    FilesApiInterface,
     IntegrityApiInterface,
     ItemsServerInterface,
     UserServerInterface,
@@ -103,7 +103,7 @@ export class SNApiService
 
   public async setHost(host: string): Promise<void> {
     this.host = host
-    await this.storageService.setValue(StorageKey.ServerHost, host)
+    this.storageService.setValue(StorageKey.ServerHost, host)
   }
 
   public getHost(): string {
@@ -807,14 +807,18 @@ export class SNApiService
     return (response as Responses.CloseUploadSessionResponse).success
   }
 
+  public getFilesDownloadUrl(): string {
+    return joinPaths(this.getFilesHost(), Paths.v1.downloadFileChunk)
+  }
+
   public async downloadFile(
-    file: EncryptedFileInterface,
+    file: { encryptedChunkSizes: FileContent['encryptedChunkSizes'] },
     chunkIndex = 0,
     apiToken: string,
     contentRangeStart: number,
     onBytesReceived: (bytes: Uint8Array) => Promise<void>,
   ): Promise<ClientDisplayableError | undefined> {
-    const url = joinPaths(this.getFilesHost(), Paths.v1.downloadFileChunk)
+    const url = this.getFilesDownloadUrl()
     const pullChunkSize = file.encryptedChunkSizes[chunkIndex]
 
     const response: Responses.HttpResponse | Responses.DownloadFileChunkResponse =

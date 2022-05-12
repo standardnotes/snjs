@@ -1,11 +1,15 @@
 import { FileDecryptor } from './FileDecryptor'
 import { PureCryptoInterface, StreamEncryptor } from '@standardnotes/sncrypto-common'
-import { EncryptedFileInterface } from '@standardnotes/models'
+import { FileContent } from '@standardnotes/models'
 import { assert } from '@standardnotes/utils'
 
 describe('file decryptor', () => {
   let decryptor: FileDecryptor
-  let file: EncryptedFileInterface
+  let file: {
+    encryptionHeader: FileContent['encryptionHeader']
+    remoteIdentifier: FileContent['remoteIdentifier']
+    key: FileContent['key']
+  }
   let crypto: PureCryptoInterface
 
   beforeEach(() => {
@@ -18,11 +22,9 @@ describe('file decryptor', () => {
     crypto.xchacha20StreamDecryptorPush = jest.fn().mockReturnValue({ message: new Uint8Array([0xaa]), tag: 0 })
 
     file = {
-      encryptedChunkSizes: [100_000],
       remoteIdentifier: '123',
       encryptionHeader: 'some-header',
       key: 'secret',
-      encryptedSize: 100_000,
     }
 
     decryptor = new FileDecryptor(file, crypto)

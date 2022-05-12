@@ -1,7 +1,7 @@
 import { StartUploadSessionResponse, MinimalHttpResponse, ClientDisplayableError } from '@standardnotes/responses'
-import { EncryptedFileInterface } from '@standardnotes/models'
+import { FileContent } from '@standardnotes/models'
 
-export interface FilesServerInterface {
+export interface FilesApiInterface {
   startUploadSession(apiToken: string): Promise<StartUploadSessionResponse>
 
   uploadFileBytes(apiToken: string, chunkId: number, encryptedBytes: Uint8Array): Promise<boolean>
@@ -9,7 +9,7 @@ export interface FilesServerInterface {
   closeUploadSession(apiToken: string): Promise<boolean>
 
   downloadFile(
-    file: EncryptedFileInterface,
+    file: { encryptedChunkSizes: FileContent['encryptedChunkSizes'] },
     chunkIndex: number,
     apiToken: string,
     contentRangeStart: number,
@@ -23,4 +23,6 @@ export interface FilesServerInterface {
     operation: 'write' | 'read' | 'delete',
     unencryptedFileSize?: number,
   ): Promise<string | ClientDisplayableError>
+
+  getFilesDownloadUrl(): string
 }

@@ -1,7 +1,4 @@
 export * from './Challenge'
 export * from './ChallengeOperation'
-export * from './ChallengePrompt'
 export * from './ChallengeResponse'
 export * from './ChallengeService'
-export * from './ChallengeValue'
-export * from './Types'

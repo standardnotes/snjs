@@ -93,17 +93,17 @@ export class AppContext {
 
     for (const prompt of challenge.prompts) {
       if (prompt.validation === ChallengeValidation.LocalPasscode) {
-        responses.push(new ChallengeValue(prompt, this.passcode))
+        responses.push(CreateChallengeValue(prompt, this.passcode))
       } else if (prompt.validation === ChallengeValidation.AccountPassword) {
-        responses.push(new ChallengeValue(prompt, accountPassword))
+        responses.push(CreateChallengeValue(prompt, accountPassword))
       } else if (prompt.validation === ChallengeValidation.ProtectionSessionDuration) {
-        responses.push(new ChallengeValue(prompt, 0))
+        responses.push(CreateChallengeValue(prompt, 0))
       } else if (prompt.placeholder === 'Email') {
-        responses.push(new ChallengeValue(prompt, this.email))
+        responses.push(CreateChallengeValue(prompt, this.email))
       } else if (prompt.placeholder === 'Password') {
-        responses.push(new ChallengeValue(prompt, accountPassword))
+        responses.push(CreateChallengeValue(prompt, accountPassword))
       } else if (challenge.heading.includes('account password')) {
-        responses.push(new ChallengeValue(prompt, accountPassword))
+        responses.push(CreateChallengeValue(prompt, accountPassword))
       } else {
         console.log('Unhandled challenge', challenge)
         throw Error(`Unhandled custom challenge in Factory.createAppContext`)

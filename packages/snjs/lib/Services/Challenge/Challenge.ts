@@ -1,13 +1,12 @@
 import { ChallengeModalTitle, ChallengeStrings } from '../Api/Messages'
 import { assertUnreachable } from '@standardnotes/utils'
-import { ChallengePrompt } from './ChallengePrompt'
-import { ChallengeReason, ChallengeValidation } from './Types'
+import { ChallengeValidation, ChallengeReason, ChallengeInterface, ChallengePrompt } from '@standardnotes/services'
 
 /**
  * A challenge is a stateless description of what the client needs to provide
  * in order to proceed.
  */
-export class Challenge {
+export class Challenge implements ChallengeInterface {
   public readonly id = Math.random()
 
   constructor(

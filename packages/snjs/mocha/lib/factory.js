@@ -348,7 +348,7 @@ export function handlePasswordChallenges(application, password) {
     receiveChallenge: (challenge) => {
       const values = challenge.prompts.map(
         (prompt) =>
-          new ChallengeValue(
+          CreateChallengeValue(
             prompt,
             prompt.validation === ChallengeValidation.ProtectionSessionDuration
               ? UnprotectedAccessSecondsDuration.OneMinute

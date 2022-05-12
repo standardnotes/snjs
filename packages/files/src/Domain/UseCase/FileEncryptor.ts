@@ -1,10 +1,13 @@
-import { DecryptedFileInterface } from '@standardnotes/models'
+import { FileContent } from '@standardnotes/models'
 import { PureCryptoInterface, StreamEncryptor, SodiumConstant } from '@standardnotes/sncrypto-common'
 
 export class FileEncryptor {
   private stream!: StreamEncryptor
 
-  constructor(private readonly file: DecryptedFileInterface, private crypto: PureCryptoInterface) {}
+  constructor(
+    private readonly file: { key: FileContent['key']; remoteIdentifier: FileContent['remoteIdentifier'] },
+    private crypto: PureCryptoInterface,
+  ) {}
 
   public initializeHeader(): string {
     this.stream = this.crypto.xchacha20StreamInitEncryptor(this.file.key)

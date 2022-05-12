@@ -514,8 +514,8 @@ describe('server session', function () {
     const receiveChallenge = async (challenge) => {
       didPromptForSignIn = true
       appA.submitValuesForChallenge(challenge, [
-        new ChallengeValue(challenge.prompts[0], email),
-        new ChallengeValue(challenge.prompts[1], password),
+        CreateChallengeValue(challenge.prompts[0], email),
+        CreateChallengeValue(challenge.prompts[1], password),
       ])
     }
     const appA = await Factory.createApplicationWithFakeCrypto(Factory.randomString())

@@ -29,7 +29,7 @@ describe('protections', function () {
         expect(challenge.prompts.find((prompt) => prompt.validation === ChallengeValidation.AccountPassword)).to.be.ok
         const values = challenge.prompts.map(
           (prompt) =>
-            new ChallengeValue(
+            CreateChallengeValue(
               prompt,
               prompt.validation === ChallengeValidation.AccountPassword
                 ? password
@@ -72,7 +72,7 @@ describe('protections', function () {
         expect(challenge.prompts.find((prompt) => prompt.validation === ChallengeValidation.LocalPasscode)).to.be.ok
         const values = challenge.prompts.map(
           (prompt) =>
-            new ChallengeValue(
+            CreateChallengeValue(
               prompt,
               prompt.validation === ChallengeValidation.LocalPasscode
                 ? passcode
@@ -104,7 +104,7 @@ describe('protections', function () {
         expect(challenge.prompts.find((prompt) => prompt.validation === ChallengeValidation.LocalPasscode)).to.be.ok
         const values = challenge.prompts.map(
           (prompt) =>
-            new ChallengeValue(
+            CreateChallengeValue(
               prompt,
               prompt.validation === ChallengeValidation.LocalPasscode
                 ? passcode
@@ -159,7 +159,7 @@ describe('protections', function () {
         expect(challenge.prompts.find((prompt) => prompt.validation === ChallengeValidation.LocalPasscode)).to.be.ok
         const values = challenge.prompts.map(
           (prompt) =>
-            new ChallengeValue(
+            CreateChallengeValue(
               prompt,
               prompt.validation === ChallengeValidation.LocalPasscode
                 ? passcode
@@ -196,7 +196,7 @@ describe('protections', function () {
           }
           values = challenge.prompts.map(
             (prompt) =>
-              new ChallengeValue(
+              CreateChallengeValue(
                 prompt,
                 prompt.validation === ChallengeValidation.AccountPassword
                   ? password
@@ -204,7 +204,7 @@ describe('protections', function () {
               ),
           )
         } else {
-          values = [new ChallengeValue(challenge.prompts[0], passcode)]
+          values = [CreateChallengeValue(challenge.prompts[0], passcode)]
         }
 
         application.submitValuesForChallenge(challenge, values)
@@ -240,7 +240,7 @@ describe('protections', function () {
         expect(challenge.prompts.find((prompt) => prompt.validation === ChallengeValidation.LocalPasscode)).to.be.ok
         const values = challenge.prompts.map(
           (prompt) =>
-            new ChallengeValue(
+            CreateChallengeValue(
               prompt,
               prompt.validation === ChallengeValidation.LocalPasscode
                 ? passcode
@@ -267,7 +267,7 @@ describe('protections', function () {
         expect(challenge.prompts.find((prompt) => prompt.validation === ChallengeValidation.LocalPasscode)).to.be.ok
         const values = challenge.prompts.map(
           (prompt) =>
-            new ChallengeValue(
+            CreateChallengeValue(
               prompt,
               prompt.validation === ChallengeValidation.LocalPasscode
                 ? passcode
@@ -411,7 +411,7 @@ describe('protections', function () {
           expect(challenge.reason).to.equal(ChallengeReason.SelectProtectedNote)
           const values = challenge.prompts.map(
             (prompt) =>
-              new ChallengeValue(
+              CreateChallengeValue(
                 prompt,
                 prompt.validation === ChallengeValidation.AccountPassword
                   ? password
@@ -452,7 +452,7 @@ describe('protections', function () {
           expect(challenge.reason).to.equal(ChallengeReason.SelectProtectedNote)
           const values = challenge.prompts.map(
             (prompt) =>
-              new ChallengeValue(
+              CreateChallengeValue(
                 prompt,
                 prompt.validation === ChallengeValidation.LocalPasscode
                   ? passcode
@@ -534,7 +534,7 @@ describe('protections', function () {
           expect(challenge.reason).to.equal(ChallengeReason.UnprotectNote)
           const values = challenge.prompts.map(
             (prompt) =>
-              new ChallengeValue(
+              CreateChallengeValue(
                 prompt,
                 prompt.validation === ChallengeValidation.LocalPasscode
                   ? passcode
@@ -571,7 +571,7 @@ describe('protections', function () {
           expect(challenge.reason).to.equal(ChallengeReason.UnprotectNote)
           const values = challenge.prompts.map(
             (prompt) =>
-              new ChallengeValue(
+              CreateChallengeValue(
                 prompt,
                 prompt.validation === ChallengeValidation.LocalPasscode
                   ? passcode

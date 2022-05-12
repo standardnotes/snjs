@@ -1,16 +1,17 @@
-import { SNRootKey, SNRootKeyParams } from '@standardnotes/encryption'
+import { SNRootKeyParams } from '@standardnotes/encryption'
 import {
   EncryptedTransferPayload,
   EncryptedPayloadInterface,
   DecryptedPayloadInterface,
   ItemsKeyContent,
+  RootKeyInterface,
 } from '@standardnotes/models'
 import { UuidString } from '@Lib/Types'
 
 export type UndecryptableItemsStorage = Record<UuidString, EncryptedTransferPayload>
 
 export type KeyRecoveryOperationSuccessResult = {
-  rootKey: SNRootKey
+  rootKey: RootKeyInterface
   decryptedItemsKey: DecryptedPayloadInterface<ItemsKeyContent>
   replaceLocalRootKeyWithResult: boolean
 }

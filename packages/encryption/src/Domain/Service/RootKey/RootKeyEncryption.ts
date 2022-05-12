@@ -1,5 +1,4 @@
-import { NamespacedRootKeyInKeychain } from '../../Keys/RootKey/Types'
-import { CreateAnyKeyParams } from '../../Keys/RootKey/KeyParams'
+import { CreateAnyKeyParams } from '../../Keys/RootKey/KeyParamsFunctions'
 import { findDefaultItemsKey } from '../Functions'
 import { KeyMode } from './KeyMode'
 import { OperatorManager } from '../../Operator/OperatorManager'
@@ -25,6 +24,8 @@ import {
   ItemsKeyContentSpecialized,
   PayloadTimestampDefaults,
   RootKeyContent,
+  RootKeyInterface,
+  NamespacedRootKeyInKeychain,
 } from '@standardnotes/models'
 
 export enum RootKeyServiceEvent {
@@ -32,7 +33,7 @@ export enum RootKeyServiceEvent {
 }
 
 export class RootKeyEncryptionService extends Services.AbstractService<RootKeyServiceEvent> {
-  private rootKey?: SNRootKey
+  private rootKey?: RootKeyInterface
   public keyMode = KeyMode.RootKeyNone
   public memoizedRootKeyParams?: SNRootKeyParams
 
@@ -203,7 +204,7 @@ export class RootKeyEncryptionService extends Services.AbstractService<RootKeySe
     return this.getRootKeyParams() as Promise<SNRootKeyParams>
   }
 
-  public async computeRootKey(password: string, keyParams: SNRootKeyParams) {
+  public async computeRootKey(password: string, keyParams: SNRootKeyParams): Promise<RootKeyInterface> {
     const version = keyParams.version
     const operator = this.operatorManager.operatorForVersion(version)
     return operator.computeRootKey(password, keyParams)
@@ -309,7 +310,7 @@ export class RootKeyEncryptionService extends Services.AbstractService<RootKeySe
     )
   }
 
-  public async unwrapRootKey(wrappingKey: SNRootKey) {
+  public async unwrapRootKey(wrappingKey: RootKeyInterface) {
     if (this.keyMode === KeyMode.WrapperOnly) {
       this.setRootKeyInstance(wrappingKey)
       return
@@ -464,16 +465,16 @@ export class RootKeyEncryptionService extends Services.AbstractService<RootKeySe
     )
   }
 
-  public setRootKeyInstance(rootKey: SNRootKey | undefined): void {
+  public setRootKeyInstance(rootKey: RootKeyInterface | undefined): void {
     this.rootKey = rootKey
   }
 
-  public getRootKey(): SNRootKey | undefined {
+  public getRootKey(): RootKeyInterface | undefined {
     return this.rootKey
   }
 
-  private getSureRootKey(): SNRootKey {
-    return this.rootKey as SNRootKey
+  private getSureRootKey(): RootKeyInterface {
+    return this.rootKey as RootKeyInterface
   }
 
   private getItemsKeys() {
@@ -496,11 +497,14 @@ export class RootKeyEncryptionService extends Services.AbstractService<RootKeySe
     return Promise.all(payloads.map((payload) => this.encrypPayloadWithKeyLookup(payload)))
   }
 
-  public async encryptPayload(payload: Models.DecryptedPayloadInterface, key: SNRootKey): Promise<EncryptedParameters> {
+  public async encryptPayload(
+    payload: Models.DecryptedPayloadInterface,
+    key: RootKeyInterface,
+  ): Promise<EncryptedParameters> {
     return OperatorWrapper.encryptPayload(payload, key, this.operatorManager)
   }
 
-  public async encryptPayloads(payloads: Models.DecryptedPayloadInterface[], key: SNRootKey) {
+  public async encryptPayloads(payloads: Models.DecryptedPayloadInterface[], key: RootKeyInterface) {
     return Promise.all(payloads.map((payload) => this.encryptPayload(payload, key)))
   }
 
@@ -522,7 +526,7 @@ export class RootKeyEncryptionService extends Services.AbstractService<RootKeySe
 
   public async decryptPayload<C extends Models.ItemContent = Models.ItemContent>(
     payload: Models.EncryptedPayloadInterface,
-    key: SNRootKey,
+    key: RootKeyInterface,
   ): Promise<DecryptedParameters<C> | ErrorDecryptingParameters> {
     return OperatorWrapper.decryptPayload(payload, key, this.operatorManager)
   }
@@ -535,7 +539,7 @@ export class RootKeyEncryptionService extends Services.AbstractService<RootKeySe
 
   public async decryptPayloads<C extends Models.ItemContent = Models.ItemContent>(
     payloads: Models.EncryptedPayloadInterface[],
-    key: SNRootKey,
+    key: RootKeyInterface,
   ): Promise<(DecryptedParameters<C> | ErrorDecryptingParameters)[]> {
     return Promise.all(payloads.map((payload) => this.decryptPayload<C>(payload, key)))
   }

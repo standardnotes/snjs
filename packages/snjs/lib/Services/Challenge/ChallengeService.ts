@@ -1,14 +1,23 @@
+import { RootKeyInterface } from '@standardnotes/models'
 import { EncryptionService } from '@standardnotes/encryption'
 import { SNStorageService } from '../Storage/StorageService'
 import { removeFromArray } from '@standardnotes/utils'
 import { isValidProtectionSessionLength } from '../Protection/ProtectionService'
-import { AbstractService, InternalEventBusInterface } from '@standardnotes/services'
-import { ChallengeArtifacts, ChallengeReason, ChallengeValidation } from './Types'
-import { ChallengeValue } from './ChallengeValue'
+import {
+  AbstractService,
+  ChallengeServiceInterface,
+  InternalEventBusInterface,
+  ChallengeArtifacts,
+  ChallengeReason,
+  ChallengeValidation,
+  ChallengeValue,
+  ChallengeInterface,
+  ChallengePromptInterface,
+  ChallengePrompt,
+} from '@standardnotes/services'
 import { ChallengeResponse } from './ChallengeResponse'
 import { ChallengeOperation } from './ChallengeOperation'
 import { Challenge } from './Challenge'
-import { ChallengePrompt } from './ChallengePrompt'
 
 type ChallengeValidationResponse = {
   valid: boolean
@@ -28,7 +37,7 @@ export type ChallengeObserver = {
 /**
  * The challenge service creates, updates and keeps track of running challenge operations.
  */
-export class ChallengeService extends AbstractService {
+export class ChallengeService extends AbstractService implements ChallengeServiceInterface {
   private challengeOperations: Record<string, ChallengeOperation> = {}
   public sendChallenge!: (challenge: Challenge) => void
   private challengeObservers: Record<string, ChallengeObserver[]> = {}
@@ -50,15 +59,21 @@ export class ChallengeService extends AbstractService {
     super.deinit()
   }
 
-  /**
-   * Resolves when the challenge has been completed.
-   * For non-validated challenges, will resolve when the first value is submitted.
-   */
   public promptForChallengeResponse(challenge: Challenge): Promise<ChallengeResponse | undefined> {
     return new Promise<ChallengeResponse | undefined>((resolve) => {
       this.createOrGetChallengeOperation(challenge, resolve)
       this.sendChallenge(challenge)
     })
+  }
+
+  public createChallenge(
+    prompts: ChallengePromptInterface[],
+    reason: ChallengeReason,
+    cancelable: boolean,
+    heading?: string,
+    subheading?: string,
+  ): ChallengeInterface {
+    return new Challenge(prompts, reason, cancelable, heading, subheading)
   }
 
   public async validateChallengeValue(value: ChallengeValue): Promise<ChallengeValidationResponse> {
@@ -95,16 +110,31 @@ export class ChallengeService extends AbstractService {
    * @param passcode - If the consumer already has access to the passcode,
    * they can pass it here so that the user is not prompted again.
    */
-  async getWrappingKeyIfApplicable(passcode?: string) {
+  async getWrappingKeyIfApplicable(passcode?: string): Promise<
+    | {
+        canceled?: undefined
+        wrappingKey?: undefined
+      }
+    | {
+        canceled: boolean
+        wrappingKey?: undefined
+      }
+    | {
+        wrappingKey: RootKeyInterface
+        canceled?: undefined
+      }
+  > {
     if (!this.protocolService.hasPasscode()) {
       return {}
     }
+
     if (!passcode) {
       passcode = await this.promptForCorrectPasscode(ChallengeReason.ResaveRootKey)
       if (!passcode) {
         return { canceled: true }
       }
     }
+
     const wrappingKey = await this.protocolService.computeWrappingKey(passcode)
     return { wrappingKey }
   }
@@ -205,7 +235,7 @@ export class ChallengeService extends AbstractService {
     this.deleteChallengeOperation(operation)
   }
 
-  public completeChallenge(challenge: Challenge) {
+  public completeChallenge(challenge: Challenge): void {
     const operation = this.challengeOperations[challenge.id]
     operation.complete()
     this.deleteChallengeOperation(operation)

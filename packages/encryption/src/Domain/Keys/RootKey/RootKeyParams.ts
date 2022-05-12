@@ -7,17 +7,12 @@ import {
   ProtocolVersion,
   KeyParamsOrigination,
 } from '@standardnotes/common'
+import { RootKeyParamsInterface } from '@standardnotes/models'
 import { pickByCopy } from '@standardnotes/utils'
 import { ProtocolVersionForKeyParams } from './ProtocolVersionForKeyParams'
 import { ValidKeyParamsKeys } from './ValidKeyParamsKeys'
 
-/**
- * Key params are public data that contain information about how a root key was created.
- * Given a keyParams object and a password, clients can compute a root key that was created
- * previously.
- */
-
-export class SNRootKeyParams {
+export class SNRootKeyParams implements RootKeyParamsInterface {
   public readonly content: AnyKeyParamsContent
 
   constructor(content: AnyKeyParamsContent) {
@@ -28,50 +23,46 @@ export class SNRootKeyParams {
     }
   }
 
-  /**
-   * For consumers to determine whether the object they are
-   * working with is a proper RootKeyParams object.
-   */
-  get isKeyParamsObject() {
+  get isKeyParamsObject(): boolean {
     return true
   }
 
-  get identifier() {
+  get identifier(): string {
     return this.content004.identifier || this.content002.email
   }
 
-  get version() {
+  get version(): ProtocolVersion {
     return this.content.version
   }
 
-  get origination() {
+  get origination(): KeyParamsOrigination | undefined {
     return this.content.origination
   }
 
-  get content001() {
+  get content001(): KeyParamsContent001 {
     return this.content as KeyParamsContent001
   }
 
-  get content002() {
+  get content002(): KeyParamsContent002 {
     return this.content as KeyParamsContent002
   }
 
-  get content003() {
+  get content003(): KeyParamsContent003 {
     return this.content as KeyParamsContent003
   }
 
-  get content004() {
+  get content004(): KeyParamsContent004 {
     return this.content as KeyParamsContent004
   }
 
-  get createdDate() {
+  get createdDate(): Date | undefined {
     if (!this.content004.created) {
       return undefined
     }
     return new Date(Number(this.content004.created))
   }
 
-  compare(other: SNRootKeyParams) {
+  compare(other: SNRootKeyParams): boolean {
     if (this.version !== other.version) {
       return false
     }
@@ -85,11 +76,6 @@ export class SNRootKeyParams {
     }
   }
 
-  /**
-   * @access public
-   * When saving in a file or communicating with server,
-   * use the original values.
-   */
   getPortableValue(): AnyKeyParamsContent {
     return pickByCopy(this.content, ValidKeyParamsKeys as (keyof AnyKeyParamsContent)[])
   }

@@ -1,14 +1,19 @@
 import { sleep } from '@standardnotes/utils'
 import { PureCryptoInterface, StreamEncryptor } from '@standardnotes/sncrypto-common'
 import { FileDownloadProgress } from '../Types/FileDownloadProgress'
-import { FilesServerInterface } from '../FilesServerInterface'
+import { FilesApiInterface } from '@standardnotes/services'
 import { DownloadAndDecryptFileOperation } from './DownloadAndDecrypt'
-import { RemoteFileInterface, EncryptedFileInterface } from '@standardnotes/models'
+import { FileContent } from '@standardnotes/models'
 
 describe('download and decrypt', () => {
-  let apiService: FilesServerInterface
+  let apiService: FilesApiInterface
   let operation: DownloadAndDecryptFileOperation
-  let file: RemoteFileInterface & EncryptedFileInterface
+  let file: {
+    encryptedChunkSizes: FileContent['encryptedChunkSizes']
+    encryptionHeader: FileContent['encryptionHeader']
+    remoteIdentifier: FileContent['remoteIdentifier']
+    key: FileContent['key']
+  }
   let crypto: PureCryptoInterface
 
   const NumChunks = 5
@@ -44,7 +49,8 @@ describe('download and decrypt', () => {
   }
 
   beforeEach(() => {
-    apiService = {} as jest.Mocked<FilesServerInterface>
+    apiService = {} as jest.Mocked<FilesApiInterface>
+    apiService.createFileValetToken = jest.fn()
     downloadChunksOfSize(5)
 
     crypto = {} as jest.Mocked<PureCryptoInterface>
@@ -60,14 +66,13 @@ describe('download and decrypt', () => {
       remoteIdentifier: '123',
       key: 'secret',
       encryptionHeader: 'some-header',
-      encryptedSize: 100_000,
     }
   })
 
   it('run should resolve when operation is complete', async () => {
     let receivedBytes = new Uint8Array()
 
-    operation = new DownloadAndDecryptFileOperation(file, crypto, apiService, 'api-token')
+    operation = new DownloadAndDecryptFileOperation(file, crypto, apiService)
 
     await operation.run(async (decryptedBytes) => {
       if (decryptedBytes) {
@@ -86,12 +91,11 @@ describe('download and decrypt', () => {
       remoteIdentifier: '123',
       key: 'secret',
       encryptionHeader: 'some-header',
-      encryptedSize: 500_000,
     }
 
     downloadChunksOfSize(100_000)
 
-    operation = new DownloadAndDecryptFileOperation(file, crypto, apiService, 'api-token')
+    operation = new DownloadAndDecryptFileOperation(file, crypto, apiService)
 
     const progress: FileDownloadProgress = await new Promise((resolve) => {
       // eslint-disable-next-line @typescript-eslint/require-await

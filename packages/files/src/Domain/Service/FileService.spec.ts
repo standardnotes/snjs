@@ -4,10 +4,12 @@ import {
   ItemManagerInterface,
   AlertService,
   ApiServiceInterface,
+  ChallengeServiceInterface,
 } from '@standardnotes/services'
 import { FileService } from './FileService'
 import { PureCryptoInterface, StreamEncryptor } from '@standardnotes/sncrypto-common'
 import { SNFile } from '@standardnotes/models'
+import { EncryptionProvider } from '@standardnotes/encryption'
 
 describe('fileService', () => {
   let apiService: ApiServiceInterface
@@ -15,7 +17,9 @@ describe('fileService', () => {
   let syncService: SyncServiceInterface
   let alertService: AlertService
   let crypto: PureCryptoInterface
+  let challengor: ChallengeServiceInterface
   let fileService: FileService
+  let encryptor: EncryptionProvider
   let internalEventBus: InternalEventBusInterface
 
   beforeEach(() => {
@@ -32,8 +36,12 @@ describe('fileService', () => {
     itemManager.addObserver = jest.fn()
     itemManager.changeItem = jest.fn()
 
+    challengor = {} as jest.Mocked<ChallengeServiceInterface>
+
     syncService = {} as jest.Mocked<SyncServiceInterface>
     syncService.sync = jest.fn()
+
+    encryptor = {} as jest.Mocked<EncryptionProvider>
 
     alertService = {} as jest.Mocked<AlertService>
     alertService.confirm = jest.fn().mockReturnValue(true)
@@ -44,7 +52,16 @@ describe('fileService', () => {
     internalEventBus = {} as jest.Mocked<InternalEventBusInterface>
     internalEventBus.publish = jest.fn()
 
-    fileService = new FileService(apiService, itemManager, syncService, alertService, crypto, internalEventBus)
+    fileService = new FileService(
+      apiService,
+      itemManager,
+      syncService,
+      encryptor,
+      challengor,
+      alertService,
+      crypto,
+      internalEventBus,
+    )
 
     crypto.xchacha20StreamInitDecryptor = jest.fn().mockReturnValue({
       state: {},

@@ -1,7 +1,13 @@
 import { ProtocolVersion } from '@standardnotes/common'
-import { DecryptedPayloadInterface, EncryptedPayloadInterface, ItemContent } from '@standardnotes/models'
+import {
+  DecryptedPayloadInterface,
+  EncryptedPayloadInterface,
+  ItemContent,
+  RootKeyInterface,
+} from '@standardnotes/models'
 import { ClientDisplayableError } from '@standardnotes/responses'
 import { BackupFile } from '../../Backups/BackupFile'
+import { SNRootKeyParams } from '../../Keys/RootKey/RootKeyParams'
 import { KeyedDecryptionSplit, KeyedEncryptionSplit } from '../../Split/EncryptionSplit'
 
 export interface EncryptionProvider {
@@ -24,6 +30,10 @@ export interface EncryptionProvider {
   ): Promise<(P | EncryptedPayloadInterface)[]>
 
   hasRootKeyEncryptionSource(): boolean
+
+  getKeyEmbeddedKeyParams(key: EncryptedPayloadInterface): SNRootKeyParams | undefined
+
+  computeRootKey(password: string, keyParams: SNRootKeyParams): Promise<RootKeyInterface>
 
   /**
    * @returns The versions that this library supports.

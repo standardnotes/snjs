@@ -1,4 +1,4 @@
-import { Create002KeyParams } from '../../Keys/RootKey/KeyParams'
+import { Create002KeyParams } from '../../Keys/RootKey/KeyParamsFunctions'
 import { SNProtocolOperator001 } from '../001/Operator001'
 import { SNRootKey } from '../../Keys/RootKey/RootKey'
 import { SNRootKeyParams } from '../../Keys/RootKey/RootKeyParams'

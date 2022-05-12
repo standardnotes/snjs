@@ -95,10 +95,10 @@ describe('2020-01-15 mobile migration', () => {
             prompt.validation === ChallengeValidation.None ||
             prompt.validation === ChallengeValidation.LocalPasscode
           ) {
-            values.push(new ChallengeValue(prompt, passcode))
+            values.push(CreateChallengeValue(prompt, passcode))
           }
           if (prompt.validation === ChallengeValidation.Biometric) {
-            values.push(new ChallengeValue(prompt, true))
+            values.push(CreateChallengeValue(prompt, true))
           }
         }
         return values
@@ -230,10 +230,10 @@ describe('2020-01-15 mobile migration', () => {
       const values = []
       for (const prompt of prompts) {
         if (prompt.validation === ChallengeValidation.None || prompt.validation === ChallengeValidation.LocalPasscode) {
-          values.push(new ChallengeValue(prompt, passcode))
+          values.push(CreateChallengeValue(prompt, passcode))
         }
         if (prompt.validation === ChallengeValidation.Biometric) {
-          values.push(new ChallengeValue(prompt, true))
+          values.push(CreateChallengeValue(prompt, true))
         }
       }
       return values
@@ -341,10 +341,10 @@ describe('2020-01-15 mobile migration', () => {
       const values = []
       for (const prompt of prompts) {
         if (prompt.validation === ChallengeValidation.None || prompt.validation === ChallengeValidation.LocalPasscode) {
-          values.push(new ChallengeValue(prompt, passcode))
+          values.push(CreateChallengeValue(prompt, passcode))
         }
         if (prompt.validation === ChallengeValidation.Biometric) {
-          values.push(new ChallengeValue(prompt, true))
+          values.push(CreateChallengeValue(prompt, true))
         }
       }
       return values
@@ -423,10 +423,10 @@ describe('2020-01-15 mobile migration', () => {
       const values = []
       for (const prompt of prompts) {
         if (prompt.validation === ChallengeValidation.None) {
-          values.push(new ChallengeValue(prompt, password))
+          values.push(CreateChallengeValue(prompt, password))
         }
         if (prompt.validation === ChallengeValidation.Biometric) {
-          values.push(new ChallengeValue(prompt, true))
+          values.push(CreateChallengeValue(prompt, true))
         }
       }
       return values
@@ -533,9 +533,9 @@ describe('2020-01-15 mobile migration', () => {
       const values = []
       for (const prompt of prompts) {
         if (prompt.placeholder === SessionStrings.EmailInputPlaceholder) {
-          values.push(new ChallengeValue(prompt, email))
+          values.push(CreateChallengeValue(prompt, email))
         } else if (prompt.placeholder === SessionStrings.PasswordInputPlaceholder) {
-          values.push(new ChallengeValue(prompt, password))
+          values.push(CreateChallengeValue(prompt, password))
         } else {
           throw Error('Unhandled prompt')
         }
@@ -620,7 +620,7 @@ describe('2020-01-15 mobile migration', () => {
       const values = []
       for (const prompt of prompts) {
         if (prompt.validation === ChallengeValidation.None) {
-          values.push(new ChallengeValue(prompt, password))
+          values.push(CreateChallengeValue(prompt, password))
         }
       }
       return values
@@ -690,7 +690,7 @@ describe('2020-01-15 mobile migration', () => {
       const values = []
       for (const prompt of prompts) {
         if (prompt.validation === ChallengeValidation.None) {
-          values.push(new ChallengeValue(prompt, password))
+          values.push(CreateChallengeValue(prompt, password))
         }
       }
       return values
@@ -812,10 +812,10 @@ describe('2020-01-15 mobile migration', () => {
       const values = []
       for (const prompt of prompts) {
         if (prompt.validation === ChallengeValidation.None || prompt.validation === ChallengeValidation.LocalPasscode) {
-          values.push(new ChallengeValue(prompt, passcode))
+          values.push(CreateChallengeValue(prompt, passcode))
         }
         if (prompt.validation === ChallengeValidation.Biometric) {
-          values.push(new ChallengeValue(prompt, true))
+          values.push(CreateChallengeValue(prompt, true))
         }
       }
       return values
@@ -954,10 +954,10 @@ describe('2020-01-15 mobile migration', () => {
             prompt.validation === ChallengeValidation.None ||
             prompt.validation === ChallengeValidation.LocalPasscode
           ) {
-            values.push(new ChallengeValue(prompt, passcode))
+            values.push(CreateChallengeValue(prompt, passcode))
           }
           if (prompt.validation === ChallengeValidation.Biometric) {
-            values.push(new ChallengeValue(prompt, true))
+            values.push(CreateChallengeValue(prompt, true))
           }
         }
         return values

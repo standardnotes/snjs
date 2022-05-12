@@ -1,10 +1,10 @@
+import { FileContent } from '@standardnotes/models'
 import { PureCryptoInterface, StreamEncryptor, SodiumConstant } from '@standardnotes/sncrypto-common'
-import { DecryptedFileInterface } from '@standardnotes/models'
 import { FileEncryptor } from './FileEncryptor'
 
 describe('file encryptor', () => {
   let encryptor: FileEncryptor
-  let file: DecryptedFileInterface
+  let file: { key: FileContent['key']; remoteIdentifier: FileContent['remoteIdentifier'] }
   let crypto: PureCryptoInterface
 
   beforeEach(() => {
@@ -19,7 +19,6 @@ describe('file encryptor', () => {
     file = {
       remoteIdentifier: '123',
       key: 'secret',
-      decryptedSize: 100,
     }
 
     encryptor = new FileEncryptor(file, crypto)

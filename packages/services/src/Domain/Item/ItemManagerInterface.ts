@@ -10,6 +10,7 @@ import {
   EncryptedItemInterface,
   DeletedItemInterface,
   ItemContent,
+  PredicateInterface,
 } from '@standardnotes/models'
 import { AbstractService } from '../Service/AbstractService'
 
@@ -66,6 +67,8 @@ export interface ItemManagerInterface extends AbstractService {
 
   emitItemFromPayload(payload: DecryptedPayloadInterface, source: PayloadEmitSource): Promise<DecryptedItemInterface>
 
+  getItems<T extends DecryptedItemInterface>(contentType: ContentType | ContentType[]): T[]
+
   /**
    * Returns all non-deleted items keys
    */
@@ -115,4 +118,16 @@ export interface ItemManagerInterface extends AbstractService {
     emitSource?: PayloadEmitSource,
     payloadSourceKey?: string,
   ): Promise<ItemsKeyInterface>
+
+  itemsMatchingPredicate<T extends DecryptedItemInterface>(
+    contentType: ContentType,
+    predicate: PredicateInterface<T>,
+  ): T[]
+
+  itemsMatchingPredicates<T extends DecryptedItemInterface>(
+    contentType: ContentType,
+    predicates: PredicateInterface<T>[],
+  ): T[]
+
+  subItemsMatchingPredicates<T extends DecryptedItemInterface>(items: T[], predicates: PredicateInterface<T>[]): T[]
 }

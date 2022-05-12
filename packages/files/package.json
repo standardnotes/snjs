@@ -35,6 +35,7 @@
     "preset": "../../node_modules/@standardnotes/config/src/jest.json"
   },
   "dependencies": {
+    "@standardnotes/encryption": "^1.6.10",
     "@standardnotes/models": "^1.7.1",
     "@standardnotes/responses": "^1.6.19",
     "@standardnotes/services": "^1.10.11",

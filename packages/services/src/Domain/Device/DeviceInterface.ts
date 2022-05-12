@@ -1,7 +1,11 @@
 import { Environment } from './Environments'
 import { ApplicationIdentifier } from '@standardnotes/common'
-import { FullyFormedTransferPayload, TransferPayload } from '@standardnotes/models'
-import { LegacyRawKeychainValue, NamespacedRootKeyInKeychain } from './KeychainTypes'
+import {
+  FullyFormedTransferPayload,
+  TransferPayload,
+  LegacyRawKeychainValue,
+  NamespacedRootKeyInKeychain,
+} from '@standardnotes/models'
 
 /**
  * Platforms must override this class to provide platform specific utilities

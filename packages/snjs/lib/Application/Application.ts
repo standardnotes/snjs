@@ -1,5 +1,4 @@
 import { SnjsVersion } from './../Version'
-import * as Challenges from '../Services/Challenge'
 import * as Common from '@standardnotes/common'
 import * as ExternalServices from '@standardnotes/services'
 import * as Encryption from '@standardnotes/encryption'
@@ -13,17 +12,26 @@ import * as Files from '@standardnotes/files'
 import { Subscription } from '@standardnotes/auth'
 import { UuidString, DeinitSource, ApplicationEventPayload } from '../Types'
 import { ApplicationEvent, applicationEventForSyncEvent } from '@Lib/Application/Event'
-import { DiagnosticInfo, Environment, Platform } from '@standardnotes/services'
+import {
+  ChallengeReason,
+  ChallengeValidation,
+  DiagnosticInfo,
+  Environment,
+  isDesktopDevice,
+  Platform,
+  ChallengeValue,
+} from '@standardnotes/services'
 import { SNLog } from '../Log'
 import { useBoolean } from '@standardnotes/utils'
 import { DecryptedItemInterface, EncryptedItemInterface } from '@standardnotes/models'
 import { ClientDisplayableError } from '@standardnotes/responses'
+import { Challenge, ChallengeResponse } from '../Services'
 
 /** How often to automatically sync, in milliseconds */
 const DEFAULT_AUTO_SYNC_INTERVAL = 30_000
 
 type LaunchCallback = {
-  receiveChallenge: (challenge: Challenges.Challenge) => void
+  receiveChallenge: (challenge: Challenge) => void
 }
 type ApplicationEventCallback = (event: ApplicationEvent, data?: unknown) => Promise<void>
 type ApplicationObserver = {
@@ -74,6 +82,8 @@ export class SNApplication implements InternalServices.ListedClientInterface {
   private fileService!: Files.FileService
   private mutatorService!: InternalServices.MutatorService
   private integrityService!: ExternalServices.IntegrityService
+  private statusService!: ExternalServices.StatusService
+  private filesBackupService?: Files.FilesBackupService
 
   private internalEventBus!: ExternalServices.InternalEventBusInterface
 
@@ -181,6 +191,14 @@ export class SNApplication implements InternalServices.ListedClientInterface {
 
   public get sessions(): InternalServices.SessionsClientInterface {
     return this.sessionManager
+  }
+
+  public get status(): ExternalServices.StatusServiceInterface {
+    return this.statusService
+  }
+
+  public get fileBackups(): Files.FilesBackupService | undefined {
+    return this.filesBackupService
   }
 
   public computePrivateWorkspaceIdentifier(userphrase: string, name: string): Promise<string | undefined> {
@@ -301,15 +319,15 @@ export class SNApplication implements InternalServices.ListedClientInterface {
     // optional override
   }
 
-  public getLaunchChallenge(): Challenges.Challenge | undefined {
+  public getLaunchChallenge(): Challenge | undefined {
     return this.protectionService.createLaunchChallenge()
   }
 
-  private async handleLaunchChallengeResponse(response: Challenges.ChallengeResponse) {
-    if (response.challenge.hasPromptForValidationType(Challenges.ChallengeValidation.LocalPasscode)) {
+  private async handleLaunchChallengeResponse(response: ChallengeResponse) {
+    if (response.challenge.hasPromptForValidationType(ChallengeValidation.LocalPasscode)) {
       let wrappingKey = response.artifacts?.wrappingKey
       if (!wrappingKey) {
-        const value = response.getValueForType(Challenges.ChallengeValidation.LocalPasscode)
+        const value = response.getValueForType(ChallengeValidation.LocalPasscode)
         wrappingKey = await this.protocolService.computeWrappingKey(value.value as string)
       }
       await this.protocolService.unwrapRootKey(wrappingKey)
@@ -570,7 +588,7 @@ export class SNApplication implements InternalServices.ListedClientInterface {
 
   public async authorizeProtectedActionForNotes(
     notes: Models.SNNote[],
-    challengeReason: InternalServices.ChallengeReason,
+    challengeReason: ChallengeReason,
   ): Promise<Models.SNNote[]> {
     return await this.protectionService.authorizeProtectedActionForNotes(notes, challengeReason)
   }
@@ -673,22 +691,19 @@ export class SNApplication implements InternalServices.ListedClientInterface {
     }
   }
 
-  public promptForCustomChallenge(challenge: Challenges.Challenge): Promise<Challenges.ChallengeResponse | undefined> {
+  public promptForCustomChallenge(challenge: Challenge): Promise<ChallengeResponse | undefined> {
     return this.challengeService?.promptForChallengeResponse(challenge)
   }
 
-  public addChallengeObserver(
-    challenge: Challenges.Challenge,
-    observer: InternalServices.ChallengeObserver,
-  ): () => void {
+  public addChallengeObserver(challenge: Challenge, observer: InternalServices.ChallengeObserver): () => void {
     return this.challengeService.addChallengeObserver(challenge, observer)
   }
 
-  public submitValuesForChallenge(challenge: Challenges.Challenge, values: Challenges.ChallengeValue[]): Promise<void> {
+  public submitValuesForChallenge(challenge: Challenge, values: ChallengeValue[]): Promise<void> {
     return this.challengeService.submitValuesForChallenge(challenge, values)
   }
 
-  public cancelChallenge(challenge: Challenges.Challenge): void {
+  public cancelChallenge(challenge: Challenge): void {
     this.challengeService.cancelChallenge(challenge)
   }
 
@@ -960,9 +975,11 @@ export class SNApplication implements InternalServices.ListedClientInterface {
   private constructServices() {
     this.createPayloadManager()
     this.createItemManager()
+
     this.createStorageManager()
     this.createProtocolService()
     this.storageService.provideEncryptionProvider(this.protocolService)
+
     this.createChallengeService()
     this.createHttpManager()
     this.createApiService()
@@ -985,6 +1002,11 @@ export class SNApplication implements InternalServices.ListedClientInterface {
     this.createFileService()
     this.createIntegrityService()
     this.createMutatorService()
+    this.createStatusService()
+
+    if (isDesktopDevice(this.deviceInterface)) {
+      this.createFilesBackupService(this.deviceInterface)
+    }
   }
 
   private clearServices() {
@@ -1015,6 +1037,8 @@ export class SNApplication implements InternalServices.ListedClientInterface {
     ;(this.fileService as unknown) = undefined
     ;(this.integrityService as unknown) = undefined
     ;(this.mutatorService as unknown) = undefined
+    ;(this.filesBackupService as unknown) = undefined
+    ;(this.statusService as unknown) = undefined
 
     this.services = []
   }
@@ -1049,6 +1073,8 @@ export class SNApplication implements InternalServices.ListedClientInterface {
       this.apiService,
       this.itemManager,
       this.syncService,
+      this.protocolService,
+      this.challengeService,
       this.alertService,
       this.options.crypto,
       this.internalEventBus,
@@ -1437,6 +1463,23 @@ export class SNApplication implements InternalServices.ListedClientInterface {
       this.internalEventBus,
     )
     this.services.push(this.mutatorService)
+  }
+
+  private createFilesBackupService(device: ExternalServices.DesktopDeviceInterface): void {
+    this.filesBackupService = new Files.FilesBackupService(
+      this.itemManager,
+      this.apiService,
+      this.protocolService,
+      device,
+      this.statusService,
+      this.internalEventBus,
+    )
+    this.services.push(this.filesBackupService)
+  }
+
+  private createStatusService(): void {
+    this.statusService = new ExternalServices.StatusService(this.internalEventBus)
+    this.services.push(this.statusService)
   }
 
   private getClass<T>(base: T) {

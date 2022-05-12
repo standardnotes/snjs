@@ -4,14 +4,14 @@ import {
   EncryptedPayloadInterface,
   ItemsKeyInterface,
   PayloadInterface,
+  RootKeyInterface,
 } from '@standardnotes/models'
-import { SNRootKey } from '../Keys/RootKey/RootKey'
 import { EncryptionTypeSplit } from './EncryptionTypeSplit'
 
 export interface AbstractKeySplit<T = EncryptedPayloadInterface | DecryptedPayloadInterface> {
   usesRootKey?: {
     items: T[]
-    key: SNRootKey
+    key: RootKeyInterface
   }
   usesItemsKey?: {
     items: T[]

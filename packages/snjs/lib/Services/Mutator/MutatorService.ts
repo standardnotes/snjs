@@ -1,5 +1,12 @@
 import { SNHistoryManager } from './../History/HistoryManager'
-import { AbstractService, InternalEventBusInterface, SyncOptions } from '@standardnotes/services'
+import {
+  AbstractService,
+  InternalEventBusInterface,
+  SyncOptions,
+  ChallengeValidation,
+  ChallengePrompt,
+  ChallengeReason,
+} from '@standardnotes/services'
 import { BackupFile, EncryptionProvider } from '@standardnotes/encryption'
 import { ClientDisplayableError } from '@standardnotes/responses'
 import { ContentType, ProtocolVersion, compareVersions } from '@standardnotes/common'
@@ -12,7 +19,7 @@ import { SNSyncService } from '../Sync'
 import { Strings } from '../../Strings'
 import { TagsToFoldersMigrationApplicator } from '@Lib/Migrations/Applicators/TagsToFolders'
 import * as Models from '@standardnotes/models'
-import { Challenge, ChallengeValidation, ChallengePrompt, ChallengeReason, ChallengeService } from '../Challenge'
+import { Challenge, ChallengeService } from '../Challenge'
 import {
   CreateDecryptedBackupFileContextPayload,
   CreateEncryptedBackupFileContextPayload,
