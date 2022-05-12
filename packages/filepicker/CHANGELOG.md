@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.14.0](https://github.com/standardnotes/snjs/compare/@standardnotes/filepicker@1.13.7...@standardnotes/filepicker@1.14.0) (2022-05-12)
+
+
+### Features
+
+* file desktop backups ([#731](https://github.com/standardnotes/snjs/issues/731)) ([0dbce7d](https://github.com/standardnotes/snjs/commit/0dbce7dc9712fde848445b951079c81479c8bc11))
+
+
+
+
+
 ## [1.13.7](https://github.com/standardnotes/snjs/compare/@standardnotes/filepicker@1.13.6...@standardnotes/filepicker@1.13.7) (2022-05-06)
 
 **Note:** Version bump only for package @standardnotes/filepicker

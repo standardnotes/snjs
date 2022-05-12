@@ -1,6 +1,6 @@
 {
   "name": "@standardnotes/snjs",
-  "version": "2.106.12",
+  "version": "2.107.0",
   "engines": {
     "node": ">=14.0.0 <17.0.0"
   },
@@ -81,13 +81,13 @@
     "@standardnotes/auth": "^3.18.13",
     "@standardnotes/common": "^1.19.8",
     "@standardnotes/domain-events": "^2.28.3",
-    "@standardnotes/encryption": "^1.6.12",
+    "@standardnotes/encryption": "^1.7.0",
     "@standardnotes/features": "^1.42.1",
-    "@standardnotes/filepicker": "^1.13.7",
-    "@standardnotes/files": "^1.0.15",
-    "@standardnotes/models": "^1.7.1",
+    "@standardnotes/filepicker": "^1.14.0",
+    "@standardnotes/files": "^1.1.0",
+    "@standardnotes/models": "^1.8.0",
     "@standardnotes/responses": "^1.6.19",
-    "@standardnotes/services": "^1.10.11",
+    "@standardnotes/services": "^1.11.0",
     "@standardnotes/settings": "^1.14.3",
     "@standardnotes/sncrypto-common": "^1.8.2",
     "@standardnotes/utils": "^1.6.6"
