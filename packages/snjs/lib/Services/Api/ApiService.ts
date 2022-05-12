@@ -187,6 +187,7 @@ export class SNApiService
     authentication?: string
     customHeaders?: Record<string, string>[]
     responseType?: XMLHttpRequestResponseType
+    external?: boolean
   }) {
     try {
       const response = await this.httpService.runHttp(params)
@@ -636,6 +637,7 @@ export class SNApiService
     return this.request({
       verb: HttpVerb.Get,
       url,
+      external: true,
       fallbackErrorMessage: messages.API_MESSAGE_GENERIC_INVALID_LOGIN,
     })
   }
