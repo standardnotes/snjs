@@ -12,7 +12,7 @@ export function serverFeatures(): ServerFeatureDescription[] {
       permission_name: PermissionName.TwoFactorAuth,
     },
     {
-      availableInSubscriptions: [SubscriptionName.PlusPlan, SubscriptionName.ProPlan],
+      availableInSubscriptions: [SubscriptionName.ProPlan],
       name: 'Unlimited note history',
       identifier: FeatureIdentifier.NoteHistoryUnlimited,
       permission_name: PermissionName.NoteHistoryUnlimited,
