@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.28.3](https://github.com/standardnotes/snjs/compare/@standardnotes/domain-events@2.28.2...@standardnotes/domain-events@2.28.3) (2022-05-12)
+
+
+### Bug Fixes
+
+* add temporary option to skip email on extension key granted event ([fc2e59f](https://github.com/standardnotes/snjs/commit/fc2e59f9c86c95aa9b1a9aec0896f29f1516aa99))
+
+
+
+
+
 ## [2.28.2](https://github.com/standardnotes/snjs/compare/@standardnotes/domain-events@2.28.1...@standardnotes/domain-events@2.28.2) (2022-05-12)
 
 **Note:** Version bump only for package @standardnotes/domain-events
