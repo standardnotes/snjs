@@ -24,6 +24,7 @@ export type HttpRequest = {
   authentication?: string
   customHeaders?: Record<string, string>[]
   responseType?: XMLHttpRequestResponseType
+  external?: boolean
 }
 
 /**
@@ -83,13 +84,15 @@ export class SNHttpService extends AbstractService {
     request.open(httpRequest.verb, httpRequest.url, true)
     request.responseType = httpRequest.responseType ?? ''
 
-    request.setRequestHeader('X-SNJS-Version', SnjsVersion)
+    if (!httpRequest.external) {
+      request.setRequestHeader('X-SNJS-Version', SnjsVersion)
 
-    const appVersionHeaderValue = `${Environment[this.environment]}-${this.appVersion}`
-    request.setRequestHeader('X-Application-Version', appVersionHeaderValue)
+      const appVersionHeaderValue = `${Environment[this.environment]}-${this.appVersion}`
+      request.setRequestHeader('X-Application-Version', appVersionHeaderValue)
 
-    if (httpRequest.authentication) {
-      request.setRequestHeader('Authorization', 'Bearer ' + httpRequest.authentication)
+      if (httpRequest.authentication) {
+        request.setRequestHeader('Authorization', 'Bearer ' + httpRequest.authentication)
+      }
     }
 
     let contenTypeIsSet = false
@@ -101,7 +104,7 @@ export class SNHttpService extends AbstractService {
         }
       })
     }
-    if (!contenTypeIsSet) {
+    if (!contenTypeIsSet && !httpRequest.external) {
       request.setRequestHeader('Content-Type', 'application/json')
     }
 
