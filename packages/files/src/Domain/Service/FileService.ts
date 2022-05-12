@@ -27,6 +27,7 @@ import {
   FileHandleRead,
   FileSystemNoSelection,
   ChallengeServiceInterface,
+  FileBackupsConstantsV1,
 } from '@standardnotes/services'
 import { FilesClientInterface } from './FilesClientInterface'
 import { FileDownloadProgress } from '../Types/FileDownloadProgress'
@@ -201,7 +202,7 @@ export class FileService extends AbstractService implements FilesClientInterface
   }
 
   public isFileNameFileBackupMetadataFile(name: string): boolean {
-    return name === 'metadata.sn.json'
+    return name === FileBackupsConstantsV1.MetadataFileName
   }
 
   public async decryptBackupMetadataFile(metdataFile: FileBackupMetadataFile): Promise<FileContent | undefined> {

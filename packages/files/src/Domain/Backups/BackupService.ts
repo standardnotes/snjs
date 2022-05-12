@@ -33,6 +33,7 @@ export class FilesBackupService extends AbstractService {
         PayloadEmitSource.RemoteSaved,
         PayloadEmitSource.RemoteRetrieved,
       ]
+
       if (applicableSources.includes(source)) {
         void this.handleChangedFiles([...changed, ...inserted])
       }
@@ -147,6 +148,7 @@ export class FilesBackupService extends AbstractService {
       },
       file: encryptedFile.ejected(),
       itemsKey: encryptedItemsKey.ejected(),
+      version: '1.0.0',
     }
 
     const metaFileAsString = JSON.stringify(metaFile, null, 2)

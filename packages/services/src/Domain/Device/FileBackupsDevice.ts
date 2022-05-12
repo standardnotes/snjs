@@ -3,20 +3,30 @@ import { EncryptedTransferPayload } from '@standardnotes/models'
 
 /* istanbul ignore file */
 
-export const FileBackupMetadataName = () => 'metadata.sn.json'
+export const FileBackupsConstantsV1 = {
+  Version: '1.0.0',
+  MetadataFileName: 'metadata.sn.json',
+  BinaryFileName: 'file.encrypted',
+}
 
 export interface FileBackupMetadataFile {
   info: Record<string, string>
   file: EncryptedTransferPayload
   itemsKey: EncryptedTransferPayload
+  version: '1.0.0'
 }
 
 export interface FileBackupsMapping {
+  version: typeof FileBackupsConstantsV1.Version
   files: Record<
     Uuid,
     {
-      path: string
       backedUpOn: Date
+      absolutePath: string
+      relativePath: string
+      metadataFileName: typeof FileBackupsConstantsV1.MetadataFileName
+      binaryFileName: typeof FileBackupsConstantsV1.BinaryFileName
+      version: typeof FileBackupsConstantsV1.Version
     }
   >
 }
