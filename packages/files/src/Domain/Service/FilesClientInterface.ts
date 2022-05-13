@@ -1,5 +1,5 @@
 import { EncryptAndUploadFileOperation } from '../Operations/EncryptAndUpload'
-import { SNFile, FileMetadata, FileContent } from '@standardnotes/models'
+import { FileItem, FileMetadata } from '@standardnotes/models'
 import { ClientDisplayableError } from '@standardnotes/responses'
 import { FileDownloadProgress } from '../Types/FileDownloadProgress'
 import { FileSystemApi, FileBackupMetadataFile, FileHandleRead, FileSystemNoSelection } from '@standardnotes/services'
@@ -17,32 +17,32 @@ export interface FilesClientInterface {
   finishUpload(
     operation: EncryptAndUploadFileOperation,
     fileMetadata: FileMetadata,
-  ): Promise<SNFile | ClientDisplayableError>
+  ): Promise<FileItem | ClientDisplayableError>
 
   downloadFile(
-    file: SNFile,
+    file: FileItem,
     onDecryptedBytes: (bytes: Uint8Array, progress: FileDownloadProgress | undefined) => Promise<void>,
   ): Promise<ClientDisplayableError | undefined>
 
-  deleteFile(file: SNFile): Promise<ClientDisplayableError | undefined>
+  deleteFile(file: FileItem): Promise<ClientDisplayableError | undefined>
 
   minimumChunkSize(): number
 
-  isFileNameFileBackupMetadataFile(name: string): boolean
+  isFileNameFileBackupRelated(name: string): 'metadata' | 'binary' | false
 
-  decryptBackupMetadataFile(metdataFile: FileBackupMetadataFile): Promise<FileContent | undefined>
+  decryptBackupMetadataFile(metdataFile: FileBackupMetadataFile): Promise<FileItem | undefined>
 
   selectFile(fileSystem: FileSystemApi): Promise<FileHandleRead | FileSystemNoSelection>
 
   readBackupFileAndSaveDecrypted(
     fileHandle: FileHandleRead,
-    file: FileContent,
+    file: FileItem,
     fileSystem: FileSystemApi,
   ): Promise<'success' | 'aborted' | 'failed'>
 
   readBackupFileBytesDecrypted(
     fileHandle: FileHandleRead,
-    file: FileContent,
+    file: FileItem,
     fileSystem: FileSystemApi,
   ): Promise<Uint8Array>
 }

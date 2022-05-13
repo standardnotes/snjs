@@ -2,14 +2,14 @@ import { ConflictStrategy } from './../../Abstract/Item/Types/ConflictStrategy'
 import { ContentType } from '@standardnotes/common'
 import { FillItemContent } from '../../Abstract/Content/ItemContent'
 import { DecryptedPayload, PayloadTimestampDefaults } from '../../Abstract/Payload'
-import { FileContent, SNFile } from './File'
+import { FileContent, FileItem } from './File'
 import { UuidGenerator } from '@standardnotes/utils'
 
 UuidGenerator.SetGenerator(() => String(Math.random()))
 
 describe('file', () => {
-  const createFile = (content: Partial<FileContent> = {}): SNFile => {
-    return new SNFile(
+  const createFile = (content: Partial<FileContent> = {}): FileItem => {
+    return new FileItem(
       new DecryptedPayload<FileContent>({
         uuid: '123',
         content_type: ContentType.File,
@@ -27,8 +27,8 @@ describe('file', () => {
     )
   }
 
-  const copyFile = (file: SNFile, override: Partial<FileContent> = {}): SNFile => {
-    return new SNFile(
+  const copyFile = (file: FileItem, override: Partial<FileContent> = {}): FileItem => {
+    return new FileItem(
       file.payload.copy({
         content: {
           ...file.content,

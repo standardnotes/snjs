@@ -1,8 +1,8 @@
 import { StreamingFileReader, StreamingFileSaver } from '../../../filepicker'
-import { SNApplication, SNFile, ClientDisplayableError } from '../../../snjs'
+import { SNApplication, FileItem, ClientDisplayableError } from '../../../snjs'
 
 export class FileSystemApi {
-  private uploadedFiles: SNFile[] = []
+  private uploadedFiles: FileItem[] = []
 
   constructor(private application: SNApplication) {
     this.configureFilePicker()

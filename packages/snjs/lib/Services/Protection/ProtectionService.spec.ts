@@ -4,7 +4,7 @@ import { SNStorageService } from '../Storage/StorageService'
 import { SNProtectionService } from './ProtectionService'
 import { InternalEventBus, InternalEventBusInterface, ChallengeReason } from '@standardnotes/services'
 import { UuidGenerator } from '@standardnotes/utils'
-import { DecryptedPayload, FileContent, SNFile, FillItemContent, PayloadTimestampDefaults } from '@standardnotes/models'
+import { DecryptedPayload, FileContent, FileItem, FillItemContent, PayloadTimestampDefaults } from '@standardnotes/models'
 import { ContentType } from '@standardnotes/common'
 
 const setupRandomUuid = () => {
@@ -23,7 +23,7 @@ describe('protectionService', () => {
   }
 
   const createFile = (name: string, isProtected?: boolean) => {
-    return new SNFile(
+    return new FileItem(
       new DecryptedPayload({
         uuid: String(Math.random()),
         content_type: ContentType.File,

@@ -1,7 +1,7 @@
 import { ContentType } from '@standardnotes/common'
 import { EncryptedItem } from '../../Abstract/Item/Implementations/EncryptedItem'
 import { DecryptedPayloadInterface } from '../../Abstract/Payload/Interfaces/DecryptedPayload'
-import { SNFile } from '../../Syncable/File/File'
+import { FileItem } from '../../Syncable/File/File'
 import { SNFeatureRepo } from '../../Syncable/FeatureRepo/FeatureRepo'
 import { SNActionsExtension } from '../../Syncable/ActionsExtension/ActionsExtension'
 import { SNComponent } from '../../Syncable/Component/Component'
@@ -54,7 +54,7 @@ const ContentTypeClassMapping: Partial<Record<ContentType, MappingEntry>> = {
   [ContentType.Component]: { itemClass: SNComponent, mutatorClass: ComponentMutator },
   [ContentType.Editor]: { itemClass: SNEditor },
   [ContentType.ExtensionRepo]: { itemClass: SNFeatureRepo },
-  [ContentType.File]: { itemClass: SNFile, mutatorClass: FileMutator },
+  [ContentType.File]: { itemClass: FileItem, mutatorClass: FileMutator },
   [ContentType.Note]: { itemClass: SNNote, mutatorClass: NoteMutator },
   [ContentType.SmartView]: { itemClass: SmartView, mutatorClass: TagMutator },
   [ContentType.Tag]: { itemClass: SNTag, mutatorClass: TagMutator },

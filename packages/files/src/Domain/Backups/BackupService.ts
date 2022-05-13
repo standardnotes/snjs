@@ -1,6 +1,6 @@
 import { ContentType, Uuid } from '@standardnotes/common'
 import { EncryptionProvider } from '@standardnotes/encryption'
-import { PayloadEmitSource, SNFile } from '@standardnotes/models'
+import { PayloadEmitSource, FileItem } from '@standardnotes/models'
 import { ClientDisplayableError } from '@standardnotes/responses'
 import {
   ItemManagerInterface,
@@ -27,7 +27,7 @@ export class FilesBackupService extends AbstractService {
   ) {
     super(internalEventBus)
 
-    this.itemsObserverDisposer = items.addObserver<SNFile>(ContentType.File, ({ changed, inserted, source }) => {
+    this.itemsObserverDisposer = items.addObserver<FileItem>(ContentType.File, ({ changed, inserted, source }) => {
       const applicableSources = [
         PayloadEmitSource.LocalDatabaseLoaded,
         PayloadEmitSource.RemoteSaved,
@@ -59,7 +59,7 @@ export class FilesBackupService extends AbstractService {
   }
 
   private backupAllFiles(): void {
-    const files = this.items.getItems<SNFile>(ContentType.File)
+    const files = this.items.getItems<FileItem>(ContentType.File)
 
     void this.handleChangedFiles(files)
   }
@@ -84,7 +84,7 @@ export class FilesBackupService extends AbstractService {
     return (await this.device.getFilesBackupsMappingFile()).files
   }
 
-  private async handleChangedFiles(files: SNFile[]): Promise<void> {
+  private async handleChangedFiles(files: FileItem[]): Promise<void> {
     if (files.length === 0) {
       return
     }
@@ -112,7 +112,7 @@ export class FilesBackupService extends AbstractService {
     }
   }
 
-  private async performBackupOperation(file: SNFile): Promise<'success' | 'failed' | 'aborted'> {
+  private async performBackupOperation(file: FileItem): Promise<'success' | 'failed' | 'aborted'> {
     const removeStatus = this.status.addMessage(`Backing up file ${file.name}...`)
 
     const encryptedFile = await this.encryptor.encryptSplitSingle({

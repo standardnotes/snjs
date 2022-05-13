@@ -4,7 +4,7 @@ import { ContentType } from '@standardnotes/common'
 import { DownloadAndDecryptFileOperation } from '../Operations/DownloadAndDecrypt'
 import { EncryptAndUploadFileOperation } from '../Operations/EncryptAndUpload'
 import {
-  SNFile,
+  FileItem,
   FileProtocolV1Constants,
   FileMetadata,
   FileContentSpecialized,
@@ -117,7 +117,7 @@ export class FileService extends AbstractService implements FilesClientInterface
   public async finishUpload(
     operation: EncryptAndUploadFileOperation,
     fileMetadata: FileMetadata,
-  ): Promise<SNFile | ClientDisplayableError> {
+  ): Promise<FileItem | ClientDisplayableError> {
     const uploadSessionClosed = await this.api.closeUploadSession(operation.getApiToken())
 
     if (!uploadSessionClosed) {
@@ -136,7 +136,7 @@ export class FileService extends AbstractService implements FilesClientInterface
       remoteIdentifier: result.remoteIdentifier,
     }
 
-    const file = await this.itemManager.createItem<SNFile>(
+    const file = await this.itemManager.createItem<FileItem>(
       ContentType.File,
       FillItemContentSpecialized(fileContent),
       true,
@@ -148,7 +148,7 @@ export class FileService extends AbstractService implements FilesClientInterface
   }
 
   public async downloadFile(
-    file: SNFile,
+    file: FileItem,
     onDecryptedBytes: (decryptedBytes: Uint8Array, progress?: FileDownloadProgress) => Promise<void>,
   ): Promise<ClientDisplayableError | undefined> {
     const cachedFile = this.cache.get(file.uuid)
@@ -180,7 +180,7 @@ export class FileService extends AbstractService implements FilesClientInterface
     return result.error
   }
 
-  public async deleteFile(file: SNFile): Promise<ClientDisplayableError | undefined> {
+  public async deleteFile(file: FileItem): Promise<ClientDisplayableError | undefined> {
     this.cache.remove(file.uuid)
 
     const tokenResult = await this.api.createFileValetToken(file.remoteIdentifier, 'delete')
@@ -201,11 +201,17 @@ export class FileService extends AbstractService implements FilesClientInterface
     return undefined
   }
 
-  public isFileNameFileBackupMetadataFile(name: string): boolean {
-    return name === FileBackupsConstantsV1.MetadataFileName
+  public isFileNameFileBackupRelated(name: string): 'metadata' | 'binary' | false {
+    if (name === FileBackupsConstantsV1.MetadataFileName) {
+      return 'metadata'
+    } else if (name === FileBackupsConstantsV1.BinaryFileName) {
+      return 'binary'
+    }
+
+    return false
   }
 
-  public async decryptBackupMetadataFile(metdataFile: FileBackupMetadataFile): Promise<FileContent | undefined> {
+  public async decryptBackupMetadataFile(metdataFile: FileBackupMetadataFile): Promise<FileItem | undefined> {
     const encryptedItemsKey = new EncryptedPayload(metdataFile.itemsKey)
 
     const decryptedItemsKeyResult = await DecryptItemsKeyWithUserFallback(
@@ -222,7 +228,7 @@ export class FileService extends AbstractService implements FilesClientInterface
 
     const itemsKey = new SNItemsKey(decryptedItemsKeyResult)
 
-    const decryptedFile = await this.encryptor.decryptSplitSingle({
+    const decryptedFile = await this.encryptor.decryptSplitSingle<FileContent>({
       usesItemsKey: {
         items: [encryptedFile],
         key: itemsKey,
@@ -233,7 +239,7 @@ export class FileService extends AbstractService implements FilesClientInterface
       return undefined
     }
 
-    return decryptedFile.content as FileContent
+    return new FileItem(decryptedFile)
   }
 
   public async selectFile(fileSystem: FileSystemApi): Promise<FileHandleRead | FileSystemNoSelection> {
@@ -244,7 +250,7 @@ export class FileService extends AbstractService implements FilesClientInterface
 
   public async readBackupFileAndSaveDecrypted(
     fileHandle: FileHandleRead,
-    file: FileContent,
+    file: FileItem,
     fileSystem: FileSystemApi,
   ): Promise<'success' | 'aborted' | 'failed'> {
     const destinationDirectoryHandle = await fileSystem.selectDirectory()
@@ -270,7 +276,7 @@ export class FileService extends AbstractService implements FilesClientInterface
 
   public async readBackupFileBytesDecrypted(
     fileHandle: FileHandleRead,
-    file: FileContent,
+    file: FileItem,
     fileSystem: FileSystemApi,
   ): Promise<Uint8Array> {
     let bytes = new Uint8Array()

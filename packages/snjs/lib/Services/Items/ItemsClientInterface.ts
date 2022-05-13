@@ -1,7 +1,7 @@
 import { ContentType } from '@standardnotes/common'
 import {
   SNNote,
-  SNFile,
+  FileItem,
   SNTag,
   SmartView,
   TagNoteCountChangeObserver,
@@ -20,13 +20,13 @@ import { UuidString } from '@Lib/Types'
 export interface ItemsClientInterface {
   get invalidItems(): EncryptedItemInterface[]
 
-  associateFileWithNote(file: SNFile, note: SNNote): Promise<SNFile>
+  associateFileWithNote(file: FileItem, note: SNNote): Promise<FileItem>
 
-  disassociateFileWithNote(file: SNFile, note: SNNote): Promise<SNFile>
+  disassociateFileWithNote(file: FileItem, note: SNNote): Promise<FileItem>
 
-  getFilesForNote(note: SNNote): SNFile[]
+  getFilesForNote(note: SNNote): FileItem[]
 
-  renameFile(file: SNFile, name: string): Promise<SNFile>
+  renameFile(file: FileItem, name: string): Promise<FileItem>
 
   addTagToNote(note: SNNote, tag: SNTag, addHierarchy: boolean): Promise<SNTag[]>
 

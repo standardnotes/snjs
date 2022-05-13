@@ -1016,14 +1016,14 @@ export class ItemManager
     })
   }
 
-  public async associateFileWithNote(file: Models.SNFile, note: Models.SNNote): Promise<Models.SNFile> {
-    return this.changeItem<Models.FileMutator, Models.SNFile>(file, (mutator) => {
+  public async associateFileWithNote(file: Models.FileItem, note: Models.SNNote): Promise<Models.FileItem> {
+    return this.changeItem<Models.FileMutator, Models.FileItem>(file, (mutator) => {
       mutator.associateWithNote(note)
     })
   }
 
-  public async disassociateFileWithNote(file: Models.SNFile, note: Models.SNNote): Promise<Models.SNFile> {
-    return this.changeItem<Models.FileMutator, Models.SNFile>(file, (mutator) => {
+  public async disassociateFileWithNote(file: Models.FileItem, note: Models.SNNote): Promise<Models.FileItem> {
+    return this.changeItem<Models.FileMutator, Models.FileItem>(file, (mutator) => {
       mutator.disassociateWithNote(note)
     })
   }
@@ -1200,14 +1200,14 @@ export class ItemManager
     this.payloadManager.removePayloadLocally(item.payload)
   }
 
-  public getFilesForNote(note: Models.SNNote): Models.SNFile[] {
+  public getFilesForNote(note: Models.SNNote): Models.FileItem[] {
     return (
-      this.itemsReferencingItem(note).filter((ref) => ref.content_type === ContentType.File) as Models.SNFile[]
+      this.itemsReferencingItem(note).filter((ref) => ref.content_type === ContentType.File) as Models.FileItem[]
     ).sort((a, b) => (a.name.toLowerCase() > b.name.toLowerCase() ? 1 : -1))
   }
 
-  public renameFile(file: Models.SNFile, name: string): Promise<Models.SNFile> {
-    return this.changeItem<Models.FileMutator, Models.SNFile>(file, (mutator) => {
+  public renameFile(file: Models.FileItem, name: string): Promise<Models.FileItem> {
+    return this.changeItem<Models.FileMutator, Models.FileItem>(file, (mutator) => {
       mutator.name = name
     })
   }

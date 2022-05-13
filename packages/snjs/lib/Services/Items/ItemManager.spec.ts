@@ -95,7 +95,7 @@ describe('itemManager', () => {
   }
 
   const createFile = (name: string) => {
-    return new Models.SNFile(
+    return new Models.FileItem(
       new Models.DecryptedPayload({
         uuid: String(Math.random()),
         content_type: ContentType.File,
