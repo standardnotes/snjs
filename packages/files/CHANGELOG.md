@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.1.2](https://github.com/standardnotes/snjs/compare/@standardnotes/files@1.1.1...@standardnotes/files@1.1.2) (2022-05-13)
+
+
+### Bug Fixes
+
+* file backup decryption ([3f0d076](https://github.com/standardnotes/snjs/commit/3f0d076434c0dbb1827a298e302e4dc3815e501c))
+
+
+
+
+
 ## [1.1.1](https://github.com/standardnotes/snjs/compare/@standardnotes/files@1.1.0...@standardnotes/files@1.1.1) (2022-05-12)
 
 **Note:** Version bump only for package @standardnotes/files
