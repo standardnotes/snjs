@@ -4,7 +4,13 @@ import { SNStorageService } from '../Storage/StorageService'
 import { SNProtectionService } from './ProtectionService'
 import { InternalEventBus, InternalEventBusInterface, ChallengeReason } from '@standardnotes/services'
 import { UuidGenerator } from '@standardnotes/utils'
-import { DecryptedPayload, FileContent, FileItem, FillItemContent, PayloadTimestampDefaults } from '@standardnotes/models'
+import {
+  DecryptedPayload,
+  FileContent,
+  FileItem,
+  FillItemContent,
+  PayloadTimestampDefaults,
+} from '@standardnotes/models'
 import { ContentType } from '@standardnotes/common'
 
 const setupRandomUuid = () => {
