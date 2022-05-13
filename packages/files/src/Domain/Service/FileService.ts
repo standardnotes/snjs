@@ -32,7 +32,7 @@ import {
 import { FilesClientInterface } from './FilesClientInterface'
 import { FileDownloadProgress } from '../Types/FileDownloadProgress'
 import { readAndDecryptBackupFile } from './ReadAndDecryptBackupFile'
-import { DecryptItemsKeyWithUserFallback, EncryptionProvider } from '@standardnotes/encryption'
+import { DecryptItemsKeyWithUserFallback, EncryptionProvider, SNItemsKey } from '@standardnotes/encryption'
 
 const OneHundredMb = 100 * 1_000_000
 
@@ -208,17 +208,24 @@ export class FileService extends AbstractService implements FilesClientInterface
   public async decryptBackupMetadataFile(metdataFile: FileBackupMetadataFile): Promise<FileContent | undefined> {
     const encryptedItemsKey = new EncryptedPayload(metdataFile.itemsKey)
 
-    const decryptedItemsKey = await DecryptItemsKeyWithUserFallback(encryptedItemsKey, this.encryptor, this.challengor)
+    const decryptedItemsKeyResult = await DecryptItemsKeyWithUserFallback(
+      encryptedItemsKey,
+      this.encryptor,
+      this.challengor,
+    )
 
-    if (!decryptedItemsKey) {
+    if (decryptedItemsKeyResult === 'failed' || decryptedItemsKeyResult === 'aborted') {
       return undefined
     }
 
     const encryptedFile = new EncryptedPayload(metdataFile.file)
 
+    const itemsKey = new SNItemsKey(decryptedItemsKeyResult)
+
     const decryptedFile = await this.encryptor.decryptSplitSingle({
-      usesItemsKeyWithKeyLookup: {
+      usesItemsKey: {
         items: [encryptedFile],
+        key: itemsKey,
       },
     })
 
