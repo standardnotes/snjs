@@ -1,3 +1,13 @@
+import { SnjsVersion } from './../Version'
+import {
+  HttpService,
+  HttpServiceInterface,
+  UserApiService,
+  UserApiServiceInterface,
+  UserRegistartionResponse,
+  UserServer,
+  UserServerInterface,
+} from '@standardnotes/api'
 import * as Common from '@standardnotes/common'
 import * as ExternalServices from '@standardnotes/services'
 import * as Encryption from '@standardnotes/encryption'
@@ -68,12 +78,21 @@ export class SNApplication
   public readonly ephemeralIdentifier = Utils.nonSecureRandomIdentifier()
 
   private migrationService!: InternalServices.SNMigrationService
-  private httpService!: InternalServices.SNHttpService
+  /**
+   * @deprecated will be fully replaced by @standardnotes/api::HttpService
+   */
+  private deprecatedHttpService!: InternalServices.SNHttpService
+  private declare httpService: HttpServiceInterface
   private payloadManager!: InternalServices.PayloadManager
   public protocolService!: Encryption.EncryptionService
   private diskStorageService!: InternalServices.DiskStorageService
   private inMemoryStore!: ExternalServices.KeyValueStoreInterface<string>
+  /**
+   * @deprecated will be fully replaced by @standardnotes/api services
+   */
   private apiService!: InternalServices.SNApiService
+  private declare userApiService: UserApiServiceInterface
+  private declare userServer: UserServerInterface
   private sessionManager!: InternalServices.SNSessionManager
   private syncService!: InternalServices.SNSyncService
   private challengeService!: InternalServices.ChallengeService
@@ -772,7 +791,7 @@ export class SNApplication
     password: string,
     ephemeral = false,
     mergeLocal = true,
-  ): Promise<InternalServices.AccountServiceResponse> {
+  ): Promise<UserRegistartionResponse> {
     return this.userService.register(email, password, ephemeral, mergeLocal)
   }
 
@@ -1006,6 +1025,9 @@ export class SNApplication
     this.createChallengeService()
     this.createHttpManager()
     this.createApiService()
+    this.createHttpService()
+    this.createUserServer()
+    this.createUserApiService()
     this.createWebSocketsService()
     this.createSessionManager()
     this.createHistoryManager()
@@ -1035,12 +1057,15 @@ export class SNApplication
   private clearServices() {
     ;(this.migrationService as unknown) = undefined
     ;(this.alertService as unknown) = undefined
+    ;(this.deprecatedHttpService as unknown) = undefined
     ;(this.httpService as unknown) = undefined
     ;(this.payloadManager as unknown) = undefined
     ;(this.protocolService as unknown) = undefined
     ;(this.diskStorageService as unknown) = undefined
     ;(this.inMemoryStore as unknown) = undefined
     ;(this.apiService as unknown) = undefined
+    ;(this.userApiService as unknown) = undefined
+    ;(this.userServer as unknown) = undefined
     ;(this.sessionManager as unknown) = undefined
     ;(this.syncService as unknown) = undefined
     ;(this.challengeService as unknown) = undefined
@@ -1087,7 +1112,7 @@ export class SNApplication
       this.apiService,
       this.itemManager,
       this.settingsService,
-      this.httpService,
+      this.deprecatedHttpService,
       this.internalEventBus,
     )
     this.services.push(this.listedService)
@@ -1216,7 +1241,7 @@ export class SNApplication
 
   private createApiService() {
     this.apiService = new InternalServices.SNApiService(
-      this.httpService,
+      this.deprecatedHttpService,
       this.diskStorageService,
       this.options.defaultHost,
       this.inMemoryStore,
@@ -1224,6 +1249,14 @@ export class SNApplication
       this.internalEventBus,
     )
     this.services.push(this.apiService)
+  }
+
+  private createUserApiService() {
+    this.userApiService = new UserApiService(this.userServer)
+  }
+
+  private createUserServer() {
+    this.userServer = new UserServer(this.httpService, this.options.defaultHost)
   }
 
   private createItemManager() {
@@ -1249,12 +1282,21 @@ export class SNApplication
   }
 
   private createHttpManager() {
-    this.httpService = new InternalServices.SNHttpService(
+    this.deprecatedHttpService = new InternalServices.SNHttpService(
       this.environment,
       this.options.appVersion,
       this.internalEventBus,
     )
-    this.services.push(this.httpService)
+    this.services.push(this.deprecatedHttpService)
+  }
+
+  private createHttpService() {
+    this.httpService = new HttpService(
+      this.environment,
+      this.options.appVersion,
+      SnjsVersion,
+      this.apiService.processMetaObject.bind(this.apiService),
+    )
   }
 
   private createPayloadManager() {
@@ -1326,6 +1368,7 @@ export class SNApplication
     this.sessionManager = new InternalServices.SNSessionManager(
       this.diskStorageService,
       this.apiService,
+      this.userApiService,
       this.alertService,
       this.protocolService,
       this.challengeService,
@@ -1436,7 +1479,7 @@ export class SNApplication
       this.itemManager,
       this.alertService,
       this.deviceInterface,
-      this.httpService,
+      this.deprecatedHttpService,
       this.payloadManager,
       this.protocolService,
       this.syncService,

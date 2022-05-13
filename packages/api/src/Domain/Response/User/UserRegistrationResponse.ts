@@ -1,14 +1,7 @@
-import { KeyParamsData, SessionBody } from '@standardnotes/responses'
-
 import { HttpErrorResponseBody } from '../../Http/HttpErrorResponseBody'
 import { HttpResponse } from '../../Http/HttpResponse'
+import { UserRegistartionResponseBody } from './UserRegistrationResponseBody'
 
 export interface UserRegistartionResponse extends HttpResponse {
-  data:
-    | HttpErrorResponseBody
-    | {
-        session: SessionBody
-        key_params: KeyParamsData
-        user: Record<string, unknown>
-      }
+  data: UserRegistartionResponseBody | HttpErrorResponseBody
 }

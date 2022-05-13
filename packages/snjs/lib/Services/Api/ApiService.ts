@@ -33,6 +33,7 @@ import { Strings } from '@Lib/Strings'
 import { SNRootKeyParams } from '@standardnotes/encryption'
 import { ApiEndpointParam, ClientDisplayableError, CreateValetTokenPayload } from '@standardnotes/responses'
 import { PureCryptoInterface } from '@standardnotes/sncrypto-common'
+import { HttpResponseMeta } from '@standardnotes/api'
 
 /** Legacy api version field to be specified in params when calling v0 APIs. */
 const V0_API_VERSION = '20200115'
@@ -163,7 +164,7 @@ export class SNApiService
     return response
   }
 
-  private processMetaObject(meta: Responses.ResponseMeta) {
+  public processMetaObject(meta: HttpResponseMeta) {
     if (meta.auth && meta.auth.userUuid && meta.auth.roles) {
       void this.notifyEvent(ApiServiceEvent.MetaReceived, {
         userUuid: meta.auth.userUuid,

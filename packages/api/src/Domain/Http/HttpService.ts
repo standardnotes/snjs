@@ -8,9 +8,16 @@ import { HttpServiceInterface } from './HttpServiceInterface'
 import { HttpStatusCode } from './HttpStatusCode'
 import { XMLHttpRequestState } from './XMLHttpRequestState'
 import { ErrorMessage } from '../Error/ErrorMessage'
+import { HttpResponseMeta } from './HttpResponseMeta'
+import { HttpErrorResponseBody } from './HttpErrorResponseBody'
 
 export class HttpService implements HttpServiceInterface {
-  constructor(private environment: Environment, private appVersion: string, private snjsVersion: string) {}
+  constructor(
+    private environment: Environment,
+    private appVersion: string,
+    private snjsVersion: string,
+    private updateMetaCallback: (meta: HttpResponseMeta) => void,
+  ) {}
 
   async getAbsolute(url: string, params?: HttpRequestParams, authentication?: string): Promise<HttpResponse> {
     return this.runHttp({ url, params, verb: HttpVerb.Get, authentication })
@@ -35,7 +42,13 @@ export class HttpService implements HttpServiceInterface {
   private async runHttp(httpRequest: HttpRequest): Promise<HttpResponse> {
     const request = this.createXmlRequest(httpRequest)
 
-    return this.runRequest(request, this.createRequestBody(httpRequest))
+    const response = await this.runRequest(request, this.createRequestBody(httpRequest))
+
+    if (response.meta) {
+      this.updateMetaCallback(response.meta)
+    }
+
+    return response
   }
 
   private createRequestBody(httpRequest: HttpRequest): string | Uint8Array | undefined {
@@ -146,8 +159,8 @@ export class HttpService implements HttpServiceInterface {
     if (httpStatus >= HttpStatusCode.Success && httpStatus < HttpStatusCode.MultipleChoices) {
       resolve(response)
     } else {
-      if (httpStatus === HttpStatusCode.Forbidden && response.data !== undefined) {
-        response.data.message = ErrorMessage.RateLimited
+      if (httpStatus === HttpStatusCode.Forbidden && response.data && response.data.error !== undefined) {
+        ;(response.data as HttpErrorResponseBody).error.message = ErrorMessage.RateLimited
       }
 
       reject(response)
