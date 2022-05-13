@@ -8,7 +8,7 @@ import {
 } from '@standardnotes/services'
 import { FileService } from './FileService'
 import { PureCryptoInterface, StreamEncryptor } from '@standardnotes/sncrypto-common'
-import { SNFile } from '@standardnotes/models'
+import { FileItem } from '@standardnotes/models'
 import { EncryptionProvider } from '@standardnotes/encryption'
 
 describe('fileService', () => {
@@ -81,7 +81,7 @@ describe('fileService', () => {
     const file = {
       uuid: '1',
       decryptedSize: 100_000,
-    } as jest.Mocked<SNFile>
+    } as jest.Mocked<FileItem>
 
     let downloadMock = apiService.downloadFile as jest.Mock
 
@@ -106,7 +106,7 @@ describe('fileService', () => {
     const file = {
       uuid: '1',
       decryptedSize: 100_000,
-    } as jest.Mocked<SNFile>
+    } as jest.Mocked<FileItem>
 
     await fileService.downloadFile(file, async () => {
       return Promise.resolve()

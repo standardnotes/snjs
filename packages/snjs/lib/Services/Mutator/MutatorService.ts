@@ -192,12 +192,12 @@ export class MutatorService extends AbstractService implements MutatorClientInte
     return results || []
   }
 
-  async protectFile(file: Models.SNFile): Promise<Models.SNFile> {
+  async protectFile(file: Models.FileItem): Promise<Models.FileItem> {
     const result = await this.protectItems([file])
     return result[0]
   }
 
-  async unprotectFile(file: Models.SNFile): Promise<Models.SNFile | undefined> {
+  async unprotectFile(file: Models.FileItem): Promise<Models.FileItem | undefined> {
     const result = await this.unprotectItems([file], ChallengeReason.UnprotectFile)
     return result ? result[0] : undefined
   }

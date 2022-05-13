@@ -1,6 +1,6 @@
 import { ChallengeReason } from '@standardnotes/services'
-import { SNFile } from '@standardnotes/models'
+import { FileItem } from '@standardnotes/models'
 
 export interface ProtectionsClientInterface {
-  authorizeProtectedActionForFiles(files: SNFile[], challengeReason: ChallengeReason): Promise<SNFile[]>
+  authorizeProtectedActionForFiles(files: FileItem[], challengeReason: ChallengeReason): Promise<FileItem[]>
 }

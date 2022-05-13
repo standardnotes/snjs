@@ -31,7 +31,7 @@ export type FileContentSpecialized = FileContentWithoutSize & FileMetadata & Siz
 
 export type FileContent = FileContentSpecialized & ItemContent
 
-export class SNFile
+export class FileItem
   extends DecryptedItem<FileContent>
   implements FileContentWithoutSize, Sizes, FileProtocolV1, FileMetadata, SortableItem
 {
@@ -62,7 +62,7 @@ export class SNFile
     this.mimeType = this.content.mimeType
   }
 
-  public override strategyWhenConflictingWithItem(item: SNFile): ConflictStrategy {
+  public override strategyWhenConflictingWithItem(item: FileItem): ConflictStrategy {
     if (
       item.key !== this.key ||
       item.encryptionHeader !== this.encryptionHeader ||

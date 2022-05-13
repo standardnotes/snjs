@@ -1,4 +1,4 @@
-import { SNApplication, ContentType, SNFile, ClientDisplayableError } from '../../../snjs'
+import { SNApplication, ContentType, FileItem, ClientDisplayableError } from '../../../snjs'
 import { ClassicFileReader, ClassicFileSaver } from '../../../filepicker'
 
 export class ClassicFileApi {
@@ -40,7 +40,7 @@ export class ClassicFileApi {
     console.log('Downloading file', remoteIdentifier)
     const file = this.application['itemManager']
       .getItems(ContentType.File)
-      .find((file: SNFile) => file.remoteIdentifier === remoteIdentifier)
+      .find((file: FileItem) => file.remoteIdentifier === remoteIdentifier)
 
     let receivedBytes = new Uint8Array()
 

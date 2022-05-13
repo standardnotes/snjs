@@ -1,7 +1,7 @@
 import { Challenge } from './../Challenge/Challenge'
 import { ChallengeService } from './../Challenge/ChallengeService'
 import { SNLog } from '@Lib/Log'
-import { SNFile, SNNote } from '@standardnotes/models'
+import { FileItem, SNNote } from '@standardnotes/models'
 import { EncryptionService } from '@standardnotes/encryption'
 import { SNStorageService } from '@Lib/Services/Storage/StorageService'
 import { isNullOrUndefined } from '@standardnotes/utils'
@@ -143,7 +143,7 @@ export class SNProtectionService extends AbstractService<ProtectionEvent> implem
     }
   }
 
-  async authorizeProtectedActionForFiles(files: SNFile[], challengeReason: ChallengeReason): Promise<SNFile[]> {
+  async authorizeProtectedActionForFiles(files: FileItem[], challengeReason: ChallengeReason): Promise<FileItem[]> {
     let sessionValidation: Promise<boolean> | undefined
     const authorizedFiles = []
     for (const file of files) {
