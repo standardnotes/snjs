@@ -3,14 +3,6 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
-## [1.6.20](https://github.com/standardnotes/snjs/compare/@standardnotes/responses@1.6.19...@standardnotes/responses@1.6.20) (2022-05-16)
-
-**Note:** Version bump only for package @standardnotes/responses
-
-
-
-
-
 ## [1.6.19](https://github.com/standardnotes/snjs/compare/@standardnotes/responses@1.6.18...@standardnotes/responses@1.6.19) (2022-05-12)
 
 **Note:** Version bump only for package @standardnotes/responses
