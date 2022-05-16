@@ -138,4 +138,20 @@ export default class WebDeviceInterface {
   async clearRawKeychainValue() {
     localStorage.removeItem(KEYCHAIN_STORAGE_KEY)
   }
+
+  performSoftReset() {
+
+  }
+
+  performHardReset() {
+
+  }
+
+  isDeviceDestroyed() {
+    return false
+  }
+
+  deinit() {
+
+  }
 }

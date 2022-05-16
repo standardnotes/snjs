@@ -19,7 +19,7 @@ export type ApplicationDescriptor = {
 export type DescriptorRecord = Record<string, ApplicationDescriptor>
 
 type AppGroupCallback<D extends DeviceInterface = DeviceInterface> = {
-  applicationCreator: (descriptor: ApplicationDescriptor, deviceInterface: D) => ApplicationInterface
+  applicationCreator: (descriptor: ApplicationDescriptor, deviceInterface: D) => Promise<ApplicationInterface>
 }
 
 export enum ApplicationGroupEvent {
@@ -71,23 +71,27 @@ export class SNApplicationGroup<D extends DeviceInterface = DeviceInterface> ext
     )) as DescriptorRecord
 
     if (!this.descriptorRecord) {
-      this.createNewDescriptorRecord()
+      await this.createNewDescriptorRecord()
     }
 
     let primaryDescriptor = this.findPrimaryDescriptor()
     if (!primaryDescriptor) {
       console.error('No primary application descriptor found. Ensure migrations have been run.')
       primaryDescriptor = this.getDescriptors()[0]
+
+      this.setDescriptorAsPrimary(primaryDescriptor)
+
+      await this.persistDescriptors()
     }
 
-    const application = this.buildApplication(primaryDescriptor)
+    const application = await this.buildApplication(primaryDescriptor)
 
     this.primaryApplication = application
 
     await this.notifyEvent(ApplicationGroupEvent.PrimaryApplicationSet, { primaryApplication: application })
   }
 
-  private createNewDescriptorRecord() {
+  private async createNewDescriptorRecord() {
     /**
      * The identifier 'standardnotes' is used because this was the
      * database name of Standard Notes web/desktop
@@ -105,7 +109,7 @@ export class SNApplicationGroup<D extends DeviceInterface = DeviceInterface> ext
 
     this.descriptorRecord = descriptorRecord
 
-    void this.persistDescriptors()
+    await this.persistDescriptors()
   }
 
   public getDescriptors() {
@@ -257,8 +261,8 @@ export class SNApplicationGroup<D extends DeviceInterface = DeviceInterface> ext
     }
   }
 
-  private buildApplication(descriptor: ApplicationDescriptor) {
-    const application = this.callback.applicationCreator(descriptor, this.device)
+  private async buildApplication(descriptor: ApplicationDescriptor) {
+    const application = await this.callback.applicationCreator(descriptor, this.device)
 
     application.setOnDeinit(this.onApplicationDeinit)
 
