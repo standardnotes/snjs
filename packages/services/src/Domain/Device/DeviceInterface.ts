@@ -70,4 +70,6 @@ export interface DeviceInterface {
   performSoftReset(): void
 
   performHardReset(): void
+
+  isDeviceDestroyed(): boolean
 }

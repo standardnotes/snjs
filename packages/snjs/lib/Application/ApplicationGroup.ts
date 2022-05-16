@@ -25,6 +25,7 @@ type AppGroupCallback<D extends DeviceInterface = DeviceInterface> = {
 export enum ApplicationGroupEvent {
   PrimaryApplicationSet = 'PrimaryApplicationSet',
   DescriptorsDataChanged = 'DescriptorsDataChanged',
+  DeviceWillRestart = 'DeviceWillRestart',
 }
 
 export type ApplicationGroupEventData = {
@@ -59,6 +60,10 @@ export class SNApplicationGroup<D extends DeviceInterface = DeviceInterface> ext
   }
 
   public async initialize(callback: AppGroupCallback<D>): Promise<void> {
+    if (this.device.isDeviceDestroyed()) {
+      throw 'Attempting to initialize new application while device is destroyed.'
+    }
+
     this.callback = callback
 
     this.descriptorRecord = (await this.device.getJsonParsedRawStorageValue(
@@ -66,28 +71,27 @@ export class SNApplicationGroup<D extends DeviceInterface = DeviceInterface> ext
     )) as DescriptorRecord
 
     if (!this.descriptorRecord) {
-      this.createDescriptorRecord()
+      this.createNewDescriptorRecord()
     }
 
-    const primaryDescriptor = this.findPrimaryDescriptor()
+    let primaryDescriptor = this.findPrimaryDescriptor()
     if (!primaryDescriptor) {
-      throw Error('No primary application descriptor found. Ensure migrations have been run.')
+      console.error('No primary application descriptor found. Ensure migrations have been run.')
+      primaryDescriptor = this.getDescriptors()[0]
     }
 
     const application = this.buildApplication(primaryDescriptor)
 
     this.primaryApplication = application
 
-    const descriptor = this.descriptorForApplication(application)
-
-    this.setDescriptorAsPrimary(descriptor)
-
     await this.notifyEvent(ApplicationGroupEvent.PrimaryApplicationSet, { primaryApplication: application })
   }
 
-  private createDescriptorRecord() {
-    /** The identifier 'standardnotes' is used because this was the
-     * database name of Standard Notes web/desktop */
+  private createNewDescriptorRecord() {
+    /**
+     * The identifier 'standardnotes' is used because this was the
+     * database name of Standard Notes web/desktop
+     * */
     const identifier = 'standardnotes'
     const descriptorRecord: DescriptorRecord = {
       [identifier]: {
@@ -137,26 +141,36 @@ export class SNApplicationGroup<D extends DeviceInterface = DeviceInterface> ext
       this.primaryApplication = undefined
     }
 
-    if (source === DeinitSource.SignOut) {
-      void this.removeDescriptor(this.descriptorForApplication(application))
+    const performSyncronously = async () => {
+      if (source === DeinitSource.SignOut) {
+        void this.removeDescriptor(this.descriptorForApplication(application))
 
-      if (isUserInitiated) {
-        /** If there are no more descriptors (all accounts have been signed out), create a new blank slate app */
-        const descriptors = this.getDescriptors()
+        if (isUserInitiated) {
+          /** If there are no more descriptors (all accounts have been signed out), create a new blank slate app */
+          const descriptors = this.getDescriptors()
 
-        if (descriptors.length === 0) {
-          this.handleAllWorkspacesSignedOut()
+          if (descriptors.length === 0) {
+            this.handleAllWorkspacesSignedOut()
 
-          void this.unloadCurrentAndCreateNewDescriptor()
+            await this.createNewPrimaryDescriptor()
+          }
         }
+      }
+
+      const device = this.device
+
+      void this.notifyEvent(ApplicationGroupEvent.DeviceWillRestart)
+
+      this.deinit()
+
+      if (mode === DeinitMode.Hard) {
+        device.performHardReset()
+      } else {
+        device.performSoftReset()
       }
     }
 
-    if (mode === DeinitMode.Hard) {
-      this.device.performHardReset()
-    } else {
-      this.device.performSoftReset()
-    }
+    void performSyncronously()
   }
 
   handleAllWorkspacesSignedOut(): void {
@@ -184,6 +198,11 @@ export class SNApplicationGroup<D extends DeviceInterface = DeviceInterface> ext
   public removeDescriptor(descriptor: ApplicationDescriptor) {
     delete this.descriptorRecord[descriptor.identifier]
 
+    const descriptors = this.getDescriptors()
+    if (descriptor.primary && descriptors.length > 0) {
+      this.setDescriptorAsPrimary(descriptors[0])
+    }
+
     return this.persistDescriptors()
   }
 
@@ -200,6 +219,7 @@ export class SNApplicationGroup<D extends DeviceInterface = DeviceInterface> ext
   private createNewApplicationDescriptor(label?: string) {
     const identifier = UuidGenerator.GenerateUuid()
     const index = this.getDescriptors().length + 1
+
     const descriptor: ApplicationDescriptor = {
       identifier: identifier,
       label: label || `Workspace ${index}`,
@@ -209,16 +229,18 @@ export class SNApplicationGroup<D extends DeviceInterface = DeviceInterface> ext
     return descriptor
   }
 
-  public async unloadCurrentAndCreateNewDescriptor(label?: string): Promise<void> {
-    const identifier = UuidGenerator.GenerateUuid()
-
+  private async createNewPrimaryDescriptor(label?: string): Promise<void> {
     const descriptor = this.createNewApplicationDescriptor(label)
 
-    this.descriptorRecord[identifier] = descriptor
+    this.descriptorRecord[descriptor.identifier] = descriptor
 
     this.setDescriptorAsPrimary(descriptor)
 
     await this.persistDescriptors()
+  }
+
+  public async unloadCurrentAndCreateNewDescriptor(label?: string): Promise<void> {
+    await this.createNewPrimaryDescriptor(label)
 
     if (this.primaryApplication) {
       this.primaryApplication.deinit(this.primaryApplication.getDeinitMode(), DeinitSource.AppGroupUnload)

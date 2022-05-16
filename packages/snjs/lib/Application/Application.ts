@@ -1,4 +1,3 @@
-import { StorageKey } from './../../../services/src/Domain/Storage/StorageKeys'
 import { SnjsVersion } from './../Version'
 import * as Common from '@standardnotes/common'
 import * as ExternalServices from '@standardnotes/services'
@@ -21,6 +20,7 @@ import {
   isDesktopDevice,
   Platform,
   ChallengeValue,
+  StorageKey,
 } from '@standardnotes/services'
 import { SNLog } from '../Log'
 import { useBoolean } from '@standardnotes/utils'
