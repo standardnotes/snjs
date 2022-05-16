@@ -23,6 +23,19 @@ export class ChallengeOperation {
     public onCancel: () => void,
   ) {}
 
+  deinit() {
+    ;(this.challenge as unknown) = undefined
+    ;(this.onValidValue as unknown) = undefined
+    ;(this.onInvalidValue as unknown) = undefined
+    ;(this.onNonvalidatedSubmit as unknown) = undefined
+    ;(this.onComplete as unknown) = undefined
+    ;(this.onCancel as unknown) = undefined
+    ;(this.nonvalidatedValues as unknown) = undefined
+    ;(this.validValues as unknown) = undefined
+    ;(this.invalidValues as unknown) = undefined
+    ;(this.artifacts as unknown) = undefined
+  }
+
   /**
    * Mark this challenge as complete, triggering the resolve function,
    * as well as notifying the client
@@ -81,6 +94,7 @@ export class ChallengeOperation {
     }
     valuesArray.push(value)
     Object.assign(this.artifacts, artifacts)
+
     if (this.isFinished()) {
       this.complete()
     } else {

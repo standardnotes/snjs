@@ -102,7 +102,7 @@ export class SNApplication implements InternalServices.ListedClientInterface {
   /** True if the application has launched */
   private launched = false
   /** Whether the application has been destroyed via .deinit() */
-  private dealloced = false
+  public dealloced = false
   private revokingSession = false
   private handledFullSyncStage = false
 
@@ -719,6 +719,7 @@ export class SNApplication implements InternalServices.ListedClientInterface {
     this.dealloced = true
 
     clearInterval(this.autoSyncInterval)
+    ;(this.autoSyncInterval as unknown) = undefined
 
     for (const uninstallObserver of this.serviceObservers) {
       uninstallObserver()

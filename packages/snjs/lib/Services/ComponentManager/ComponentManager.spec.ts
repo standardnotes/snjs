@@ -51,7 +51,6 @@ describe('featuresService', () => {
       internalEventBus,
     )
     manager.setDesktopManager(desktopManager)
-    manager.configureForNonMobileUsage = jest.fn().mockReturnValue(0)
     return manager
   }
 

@@ -7,7 +7,7 @@ import {
   InternalEventBusInterface,
   RawStorageKey,
 } from '@standardnotes/services'
-import { UuidGenerator, removeFromArray } from '@standardnotes/utils'
+import { UuidGenerator } from '@standardnotes/utils'
 
 export type ApplicationDescriptor = {
   identifier: string | UuidString
@@ -22,15 +22,34 @@ type AppGroupCallback<D extends DeviceInterface = DeviceInterface> = {
   applicationCreator: (descriptor: ApplicationDescriptor, deviceInterface: D) => SNApplication
 }
 
-type AppGroupChangeCallback = () => void
+export enum ApplicationGroupEvent {
+  PrimaryApplicationChanged = 'PrimaryApplicationChanged',
+  PrimaryDescriptorChanged = 'PrimaryDescriptorChanged',
+}
 
-export class SNApplicationGroup<D extends DeviceInterface = DeviceInterface> extends AbstractService {
+export type ApplicationGroupEventData = {
+  primaryApplication?: SNApplication
+  primaryDescriptor?: ApplicationDescriptor
+}
+
+export enum ApplicationGroupMode {
+  AutoSwitch = 'AutoSwitch',
+  RequiresReload = 'RequiresReload',
+}
+
+export class SNApplicationGroup<D extends DeviceInterface = DeviceInterface> extends AbstractService<
+  ApplicationGroupEvent,
+  ApplicationGroupEventData
+> {
   public primaryApplication?: SNApplication
   private descriptorRecord!: DescriptorRecord
-  private changeObservers: AppGroupChangeCallback[] = []
   callback!: AppGroupCallback<D>
 
-  constructor(public deviceInterface: D, internalEventBus?: InternalEventBusInterface) {
+  constructor(
+    public deviceInterface: D,
+    private mode: ApplicationGroupMode = ApplicationGroupMode.AutoSwitch,
+    internalEventBus?: InternalEventBusInterface,
+  ) {
     if (internalEventBus === undefined) {
       internalEventBus = new InternalEventBus()
     }
@@ -40,8 +59,12 @@ export class SNApplicationGroup<D extends DeviceInterface = DeviceInterface> ext
 
   override deinit() {
     super.deinit()
+
     this.deviceInterface.deinit()
     ;(this.deviceInterface as unknown) = undefined
+    ;(this.callback as unknown) = undefined
+    ;(this.primaryApplication as unknown) = undefined
+    ;(this.onApplicationDeinit as unknown) = undefined
   }
 
   public async initialize(callback: AppGroupCallback<D>): Promise<void> {
@@ -62,7 +85,7 @@ export class SNApplicationGroup<D extends DeviceInterface = DeviceInterface> ext
 
     const application = this.buildApplication(primaryDescriptor)
 
-    void this.setPrimaryApplication(application, false)
+    void this.setPrimaryApplication(application, { persist: false })
   }
 
   private createDescriptorRecord() {
@@ -102,7 +125,7 @@ export class SNApplicationGroup<D extends DeviceInterface = DeviceInterface> ext
       await this.primaryApplication.user.signOut(false, DeinitSource.AppGroupUnload)
     }
 
-    this.removeAllDescriptors()
+    await this.removeAllDescriptors()
 
     this.handleAllWorkspacesSignedOut()
 
@@ -118,7 +141,7 @@ export class SNApplicationGroup<D extends DeviceInterface = DeviceInterface> ext
     }
 
     if (source === DeinitSource.SignOut) {
-      this.removeDescriptor(this.descriptorForApplication(application))
+      void this.removeDescriptor(this.descriptorForApplication(application))
 
       if (sideffects) {
         /** If there are no more descriptors (all accounts have been signed out), create a new blank slate app */
@@ -143,65 +166,55 @@ export class SNApplicationGroup<D extends DeviceInterface = DeviceInterface> ext
     /** Optional override */
   }
 
-  /**
-   * Notifies observer when the primary application has changed.
-   * Any application which is no longer active is destroyed, and
-   * must be removed from the interface.
-   */
-  public addApplicationChangeObserver(callback: AppGroupChangeCallback): () => void {
-    this.changeObservers.push(callback)
-    if (this.primaryApplication) {
-      callback()
-    }
-    return () => {
-      removeFromArray(this.changeObservers, callback)
-    }
-  }
-
-  private notifyObserversOfAppChange() {
-    for (const observer of this.changeObservers) {
-      observer()
-    }
-  }
-
-  public setPrimaryApplication(application: SNApplication, persist = true): void {
+  public async setPrimaryApplication(
+    application: SNApplication,
+    { persist = true }: { persist: boolean },
+  ): Promise<void> {
     if (this.primaryApplication === application) {
       return
     }
 
-    if (this.primaryApplication) {
-      this.primaryApplication.deinit(DeinitSource.AppGroupUnload)
-    }
+    const previousApplication = this.primaryApplication
 
     this.primaryApplication = application
 
     const descriptor = this.descriptorForApplication(application)
+
     this.setDescriptorAsPrimary(descriptor)
 
-    this.notifyObserversOfAppChange()
-
     if (persist) {
-      this.persistDescriptors()
+      await this.persistDescriptors()
     }
+
+    if (previousApplication) {
+      previousApplication.deinit(DeinitSource.AppGroupUnload)
+    }
+
+    await this.notifyEvent(ApplicationGroupEvent.PrimaryApplicationChanged, { primaryApplication: application })
   }
 
-  setDescriptorAsPrimary(primaryDescriptor: ApplicationDescriptor) {
+  public setDescriptorAsPrimary(primaryDescriptor: ApplicationDescriptor) {
     for (const descriptor of this.getDescriptors()) {
       descriptor.primary = descriptor === primaryDescriptor
     }
   }
 
   private persistDescriptors() {
-    void this.deviceInterface.setRawStorageValue(RawStorageKey.DescriptorRecord, JSON.stringify(this.descriptorRecord))
+    return this.deviceInterface.setRawStorageValue(
+      RawStorageKey.DescriptorRecord,
+      JSON.stringify(this.descriptorRecord),
+    )
   }
 
   public renameDescriptor(descriptor: ApplicationDescriptor, label: string) {
     descriptor.label = label
-    this.persistDescriptors()
+
+    void this.persistDescriptors()
   }
 
   public removeDescriptor(descriptor: ApplicationDescriptor) {
     delete this.descriptorRecord[descriptor.identifier]
+
     return this.persistDescriptors()
   }
 
@@ -215,7 +228,7 @@ export class SNApplicationGroup<D extends DeviceInterface = DeviceInterface> ext
     return this.descriptorRecord[application.identifier]
   }
 
-  public addNewApplication(label?: string): SNApplication {
+  private createNewApplicationDescriptor(label?: string) {
     const identifier = UuidGenerator.GenerateUuid()
     const index = this.getDescriptors().length + 1
     const descriptor: ApplicationDescriptor = {
@@ -223,20 +236,31 @@ export class SNApplicationGroup<D extends DeviceInterface = DeviceInterface> ext
       label: label || `Workspace ${index}`,
       primary: false,
     }
-    const application = this.buildApplication(descriptor)
 
+    return descriptor
+  }
+
+  public async addNewApplication(label?: string): Promise<void> {
+    const identifier = UuidGenerator.GenerateUuid()
+
+    const descriptor = this.createNewApplicationDescriptor(label)
     this.descriptorRecord[identifier] = descriptor
 
-    this.setPrimaryApplication(application)
-    this.persistDescriptors()
-
-    return application
+    if (this.mode === ApplicationGroupMode.AutoSwitch) {
+      const application = this.buildApplication(descriptor)
+      void this.setPrimaryApplication(application, { persist: true })
+    } else {
+      this.setDescriptorAsPrimary(descriptor)
+      await this.persistDescriptors()
+      this.primaryApplication?.deinit(DeinitSource.AppGroupUnload)
+      await this.notifyEvent(ApplicationGroupEvent.PrimaryDescriptorChanged, { primaryDescriptor: descriptor })
+    }
   }
 
   public loadApplicationForDescriptor(descriptor: ApplicationDescriptor) {
     const application = this.buildApplication(descriptor)
 
-    this.setPrimaryApplication(application)
+    return this.setPrimaryApplication(application, { persist: true })
   }
 
   private buildApplication(descriptor: ApplicationDescriptor) {

@@ -25,8 +25,9 @@ export class TagNotesIndex implements SNIndex {
   public addCountChangeObserver(observer: TagNoteCountChangeObserver): () => void {
     this.observers.push(observer)
 
+    const thislessEventObservers = this.observers
     return () => {
-      removeFromArray(this.observers, observer)
+      removeFromArray(thislessEventObservers, observer)
     }
   }
 

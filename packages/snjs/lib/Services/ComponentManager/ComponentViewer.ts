@@ -131,16 +131,20 @@ export class ComponentViewer {
     if (actionObserver) {
       this.actionObservers.push(actionObserver)
     }
+
     this.featureStatus = featuresService.getFeatureStatus(component.identifier)
+
     this.removeFeaturesObserver = featuresService.addEventObserver((event) => {
       if (event === FeaturesEvent.FeaturesUpdated) {
         const featureStatus = featuresService.getFeatureStatus(component.identifier)
+
         if (featureStatus !== this.featureStatus) {
           this.featureStatus = featureStatus
           this.notifyEventObservers(ComponentViewerEvent.FeatureStatusUpdated)
         }
       }
     })
+
     this.log('Constructor', this)
   }
 
@@ -158,18 +162,29 @@ export class ComponentViewer {
   }
 
   private deinit(): void {
+    ;(this.component as unknown) = undefined
+    ;(this.itemManager as unknown) = undefined
+    ;(this.syncService as unknown) = undefined
+    ;(this.alertService as unknown) = undefined
+    ;(this.preferencesSerivce as unknown) = undefined
+    ;(this.componentManagerFunctions as unknown) = undefined
+
     this.eventObservers.length = 0
+    this.actionObservers.length = 0
+
     this.removeFeaturesObserver()
     ;(this.removeFeaturesObserver as unknown) = undefined
+
     this.removeItemObserver()
     ;(this.removeItemObserver as unknown) = undefined
-    this.actionObservers.length = 0
   }
 
   public addEventObserver(observer: EventObserver): () => void {
     this.eventObservers.push(observer)
+
+    const thislessChangeObservers = this.eventObservers
     return () => {
-      removeFromArray(this.eventObservers, observer)
+      removeFromArray(thislessChangeObservers, observer)
     }
   }
 
@@ -181,8 +196,10 @@ export class ComponentViewer {
 
   public addActionObserver(observer: ActionObserver): () => void {
     this.actionObservers.push(observer)
+
+    const thislessChangeObservers = this.actionObservers
     return () => {
-      removeFromArray(this.actionObservers, observer)
+      removeFromArray(thislessChangeObservers, observer)
     }
   }
 

@@ -234,8 +234,10 @@ export class PayloadManager extends AbstractService implements PayloadManagerInt
       callback,
     }
     this.changeObservers.push(observer)
+
+    const thislessChangeObservers = this.changeObservers
     return () => {
-      removeFromArray(this.changeObservers, observer)
+      removeFromArray(thislessChangeObservers, observer)
     }
   }
 

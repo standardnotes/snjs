@@ -27,12 +27,18 @@ export class NoteGroupController {
 
   public deinit(): void {
     ;(this.application as unknown) = undefined
+
     this.eventObservers.forEach((removeObserver) => {
       removeObserver()
     })
+
+    this.changeObservers.length = 0
+
     for (const controller of this.noteControllers) {
       this.closeNoteView(controller, false)
     }
+
+    this.noteControllers.length = 0
   }
 
   async createNoteView(noteUuid?: string, noteTitle?: string, noteTag?: UuidString): Promise<NoteViewController> {
@@ -46,6 +52,7 @@ export class NoteGroupController {
 
   closeNoteView(controller: NoteViewController, notifyObservers = true): void {
     controller.deinit()
+
     removeFromArray(this.noteControllers, controller)
 
     if (notifyObservers) {
@@ -76,11 +83,14 @@ export class NoteGroupController {
    */
   public addActiveControllerChangeObserver(callback: NoteControllerGroupChangeCallback): () => void {
     this.changeObservers.push(callback)
+
     if (this.activeNoteViewController) {
       callback(this.activeNoteViewController)
     }
+
+    const thislessChangeObservers = this.changeObservers
     return () => {
-      removeFromArray(this.changeObservers, callback)
+      removeFromArray(thislessChangeObservers, callback)
     }
   }
 
