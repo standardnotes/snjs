@@ -238,33 +238,6 @@ export class SNApiService
     })
   }
 
-  async register(
-    email: string,
-    serverPassword: string,
-    keyParams: SNRootKeyParams,
-    ephemeral: boolean,
-  ): Promise<Responses.RegistrationResponse | Responses.HttpResponse> {
-    if (this.registering) {
-      return this.createErrorResponse(messages.API_MESSAGE_REGISTRATION_IN_PROGRESS) as Responses.RegistrationResponse
-    }
-    this.registering = true
-    const url = joinPaths(this.host, Paths.v1.register)
-    const params = this.params({
-      password: serverPassword,
-      email,
-      ephemeral,
-      ...keyParams.getPortableValue(),
-    })
-    const response = await this.request({
-      verb: HttpVerb.Post,
-      url,
-      fallbackErrorMessage: messages.API_MESSAGE_GENERIC_REGISTRATION_FAIL,
-      params,
-    })
-    this.registering = false
-    return response
-  }
-
   async signIn(dto: {
     email: string
     serverPassword: string
