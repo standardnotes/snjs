@@ -433,13 +433,13 @@ describe('featuresService', () => {
           identifier: FeatureIdentifier.MidnightTheme,
           content_type: ContentType.Theme,
           expires_at: tomorrow_server,
-          role_name: RoleName.CoreUser,
+          role_name: RoleName.PlusUser,
         },
         {
           identifier: FeatureIdentifier.BoldEditor,
           content_type: ContentType.Component,
           expires_at: expiredDate,
-          role_name: RoleName.PlusUser,
+          role_name: RoleName.ProUser,
         },
       ] as jest.Mocked<FeatureDescription[]>
 
@@ -468,13 +468,13 @@ describe('featuresService', () => {
           identifier: FeatureIdentifier.MidnightTheme,
           content_type: ContentType.Theme,
           expires_at: expiredDate,
-          role_name: RoleName.CoreUser,
+          role_name: RoleName.PlusUser,
         },
         {
           identifier: FeatureIdentifier.BoldEditor,
           content_type: ContentType.Component,
           expires_at: expiredDate,
-          role_name: RoleName.PlusUser,
+          role_name: RoleName.ProUser,
         },
       ] as jest.Mocked<FeatureDescription[]>
 
@@ -635,7 +635,7 @@ describe('featuresService', () => {
         FeatureStatus.NoUserSubscription,
       )
 
-      await featuresService.updateRolesAndFetchFeatures('123', [RoleName.CoreUser, RoleName.CoreUser])
+      await featuresService.updateRolesAndFetchFeatures('123', [RoleName.PlusPlan])
 
       expect(featuresService.getFeatureStatus(FeatureIdentifier.DeprecatedFileSafe)).toBe(FeatureStatus.Entitled)
     })
@@ -735,20 +735,10 @@ describe('featuresService', () => {
   })
 
   describe('hasMinimumRole', () => {
-    it('should be false if basic user checks for core role', async () => {
-      const featuresService = createService()
-
-      await featuresService.updateRolesAndFetchFeatures('123', [RoleName.CoreUser])
-
-      const hasCoreUserRole = featuresService.hasMinimumRole(RoleName.CoreUser)
-
-      expect(hasCoreUserRole).toBe(false)
-    })
-
     it('should be false if core user checks for plus role', async () => {
       const featuresService = createService()
 
-      await featuresService.updateRolesAndFetchFeatures('123', [RoleName.CoreUser, RoleName.CoreUser])
+      await featuresService.updateRolesAndFetchFeatures('123', [RoleName.CoreUser])
 
       const hasPlusUserRole = featuresService.hasMinimumRole(RoleName.PlusUser)
 
