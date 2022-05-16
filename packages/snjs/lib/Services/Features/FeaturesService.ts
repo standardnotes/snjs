@@ -408,7 +408,7 @@ export class SNFeaturesService
 
   hasOnlineSubscription(): boolean {
     const roles = this.roles
-    const unpaidRoles = [RoleName.CoreUser]
+    const unpaidRoles = [RoleName.BasicUser]
     return roles.some((role) => !unpaidRoles.includes(role))
   }
 

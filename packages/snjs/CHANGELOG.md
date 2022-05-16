@@ -3,29 +3,6 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
-## [2.108.1](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.108.0...@standardnotes/snjs@2.108.1) (2022-05-16)
-
-
-### Bug Fixes
-
-* role name in FeaturesService unit tests ([#736](https://github.com/standardnotes/snjs/issues/736)) ([964adee](https://github.com/standardnotes/snjs/commit/964adee52d89ef58fdc7efe684349834d34f8c44))
-* unit tests for role and subscription removal ([bd9b6c2](https://github.com/standardnotes/snjs/commit/bd9b6c221786ad5533b5d03799cef2fc14af707a))
-
-
-
-
-
-# [2.108.0](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.107.3...@standardnotes/snjs@2.108.0) (2022-05-16)
-
-
-### Features
-
-* remove basic user role and core subscription plan names ([304e232](https://github.com/standardnotes/snjs/commit/304e232e738456a93374de869117b5579e8a8f57))
-
-
-
-
-
 ## [2.107.3](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.107.2...@standardnotes/snjs@2.107.3) (2022-05-13)
 
 **Note:** Version bump only for package @standardnotes/snjs
