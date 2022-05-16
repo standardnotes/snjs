@@ -35,8 +35,17 @@ describe('basic auth', function () {
 
   it('fails register new account with short password', async function () {
     const password = '123456'
-    const response = await this.application.register(this.email, password)
-    expect(response.error).to.be.ok
+
+    let error = null
+    try {
+      await this.application.register(this.email, password)
+    } catch(caughtError) {
+      error = caughtError
+    }
+
+    expect(error.message).to.equal('Your password must be at least 8 characters in length. \
+    For your security, please choose a longer password or, ideally, a passphrase, and try again.')
+
     expect(await this.application.protocolService.getRootKey()).to.not.be.ok
   })
 
