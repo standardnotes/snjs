@@ -1,4 +1,4 @@
-import { FeatureIdentifier } from '@standardnotes/features'
+import { NoteType } from '@standardnotes/features'
 import { IconType } from '@Lib/Types/IconType'
 
 export class IconsController {
@@ -40,23 +40,19 @@ export class IconsController {
     return iconType
   }
 
-  getIconAndTintForEditor(identifier: FeatureIdentifier | undefined): [IconType, number] {
-    switch (identifier) {
-      case FeatureIdentifier.BoldEditor:
-      case FeatureIdentifier.PlusEditor:
+  getIconAndTintForNoteType(noteType?: NoteType): [IconType, number] {
+    switch (noteType) {
+      case NoteType.RichText:
         return ['rich-text', 1]
-      case FeatureIdentifier.MarkdownBasicEditor:
-      case FeatureIdentifier.MarkdownMathEditor:
-      case FeatureIdentifier.MarkdownMinimistEditor:
-      case FeatureIdentifier.MarkdownProEditor:
+      case NoteType.Markdown:
         return ['markdown', 2]
-      case FeatureIdentifier.TokenVaultEditor:
+      case NoteType.Authentication:
         return ['authenticator', 6]
-      case FeatureIdentifier.SheetsEditor:
+      case NoteType.Spreadsheet:
         return ['spreadsheets', 5]
-      case FeatureIdentifier.TaskEditor:
+      case NoteType.Task:
         return ['tasks', 3]
-      case FeatureIdentifier.CodeEditor:
+      case NoteType.Code:
         return ['code', 4]
       default:
         return ['plain-text', 1]
