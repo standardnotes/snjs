@@ -1,7 +1,8 @@
-import { SNRootKeyParams } from '@standardnotes/encryption'
+import { RootKeyParamsInterface } from '@standardnotes/models'
+
 import { ErrorMessage } from '../../Error/ErrorMessage'
 import { ApiCallError } from '../../Error/ApiCallError'
-import { UserRegistartionResponse } from '../../Response/User/UserRegistrationResponse'
+import { UserRegistrationResponse } from '../../Response/User/UserRegistrationResponse'
 import { UserServerInterface } from '../../Server/User/UserServerInterface'
 import { ApiVersion } from '../../Api/ApiVersion'
 import { ApiEndpointParam } from '../../Request/ApiEndpointParam'
@@ -17,9 +18,9 @@ export class UserApiService implements UserApiServiceInterface {
   async register(
     email: string,
     serverPassword: string,
-    keyParams: SNRootKeyParams,
+    keyParams: RootKeyParamsInterface,
     ephemeral: boolean,
-  ): Promise<UserRegistartionResponse> {
+  ): Promise<UserRegistrationResponse> {
     if (this.registering) {
       throw new ApiCallError(ErrorMessage.RegistrationInProgress)
     }

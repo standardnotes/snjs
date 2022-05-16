@@ -1,7 +1,7 @@
 import { HttpErrorResponseBody } from '../../Http/HttpErrorResponseBody'
 import { HttpResponse } from '../../Http/HttpResponse'
-import { UserRegistartionResponseBody } from './UserRegistrationResponseBody'
+import { UserRegistrationResponseBody } from './UserRegistrationResponseBody'
 
-export interface UserRegistartionResponse extends HttpResponse {
-  data: UserRegistartionResponseBody | HttpErrorResponseBody
+export interface UserRegistrationResponse extends HttpResponse {
+  data: UserRegistrationResponseBody | HttpErrorResponseBody
 }

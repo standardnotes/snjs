@@ -23,7 +23,7 @@ import { UserClientInterface } from './UserClientInterface'
 import { UuidGenerator } from '@standardnotes/utils'
 import * as Messages from '../Api/Messages'
 import { DeinitSource } from '@Lib/Types'
-import { UserRegistartionResponse } from '@Lib/../../api/dist'
+import { UserRegistrationResponse } from '@Lib/../../api/dist'
 
 const MINIMUM_PASSCODE_LENGTH = 1
 
@@ -80,7 +80,7 @@ export class UserService extends AbstractService<AccountEvent, AccountEventData>
     password: string,
     ephemeral = false,
     mergeLocal = true,
-  ): Promise<UserRegistartionResponse> {
+  ): Promise<UserRegistrationResponse> {
     if (this.protocolService.hasAccount()) {
       throw Error('Tried to register when an account already exists.')
     }

@@ -1,6 +1,6 @@
 import { UserRegistrationRequestParams } from '../../Request/User/UserRegistrationRequestParams'
-import { UserRegistartionResponse } from '../../Response/User/UserRegistrationResponse'
+import { UserRegistrationResponse } from '../../Response/User/UserRegistrationResponse'
 
 export interface UserServerInterface {
-  register(params: UserRegistrationRequestParams): Promise<UserRegistartionResponse>
+  register(params: UserRegistrationRequestParams): Promise<UserRegistrationResponse>
 }

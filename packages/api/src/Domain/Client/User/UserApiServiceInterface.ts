@@ -1,11 +1,11 @@
-import { SNRootKeyParams } from '@standardnotes/encryption'
-import { UserRegistartionResponse } from '../../Response/User/UserRegistrationResponse'
+import { RootKeyParamsInterface } from '@standardnotes/models'
+import { UserRegistrationResponse } from '../../Response/User/UserRegistrationResponse'
 
 export interface UserApiServiceInterface {
   register(
     email: string,
     serverPassword: string,
-    keyParams: SNRootKeyParams,
+    keyParams: RootKeyParamsInterface,
     ephemeral: boolean,
-  ): Promise<UserRegistartionResponse>
+  ): Promise<UserRegistrationResponse>
 }

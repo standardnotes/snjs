@@ -44,8 +44,8 @@ import {
   ErrorMessage,
   HttpErrorResponseBody,
   UserApiServiceInterface,
-  UserRegistartionResponse,
-  UserRegistartionResponseBody,
+  UserRegistrationResponse,
+  UserRegistrationResponseBody,
 } from '@standardnotes/api'
 
 export const MINIMUM_PASSWORD_LENGTH = 8
@@ -270,7 +270,7 @@ export class SNSessionManager extends AbstractService<SessionEvent> implements S
     return undefined
   }
 
-  async register(email: string, password: string, ephemeral: boolean): Promise<UserRegistartionResponse> {
+  async register(email: string, password: string, ephemeral: boolean): Promise<UserRegistrationResponse> {
     if (password.length < MINIMUM_PASSWORD_LENGTH) {
       throw new ApiCallError(
         ErrorMessage.InsufficientPasswordMessage.replace('%LENGTH%', MINIMUM_PASSWORD_LENGTH.toString()),
@@ -291,7 +291,7 @@ export class SNSessionManager extends AbstractService<SessionEvent> implements S
       throw new ApiCallError((registerResponse.data as HttpErrorResponseBody).error.message)
     }
 
-    await this.handleAuthResponse(registerResponse.data as UserRegistartionResponseBody, rootKey, wrappingKey)
+    await this.handleAuthResponse(registerResponse.data as UserRegistrationResponseBody, rootKey, wrappingKey)
 
     return registerResponse
   }
@@ -625,7 +625,7 @@ export class SNSessionManager extends AbstractService<SessionEvent> implements S
     this.webSocketsService.startWebSocketConnection(session.authorizationValue)
   }
 
-  private async handleAuthResponse(body: UserRegistartionResponseBody, rootKey: SNRootKey, wrappingKey?: SNRootKey) {
+  private async handleAuthResponse(body: UserRegistrationResponseBody, rootKey: SNRootKey, wrappingKey?: SNRootKey) {
     const session = new TokenSession(
       body.session.access_token,
       body.session.access_expiration,

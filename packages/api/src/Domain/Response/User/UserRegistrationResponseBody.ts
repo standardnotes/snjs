@@ -1,7 +1,7 @@
 import { Uuid } from '@standardnotes/common'
 import { KeyParamsData, SessionBody } from '@standardnotes/responses'
 
-export type UserRegistartionResponseBody = {
+export type UserRegistrationResponseBody = {
   session: SessionBody
   key_params: KeyParamsData
   user: {
