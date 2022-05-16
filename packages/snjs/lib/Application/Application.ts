@@ -1,3 +1,4 @@
+import { StorageKey } from './../../../services/src/Domain/Storage/StorageKeys'
 import { SnjsVersion } from './../Version'
 import * as Common from '@standardnotes/common'
 import * as ExternalServices from '@standardnotes/services'
@@ -26,6 +27,7 @@ import { useBoolean } from '@standardnotes/utils'
 import { DecryptedItemInterface, EncryptedItemInterface } from '@standardnotes/models'
 import { ClientDisplayableError } from '@standardnotes/responses'
 import { Challenge, ChallengeResponse } from '../Services'
+import { ApplicationInterface, DeinitCallback, DeinitMode } from './ApplicationInterface'
 
 /** How often to automatically sync, in milliseconds */
 const DEFAULT_AUTO_SYNC_INTERVAL = 30_000
@@ -46,8 +48,8 @@ type ItemStream<I extends DecryptedItemInterface> = (data: {
 }) => void
 type ObserverRemover = () => void
 
-export class SNApplication implements InternalServices.ListedClientInterface {
-  private onDeinit?: (app: SNApplication, source: DeinitSource) => void
+export class SNApplication implements ApplicationInterface, InternalServices.ListedClientInterface {
+  onDeinit?: DeinitCallback
 
   /**
    * A runtime based identifier for each dynamic instantiation of the application instance.
@@ -708,14 +710,14 @@ export class SNApplication implements InternalServices.ListedClientInterface {
   }
 
   /** Set a function to be called when this application deinits */
-  public setOnDeinit(onDeinit: (app: SNApplication, source: DeinitSource) => void): void {
+  public setOnDeinit(onDeinit: DeinitCallback): void {
     this.onDeinit = onDeinit
   }
 
   /**
    * Destroys the application instance.
    */
-  public deinit(source: DeinitSource): void {
+  public deinit(mode: DeinitMode, source: DeinitSource): void {
     this.dealloced = true
 
     clearInterval(this.autoSyncInterval)
@@ -741,11 +743,13 @@ export class SNApplication implements InternalServices.ListedClientInterface {
     this.serviceObservers.length = 0
     this.managedSubscribers.length = 0
     this.streamRemovers.length = 0
+
     this.clearInternalEventBus()
     this.clearServices()
+
     this.started = false
 
-    this.onDeinit?.(this, source)
+    this.onDeinit?.(this, mode, source)
     this.onDeinit = undefined
   }
 
@@ -870,7 +874,16 @@ export class SNApplication implements InternalServices.ListedClientInterface {
      * but only up to a certain limit. */
     const MaximumWaitTime = 500
     await this.prepareForDeinit(MaximumWaitTime)
-    return this.deinit(DeinitSource.Lock)
+    return this.deinit(this.getDeinitMode(), DeinitSource.Lock)
+  }
+
+  getDeinitMode(): DeinitMode {
+    const value = this.getValue(StorageKey.DeinitMode)
+    if (value === 'hard') {
+      return DeinitMode.Hard
+    }
+
+    return DeinitMode.Soft
   }
 
   public addPasscode(passcode: string): Promise<boolean> {
@@ -1178,7 +1191,7 @@ export class SNApplication implements InternalServices.ListedClientInterface {
           case InternalServices.AccountEvent.SignedOut: {
             await this.notifyEvent(ApplicationEvent.SignedOut)
             await this.prepareForDeinit()
-            this.deinit(data?.source || DeinitSource.SignOut)
+            this.deinit(this.getDeinitMode(), data?.source || DeinitSource.SignOut)
             break
           }
           default: {
