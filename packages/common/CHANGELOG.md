@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.20.0](https://github.com/standardnotes/snjs/compare/@standardnotes/common@1.19.8...@standardnotes/common@1.20.0) (2022-05-16)
+
+
+### Features
+
+* remove basic user role and core subscription plan names ([304e232](https://github.com/standardnotes/snjs/commit/304e232e738456a93374de869117b5579e8a8f57))
+
+
+
+
+
 ## [1.19.8](https://github.com/standardnotes/snjs/compare/@standardnotes/common@1.19.6...@standardnotes/common@1.19.8) (2022-05-04)
 
 **Note:** Version bump only for package @standardnotes/common
