@@ -1,6 +1,6 @@
 {
   "name": "@standardnotes/features",
-  "version": "1.43.0",
+  "version": "1.42.1",
   "engines": {
     "node": ">=14.0.0 <17.0.0"
   },
@@ -24,8 +24,8 @@
     "test:unit": "jest"
   },
   "dependencies": {
-    "@standardnotes/auth": "^3.18.14",
-    "@standardnotes/common": "^1.20.0"
+    "@standardnotes/auth": "^3.18.13",
+    "@standardnotes/common": "^1.19.8"
   },
   "devDependencies": {
     "@standardnotes/config": "^2.4.3",

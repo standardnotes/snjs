@@ -16,4 +16,12 @@ describe('features', () => {
       expect(feature.availableInSubscriptions.includes(SubscriptionName.PlusPlan))
     }
   })
+
+  it('gets features for core plan', () => {
+    const features = GetFeaturesForSubscription(SubscriptionName.CorePlan)
+
+    for (const feature of features) {
+      expect(feature.availableInSubscriptions.includes(SubscriptionName.CorePlan))
+    }
+  })
 })
