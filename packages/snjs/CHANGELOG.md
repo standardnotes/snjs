@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.108.0](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.107.3...@standardnotes/snjs@2.108.0) (2022-05-16)
+
+
+### Features
+
+* remove basic user role and core subscription plan names ([304e232](https://github.com/standardnotes/snjs/commit/304e232e738456a93374de869117b5579e8a8f57))
+
+
+
+
+
 ## [2.107.3](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.107.2...@standardnotes/snjs@2.107.3) (2022-05-13)
 
 **Note:** Version bump only for package @standardnotes/snjs
