@@ -635,7 +635,7 @@ describe('featuresService', () => {
         FeatureStatus.NoUserSubscription,
       )
 
-      await featuresService.updateRolesAndFetchFeatures('123', [RoleName.PlusPlan])
+      await featuresService.updateRolesAndFetchFeatures('123', [RoleName.PlusUser])
 
       expect(featuresService.getFeatureStatus(FeatureIdentifier.DeprecatedFileSafe)).toBe(FeatureStatus.Entitled)
     })
