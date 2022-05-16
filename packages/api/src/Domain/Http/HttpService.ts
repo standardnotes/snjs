@@ -70,13 +70,15 @@ export class HttpService implements HttpServiceInterface {
     request.open(httpRequest.verb, httpRequest.url, true)
     request.responseType = httpRequest.responseType ?? ''
 
-    request.setRequestHeader('X-SNJS-Version', this.snjsVersion)
+    if (!httpRequest.external) {
+      request.setRequestHeader('X-SNJS-Version', this.snjsVersion)
 
-    const appVersionHeaderValue = `${Environment[this.environment]}-${this.appVersion}`
-    request.setRequestHeader('X-Application-Version', appVersionHeaderValue)
+      const appVersionHeaderValue = `${Environment[this.environment]}-${this.appVersion}`
+      request.setRequestHeader('X-Application-Version', appVersionHeaderValue)
 
-    if (httpRequest.authentication) {
-      request.setRequestHeader('Authorization', 'Bearer ' + httpRequest.authentication)
+      if (httpRequest.authentication) {
+        request.setRequestHeader('Authorization', 'Bearer ' + httpRequest.authentication)
+      }
     }
 
     let contenTypeIsSet = false
@@ -88,7 +90,7 @@ export class HttpService implements HttpServiceInterface {
         }
       })
     }
-    if (!contenTypeIsSet) {
+    if (!contenTypeIsSet && !httpRequest.external) {
       request.setRequestHeader('Content-Type', 'application/json')
     }
 

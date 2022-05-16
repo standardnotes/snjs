@@ -9,4 +9,5 @@ export type HttpRequest = {
   authentication?: string
   customHeaders?: Record<string, string>[]
   responseType?: XMLHttpRequestResponseType
+  external?: boolean
 }
