@@ -101,6 +101,12 @@ export async function createInitAppWithFakeCrypto(environment, platform) {
   return Applications.createInitAppWithFakeCrypto(environment, platform)
 }
 
+export async function createInitAppWithFakeCryptoWithOptions({ environment, platform, identifier }) {
+  const application = Applications.createApplicationWithOptions({ identifier, environment, platform })
+  await Applications.initializeApplication(application)
+  return application
+}
+
 export async function createInitAppWithRealCrypto(environment, platform) {
   return Applications.createInitAppWithRealCrypto(environment, platform)
 }
@@ -346,14 +352,13 @@ export function ignoreChallenges(application) {
 export function handlePasswordChallenges(application, password) {
   application.setLaunchCallback({
     receiveChallenge: (challenge) => {
-      const values = challenge.prompts.map(
-        (prompt) =>
-          CreateChallengeValue(
-            prompt,
-            prompt.validation === ChallengeValidation.ProtectionSessionDuration
-              ? UnprotectedAccessSecondsDuration.OneMinute
-              : password,
-          ),
+      const values = challenge.prompts.map((prompt) =>
+        CreateChallengeValue(
+          prompt,
+          prompt.validation === ChallengeValidation.ProtectionSessionDuration
+            ? UnprotectedAccessSecondsDuration.OneMinute
+            : password,
+        ),
       )
       application.submitValuesForChallenge(challenge, values)
     },

@@ -146,7 +146,7 @@ describe('application instances', () => {
       expect(confirmAlert.callCount).to.equal(1)
       expect(confirmAlert.calledWith(expectedConfirmMessage)).to.be.ok
       expect(deinit.callCount).to.equal(1)
-      expect(deinit.calledWith(DeinitSource.SignOut)).to.be.ok
+      expect(deinit.calledWith(DeinitMode.Soft, DeinitSource.SignOut)).to.be.ok
     })
 
     it('does not show confirmation dialog when there are no unsaved changes', async () => {
@@ -154,7 +154,7 @@ describe('application instances', () => {
 
       expect(confirmAlert.callCount).to.equal(0)
       expect(deinit.callCount).to.equal(1)
-      expect(deinit.calledWith(DeinitSource.SignOut)).to.be.ok
+      expect(deinit.calledWith(DeinitMode.Soft, DeinitSource.SignOut)).to.be.ok
     })
 
     it('does not show confirmation dialog when there are unsaved changes and the "force" option is set to true', async () => {
@@ -163,7 +163,7 @@ describe('application instances', () => {
 
       expect(confirmAlert.callCount).to.equal(0)
       expect(deinit.callCount).to.equal(1)
-      expect(deinit.calledWith(DeinitSource.SignOut)).to.be.ok
+      expect(deinit.calledWith(DeinitMode.Soft, DeinitSource.SignOut)).to.be.ok
     })
 
     it('cancels sign out if confirmation dialog is rejected', async () => {

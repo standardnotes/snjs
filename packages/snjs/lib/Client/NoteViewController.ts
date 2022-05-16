@@ -39,9 +39,21 @@ export class NoteViewController {
     private defaultTag: UuidString | undefined,
   ) {
     this.application = application
+
     if (noteUuid) {
       this.note = application.items.findItem(noteUuid) as SNNote
     }
+  }
+
+  deinit(): void {
+    this.removeStreamObserver?.()
+    ;(this.removeStreamObserver as unknown) = undefined
+    ;(this.application as unknown) = undefined
+    ;(this.note as unknown) = undefined
+
+    this.innerValueChangeObservers.length = 0
+
+    this.saveTimeout = undefined
   }
 
   async initialize(addTagHierarchy: boolean): Promise<void> {
@@ -90,16 +102,6 @@ export class NoteViewController {
     )
   }
 
-  deinit(): void {
-    this.removeStreamObserver?.()
-    ;(this.removeStreamObserver as unknown) = undefined
-    ;(this.application as unknown) = undefined
-
-    this.innerValueChangeObservers.length = 0
-
-    this.saveTimeout = undefined
-  }
-
   public insertTemplatedNote(): Promise<DecryptedItemInterface> {
     this.isTemplateNote = false
     return this.application.mutator.insertItem(this.note)
@@ -116,8 +118,9 @@ export class NoteViewController {
       callback(this.note, PayloadEmitSource.InitialObserverRegistrationPush)
     }
 
+    const thislessChangeObservers = this.innerValueChangeObservers
     return () => {
-      removeFromArray(this.innerValueChangeObservers, callback)
+      removeFromArray(thislessChangeObservers, callback)
     }
   }
 

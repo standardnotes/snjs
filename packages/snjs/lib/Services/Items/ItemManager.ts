@@ -139,6 +139,7 @@ export class ItemManager
     ;(this.payloadManager as unknown) = undefined
     ;(this.collection as unknown) = undefined
     ;(this.notesCollection as unknown) = undefined
+    ;(this.tagNotesIndex as unknown) = undefined
   }
 
   resetState(): void {
@@ -252,8 +253,9 @@ export class ItemManager
 
     this.observers.push(observer as ItemsChangeObserver)
 
+    const thislessObservers = this.observers
     return () => {
-      removeFromArray(this.observers, observer)
+      removeFromArray(thislessObservers, observer)
     }
   }
 

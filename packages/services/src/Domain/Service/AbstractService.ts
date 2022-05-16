@@ -19,8 +19,10 @@ export abstract class AbstractService<EventName = string, EventData = undefined>
 
   public addEventObserver(observer: EventObserver<EventName, EventData>): () => void {
     this.eventObservers.push(observer)
+
+    const thislessEventObservers = this.eventObservers
     return () => {
-      removeFromArray(this.eventObservers, observer)
+      removeFromArray(thislessEventObservers, observer)
     }
   }
 
@@ -68,6 +70,7 @@ export abstract class AbstractService<EventName = string, EventData = undefined>
   public deinit(): void {
     this.eventObservers.length = 0
     ;(this.internalEventBus as unknown) = undefined
+    ;(this.criticalPromises as unknown) = undefined
   }
 
   /**

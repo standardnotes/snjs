@@ -2,14 +2,16 @@ import WebDeviceInterface from './web_device_interface.js'
 import FakeWebCrypto from './fake_web_crypto.js'
 import * as Defaults from './Defaults.js'
 
-export function createApplication(identifier, environment, platform, host, crypto) {
-  const deviceInterface = new WebDeviceInterface()
-  deviceInterface.environment = environment
+export function createApplicationWithOptions({ identifier, environment, platform, host, crypto, device }) {
+  if (!device) {
+    device = new WebDeviceInterface()
+    device.environment = environment
+  }
 
   return new SNApplication({
     environment: environment || Environment.Web,
     platform: platform || Platform.MacWeb,
-    deviceInterface,
+    deviceInterface: device,
     crypto: crypto || new FakeWebCrypto(),
     alertService: {
       confirm: async () => true,
@@ -21,6 +23,10 @@ export function createApplication(identifier, environment, platform, host, crypt
     appVersion: Defaults.getAppVersion(),
     webSocketUrl: Defaults.getDefaultWebSocketUrl(),
   })
+}
+
+export function createApplication(identifier, environment, platform, host, crypto) {
+  return createApplicationWithOptions({ identifier, environment, platform, host, crypto })
 }
 
 export function createApplicationWithFakeCrypto(identifier, environment, platform, host) {

@@ -15,7 +15,7 @@ export async function safeDeinit(application) {
 
   await application.prepareForDeinit()
 
-  application.deinit(DeinitSource.SignOut)
+  application.deinit(DeinitMode.Soft, DeinitSource.SignOut)
 }
 
 export async function sleep(seconds) {

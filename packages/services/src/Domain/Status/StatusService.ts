@@ -1,6 +1,6 @@
 import { removeFromArray } from '@standardnotes/utils'
 import { AbstractService } from '../Service/AbstractService'
-import { StatusServiceEvent, StatusServiceInterface } from './StatusServiceInterface'
+import { StatusServiceEvent, StatusServiceInterface, StatusMessageIdentifier } from './StatusServiceInterface'
 
 /* istanbul ignore file */
 
@@ -18,16 +18,18 @@ export class StatusService extends AbstractService<StatusServiceEvent, string> i
     this.recomputeMessage()
   }
 
-  addMessage(message: string): () => void {
+  addMessage(message: string): StatusMessageIdentifier {
     this.dynamicMessages.push(message)
 
     this.recomputeMessage()
 
-    return () => {
-      removeFromArray(this.dynamicMessages, message)
+    return message
+  }
 
-      this.recomputeMessage()
-    }
+  removeMessage(message: StatusMessageIdentifier): void {
+    removeFromArray(this.dynamicMessages, message)
+
+    this.recomputeMessage()
   }
 
   private recomputeMessage(): void {

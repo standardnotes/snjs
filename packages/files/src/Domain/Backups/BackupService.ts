@@ -113,7 +113,7 @@ export class FilesBackupService extends AbstractService {
   }
 
   private async performBackupOperation(file: FileItem): Promise<'success' | 'failed' | 'aborted'> {
-    const removeStatus = this.status.addMessage(`Backing up file ${file.name}...`)
+    const messageId = this.status.addMessage(`Backing up file ${file.name}...`)
 
     const encryptedFile = await this.encryptor.encryptSplitSingle({
       usesItemsKeyWithKeyLookup: {
@@ -159,12 +159,12 @@ export class FilesBackupService extends AbstractService {
       valetToken: token,
     })
 
-    removeStatus()
+    this.status.removeMessage(messageId)
 
     if (result === 'failed') {
-      const removeFail = this.status.addMessage(`Failed to back up ${file.name}...`)
+      const failMessageId = this.status.addMessage(`Failed to back up ${file.name}...`)
       setTimeout(() => {
-        removeFail()
+        this.status.removeMessage(failMessageId)
       }, 2000)
     }
 

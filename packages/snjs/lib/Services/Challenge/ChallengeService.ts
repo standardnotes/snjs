@@ -34,6 +34,14 @@ export type ChallengeObserver = {
   onCancel?: () => void
 }
 
+const clearChallengeObserver = (observer: ChallengeObserver) => {
+  observer.onCancel = undefined
+  observer.onComplete = undefined
+  observer.onValidValue = undefined
+  observer.onInvalidValue = undefined
+  observer.onNonvalidatedSubmit = undefined
+}
+
 /**
  * The challenge service creates, updates and keeps track of running challenge operations.
  */
@@ -145,9 +153,14 @@ export class ChallengeService extends AbstractService implements ChallengeServic
 
   public addChallengeObserver(challenge: Challenge, observer: ChallengeObserver) {
     const observers = this.challengeObservers[challenge.id] || []
+
     observers.push(observer)
+
     this.challengeObservers[challenge.id] = observers
+
     return () => {
+      clearChallengeObserver(observer)
+
       removeFromArray(observers, observer)
     }
   }
@@ -157,6 +170,7 @@ export class ChallengeService extends AbstractService implements ChallengeServic
     resolve: (response: ChallengeResponse | undefined) => void,
   ): ChallengeOperation {
     let operation = this.getChallengeOperation(challenge)
+
     if (!operation) {
       operation = new ChallengeOperation(
         challenge,
@@ -179,6 +193,7 @@ export class ChallengeService extends AbstractService implements ChallengeServic
           resolve(undefined)
         },
       )
+
       this.challengeOperations[challenge.id] = operation
     }
     return operation
@@ -186,6 +201,7 @@ export class ChallengeService extends AbstractService implements ChallengeServic
 
   private performOnObservers(challenge: Challenge, perform: (observer: ChallengeObserver) => void) {
     const observers = this.challengeObservers[challenge.id] || []
+
     for (const observer of observers) {
       perform(observer)
     }
@@ -226,18 +242,23 @@ export class ChallengeService extends AbstractService implements ChallengeServic
   }
 
   private deleteChallengeOperation(operation: ChallengeOperation) {
-    delete this.challengeOperations[operation.challenge.id]
+    const challenge = operation.challenge
+    operation.deinit()
+
+    delete this.challengeOperations[challenge.id]
   }
 
   public cancelChallenge(challenge: Challenge) {
     const operation = this.challengeOperations[challenge.id]
     operation.cancel()
+
     this.deleteChallengeOperation(operation)
   }
 
   public completeChallenge(challenge: Challenge): void {
     const operation = this.challengeOperations[challenge.id]
     operation.complete()
+
     this.deleteChallengeOperation(operation)
   }
 
@@ -245,6 +266,7 @@ export class ChallengeService extends AbstractService implements ChallengeServic
     if (values.length === 0) {
       throw Error('Attempting to submit 0 values for challenge')
     }
+
     for (const value of values) {
       if (!value.prompt.validates) {
         const operation = this.getChallengeOperation(challenge)
@@ -264,9 +286,15 @@ export class ChallengeService extends AbstractService implements ChallengeServic
   ) {
     const operation = this.getChallengeOperation(challenge)
     operation.setValueStatus(value, valid, artifacts)
+
     if (operation.isFinished()) {
       this.deleteChallengeOperation(operation)
-      delete this.challengeObservers[operation.challenge.id]
+
+      const observers = this.challengeObservers[challenge.id]
+      observers.forEach(clearChallengeObserver)
+      observers.length = 0
+
+      delete this.challengeObservers[challenge.id]
     }
   }
 }

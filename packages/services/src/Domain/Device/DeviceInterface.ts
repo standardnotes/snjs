@@ -66,4 +66,10 @@ export interface DeviceInterface {
   clearRawKeychainValue(): Promise<void>
 
   openUrl(url: string): void
+
+  performSoftReset(): void
+
+  performHardReset(): void
+
+  isDeviceDestroyed(): boolean
 }

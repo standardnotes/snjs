@@ -68,9 +68,19 @@ export class SNComponentManager extends AbstractService<ComponentManagerEvent, E
   ) {
     super(internalEventBus)
     this.loggingEnabled = false
+
     this.addItemObserver()
+
+    /* On mobile, events listeners are handled by a respective component */
     if (environment !== Environment.Mobile) {
-      this.configureForNonMobileUsage()
+      window.addEventListener
+        ? window.addEventListener('focus', this.detectFocusChange, true)
+        : window.attachEvent('onfocusout', this.detectFocusChange)
+      window.addEventListener
+        ? window.addEventListener('blur', this.detectFocusChange, true)
+        : window.attachEvent('onblur', this.detectFocusChange)
+
+      window.addEventListener('message', this.onWindowMessage, true)
     }
   }
 
@@ -94,23 +104,32 @@ export class SNComponentManager extends AbstractService<ComponentManagerEvent, E
 
   override deinit(): void {
     super.deinit()
+
     for (const viewer of this.viewers) {
       viewer.destroy()
     }
+
     this.viewers.length = 0
     this.permissionDialogs.length = 0
+
     this.desktopManager = undefined
     ;(this.itemManager as unknown) = undefined
+    ;(this.featuresService as unknown) = undefined
     ;(this.syncService as unknown) = undefined
     ;(this.alertService as unknown) = undefined
     ;(this.preferencesSerivce as unknown) = undefined
-    this.removeItemObserver()
+
+    this.removeItemObserver?.()
     ;(this.removeItemObserver as unknown) = undefined
+
     if (window && !this.isMobile) {
       window.removeEventListener('focus', this.detectFocusChange, true)
       window.removeEventListener('blur', this.detectFocusChange, true)
-      window.removeEventListener('message', this.onWindowMessage)
+      window.removeEventListener('message', this.onWindowMessage, true)
     }
+
+    ;(this.detectFocusChange as unknown) = undefined
+    ;(this.onWindowMessage as unknown) = undefined
   }
 
   public createComponentViewer(
@@ -213,18 +232,6 @@ export class SNComponentManager extends AbstractService<ComponentManagerEvent, E
       this.log('Component manager received message', event.data)
       this.componentViewerForSessionKey(event.data.sessionKey)?.handleMessage(event.data)
     }
-  }
-
-  configureForNonMobileUsage(): void {
-    window.addEventListener
-      ? window.addEventListener('focus', this.detectFocusChange, true)
-      : window.attachEvent('onfocusout', this.detectFocusChange)
-    window.addEventListener
-      ? window.addEventListener('blur', this.detectFocusChange, true)
-      : window.attachEvent('onblur', this.detectFocusChange)
-
-    /* On mobile, events listeners are handled by a respective component */
-    window.addEventListener('message', this.onWindowMessage)
   }
 
   configureForDesktop(): void {
