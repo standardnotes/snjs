@@ -81,30 +81,6 @@ describe('application group', function () {
     expect(group.getDescriptors().length).to.equal(2)
   })
 
-  it('signing out of application should remove from group and create new', async function () {
-    const group = new SNApplicationGroup(globalDevice)
-    await group.initialize({
-      applicationCreator: (descriptor, device) => {
-        return Factory.createInitAppWithFakeCryptoWithOptions({
-          device: device,
-          identifier: descriptor.identifier,
-        })
-      },
-    })
-    const application = group.primaryApplication
-    const identifier = application.identifier
-    await Factory.safeDeinit(application)
-
-    /**
-     * On Safari 14.0.1 the new app instance will only be created on the
-     * next tick
-     */
-    await Factory.sleep(0)
-
-    /** Expect a new application to have been created */
-    expect(group.findPrimaryDescriptor().identifier).to.not.equal(identifier)
-  })
-
   it('should be notified when application changes', async function () {
     const group = new SNApplicationGroup(globalDevice)
     let notifyCount = 0

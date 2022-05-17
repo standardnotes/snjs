@@ -21,7 +21,7 @@ export class SNApplicationGroup<D extends DeviceInterface = DeviceInterface> ext
   | ApplicationGroupEventData[ApplicationGroupEvent.DeviceWillRestart]
   | ApplicationGroupEventData[ApplicationGroupEvent.DescriptorsDataChanged]
 > {
-  public primaryApplication?: AppGroupManagedApplication
+  public primaryApplication!: AppGroupManagedApplication
   private descriptorRecord!: DescriptorRecord
   callback!: AppGroupCallback<D>
 
@@ -112,11 +112,7 @@ export class SNApplicationGroup<D extends DeviceInterface = DeviceInterface> ext
   async signOutAllWorkspaces() {
     await this.removeAllDescriptors()
 
-    await this.device.clearAllDataFromDevice()
-
-    if (this.primaryApplication) {
-      await this.primaryApplication.user.signOut(false, DeinitSource.AppGroupUnload)
-    }
+    await this.primaryApplication.user.signOut(false, DeinitSource.SignOutAll)
   }
 
   onApplicationDeinit: DeinitCallback = (
@@ -124,25 +120,19 @@ export class SNApplicationGroup<D extends DeviceInterface = DeviceInterface> ext
     mode: DeinitMode,
     source: DeinitSource,
   ) => {
-    /** If we are initiaitng this unloading via function below, we don't want any side-effects */
-    const isUserInitiated = source !== DeinitSource.AppGroupUnload
-
     if (this.primaryApplication === application) {
-      this.primaryApplication = undefined
+      ;(this.primaryApplication as unknown) = undefined
     }
 
     const performSyncronously = async () => {
       if (source === DeinitSource.SignOut) {
         void this.removeDescriptor(this.descriptorForApplication(application))
+      }
 
-        if (isUserInitiated) {
-          /** If there are no more descriptors (all accounts have been signed out), create a new blank slate app */
-          const descriptors = this.getDescriptors()
+      const descriptors = this.getDescriptors()
 
-          if (descriptors.length === 0) {
-            await this.createNewPrimaryDescriptor()
-          }
-        }
+      if (descriptors.length === 0) {
+        await this.device.clearAllDataFromDevice()
       }
 
       const device = this.device
@@ -227,7 +217,7 @@ export class SNApplicationGroup<D extends DeviceInterface = DeviceInterface> ext
     await this.createNewPrimaryDescriptor(label)
 
     if (this.primaryApplication) {
-      this.primaryApplication.deinit(this.primaryApplication.getDeinitMode(), DeinitSource.AppGroupUnload)
+      this.primaryApplication.deinit(this.primaryApplication.getDeinitMode(), DeinitSource.SwitchWorkspace)
     }
   }
 
@@ -237,7 +227,7 @@ export class SNApplicationGroup<D extends DeviceInterface = DeviceInterface> ext
     await this.persistDescriptors()
 
     if (this.primaryApplication) {
-      this.primaryApplication.deinit(this.primaryApplication.getDeinitMode(), DeinitSource.AppGroupUnload)
+      this.primaryApplication.deinit(this.primaryApplication.getDeinitMode(), DeinitSource.SwitchWorkspace)
     }
   }
 
