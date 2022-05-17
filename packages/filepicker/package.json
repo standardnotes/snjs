@@ -1,6 +1,6 @@
 {
   "name": "@standardnotes/filepicker",
-  "version": "1.14.6",
+  "version": "1.14.7",
   "engines": {
     "node": ">=14.0.0 <17.0.0"
   },
@@ -40,8 +40,8 @@
     ]
   },
   "dependencies": {
-    "@standardnotes/common": "^1.20.1",
-    "@standardnotes/services": "^1.11.6",
-    "@standardnotes/utils": "^1.6.8"
+    "@standardnotes/common": "^1.21.0",
+    "@standardnotes/services": "^1.11.7",
+    "@standardnotes/utils": "^1.6.9"
   }
 }
