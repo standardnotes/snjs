@@ -110,15 +110,13 @@ export class SNApplicationGroup<D extends DeviceInterface = DeviceInterface> ext
   }
 
   async signOutAllWorkspaces() {
+    await this.removeAllDescriptors()
+
+    await this.device.clearAllDataFromDevice()
+
     if (this.primaryApplication) {
       await this.primaryApplication.user.signOut(false, DeinitSource.AppGroupUnload)
     }
-
-    await this.removeAllDescriptors()
-
-    this.handleAllWorkspacesSignedOut()
-
-    void this.unloadCurrentAndCreateNewDescriptor()
   }
 
   onApplicationDeinit: DeinitCallback = (
@@ -142,8 +140,6 @@ export class SNApplicationGroup<D extends DeviceInterface = DeviceInterface> ext
           const descriptors = this.getDescriptors()
 
           if (descriptors.length === 0) {
-            this.handleAllWorkspacesSignedOut()
-
             await this.createNewPrimaryDescriptor()
           }
         }
@@ -163,10 +159,6 @@ export class SNApplicationGroup<D extends DeviceInterface = DeviceInterface> ext
     }
 
     void performSyncronously()
-  }
-
-  handleAllWorkspacesSignedOut(): void {
-    /** Optional override */
   }
 
   public setDescriptorAsPrimary(primaryDescriptor: ApplicationDescriptor) {

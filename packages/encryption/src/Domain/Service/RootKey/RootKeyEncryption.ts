@@ -444,7 +444,7 @@ export class RootKeyEncryptionService extends Services.AbstractService<RootKeySe
   /**
    * Deletes root key and wrapper from keychain. Used when signing out of application.
    */
-  public async clearLocalKeyState() {
+  public async deleteWorkspaceSpecificKeyStateFromDevice() {
     await this.deviceInterface.clearNamespacedKeychainValue(this.identifier)
     await this.storageService.removeValue(Services.StorageKey.WrappedRootKey, Services.StorageValueModes.Nonwrapped)
     await this.storageService.removeValue(

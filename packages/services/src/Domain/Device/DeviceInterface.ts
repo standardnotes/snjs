@@ -43,6 +43,8 @@ export interface DeviceInterface {
    */
   getDatabaseKeys(): Promise<string[]>
 
+  clearAllDataFromDevice(): Promise<void>
+
   getAllRawDatabasePayloads<T extends FullyFormedTransferPayload = FullyFormedTransferPayload>(
     identifier: ApplicationIdentifier,
   ): Promise<T[]>

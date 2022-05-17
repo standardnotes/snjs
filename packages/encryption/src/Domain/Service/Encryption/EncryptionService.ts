@@ -544,8 +544,8 @@ export class EncryptionService extends Services.AbstractService<EncryptionServic
   /**
    * Deletes root key and wrapper from keychain. Used when signing out of application.
    */
-  public async clearLocalKeyState() {
-    await this.rootKeyEncryption.clearLocalKeyState()
+  public async deleteWorkspaceSpecificKeyStateFromDevice() {
+    await this.rootKeyEncryption.deleteWorkspaceSpecificKeyStateFromDevice()
   }
 
   public async validateAccountPassword(password: string) {

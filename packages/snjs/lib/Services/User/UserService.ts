@@ -271,7 +271,7 @@ export class UserService extends AbstractService<AccountEvent, AccountEventData>
   public async signOut(force = false, source = DeinitSource.SignOut): Promise<void> {
     const performSignOut = async () => {
       await this.sessionManager.signOut()
-      await this.protocolService.clearLocalKeyState()
+      await this.protocolService.deleteWorkspaceSpecificKeyStateFromDevice()
       await this.storageService.clearAllData()
       await this.notifyEvent(AccountEvent.SignedOut, { source })
     }
