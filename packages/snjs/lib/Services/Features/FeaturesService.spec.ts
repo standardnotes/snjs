@@ -468,13 +468,13 @@ describe('featuresService', () => {
           identifier: FeatureIdentifier.MidnightTheme,
           content_type: ContentType.Theme,
           expires_at: expiredDate,
-          role_name: RoleName.CoreUser,
+          role_name: RoleName.PlusUser,
         },
         {
           identifier: FeatureIdentifier.BoldEditor,
           content_type: ContentType.Component,
           expires_at: expiredDate,
-          role_name: RoleName.PlusUser,
+          role_name: RoleName.ProUser,
         },
       ] as jest.Mocked<FeatureDescription[]>
 
@@ -484,7 +484,7 @@ describe('featuresService', () => {
         },
       })
 
-      await featuresService.updateRolesAndFetchFeatures('123', [RoleName.CoreUser])
+      await featuresService.updateRolesAndFetchFeatures('123', [RoleName.PlusUser])
 
       expect(featuresService.getFeatureStatus(FeatureIdentifier.MidnightTheme)).toBe(
         FeatureStatus.InCurrentPlanButExpired,
