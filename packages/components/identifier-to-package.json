@@ -13,7 +13,7 @@
   "org.standardnotes.advanced-markdown-editor": "sn-advanced-markdown-editor",
   "org.standardnotes.minimal-markdown-editor": "sn-minimal-markdown-editor",
   "org.standardnotes.fancy-markdown-editor": "sn-fancy-markdown-editor",
-  "org.standardnotes.simple-task-editor": "sn-simple-task-editor",
+  "org.standardnotes.simple-task-editor": "@standardnotes/simple-task-editor",
   "org.standardnotes.token-vault": "sn-token-vault",
   "org.standardnotes.standard-sheets": "sn-spreadsheets",
   "org.standardnotes.file-safe": "@standardnotes/filesafe-bar",

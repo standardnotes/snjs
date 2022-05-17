@@ -158,7 +158,7 @@ export function editors(): EditorFeatureDescription[] {
     name: 'Basic Checklist',
     identifier: FeatureIdentifier.TaskEditor,
     note_type: NoteType.Task,
-    version: '1.3.9',
+    version: '1.3.10',
     spellcheckControl: true,
     file_type: 'md',
     interchangeable: false,

@@ -2303,6 +2303,11 @@
   resolved "https://registry.yarnpkg.com/@standardnotes/midnight-theme/-/midnight-theme-1.2.7.tgz#34bb614425ee04b04d9c4675e4760a0bf6a992cd"
   integrity sha512-xwtezvFZiTjvFrsBuMlMHL9YpcrIlbII3EBXYGe5lngvI9/8ufcNSq/edbE14f7q4mL+hxo5XP1HA861S9wy7g==
 
+"@standardnotes/simple-task-editor@1.3.10":
+  version "1.3.10"
+  resolved "https://registry.yarnpkg.com/@standardnotes/simple-task-editor/-/simple-task-editor-1.3.10.tgz#60e90b27f63a11aa1646efd7d34e72598408f37d"
+  integrity sha512-fgiCQLXT2S2vUwvtqhCOdqw9c1hUp8/YdjPqLF967t3l5PKywNteTn2Nz8Mg7B1+CUzrEFcZTJOFkDDsT5kjhA==
+
 "@standardnotes/solarized-dark-theme@1.2.6":
   version "1.2.6"
   resolved "https://registry.yarnpkg.com/@standardnotes/solarized-dark-theme/-/solarized-dark-theme-1.2.6.tgz#96811405eb00de70927f36cc962d51b405eacdff"
@@ -9479,11 +9484,6 @@ sn-simple-markdown-editor@1.4.2:
   version "1.4.2"
   resolved "https://registry.yarnpkg.com/sn-simple-markdown-editor/-/sn-simple-markdown-editor-1.4.2.tgz#32cbb6300a1b251c285c97bf89b9c6442213698a"
   integrity sha512-HASXYu/zs2PGYtIZm+1zb9IorQvqe8ovDVA0K2nQ2ZzHMgw5/w7SVNVPH0FZeStv9JEqOYCccLUK0UZGdKdMWA==
-
-sn-simple-task-editor@1.3.9:
-  version "1.3.9"
-  resolved "https://registry.yarnpkg.com/sn-simple-task-editor/-/sn-simple-task-editor-1.3.9.tgz#e3e0a122ae77df564feb55d04e08f5cff4781fb1"
-  integrity sha512-CKF4jn7hqhhLnZhHj1LqsfSGFmdpQpz/puX0U8U0Q9/2W9aap9pnmduOo1OP25dBnGXnrjxsK5LP6W3l83tehg==
 
 sn-spreadsheets@1.4.4:
   version "1.4.4"
