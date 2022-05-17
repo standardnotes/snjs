@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.109.2](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.109.1...@standardnotes/snjs@2.109.2) (2022-05-17)
+
+
+### Bug Fixes
+
+* workspace signout all ([0ac4501](https://github.com/standardnotes/snjs/commit/0ac45019428946016ef02384b07b8190378008fc))
+
+
+
+
+
 ## [2.109.1](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.109.0...@standardnotes/snjs@2.109.1) (2022-05-17)
 
 **Note:** Version bump only for package @standardnotes/snjs
