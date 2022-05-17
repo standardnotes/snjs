@@ -1,4 +1,5 @@
-import { UuidString, DeinitSource } from '../Types'
+import { AppGroupManagedApplication } from './../Application/ApplicationInterface'
+import { DeinitSource } from '../Types'
 import {
   AbstractService,
   DeviceInterface,
@@ -7,37 +8,20 @@ import {
   RawStorageKey,
 } from '@standardnotes/services'
 import { UuidGenerator } from '@standardnotes/utils'
-import { ApplicationInterface, DeinitCallback, DeinitMode } from './ApplicationInterface'
-
-export type ApplicationDescriptor = {
-  identifier: string | UuidString
-  label: string
-  /** Whether the application is the primary user-facing selected application */
-  primary: boolean
-}
-
-export type DescriptorRecord = Record<string, ApplicationDescriptor>
-
-type AppGroupCallback<D extends DeviceInterface = DeviceInterface> = {
-  applicationCreator: (descriptor: ApplicationDescriptor, deviceInterface: D) => Promise<ApplicationInterface>
-}
-
-export enum ApplicationGroupEvent {
-  PrimaryApplicationSet = 'PrimaryApplicationSet',
-  DescriptorsDataChanged = 'DescriptorsDataChanged',
-  DeviceWillRestart = 'DeviceWillRestart',
-}
-
-export type ApplicationGroupEventData = {
-  primaryApplication?: ApplicationInterface
-  primaryDescriptor?: ApplicationDescriptor
-}
+import { DeinitCallback } from './DeinitCallback'
+import { DeinitMode } from '../Application/DeinitMode'
+import { AppGroupCallback } from './AppGroupCallback'
+import { ApplicationGroupEvent, ApplicationGroupEventData } from './ApplicationGroupEvent'
+import { DescriptorRecord } from './DescriptorRecord'
+import { ApplicationDescriptor } from './ApplicationDescriptor'
 
 export class SNApplicationGroup<D extends DeviceInterface = DeviceInterface> extends AbstractService<
   ApplicationGroupEvent,
-  ApplicationGroupEventData
+  | ApplicationGroupEventData[ApplicationGroupEvent.PrimaryApplicationSet]
+  | ApplicationGroupEventData[ApplicationGroupEvent.DeviceWillRestart]
+  | ApplicationGroupEventData[ApplicationGroupEvent.DescriptorsDataChanged]
 > {
-  public primaryApplication?: ApplicationInterface
+  public primaryApplication?: AppGroupManagedApplication
   private descriptorRecord!: DescriptorRecord
   callback!: AppGroupCallback<D>
 
@@ -88,7 +72,7 @@ export class SNApplicationGroup<D extends DeviceInterface = DeviceInterface> ext
 
     this.primaryApplication = application
 
-    await this.notifyEvent(ApplicationGroupEvent.PrimaryApplicationSet, { primaryApplication: application })
+    await this.notifyEvent(ApplicationGroupEvent.PrimaryApplicationSet, { application: application })
   }
 
   private async createNewDescriptorRecord() {
@@ -137,7 +121,11 @@ export class SNApplicationGroup<D extends DeviceInterface = DeviceInterface> ext
     void this.unloadCurrentAndCreateNewDescriptor()
   }
 
-  onApplicationDeinit: DeinitCallback = (application: ApplicationInterface, mode: DeinitMode, source: DeinitSource) => {
+  onApplicationDeinit: DeinitCallback = (
+    application: AppGroupManagedApplication,
+    mode: DeinitMode,
+    source: DeinitSource,
+  ) => {
     /** If we are initiaitng this unloading via function below, we don't want any side-effects */
     const isUserInitiated = source !== DeinitSource.AppGroupUnload
 
@@ -163,7 +151,7 @@ export class SNApplicationGroup<D extends DeviceInterface = DeviceInterface> ext
 
       const device = this.device
 
-      void this.notifyEvent(ApplicationGroupEvent.DeviceWillRestart)
+      void this.notifyEvent(ApplicationGroupEvent.DeviceWillRestart, { source, mode })
 
       this.deinit()
 
@@ -190,7 +178,7 @@ export class SNApplicationGroup<D extends DeviceInterface = DeviceInterface> ext
   private async persistDescriptors() {
     await this.device.setRawStorageValue(RawStorageKey.DescriptorRecord, JSON.stringify(this.descriptorRecord))
 
-    void this.notifyEvent(ApplicationGroupEvent.DescriptorsDataChanged)
+    void this.notifyEvent(ApplicationGroupEvent.DescriptorsDataChanged, { descriptors: this.descriptorRecord })
   }
 
   public renameDescriptor(descriptor: ApplicationDescriptor, label: string) {
@@ -216,7 +204,7 @@ export class SNApplicationGroup<D extends DeviceInterface = DeviceInterface> ext
     return this.persistDescriptors()
   }
 
-  private descriptorForApplication(application: ApplicationInterface) {
+  private descriptorForApplication(application: AppGroupManagedApplication) {
     return this.descriptorRecord[application.identifier]
   }
 

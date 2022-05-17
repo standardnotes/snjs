@@ -1,4 +1,3 @@
-import { SnjsVersion } from './../Version'
 import * as Common from '@standardnotes/common'
 import * as ExternalServices from '@standardnotes/services'
 import * as Encryption from '@standardnotes/encryption'
@@ -9,6 +8,7 @@ import * as Utils from '@standardnotes/utils'
 import * as Options from './Options'
 import * as Settings from '@standardnotes/settings'
 import * as Files from '@standardnotes/files'
+import { SnjsVersion } from './../Version'
 import { Subscription } from '@standardnotes/auth'
 import { UuidString, DeinitSource, ApplicationEventPayload } from '../Types'
 import { ApplicationEvent, applicationEventForSyncEvent } from '@Lib/Application/Event'
@@ -27,7 +27,9 @@ import { useBoolean } from '@standardnotes/utils'
 import { DecryptedItemInterface, EncryptedItemInterface } from '@standardnotes/models'
 import { ClientDisplayableError } from '@standardnotes/responses'
 import { Challenge, ChallengeResponse } from '../Services'
-import { ApplicationInterface, DeinitCallback, DeinitMode } from './ApplicationInterface'
+import { AppGroupManagedApplication, ApplicationInterface } from './ApplicationInterface'
+import { DeinitCallback } from '../ApplicationGroup/DeinitCallback'
+import { DeinitMode } from './DeinitMode'
 
 /** How often to automatically sync, in milliseconds */
 const DEFAULT_AUTO_SYNC_INTERVAL = 30_000
@@ -35,21 +37,27 @@ const DEFAULT_AUTO_SYNC_INTERVAL = 30_000
 type LaunchCallback = {
   receiveChallenge: (challenge: Challenge) => void
 }
+
 type ApplicationEventCallback = (event: ApplicationEvent, data?: unknown) => Promise<void>
+
 type ApplicationObserver = {
   singleEvent?: ApplicationEvent
   callback: ApplicationEventCallback
 }
+
 type ItemStream<I extends DecryptedItemInterface> = (data: {
   changed: I[]
   inserted: I[]
   removed: (Models.DeletedItemInterface | Models.EncryptedItemInterface)[]
   source: Models.PayloadEmitSource
 }) => void
+
 type ObserverRemover = () => void
 
-export class SNApplication implements ApplicationInterface, InternalServices.ListedClientInterface {
-  onDeinit?: DeinitCallback
+export class SNApplication
+  implements ApplicationInterface, AppGroupManagedApplication, InternalServices.ListedClientInterface
+{
+  onDeinit!: DeinitCallback
 
   /**
    * A runtime based identifier for each dynamic instantiation of the application instance.
@@ -709,7 +717,6 @@ export class SNApplication implements ApplicationInterface, InternalServices.Lis
     this.challengeService.cancelChallenge(challenge)
   }
 
-  /** Set a function to be called when this application deinits */
   public setOnDeinit(onDeinit: DeinitCallback): void {
     this.onDeinit = onDeinit
   }
@@ -750,7 +757,7 @@ export class SNApplication implements ApplicationInterface, InternalServices.Lis
     this.started = false
 
     this.onDeinit?.(this, mode, source)
-    this.onDeinit = undefined
+    ;(this.onDeinit as unknown) = undefined
   }
 
   /**
