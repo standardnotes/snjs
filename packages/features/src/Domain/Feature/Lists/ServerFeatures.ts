@@ -6,7 +6,7 @@ import { SubscriptionName } from '@standardnotes/common'
 export function serverFeatures(): ServerFeatureDescription[] {
   return [
     {
-      availableInSubscriptions: [SubscriptionName.CorePlan, SubscriptionName.PlusPlan, SubscriptionName.ProPlan],
+      availableInSubscriptions: [SubscriptionName.PlusPlan, SubscriptionName.ProPlan],
       name: 'Two factor authentication',
       identifier: FeatureIdentifier.TwoFactorAuth,
       permission_name: PermissionName.TwoFactorAuth,
@@ -22,12 +22,6 @@ export function serverFeatures(): ServerFeatureDescription[] {
       name: '365 days note history',
       identifier: FeatureIdentifier.NoteHistory365Days,
       permission_name: PermissionName.NoteHistory365Days,
-    },
-    {
-      availableInSubscriptions: [SubscriptionName.CorePlan],
-      name: '30 days note history',
-      identifier: FeatureIdentifier.NoteHistory30Days,
-      permission_name: PermissionName.NoteHistory30Days,
     },
     {
       availableInSubscriptions: [SubscriptionName.PlusPlan, SubscriptionName.ProPlan],

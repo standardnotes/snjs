@@ -56,7 +56,7 @@ describe('featuresService', () => {
   }
 
   beforeEach(() => {
-    roles = [RoleName.BasicUser, RoleName.CoreUser]
+    roles = [RoleName.CoreUser, RoleName.PlusUser]
 
     now = new Date()
     tomorrow_client = now.setDate(now.getDate() + 1)
@@ -215,7 +215,7 @@ describe('featuresService', () => {
     })
 
     it('saves new roles to storage and fetches features if a role has been removed', async () => {
-      const newRoles = [RoleName.BasicUser]
+      const newRoles = [RoleName.CoreUser]
 
       storageService.getValue = jest.fn().mockReturnValue(roles)
       const featuresService = createService()
@@ -433,13 +433,13 @@ describe('featuresService', () => {
           identifier: FeatureIdentifier.MidnightTheme,
           content_type: ContentType.Theme,
           expires_at: tomorrow_server,
-          role_name: RoleName.CoreUser,
+          role_name: RoleName.PlusUser,
         },
         {
           identifier: FeatureIdentifier.BoldEditor,
           content_type: ContentType.Component,
           expires_at: expiredDate,
-          role_name: RoleName.PlusUser,
+          role_name: RoleName.ProUser,
         },
       ] as jest.Mocked<FeatureDescription[]>
 
@@ -451,13 +451,13 @@ describe('featuresService', () => {
 
       sessionManager.isSignedIntoFirstPartyServer = jest.fn().mockReturnValue(true)
 
-      await featuresService.updateRolesAndFetchFeatures('123', [RoleName.BasicUser, RoleName.CoreUser])
+      await featuresService.updateRolesAndFetchFeatures('123', [RoleName.CoreUser, RoleName.PlusUser])
 
       expect(featuresService.getFeatureStatus(FeatureIdentifier.MidnightTheme)).toBe(FeatureStatus.Entitled)
       expect(featuresService.getFeatureStatus(FeatureIdentifier.BoldEditor)).toBe(FeatureStatus.NotInCurrentPlan)
       expect(featuresService.getFeatureStatus(FeatureIdentifier.SheetsEditor)).toBe(FeatureStatus.NotInCurrentPlan)
 
-      await featuresService.updateRolesAndFetchFeatures('123', [RoleName.BasicUser])
+      await featuresService.updateRolesAndFetchFeatures('123', [RoleName.CoreUser])
 
       expect(featuresService.getFeatureStatus(FeatureIdentifier.MidnightTheme)).toBe(FeatureStatus.NoUserSubscription)
       expect(featuresService.getFeatureStatus(FeatureIdentifier.BoldEditor)).toBe(FeatureStatus.NoUserSubscription)
@@ -484,7 +484,7 @@ describe('featuresService', () => {
         },
       })
 
-      await featuresService.updateRolesAndFetchFeatures('123', [RoleName.BasicUser, RoleName.CoreUser])
+      await featuresService.updateRolesAndFetchFeatures('123', [RoleName.CoreUser])
 
       expect(featuresService.getFeatureStatus(FeatureIdentifier.MidnightTheme)).toBe(
         FeatureStatus.InCurrentPlanButExpired,
@@ -540,7 +540,7 @@ describe('featuresService', () => {
         set: jest.fn(),
       })
 
-      await featuresService.updateRolesAndFetchFeatures('123', [RoleName.BasicUser])
+      await featuresService.updateRolesAndFetchFeatures('123', [RoleName.CoreUser])
 
       expect(featuresService.getFeatureStatus(themeFeature.identifier)).toBe(FeatureStatus.Entitled)
       expect(featuresService.getFeatureStatus(editorFeature.identifier)).toBe(FeatureStatus.InCurrentPlanButExpired)
@@ -552,7 +552,7 @@ describe('featuresService', () => {
     it('feature status should be not entitled if no account or offline repo', async () => {
       const featuresService = createService()
 
-      await featuresService.updateRolesAndFetchFeatures('123', [RoleName.BasicUser])
+      await featuresService.updateRolesAndFetchFeatures('123', [RoleName.CoreUser])
 
       sessionManager.isSignedIntoFirstPartyServer = jest.fn().mockReturnValue(false)
 
@@ -573,7 +573,7 @@ describe('featuresService', () => {
         },
       })
 
-      await featuresService.updateRolesAndFetchFeatures('123', [RoleName.BasicUser, RoleName.PlusUser])
+      await featuresService.updateRolesAndFetchFeatures('123', [RoleName.CoreUser, RoleName.PlusUser])
 
       sessionManager.isSignedIntoFirstPartyServer = jest.fn().mockReturnValue(true)
 
@@ -591,7 +591,7 @@ describe('featuresService', () => {
     it('feature status should be dynamic for subscriber if cached features and no successful features request made yet', async () => {
       const featuresService = createService()
 
-      await featuresService.updateRolesAndFetchFeatures('123', [RoleName.BasicUser, RoleName.PlusUser])
+      await featuresService.updateRolesAndFetchFeatures('123', [RoleName.CoreUser, RoleName.PlusUser])
 
       featuresService['completedSuccessfulFeaturesRetrieval'] = false
 
@@ -609,7 +609,7 @@ describe('featuresService', () => {
     it('feature status for offline subscription', async () => {
       const featuresService = createService()
 
-      await featuresService.updateRolesAndFetchFeatures('123', [RoleName.BasicUser, RoleName.PlusUser])
+      await featuresService.updateRolesAndFetchFeatures('123', [RoleName.CoreUser, RoleName.PlusUser])
 
       sessionManager.isSignedIntoFirstPartyServer = jest.fn().mockReturnValue(false)
       featuresService.hasOnlineSubscription = jest.fn().mockReturnValue(false)
@@ -635,7 +635,7 @@ describe('featuresService', () => {
         FeatureStatus.NoUserSubscription,
       )
 
-      await featuresService.updateRolesAndFetchFeatures('123', [RoleName.BasicUser, RoleName.CoreUser])
+      await featuresService.updateRolesAndFetchFeatures('123', [RoleName.CoreUser, RoleName.PlusUser])
 
       expect(featuresService.getFeatureStatus(FeatureIdentifier.DeprecatedFileSafe)).toBe(FeatureStatus.Entitled)
     })
@@ -643,12 +643,12 @@ describe('featuresService', () => {
     it('has paid subscription', async () => {
       const featuresService = createService()
 
-      await featuresService.updateRolesAndFetchFeatures('123', [RoleName.BasicUser])
+      await featuresService.updateRolesAndFetchFeatures('123', [RoleName.CoreUser])
       sessionManager.isSignedIntoFirstPartyServer = jest.fn().mockReturnValue(true)
 
       expect(featuresService.hasPaidOnlineOrOfflineSubscription()).toBeFalsy
 
-      await featuresService.updateRolesAndFetchFeatures('123', [RoleName.BasicUser, RoleName.PlusUser])
+      await featuresService.updateRolesAndFetchFeatures('123', [RoleName.CoreUser, RoleName.PlusUser])
 
       expect(featuresService.hasPaidOnlineOrOfflineSubscription()).toEqual(true)
     })
@@ -656,7 +656,7 @@ describe('featuresService', () => {
     it('has paid subscription should be true if offline repo and signed into third party server', async () => {
       const featuresService = createService()
 
-      await featuresService.updateRolesAndFetchFeatures('123', [RoleName.BasicUser])
+      await featuresService.updateRolesAndFetchFeatures('123', [RoleName.CoreUser])
 
       featuresService.hasOfflineRepo = jest.fn().mockReturnValue(true)
       sessionManager.isSignedIntoFirstPartyServer = jest.fn().mockReturnValue(false)
@@ -728,32 +728,17 @@ describe('featuresService', () => {
     it('should sort given roles according to role hierarchy', () => {
       const featuresService = createService()
 
-      const sortedRoles = featuresService.rolesBySorting([
-        RoleName.ProUser,
-        RoleName.CoreUser,
-        RoleName.BasicUser,
-        RoleName.PlusUser,
-      ])
+      const sortedRoles = featuresService.rolesBySorting([RoleName.ProUser, RoleName.CoreUser, RoleName.PlusUser])
 
-      expect(sortedRoles).toStrictEqual([RoleName.BasicUser, RoleName.CoreUser, RoleName.PlusUser, RoleName.ProUser])
+      expect(sortedRoles).toStrictEqual([RoleName.CoreUser, RoleName.PlusUser, RoleName.ProUser])
     })
   })
 
   describe('hasMinimumRole', () => {
-    it('should be false if basic user checks for core role', async () => {
-      const featuresService = createService()
-
-      await featuresService.updateRolesAndFetchFeatures('123', [RoleName.BasicUser])
-
-      const hasCoreUserRole = featuresService.hasMinimumRole(RoleName.CoreUser)
-
-      expect(hasCoreUserRole).toBe(false)
-    })
-
     it('should be false if core user checks for plus role', async () => {
       const featuresService = createService()
 
-      await featuresService.updateRolesAndFetchFeatures('123', [RoleName.CoreUser, RoleName.BasicUser])
+      await featuresService.updateRolesAndFetchFeatures('123', [RoleName.CoreUser])
 
       const hasPlusUserRole = featuresService.hasMinimumRole(RoleName.PlusUser)
 
@@ -763,7 +748,7 @@ describe('featuresService', () => {
     it('should be false if plus user checks for pro role', async () => {
       const featuresService = createService()
 
-      await featuresService.updateRolesAndFetchFeatures('123', [RoleName.PlusUser, RoleName.BasicUser])
+      await featuresService.updateRolesAndFetchFeatures('123', [RoleName.PlusUser, RoleName.CoreUser])
 
       const hasProUserRole = featuresService.hasMinimumRole(RoleName.ProUser)
 
@@ -773,11 +758,7 @@ describe('featuresService', () => {
     it('should be true if pro user checks for core user', async () => {
       const featuresService = createService()
 
-      await featuresService.updateRolesAndFetchFeatures('123', [
-        RoleName.ProUser,
-        RoleName.BasicUser,
-        RoleName.PlusUser,
-      ])
+      await featuresService.updateRolesAndFetchFeatures('123', [RoleName.ProUser, RoleName.PlusUser])
 
       const hasCoreUserRole = featuresService.hasMinimumRole(RoleName.CoreUser)
 
@@ -787,11 +768,7 @@ describe('featuresService', () => {
     it('should be true if pro user checks for pro user', async () => {
       const featuresService = createService()
 
-      await featuresService.updateRolesAndFetchFeatures('123', [
-        RoleName.ProUser,
-        RoleName.BasicUser,
-        RoleName.PlusUser,
-      ])
+      await featuresService.updateRolesAndFetchFeatures('123', [RoleName.ProUser, RoleName.PlusUser])
 
       const hasProUserRole = featuresService.hasMinimumRole(RoleName.ProUser)
 
