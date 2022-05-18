@@ -14,11 +14,6 @@ export interface WebClientRequiresDesktopMethods extends FileBackupsDevice {
 
   onInitialDataLoad(): void
 
-  /**
-   * Destroys all sensitive storage data, such as localStorage, IndexedDB, and other log files.
-   */
-  clearAllDataFromDevice(): Promise<void>
-
   onSearch(text?: string): void
 
   downloadBackup(): void | Promise<void>

@@ -43,7 +43,11 @@ export interface DeviceInterface {
    */
   getDatabaseKeys(): Promise<string[]>
 
-  clearAllDataFromDevice(): Promise<void>
+  /**
+   * Return true for killsApplication if the clear data operation kills the application process completely.
+   * This tends to be the case for the desktop application.
+   */
+  clearAllDataFromDevice(workspaceIdentifiers: ApplicationIdentifier[]): Promise<{ killsApplication: boolean }>
 
   getAllRawDatabasePayloads<T extends FullyFormedTransferPayload = FullyFormedTransferPayload>(
     identifier: ApplicationIdentifier,

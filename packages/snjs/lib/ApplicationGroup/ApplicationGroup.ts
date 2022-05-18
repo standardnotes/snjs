@@ -110,8 +110,6 @@ export class SNApplicationGroup<D extends DeviceInterface = DeviceInterface> ext
   }
 
   async signOutAllWorkspaces() {
-    await this.removeAllDescriptors()
-
     await this.primaryApplication.user.signOut(false, DeinitSource.SignOutAll)
   }
 
@@ -131,8 +129,16 @@ export class SNApplicationGroup<D extends DeviceInterface = DeviceInterface> ext
 
       const descriptors = this.getDescriptors()
 
-      if (descriptors.length === 0) {
-        await this.device.clearAllDataFromDevice()
+      if (descriptors.length === 0 || source === DeinitSource.SignOutAll) {
+        const identifiers = descriptors.map((d) => d.identifier)
+
+        this.descriptorRecord = {}
+
+        const { killsApplication } = await this.device.clearAllDataFromDevice(identifiers)
+
+        if (killsApplication) {
+          return
+        }
       }
 
       const device = this.device

@@ -1,8 +1,7 @@
-import { UuidString } from '../Types'
+import { ApplicationIdentifier } from '@standardnotes/common'
 
 export type ApplicationDescriptor = {
-  identifier: string | UuidString
+  identifier: ApplicationIdentifier
   label: string
-  /** Whether the application is the primary user-facing selected application */
   primary: boolean
 }
