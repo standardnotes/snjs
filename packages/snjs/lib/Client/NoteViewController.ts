@@ -64,16 +64,17 @@ export class NoteViewController {
         references: [],
       })
 
+      this.isTemplateNote = true
+      this.note = note
+
       if (this.defaultTag) {
         const tag = this.application.items.findItem(this.defaultTag) as SNTag
         await this.application.items.addTagToNote(note, tag, addTagHierarchy)
       }
 
-      this.isTemplateNote = true
-      this.note = note
-
       this.notifyObservers(this.note, PayloadEmitSource.InitialObserverRegistrationPush)
     }
+
     this.streamItems()
   }
 

@@ -35,42 +35,54 @@ export class NoteGroupController {
     this.changeObservers.length = 0
 
     for (const controller of this.noteControllers) {
-      this.closeNoteView(controller, false)
+      this.closeNoteController(controller, { notify: false })
     }
 
     this.noteControllers.length = 0
   }
 
-  async createNoteView(noteUuid?: string, noteTitle?: string, noteTag?: UuidString): Promise<NoteViewController> {
+  async createNoteController(noteUuid?: string, noteTitle?: string, noteTag?: UuidString): Promise<NoteViewController> {
+    if (this.activeNoteViewController) {
+      this.closeNoteController(this.activeNoteViewController, { notify: false })
+    }
+
     const controller = new NoteViewController(this.application, noteUuid, noteTitle, noteTag)
-    await controller.initialize(this.addTagHierarchy)
+
     this.noteControllers.push(controller)
+
+    await controller.initialize(this.addTagHierarchy)
+
     this.notifyObservers()
 
     return controller
   }
 
-  closeNoteView(controller: NoteViewController, notifyObservers = true): void {
+  public closeNoteController(
+    controller: NoteViewController,
+    { notify = true }: { notify: boolean } = { notify: true },
+  ): void {
     controller.deinit()
 
     removeFromArray(this.noteControllers, controller)
 
-    if (notifyObservers) {
+    if (notify) {
       this.notifyObservers()
     }
   }
 
-  closeActiveNoteView(): void {
+  closeActiveNoteController(): void {
     const activeController = this.activeNoteViewController
+
     if (activeController) {
-      this.closeNoteView(activeController, true)
+      this.closeNoteController(activeController, { notify: true })
     }
   }
 
-  closeAllNoteViews(): void {
+  closeAllNoteControllers(): void {
     for (const controller of this.noteControllers) {
-      this.closeNoteView(controller, false)
+      this.closeNoteController(controller, { notify: false })
     }
+
     this.notifyObservers()
   }
 

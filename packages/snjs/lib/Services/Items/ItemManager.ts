@@ -386,9 +386,7 @@ export class ItemManager
       })
     }
 
-    const observers = this.observers.slice()
-
-    for (const observer of observers) {
+    for (const observer of this.observers) {
       const filteredChanged = filter(changed, observer.contentType)
       const filteredInserted = filter(inserted, observer.contentType)
       const filteredDiscarded = filter(removed, observer.contentType)

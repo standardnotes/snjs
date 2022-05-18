@@ -472,9 +472,12 @@ export class SNApplication
     contentType: Common.ContentType | Common.ContentType[],
     stream: ItemStream<I>,
   ): () => void {
-    const observer = this.itemManager.addObserver<I>(contentType, ({ changed, inserted, removed, source }) => {
-      stream({ changed, inserted, removed, source })
-    })
+    const removeItemManagerObserver = this.itemManager.addObserver<I>(
+      contentType,
+      ({ changed, inserted, removed, source }) => {
+        stream({ changed, inserted, removed, source })
+      },
+    )
 
     /** Push current values now */
     const matches = this.itemManager.getItems<I>(contentType)
@@ -487,11 +490,12 @@ export class SNApplication
       })
     }
 
-    this.streamRemovers.push(observer)
+    this.streamRemovers.push(removeItemManagerObserver)
 
     return () => {
-      observer()
-      Utils.removeFromArray(this.streamRemovers, observer)
+      removeItemManagerObserver()
+
+      Utils.removeFromArray(this.streamRemovers, removeItemManagerObserver)
     }
   }
 
