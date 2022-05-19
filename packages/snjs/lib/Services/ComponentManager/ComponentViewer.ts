@@ -88,6 +88,8 @@ export enum ComponentViewerError {
   MissingUrl = 'MissingUrl',
 }
 
+type Writeable<T> = { -readonly [P in keyof T]: T[P] }
+
 export class ComponentViewer {
   private streamItems?: ContentType[]
   private streamContextItemOriginalMessage?: ComponentMessage
@@ -100,6 +102,7 @@ export class ComponentViewer {
   private featureStatus: FeatureStatus
   private removeFeaturesObserver: () => void
   private eventObservers: EventObserver[] = []
+  private dealloced = false
 
   private window?: Window
   private hidden = false
@@ -108,7 +111,7 @@ export class ComponentViewer {
   public sessionKey?: string
 
   constructor(
-    public component: SNComponent,
+    public readonly component: SNComponent,
     private itemManager: ItemManager,
     private syncService: SNSyncService,
     private alertService: AlertService,
@@ -124,6 +127,9 @@ export class ComponentViewer {
     this.removeItemObserver = this.itemManager.addObserver(
       ContentType.Any,
       ({ changed, inserted, removed, source, sourceKey }) => {
+        if (this.dealloced) {
+          return
+        }
         const items = [...changed, ...inserted, ...removed]
         this.handleChangesInItems(items, source, sourceKey)
       },
@@ -135,6 +141,9 @@ export class ComponentViewer {
     this.featureStatus = featuresService.getFeatureStatus(component.identifier)
 
     this.removeFeaturesObserver = featuresService.addEventObserver((event) => {
+      if (this.dealloced) {
+        return
+      }
       if (event === FeaturesEvent.FeaturesUpdated) {
         const featureStatus = featuresService.getFeatureStatus(component.identifier)
 
@@ -162,6 +171,7 @@ export class ComponentViewer {
   }
 
   private deinit(): void {
+    this.dealloced = true
     ;(this.component as unknown) = undefined
     ;(this.itemManager as unknown) = undefined
     ;(this.syncService as unknown) = undefined
@@ -253,7 +263,7 @@ export class ComponentViewer {
   private updateOurComponentRefFromChangedItems(items: DecryptedItemInterface[]): void {
     const updatedComponent = items.find((item) => item.uuid === this.component.uuid)
     if (updatedComponent && isDecryptedItem(updatedComponent)) {
-      this.component = updatedComponent as SNComponent
+      ;(this.component as Writeable<SNComponent>) = updatedComponent as SNComponent
     }
   }
 
