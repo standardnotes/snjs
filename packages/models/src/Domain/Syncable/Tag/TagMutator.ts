@@ -1,6 +1,6 @@
 import { ContentType } from '@standardnotes/common'
 import { TagContent, SNTag } from './Tag'
-import { SNFile } from '../File'
+import { FileItem } from '../File'
 import { SNNote } from '../Note'
 import { isTagToParentTagReference } from '../../Abstract/Reference/Functions'
 import { TagToParentTagReference } from '../../Abstract/Reference/TagToParentTagReference'
@@ -35,7 +35,7 @@ export class TagMutator extends DecryptedItemMutator<TagContent> {
     this.mutableContent.references = this.immutableItem.references.filter((ref) => !isTagToParentTagReference(ref))
   }
 
-  public addFile(file: SNFile): void {
+  public addFile(file: FileItem): void {
     if (this.immutableItem.isReferencingItem(file)) {
       return
     }
@@ -49,7 +49,7 @@ export class TagMutator extends DecryptedItemMutator<TagContent> {
     this.mutableContent.references.push(reference)
   }
 
-  public removeFile(file: SNFile): void {
+  public removeFile(file: FileItem): void {
     this.mutableContent.references = this.mutableContent.references.filter((r) => r.uuid !== file.uuid)
   }
 

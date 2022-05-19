@@ -27,7 +27,12 @@
     "version-bump-beta": "lerna version --conventional-commits --conventional-prerelease --yes -m \"chore(release): publish beta\"",
     "publish-packages": "lerna publish from-git --yes",
     "publish-packages-beta": "lerna publish from-git --yes --dist-tag beta",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "build:services": "yarn --cwd packages/services build",
+    "build:models": "yarn --cwd packages/models build",
+    "build:snjs": "yarn --cwd packages/snjs build",
+    "build:files": "yarn --cwd packages/files build",
+    "build:filepicker": "yarn --cwd packages/filepicker build"
   },
   "devDependencies": {
     "@types/node": "^17.0.21",

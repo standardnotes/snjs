@@ -45,7 +45,7 @@ export interface ItemsClientInterface {
 
   getDisplayableItemsKeys(): SNItemsKey[]
 
-  getDisplayableFiles(): SNFile[]
+  getDisplayableFiles(): FileItem[]
 
   getDisplayableComponents(): (SNComponent | SNTheme)[]
 

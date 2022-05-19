@@ -2,7 +2,7 @@ import { TagContent } from './../../Syncable/Tag/Tag'
 import { ContentType } from '@standardnotes/common'
 import { FillItemContent, ItemContent } from '../../Abstract/Content/ItemContent'
 import { DecryptedPayload, PayloadSource, PayloadTimestampDefaults } from '../../Abstract/Payload'
-import { FileContent, SNFile } from '../../Syncable/File'
+import { FileContent, FileItem } from '../../Syncable/File'
 import { NoteContent, SNNote } from '../../Syncable/Note'
 import { SNTag } from '../../Syncable/Tag'
 
@@ -55,7 +55,7 @@ export const createTag = (title = 'photos') => {
 }
 
 export const createFile = (name = 'screenshot.png') => {
-  return new SNFile(
+  return new FileItem(
     new DecryptedPayload(
       {
         uuid: mockUuid(),

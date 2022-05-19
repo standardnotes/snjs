@@ -34,12 +34,12 @@ export class ItemManager
   private systemSmartViews: Models.SmartView[]
   private tagNotesIndex!: Models.TagNotesIndex
 
-  private noteAndFilesDisplayController!: Models.ItemDisplayController<Models.SNNote | Models.SNFile>
+  private noteAndFilesDisplayController!: Models.ItemDisplayController<Models.SNNote | Models.FileItem>
   private tagDisplayController!: Models.ItemDisplayController<Models.SNTag>
   private itemsKeyDisplayController!: Models.ItemDisplayController<SNItemsKey>
   private componentDisplayController!: Models.ItemDisplayController<Models.SNComponent>
   private themeDisplayController!: Models.ItemDisplayController<Models.SNTheme>
-  private fileDisplayController!: Models.ItemDisplayController<Models.SNFile>
+  private fileDisplayController!: Models.ItemDisplayController<Models.FileItem>
   private smartViewDisplayController!: Models.ItemDisplayController<Models.SmartView>
 
   constructor(
@@ -180,11 +180,11 @@ export class ItemManager
     return this.noteAndFilesDisplayController.items().filter(Models.isNote)
   }
 
-  public getDisplayableFiles(): Models.SNFile[] {
+  public getDisplayableFiles(): Models.FileItem[] {
     return this.fileDisplayController.items()
   }
 
-  public getDisplayableNotesAndFiles(): (Models.SNNote | Models.SNFile)[] {
+  public getDisplayableNotesAndFiles(): (Models.SNNote | Models.FileItem)[] {
     return this.noteAndFilesDisplayController.items()
   }
 
@@ -206,7 +206,6 @@ export class ItemManager
     ;(this.payloadManager as unknown) = undefined
     ;(this.collection as unknown) = undefined
     ;(this.tagNotesIndex as unknown) = undefined
-    ;(this.noteDisplayController as unknown) = undefined
     ;(this.tagDisplayController as unknown) = undefined
     ;(this.noteAndFilesDisplayController as unknown) = undefined
     ;(this.itemsKeyDisplayController as unknown) = undefined
@@ -1099,13 +1098,13 @@ export class ItemManager
 
   public async associateFileWithNote(file: Models.FileItem, note: Models.SNNote): Promise<Models.FileItem> {
     return this.changeItem<Models.FileMutator, Models.FileItem>(file, (mutator) => {
-      mutator.associateWithNote(note)
+      mutator.addNote(note)
     })
   }
 
   public async disassociateFileWithNote(file: Models.FileItem, note: Models.SNNote): Promise<Models.FileItem> {
     return this.changeItem<Models.FileMutator, Models.FileItem>(file, (mutator) => {
-      mutator.disassociateWithNote(note)
+      mutator.removeNote(note)
     })
   }
 
