@@ -10,10 +10,14 @@ export class OrderedByteChunker {
     this.remainingChunks = chunkSizes.slice()
   }
 
+  private needsPop(isLast: boolean): boolean {
+    return this.bytes.length >= this.remainingChunks[0] || isLast
+  }
+
   public async addBytes(bytes: Uint8Array, isLast: boolean): Promise<void> {
     this.bytes = new Uint8Array([...this.bytes, ...bytes])
 
-    if (this.bytes.length >= this.remainingChunks[0] || isLast) {
+    if (this.needsPop(isLast)) {
       await this.popBytes(isLast)
     }
   }
@@ -28,5 +32,9 @@ export class OrderedByteChunker {
     this.remainingChunks.shift()
 
     await this.onChunk(chunk, this.index++, isLast)
+
+    if (this.needsPop(isLast)) {
+      await this.popBytes(isLast)
+    }
   }
 }

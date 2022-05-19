@@ -5,8 +5,15 @@ import { FileDownloadProgress } from '../Types/FileDownloadProgress'
 import { FilesApiInterface } from '@standardnotes/services'
 import { PureCryptoInterface } from '@standardnotes/sncrypto-common'
 import { FileContent } from '@standardnotes/models'
+import { DecryptedBytes, EncryptedBytes } from '@standardnotes/filepicker'
 
 export type DownloadAndDecryptResult = { success: boolean; error?: ClientDisplayableError; aborted?: boolean }
+
+type OnBytesCallback = (results: {
+  decrypted: DecryptedBytes
+  encrypted: EncryptedBytes
+  progress: FileDownloadProgress
+}) => Promise<void>
 
 export class DownloadAndDecryptFileOperation {
   private downloader: FileDownloader
@@ -28,9 +35,7 @@ export class DownloadAndDecryptFileOperation {
     return new FileDecryptor(this.file, this.crypto)
   }
 
-  public async run(
-    onDecryptedBytes: (decryptedBytes: Uint8Array, progress: FileDownloadProgress) => Promise<void>,
-  ): Promise<DownloadAndDecryptResult> {
+  public async run(onBytes: OnBytesCallback): Promise<DownloadAndDecryptResult> {
     const decryptor = this.createDecryptor()
 
     let decryptError: ClientDisplayableError | undefined
@@ -50,7 +55,9 @@ export class DownloadAndDecryptFileOperation {
         return
       }
 
-      await onDecryptedBytes(result.decryptedBytes, progress)
+      const decryptedBytes = result.decryptedBytes
+
+      await onBytes({ decrypted: { decryptedBytes }, encrypted: { encryptedBytes }, progress })
     }
 
     const downloadResult = await this.downloader.run(onDownloadBytes)
