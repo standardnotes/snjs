@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.109.6](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.109.5...@standardnotes/snjs@2.109.6) (2022-05-19)
+
+
+### Bug Fixes
+
+* ignore component viewer callbacks if dealloced ([d8eba55](https://github.com/standardnotes/snjs/commit/d8eba55aa2d8ba51f9cf89b1f2f1e3afb44c7822))
+
+
+
+
+
 ## [2.109.5](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.109.4...@standardnotes/snjs@2.109.5) (2022-05-18)
 
 **Note:** Version bump only for package @standardnotes/snjs
