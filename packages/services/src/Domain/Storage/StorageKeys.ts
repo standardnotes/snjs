@@ -37,6 +37,7 @@ export enum StorageKey {
   UserFeatures = 'user_features',
   ExperimentalFeatures = 'experimental_features',
   DeinitMode = 'deinit_mode',
+  CodeVerifier = 'code_verifier',
 }
 
 export enum NonwrappedStorageKey {

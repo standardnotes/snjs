@@ -65,11 +65,4 @@ describe('mfa service', () => {
 
     Factory.safeDeinit(snApp)
   }).timeout(Factory.TenSecondTimeout)
-
-  it("doesn't allow mfa for basic user", async () => {
-    const snApp = await createApp().then(registerApp)
-    expect(await snApp.isMfaFeatureAvailable()).to.equal(false)
-
-    Factory.safeDeinit(snApp)
-  })
 })

@@ -1,7 +1,6 @@
 version: '3.8'
 services:
   snjs:
-    image: snjs-local
     build: .
     restart: unless-stopped
     networks:

@@ -18,7 +18,7 @@ import { SNApiService } from '../Api/ApiService'
 import { SNHistoryManager } from '../History/HistoryManager'
 import { SNLog } from '@Lib/Log'
 import { SNSessionManager } from '../Session/SessionManager'
-import { SNStorageService } from '../Storage/StorageService'
+import { DiskStorageService } from '../Storage/DiskStorageService'
 import { SortPayloadsByRecentAndContentPriority } from '@Lib/Services/Sync/Utils'
 import { SyncClientInterface } from './SyncClientInterface'
 import { SyncPromise } from './Types'
@@ -132,7 +132,7 @@ export class SNSyncService
     private itemManager: ItemManager,
     private sessionManager: SNSessionManager,
     private protocolService: Encryption.EncryptionService,
-    private storageService: SNStorageService,
+    private storageService: DiskStorageService,
     private payloadManager: PayloadManager,
     private apiService: SNApiService,
     private historyService: SNHistoryManager,

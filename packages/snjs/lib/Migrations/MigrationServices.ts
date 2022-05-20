@@ -1,15 +1,14 @@
 import { SNSessionManager } from '../Services/Session/SessionManager'
 import { ApplicationIdentifier } from '@standardnotes/common'
 import { ItemManager } from '@Lib/Services/Items/ItemManager'
-import { SNStorageService } from '@Lib/Services/Storage/StorageService'
 import { EncryptionService } from '@standardnotes/encryption'
 import { DeviceInterface, InternalEventBusInterface, Environment } from '@standardnotes/services'
-import { ChallengeService, SNSingletonManager, SNFeaturesService } from '@Lib/Services'
+import { ChallengeService, SNSingletonManager, SNFeaturesService, DiskStorageService } from '@Lib/Services'
 
 export type MigrationServices = {
   protocolService: EncryptionService
   deviceInterface: DeviceInterface
-  storageService: SNStorageService
+  storageService: DiskStorageService
   challengeService: ChallengeService
   sessionManager: SNSessionManager
   itemManager: ItemManager

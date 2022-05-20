@@ -61,7 +61,7 @@ describe('features', () => {
   describe('new user roles received on api response meta', () => {
     it('should save roles and features', async () => {
       expect(application.featuresService.roles).to.have.lengthOf(1)
-      expect(application.featuresService.roles[0]).to.equal('BASIC_USER')
+      expect(application.featuresService.roles[0]).to.equal('CORE_USER')
 
       expect(application.featuresService.features).to.have.lengthOf(3)
       expect(application.featuresService.features[0]).to.containSubset(midnightThemeFeature)
@@ -70,7 +70,7 @@ describe('features', () => {
       const storedRoles = await application.getValue(StorageKey.UserRoles)
 
       expect(storedRoles).to.have.lengthOf(1)
-      expect(storedRoles[0]).to.equal('BASIC_USER')
+      expect(storedRoles[0]).to.equal('CORE_USER')
 
       const storedFeatures = await application.getValue(StorageKey.UserFeatures)
 

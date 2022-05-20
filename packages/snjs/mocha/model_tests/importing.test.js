@@ -342,7 +342,7 @@ describe('importing', function () {
       true,
     )
 
-    const storedPayloads = await application.storageService.getAllRawPayloads()
+    const storedPayloads = await application.diskStorageService.getAllRawPayloads()
     expect(application.itemManager.items.length).to.equal(storedPayloads.length)
     const notes = storedPayloads.filter((p) => p.content_type === ContentType.Note)
     const itemsKeys = storedPayloads.filter((p) => p.content_type === ContentType.ItemsKey)

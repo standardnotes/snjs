@@ -70,7 +70,8 @@ export class SNApplication
   private httpService!: InternalServices.SNHttpService
   private payloadManager!: InternalServices.PayloadManager
   public protocolService!: Encryption.EncryptionService
-  private storageService!: InternalServices.SNStorageService
+  private diskStorageService!: InternalServices.DiskStorageService
+  private inMemoryStore!: ExternalServices.KeyValueStoreInterface<string>
   private apiService!: InternalServices.SNApiService
   private sessionManager!: InternalServices.SNSessionManager
   private syncService!: InternalServices.SNSyncService
@@ -236,7 +237,7 @@ export class SNApplication
     await this.notifyEvent(ApplicationEvent.MigrationsLoaded)
     await this.handleStage(ExternalServices.ApplicationStage.PreparingForLaunch_0)
 
-    await this.storageService.initializeFromDisk()
+    await this.diskStorageService.initializeFromDisk()
     await this.notifyEvent(ApplicationEvent.StorageReady)
 
     await this.protocolService.initialize()
@@ -270,9 +271,9 @@ export class SNApplication
       await this.handleLaunchChallengeResponse(response)
     }
 
-    if (this.storageService.isStorageWrapped()) {
+    if (this.diskStorageService.isStorageWrapped()) {
       try {
-        await this.storageService.decryptStorage()
+        await this.diskStorageService.decryptStorage()
       } catch (_error) {
         void this.alertService.alert(
           InternalServices.ErrorAlertStrings.StorageDecryptErrorBody,
@@ -662,19 +663,19 @@ export class SNApplication
   }
 
   public isEphemeralSession(): boolean {
-    return this.storageService.isEphemeralSession()
+    return this.diskStorageService.isEphemeralSession()
   }
 
   public setValue(key: string, value: unknown, mode?: ExternalServices.StorageValueModes): void {
-    return this.storageService.setValue(key, value, mode)
+    return this.diskStorageService.setValue(key, value, mode)
   }
 
   public getValue(key: string, mode?: ExternalServices.StorageValueModes): unknown {
-    return this.storageService.getValue(key, mode)
+    return this.diskStorageService.getValue(key, mode)
   }
 
   public async removeValue(key: string, mode?: ExternalServices.StorageValueModes): Promise<void> {
-    return this.storageService.removeValue(key, mode)
+    return this.diskStorageService.removeValue(key, mode)
   }
 
   public getPreference<K extends Models.PrefKey>(key: K): Models.PrefValue[K] | undefined
@@ -916,16 +917,16 @@ export class SNApplication
   }
 
   public getStorageEncryptionPolicy(): ExternalServices.StorageEncryptionPolicy {
-    return this.storageService.getStorageEncryptionPolicy()
+    return this.diskStorageService.getStorageEncryptionPolicy()
   }
 
   public setStorageEncryptionPolicy(encryptionPolicy: ExternalServices.StorageEncryptionPolicy): Promise<void> {
-    this.storageService.setEncryptionPolicy(encryptionPolicy)
+    this.diskStorageService.setEncryptionPolicy(encryptionPolicy)
     return this.protocolService.repersistAllItems()
   }
 
   public enableEphemeralPersistencePolicy(): Promise<void> {
-    return this.storageService.setPersistencePolicy(ExternalServices.StoragePersistencePolicies.Ephemeral)
+    return this.diskStorageService.setPersistencePolicy(ExternalServices.StoragePersistencePolicies.Ephemeral)
   }
 
   public hasPendingMigrations(): Promise<boolean> {
@@ -1000,11 +1001,10 @@ export class SNApplication
   private constructServices() {
     this.createPayloadManager()
     this.createItemManager()
-
-    this.createStorageManager()
+    this.createDiskStorageManager()
+    this.createInMemoryStorageManager()
     this.createProtocolService()
-    this.storageService.provideEncryptionProvider(this.protocolService)
-
+    this.diskStorageService.provideEncryptionProvider(this.protocolService)
     this.createChallengeService()
     this.createHttpManager()
     this.createApiService()
@@ -1040,7 +1040,8 @@ export class SNApplication
     ;(this.httpService as unknown) = undefined
     ;(this.payloadManager as unknown) = undefined
     ;(this.protocolService as unknown) = undefined
-    ;(this.storageService as unknown) = undefined
+    ;(this.diskStorageService as unknown) = undefined
+    ;(this.inMemoryStore as unknown) = undefined
     ;(this.apiService as unknown) = undefined
     ;(this.sessionManager as unknown) = undefined
     ;(this.syncService as unknown) = undefined
@@ -1121,7 +1122,7 @@ export class SNApplication
 
   private createFeaturesService() {
     this.featuresService = new InternalServices.SNFeaturesService(
-      this.storageService,
+      this.diskStorageService,
       this.apiService,
       this.itemManager,
       this.webSocketsService,
@@ -1155,7 +1156,7 @@ export class SNApplication
 
   private createWebSocketsService() {
     this.webSocketsService = new InternalServices.SNWebSocketsService(
-      this.storageService,
+      this.diskStorageService,
       this.options.webSocketUrl,
       this.internalEventBus,
     )
@@ -1166,7 +1167,7 @@ export class SNApplication
     this.migrationService = new InternalServices.SNMigrationService({
       protocolService: this.protocolService,
       deviceInterface: this.deviceInterface,
-      storageService: this.storageService,
+      storageService: this.diskStorageService,
       sessionManager: this.sessionManager,
       challengeService: this.challengeService,
       itemManager: this.itemManager,
@@ -1183,7 +1184,7 @@ export class SNApplication
     this.userService = new InternalServices.UserService(
       this.sessionManager,
       this.syncService,
-      this.storageService,
+      this.diskStorageService,
       this.itemManager,
       this.protocolService,
       this.alertService,
@@ -1217,8 +1218,10 @@ export class SNApplication
   private createApiService() {
     this.apiService = new InternalServices.SNApiService(
       this.httpService,
-      this.storageService,
+      this.diskStorageService,
       this.options.defaultHost,
+      this.inMemoryStore,
+      this.options.crypto,
       this.internalEventBus,
     )
     this.services.push(this.apiService)
@@ -1270,14 +1273,18 @@ export class SNApplication
     this.services.push(this.singletonManager)
   }
 
-  private createStorageManager() {
-    this.storageService = new InternalServices.SNStorageService(
+  private createDiskStorageManager() {
+    this.diskStorageService = new InternalServices.DiskStorageService(
       this.deviceInterface,
       this.identifier,
       this.environment,
       this.internalEventBus,
     )
-    this.services.push(this.storageService)
+    this.services.push(this.diskStorageService)
+  }
+
+  private createInMemoryStorageManager() {
+    this.inMemoryStore = new ExternalServices.InMemoryStore()
   }
 
   private createProtocolService() {
@@ -1285,7 +1292,7 @@ export class SNApplication
       this.itemManager,
       this.payloadManager,
       this.deviceInterface,
-      this.storageService,
+      this.diskStorageService,
       this.identifier,
       this.options.crypto,
       this.internalEventBus,
@@ -1308,7 +1315,7 @@ export class SNApplication
       this.protocolService,
       this.challengeService,
       this.alertService,
-      this.storageService,
+      this.diskStorageService,
       this.syncService,
       this.userService,
       this.internalEventBus,
@@ -1318,7 +1325,7 @@ export class SNApplication
 
   private createSessionManager() {
     this.sessionManager = new InternalServices.SNSessionManager(
-      this.storageService,
+      this.diskStorageService,
       this.apiService,
       this.alertService,
       this.protocolService,
@@ -1358,7 +1365,7 @@ export class SNApplication
       this.itemManager,
       this.sessionManager,
       this.protocolService,
-      this.storageService,
+      this.diskStorageService,
       this.payloadManager,
       this.apiService,
       this.historyManager,
@@ -1387,7 +1394,7 @@ export class SNApplication
 
   private createChallengeService() {
     this.challengeService = new InternalServices.ChallengeService(
-      this.storageService,
+      this.diskStorageService,
       this.protocolService,
       this.internalEventBus,
     )
@@ -1398,7 +1405,7 @@ export class SNApplication
     this.protectionService = new InternalServices.SNProtectionService(
       this.protocolService,
       this.challengeService,
-      this.storageService,
+      this.diskStorageService,
       this.internalEventBus,
     )
     this.serviceObservers.push(
@@ -1416,7 +1423,7 @@ export class SNApplication
   private createHistoryManager() {
     this.historyManager = new InternalServices.SNHistoryManager(
       this.itemManager,
-      this.storageService,
+      this.diskStorageService,
       this.apiService,
       this.protocolService,
       this.deviceInterface,

@@ -40,6 +40,12 @@ describe('utils', async function () {
     expect(b64).to.equal('aGVsbG8gd29ybGQ=')
   })
 
+  it('base64URLEncode', async function () {
+    const str = 'hello world'
+    const b64 = await base64Encode(str)
+    expect(b64).to.equal('aGVsbG8gd29ybGQ')
+  })
+
   it('base64Decode', async function () {
     const b64 = 'aGVsbG8gd29ybGQ='
     const str = await base64Decode(b64)

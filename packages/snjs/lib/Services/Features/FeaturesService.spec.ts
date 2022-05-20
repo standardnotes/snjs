@@ -7,7 +7,7 @@ import {
   SNApiService,
   UserService,
   SNSessionManager,
-  SNStorageService,
+  DiskStorageService,
   StorageKey,
 } from '@Lib/index'
 import { FeatureStatus, SNFeaturesService } from '@Lib/Services/Features'
@@ -20,7 +20,7 @@ import { convertTimestampToMilliseconds } from '@standardnotes/utils'
 import { InternalEventBusInterface } from '@standardnotes/services'
 
 describe('featuresService', () => {
-  let storageService: SNStorageService
+  let storageService: DiskStorageService
   let apiService: SNApiService
   let itemManager: ItemManager
   let webSocketsService: SNWebSocketsService
@@ -75,7 +75,7 @@ describe('featuresService', () => {
 
     items = [] as jest.Mocked<ItemInterface[]>
 
-    storageService = {} as jest.Mocked<SNStorageService>
+    storageService = {} as jest.Mocked<DiskStorageService>
     storageService.setValue = jest.fn()
     storageService.getValue = jest.fn()
 

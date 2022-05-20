@@ -137,6 +137,15 @@ export function base64Encode(text: string): string {
 }
 
 /**
+ * Converts a plain string into base64 url safe
+ * @param text - A plain string
+ * @returns  A base64 url safe encoded string
+ */
+export function base64URLEncode(text: string): string {
+  return to_base64(text, base64_variants.URLSAFE)
+}
+
+/**
  * Converts a base64 string into a plain string
  * @param base64String - A base64 encoded string
  * @returns A plain string

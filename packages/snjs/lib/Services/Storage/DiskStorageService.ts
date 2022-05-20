@@ -31,7 +31,7 @@ import {
  * decrypt the persisted key/values, and also a method to determine whether a particular
  * key can decrypt wrapped storage.
  */
-export class SNStorageService extends Services.AbstractService implements Services.StorageServiceInterface {
+export class DiskStorageService extends Services.AbstractService implements Services.StorageServiceInterface {
   private encryptionProvider!: Encryption.EncryptionProvider
   private storagePersistable = false
   private persistencePolicy!: Services.StoragePersistencePolicies
@@ -337,7 +337,7 @@ export class SNStorageService extends Services.AbstractService implements Servic
     unwrapped?: Services.ValuesObjectRecord,
     nonwrapped?: Services.ValuesObjectRecord,
   ) {
-    return SNStorageService.DefaultValuesObject(wrapped, unwrapped, nonwrapped)
+    return DiskStorageService.DefaultValuesObject(wrapped, unwrapped, nonwrapped)
   }
 
   public static DefaultValuesObject(
