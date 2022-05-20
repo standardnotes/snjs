@@ -43,6 +43,10 @@ export class SNActionsExtension extends DecryptedItem<ActionExtensionContent> {
     this.actions = payload.content.actions
   }
 
+  public get displayName(): string {
+    return this.name
+  }
+
   public get thirdPartyPackageInfo(): ThirdPartyFeatureDescription {
     return this.package_info as ThirdPartyFeatureDescription
   }

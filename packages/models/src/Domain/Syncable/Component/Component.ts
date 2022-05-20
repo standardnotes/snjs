@@ -7,6 +7,7 @@ import {
   ComponentFlag,
   FeatureDescription,
   ComponentPermission,
+  FindNativeFeature,
 } from '@standardnotes/features'
 import { AppDataField } from '../../Abstract/Item/Types/AppDataField'
 import { ComponentContent, ComponentInterface } from './ComponentContent'
@@ -93,6 +94,10 @@ export class SNComponent extends DecryptedItem<ComponentContent> implements Comp
 
   override get isSingleton(): boolean {
     return true
+  }
+
+  public get displayName(): string {
+    return FindNativeFeature(this.identifier)?.name || this.name
   }
 
   public override singletonPredicate(): Predicate<SNComponent> {
