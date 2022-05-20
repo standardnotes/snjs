@@ -34,7 +34,7 @@ describe('offline syncing', () => {
     let note = await Factory.createMappedNote(this.application)
     expect(this.application.itemManager.getDirtyItems().length).to.equal(1)
 
-    const rawPayloads1 = await this.application.storageService.getAllRawPayloads()
+    const rawPayloads1 = await this.application.diskStorageService.getAllRawPayloads()
     expect(rawPayloads1.length).to.equal(this.expectedItemCount)
 
     await this.application.syncService.sync(syncOptions)
@@ -48,7 +48,7 @@ describe('offline syncing', () => {
 
     expect(this.application.itemManager.getDirtyItems().length).to.equal(0)
 
-    const rawPayloads2 = await this.application.storageService.getAllRawPayloads()
+    const rawPayloads2 = await this.application.diskStorageService.getAllRawPayloads()
     expect(rawPayloads2.length).to.equal(this.expectedItemCount)
 
     const itemsKeyRaw = (await Factory.getStoragePayloadsOfType(this.application, ContentType.ItemsKey))[0]
@@ -65,14 +65,14 @@ describe('offline syncing', () => {
     await this.application.addPasscode('foobar')
     await Factory.createMappedNote(this.application)
     expect(this.application.itemManager.getDirtyItems().length).to.equal(1)
-    const rawPayloads1 = await this.application.storageService.getAllRawPayloads()
+    const rawPayloads1 = await this.application.diskStorageService.getAllRawPayloads()
     expect(rawPayloads1.length).to.equal(this.expectedItemCount)
 
     await this.application.syncService.sync(syncOptions)
     this.expectedItemCount++
 
     expect(this.application.itemManager.getDirtyItems().length).to.equal(0)
-    const rawPayloads2 = await this.application.storageService.getAllRawPayloads()
+    const rawPayloads2 = await this.application.diskStorageService.getAllRawPayloads()
     expect(rawPayloads2.length).to.equal(this.expectedItemCount)
 
     const payload = rawPayloads2[0]

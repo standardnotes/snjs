@@ -29,7 +29,7 @@ import { SessionFromRawStorageValue } from './Sessions/Generator'
 import { SessionsClientInterface } from './SessionsClientInterface'
 import { ShareToken } from './ShareToken'
 import { SNApiService } from '../Api/ApiService'
-import { SNStorageService } from '../Storage/StorageService'
+import { DiskStorageService } from '../Storage/DiskStorageService'
 import { SNWebSocketsService } from '../Api/WebsocketsService'
 import { Strings } from '@Lib/Strings'
 import { Subscription } from '@standardnotes/auth'
@@ -68,7 +68,7 @@ export class SNSessionManager extends AbstractService<SessionEvent> implements S
   private isSessionRenewChallengePresented = false
 
   constructor(
-    private storageService: SNStorageService,
+    private diskStorageService: DiskStorageService,
     private apiService: SNApiService,
     private alertService: AlertService,
     private protocolService: EncryptionService,
@@ -88,7 +88,7 @@ export class SNSessionManager extends AbstractService<SessionEvent> implements S
 
   override deinit(): void {
     ;(this.protocolService as unknown) = undefined
-    ;(this.storageService as unknown) = undefined
+    ;(this.diskStorageService as unknown) = undefined
     ;(this.apiService as unknown) = undefined
     ;(this.alertService as unknown) = undefined
     ;(this.challengeService as unknown) = undefined
@@ -103,16 +103,16 @@ export class SNSessionManager extends AbstractService<SessionEvent> implements S
   }
 
   public initializeFromDisk() {
-    this.setUser(this.storageService.getValue(StorageKey.User))
+    this.setUser(this.diskStorageService.getValue(StorageKey.User))
 
     if (!this.user) {
-      const legacyUuidLookup = this.storageService.getValue<string>(StorageKey.LegacyUuid)
+      const legacyUuidLookup = this.diskStorageService.getValue<string>(StorageKey.LegacyUuid)
       if (legacyUuidLookup) {
         this.setUser({ uuid: legacyUuidLookup, email: legacyUuidLookup })
       }
     }
 
-    const rawSession = this.storageService.getValue<RawStorageValue>(StorageKey.Session)
+    const rawSession = this.diskStorageService.getValue<RawStorageValue>(StorageKey.Session)
     if (rawSession) {
       const session = SessionFromRawStorageValue(rawSession)
       this.setSession(session, false)
@@ -195,7 +195,7 @@ export class SNSessionManager extends AbstractService<SessionEvent> implements S
             email,
             password,
             false,
-            this.storageService.isEphemeralSession(),
+            this.diskStorageService.isEphemeralSession(),
             currentKeyParams?.version,
           )
           if (signInResult.response.error) {
@@ -300,7 +300,12 @@ export class SNSessionManager extends AbstractService<SessionEvent> implements S
     mfaKeyPath?: string
     mfaCode?: string
   }> {
-    const response = await this.apiService.getAccountKeyParams(email, mfaKeyPath, mfaCode)
+    const response = await this.apiService.getAccountKeyParams({
+      email,
+      mfaKeyPath,
+      mfaCode,
+    })
+
     if (response.error || isNullOrUndefined(response.data)) {
       if (mfaCode) {
         await this.alertService.alert(SignInStrings.IncorrectMfa)
@@ -428,13 +433,7 @@ export class SNSessionManager extends AbstractService<SessionEvent> implements S
       }
     }
     const rootKey = await this.protocolService.computeRootKey(password, keyParams)
-    const signInResponse = await this.bypassChecksAndSignInWithRootKey(
-      email,
-      rootKey,
-      paramsResult.mfaKeyPath,
-      paramsResult.mfaCode,
-      ephemeral,
-    )
+    const signInResponse = await this.bypassChecksAndSignInWithRootKey(email, rootKey, ephemeral)
     return {
       response: signInResponse,
     }
@@ -443,8 +442,6 @@ export class SNSessionManager extends AbstractService<SessionEvent> implements S
   public async bypassChecksAndSignInWithRootKey(
     email: string,
     rootKey: SNRootKey,
-    mfaKeyPath?: string,
-    mfaCode?: string,
     ephemeral = false,
   ): Promise<Responses.SignInResponse | Responses.HttpResponse> {
     const { wrappingKey, canceled } = await this.challengeService.getWrappingKeyIfApplicable()
@@ -456,39 +453,26 @@ export class SNSessionManager extends AbstractService<SessionEvent> implements S
       )
     }
 
-    const signInResponse = await this.apiService.signIn(email, rootKey.serverPassword!, mfaKeyPath, mfaCode, ephemeral)
+    const signInResponse = await this.apiService.signIn({
+      email,
+      serverPassword: rootKey.serverPassword!,
+      ephemeral,
+    })
 
-    if (!signInResponse.error && signInResponse.data) {
-      const updatedKeyParams = (signInResponse as Responses.SignInResponse).data.key_params
-      const expandedRootKey = new SNRootKey(
-        CopyPayloadWithContentOverride(rootKey.payload, {
-          keyParams: updatedKeyParams || rootKey.keyParams.getPortableValue(),
-        }),
-      )
-
-      await this.handleSuccessAuthResponse(signInResponse as Responses.SignInResponse, expandedRootKey, wrappingKey)
-
+    if (signInResponse.error || !signInResponse.data) {
       return signInResponse
-    } else {
-      if (signInResponse.error?.payload?.mfa_key) {
-        if (mfaCode) {
-          await this.alertService.alert(SignInStrings.IncorrectMfa)
-        }
-        /** Prompt for MFA code and try again */
-        const inputtedCode = await this.promptForMfaValue()
-        if (!inputtedCode) {
-          /** User dismissed window without input */
-          return this.apiService.createErrorResponse(
-            SignInStrings.SignInCanceledMissingMfa,
-            Responses.StatusCode.CanceledMfa,
-          )
-        }
-        return this.bypassChecksAndSignInWithRootKey(email, rootKey, signInResponse.error.payload.mfa_key, inputtedCode)
-      } else {
-        /** Some other error, return to caller */
-        return signInResponse
-      }
     }
+
+    const updatedKeyParams = (signInResponse as Responses.SignInResponse).data.key_params
+    const expandedRootKey = new SNRootKey(
+      CopyPayloadWithContentOverride(rootKey.payload, {
+        keyParams: updatedKeyParams || rootKey.keyParams.getPortableValue(),
+      }),
+    )
+
+    await this.handleSuccessAuthResponse(signInResponse as Responses.SignInResponse, expandedRootKey, wrappingKey)
+
+    return signInResponse
   }
 
   public async changeCredentials(parameters: {
@@ -626,7 +610,7 @@ export class SNSessionManager extends AbstractService<SessionEvent> implements S
 
     this.setUser(user)
 
-    this.storageService.setValue(StorageKey.User, user)
+    this.diskStorageService.setValue(StorageKey.User, user)
 
     void this.apiService.setHost(host)
 

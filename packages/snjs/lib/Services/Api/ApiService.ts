@@ -13,6 +13,7 @@ import {
   MetaReceivedData,
   DiagnosticInfo,
   FilesApiInterface,
+  KeyValueStoreInterface,
 } from '@standardnotes/services'
 import { ServerSyncPushContextualPayload, SNFeatureRepo, FileContent } from '@standardnotes/models'
 import * as Responses from '@standardnotes/responses'
@@ -22,7 +23,7 @@ import { isUrlFirstParty, TRUSTED_FEATURE_HOSTS } from '@Lib/Hosts'
 import { Paths } from './Paths'
 import { Session } from '../Session/Sessions/Session'
 import { TokenSession } from '../Session/Sessions/TokenSession'
-import { SNStorageService } from '../Storage/StorageService'
+import { DiskStorageService } from '../Storage/DiskStorageService'
 import { UserServerInterface } from '../User/UserServerInterface'
 import { UuidString } from '../../Types/UuidString'
 import * as messages from '@Lib/Services/Api/Messages'
@@ -31,6 +32,7 @@ import { SettingsServerInterface } from '../Settings/SettingsServerInterface'
 import { Strings } from '@Lib/Strings'
 import { SNRootKeyParams } from '@standardnotes/encryption'
 import { ApiEndpointParam, ClientDisplayableError, CreateValetTokenPayload } from '@standardnotes/responses'
+import { PureCryptoInterface } from '@standardnotes/sncrypto-common'
 
 /** Legacy api version field to be specified in params when calling v0 APIs. */
 const V0_API_VERSION = '20200115'
@@ -58,8 +60,10 @@ export class SNApiService
 
   constructor(
     private httpService: SNHttpService,
-    private storageService: SNStorageService,
+    private storageService: DiskStorageService,
     private host: string,
+    private inMemoryStore: KeyValueStoreInterface<string>,
+    private crypto: PureCryptoInterface,
     protected override internalEventBus: InternalEventBusInterface,
   ) {
     super(internalEventBus)
@@ -204,22 +208,28 @@ export class SNApiService
    *                    would receive parameters as params['foo'] with value equal to mfaCode.
    * @param mfaCode     The mfa challenge response value.
    */
-  getAccountKeyParams(
-    email: string,
-    mfaKeyPath?: string,
-    mfaCode?: string,
-  ): Promise<Responses.KeyParamsResponse | Responses.HttpResponse> {
+  async getAccountKeyParams(dto: {
+    email: string
+    mfaKeyPath?: string
+    mfaCode?: string
+  }): Promise<Responses.KeyParamsResponse | Responses.HttpResponse> {
+    const codeVerifier = this.crypto.generateRandomKey(256)
+    this.inMemoryStore.setValue(StorageKey.CodeVerifier, codeVerifier)
+
+    const codeChallenge = this.crypto.base64URLEncode(await this.crypto.sha256(codeVerifier))
+
     const params = this.params({
-      email: email,
+      email: dto.email,
+      code_challenge: codeChallenge,
     })
 
-    if (mfaKeyPath && mfaCode) {
-      params[mfaKeyPath] = mfaCode
+    if (dto.mfaKeyPath !== undefined && dto.mfaCode !== undefined) {
+      params[dto.mfaKeyPath] = dto.mfaCode
     }
 
     return this.request({
-      verb: HttpVerb.Get,
-      url: joinPaths(this.host, Paths.v1.keyParams),
+      verb: HttpVerb.Post,
+      url: joinPaths(this.host, Paths.v2.keyParams),
       fallbackErrorMessage: messages.API_MESSAGE_GENERIC_INVALID_LOGIN,
       params,
       /** A session is optional here, if valid, endpoint bypasses 2FA and returns additional params */
@@ -254,26 +264,23 @@ export class SNApiService
     return response
   }
 
-  async signIn(
-    email: string,
-    serverPassword: string,
-    mfaKeyPath?: string,
-    mfaCode?: string,
-    ephemeral = false,
-  ): Promise<Responses.SignInResponse | Responses.HttpResponse> {
+  async signIn(dto: {
+    email: string
+    serverPassword: string
+    ephemeral: boolean
+  }): Promise<Responses.SignInResponse | Responses.HttpResponse> {
     if (this.authenticating) {
       return this.createErrorResponse(messages.API_MESSAGE_LOGIN_IN_PROGRESS) as Responses.SignInResponse
     }
     this.authenticating = true
-    const url = joinPaths(this.host, Paths.v1.signIn)
+    const url = joinPaths(this.host, Paths.v2.signIn)
     const params = this.params({
-      email,
-      password: serverPassword,
-      ephemeral,
+      email: dto.email,
+      password: dto.serverPassword,
+      ephemeral: dto.ephemeral,
+      code_verifier: this.inMemoryStore.getValue(StorageKey.CodeVerifier) as string,
     })
-    if (mfaKeyPath && mfaCode) {
-      params[mfaKeyPath] = mfaCode
-    }
+
     const response = await this.request({
       verb: HttpVerb.Post,
       url,
@@ -282,6 +289,9 @@ export class SNApiService
     })
 
     this.authenticating = false
+
+    this.inMemoryStore.removeValue(StorageKey.CodeVerifier)
+
     return response
   }
 

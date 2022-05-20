@@ -3,7 +3,7 @@ import { ChallengeService } from './../Challenge/ChallengeService'
 import { SNLog } from '@Lib/Log'
 import { FileItem, SNNote } from '@standardnotes/models'
 import { EncryptionService } from '@standardnotes/encryption'
-import { SNStorageService } from '@Lib/Services/Storage/StorageService'
+import { DiskStorageService } from '@Lib/Services/Storage/DiskStorageService'
 import { isNullOrUndefined } from '@standardnotes/utils'
 import {
   AbstractService,
@@ -66,7 +66,7 @@ export class SNProtectionService extends AbstractService<ProtectionEvent> implem
   constructor(
     private protocolService: EncryptionService,
     private challengeService: ChallengeService,
-    private storageService: SNStorageService,
+    private storageService: DiskStorageService,
     protected override internalEventBus: InternalEventBusInterface,
   ) {
     super(internalEventBus)

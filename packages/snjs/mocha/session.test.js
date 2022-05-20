@@ -43,7 +43,7 @@ describe('server session', function () {
   }
 
   async function getSessionFromStorage(application) {
-    return application.storageService.getValue(StorageKey.Session)
+    return application.diskStorageService.getValue(StorageKey.Session)
   }
 
   it('should succeed when a sync request is perfomed with an expired access token', async function () {
@@ -651,7 +651,7 @@ describe('server session', function () {
     invalidSession.accessToken = undefined
     invalidSession.refreshToken = undefined
 
-    const storageKey = this.application.storageService.getPersistenceKey()
+    const storageKey = this.application.diskStorageService.getPersistenceKey()
     expect(localStorage.getItem(storageKey)).to.be.ok
 
     await this.application.user.signOut()

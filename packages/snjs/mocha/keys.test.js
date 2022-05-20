@@ -125,7 +125,7 @@ describe('keys', function () {
     await this.application.payloadManager.emitPayload(dirtied, PayloadEmitSource.LocalChanged)
     await this.application.sync.sync()
 
-    const rawPayloads = await this.application.storageService.getAllRawPayloads()
+    const rawPayloads = await this.application.diskStorageService.getAllRawPayloads()
     const rawNotePayload = rawPayloads.find((r) => r.content_type === ContentType.Note)
     expect(typeof rawNotePayload.content).to.equal('string')
   })
@@ -261,7 +261,7 @@ describe('keys', function () {
   it('When setting passcode, should encrypt items keys', async function () {
     await this.application.addPasscode('foo')
     const itemsKey = this.application.itemManager.getDisplayableItemsKeys()[0]
-    const rawPayloads = await this.application.storageService.getAllRawPayloads()
+    const rawPayloads = await this.application.diskStorageService.getAllRawPayloads()
     const itemsKeyRawPayload = rawPayloads.find((p) => p.uuid === itemsKey.uuid)
     const itemsKeyPayload = new EncryptedPayload(itemsKeyRawPayload)
     expect(itemsKeyPayload.enc_item_key).to.be.ok
@@ -270,7 +270,7 @@ describe('keys', function () {
   it('items key encrypted payload should contain root key params', async function () {
     await this.application.addPasscode('foo')
     const itemsKey = this.application.itemManager.getDisplayableItemsKeys()[0]
-    const rawPayloads = await this.application.storageService.getAllRawPayloads()
+    const rawPayloads = await this.application.diskStorageService.getAllRawPayloads()
     const itemsKeyRawPayload = rawPayloads.find((p) => p.uuid === itemsKey.uuid)
     const itemsKeyPayload = new EncryptedPayload(itemsKeyRawPayload)
     const operator = this.application.protocolService.operatorManager.operatorForVersion(ProtocolVersion.V004)
@@ -350,7 +350,7 @@ describe('keys', function () {
 
     const originalRootKey = await this.application.protocolService.getRootKey()
     /** Expect that we can decrypt raw payload with current root key */
-    const rawPayloads = await this.application.storageService.getAllRawPayloads()
+    const rawPayloads = await this.application.diskStorageService.getAllRawPayloads()
     const itemsKeyRawPayload = rawPayloads.find((p) => p.uuid === originalItemsKey.uuid)
     const itemsKeyPayload = new EncryptedPayload(itemsKeyRawPayload)
     const decrypted = await this.application.protocolService.decryptSplitSingle({
@@ -375,7 +375,7 @@ describe('keys', function () {
      * Expect that originalRootKey can no longer decrypt originalItemsKey
      * as items key has been re-encrypted with new root key
      */
-    const rawPayloads2 = await this.application.storageService.getAllRawPayloads()
+    const rawPayloads2 = await this.application.diskStorageService.getAllRawPayloads()
     const itemsKeyRawPayload2 = rawPayloads2.find((p) => p.uuid === originalItemsKey.uuid)
     expect(itemsKeyRawPayload2.content).to.not.equal(itemsKeyRawPayload.content)
 
@@ -489,7 +489,7 @@ describe('keys', function () {
     await Factory.registerUserToApplication({ application: this.application })
     const rawKey = await this.application.deviceInterface.getNamespacedKeychainValue(this.application.identifier)
     expect(rawKey.keyParams).to.not.be.ok
-    const rawKeyParams = await this.application.storageService.getValue(
+    const rawKeyParams = await this.application.diskStorageService.getValue(
       StorageKey.RootKeyParams,
       StorageValueModes.Nonwrapped,
     )
@@ -499,7 +499,7 @@ describe('keys', function () {
   it('persisted key params should exactly equal in memory rootKey.keyParams', async function () {
     await Factory.registerUserToApplication({ application: this.application })
     const rootKey = await this.application.protocolService.getRootKey()
-    const rawKeyParams = await this.application.storageService.getValue(
+    const rawKeyParams = await this.application.diskStorageService.getValue(
       StorageKey.RootKeyParams,
       StorageValueModes.Nonwrapped,
     )
@@ -837,7 +837,7 @@ describe('keys', function () {
     })
     expect(defaultKeys.length).to.equal(1)
 
-    const rawPayloads = await otherClient.storageService.getAllRawPayloads()
+    const rawPayloads = await otherClient.diskStorageService.getAllRawPayloads()
     const notePayload = rawPayloads.find((p) => p.content_type === ContentType.Note)
 
     expect(notePayload.items_key_id).to.equal(itemsKey.uuid)

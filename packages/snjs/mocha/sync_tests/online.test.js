@@ -45,7 +45,7 @@ describe('online syncing', function () {
     expect(this.application.syncService.isOutOfSync()).to.equal(false)
     const items = this.application.itemManager.allTrackedItems()
     expect(items.length).to.equal(this.expectedItemCount)
-    const rawPayloads = await this.application.storageService.getAllRawPayloads()
+    const rawPayloads = await this.application.diskStorageService.getAllRawPayloads()
     expect(rawPayloads.length).to.equal(this.expectedItemCount)
     await Factory.safeDeinit(this.application)
     localStorage.clear()
@@ -62,7 +62,7 @@ describe('online syncing', function () {
     note = this.application.items.findItem(note.uuid)
     expect(note.dirty).to.not.be.ok
 
-    const rawPayloads = await this.application.storageService.getAllRawPayloads()
+    const rawPayloads = await this.application.diskStorageService.getAllRawPayloads()
     const notePayloads = noteObjectsFromObjects(rawPayloads)
     expect(notePayloads.length).to.equal(1)
     for (const rawNote of notePayloads) {
@@ -236,7 +236,7 @@ describe('online syncing', function () {
     this.expectedItemCount++
     await this.application.itemManager.setItemDirty(note)
     await this.application.syncService.sync(syncOptions)
-    const rawPayloads = await this.application.storageService.getAllRawPayloads()
+    const rawPayloads = await this.application.diskStorageService.getAllRawPayloads()
     const notePayload = noteObjectsFromObjects(rawPayloads)
     expect(notePayload.length).to.equal(1)
     expect(this.application.itemManager.getDisplayableNotes().length).to.equal(1)
@@ -262,7 +262,7 @@ describe('online syncing', function () {
       expect(item.content.title).to.be.ok
     }
 
-    const updatedRawPayloads = await this.application.storageService.getAllRawPayloads()
+    const updatedRawPayloads = await this.application.diskStorageService.getAllRawPayloads()
     for (const payload of updatedRawPayloads) {
       // if an item comes back from the server, it is saved to disk immediately without a dirty value.
       expect(payload.dirty).to.not.be.ok
@@ -348,7 +348,7 @@ describe('online syncing', function () {
     // We expect that this item is now gone for good, and no duplicate has been created.
     expect(this.application.itemManager.items.length).to.equal(this.expectedItemCount)
     await Factory.sleep(0.5)
-    const rawPayloads = await this.application.storageService.getAllRawPayloads()
+    const rawPayloads = await this.application.diskStorageService.getAllRawPayloads()
     expect(rawPayloads.length).to.equal(this.expectedItemCount)
   })
 
@@ -508,7 +508,7 @@ describe('online syncing', function () {
 
     expect(this.application.itemManager.items.length).to.equal(0)
 
-    const rawPayloads = await this.application.storageService.getAllRawPayloads()
+    const rawPayloads = await this.application.diskStorageService.getAllRawPayloads()
 
     const encryptedPayloads = rawPayloads.map((rawPayload) => {
       return new EncryptedPayload(rawPayload)
@@ -542,7 +542,7 @@ describe('online syncing', function () {
     this.expectedItemCount += largeItemCount
 
     await this.application.syncService.sync(syncOptions)
-    const rawPayloads = await this.application.storageService.getAllRawPayloads()
+    const rawPayloads = await this.application.diskStorageService.getAllRawPayloads()
     expect(rawPayloads.length).to.equal(this.expectedItemCount)
   }).timeout(15000)
 
@@ -562,7 +562,7 @@ describe('online syncing', function () {
     await this.application.payloadManager.resetState()
     await this.application.itemManager.resetState()
     await this.application.syncService.clearSyncPositionTokens()
-    await this.application.storageService.clearAllPayloads()
+    await this.application.diskStorageService.clearAllPayloads()
     expect(this.application.itemManager.items.length).to.equal(0)
 
     /** Download all data */
@@ -570,7 +570,7 @@ describe('online syncing', function () {
     await this.context.awaitNextSucessfulSync()
     expect(this.application.itemManager.items.length).to.equal(this.expectedItemCount)
 
-    const rawPayloads = await this.application.storageService.getAllRawPayloads()
+    const rawPayloads = await this.application.diskStorageService.getAllRawPayloads()
     expect(rawPayloads.length).to.equal(this.expectedItemCount)
   }).timeout(30000)
 
@@ -595,7 +595,7 @@ describe('online syncing', function () {
     this.application.syncService.sync(syncOptions)
     await Factory.sleep(0.3)
 
-    const rawPayloads = await this.application.storageService.getAllRawPayloads()
+    const rawPayloads = await this.application.diskStorageService.getAllRawPayloads()
     const notePayload = rawPayloads.find((p) => p.content_type === ContentType.Note)
     expect(typeof notePayload.content).to.equal('string')
   })
@@ -613,7 +613,7 @@ describe('online syncing', function () {
       syncOptions,
     )
     this.expectedItemCount++
-    const rawPayloads = await this.application.storageService.getAllRawPayloads()
+    const rawPayloads = await this.application.diskStorageService.getAllRawPayloads()
     const notePayload = rawPayloads.find((p) => p.content_type === ContentType.Note)
     expect(typeof notePayload.content).to.equal('string')
     expect(notePayload.content.length).to.be.above(text.length)
@@ -640,7 +640,7 @@ describe('online syncing', function () {
     expect(note.dirty).to.equal(true)
     expect(this.application.itemManager.getDirtyItems().length).to.equal(1)
 
-    const rawPayloads = await this.application.storageService.getAllRawPayloads()
+    const rawPayloads = await this.application.diskStorageService.getAllRawPayloads()
     expect(rawPayloads.length).to.equal(this.expectedItemCount)
     const rawPayload = rawPayloads.find((p) => p.uuid === note.uuid)
     expect(rawPayload.uuid).to.equal(note.uuid)
@@ -651,11 +651,11 @@ describe('online syncing', function () {
     await this.application.syncService.clearSyncPositionTokens()
     await this.application.payloadManager.resetState()
     await this.application.itemManager.resetState()
-    const databasePayloads = await this.application.storageService.getAllRawPayloads()
+    const databasePayloads = await this.application.diskStorageService.getAllRawPayloads()
     await this.application.syncService.loadDatabasePayloads(databasePayloads)
     await this.application.syncService.sync(syncOptions)
 
-    const newRawPayloads = await this.application.storageService.getAllRawPayloads()
+    const newRawPayloads = await this.application.diskStorageService.getAllRawPayloads()
     expect(newRawPayloads.length).to.equal(this.expectedItemCount)
 
     const currentItem = this.application.itemManager.findItem(note.uuid)
@@ -685,13 +685,13 @@ describe('online syncing', function () {
     await this.application.syncService.sync(syncOptions)
 
     this.application = await Factory.signOutApplicationAndReturnNew(this.application)
-    const rawPayloads = await this.application.storageService.getAllRawPayloads()
+    const rawPayloads = await this.application.diskStorageService.getAllRawPayloads()
     expect(rawPayloads.length).to.equal(BASE_ITEM_COUNT)
 
     await this.application.signIn(this.email, this.password, undefined, undefined, undefined, true)
 
     this.application.syncService.ut_setDatabaseLoaded(false)
-    const databasePayloads = await this.application.storageService.getAllRawPayloads()
+    const databasePayloads = await this.application.diskStorageService.getAllRawPayloads()
     await this.application.syncService.loadDatabasePayloads(databasePayloads)
     await this.application.syncService.sync(syncOptions)
 

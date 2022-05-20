@@ -10,6 +10,7 @@ export * from './Common/Utils'
 export * from './SHA/CryptoSha256Interface'
 
 export * from './Types/Base64String'
+export * from './Types/Base64URLSafeString'
 export * from './Types/HexString'
 export * from './Types/SodiumConstant'
 export * from './Types/SodiumStateAddress'

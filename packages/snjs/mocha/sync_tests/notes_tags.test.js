@@ -89,7 +89,7 @@ describe('notes + tags syncing', function () {
 
     // when signing in, all local items are cleared from storage (but kept in memory; to clear desktop logs),
     // then resaved with alternated uuids.
-    await this.application.storageService.clearAllPayloads()
+    await this.application.diskStorageService.clearAllPayloads()
     await this.application.syncService.markAllItemsAsNeedingSyncAndPersist()
 
     expect(this.application.itemManager.getDisplayableNotes().length).to.equal(1)

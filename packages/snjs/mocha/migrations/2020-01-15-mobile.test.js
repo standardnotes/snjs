@@ -115,11 +115,11 @@ describe('2020-01-15 mobile migration', () => {
       expect(application.protocolService.rootKeyEncryption.keyMode).to.equal(KeyMode.RootKeyPlusWrapper)
 
       /** Should be decrypted */
-      const storageMode = application.storageService.domainKeyForMode(StorageValueModes.Default)
-      const valueStore = application.storageService.values[storageMode]
+      const storageMode = application.diskStorageService.domainKeyForMode(StorageValueModes.Default)
+      const valueStore = application.diskStorageService.values[storageMode]
       expect(valueStore.content_type).to.not.be.ok
 
-      const keyParams = await application.storageService.getValue(
+      const keyParams = await application.diskStorageService.getValue(
         StorageKey.RootKeyParams,
         StorageValueModes.Nonwrapped,
       )
@@ -141,14 +141,14 @@ describe('2020-01-15 mobile migration', () => {
       expect(retrievedNote.content.text).to.equal(notePayload.content.text)
 
       expect(
-        await application.storageService.getValue(NonwrappedStorageKey.MobileFirstRun, StorageValueModes.Nonwrapped),
+        await application.diskStorageService.getValue(NonwrappedStorageKey.MobileFirstRun, StorageValueModes.Nonwrapped),
       ).to.equal(false)
 
       expect(
-        await application.storageService.getValue(StorageKey.BiometricsState, StorageValueModes.Nonwrapped),
+        await application.diskStorageService.getValue(StorageKey.BiometricsState, StorageValueModes.Nonwrapped),
       ).to.equal(biometricPrefs.enabled)
       expect(
-        await application.storageService.getValue(StorageKey.MobileBiometricsTiming, StorageValueModes.Nonwrapped),
+        await application.diskStorageService.getValue(StorageKey.MobileBiometricsTiming, StorageValueModes.Nonwrapped),
       ).to.equal(biometricPrefs.timing)
       expect(await application.getUser().email).to.equal(identifier)
 
@@ -168,7 +168,7 @@ describe('2020-01-15 mobile migration', () => {
       await application.launch(true)
       expect(await application.getUser().email).to.equal(identifier)
       expect(await application.getHost()).to.equal(customServer)
-      const preferences = await application.storageService.getValue('preferences')
+      const preferences = await application.diskStorageService.getValue('preferences')
       expect(preferences.sortBy).to.equal('userModifiedAt')
       expect(preferences.sortReverse).to.be.false
       expect(preferences.hideDate).to.be.false
@@ -255,8 +255,8 @@ describe('2020-01-15 mobile migration', () => {
     expect(application.protocolService.rootKeyEncryption.keyMode).to.equal(KeyMode.WrapperOnly)
     await application.launch(true)
     /** Should be decrypted */
-    const storageMode = application.storageService.domainKeyForMode(StorageValueModes.Default)
-    const valueStore = application.storageService.values[storageMode]
+    const storageMode = application.diskStorageService.domainKeyForMode(StorageValueModes.Default)
+    const valueStore = application.diskStorageService.values[storageMode]
     expect(valueStore.content_type).to.not.be.ok
 
     const rootKey = await application.protocolService.getRootKey()
@@ -276,21 +276,21 @@ describe('2020-01-15 mobile migration', () => {
     expect(retrievedNote.uuid).to.equal(notePayload.uuid)
     expect(retrievedNote.content.text).to.equal(notePayload.content.text)
     expect(
-      await application.storageService.getValue(NonwrappedStorageKey.MobileFirstRun, StorageValueModes.Nonwrapped),
+      await application.diskStorageService.getValue(NonwrappedStorageKey.MobileFirstRun, StorageValueModes.Nonwrapped),
     ).to.equal(false)
     expect(
-      await application.storageService.getValue(StorageKey.BiometricsState, StorageValueModes.Nonwrapped),
+      await application.diskStorageService.getValue(StorageKey.BiometricsState, StorageValueModes.Nonwrapped),
     ).to.equal(biometricPrefs.enabled)
     expect(
-      await application.storageService.getValue(StorageKey.MobileBiometricsTiming, StorageValueModes.Nonwrapped),
+      await application.diskStorageService.getValue(StorageKey.MobileBiometricsTiming, StorageValueModes.Nonwrapped),
     ).to.equal(biometricPrefs.timing)
     expect(
-      await application.storageService.getValue(StorageKey.MobilePasscodeTiming, StorageValueModes.Nonwrapped),
+      await application.diskStorageService.getValue(StorageKey.MobilePasscodeTiming, StorageValueModes.Nonwrapped),
     ).to.eql(passcodeTiming)
     expect(
-      await application.storageService.getValue(StorageKey.MobilePasscodeKeyboardType, StorageValueModes.Nonwrapped),
+      await application.diskStorageService.getValue(StorageKey.MobilePasscodeKeyboardType, StorageValueModes.Nonwrapped),
     ).to.eql(passcodeKeyboardType)
-    const preferences = await application.storageService.getValue('preferences')
+    const preferences = await application.diskStorageService.getValue('preferences')
     expect(preferences.sortBy).to.equal(undefined)
     expect(preferences.sortReverse).to.be.false
     expect(preferences.hideNotePreview).to.be.false
@@ -449,8 +449,8 @@ describe('2020-01-15 mobile migration', () => {
 
     expect(application.protocolService.rootKeyEncryption.keyMode).to.equal(KeyMode.RootKeyOnly)
     /** Should be decrypted */
-    const storageMode = application.storageService.domainKeyForMode(StorageValueModes.Default)
-    const valueStore = application.storageService.values[storageMode]
+    const storageMode = application.diskStorageService.domainKeyForMode(StorageValueModes.Default)
+    const valueStore = application.diskStorageService.values[storageMode]
     expect(valueStore.content_type).to.not.be.ok
     const rootKey = await application.protocolService.getRootKey()
     expect(rootKey.masterKey).to.equal(accountKey.masterKey)
@@ -459,7 +459,7 @@ describe('2020-01-15 mobile migration', () => {
     expect(rootKey.keyVersion).to.equal(ProtocolVersion.V003)
     expect(application.protocolService.rootKeyEncryption.keyMode).to.equal(KeyMode.RootKeyOnly)
 
-    const keyParams = await application.storageService.getValue(StorageKey.RootKeyParams, StorageValueModes.Nonwrapped)
+    const keyParams = await application.diskStorageService.getValue(StorageKey.RootKeyParams, StorageValueModes.Nonwrapped)
     expect(typeof keyParams).to.equal('object')
 
     /** Expect note is decrypted */
@@ -468,16 +468,16 @@ describe('2020-01-15 mobile migration', () => {
     expect(retrievedNote.uuid).to.equal(notePayload.uuid)
     expect(retrievedNote.content.text).to.equal(notePayload.content.text)
     expect(
-      await application.storageService.getValue(NonwrappedStorageKey.MobileFirstRun, StorageValueModes.Nonwrapped),
+      await application.diskStorageService.getValue(NonwrappedStorageKey.MobileFirstRun, StorageValueModes.Nonwrapped),
     ).to.equal(false)
     expect(
-      await application.storageService.getValue(StorageKey.BiometricsState, StorageValueModes.Nonwrapped),
+      await application.diskStorageService.getValue(StorageKey.BiometricsState, StorageValueModes.Nonwrapped),
     ).to.equal(biometricPrefs.enabled)
     expect(
-      await application.storageService.getValue(StorageKey.MobileBiometricsTiming, StorageValueModes.Nonwrapped),
+      await application.diskStorageService.getValue(StorageKey.MobileBiometricsTiming, StorageValueModes.Nonwrapped),
     ).to.equal(biometricPrefs.timing)
     expect(await application.getUser().email).to.equal(identifier)
-    const preferences = await application.storageService.getValue('preferences')
+    const preferences = await application.diskStorageService.getValue('preferences')
     expect(preferences.sortBy).to.equal('created_at')
     expect(preferences.sortReverse).to.be.false
     expect(preferences.hideDate).to.be.false
@@ -565,8 +565,8 @@ describe('2020-01-15 mobile migration', () => {
 
     expect(application.protocolService.rootKeyEncryption.keyMode).to.equal(KeyMode.RootKeyOnly)
     /** Should be decrypted */
-    const storageMode = application.storageService.domainKeyForMode(StorageValueModes.Default)
-    const valueStore = application.storageService.values[storageMode]
+    const storageMode = application.diskStorageService.domainKeyForMode(StorageValueModes.Default)
+    const valueStore = application.diskStorageService.values[storageMode]
     expect(valueStore.content_type).to.not.be.ok
     const rootKey = await application.protocolService.getRootKey()
     expect(rootKey).to.be.ok
@@ -837,8 +837,8 @@ describe('2020-01-15 mobile migration', () => {
 
     expect(application.protocolService.rootKeyEncryption.keyMode).to.equal(KeyMode.RootKeyNone)
     /** Should be decrypted */
-    const storageMode = application.storageService.domainKeyForMode(StorageValueModes.Default)
-    const valueStore = application.storageService.values[storageMode]
+    const storageMode = application.diskStorageService.domainKeyForMode(StorageValueModes.Default)
+    const valueStore = application.diskStorageService.values[storageMode]
     expect(valueStore.content_type).to.not.be.ok
 
     const rootKey = await application.protocolService.getRootKey()
@@ -851,15 +851,15 @@ describe('2020-01-15 mobile migration', () => {
     expect(retrievedNote.uuid).to.equal(notePayload.uuid)
     expect(retrievedNote.content.text).to.equal(notePayload.content.text)
     expect(
-      await application.storageService.getValue(NonwrappedStorageKey.MobileFirstRun, StorageValueModes.Nonwrapped),
+      await application.diskStorageService.getValue(NonwrappedStorageKey.MobileFirstRun, StorageValueModes.Nonwrapped),
     ).to.equal(false)
     expect(
-      await application.storageService.getValue(StorageKey.BiometricsState, StorageValueModes.Nonwrapped),
+      await application.diskStorageService.getValue(StorageKey.BiometricsState, StorageValueModes.Nonwrapped),
     ).to.equal(biometricPrefs.enabled)
     expect(
-      await application.storageService.getValue(StorageKey.MobileBiometricsTiming, StorageValueModes.Nonwrapped),
+      await application.diskStorageService.getValue(StorageKey.MobileBiometricsTiming, StorageValueModes.Nonwrapped),
     ).to.equal(biometricPrefs.timing)
-    const preferences = await application.storageService.getValue('preferences')
+    const preferences = await application.diskStorageService.getValue('preferences')
     expect(preferences.sortBy).to.equal('created_at')
     expect(preferences.sortReverse).to.be.false
     expect(preferences.hideDate).to.be.false
@@ -974,11 +974,11 @@ describe('2020-01-15 mobile migration', () => {
       expect(application.protocolService.rootKeyEncryption.keyMode).to.equal(KeyMode.RootKeyPlusWrapper)
 
       /** Should be decrypted */
-      const storageMode = application.storageService.domainKeyForMode(StorageValueModes.Default)
-      const valueStore = application.storageService.values[storageMode]
+      const storageMode = application.diskStorageService.domainKeyForMode(StorageValueModes.Default)
+      const valueStore = application.diskStorageService.values[storageMode]
       expect(valueStore.content_type).to.not.be.ok
 
-      const keyParams = await application.storageService.getValue(
+      const keyParams = await application.diskStorageService.getValue(
         StorageKey.RootKeyParams,
         StorageValueModes.Nonwrapped,
       )
@@ -1000,14 +1000,14 @@ describe('2020-01-15 mobile migration', () => {
       expect(retrievedNote.content.text).to.equal(notePayload.content.text)
 
       expect(
-        await application.storageService.getValue(NonwrappedStorageKey.MobileFirstRun, StorageValueModes.Nonwrapped),
+        await application.diskStorageService.getValue(NonwrappedStorageKey.MobileFirstRun, StorageValueModes.Nonwrapped),
       ).to.equal(false)
 
       expect(
-        await application.storageService.getValue(StorageKey.BiometricsState, StorageValueModes.Nonwrapped),
+        await application.diskStorageService.getValue(StorageKey.BiometricsState, StorageValueModes.Nonwrapped),
       ).to.equal(biometricPrefs.enabled)
       expect(
-        await application.storageService.getValue(StorageKey.MobileBiometricsTiming, StorageValueModes.Nonwrapped),
+        await application.diskStorageService.getValue(StorageKey.MobileBiometricsTiming, StorageValueModes.Nonwrapped),
       ).to.equal(biometricPrefs.timing)
       expect(await application.getUser().email).to.equal(identifier)
 
@@ -1026,7 +1026,7 @@ describe('2020-01-15 mobile migration', () => {
       await application.launch(true)
       expect(await application.getUser().email).to.equal(identifier)
       expect(await application.getHost()).to.equal(customServer)
-      const preferences = await application.storageService.getValue('preferences')
+      const preferences = await application.diskStorageService.getValue('preferences')
       expect(preferences.sortBy).to.equal('userModifiedAt')
       expect(preferences.sortReverse).to.be.false
       expect(preferences.hideDate).to.be.false

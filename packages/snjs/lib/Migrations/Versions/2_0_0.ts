@@ -4,7 +4,7 @@ import { Migration } from '@Lib/Migrations/Migration'
 import { MigrationServices } from '../MigrationServices'
 import { PreviousSnjsVersion2_0_0 } from '../../Version'
 import { SNRootKey, CreateNewRootKey } from '@standardnotes/encryption'
-import { SNStorageService } from '../../Services/Storage/StorageService'
+import { DiskStorageService } from '../../Services/Storage/DiskStorageService'
 import { StorageReader1_0_0 } from '../StorageReaders/Versions/Reader1_0_0'
 import * as Models from '@standardnotes/models'
 import * as Services from '@standardnotes/services'
@@ -166,7 +166,7 @@ export class Migration2_0_0 extends Migration {
    * All platforms
    */
   private async allPlatformHelperSetStorageStructure(rawStructure: Services.StorageValuesObject) {
-    const newStructure = SNStorageService.DefaultValuesObject(
+    const newStructure = DiskStorageService.DefaultValuesObject(
       rawStructure.wrapped,
       rawStructure.unwrapped,
       rawStructure.nonwrapped,

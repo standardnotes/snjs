@@ -118,7 +118,7 @@ describe('device authentication', function () {
     })
     const sampleStorageKey = 'foo'
     const sampleStorageValue = 'bar'
-    await application.storageService.setValue(sampleStorageKey, sampleStorageValue)
+    await application.diskStorageService.setValue(sampleStorageKey, sampleStorageValue)
     expect(application.protocolService.rootKeyEncryption.keyMode).to.equal(KeyMode.RootKeyOnly)
     const passcode = 'foobar'
     Factory.handlePasswordChallenges(application, password)
@@ -156,7 +156,7 @@ describe('device authentication', function () {
     })
     expect(await tmpApplication.protocolService.getRootKey()).to.not.be.ok
     await tmpApplication.launch(true)
-    expect(await tmpApplication.storageService.getValue(sampleStorageKey)).to.equal(sampleStorageValue)
+    expect(await tmpApplication.diskStorageService.getValue(sampleStorageKey)).to.equal(sampleStorageValue)
     expect(await tmpApplication.protocolService.getRootKey()).to.be.ok
     expect(tmpApplication.protocolService.rootKeyEncryption.keyMode).to.equal(KeyMode.RootKeyPlusWrapper)
     await Factory.safeDeinit(tmpApplication)

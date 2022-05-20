@@ -11,7 +11,7 @@ import { SettingName } from '@standardnotes/settings'
 import { PureCryptoInterface } from '@standardnotes/sncrypto-common'
 import { SNSessionManager } from '@Lib/Services/Session/SessionManager'
 import { SNSettingsService } from '../Settings'
-import { SNStorageService } from '../Storage/StorageService'
+import { DiskStorageService } from '../Storage/DiskStorageService'
 import { SNSyncService } from '../Sync/SyncService'
 import { SNWebSocketsService, WebSocketsServiceEvent } from '../Api/WebsocketsService'
 import { TRUSTED_CUSTOM_EXTENSIONS_HOSTS, TRUSTED_FEATURE_HOSTS } from '@Lib/Hosts'
@@ -46,7 +46,7 @@ export class SNFeaturesService
   private completedSuccessfulFeaturesRetrieval = false
 
   constructor(
-    private storageService: SNStorageService,
+    private storageService: DiskStorageService,
     private apiService: SNApiService,
     private itemManager: ItemManager,
     private webSocketsService: SNWebSocketsService,
