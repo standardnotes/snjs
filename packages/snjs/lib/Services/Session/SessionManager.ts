@@ -4,6 +4,11 @@ import {
   InternalEventBusInterface,
   StorageKey,
   DiagnosticInfo,
+  ChallengePrompt,
+  ChallengeValidation,
+  ChallengeKeyboardType,
+  ChallengeReason,
+  ChallengePromptTitle,
 } from '@standardnotes/services'
 import { Base64String } from '@standardnotes/sncrypto-common'
 import { ClientDisplayableError } from '@standardnotes/responses'

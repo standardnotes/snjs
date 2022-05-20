@@ -18,7 +18,6 @@ import {
   getIncrementedDirtyIndex,
 } from '@standardnotes/models'
 import { SNSyncService } from '../Sync/SyncService'
-import { KeyRecoveryStrings } from '../Api/Messages'
 import { DiskStorageService } from '../Storage/DiskStorageService'
 import { PayloadManager } from '../Payloads/PayloadManager'
 import { Challenge, ChallengeService } from '../Challenge'
