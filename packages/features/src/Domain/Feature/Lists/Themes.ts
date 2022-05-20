@@ -115,7 +115,7 @@ export function themes(): ThemeFeatureDescription[] {
 
   const dynamic: ThemeFeatureDescription = FillThemeComponentDefaults({
     availableInSubscriptions: [SubscriptionName.PlusPlan, SubscriptionName.ProPlan],
-    name: 'Dynamic',
+    name: 'Dynamic Panels',
     identifier: FeatureIdentifier.DynamicTheme,
     permission_name: PermissionName.ThemeDynamic,
     layerable: true,
