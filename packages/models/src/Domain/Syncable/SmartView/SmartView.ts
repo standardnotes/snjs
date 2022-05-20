@@ -7,7 +7,7 @@ import { DecryptedPayloadInterface } from '../../Abstract/Payload/Interfaces/Dec
 export const SMART_TAG_DSL_PREFIX = '!['
 
 export enum SystemViewId {
-  AllNotesAndFiles = 'all-notes-and-files',
+  AllNotes = 'all-notes',
   ArchivedNotes = 'archived-notes',
   TrashedNotes = 'trashed-notes',
   UntaggedNotes = 'untagged-notes',

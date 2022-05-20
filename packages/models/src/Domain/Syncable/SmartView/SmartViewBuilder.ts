@@ -8,17 +8,16 @@ import { Predicate } from '../../Runtime/Predicate/Predicate'
 import { CompoundPredicate } from '../../Runtime/Predicate/CompoundPredicate'
 import { PayloadTimestampDefaults } from '../../Abstract/Payload'
 import { FilterDisplayOptions } from '../../Runtime/Display'
-import { PredicateInterface } from '../../Runtime/Predicate/Interface'
 
 export function BuildSmartViews(options: FilterDisplayOptions): SmartView[] {
-  const notesAndFiles = new SmartView(
+  const notes = new SmartView(
     new DecryptedPayload({
-      uuid: SystemViewId.AllNotesAndFiles,
+      uuid: SystemViewId.AllNotes,
       content_type: ContentType.SmartView,
       ...PayloadTimestampDefaults(),
       content: FillItemContent<SmartViewContent>({
-        title: 'Notes & Files',
-        predicate: allNotesAndFilesPredicate(options).toJson(),
+        title: 'Notes',
+        predicate: allNotesPredicate(options).toJson(),
       }),
     }),
   )
@@ -59,17 +58,11 @@ export function BuildSmartViews(options: FilterDisplayOptions): SmartView[] {
     }),
   )
 
-  return [notesAndFiles, archived, trash, untagged]
+  return [notes, archived, trash, untagged]
 }
 
-function allNotesAndFilesPredicate(options: FilterDisplayOptions) {
-  const subPredicates: PredicateInterface<SNNote>[] = []
-
-  const notesAndFilesPredicate = new CompoundPredicate('or', [
-    new Predicate('content_type', '=', ContentType.Note),
-    new Predicate('content_type', '=', ContentType.File),
-  ])
-  subPredicates.push(notesAndFilesPredicate)
+function allNotesPredicate(options: FilterDisplayOptions) {
+  const subPredicates: Predicate<SNNote>[] = [new Predicate('content_type', '=', ContentType.Note)]
 
   if (options.includeTrashed === false) {
     subPredicates.push(new Predicate('trashed', '=', false))

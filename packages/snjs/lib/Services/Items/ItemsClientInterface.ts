@@ -47,8 +47,6 @@ export interface ItemsClientInterface {
 
   getDisplayableFiles(): FileItem[]
 
-  getDisplayableNotesAndFiles(): (SNNote | FileItem)[]
-
   getDisplayableComponents(): (SNComponent | SNTheme)[]
 
   getItems<T extends DecryptedItemInterface>(contentType: ContentType | ContentType[]): T[]
