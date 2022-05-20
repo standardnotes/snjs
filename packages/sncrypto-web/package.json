@@ -1,6 +1,6 @@
 {
   "name": "@standardnotes/sncrypto-web",
-  "version": "1.9.2",
+  "version": "1.10.0",
   "description": "SNCrypto Web",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -18,7 +18,7 @@
     "test:e2e": "node test-server.js"
   },
   "dependencies": {
-    "@standardnotes/sncrypto-common": "^1.8.2",
+    "@standardnotes/sncrypto-common": "^1.9.0",
     "buffer": "^6.0.3",
     "libsodium-wrappers": "^0.7.9"
   },

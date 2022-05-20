@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.12.0](https://github.com/standardnotes/snjs/compare/@standardnotes/services@1.11.9...@standardnotes/services@1.12.0) (2022-05-20)
+
+
+### Features
+
+* authentication with PKCE mechanism ([#719](https://github.com/standardnotes/snjs/issues/719)) ([1bc19b7](https://github.com/standardnotes/snjs/commit/1bc19b79decf83a563d1cf095ee2e56f738152d1))
+
+
+
+
+
 ## [1.11.9](https://github.com/standardnotes/snjs/compare/@standardnotes/services@1.11.8...@standardnotes/services@1.11.9) (2022-05-18)
 
 **Note:** Version bump only for package @standardnotes/services
