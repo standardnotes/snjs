@@ -67,7 +67,6 @@ export class ItemManager
       {
         sortBy: 'created_at',
         sortDirection: 'dsc',
-        hiddenContentTypes: [ContentType.File],
       },
     )
     this.tagDisplayController = new Models.ItemDisplayController(this.collection, [ContentType.Tag], {
@@ -125,7 +124,7 @@ export class ItemManager
   public setPrimaryItemDisplayOptions(options: Models.DisplayOptions): void {
     const override: Models.FilterDisplayOptions = {}
 
-    if (options.views && options.views.find((view) => view.uuid === Models.SystemViewId.AllNotes)) {
+    if (options.views && options.views.find((view) => view.uuid === Models.SystemViewId.AllNotesAndFiles)) {
       if (options.includeArchived == undefined) {
         override.includeArchived = false
       }
@@ -280,7 +279,7 @@ export class ItemManager
 
   public countableNotesForTag(tag: Models.SNTag | Models.SmartView): number {
     if (tag instanceof Models.SmartView) {
-      if (tag.uuid === Models.SystemViewId.AllNotes) {
+      if (tag.uuid === Models.SystemViewId.AllNotesAndFiles) {
         return this.tagNotesIndex.allCountableNotesCount()
       }
 
@@ -1219,7 +1218,7 @@ export class ItemManager
   }
 
   public get allNotesSmartView(): Models.SmartView {
-    return this.systemSmartViews.find((tag) => tag.uuid === Models.SystemViewId.AllNotes) as Models.SmartView
+    return this.systemSmartViews.find((tag) => tag.uuid === Models.SystemViewId.AllNotesAndFiles) as Models.SmartView
   }
 
   public get archivedSmartView(): Models.SmartView {
