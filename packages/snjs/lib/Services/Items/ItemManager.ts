@@ -67,7 +67,6 @@ export class ItemManager
       {
         sortBy: 'created_at',
         sortDirection: 'dsc',
-        hiddenContentTypes: [ContentType.File],
       },
     )
     this.tagDisplayController = new Models.ItemDisplayController(this.collection, [ContentType.Tag], {
