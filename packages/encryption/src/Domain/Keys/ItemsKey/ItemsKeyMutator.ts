@@ -2,6 +2,6 @@ import { DecryptedItemMutator, ItemsKeyMutatorInterface, ItemsKeyContent } from 
 
 export class ItemsKeyMutator extends DecryptedItemMutator<ItemsKeyContent> implements ItemsKeyMutatorInterface {
   set isDefault(isDefault: boolean) {
-    this.content.isDefault = isDefault
+    this.mutableContent.isDefault = isDefault
   }
 }

@@ -15,33 +15,33 @@ export class DecryptedItemMutator<C extends ItemContent = ItemContent> extends I
   DecryptedPayloadInterface<C>,
   DecryptedItemInterface<C>
 > {
-  protected content: C
+  protected mutableContent: C
 
   constructor(item: DecryptedItemInterface<C>, type: MutationType) {
     super(item, type)
 
-    const mutableCopy = Copy(this.payload.content)
-    this.content = mutableCopy
+    const mutableCopy = Copy(this.immutablePayload.content)
+    this.mutableContent = mutableCopy
   }
 
   public override getResult() {
     if (this.type === MutationType.NonDirtying) {
-      return this.payload.copy({
-        content: this.content,
+      return this.immutablePayload.copy({
+        content: this.mutableContent,
       })
     }
 
     if (this.type === MutationType.UpdateUserTimestamps) {
       this.userModifiedDate = new Date()
     } else {
-      const currentValue = this.item.userModifiedDate
+      const currentValue = this.immutableItem.userModifiedDate
       if (!currentValue) {
-        this.userModifiedDate = new Date(this.item.serverUpdatedAt)
+        this.userModifiedDate = new Date(this.immutableItem.serverUpdatedAt)
       }
     }
 
-    const result = this.payload.copy({
-      content: this.content,
+    const result = this.immutablePayload.copy({
+      content: this.mutableContent,
       dirty: true,
       dirtyIndex: getIncrementedDirtyIndex(),
     })
@@ -50,8 +50,8 @@ export class DecryptedItemMutator<C extends ItemContent = ItemContent> extends I
   }
 
   public override setBeginSync(began: Date, globalDirtyIndex: number) {
-    this.payload = this.payload.copy({
-      content: this.content,
+    this.immutablePayload = this.immutablePayload.copy({
+      content: this.mutableContent,
       lastSyncBegan: began,
       globalDirtyIndexAtLastSync: globalDirtyIndex,
     })
@@ -59,7 +59,7 @@ export class DecryptedItemMutator<C extends ItemContent = ItemContent> extends I
 
   /** Not recommended to use as this might break item schema if used incorrectly */
   public setCustomContent(content: C): void {
-    this.content = Copy(content)
+    this.mutableContent = Copy(content)
   }
 
   public set userModifiedDate(date: Date) {
@@ -67,15 +67,15 @@ export class DecryptedItemMutator<C extends ItemContent = ItemContent> extends I
   }
 
   public set conflictOf(conflictOf: Uuid | undefined) {
-    this.content.conflict_of = conflictOf
+    this.mutableContent.conflict_of = conflictOf
   }
 
   public set protected(isProtected: boolean) {
-    this.content.protected = isProtected
+    this.mutableContent.protected = isProtected
   }
 
   public set trashed(trashed: boolean) {
-    this.content.trashed = trashed
+    this.mutableContent.trashed = trashed
   }
 
   public set pinned(pinned: boolean) {
@@ -94,13 +94,13 @@ export class DecryptedItemMutator<C extends ItemContent = ItemContent> extends I
    * Overwrites the entirety of this domain's data with the data arg.
    */
   public setDomainData(data: DomainDataValueType, domain: ItemDomainKey): void {
-    if (!this.content.appData) {
-      this.content.appData = {
+    if (!this.mutableContent.appData) {
+      this.mutableContent.appData = {
         [DefaultAppDomain]: {},
       }
     }
 
-    this.content.appData[domain] = data
+    this.mutableContent.appData[domain] = data
   }
 
   /**
@@ -108,17 +108,17 @@ export class DecryptedItemMutator<C extends ItemContent = ItemContent> extends I
    * Then sets data[key] = value
    */
   public setDomainDataKey(key: keyof DomainDataValueType, value: unknown, domain: ItemDomainKey): void {
-    if (!this.content.appData) {
-      this.content.appData = {
+    if (!this.mutableContent.appData) {
+      this.mutableContent.appData = {
         [DefaultAppDomain]: {},
       }
     }
 
-    if (!this.content.appData[domain]) {
-      this.content.appData[domain] = {}
+    if (!this.mutableContent.appData[domain]) {
+      this.mutableContent.appData[domain] = {}
     }
 
-    const domainData = this.content.appData[domain] as DomainDataValueType
+    const domainData = this.mutableContent.appData[domain] as DomainDataValueType
     domainData[key] = value
   }
 
@@ -126,20 +126,20 @@ export class DecryptedItemMutator<C extends ItemContent = ItemContent> extends I
     this.setDomainDataKey(key, value, DefaultAppDomain)
   }
 
-  public addItemAsRelationship(item: DecryptedItemInterface) {
-    const references = this.content.references || []
+  public e2ePendingRefactor_addItemAsRelationship(item: DecryptedItemInterface) {
+    const references = this.mutableContent.references || []
     if (!references.find((r) => r.uuid === item.uuid)) {
       references.push({
         uuid: item.uuid,
         content_type: item.content_type,
       })
     }
-    this.content.references = references
+    this.mutableContent.references = references
   }
 
   public removeItemAsRelationship(item: ItemInterface) {
-    let references = this.content.references || []
+    let references = this.mutableContent.references || []
     references = references.filter((r) => r.uuid !== item.uuid)
-    this.content.references = references
+    this.mutableContent.references = references
   }
 }

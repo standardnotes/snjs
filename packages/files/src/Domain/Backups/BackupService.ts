@@ -121,7 +121,7 @@ export class FilesBackupService extends AbstractService {
       },
     })
 
-    const itemsKey = this.items.itemsKeys().find((k) => k.uuid === encryptedFile.items_key_id)
+    const itemsKey = this.items.getDisplayableItemsKeys().find((k) => k.uuid === encryptedFile.items_key_id)
 
     if (!itemsKey) {
       return 'failed'

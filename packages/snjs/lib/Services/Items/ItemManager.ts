@@ -31,9 +31,16 @@ export class ItemManager
   private unsubChangeObserver: () => void
   private observers: ItemsChangeObserver[] = []
   private collection!: Models.ItemCollection
-  private notesCollection!: Models.NotesCollection
   private systemSmartViews: Models.SmartView[]
   private tagNotesIndex!: Models.TagNotesIndex
+
+  private noteAndFilesDisplayController!: Models.ItemDisplayController<Models.SNNote | Models.FileItem>
+  private tagDisplayController!: Models.ItemDisplayController<Models.SNTag>
+  private itemsKeyDisplayController!: Models.ItemDisplayController<SNItemsKey>
+  private componentDisplayController!: Models.ItemDisplayController<Models.SNComponent>
+  private themeDisplayController!: Models.ItemDisplayController<Models.SNTheme>
+  private fileDisplayController!: Models.ItemDisplayController<Models.FileItem>
+  private smartViewDisplayController!: Models.ItemDisplayController<Models.SmartView>
 
   constructor(
     private payloadManager: PayloadManager,
@@ -41,12 +48,12 @@ export class ItemManager
   ) {
     super(internalEventBus)
     this.payloadManager = payloadManager
-    this.systemSmartViews = this.rebuildSystemSmartViews(Models.NotesDisplayCriteria.Create({}))
+    this.systemSmartViews = this.rebuildSystemSmartViews({})
     this.createCollection()
     this.unsubChangeObserver = this.payloadManager.addObserver(ContentType.Any, this.setPayloads.bind(this))
   }
 
-  private rebuildSystemSmartViews(criteria: Models.NotesDisplayCriteria): Models.SmartView[] {
+  private rebuildSystemSmartViews(criteria: Models.FilterDisplayOptions): Models.SmartView[] {
     this.systemSmartViews = Models.BuildSmartViews(criteria)
     return this.systemSmartViews
   }
@@ -54,16 +61,52 @@ export class ItemManager
   private createCollection() {
     this.collection = new Models.ItemCollection()
 
-    this.collection.setDisplayOptions(ContentType.Note, Models.CollectionSort.CreatedAt, 'dsc')
-    this.collection.setDisplayOptions(ContentType.Tag, Models.CollectionSort.Title, 'dsc')
-    this.collection.setDisplayOptions(ContentType.ItemsKey, Models.CollectionSort.CreatedAt, 'asc')
-    this.collection.setDisplayOptions(ContentType.Component, Models.CollectionSort.CreatedAt, 'asc')
-    this.collection.setDisplayOptions(ContentType.Theme, Models.CollectionSort.Title, 'asc')
-    this.collection.setDisplayOptions(ContentType.SmartView, Models.CollectionSort.Title, 'dsc')
-    this.collection.setDisplayOptions(ContentType.File, Models.CollectionSort.Title, 'asc')
+    this.noteAndFilesDisplayController = new Models.ItemDisplayController(
+      this.collection,
+      [ContentType.Note, ContentType.File],
+      {
+        sortBy: 'created_at',
+        sortDirection: 'dsc',
+      },
+    )
+    this.tagDisplayController = new Models.ItemDisplayController(this.collection, [ContentType.Tag], {
+      sortBy: 'title',
+      sortDirection: 'asc',
+    })
+    this.itemsKeyDisplayController = new Models.ItemDisplayController(this.collection, [ContentType.ItemsKey], {
+      sortBy: 'created_at',
+      sortDirection: 'asc',
+    })
+    this.componentDisplayController = new Models.ItemDisplayController(this.collection, [ContentType.Component], {
+      sortBy: 'created_at',
+      sortDirection: 'asc',
+    })
+    this.themeDisplayController = new Models.ItemDisplayController(this.collection, [ContentType.Theme], {
+      sortBy: 'title',
+      sortDirection: 'asc',
+    })
+    this.smartViewDisplayController = new Models.ItemDisplayController(this.collection, [ContentType.SmartView], {
+      sortBy: 'title',
+      sortDirection: 'asc',
+    })
+    this.fileDisplayController = new Models.ItemDisplayController(this.collection, [ContentType.File], {
+      sortBy: 'title',
+      sortDirection: 'asc',
+    })
 
-    this.notesCollection = new Models.NotesCollection(this.collection)
     this.tagNotesIndex = new Models.TagNotesIndex(this.collection, this.tagNotesIndex?.observers)
+  }
+
+  private get allDisplayControllers(): Models.ItemDisplayController<Models.DisplayItem>[] {
+    return [
+      this.noteAndFilesDisplayController,
+      this.tagDisplayController,
+      this.itemsKeyDisplayController,
+      this.componentDisplayController,
+      this.themeDisplayController,
+      this.smartViewDisplayController,
+      this.fileDisplayController,
+    ]
   }
 
   get invalidItems(): Models.EncryptedItemInterface[] {
@@ -78,59 +121,82 @@ export class ItemManager
     return new Models.DecryptedPayload(object)
   }
 
-  setDisplayOptions(
-    contentType: ContentType.Tag | ContentType.SmartView | ContentType.Theme | ContentType.Component | ContentType.File,
-    sortBy?: Models.CollectionSortProperty,
-    direction?: Models.CollectionSortDirection,
-    filter?: (element: Models.SortableItem) => boolean,
-  ): void {
-    this.collection.setDisplayOptions(contentType, sortBy, direction, filter)
-  }
+  public setPrimaryItemDisplayOptions(options: Models.DisplayOptions): void {
+    const override: Models.FilterDisplayOptions = {}
 
-  public setNotesDisplayCriteria(criteria: Models.NotesDisplayCriteria): void {
-    const override: Partial<Models.NotesDisplayCriteria> = {}
-    if (criteria.views.find((view) => view.uuid === Models.SystemViewId.AllNotes)) {
-      if (criteria.includeArchived == undefined) {
+    if (options.views && options.views.find((view) => view.uuid === Models.SystemViewId.AllNotes)) {
+      if (options.includeArchived == undefined) {
         override.includeArchived = false
       }
-      if (criteria.includeTrashed == undefined) {
+      if (options.includeTrashed == undefined) {
         override.includeTrashed = false
       }
     }
-    if (criteria.views.find((view) => view.uuid === Models.SystemViewId.ArchivedNotes)) {
-      if (criteria.includeTrashed == undefined) {
+    if (options.views && options.views.find((view) => view.uuid === Models.SystemViewId.ArchivedNotes)) {
+      if (options.includeTrashed == undefined) {
         override.includeTrashed = false
       }
     }
-    if (criteria.views.find((view) => view.uuid === Models.SystemViewId.TrashedNotes)) {
-      if (criteria.includeArchived == undefined) {
+    if (options.views && options.views.find((view) => view.uuid === Models.SystemViewId.TrashedNotes)) {
+      if (options.includeArchived == undefined) {
         override.includeArchived = true
       }
     }
 
-    this.rebuildSystemSmartViews(Models.NotesDisplayCriteria.Copy(criteria, override))
+    this.rebuildSystemSmartViews({ ...options, ...override })
 
-    const updatedViews = criteria.views.map((tag) => {
-      const matchingSystemTag = this.systemSmartViews.find((view) => view.uuid === tag.uuid)
-      return matchingSystemTag || tag
-    })
+    const mostRecentVersionOfTags = options.tags
+      ?.map((tag) => {
+        return this.collection.find(tag.uuid) as Models.SNTag
+      })
+      .filter((tag) => tag != undefined)
 
-    const updatedCriteria = Models.NotesDisplayCriteria.Copy(criteria, {
-      views: updatedViews,
+    const mostRecentVersionOfViews = options.views
+      ?.map((view) => {
+        if (Models.isSystemView(view)) {
+          return this.systemSmartViews.find((systemView) => systemView.uuid === view.uuid) as Models.SmartView
+        }
+        return this.collection.find(view.uuid) as Models.SmartView
+      })
+      .filter((view) => view != undefined)
+
+    const updatedOptions: Models.DisplayOptions = {
+      ...options,
       ...override,
+      ...{
+        tags: mostRecentVersionOfTags,
+        views: mostRecentVersionOfViews,
+      },
+    }
+
+    this.noteAndFilesDisplayController.setDisplayOptions({
+      customFilter: Models.computeUnifiedFilterForDisplayOptions(updatedOptions, this.collection),
+      ...updatedOptions,
     })
-
-    this.notesCollection.setCriteria(updatedCriteria)
-  }
-
-  public getDisplayableItems<T extends Models.DecryptedItemInterface>(
-    contentType: ContentType.Tag | ContentType.SmartView | ContentType.Theme | ContentType.Component | ContentType.File,
-  ): T[] {
-    return this.collection.displayElements(contentType)
   }
 
   public getDisplayableNotes(): Models.SNNote[] {
-    return this.notesCollection.displayElements()
+    return this.noteAndFilesDisplayController.items().filter(Models.isNote)
+  }
+
+  public getDisplayableFiles(): Models.FileItem[] {
+    return this.fileDisplayController.items()
+  }
+
+  public getDisplayableNotesAndFiles(): (Models.SNNote | Models.FileItem)[] {
+    return this.noteAndFilesDisplayController.items()
+  }
+
+  public getDisplayableTags(): Models.SNTag[] {
+    return this.tagDisplayController.items()
+  }
+
+  public getDisplayableItemsKeys(): SNItemsKey[] {
+    return this.itemsKeyDisplayController.items()
+  }
+
+  public getDisplayableComponents(): (Models.SNComponent | Models.SNTheme)[] {
+    return [...this.componentDisplayController.items(), ...this.themeDisplayController.items()]
   }
 
   public override deinit(): void {
@@ -138,8 +204,14 @@ export class ItemManager
     ;(this.unsubChangeObserver as unknown) = undefined
     ;(this.payloadManager as unknown) = undefined
     ;(this.collection as unknown) = undefined
-    ;(this.notesCollection as unknown) = undefined
     ;(this.tagNotesIndex as unknown) = undefined
+    ;(this.tagDisplayController as unknown) = undefined
+    ;(this.noteAndFilesDisplayController as unknown) = undefined
+    ;(this.itemsKeyDisplayController as unknown) = undefined
+    ;(this.componentDisplayController as unknown) = undefined
+    ;(this.themeDisplayController as unknown) = undefined
+    ;(this.fileDisplayController as unknown) = undefined
+    ;(this.smartViewDisplayController as unknown) = undefined
   }
 
   resetState(): void {
@@ -193,26 +265,8 @@ export class ItemManager
     return this.collection.all()
   }
 
-  itemsKeys(): Models.ItemsKeyInterface[] {
-    return this.collection.displayElements(ContentType.ItemsKey)
-  }
-
-  get notes() {
-    return this.notesCollection.displayElements()
-  }
-
-  get tags(): Models.SNTag[] {
-    return this.collection.displayElements(ContentType.Tag)
-  }
-
   public hasTagsNeedingFoldersMigration(): boolean {
     return TagsToFoldersMigrationApplicator.isApplicableToCurrentData(this)
-  }
-
-  get components(): Models.SNComponent[] {
-    const components = this.collection.displayElements(ContentType.Component) as Models.SNComponent[]
-    const themes = this.collection.displayElements(ContentType.Theme) as Models.SNComponent[]
-    return components.concat(themes)
   }
 
   public addNoteCountChangeObserver(observer: Models.TagNoteCountChangeObserver): () => void {
@@ -297,17 +351,36 @@ export class ItemManager
   private setPayloads(data: PayloadManagerChangeData) {
     const { changed, inserted, discarded, ignored, unerrored, source, sourceKey } = data
 
-    const createItem = (payload: Models.FullyFormedPayloadInterface) => Models.CreateItemFromPayload(payload)
+    const createItem = (payload: Models.FullyFormedPayloadInterface) => {
+      return Models.CreateItemFromPayload(payload)
+    }
 
-    const changedItems = changed.map(createItem)
+    const affectedContentTypes = new Set<ContentType>()
 
-    const insertedItems = inserted.map(createItem)
+    const changedItems = changed.map((p) => {
+      affectedContentTypes.add(p.content_type)
+      return createItem(p)
+    })
 
-    const discardedItems: Models.DeletedItemInterface[] = discarded.map((p) => new Models.DeletedItem(p))
+    const insertedItems = inserted.map((p) => {
+      affectedContentTypes.add(p.content_type)
+      return createItem(p)
+    })
 
-    const ignoredItems: Models.EncryptedItemInterface[] = ignored.map((p) => new Models.EncryptedItem(p))
+    const discardedItems: Models.DeletedItemInterface[] = discarded.map((p) => {
+      affectedContentTypes.add(p.content_type)
+      return new Models.DeletedItem(p)
+    })
 
-    const unerroredItems = unerrored.map((p) => Models.CreateDecryptedItemFromPayload(p))
+    const ignoredItems: Models.EncryptedItemInterface[] = ignored.map((p) => {
+      affectedContentTypes.add(p.content_type)
+      return new Models.EncryptedItem(p)
+    })
+
+    const unerroredItems = unerrored.map((p) => {
+      affectedContentTypes.add(p.content_type)
+      return Models.CreateDecryptedItemFromPayload(p)
+    })
 
     const delta: Models.ItemDelta = {
       changed: changedItems,
@@ -318,8 +391,14 @@ export class ItemManager
     }
 
     this.collection.onChange(delta)
-    this.notesCollection.onChange(delta)
     this.tagNotesIndex.onChange(delta)
+
+    const affectedContentTypesArray = Array.from(affectedContentTypes.values())
+    for (const controller of this.allDisplayControllers) {
+      if (controller.contentTypes.some((ct) => affectedContentTypesArray.includes(ct))) {
+        controller.onCollectionChange(delta)
+      }
+    }
 
     this.notifyObserversByUiAdjustingDelta(delta, source, sourceKey)
   }
@@ -838,12 +917,12 @@ export class ItemManager
   }
 
   public getRootTags(): Models.SNTag[] {
-    return this.tags.filter((tag) => tag.parentId === undefined)
+    return this.getDisplayableTags().filter((tag) => tag.parentId === undefined)
   }
 
   public findTagByTitle(title: string): Models.SNTag | undefined {
     const lowerCaseTitle = title.toLowerCase()
-    return this.tags.find((tag) => tag.title?.toLowerCase() === lowerCaseTitle)
+    return this.getDisplayableTags().find((tag) => tag.title?.toLowerCase() === lowerCaseTitle)
   }
 
   public findTagByTitleAndParent(title: string, parentItemToLookupUuidFor?: Models.SNTag): Models.SNTag | undefined {
@@ -862,7 +941,7 @@ export class ItemManager
    */
   public searchTags(searchQuery: string, note?: Models.SNNote): Models.SNTag[] {
     return naturalSort(
-      this.tags.filter((tag) => {
+      this.getDisplayableTags().filter((tag) => {
         const expandedTitle = this.getTagLongTitle(tag)
         const matchesQuery = expandedTitle.toLowerCase().includes(searchQuery.toLowerCase())
         const tagInNote = note ? this.itemsReferencingItem(note).some((item) => item?.uuid === tag.uuid) : false
@@ -1018,26 +1097,28 @@ export class ItemManager
 
   public async associateFileWithNote(file: Models.FileItem, note: Models.SNNote): Promise<Models.FileItem> {
     return this.changeItem<Models.FileMutator, Models.FileItem>(file, (mutator) => {
-      mutator.associateWithNote(note)
+      mutator.addNote(note)
     })
   }
 
   public async disassociateFileWithNote(file: Models.FileItem, note: Models.SNNote): Promise<Models.FileItem> {
     return this.changeItem<Models.FileMutator, Models.FileItem>(file, (mutator) => {
-      mutator.disassociateWithNote(note)
+      mutator.removeNote(note)
     })
   }
 
   public async addTagToNote(note: Models.SNNote, tag: Models.SNTag, addHierarchy: boolean): Promise<Models.SNTag[]> {
     let tagsToAdd = [tag]
+
     if (addHierarchy) {
       const parentChainTags = this.getTagParentChain(tag)
       tagsToAdd = [...parentChainTags, tag]
     }
+
     return Promise.all(
       tagsToAdd.map((tagToAdd) => {
-        return this.changeItem(tagToAdd, (mutator) => {
-          mutator.addItemAsRelationship(note)
+        return this.changeTag(tagToAdd, (mutator) => {
+          mutator.addNote(note)
         }) as Promise<Models.SNTag>
       }),
     )
@@ -1125,7 +1206,15 @@ export class ItemManager
   }
 
   public notesMatchingSmartView(view: Models.SmartView): Models.SNNote[] {
-    return this.notesCollection.notesMatchingSmartView(view)
+    const criteria: Models.FilterDisplayOptions = {
+      views: [view],
+    }
+
+    return Models.itemsMatchingOptions(
+      criteria,
+      this.collection.allDecrypted(ContentType.Note),
+      this.collection,
+    ) as Models.SNNote[]
   }
 
   public get allNotesSmartView(): Models.SmartView {
@@ -1160,7 +1249,7 @@ export class ItemManager
    * Returns all smart views, sorted by title.
    */
   public getSmartViews(): Models.SmartView[] {
-    const userTags = this.collection.displayElements(ContentType.SmartView) as Models.SmartView[]
+    const userTags = this.smartViewDisplayController.items()
     return this.systemSmartViews.concat(userTags)
   }
 
@@ -1198,6 +1287,13 @@ export class ItemManager
   public removeItemLocally(item: Models.DecryptedItemInterface | Models.DeletedItemInterface): void {
     this.collection.discard([item])
     this.payloadManager.removePayloadLocally(item.payload)
+
+    const delta = Models.CreateItemDelta({ discarded: [item] as Models.DeletedItemInterface[] })
+    for (const controller of this.allDisplayControllers) {
+      if (controller.contentTypes.some((ct) => ct === item.content_type)) {
+        controller.onCollectionChange(delta)
+      }
+    }
   }
 
   public getFilesForNote(note: Models.SNNote): Models.FileItem[] {

@@ -81,7 +81,7 @@ describe('online syncing', function () {
       password: this.password,
     })
 
-    const notes = this.application.itemManager.notes
+    const notes = this.application.itemManager.getDisplayableNotes()
     expect(notes.length).to.equal(1)
     expect(notes[0].title).to.equal(note.title)
   })
@@ -126,7 +126,7 @@ describe('online syncing', function () {
     await Factory.alternateUuidForItem(this.application, note.uuid)
     await this.application.sync.sync(syncOptions)
 
-    const notes = this.application.itemManager.notes
+    const notes = this.application.itemManager.getDisplayableNotes()
     expect(notes.length).to.equal(1)
     expect(notes[0].uuid).to.not.equal(note.uuid)
   })
@@ -142,7 +142,7 @@ describe('online syncing', function () {
       mergeLocal: true,
     })
 
-    const notes = this.application.itemManager.notes
+    const notes = this.application.itemManager.getDisplayableNotes()
     expect(notes.length).to.equal(1)
     /** uuid should have been alternated */
     expect(notes[0].uuid).to.equal(note.uuid)
@@ -229,9 +229,9 @@ describe('online syncing', function () {
   })
 
   it('allows saving of data after sign out', async function () {
-    expect(this.application.itemManager.itemsKeys().length).to.equal(1)
+    expect(this.application.itemManager.getDisplayableItemsKeys().length).to.equal(1)
     this.application = await Factory.signOutApplicationAndReturnNew(this.application)
-    expect(this.application.itemManager.itemsKeys().length).to.equal(1)
+    expect(this.application.itemManager.getDisplayableItemsKeys().length).to.equal(1)
     const note = await Factory.createMappedNote(this.application)
     this.expectedItemCount++
     await this.application.itemManager.setItemDirty(note)
@@ -239,7 +239,7 @@ describe('online syncing', function () {
     const rawPayloads = await this.application.diskStorageService.getAllRawPayloads()
     const notePayload = noteObjectsFromObjects(rawPayloads)
     expect(notePayload.length).to.equal(1)
-    expect(this.application.itemManager.notes.length).to.equal(1)
+    expect(this.application.itemManager.getDisplayableNotes().length).to.equal(1)
 
     // set item to be merged for when sign in occurs
     await this.application.syncService.markAllItemsAsNeedingSyncAndPersist()
@@ -254,11 +254,11 @@ describe('online syncing', function () {
     })
 
     expect(this.application.itemManager.getDirtyItems().length).to.equal(0)
-    expect(this.application.itemManager.itemsKeys().length).to.equal(1)
+    expect(this.application.itemManager.getDisplayableItemsKeys().length).to.equal(1)
     expect(this.application.syncService.isOutOfSync()).to.equal(false)
-    expect(this.application.itemManager.notes.length).to.equal(1)
+    expect(this.application.itemManager.getDisplayableNotes().length).to.equal(1)
 
-    for (const item of this.application.itemManager.notes) {
+    for (const item of this.application.itemManager.getDisplayableNotes()) {
       expect(item.content.title).to.be.ok
     }
 

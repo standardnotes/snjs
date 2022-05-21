@@ -72,7 +72,7 @@ describe('online conflict handling', function () {
 
     /** First modify the item without saving so that our local contents digress from the server's */
     await this.application.mutator.changeItem(item, (mutator) => {
-      mutator.content.foo = `${Math.random()}`
+      mutator.mutableContent.foo = `${Math.random()}`
     })
 
     await Factory.changePayloadTimeStampAndSync(
@@ -159,7 +159,7 @@ describe('online conflict handling', function () {
 
     this.expectedItemCount++
 
-    const duplicate = this.application.itemManager.notes.find((n) => {
+    const duplicate = this.application.itemManager.getDisplayableNotes().find((n) => {
       return n.uuid !== note.uuid
     })
     expect(duplicate).to.be.ok
@@ -202,7 +202,7 @@ describe('online conflict handling', function () {
 
     // We expect this item to be duplicated
     this.expectedItemCount++
-    expect(this.application.itemManager.notes.length).to.equal(2)
+    expect(this.application.itemManager.getDisplayableNotes().length).to.equal(2)
 
     const allItems = this.application.itemManager.items
     expect(allItems.length).to.equal(this.expectedItemCount)
@@ -248,8 +248,8 @@ describe('online conflict handling', function () {
     const allItems = this.application.itemManager.items
     expect(allItems.length).to.equal(this.expectedItemCount)
 
-    const note1 = this.application.itemManager.notes[0]
-    const note2 = this.application.itemManager.notes[1]
+    const note1 = this.application.itemManager.getDisplayableNotes()[0]
+    const note2 = this.application.itemManager.getDisplayableNotes()[1]
     expect(note1.content.title).to.not.equal(note2.content.title)
     await this.sharedFinalAssertions()
   })
@@ -355,7 +355,7 @@ describe('online conflict handling', function () {
       note,
       (mutator) => {
         // client A
-        mutator.content.conflict_of = 'foo'
+        mutator.mutableContent.conflict_of = 'foo'
       },
       undefined,
       undefined,
@@ -367,7 +367,7 @@ describe('online conflict handling', function () {
     await this.application.itemManager.changeItem(
       note,
       (mutator) => {
-        mutator.content.conflict_of = 'bar'
+        mutator.mutableContent.conflict_of = 'bar'
       },
       undefined,
       undefined,
@@ -389,7 +389,7 @@ describe('online conflict handling', function () {
       note,
       (mutator) => {
         // client A
-        mutator.content.foo = 'foo'
+        mutator.mutableContent.foo = 'foo'
       },
       undefined,
       undefined,
@@ -555,7 +555,7 @@ describe('online conflict handling', function () {
      */
     this.application.syncService.lockSyncing()
     const yesterday = Factory.yesterday()
-    for (const note of this.application.itemManager.notes) {
+    for (const note of this.application.itemManager.getDisplayableNotes()) {
       /** First modify the item without saving so that
        * our local contents digress from the server's */
       await this.application.itemManager.changeItem(note, (mutator) => {
@@ -575,7 +575,7 @@ describe('online conflict handling', function () {
     this.application.syncService.sync(syncOptions)
     await this.context.awaitNextSucessfulSync()
 
-    expect(this.application.itemManager.notes.length).to.equal(largeItemCount * 2)
+    expect(this.application.itemManager.getDisplayableNotes().length).to.equal(largeItemCount * 2)
     await this.sharedFinalAssertions()
   }).timeout(60000)
 
@@ -591,7 +591,7 @@ describe('online conflict handling', function () {
     expect(userPrefs).to.be.ok
 
     tag = await this.application.itemManager.changeItem(tag, (mutator) => {
-      mutator.addItemAsRelationship(userPrefs)
+      mutator.e2ePendingRefactor_addItemAsRelationship(userPrefs)
     })
 
     await this.application.itemManager.setItemDirty(userPrefs)
@@ -655,7 +655,7 @@ describe('online conflict handling', function () {
     tag = await this.application.mutator.changeAndSaveItem(
       tag,
       (mutator) => {
-        mutator.addItemAsRelationship(note)
+        mutator.e2ePendingRefactor_addItemAsRelationship(note)
       },
       undefined,
       undefined,
@@ -733,7 +733,7 @@ describe('online conflict handling', function () {
     await this.application.sync.sync()
 
     /** Expect that no duplicates have been created, and that the note's title is now finalTitle */
-    expect(this.application.itemManager.notes.length).to.equal(1)
+    expect(this.application.itemManager.getDisplayableNotes().length).to.equal(1)
     const finalNote = this.application.items.findItem(note.uuid)
     expect(finalNote.title).to.equal(finalTitle)
     await this.sharedFinalAssertions()
@@ -777,7 +777,7 @@ describe('online conflict handling', function () {
      */
     const resultNote = await this.application.items.findItem(note.uuid)
     expect(resultNote.errorDecrypting).to.not.be.ok
-    expect(this.application.itemManager.notes.length).to.equal(1)
+    expect(this.application.itemManager.getDisplayableNotes().length).to.equal(1)
     await this.sharedFinalAssertions()
   })
 
@@ -840,8 +840,8 @@ describe('online conflict handling', function () {
     })
     Factory.handlePasswordChallenges(newApp, password)
     await newApp.mutator.importData(backupFile, true)
-    expect(newApp.itemManager.tags.length).to.equal(1)
-    expect(newApp.itemManager.notes.length).to.equal(1)
+    expect(newApp.itemManager.getDisplayableTags().length).to.equal(1)
+    expect(newApp.itemManager.getDisplayableNotes().length).to.equal(1)
     await Factory.safeDeinit(newApp)
   }).timeout(10000)
 
@@ -852,10 +852,10 @@ describe('online conflict handling', function () {
      */
     /** Create primary account and export data */
     await createSyncedNoteWithTag(this.application)
-    const tag = this.application.itemManager.tags[0]
+    const tag = this.application.itemManager.getDisplayableTags()[0]
     const note2 = await Factory.createMappedNote(this.application)
     await this.application.mutator.changeAndSaveItem(tag, (mutator) => {
-      mutator.addItemAsRelationship(note2)
+      mutator.e2ePendingRefactor_addItemAsRelationship(note2)
     })
     let backupFile = await this.application.createEncryptedBackupFileForAutomatedDesktopBackups()
     backupFile.items = [
@@ -875,7 +875,7 @@ describe('online conflict handling', function () {
     })
     Factory.handlePasswordChallenges(newApp, password)
     await newApp.mutator.importData(backupFile, true)
-    const newTag = newApp.itemManager.tags[0]
+    const newTag = newApp.itemManager.getDisplayableTags()[0]
     const notes = newApp.items.referencesForItem(newTag)
     expect(notes.length).to.equal(2)
     await Factory.safeDeinit(newApp)
@@ -910,7 +910,7 @@ describe('online conflict handling', function () {
     })
     await this.application.itemManager.emitItemFromPayload(modified)
     await this.application.sync.sync()
-    expect(this.application.itemManager.notes.length).to.equal(1)
+    expect(this.application.itemManager.getDisplayableNotes().length).to.equal(1)
     await this.sharedFinalAssertions()
   })
 
@@ -934,7 +934,7 @@ describe('online conflict handling', function () {
     this.expectedItemCount++
     await this.application.itemManager.emitItemFromPayload(modified)
     await this.application.sync.sync()
-    expect(this.application.itemManager.notes.length).to.equal(2)
+    expect(this.application.itemManager.getDisplayableNotes().length).to.equal(2)
     await this.sharedFinalAssertions()
   })
 

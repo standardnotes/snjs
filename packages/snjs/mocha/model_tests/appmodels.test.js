@@ -99,7 +99,7 @@ describe('app models', () => {
     item = items[0]
 
     expect(item.content.foo).to.equal('bar')
-    expect(this.application.itemManager.notes.length).to.equal(1)
+    expect(this.application.itemManager.getDisplayableNotes().length).to.equal(1)
   })
 
   it('mapping item twice should preserve references', async function () {
@@ -107,10 +107,10 @@ describe('app models', () => {
     const item2 = await Factory.createMappedNote(this.application)
 
     await this.application.itemManager.changeItem(item1, (mutator) => {
-      mutator.addItemAsRelationship(item2)
+      mutator.e2ePendingRefactor_addItemAsRelationship(item2)
     })
     await this.application.itemManager.changeItem(item2, (mutator) => {
-      mutator.addItemAsRelationship(item1)
+      mutator.e2ePendingRefactor_addItemAsRelationship(item1)
     })
 
     const refreshedItem = this.application.itemManager.findItem(item1.uuid)
@@ -122,10 +122,10 @@ describe('app models', () => {
     var item2 = await Factory.createMappedNote(this.application)
 
     await this.application.itemManager.changeItem(item1, (mutator) => {
-      mutator.addItemAsRelationship(item2)
+      mutator.e2ePendingRefactor_addItemAsRelationship(item2)
     })
     await this.application.itemManager.changeItem(item2, (mutator) => {
-      mutator.addItemAsRelationship(item1)
+      mutator.e2ePendingRefactor_addItemAsRelationship(item1)
     })
 
     const refreshedItem1 = this.application.itemManager.findItem(item1.uuid)
@@ -154,10 +154,10 @@ describe('app models', () => {
     var item1 = await Factory.createMappedNote(this.application)
     var item2 = await Factory.createMappedNote(this.application)
     await this.application.itemManager.changeItem(item1, (mutator) => {
-      mutator.addItemAsRelationship(item2)
+      mutator.e2ePendingRefactor_addItemAsRelationship(item2)
     })
     await this.application.itemManager.changeItem(item2, (mutator) => {
-      mutator.addItemAsRelationship(item1)
+      mutator.e2ePendingRefactor_addItemAsRelationship(item1)
     })
 
     const refreshedItem1 = this.application.itemManager.findItem(item1.uuid)
@@ -200,7 +200,7 @@ describe('app models', () => {
     const item2 = await Factory.createMappedNote(this.application)
 
     const refreshedItem1 = await this.application.itemManager.changeItem(item1, (mutator) => {
-      mutator.addItemAsRelationship(item2)
+      mutator.e2ePendingRefactor_addItemAsRelationship(item2)
     })
 
     expect(refreshedItem1.content.references.length).to.equal(1)
@@ -222,7 +222,7 @@ describe('app models', () => {
     const item1 = await Factory.createMappedNote(this.application)
     const item2 = await Factory.createMappedNote(this.application)
     const refreshedItem1 = await this.application.itemManager.changeItem(item1, (mutator) => {
-      mutator.addItemAsRelationship(item2)
+      mutator.e2ePendingRefactor_addItemAsRelationship(item2)
     })
 
     const refreshedItem1_2 = await this.application.itemManager.emitItemFromPayload(
@@ -246,7 +246,7 @@ describe('app models', () => {
     const item2 = await Factory.createMappedNote(this.application)
 
     const refreshedItem1 = await this.application.itemManager.changeItem(item1, (mutator) => {
-      mutator.addItemAsRelationship(item2)
+      mutator.e2ePendingRefactor_addItemAsRelationship(item2)
     })
 
     expect(refreshedItem1.content.references.length).to.equal(1)
@@ -256,14 +256,14 @@ describe('app models', () => {
     const refreshedItem1_2 = this.application.itemManager.findItem(item1.uuid)
     expect(refreshedItem1_2).to.not.be.ok
 
-    expect(this.application.itemManager.notes.length).to.equal(2)
+    expect(this.application.itemManager.getDisplayableNotes().length).to.equal(2)
 
     expect(alternatedItem.content.references.length).to.equal(1)
     expect(this.application.itemManager.itemsReferencingItem(alternatedItem.uuid).length).to.equal(0)
 
     expect(this.application.itemManager.itemsReferencingItem(item2).length).to.equal(1)
 
-    expect(alternatedItem.hasRelationshipWithItem(item2)).to.equal(true)
+    expect(alternatedItem.isReferencingItem(item2)).to.equal(true)
     expect(alternatedItem.dirty).to.equal(true)
   })
 
@@ -275,7 +275,7 @@ describe('app models', () => {
 
   it('alterating itemskey uuid should update errored items encrypted with that key', async function () {
     const item1 = await Factory.createMappedNote(this.application)
-    const itemsKey = this.application.itemManager.itemsKeys()[0]
+    const itemsKey = this.application.itemManager.getDisplayableItemsKeys()[0]
 
     /** Encrypt item1 and emit as errored so it persists with items_key_id */
     const encrypted = await this.application.protocolService.encryptSplitSingle({
@@ -309,7 +309,7 @@ describe('app models', () => {
     this.expectedItemCount += 2
 
     await this.application.itemManager.changeItem(item1, (mutator) => {
-      mutator.addItemAsRelationship(item2)
+      mutator.e2ePendingRefactor_addItemAsRelationship(item2)
     })
 
     expect(this.application.itemManager.itemsReferencingItem(item2).length).to.equal(1)
@@ -329,8 +329,8 @@ describe('app models', () => {
 
     expect(this.application.itemManager.itemsReferencingItem(alternatedItem2).length).to.equal(1)
 
-    expect(refreshedAltItem1.hasRelationshipWithItem(alternatedItem2)).to.equal(true)
-    expect(alternatedItem2.hasRelationshipWithItem(refreshedAltItem1)).to.equal(false)
+    expect(refreshedAltItem1.isReferencingItem(alternatedItem2)).to.equal(true)
+    expect(alternatedItem2.isReferencingItem(refreshedAltItem1)).to.equal(false)
     expect(refreshedAltItem1.dirty).to.equal(true)
   })
 
@@ -338,7 +338,7 @@ describe('app models', () => {
     const tag = await Factory.createMappedTag(this.application)
     const note = await Factory.createMappedNote(this.application)
     const refreshedTag = await this.application.itemManager.changeItem(tag, (mutator) => {
-      mutator.addItemAsRelationship(note)
+      mutator.e2ePendingRefactor_addItemAsRelationship(note)
     })
 
     expect(refreshedTag.content.references.length).to.equal(1)
@@ -346,8 +346,8 @@ describe('app models', () => {
     const noteCopy = await this.application.itemManager.duplicateItem(note)
     expect(note.uuid).to.not.equal(noteCopy.uuid)
 
-    expect(this.application.itemManager.notes.length).to.equal(2)
-    expect(this.application.itemManager.tags.length).to.equal(1)
+    expect(this.application.itemManager.getDisplayableNotes().length).to.equal(2)
+    expect(this.application.itemManager.getDisplayableTags().length).to.equal(1)
 
     expect(note.content.references.length).to.equal(0)
     expect(noteCopy.content.references.length).to.equal(0)

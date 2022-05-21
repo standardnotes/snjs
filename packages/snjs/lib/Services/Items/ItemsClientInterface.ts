@@ -1,3 +1,4 @@
+import { SNItemsKey } from '@standardnotes/encryption'
 import { ContentType } from '@standardnotes/common'
 import {
   SNNote,
@@ -5,15 +6,14 @@ import {
   SNTag,
   SmartView,
   TagNoteCountChangeObserver,
-  NotesDisplayCriteria,
   DecryptedPayloadInterface,
-  CollectionSortProperty,
   EncryptedItemInterface,
-  CollectionSortDirection,
   DecryptedTransferPayload,
   PredicateInterface,
   DecryptedItemInterface,
-  SortableItem,
+  SNComponent,
+  SNTheme,
+  DisplayOptions,
 } from '@standardnotes/models'
 import { UuidString } from '@Lib/Types'
 
@@ -30,29 +30,26 @@ export interface ItemsClientInterface {
 
   addTagToNote(note: SNNote, tag: SNTag, addHierarchy: boolean): Promise<SNTag[]>
 
-  /**
-   * Creates an unmanaged, un-inserted item from a payload.
-   */
+  /** Creates an unmanaged, un-inserted item from a payload. */
   createItemFromPayload(payload: DecryptedPayloadInterface): DecryptedItemInterface
 
   createPayloadFromObject(object: DecryptedTransferPayload): DecryptedPayloadInterface
 
   get trashedItems(): SNNote[]
 
-  setDisplayOptions(
-    contentType: ContentType.Tag | ContentType.SmartView | ContentType.Theme | ContentType.Component | ContentType.File,
-    sortBy?: CollectionSortProperty,
-    direction?: CollectionSortDirection,
-    filter?: (element: SortableItem) => boolean,
-  ): void
-
-  setNotesDisplayCriteria(criteria: NotesDisplayCriteria): void
-
-  getDisplayableItems<T extends DecryptedItemInterface>(
-    contentType: ContentType.Tag | ContentType.SmartView | ContentType.Theme | ContentType.Component | ContentType.File,
-  ): T[]
+  setPrimaryItemDisplayOptions(options: DisplayOptions): void
 
   getDisplayableNotes(): SNNote[]
+
+  getDisplayableTags(): SNTag[]
+
+  getDisplayableItemsKeys(): SNItemsKey[]
+
+  getDisplayableFiles(): FileItem[]
+
+  getDisplayableNotesAndFiles(): (SNNote | FileItem)[]
+
+  getDisplayableComponents(): (SNComponent | SNTheme)[]
 
   getItems<T extends DecryptedItemInterface>(contentType: ContentType | ContentType[]): T[]
 

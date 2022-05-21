@@ -72,8 +72,8 @@ describe('items', () => {
     const params2 = Factory.createNotePayload()
     await this.application.itemManager.emitItemsFromPayloads([params1, params2], PayloadEmitSource.LocalChanged)
 
-    let item1 = this.application.itemManager.notes[0]
-    let item2 = this.application.itemManager.notes[1]
+    let item1 = this.application.itemManager.getDisplayableNotes()[0]
+    let item2 = this.application.itemManager.getDisplayableNotes()[1]
 
     expect(item1.isItemContentEqualWith(item2)).to.equal(true)
 
@@ -102,7 +102,7 @@ describe('items', () => {
     item1 = await this.application.mutator.changeAndSaveItem(
       item1,
       (mutator) => {
-        mutator.content.foo = 'bar'
+        mutator.mutableContent.foo = 'bar'
       },
       undefined,
       undefined,
@@ -114,7 +114,7 @@ describe('items', () => {
     item2 = await this.application.mutator.changeAndSaveItem(
       item2,
       (mutator) => {
-        mutator.content.foo = 'bar'
+        mutator.mutableContent.foo = 'bar'
       },
       undefined,
       undefined,
@@ -127,7 +127,7 @@ describe('items', () => {
     item1 = await this.application.mutator.changeAndSaveItem(
       item1,
       (mutator) => {
-        mutator.addItemAsRelationship(item2)
+        mutator.e2ePendingRefactor_addItemAsRelationship(item2)
       },
       undefined,
       undefined,
@@ -136,7 +136,7 @@ describe('items', () => {
     item2 = await this.application.mutator.changeAndSaveItem(
       item2,
       (mutator) => {
-        mutator.addItemAsRelationship(item1)
+        mutator.e2ePendingRefactor_addItemAsRelationship(item1)
       },
       undefined,
       undefined,
@@ -177,13 +177,13 @@ describe('items', () => {
     const params2 = Factory.createNotePayload()
     await this.application.itemManager.emitItemsFromPayloads([params1, params2], PayloadEmitSource.LocalChanged)
 
-    let item1 = this.application.itemManager.notes[0]
-    const item2 = this.application.itemManager.notes[1]
+    let item1 = this.application.itemManager.getDisplayableNotes()[0]
+    const item2 = this.application.itemManager.getDisplayableNotes()[1]
 
     item1 = await this.application.mutator.changeAndSaveItem(
       item1,
       (mutator) => {
-        mutator.content.foo = 'bar'
+        mutator.mutableContent.foo = 'bar'
       },
       undefined,
       undefined,

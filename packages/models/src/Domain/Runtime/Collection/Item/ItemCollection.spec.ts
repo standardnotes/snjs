@@ -1,24 +1,11 @@
 import { NoteContent } from './../../../Syncable/Note/NoteContent'
 import { ContentType } from '@standardnotes/common'
-import { DecryptedItem, EncryptedItem } from '../../../Abstract/Item'
-import { DecryptedPayload, EncryptedPayload, PayloadTimestampDefaults } from '../../../Abstract/Payload'
+import { DecryptedItem } from '../../../Abstract/Item'
+import { DecryptedPayload, PayloadTimestampDefaults } from '../../../Abstract/Payload'
 import { ItemCollection } from './ItemCollection'
-import { FillItemContent } from '../../../Abstract/Content/ItemContent'
+import { FillItemContent, ItemContent } from '../../../Abstract/Content/ItemContent'
 
 describe('item collection', () => {
-  const createEncryptedPayload = (uuid?: string) => {
-    return new EncryptedPayload({
-      uuid: uuid || String(Math.random()),
-      content_type: ContentType.Note,
-      content: '004:...',
-      enc_item_key: '004:...',
-      items_key_id: '123',
-      waitingForKey: true,
-      errorDecrypting: true,
-      ...PayloadTimestampDefaults(),
-    })
-  }
-
   const createDecryptedPayload = (uuid?: string): DecryptedPayload => {
     return new DecryptedPayload({
       uuid: uuid || String(Math.random()),
@@ -30,31 +17,20 @@ describe('item collection', () => {
     })
   }
 
-  it('should not include encrypted items as displayable', () => {
-    const payload = createEncryptedPayload()
-    const item = new EncryptedItem(payload)
-
+  it('setting same item twice should not result in doubles', () => {
     const collection = new ItemCollection()
-    collection.setDisplayOptions(ContentType.Note, 'title')
-    collection.set(item)
-
-    const results = collection.displayElements(ContentType.Note)
-
-    expect(results).toHaveLength(0)
-  })
-
-  it('should remove item from map if previously decrypted but now encrypted', () => {
-    const collection = new ItemCollection()
-    collection.setDisplayOptions(ContentType.Note, 'title')
 
     const decryptedItem = new DecryptedItem(createDecryptedPayload())
     collection.set(decryptedItem)
 
-    const encryptedItem = new EncryptedItem(createEncryptedPayload(decryptedItem.uuid))
-    collection.set(encryptedItem)
+    const updatedItem = new DecryptedItem(
+      decryptedItem.payload.copy({
+        content: { foo: 'bar' } as unknown as jest.Mocked<ItemContent>,
+      }),
+    )
 
-    const results = collection.displayElements(ContentType.Note)
+    collection.set(updatedItem)
 
-    expect(results).toHaveLength(0)
+    expect(collection.all()).toHaveLength(1)
   })
 })
