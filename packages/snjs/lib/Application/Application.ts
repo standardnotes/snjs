@@ -20,6 +20,7 @@ import {
   Platform,
   ChallengeValue,
   StorageKey,
+  ChallengeReason,
 } from '@standardnotes/services'
 import { SNLog } from '../Log'
 import { useBoolean } from '@standardnotes/utils'
@@ -598,6 +599,13 @@ export class SNApplication
 
   public clearProtectionSession(): Promise<void> {
     return this.protectionService.clearSession()
+  }
+
+  public async authorizeProtectedActionForNotes(
+    notes: Models.SNNote[],
+    challengeReason: ChallengeReason,
+  ): Promise<Models.SNNote[]> {
+    return await this.protectionService.authorizeProtectedActionForItems(notes, challengeReason)
   }
 
   /**
