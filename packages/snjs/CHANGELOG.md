@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.112.0](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.111.0...@standardnotes/snjs@2.112.0) (2022-05-21)
+
+
+### Features
+
+* generic protected access authorization ([#744](https://github.com/standardnotes/snjs/issues/744)) ([35095d2](https://github.com/standardnotes/snjs/commit/35095d27c54b813dc8ebc2c4a34e401cb237c6d0))
+
+
+
+
+
 # [2.111.0](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.110.3...@standardnotes/snjs@2.111.0) (2022-05-21)
 
 
