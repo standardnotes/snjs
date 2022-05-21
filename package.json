@@ -32,7 +32,9 @@
     "build:models": "yarn --cwd packages/models build",
     "build:snjs": "yarn --cwd packages/snjs build",
     "build:files": "yarn --cwd packages/files build",
-    "build:filepicker": "yarn --cwd packages/filepicker build"
+    "build:filepicker": "yarn --cwd packages/filepicker build",
+    "build:encryption": "yarn --cwd packages/encryption build",
+    "build:snjscore": "yarn build:models && yarn build:services && yarn build:encryption && yarn build:files && yarn build:snjs"
   },
   "devDependencies": {
     "@types/node": "^17.0.21",
