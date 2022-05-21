@@ -64,7 +64,7 @@ describe('protectionService', () => {
 
       const unprotectedFile = createFile('protected.txt', false)
 
-      await protectionService.authorizeProtectedActionForFiles([unprotectedFile], ChallengeReason.AccessProtectedFile)
+      await protectionService.authorizeProtectedActionForItems([unprotectedFile], ChallengeReason.AccessProtectedFile)
 
       expect(challengeService.promptForChallengeResponse).not.toHaveBeenCalled()
     })
@@ -74,7 +74,7 @@ describe('protectionService', () => {
 
       const protectedFile = createFile('protected.txt', true)
 
-      await protectionService.authorizeProtectedActionForFiles([protectedFile], ChallengeReason.AccessProtectedFile)
+      await protectionService.authorizeProtectedActionForItems([protectedFile], ChallengeReason.AccessProtectedFile)
 
       expect(challengeService.promptForChallengeResponse).toHaveBeenCalled()
     })
@@ -85,7 +85,7 @@ describe('protectionService', () => {
       const protectedFile = createFile('protected.txt', true)
       const unprotectedFile = createFile('unprotected.txt', false)
 
-      await protectionService.authorizeProtectedActionForFiles(
+      await protectionService.authorizeProtectedActionForItems(
         [protectedFile, unprotectedFile],
         ChallengeReason.AccessProtectedFile,
       )
@@ -99,7 +99,7 @@ describe('protectionService', () => {
       const protectedFile = createFile('protected.txt', false)
       const unprotectedFile = createFile('unprotected.txt', false)
 
-      await protectionService.authorizeProtectedActionForFiles(
+      await protectionService.authorizeProtectedActionForItems(
         [protectedFile, unprotectedFile],
         ChallengeReason.AccessProtectedFile,
       )

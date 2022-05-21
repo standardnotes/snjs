@@ -13,7 +13,6 @@ import { Subscription } from '@standardnotes/auth'
 import { UuidString, DeinitSource, ApplicationEventPayload } from '../Types'
 import { ApplicationEvent, applicationEventForSyncEvent } from '@Lib/Application/Event'
 import {
-  ChallengeReason,
   ChallengeValidation,
   DiagnosticInfo,
   Environment,
@@ -601,18 +600,11 @@ export class SNApplication
     return this.protectionService.clearSession()
   }
 
-  public async authorizeProtectedActionForNotes(
-    notes: Models.SNNote[],
-    challengeReason: ChallengeReason,
-  ): Promise<Models.SNNote[]> {
-    return await this.protectionService.authorizeProtectedActionForNotes(notes, challengeReason)
-  }
-
   /**
    * @returns whether note access has been granted or not
    */
   public authorizeNoteAccess(note: Models.SNNote): Promise<boolean> {
-    return this.protectionService.authorizeNoteAccess(note)
+    return this.protectionService.authorizeItemAccess(note)
   }
 
   public authorizeAutolockIntervalChange(): Promise<boolean> {
