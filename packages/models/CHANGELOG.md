@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.9.0](https://github.com/standardnotes/snjs/compare/@standardnotes/models@1.8.8...@standardnotes/models@1.9.0) (2022-05-21)
+
+
+### Features
+
+* display controllers ([#743](https://github.com/standardnotes/snjs/issues/743)) ([5fadce3](https://github.com/standardnotes/snjs/commit/5fadce37f1b3f2f51b8a90c257bc666ac7710074))
+
+
+
+
+
 ## [1.8.8](https://github.com/standardnotes/snjs/compare/@standardnotes/models@1.8.7...@standardnotes/models@1.8.8) (2022-05-20)
 
 **Note:** Version bump only for package @standardnotes/models
