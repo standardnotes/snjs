@@ -1,5 +1,4 @@
 import { AccountSyncOperation } from '@Lib/Services/Sync/Account/Operation'
-import { ApplicationSyncOptions } from '../../Application/Options'
 import { ContentType } from '@standardnotes/common'
 import {
   extendArray,
@@ -78,6 +77,7 @@ import {
 import { OfflineSyncResponse } from './Offline/Response'
 import { KeyedDecryptionSplit, SplitPayloadsByEncryptionType } from '@standardnotes/encryption'
 import { CreatePayloadFromRawServerItem } from './Account/Utilities'
+import { ApplicationSyncOptions } from '@Lib/Application/Options/OptionalOptions'
 
 const DEFAULT_MAJOR_CHANGE_THRESHOLD = 15
 const INVALID_SESSION_RESPONSE_STATUS = 401

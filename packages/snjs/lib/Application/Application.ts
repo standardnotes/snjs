@@ -5,7 +5,6 @@ import * as Models from '@standardnotes/models'
 import * as Responses from '@standardnotes/responses'
 import * as InternalServices from '../Services'
 import * as Utils from '@standardnotes/utils'
-import * as Options from './Options'
 import * as Settings from '@standardnotes/settings'
 import * as Files from '@standardnotes/files'
 import { SnjsVersion } from './../Version'
@@ -30,6 +29,8 @@ import { Challenge, ChallengeResponse } from '../Services'
 import { AppGroupManagedApplication, ApplicationInterface } from './ApplicationInterface'
 import { DeinitCallback } from '../ApplicationGroup/DeinitCallback'
 import { DeinitMode } from './DeinitMode'
+import { ApplicationConstructorOptions, FullyResolvedApplicationOptions } from './Options/ApplicationOptions'
+import { ApplicationOptionsDefaults } from './Options/Defaults'
 
 /** How often to automatically sync, in milliseconds */
 const DEFAULT_AUTO_SYNC_INTERVAL = 30_000
@@ -122,13 +123,13 @@ export class SNApplication
   public deviceInterface: ExternalServices.DeviceInterface
   public alertService: ExternalServices.AlertService
   public readonly identifier: Common.ApplicationIdentifier
-  public readonly options: Options.FullyResolvedApplicationOptions
+  public readonly options: FullyResolvedApplicationOptions
 
-  constructor(options: Options.ApplicationOptions) {
-    const fullyResovledOptions = {
-      ...Options.ApplicationOptionsDefaults,
+  constructor(options: ApplicationConstructorOptions) {
+    const allOptions: FullyResolvedApplicationOptions = {
+      ...ApplicationOptionsDefaults,
       ...options,
-    } as Options.FullyResolvedApplicationOptions
+    }
 
     if (!SNLog.onLog) {
       throw Error('SNLog.onLog must be set.')
@@ -137,7 +138,7 @@ export class SNApplication
       throw Error('SNLog.onError must be set.')
     }
 
-    const requiredOptions: (keyof Options.ApplicationOptions)[] = [
+    const requiredOptions: (keyof FullyResolvedApplicationOptions)[] = [
       'deviceInterface',
       'environment',
       'platform',
@@ -149,7 +150,7 @@ export class SNApplication
     ]
 
     for (const optionName of requiredOptions) {
-      if (!fullyResovledOptions[optionName]) {
+      if (!allOptions[optionName]) {
         throw Error(`${optionName} must be supplied when creating an application.`)
       }
     }
@@ -159,7 +160,7 @@ export class SNApplication
     this.deviceInterface = options.deviceInterface
     this.alertService = options.alertService
     this.identifier = options.identifier
-    this.options = Object.freeze(fullyResovledOptions)
+    this.options = Object.freeze(allOptions)
 
     this.constructInternalEventBus()
 
@@ -1228,7 +1229,7 @@ export class SNApplication
   }
 
   private createItemManager() {
-    this.itemManager = new InternalServices.ItemManager(this.payloadManager, this.internalEventBus)
+    this.itemManager = new InternalServices.ItemManager(this.payloadManager, this.options, this.internalEventBus)
     this.services.push(this.itemManager)
   }
 

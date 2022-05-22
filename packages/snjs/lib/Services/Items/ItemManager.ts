@@ -1,5 +1,5 @@
 import { ContentType, Uuid } from '@standardnotes/common'
-import { naturalSort, removeFromArray, UuidGenerator, Uuids } from '@standardnotes/utils'
+import { assert, naturalSort, removeFromArray, UuidGenerator, Uuids } from '@standardnotes/utils'
 import { ItemsKeyMutator, SNItemsKey } from '@standardnotes/encryption'
 import { PayloadManager } from '../Payloads/PayloadManager'
 import { TagsToFoldersMigrationApplicator } from '../../Migrations/Applicators/TagsToFolders'
@@ -10,6 +10,7 @@ import * as Services from '@standardnotes/services'
 import { ItemsClientInterface } from './ItemsClientInterface'
 import { PayloadManagerChangeData } from '../Payloads'
 import { DiagnosticInfo } from '@standardnotes/services'
+import { ApplicationDisplayOptions } from '@Lib/Application/Options/OptionalOptions'
 
 type ItemsChangeObserver<I extends Models.DecryptedItemInterface = Models.DecryptedItemInterface> = {
   contentType: ContentType[]
@@ -34,7 +35,7 @@ export class ItemManager
   private systemSmartViews: Models.SmartView[]
   private tagNotesIndex!: Models.TagNotesIndex
 
-  private noteAndFilesDisplayController!: Models.ItemDisplayController<Models.SNNote | Models.FileItem>
+  private navigationDisplayController!: Models.ItemDisplayController<Models.SNNote | Models.FileItem>
   private tagDisplayController!: Models.ItemDisplayController<Models.SNTag>
   private itemsKeyDisplayController!: Models.ItemDisplayController<SNItemsKey>
   private componentDisplayController!: Models.ItemDisplayController<Models.SNComponent>
@@ -44,6 +45,7 @@ export class ItemManager
 
   constructor(
     private payloadManager: PayloadManager,
+    private readonly options: ApplicationDisplayOptions = { supportsFileNavigation: false },
     protected override internalEventBus: Services.InternalEventBusInterface,
   ) {
     super(internalEventBus)
@@ -54,19 +56,20 @@ export class ItemManager
   }
 
   private rebuildSystemSmartViews(criteria: Models.FilterDisplayOptions): Models.SmartView[] {
-    this.systemSmartViews = Models.BuildSmartViews(criteria)
+    this.systemSmartViews = Models.BuildSmartViews(criteria, this.options)
     return this.systemSmartViews
   }
 
   private createCollection() {
     this.collection = new Models.ItemCollection()
 
-    this.noteAndFilesDisplayController = new Models.ItemDisplayController(
+    this.navigationDisplayController = new Models.ItemDisplayController(
       this.collection,
       [ContentType.Note, ContentType.File],
       {
         sortBy: 'created_at',
         sortDirection: 'dsc',
+        hiddenContentTypes: !this.options.supportsFileNavigation ? [ContentType.File] : [],
       },
     )
     this.tagDisplayController = new Models.ItemDisplayController(this.collection, [ContentType.Tag], {
@@ -99,7 +102,7 @@ export class ItemManager
 
   private get allDisplayControllers(): Models.ItemDisplayController<Models.DisplayItem>[] {
     return [
-      this.noteAndFilesDisplayController,
+      this.navigationDisplayController,
       this.tagDisplayController,
       this.itemsKeyDisplayController,
       this.componentDisplayController,
@@ -169,14 +172,21 @@ export class ItemManager
       },
     }
 
-    this.noteAndFilesDisplayController.setDisplayOptions({
+    this.navigationDisplayController.setDisplayOptions({
       customFilter: Models.computeUnifiedFilterForDisplayOptions(updatedOptions, this.collection),
       ...updatedOptions,
     })
   }
 
   public getDisplayableNotes(): Models.SNNote[] {
-    return this.noteAndFilesDisplayController.items().filter(Models.isNote)
+    assert(this.navigationDisplayController.contentTypes.length === 2)
+
+    const fileContentTypeHidden = !this.options.supportsFileNavigation
+    if (fileContentTypeHidden) {
+      return this.navigationDisplayController.items() as Models.SNNote[]
+    } else {
+      return this.navigationDisplayController.items().filter(Models.isNote)
+    }
   }
 
   public getDisplayableFiles(): Models.FileItem[] {
@@ -184,7 +194,8 @@ export class ItemManager
   }
 
   public getDisplayableNotesAndFiles(): (Models.SNNote | Models.FileItem)[] {
-    return this.noteAndFilesDisplayController.items()
+    assert(this.options.supportsFileNavigation)
+    return this.navigationDisplayController.items()
   }
 
   public getDisplayableTags(): Models.SNTag[] {
@@ -201,12 +212,13 @@ export class ItemManager
 
   public override deinit(): void {
     this.unsubChangeObserver()
+    ;(this.options as unknown) = undefined
     ;(this.unsubChangeObserver as unknown) = undefined
     ;(this.payloadManager as unknown) = undefined
     ;(this.collection as unknown) = undefined
     ;(this.tagNotesIndex as unknown) = undefined
     ;(this.tagDisplayController as unknown) = undefined
-    ;(this.noteAndFilesDisplayController as unknown) = undefined
+    ;(this.navigationDisplayController as unknown) = undefined
     ;(this.itemsKeyDisplayController as unknown) = undefined
     ;(this.componentDisplayController as unknown) = undefined
     ;(this.themeDisplayController as unknown) = undefined
