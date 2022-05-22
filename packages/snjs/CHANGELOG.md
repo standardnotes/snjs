@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.113.0](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.112.0...@standardnotes/snjs@2.113.0) (2022-05-22)
+
+
+### Features
+
+* optional files navigation ([#745](https://github.com/standardnotes/snjs/issues/745)) ([8512166](https://github.com/standardnotes/snjs/commit/851216615478b57b11a570173f94ee598bec31c0))
+
+
+
+
+
 # [2.112.0](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.111.0...@standardnotes/snjs@2.112.0) (2022-05-21)
 
 

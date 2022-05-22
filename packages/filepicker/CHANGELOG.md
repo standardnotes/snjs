@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.15.0](https://github.com/standardnotes/snjs/compare/@standardnotes/filepicker@1.14.13...@standardnotes/filepicker@1.15.0) (2022-05-22)
+
+
+### Features
+
+* optional files navigation ([#745](https://github.com/standardnotes/snjs/issues/745)) ([8512166](https://github.com/standardnotes/snjs/commit/851216615478b57b11a570173f94ee598bec31c0))
+
+
+
+
+
 ## [1.14.13](https://github.com/standardnotes/snjs/compare/@standardnotes/filepicker@1.14.12...@standardnotes/filepicker@1.14.13) (2022-05-21)
 
 **Note:** Version bump only for package @standardnotes/filepicker
