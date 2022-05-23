@@ -146,6 +146,10 @@ export abstract class Collection<
     return this.map[uuid]
   }
 
+  public has(uuid: Uuid): boolean {
+    return this.find(uuid) != undefined
+  }
+
   /**
    * If an item is not found, an `undefined` element
    * will be inserted into the array.

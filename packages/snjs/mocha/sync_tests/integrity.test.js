@@ -39,7 +39,7 @@ describe('sync integrity', () => {
 
   afterEach(async function () {
     expect(this.application.syncService.isOutOfSync()).to.equal(false)
-    const rawPayloads = await this.application.storageService.getAllRawPayloads()
+    const rawPayloads = await this.application.diskStorageService.getAllRawPayloads()
     expect(rawPayloads.length).to.equal(this.expectedItemCount)
     await Factory.safeDeinit(this.application)
   })

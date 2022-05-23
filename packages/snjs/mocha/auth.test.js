@@ -50,7 +50,7 @@ describe('basic auth', function () {
     expect(await this.application.protocolService.getRootKey()).to.not.be.ok
     expect(this.application.protocolService.rootKeyEncryption.keyMode).to.equal(KeyMode.RootKeyNone)
 
-    const rawPayloads = await this.application.storageService.getAllRawPayloads()
+    const rawPayloads = await this.application.diskStorageService.getAllRawPayloads()
     expect(rawPayloads.length).to.equal(BASE_ITEM_COUNT)
   })
 
@@ -301,7 +301,7 @@ describe('basic auth', function () {
 
     expect(this.application.itemManager.items.length).to.equal(this.expectedItemCount)
 
-    const note = this.application.itemManager.notes[0]
+    const note = this.application.itemManager.getDisplayableNotes()[0]
 
     /**
      * Create conflict for a note. First modify the item without saving so that

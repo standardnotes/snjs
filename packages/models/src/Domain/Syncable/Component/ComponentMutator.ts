@@ -7,11 +7,11 @@ import { DecryptedItemMutator } from '../../Abstract/Item/Mutator/DecryptedItemM
 
 export class ComponentMutator extends DecryptedItemMutator<ComponentContent> {
   set active(active: boolean) {
-    this.content.active = active
+    this.mutableContent.active = active
   }
 
   set isMobileDefault(isMobileDefault: boolean) {
-    this.content.isMobileDefault = isMobileDefault
+    this.mutableContent.isMobileDefault = isMobileDefault
   }
 
   set defaultEditor(defaultEditor: boolean) {
@@ -19,47 +19,47 @@ export class ComponentMutator extends DecryptedItemMutator<ComponentContent> {
   }
 
   set componentData(componentData: Record<string, unknown>) {
-    this.content.componentData = componentData
+    this.mutableContent.componentData = componentData
   }
 
   set package_info(package_info: FeatureDescription) {
-    this.content.package_info = package_info
+    this.mutableContent.package_info = package_info
   }
 
   set local_url(local_url: string) {
-    this.content.local_url = local_url
+    this.mutableContent.local_url = local_url
   }
 
   set hosted_url(hosted_url: string) {
-    this.content.hosted_url = hosted_url
+    this.mutableContent.hosted_url = hosted_url
   }
 
   set valid_until(valid_until: Date) {
-    this.content.valid_until = valid_until
+    this.mutableContent.valid_until = valid_until
   }
 
   set permissions(permissions: ComponentPermission[]) {
-    this.content.permissions = permissions
+    this.mutableContent.permissions = permissions
   }
 
   public associateWithItem(uuid: Uuid): void {
-    const associated = this.content.associatedItemIds || []
+    const associated = this.mutableContent.associatedItemIds || []
     addIfUnique(associated, uuid)
-    this.content.associatedItemIds = associated
+    this.mutableContent.associatedItemIds = associated
   }
 
   public disassociateWithItem(uuid: Uuid): void {
-    const disassociated = this.content.disassociatedItemIds || []
+    const disassociated = this.mutableContent.disassociatedItemIds || []
     addIfUnique(disassociated, uuid)
-    this.content.disassociatedItemIds = disassociated
+    this.mutableContent.disassociatedItemIds = disassociated
   }
 
   public removeAssociatedItemId(uuid: Uuid): void {
-    removeFromArray(this.content.associatedItemIds || [], uuid)
+    removeFromArray(this.mutableContent.associatedItemIds || [], uuid)
   }
 
   public removeDisassociatedItemId(uuid: Uuid): void {
-    removeFromArray(this.content.disassociatedItemIds || [], uuid)
+    removeFromArray(this.mutableContent.disassociatedItemIds || [], uuid)
   }
 
   public setLastSize(size: string): void {

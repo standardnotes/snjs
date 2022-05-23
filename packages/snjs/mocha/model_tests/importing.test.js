@@ -115,8 +115,8 @@ describe('importing', function () {
       true,
     )
     expectedItemCount++
-    expect(application.itemManager.notes.length).to.equal(2)
-    const imported = application.itemManager.notes.find((n) => n.uuid !== notePayload.uuid)
+    expect(application.itemManager.getDisplayableNotes().length).to.equal(2)
+    const imported = application.itemManager.getDisplayableNotes().find((n) => n.uuid !== notePayload.uuid)
     expect(imported.content.title).to.equal(mutatedNote.content.title)
   })
 
@@ -138,7 +138,7 @@ describe('importing', function () {
       },
       true,
     )
-    expect(application.itemManager.tags.length).to.equal(1)
+    expect(application.itemManager.getDisplayableTags().length).to.equal(1)
     expect(application.itemManager.findItem(tagPayload.uuid).content.references.length).to.equal(1)
   })
 
@@ -149,8 +149,8 @@ describe('importing', function () {
     const tagPayload = pair[1]
     await application.itemManager.emitItemsFromPayloads(pair, PayloadEmitSource.LocalChanged)
     expectedItemCount += 2
-    const note = application.itemManager.notes[0]
-    const tag = application.itemManager.tags[0]
+    const note = application.itemManager.getDisplayableNotes()[0]
+    const tag = application.itemManager.getDisplayableTags()[0]
     const mutatedNote = new DecryptedPayload({
       ...notePayload,
       content: {
@@ -174,8 +174,8 @@ describe('importing', function () {
     expectedItemCount += 2
     expect(application.itemManager.items.length).to.equal(expectedItemCount)
 
-    const newNote = application.itemManager.notes.find((n) => n.uuid !== notePayload.uuid)
-    const newTag = application.itemManager.tags.find((t) => t.uuid !== tagPayload.uuid)
+    const newNote = application.itemManager.getDisplayableNotes().find((n) => n.uuid !== notePayload.uuid)
+    const newTag = application.itemManager.getDisplayableTags().find((t) => t.uuid !== tagPayload.uuid)
 
     expect(newNote.uuid).to.not.equal(note.uuid)
     expect(newTag.uuid).to.not.equal(tag.uuid)
@@ -212,7 +212,7 @@ describe('importing', function () {
     expectedItemCount += 2
 
     await application.itemManager.changeItem(tag, (mutator) => {
-      mutator.addItemAsRelationship(note)
+      mutator.e2ePendingRefactor_addItemAsRelationship(note)
     })
 
     const externalNote = Object.assign(
@@ -278,10 +278,10 @@ describe('importing', function () {
       true,
     )
 
-    expect(application.itemManager.notes.length).to.equal(1)
+    expect(application.itemManager.getDisplayableNotes().length).to.equal(1)
     expect(application.items.findItem(note.uuid).deleted).to.not.be.ok
 
-    expect(application.itemManager.tags.length).to.equal(1)
+    expect(application.itemManager.getDisplayableTags().length).to.equal(1)
     expect(application.items.findItem(tag.uuid).deleted).to.not.be.ok
   })
 
@@ -312,8 +312,8 @@ describe('importing', function () {
       true,
     )
 
-    expect(application.itemManager.notes.length).to.equal(1)
-    expect(application.itemManager.notes[0].uuid).to.not.equal(note.uuid)
+    expect(application.itemManager.getDisplayableNotes().length).to.equal(1)
+    expect(application.itemManager.getDisplayableNotes()[0].uuid).to.not.equal(note.uuid)
   })
 
   it('should maintain consistency between storage and PayloadManager after an import with conflicts', async function () {
@@ -342,7 +342,7 @@ describe('importing', function () {
       true,
     )
 
-    const storedPayloads = await application.storageService.getAllRawPayloads()
+    const storedPayloads = await application.diskStorageService.getAllRawPayloads()
     expect(application.itemManager.items.length).to.equal(storedPayloads.length)
     const notes = storedPayloads.filter((p) => p.content_type === ContentType.Note)
     const itemsKeys = storedPayloads.filter((p) => p.content_type === ContentType.ItemsKey)
@@ -373,10 +373,10 @@ describe('importing', function () {
 
     await application.mutator.importData(backupData, true)
 
-    expect(application.itemManager.notes.length).to.equal(1)
+    expect(application.itemManager.getDisplayableNotes().length).to.equal(1)
     expect(application.items.findItem(note.uuid).deleted).to.not.be.ok
 
-    expect(application.itemManager.tags.length).to.equal(1)
+    expect(application.itemManager.getDisplayableTags().length).to.equal(1)
     expect(application.items.findItem(tag.uuid).deleted).to.not.be.ok
   })
 
@@ -458,7 +458,7 @@ describe('importing', function () {
     const decryptedNote = application.itemManager.findItem(noteItem.uuid)
     expect(decryptedNote.title).to.be.eq('Encrypted note')
     expect(decryptedNote.text).to.be.eq('On protocol version 003.')
-    expect(application.itemManager.notes.length).to.equal(1)
+    expect(application.itemManager.getDisplayableNotes().length).to.equal(1)
   })
 
   it('should import data from 003 encrypted payload using server generated backup with 004 key params', async function () {
@@ -539,7 +539,7 @@ describe('importing', function () {
     const decryptedNote = application.itemManager.findItem(noteItem.uuid)
     expect(decryptedNote.title).to.be.eq('Encrypted note')
     expect(decryptedNote.text).to.be.eq('On protocol version 004.')
-    expect(application.itemManager.notes.length).to.equal(1)
+    expect(application.itemManager.getDisplayableNotes().length).to.equal(1)
   })
 
   it('should return correct errorCount', async function () {
@@ -615,7 +615,7 @@ describe('importing', function () {
 
     expect(result.affectedItems.length).to.be.eq(0)
     expect(result.errorCount).to.be.eq(backupData.items.length)
-    expect(application.itemManager.notes.length).to.equal(0)
+    expect(application.itemManager.getDisplayableNotes().length).to.equal(0)
   })
 
   it('should not import data from 004 encrypted payload if an invalid password is provided', async function () {
@@ -646,7 +646,7 @@ describe('importing', function () {
     expect(result).to.not.be.undefined
     expect(result.affectedItems.length).to.be.eq(0)
     expect(result.errorCount).to.be.eq(backupData.items.length)
-    expect(application.itemManager.notes.length).to.equal(0)
+    expect(application.itemManager.getDisplayableNotes().length).to.equal(0)
   })
 
   it('should not import encrypted data with no keyParams or auth_params', async function () {
@@ -699,7 +699,7 @@ describe('importing', function () {
     expect(result).to.not.be.undefined
     expect(result.affectedItems.length).to.be.eq(0)
     expect(result.errorCount).to.be.eq(backupData.items.length)
-    expect(application.itemManager.notes.length).to.equal(0)
+    expect(application.itemManager.getDisplayableNotes().length).to.equal(0)
   })
 
   it('importing data with no items key should use the root key generated by the file password', async function () {
@@ -860,11 +860,11 @@ describe('importing', function () {
 
     await application.mutator.importData(backupData, true)
 
-    expect(application.itemManager.notes.length).to.equal(1)
-    expect(application.itemManager.tags.length).to.equal(1)
+    expect(application.itemManager.getDisplayableNotes().length).to.equal(1)
+    expect(application.itemManager.getDisplayableTags().length).to.equal(1)
 
-    const importedNote = application.itemManager.notes[0]
-    const importedTag = application.itemManager.tags[0]
+    const importedNote = application.itemManager.getDisplayableNotes()[0]
+    const importedTag = application.itemManager.getDisplayableTags()[0]
     expect(application.itemManager.referencesForItem(importedTag).length).to.equal(1)
     expect(application.itemManager.itemsReferencingItem(importedNote).length).to.equal(1)
   })

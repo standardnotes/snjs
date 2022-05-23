@@ -40,14 +40,14 @@ describe('application instances', () => {
     await Factory.createMappedNote(app1)
     await app1.syncService.sync(syncOptions)
 
-    expect((await app1.storageService.getAllRawPayloads()).length).length.to.equal(BASE_ITEM_COUNT + 1)
-    expect((await app2.storageService.getAllRawPayloads()).length).length.to.equal(BASE_ITEM_COUNT)
+    expect((await app1.diskStorageService.getAllRawPayloads()).length).length.to.equal(BASE_ITEM_COUNT + 1)
+    expect((await app2.diskStorageService.getAllRawPayloads()).length).length.to.equal(BASE_ITEM_COUNT)
 
     await Factory.createMappedNote(app2)
     await app2.syncService.sync(syncOptions)
 
-    expect((await app1.storageService.getAllRawPayloads()).length).length.to.equal(BASE_ITEM_COUNT + 1)
-    expect((await app2.storageService.getAllRawPayloads()).length).length.to.equal(BASE_ITEM_COUNT + 1)
+    expect((await app1.diskStorageService.getAllRawPayloads()).length).length.to.equal(BASE_ITEM_COUNT + 1)
+    expect((await app2.diskStorageService.getAllRawPayloads()).length).length.to.equal(BASE_ITEM_COUNT + 1)
     await Factory.safeDeinit(app1)
     await Factory.safeDeinit(app2)
   })
@@ -56,7 +56,7 @@ describe('application instances', () => {
     /** This test will always succeed but should be observed for console exceptions */
     const app = await Factory.createAndInitializeApplication('app')
     /** Don't await */
-    app.storageService.persistValuesToDisk()
+    app.diskStorageService.persistValuesToDisk()
     await app.prepareForDeinit()
     await Factory.safeDeinit(app)
   })
@@ -105,13 +105,13 @@ describe('application instances', () => {
     const app = await Factory.createAndInitializeApplication('app')
     /** Don't await */
     const MaximumWaitTime = 0.5
-    app.storageService.executeCriticalFunction(async () => {
+    app.diskStorageService.executeCriticalFunction(async () => {
       /** If we sleep less than the maximum, locking should occur safely.
        * If we sleep more than the maximum, locking should occur with exception on
        * app deinit. */
       await Factory.sleep(MaximumWaitTime - 0.05)
       /** Access any deviceInterface function */
-      app.storageService.deviceInterface.getAllRawDatabasePayloads(app.identifier)
+      app.diskStorageService.deviceInterface.getAllRawDatabasePayloads(app.identifier)
     })
     await app.lock()
   })

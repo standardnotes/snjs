@@ -18,7 +18,7 @@ import {
   getIncrementedDirtyIndex,
 } from '@standardnotes/models'
 import { SNSyncService } from '../Sync/SyncService'
-import { SNStorageService } from '../Storage/StorageService'
+import { DiskStorageService } from '../Storage/DiskStorageService'
 import { PayloadManager } from '../Payloads/PayloadManager'
 import { Challenge, ChallengeService } from '../Challenge'
 import { SNApiService } from '@Lib/Services/Api/ApiService'
@@ -94,7 +94,7 @@ export class SNKeyRecoveryService extends AbstractService<KeyRecoveryEvent, Decr
     private protocolService: EncryptionService,
     private challengeService: ChallengeService,
     private alertService: AlertService,
-    private storageService: SNStorageService,
+    private storageService: DiskStorageService,
     private syncService: SNSyncService,
     private userService: UserService,
     protected override internalEventBus: InternalEventBusInterface,
@@ -335,7 +335,9 @@ export class SNKeyRecoveryService extends AbstractService<KeyRecoveryEvent, Decr
   }
 
   private async getLatestKeyParamsFromServer(identifier: string): Promise<SNRootKeyParams | undefined> {
-    const paramsResponse = await this.apiService.getAccountKeyParams(identifier)
+    const paramsResponse = await this.apiService.getAccountKeyParams({
+      email: identifier,
+    })
 
     if (!paramsResponse.error && paramsResponse.data) {
       return KeyParamsFromApiResponse(paramsResponse as KeyParamsResponse)

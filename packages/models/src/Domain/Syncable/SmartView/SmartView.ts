@@ -8,6 +8,7 @@ export const SMART_TAG_DSL_PREFIX = '!['
 
 export enum SystemViewId {
   AllNotes = 'all-notes',
+  Files = 'files',
   ArchivedNotes = 'archived-notes',
   TrashedNotes = 'trashed-notes',
   UntaggedNotes = 'untagged-notes',

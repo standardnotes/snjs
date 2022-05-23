@@ -7,7 +7,7 @@ import {
   SNApiService,
   UserService,
   SNSessionManager,
-  SNStorageService,
+  DiskStorageService,
   StorageKey,
 } from '@Lib/index'
 import { FeatureStatus, SNFeaturesService } from '@Lib/Services/Features'
@@ -20,7 +20,7 @@ import { convertTimestampToMilliseconds } from '@standardnotes/utils'
 import { InternalEventBusInterface } from '@standardnotes/services'
 
 describe('featuresService', () => {
-  let storageService: SNStorageService
+  let storageService: DiskStorageService
   let apiService: SNApiService
   let itemManager: ItemManager
   let webSocketsService: SNWebSocketsService
@@ -75,7 +75,7 @@ describe('featuresService', () => {
 
     items = [] as jest.Mocked<ItemInterface[]>
 
-    storageService = {} as jest.Mocked<SNStorageService>
+    storageService = {} as jest.Mocked<DiskStorageService>
     storageService.setValue = jest.fn()
     storageService.getValue = jest.fn()
 
@@ -514,31 +514,28 @@ describe('featuresService', () => {
 
       featuresService['features'] = features
 
-      Object.defineProperty(itemManager, 'components', {
-        get: jest.fn(() => [
-          new SNComponent({
-            uuid: '123',
-            content_type: ContentType.Theme,
-            content: {
-              valid_until: themeFeature.expires_at,
-              package_info: {
-                ...themeFeature,
-              },
+      itemManager.getDisplayableComponents = jest.fn().mockReturnValue([
+        new SNComponent({
+          uuid: '123',
+          content_type: ContentType.Theme,
+          content: {
+            valid_until: themeFeature.expires_at,
+            package_info: {
+              ...themeFeature,
             },
-          } as never),
-          new SNComponent({
-            uuid: '456',
-            content_type: ContentType.Component,
-            content: {
-              valid_until: new Date(editorFeature.expires_at),
-              package_info: {
-                ...editorFeature,
-              },
+          },
+        } as never),
+        new SNComponent({
+          uuid: '456',
+          content_type: ContentType.Component,
+          content: {
+            valid_until: new Date(editorFeature.expires_at),
+            package_info: {
+              ...editorFeature,
             },
-          } as never),
-        ]),
-        set: jest.fn(),
-      })
+          },
+        } as never),
+      ])
 
       await featuresService.updateRolesAndFetchFeatures('123', [RoleName.CoreUser])
 

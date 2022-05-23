@@ -1,9 +1,9 @@
 import { Challenge } from './../Challenge/Challenge'
 import { ChallengeService } from './../Challenge/ChallengeService'
 import { SNLog } from '@Lib/Log'
-import { FileItem, SNNote } from '@standardnotes/models'
+import { DecryptedItem } from '@standardnotes/models'
 import { EncryptionService } from '@standardnotes/encryption'
-import { SNStorageService } from '@Lib/Services/Storage/StorageService'
+import { DiskStorageService } from '@Lib/Services/Storage/DiskStorageService'
 import { isNullOrUndefined } from '@standardnotes/utils'
 import {
   AbstractService,
@@ -17,6 +17,7 @@ import {
   ChallengeValidation,
 } from '@standardnotes/services'
 import { ProtectionsClientInterface } from './ClientInterface'
+import { ContentType } from '@Lib/../../common/dist'
 
 export enum ProtectionEvent {
   UnprotectedSessionBegan = 'UnprotectedSessionBegan',
@@ -66,7 +67,7 @@ export class SNProtectionService extends AbstractService<ProtectionEvent> implem
   constructor(
     private protocolService: EncryptionService,
     private challengeService: ChallengeService,
-    private storageService: SNStorageService,
+    private storageService: DiskStorageService,
     protected override internalEventBus: InternalEventBusInterface,
   ) {
     super(internalEventBus)
@@ -143,42 +144,34 @@ export class SNProtectionService extends AbstractService<ProtectionEvent> implem
     }
   }
 
-  async authorizeProtectedActionForFiles(files: FileItem[], challengeReason: ChallengeReason): Promise<FileItem[]> {
+  async authorizeProtectedActionForItems<T extends DecryptedItem>(
+    items: T[],
+    challengeReason: ChallengeReason,
+  ): Promise<T[]> {
     let sessionValidation: Promise<boolean> | undefined
-    const authorizedFiles = []
-    for (const file of files) {
-      const needsAuthorization = file.protected && !this.hasUnprotectedAccessSession()
+    const authorizedItems = []
+    for (const item of items) {
+      const needsAuthorization = item.protected && !this.hasUnprotectedAccessSession()
       if (needsAuthorization && !sessionValidation) {
         sessionValidation = this.validateOrRenewSession(challengeReason)
       }
       if (!needsAuthorization || (await sessionValidation)) {
-        authorizedFiles.push(file)
+        authorizedItems.push(item)
       }
     }
-    return authorizedFiles
+    return authorizedItems
   }
 
-  async authorizeProtectedActionForNotes(notes: SNNote[], challengeReason: ChallengeReason): Promise<SNNote[]> {
-    let sessionValidation: Promise<boolean> | undefined
-    const authorizedNotes = []
-    for (const note of notes) {
-      const needsAuthorization = note.protected && !this.hasUnprotectedAccessSession()
-      if (needsAuthorization && !sessionValidation) {
-        sessionValidation = this.validateOrRenewSession(challengeReason)
-      }
-      if (!needsAuthorization || (await sessionValidation)) {
-        authorizedNotes.push(note)
-      }
-    }
-    return authorizedNotes
-  }
-
-  async authorizeNoteAccess(note: SNNote): Promise<boolean> {
-    if (!note.protected) {
+  async authorizeItemAccess(item: DecryptedItem): Promise<boolean> {
+    if (!item.protected) {
       return true
     }
 
-    return this.authorizeAction(ChallengeReason.AccessProtectedNote)
+    return this.authorizeAction(
+      item.content_type === ContentType.Note
+        ? ChallengeReason.AccessProtectedNote
+        : ChallengeReason.AccessProtectedFile,
+    )
   }
 
   authorizeAddingPasscode(): Promise<boolean> {

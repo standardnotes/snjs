@@ -1,5 +1,4 @@
 import { AccountSyncOperation } from '@Lib/Services/Sync/Account/Operation'
-import { ApplicationSyncOptions } from '../../Application/Options'
 import { ContentType } from '@standardnotes/common'
 import {
   extendArray,
@@ -18,7 +17,7 @@ import { SNApiService } from '../Api/ApiService'
 import { SNHistoryManager } from '../History/HistoryManager'
 import { SNLog } from '@Lib/Log'
 import { SNSessionManager } from '../Session/SessionManager'
-import { SNStorageService } from '../Storage/StorageService'
+import { DiskStorageService } from '../Storage/DiskStorageService'
 import { SortPayloadsByRecentAndContentPriority } from '@Lib/Services/Sync/Utils'
 import { SyncClientInterface } from './SyncClientInterface'
 import { SyncPromise } from './Types'
@@ -78,6 +77,7 @@ import {
 import { OfflineSyncResponse } from './Offline/Response'
 import { KeyedDecryptionSplit, SplitPayloadsByEncryptionType } from '@standardnotes/encryption'
 import { CreatePayloadFromRawServerItem } from './Account/Utilities'
+import { ApplicationSyncOptions } from '@Lib/Application/Options/OptionalOptions'
 
 const DEFAULT_MAJOR_CHANGE_THRESHOLD = 15
 const INVALID_SESSION_RESPONSE_STATUS = 401
@@ -132,7 +132,7 @@ export class SNSyncService
     private itemManager: ItemManager,
     private sessionManager: SNSessionManager,
     private protocolService: Encryption.EncryptionService,
-    private storageService: SNStorageService,
+    private storageService: DiskStorageService,
     private payloadManager: PayloadManager,
     private apiService: SNApiService,
     private historyService: SNHistoryManager,

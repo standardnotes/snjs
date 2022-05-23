@@ -12,11 +12,11 @@ const generateLongString = (minLength = 600) => {
 }
 
 const getFilteredNotes = (application, { views }) => {
-  const criteria = NotesDisplayCriteria.Create({
+  const criteria = {
     views,
     includePinned: true,
-  })
-  application.items.setNotesDisplayCriteria(criteria)
+  }
+  application.items.setPrimaryItemDisplayOptions(criteria)
   const notes = application.items.getDisplayableNotes()
   return notes
 }

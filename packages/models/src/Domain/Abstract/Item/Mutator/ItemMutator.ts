@@ -13,30 +13,30 @@ export class ItemMutator<
   P extends PayloadInterface<TransferPayload> = PayloadInterface<TransferPayload>,
   I extends ItemInterface<P> = ItemInterface<P>,
 > {
-  public readonly item: I
-  protected payload: P
+  public readonly immutableItem: I
+  protected immutablePayload: P
   protected readonly type: MutationType
 
   constructor(item: I, type: MutationType) {
-    this.item = item
+    this.immutableItem = item
     this.type = type
-    this.payload = item.payload
+    this.immutablePayload = item.payload
   }
 
   public getUuid() {
-    return this.payload.uuid
+    return this.immutablePayload.uuid
   }
 
   public getItem(): I {
-    return this.item
+    return this.immutableItem
   }
 
   public getResult(): P {
     if (this.type === MutationType.NonDirtying) {
-      return this.payload.copy()
+      return this.immutablePayload.copy()
     }
 
-    const result = this.payload.copy({
+    const result = this.immutablePayload.copy({
       dirty: true,
       dirtyIndex: getIncrementedDirtyIndex(),
     })
@@ -45,7 +45,7 @@ export class ItemMutator<
   }
 
   public setBeginSync(began: Date, globalDirtyIndex: number) {
-    this.payload = this.payload.copy({
+    this.immutablePayload = this.immutablePayload.copy({
       lastSyncBegan: began,
       globalDirtyIndexAtLastSync: globalDirtyIndex,
     })

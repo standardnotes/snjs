@@ -3,6 +3,93 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.113.0](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.112.0...@standardnotes/snjs@2.113.0) (2022-05-22)
+
+
+### Features
+
+* optional files navigation ([#745](https://github.com/standardnotes/snjs/issues/745)) ([8512166](https://github.com/standardnotes/snjs/commit/851216615478b57b11a570173f94ee598bec31c0))
+
+
+
+
+
+# [2.112.0](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.111.0...@standardnotes/snjs@2.112.0) (2022-05-21)
+
+
+### Features
+
+* generic protected access authorization ([#744](https://github.com/standardnotes/snjs/issues/744)) ([35095d2](https://github.com/standardnotes/snjs/commit/35095d27c54b813dc8ebc2c4a34e401cb237c6d0))
+
+
+
+
+
+# [2.111.0](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.110.3...@standardnotes/snjs@2.111.0) (2022-05-21)
+
+
+### Features
+
+* display controllers ([#743](https://github.com/standardnotes/snjs/issues/743)) ([5fadce3](https://github.com/standardnotes/snjs/commit/5fadce37f1b3f2f51b8a90c257bc666ac7710074))
+
+
+
+
+
+## [2.110.3](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.110.2...@standardnotes/snjs@2.110.3) (2022-05-20)
+
+**Note:** Version bump only for package @standardnotes/snjs
+
+
+
+
+
+## [2.110.2](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.110.1...@standardnotes/snjs@2.110.2) (2022-05-20)
+
+**Note:** Version bump only for package @standardnotes/snjs
+
+
+
+
+
+## [2.110.1](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.110.0...@standardnotes/snjs@2.110.1) (2022-05-20)
+
+**Note:** Version bump only for package @standardnotes/snjs
+
+
+
+
+
+# [2.110.0](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.109.6...@standardnotes/snjs@2.110.0) (2022-05-20)
+
+
+### Features
+
+* authentication with PKCE mechanism ([#719](https://github.com/standardnotes/snjs/issues/719)) ([1bc19b7](https://github.com/standardnotes/snjs/commit/1bc19b79decf83a563d1cf095ee2e56f738152d1))
+
+
+
+
+
+## [2.109.6](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.109.5...@standardnotes/snjs@2.109.6) (2022-05-19)
+
+
+### Bug Fixes
+
+* ignore component viewer callbacks if dealloced ([d8eba55](https://github.com/standardnotes/snjs/commit/d8eba55aa2d8ba51f9cf89b1f2f1e3afb44c7822))
+
+
+
+
+
+## [2.109.5](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.109.4...@standardnotes/snjs@2.109.5) (2022-05-18)
+
+**Note:** Version bump only for package @standardnotes/snjs
+
+
+
+
+
 ## [2.109.4](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.109.3...@standardnotes/snjs@2.109.4) (2022-05-18)
 
 **Note:** Version bump only for package @standardnotes/snjs

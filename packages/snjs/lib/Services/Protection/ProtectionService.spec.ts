@@ -1,6 +1,6 @@
 import { ChallengeService } from '../Challenge'
 import { EncryptionService } from '@standardnotes/encryption'
-import { SNStorageService } from '../Storage/StorageService'
+import { DiskStorageService } from '../Storage/DiskStorageService'
 import { SNProtectionService } from './ProtectionService'
 import { InternalEventBus, InternalEventBusInterface, ChallengeReason } from '@standardnotes/services'
 import { UuidGenerator } from '@standardnotes/utils'
@@ -20,7 +20,7 @@ const setupRandomUuid = () => {
 describe('protectionService', () => {
   let protocolService: EncryptionService
   let challengeService: ChallengeService
-  let storageService: SNStorageService
+  let storageService: DiskStorageService
   let internalEventBus: InternalEventBusInterface
   let protectionService: SNProtectionService
 
@@ -50,7 +50,7 @@ describe('protectionService', () => {
     challengeService = {} as jest.Mocked<ChallengeService>
     challengeService.promptForChallengeResponse = jest.fn()
 
-    storageService = {} as jest.Mocked<SNStorageService>
+    storageService = {} as jest.Mocked<DiskStorageService>
     storageService.getValue = jest.fn()
 
     protocolService = {} as jest.Mocked<EncryptionService>
@@ -64,7 +64,7 @@ describe('protectionService', () => {
 
       const unprotectedFile = createFile('protected.txt', false)
 
-      await protectionService.authorizeProtectedActionForFiles([unprotectedFile], ChallengeReason.AccessProtectedFile)
+      await protectionService.authorizeProtectedActionForItems([unprotectedFile], ChallengeReason.AccessProtectedFile)
 
       expect(challengeService.promptForChallengeResponse).not.toHaveBeenCalled()
     })
@@ -74,7 +74,7 @@ describe('protectionService', () => {
 
       const protectedFile = createFile('protected.txt', true)
 
-      await protectionService.authorizeProtectedActionForFiles([protectedFile], ChallengeReason.AccessProtectedFile)
+      await protectionService.authorizeProtectedActionForItems([protectedFile], ChallengeReason.AccessProtectedFile)
 
       expect(challengeService.promptForChallengeResponse).toHaveBeenCalled()
     })
@@ -85,7 +85,7 @@ describe('protectionService', () => {
       const protectedFile = createFile('protected.txt', true)
       const unprotectedFile = createFile('unprotected.txt', false)
 
-      await protectionService.authorizeProtectedActionForFiles(
+      await protectionService.authorizeProtectedActionForItems(
         [protectedFile, unprotectedFile],
         ChallengeReason.AccessProtectedFile,
       )
@@ -99,7 +99,7 @@ describe('protectionService', () => {
       const protectedFile = createFile('protected.txt', false)
       const unprotectedFile = createFile('unprotected.txt', false)
 
-      await protectionService.authorizeProtectedActionForFiles(
+      await protectionService.authorizeProtectedActionForItems(
         [protectedFile, unprotectedFile],
         ChallengeReason.AccessProtectedFile,
       )

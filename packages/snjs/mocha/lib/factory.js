@@ -198,7 +198,7 @@ export async function createSyncedNote(application, title, text) {
 }
 
 export async function getStoragePayloadsOfType(application, type) {
-  const rawPayloads = await application.storageService.getAllRawPayloads()
+  const rawPayloads = await application.diskStorageService.getAllRawPayloads()
   return rawPayloads
     .filter((rp) => rp.content_type === type)
     .map((rp) => {
@@ -273,7 +273,7 @@ export async function restartApplication(application) {
 }
 
 export async function storagePayloadCount(application) {
-  const payloads = await application.storageService.getAllRawPayloads()
+  const payloads = await application.diskStorageService.getAllRawPayloads()
   return payloads.length
 }
 

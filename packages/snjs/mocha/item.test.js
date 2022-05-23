@@ -69,14 +69,14 @@ describe('item', () => {
     const note = this.createNote()
     const tag = this.createTag()
 
-    expect(tag.hasRelationshipWithItem(note)).to.equal(false)
+    expect(tag.isReferencingItem(note)).to.equal(false)
   })
 
   it('has relationship with item true', function () {
     const note = this.createNote()
     const tag = this.createTag([note])
 
-    expect(tag.hasRelationshipWithItem(note)).to.equal(true)
+    expect(tag.isReferencingItem(note)).to.equal(true)
   })
 
   it('getDomainData for random domain should return undefined', function () {

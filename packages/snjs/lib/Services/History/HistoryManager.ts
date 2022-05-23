@@ -3,7 +3,7 @@ import { EncryptionService } from '@standardnotes/encryption'
 import { isNullOrUndefined, removeFromArray } from '@standardnotes/utils'
 import { ItemManager } from '@Lib/Services/Items/ItemManager'
 import { SNApiService } from '@Lib/Services/Api/ApiService'
-import { SNStorageService } from '@Lib/Services/Storage/StorageService'
+import { DiskStorageService } from '@Lib/Services/Storage/DiskStorageService'
 import { UuidString } from '../../Types/UuidString'
 import * as Models from '@standardnotes/models'
 import * as Responses from '@standardnotes/responses'
@@ -46,7 +46,7 @@ export class SNHistoryManager extends Services.AbstractService {
 
   constructor(
     private itemManager: ItemManager,
-    private storageService: SNStorageService,
+    private storageService: DiskStorageService,
     private apiService: SNApiService,
     private protocolService: EncryptionService,
     public deviceInterface: Services.DeviceInterface,

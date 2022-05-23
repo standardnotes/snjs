@@ -49,6 +49,11 @@ const SubscriptionPathsV2 = {
   subscriptions: '/v2/subscriptions',
 }
 
+const UserPathsV2 = {
+  keyParams: '/v2/login-params',
+  signIn: '/v2/login',
+}
+
 const ListedPaths = {
   listedRegistration: (userUuid: Uuid) => `/v1/users/${userUuid}/integrations/listed`,
 }
@@ -64,5 +69,6 @@ export const Paths = {
   },
   v2: {
     ...SubscriptionPathsV2,
+    ...UserPathsV2,
   },
 }

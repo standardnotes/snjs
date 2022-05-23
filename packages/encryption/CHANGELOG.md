@@ -3,6 +3,57 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.8.1](https://github.com/standardnotes/snjs/compare/@standardnotes/encryption@1.8.0...@standardnotes/encryption@1.8.1) (2022-05-22)
+
+**Note:** Version bump only for package @standardnotes/encryption
+
+
+
+
+
+# [1.8.0](https://github.com/standardnotes/snjs/compare/@standardnotes/encryption@1.7.12...@standardnotes/encryption@1.8.0) (2022-05-21)
+
+
+### Features
+
+* display controllers ([#743](https://github.com/standardnotes/snjs/issues/743)) ([5fadce3](https://github.com/standardnotes/snjs/commit/5fadce37f1b3f2f51b8a90c257bc666ac7710074))
+
+
+
+
+
+## [1.7.12](https://github.com/standardnotes/snjs/compare/@standardnotes/encryption@1.7.11...@standardnotes/encryption@1.7.12) (2022-05-20)
+
+**Note:** Version bump only for package @standardnotes/encryption
+
+
+
+
+
+## [1.7.11](https://github.com/standardnotes/snjs/compare/@standardnotes/encryption@1.7.10...@standardnotes/encryption@1.7.11) (2022-05-20)
+
+**Note:** Version bump only for package @standardnotes/encryption
+
+
+
+
+
+## [1.7.10](https://github.com/standardnotes/snjs/compare/@standardnotes/encryption@1.7.9...@standardnotes/encryption@1.7.10) (2022-05-20)
+
+**Note:** Version bump only for package @standardnotes/encryption
+
+
+
+
+
+## [1.7.9](https://github.com/standardnotes/snjs/compare/@standardnotes/encryption@1.7.8...@standardnotes/encryption@1.7.9) (2022-05-18)
+
+**Note:** Version bump only for package @standardnotes/encryption
+
+
+
+
+
 ## [1.7.8](https://github.com/standardnotes/snjs/compare/@standardnotes/encryption@1.7.7...@standardnotes/encryption@1.7.8) (2022-05-17)
 
 

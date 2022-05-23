@@ -1,7 +1,6 @@
 version: '3.8'
 services:
   snjs:
-    image: snjs-local
     build: .
     restart: unless-stopped
     networks:
@@ -60,7 +59,7 @@ services:
       - snjs
 
   syncing-server-js:
-    image: standardnotes/syncing-server-js:1.52.0
+    image: standardnotes/syncing-server-js:1.52.1
     entrypoint: [
       "./wait-for.sh", "db", "3306",
       "./wait-for.sh", "cache", "6379",
@@ -71,7 +70,7 @@ services:
       - snjs
 
   syncing-server-js-worker:
-    image: standardnotes/syncing-server-js:1.52.0
+    image: standardnotes/syncing-server-js:1.52.1
     depends_on:
       - syncing-server-js
     entrypoint: [
@@ -83,7 +82,7 @@ services:
       - snjs
 
   api-gateway:
-    image: standardnotes/api-gateway:1.37.0
+    image: standardnotes/api-gateway:1.38.0
     depends_on:
       - syncing-server-js
       - auth
@@ -102,7 +101,7 @@ services:
       - snjs
 
   auth:
-    image: standardnotes/auth:1.43.0
+    image: standardnotes/auth:1.45.0
     depends_on:
       - syncing-server-js
     entrypoint: [
@@ -114,7 +113,7 @@ services:
       - snjs
 
   auth-worker:
-    image: standardnotes/auth:1.43.0
+    image: standardnotes/auth:1.45.0
     depends_on:
       - auth
     entrypoint: [

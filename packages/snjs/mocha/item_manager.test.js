@@ -68,7 +68,7 @@ describe('item manager', function () {
     await this.createNote()
 
     expect(this.itemManager.items.length).to.equal(1)
-    expect(this.itemManager.notes.length).to.equal(1)
+    expect(this.itemManager.getDisplayableNotes().length).to.equal(1)
   })
 
   it('find item', async function () {
@@ -254,11 +254,11 @@ describe('item manager', function () {
       await this.itemManager.duplicateItem(note)
       sinon.assert.calledTwice(this.emitPayloads)
 
-      const originalNote = this.itemManager.notes[0]
-      const duplicatedNote = this.itemManager.notes[1]
+      const originalNote = this.itemManager.getDisplayableNotes()[0]
+      const duplicatedNote = this.itemManager.getDisplayableNotes()[1]
 
       expect(this.itemManager.items.length).to.equal(2)
-      expect(this.itemManager.notes.length).to.equal(2)
+      expect(this.itemManager.getDisplayableNotes().length).to.equal(2)
       expect(originalNote.uuid).to.not.equal(duplicatedNote.uuid)
       expect(originalNote.uuid).to.equal(duplicatedNote.duplicateOf)
       expect(originalNote.uuid).to.equal(duplicatedNote.payload.duplicate_of)
@@ -271,11 +271,11 @@ describe('item manager', function () {
       await this.itemManager.duplicateItem(note, true)
       sinon.assert.calledTwice(this.emitPayloads)
 
-      const originalNote = this.itemManager.notes[0]
-      const duplicatedNote = this.itemManager.notes[1]
+      const originalNote = this.itemManager.getDisplayableNotes()[0]
+      const duplicatedNote = this.itemManager.getDisplayableNotes()[1]
 
       expect(this.itemManager.items.length).to.equal(2)
-      expect(this.itemManager.notes.length).to.equal(2)
+      expect(this.itemManager.getDisplayableNotes().length).to.equal(2)
       expect(originalNote.uuid).to.not.equal(duplicatedNote.uuid)
       expect(originalNote.uuid).to.equal(duplicatedNote.duplicateOf)
       expect(originalNote.uuid).to.equal(duplicatedNote.payload.duplicate_of)
@@ -290,7 +290,7 @@ describe('item manager', function () {
 
       expect(duplicate.content.references).to.have.length(1)
       expect(this.itemManager.items).to.have.length(3)
-      expect(this.itemManager.tags).to.have.length(2)
+      expect(this.itemManager.getDisplayableTags()).to.have.length(2)
     })
 
     it('adds duplicated item as a relationship to items referencing it', async function () {
@@ -333,7 +333,7 @@ describe('item manager', function () {
 
     /** Deleted items do not show up in item manager's public interface */
     expect(this.itemManager.items.length).to.equal(0)
-    expect(this.itemManager.notes.length).to.equal(0)
+    expect(this.itemManager.getDisplayableNotes().length).to.equal(0)
   })
 
   it('system smart views', async function () {
@@ -498,7 +498,7 @@ describe('item manager', function () {
 
       const note = await this.createNote()
       await this.itemManager.changeItem(firstTag, (mutator) => {
-        mutator.addItemAsRelationship(note)
+        mutator.e2ePendingRefactor_addItemAsRelationship(note)
       })
 
       const results = this.itemManager.searchTags('tag', note)
@@ -515,11 +515,9 @@ describe('item manager', function () {
         mutator.archived = true
       })
 
-      this.itemManager.setNotesDisplayCriteria(
-        NotesDisplayCriteria.Create({
-          views: [this.itemManager.allNotesSmartView],
-        }),
-      )
+      this.itemManager.setPrimaryItemDisplayOptions({
+        views: [this.itemManager.allNotesSmartView],
+      })
 
       expect(this.itemManager.getDisplayableNotes().length).to.equal(0)
     })
@@ -532,11 +530,9 @@ describe('item manager', function () {
         mutator.trashed = true
       })
 
-      this.itemManager.setNotesDisplayCriteria(
-        NotesDisplayCriteria.Create({
-          views: [this.itemManager.archivedSmartView],
-        }),
-      )
+      this.itemManager.setPrimaryItemDisplayOptions({
+        views: [this.itemManager.archivedSmartView],
+      })
 
       expect(this.itemManager.getDisplayableNotes().length).to.equal(0)
     })
@@ -549,11 +545,9 @@ describe('item manager', function () {
         mutator.trashed = true
       })
 
-      this.itemManager.setNotesDisplayCriteria(
-        NotesDisplayCriteria.Create({
-          views: [this.itemManager.trashSmartView],
-        }),
-      )
+      this.itemManager.setPrimaryItemDisplayOptions({
+        views: [this.itemManager.trashSmartView],
+      })
 
       expect(this.itemManager.getDisplayableNotes().length).to.equal(1)
     })
@@ -572,7 +566,7 @@ describe('item manager', function () {
 
       tags.map(async (tag) => {
         await this.itemManager.changeItem(tag, (mutator) => {
-          mutator.addItemAsRelationship(note)
+          mutator.e2ePendingRefactor_addItemAsRelationship(note)
         })
       })
 

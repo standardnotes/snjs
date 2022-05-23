@@ -3,6 +3,57 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.2.1](https://github.com/standardnotes/snjs/compare/@standardnotes/files@1.2.0...@standardnotes/files@1.2.1) (2022-05-22)
+
+**Note:** Version bump only for package @standardnotes/files
+
+
+
+
+
+# [1.2.0](https://github.com/standardnotes/snjs/compare/@standardnotes/files@1.1.13...@standardnotes/files@1.2.0) (2022-05-21)
+
+
+### Features
+
+* display controllers ([#743](https://github.com/standardnotes/snjs/issues/743)) ([5fadce3](https://github.com/standardnotes/snjs/commit/5fadce37f1b3f2f51b8a90c257bc666ac7710074))
+
+
+
+
+
+## [1.1.13](https://github.com/standardnotes/snjs/compare/@standardnotes/files@1.1.12...@standardnotes/files@1.1.13) (2022-05-20)
+
+**Note:** Version bump only for package @standardnotes/files
+
+
+
+
+
+## [1.1.12](https://github.com/standardnotes/snjs/compare/@standardnotes/files@1.1.11...@standardnotes/files@1.1.12) (2022-05-20)
+
+**Note:** Version bump only for package @standardnotes/files
+
+
+
+
+
+## [1.1.11](https://github.com/standardnotes/snjs/compare/@standardnotes/files@1.1.10...@standardnotes/files@1.1.11) (2022-05-20)
+
+**Note:** Version bump only for package @standardnotes/files
+
+
+
+
+
+## [1.1.10](https://github.com/standardnotes/snjs/compare/@standardnotes/files@1.1.9...@standardnotes/files@1.1.10) (2022-05-18)
+
+**Note:** Version bump only for package @standardnotes/files
+
+
+
+
+
 ## [1.1.9](https://github.com/standardnotes/snjs/compare/@standardnotes/files@1.1.8...@standardnotes/files@1.1.9) (2022-05-17)
 
 **Note:** Version bump only for package @standardnotes/files

@@ -56,7 +56,7 @@ export class ItemsEncryptionService extends Services.AbstractService {
   }
 
   public getItemsKeys() {
-    return this.itemManager.itemsKeys()
+    return this.itemManager.getDisplayableItemsKeys()
   }
 
   public itemsKeyForPayload(payload: Models.EncryptedPayloadInterface): Models.ItemsKeyInterface | undefined {

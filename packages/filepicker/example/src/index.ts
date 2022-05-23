@@ -1,4 +1,4 @@
-import { SNApplication, Environment, Platform, SNLog, Runtime } from '../../../snjs'
+import { SNApplication, Environment, Platform, SNLog } from '../../../snjs'
 import WebDeviceInterface from './web_device_interface'
 import { SNWebCrypto } from '../../../sncrypto-web'
 import { ClassicFileApi } from './classic_file_api'
@@ -36,7 +36,6 @@ const application = new SNApplication({
   identifier: `${Math.random()}`,
   defaultHost: host,
   appVersion: '1.0.0',
-  runtime: Runtime.Dev,
 })
 
 console.log('Created application', application)

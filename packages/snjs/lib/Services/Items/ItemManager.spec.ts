@@ -46,7 +46,7 @@ describe('itemManager', () => {
   let internalEventBus: InternalEventBusInterface
 
   const createService = () => {
-    return new ItemManager(payloadManager, internalEventBus)
+    return new ItemManager(payloadManager, { supportsFileNavigation: false }, internalEventBus)
   }
 
   beforeEach(() => {
@@ -170,10 +170,11 @@ describe('itemManager', () => {
       await itemManager.insertItems([tag, note])
       await itemManager.addTagToNote(note, tag, false)
 
-      const criteria = Models.NotesDisplayCriteria.Create({
+      itemManager.setPrimaryItemDisplayOptions({
         tags: [tag],
+        sortBy: 'title',
+        sortDirection: 'asc',
       })
-      itemManager.setNotesDisplayCriteria(criteria)
 
       const notes = itemManager.getDisplayableNotes()
       expect(notes).toHaveLength(1)
@@ -360,10 +361,11 @@ describe('itemManager', () => {
       await itemManager.addTagToNote(parentNote, parentTag, false)
       await itemManager.addTagToNote(childNote, childTag, false)
 
-      const criteria = Models.NotesDisplayCriteria.Create({
+      itemManager.setPrimaryItemDisplayOptions({
         tags: [parentTag],
+        sortBy: 'title',
+        sortDirection: 'asc',
       })
-      itemManager.setNotesDisplayCriteria(criteria)
 
       const notes = itemManager.getDisplayableNotes()
       expect(notes).toHaveLength(1)
@@ -418,7 +420,7 @@ describe('itemManager', () => {
       expect(!!item).toEqual(true)
       /* Template items should never be added to the record */
       expect(itemManager.items).toHaveLength(0)
-      expect(itemManager.notes).toHaveLength(0)
+      expect(itemManager.getDisplayableNotes()).toHaveLength(0)
     })
 
     it('isTemplateItem return the correct value', async () => {

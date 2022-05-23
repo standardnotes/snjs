@@ -134,11 +134,11 @@ describe('mutator', () => {
     const note = this.createNote()
     const tag = this.createTag()
     const mutator = new DecryptedItemMutator(tag)
-    mutator.addItemAsRelationship(note)
+    mutator.e2ePendingRefactor_addItemAsRelationship(note)
     const payload = mutator.getResult()
 
     const item = new DecryptedItem(payload)
-    expect(item.hasRelationshipWithItem(note)).to.equal(true)
+    expect(item.isReferencingItem(note)).to.equal(true)
   })
 
   it('mutate remove item as relationship', function () {
@@ -149,6 +149,6 @@ describe('mutator', () => {
     const payload = mutator.getResult()
 
     const item = new DecryptedItem(payload)
-    expect(item.hasRelationshipWithItem(note)).to.equal(false)
+    expect(item.isReferencingItem(note)).to.equal(false)
   })
 })

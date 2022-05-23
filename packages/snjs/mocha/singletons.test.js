@@ -75,7 +75,7 @@ describe('singletons', function () {
     expect(this.application.syncService.isOutOfSync()).to.equal(false)
     expect(this.application.itemManager.items.length).to.equal(this.expectedItemCount)
 
-    const rawPayloads = await this.application.storageService.getAllRawPayloads()
+    const rawPayloads = await this.application.diskStorageService.getAllRawPayloads()
     expect(rawPayloads.length).to.equal(this.expectedItemCount)
 
     await Factory.safeDeinit(this.application)

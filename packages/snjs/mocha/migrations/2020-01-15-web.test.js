@@ -82,17 +82,17 @@ describe('2020-01-15 web migration', () => {
     expect(application.sessionManager.online()).to.equal(true)
     expect(application.protocolService.rootKeyEncryption.keyMode).to.equal(KeyMode.RootKeyPlusWrapper)
     /** Should be decrypted */
-    const storageMode = application.storageService.domainKeyForMode(StorageValueModes.Default)
-    const valueStore = application.storageService.values[storageMode]
+    const storageMode = application.diskStorageService.domainKeyForMode(StorageValueModes.Default)
+    const valueStore = application.diskStorageService.values[storageMode]
     expect(valueStore.content_type).to.not.be.ok
 
     expect(await application.deviceInterface.getRawStorageValue('offlineParams')).to.not.be.ok
 
-    const keyParams = await application.storageService.getValue(StorageKey.RootKeyParams, StorageValueModes.Nonwrapped)
+    const keyParams = await application.diskStorageService.getValue(StorageKey.RootKeyParams, StorageValueModes.Nonwrapped)
     expect(typeof keyParams).to.equal('object')
 
     /** Embedded value should match */
-    const migratedKeyParams = await application.storageService.getValue(
+    const migratedKeyParams = await application.diskStorageService.getValue(
       StorageKey.RootKeyParams,
       StorageValueModes.Nonwrapped,
     )
@@ -106,14 +106,14 @@ describe('2020-01-15 web migration', () => {
     expect(application.protocolService.rootKeyEncryption.keyMode).to.equal(KeyMode.RootKeyPlusWrapper)
 
     /** Expect note is decrypted */
-    expect(application.itemManager.notes.length).to.equal(1)
-    const retrievedNote = application.itemManager.notes[0]
+    expect(application.itemManager.getDisplayableNotes().length).to.equal(1)
+    const retrievedNote = application.itemManager.getDisplayableNotes()[0]
     expect(retrievedNote.uuid).to.equal(notePayload.uuid)
     expect(retrievedNote.content.text).to.equal(notePayload.content.text)
 
     /** Ensure arbitrary values have been migrated */
     for (const key of Object.keys(arbitraryValues)) {
-      const value = await application.storageService.getValue(key)
+      const value = await application.diskStorageService.getValue(key)
       expect(arbitraryValues[key]).to.equal(value)
     }
 
@@ -173,14 +173,14 @@ describe('2020-01-15 web migration', () => {
     await application.launch(true)
     expect(application.protocolService.rootKeyEncryption.keyMode).to.equal(KeyMode.WrapperOnly)
     /** Should be decrypted */
-    const storageMode = application.storageService.domainKeyForMode(StorageValueModes.Default)
-    const valueStore = application.storageService.values[storageMode]
+    const storageMode = application.diskStorageService.domainKeyForMode(StorageValueModes.Default)
+    const valueStore = application.diskStorageService.values[storageMode]
     expect(valueStore.content_type).to.not.be.ok
 
     expect(await application.deviceInterface.getRawStorageValue('offlineParams')).to.not.be.ok
 
     /** Embedded value should match */
-    const migratedKeyParams = await application.storageService.getValue(
+    const migratedKeyParams = await application.diskStorageService.getValue(
       StorageKey.RootKeyParams,
       StorageValueModes.Nonwrapped,
     )
@@ -194,14 +194,14 @@ describe('2020-01-15 web migration', () => {
     expect(application.protocolService.rootKeyEncryption.keyMode).to.equal(KeyMode.WrapperOnly)
 
     /** Expect note is decrypted */
-    expect(application.itemManager.notes.length).to.equal(1)
-    const retrievedNote = application.itemManager.notes[0]
+    expect(application.itemManager.getDisplayableNotes().length).to.equal(1)
+    const retrievedNote = application.itemManager.getDisplayableNotes()[0]
     expect(retrievedNote.uuid).to.equal(notePayload.uuid)
     expect(retrievedNote.content.text).to.equal(notePayload.content.text)
 
     /** Ensure arbitrary values have been migrated */
     for (const key of Object.keys(arbitraryValues)) {
-      const value = await application.storageService.getValue(key)
+      const value = await application.diskStorageService.getValue(key)
       expect(arbitraryValues[key]).to.equal(value)
     }
     await Factory.safeDeinit(application)
@@ -275,11 +275,11 @@ describe('2020-01-15 web migration', () => {
     expect(application.sessionManager.online()).to.equal(true)
     expect(application.protocolService.rootKeyEncryption.keyMode).to.equal(KeyMode.RootKeyOnly)
     /** Should be decrypted */
-    const storageMode = application.storageService.domainKeyForMode(StorageValueModes.Default)
-    const valueStore = application.storageService.values[storageMode]
+    const storageMode = application.diskStorageService.domainKeyForMode(StorageValueModes.Default)
+    const valueStore = application.diskStorageService.values[storageMode]
     expect(valueStore.content_type).to.not.be.ok
     /** Embedded value should match */
-    const migratedKeyParams = await application.storageService.getValue(
+    const migratedKeyParams = await application.diskStorageService.getValue(
       StorageKey.RootKeyParams,
       StorageValueModes.Nonwrapped,
     )
@@ -291,7 +291,7 @@ describe('2020-01-15 web migration', () => {
     expect(await application.deviceInterface.getRawStorageValue('auth_params')).to.not.be.ok
     expect(await application.deviceInterface.getRawStorageValue('jwt')).to.not.be.ok
 
-    const keyParams = await application.storageService.getValue(StorageKey.RootKeyParams, StorageValueModes.Nonwrapped)
+    const keyParams = await application.diskStorageService.getValue(StorageKey.RootKeyParams, StorageValueModes.Nonwrapped)
     expect(typeof keyParams).to.equal('object')
 
     expect(rootKey.masterKey).to.equal(accountKey.masterKey)
@@ -301,8 +301,8 @@ describe('2020-01-15 web migration', () => {
     expect(application.protocolService.rootKeyEncryption.keyMode).to.equal(KeyMode.RootKeyOnly)
 
     /** Expect note is decrypted */
-    expect(application.itemManager.notes.length).to.equal(1)
-    const retrievedNote = application.itemManager.notes[0]
+    expect(application.itemManager.getDisplayableNotes().length).to.equal(1)
+    const retrievedNote = application.itemManager.getDisplayableNotes()[0]
     expect(retrievedNote.uuid).to.equal(notePayload.uuid)
     expect(retrievedNote.content.text).to.equal(notePayload.content.text)
 
@@ -312,7 +312,7 @@ describe('2020-01-15 web migration', () => {
       if (key === 'auth_params') {
         continue
       }
-      const value = await application.storageService.getValue(key)
+      const value = await application.diskStorageService.getValue(key)
       expect(storage[key]).to.equal(value)
     }
 
@@ -349,8 +349,8 @@ describe('2020-01-15 web migration', () => {
     expect(application.protocolService.rootKeyEncryption.keyMode).to.equal(KeyMode.RootKeyNone)
 
     /** Should be decrypted */
-    const storageMode = application.storageService.domainKeyForMode(StorageValueModes.Default)
-    const valueStore = application.storageService.values[storageMode]
+    const storageMode = application.diskStorageService.domainKeyForMode(StorageValueModes.Default)
+    const valueStore = application.diskStorageService.values[storageMode]
     expect(valueStore.content_type).to.not.be.ok
     const rootKey = await application.protocolService.getRootKey()
     expect(rootKey).to.not.be.ok
@@ -359,14 +359,14 @@ describe('2020-01-15 web migration', () => {
     expect(await application.deviceInterface.getRawStorageValue('migrations')).to.not.be.ok
 
     /** Expect note is decrypted */
-    expect(application.itemManager.notes.length).to.equal(1)
-    const retrievedNote = application.itemManager.notes[0]
+    expect(application.itemManager.getDisplayableNotes().length).to.equal(1)
+    const retrievedNote = application.itemManager.getDisplayableNotes()[0]
     expect(retrievedNote.uuid).to.equal(notePayload.uuid)
     expect(retrievedNote.content.text).to.equal(notePayload.content.text)
 
     /** Ensure arbitrary values have been migrated */
     for (const key of Object.keys(storage)) {
-      const value = await application.storageService.getValue(key)
+      const value = await application.diskStorageService.getValue(key)
       expect(storage[key]).to.equal(value)
     }
 
@@ -435,11 +435,11 @@ describe('2020-01-15 web migration', () => {
     expect(application.sessionManager.getUser()).to.be.ok
     expect(application.protocolService.rootKeyEncryption.keyMode).to.equal(KeyMode.RootKeyOnly)
     /** Should be decrypted */
-    const storageMode = application.storageService.domainKeyForMode(StorageValueModes.Default)
-    const valueStore = application.storageService.values[storageMode]
+    const storageMode = application.diskStorageService.domainKeyForMode(StorageValueModes.Default)
+    const valueStore = application.diskStorageService.values[storageMode]
     expect(valueStore.content_type).to.not.be.ok
     /** Embedded value should match */
-    const migratedKeyParams = await application.storageService.getValue(
+    const migratedKeyParams = await application.diskStorageService.getValue(
       StorageKey.RootKeyParams,
       StorageValueModes.Nonwrapped,
     )
@@ -454,7 +454,7 @@ describe('2020-01-15 web migration', () => {
     expect(await application.deviceInterface.getRawStorageValue('mk')).to.not.be.ok
     expect(await application.deviceInterface.getRawStorageValue('pw')).to.not.be.ok
 
-    const keyParams = await application.storageService.getValue(StorageKey.RootKeyParams, StorageValueModes.Nonwrapped)
+    const keyParams = await application.diskStorageService.getValue(StorageKey.RootKeyParams, StorageValueModes.Nonwrapped)
     expect(typeof keyParams).to.equal('object')
 
     expect(rootKey.masterKey).to.equal(accountKey.masterKey)
@@ -464,15 +464,15 @@ describe('2020-01-15 web migration', () => {
     expect(application.protocolService.rootKeyEncryption.keyMode).to.equal(KeyMode.RootKeyOnly)
 
     /** Expect note is decrypted */
-    expect(application.itemManager.notes.length).to.equal(1)
-    const retrievedNote = application.itemManager.notes[0]
+    expect(application.itemManager.getDisplayableNotes().length).to.equal(1)
+    const retrievedNote = application.itemManager.getDisplayableNotes()[0]
     expect(retrievedNote.uuid).to.equal(notePayload.uuid)
     expect(retrievedNote.content.text).to.equal(notePayload.content.text)
 
     /** Ensure arbitrary values have been migrated */
     for (const key of Object.keys(storage)) {
       /** Is stringified in storage, but parsed in storageService */
-      const value = await application.storageService.getValue(key)
+      const value = await application.diskStorageService.getValue(key)
       if (key === 'auth_params') {
         continue
       } else if (key === 'user') {
@@ -546,11 +546,11 @@ describe('2020-01-15 web migration', () => {
     expect(application.sessionManager.getUser()).to.be.ok
     expect(application.protocolService.rootKeyEncryption.keyMode).to.equal(KeyMode.RootKeyPlusWrapper)
     /** Should be decrypted */
-    const storageMode = application.storageService.domainKeyForMode(StorageValueModes.Default)
-    const valueStore = application.storageService.values[storageMode]
+    const storageMode = application.diskStorageService.domainKeyForMode(StorageValueModes.Default)
+    const valueStore = application.diskStorageService.values[storageMode]
     expect(valueStore.content_type).to.not.be.ok
     /** Embedded value should match */
-    const migratedKeyParams = await application.storageService.getValue(
+    const migratedKeyParams = await application.diskStorageService.getValue(
       StorageKey.RootKeyParams,
       StorageValueModes.Nonwrapped,
     )
@@ -565,7 +565,7 @@ describe('2020-01-15 web migration', () => {
     expect(await application.deviceInterface.getRawStorageValue('mk')).to.not.be.ok
     expect(await application.deviceInterface.getRawStorageValue('pw')).to.not.be.ok
 
-    const keyParams = await application.storageService.getValue(StorageKey.RootKeyParams, StorageValueModes.Nonwrapped)
+    const keyParams = await application.diskStorageService.getValue(StorageKey.RootKeyParams, StorageValueModes.Nonwrapped)
     expect(typeof keyParams).to.equal('object')
 
     expect(rootKey.masterKey).to.equal(accountKey.masterKey)
@@ -574,8 +574,8 @@ describe('2020-01-15 web migration', () => {
     expect(rootKey.keyVersion).to.equal(ProtocolVersion.V002)
 
     /** Expect note is decrypted */
-    expect(application.itemManager.notes.length).to.equal(1)
-    const retrievedNote = application.itemManager.notes[0]
+    expect(application.itemManager.getDisplayableNotes().length).to.equal(1)
+    const retrievedNote = application.itemManager.getDisplayableNotes()[0]
     expect(retrievedNote.uuid).to.equal(notePayload.uuid)
     expect(retrievedNote.content.text).to.equal(notePayload.content.text)
 

@@ -16,7 +16,7 @@ import {
 import { SNApiService } from './../Api/ApiService'
 import { SNProtectionService } from '../Protection/ProtectionService'
 import { SNSessionManager, MINIMUM_PASSWORD_LENGTH } from '../Session/SessionManager'
-import { SNStorageService } from '@Lib/Services/Storage/StorageService'
+import { DiskStorageService } from '@Lib/Services/Storage/DiskStorageService'
 import { SNSyncService } from '../Sync/SyncService'
 import { Strings } from '../../Strings/index'
 import { UserClientInterface } from './UserClientInterface'
@@ -45,7 +45,7 @@ export class UserService extends AbstractService<AccountEvent, AccountEventData>
   constructor(
     private sessionManager: SNSessionManager,
     private syncService: SNSyncService,
-    private storageService: SNStorageService,
+    private storageService: DiskStorageService,
     private itemManager: ItemManager,
     private protocolService: EncryptionService,
     private alertService: AlertService,
@@ -456,7 +456,7 @@ export class UserService extends AbstractService<AccountEvent, AccountEventData>
    * https://github.com/standardnotes/desktop/issues/131
    */
   private async rewriteItemsKeys(): Promise<void> {
-    const itemsKeys = this.itemManager.itemsKeys()
+    const itemsKeys = this.itemManager.getDisplayableItemsKeys()
     const payloads = itemsKeys.map((key) => key.payloadRepresentation())
     await this.storageService.forceDeletePayloads(payloads)
     await this.syncService.persistPayloads(payloads)

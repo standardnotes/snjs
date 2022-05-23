@@ -8,10 +8,12 @@ import { DecryptedPayloadInterface } from '../../Payload/Interfaces/DecryptedPay
 import { ItemInterface } from './ItemInterface'
 import { SortableItem } from '../../../Runtime/Collection/CollectionSort'
 import { DecryptedTransferPayload } from '../../TransferPayload/Interfaces/DecryptedTransferPayload'
+import { SearchableItem } from '../../../Runtime/Display'
 
 export interface DecryptedItemInterface<C extends ItemContent = ItemContent>
   extends ItemInterface<DecryptedPayloadInterface<C>>,
-    SortableItem {
+    SortableItem,
+    SearchableItem {
   readonly content: C
   readonly conflictOf?: Uuid
   readonly duplicateOf?: Uuid
@@ -31,7 +33,7 @@ export interface DecryptedItemInterface<C extends ItemContent = ItemContent>
 
   payloadRepresentation(override?: Partial<DecryptedTransferPayload<C>>): DecryptedPayloadInterface<C>
 
-  hasRelationshipWithItem(item: DecryptedItemInterface): boolean
+  isReferencingItem(item: DecryptedItemInterface): boolean
 
   getDomainData(domain: typeof ComponentDataDomain | typeof DefaultAppDomain): undefined | Record<string, unknown>
 

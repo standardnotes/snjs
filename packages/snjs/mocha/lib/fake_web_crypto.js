@@ -56,6 +56,10 @@ export default class FakeWebCrypto {
     return btoa(text)
   }
 
+  base64URLEncode(text) {
+    return this.base64Encode(text).replace(/\+/g, '-').replace(/\//g, '_').replace(/\=+$/, '')
+  }
+
   base64Decode(base64String) {
     return atob(base64String)
   }
