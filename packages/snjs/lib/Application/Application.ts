@@ -481,16 +481,13 @@ export class SNApplication
       },
     )
 
-    /** Push current values now */
     const matches = this.itemManager.getItems<I>(contentType)
-    if (matches.length > 0) {
-      stream({
-        inserted: matches,
-        changed: [],
-        removed: [],
-        source: Models.PayloadEmitSource.InitialObserverRegistrationPush,
-      })
-    }
+    stream({
+      inserted: matches,
+      changed: [],
+      removed: [],
+      source: Models.PayloadEmitSource.InitialObserverRegistrationPush,
+    })
 
     this.streamRemovers.push(removeItemManagerObserver)
 
