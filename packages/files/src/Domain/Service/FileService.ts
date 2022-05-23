@@ -1,4 +1,4 @@
-import { DecryptedBytes, EncryptedBytes, FileMemoryCache } from '@standardnotes/filepicker'
+import { DecryptedBytes, EncryptedBytes, FileMemoryCache, OrderedByteChunker } from '@standardnotes/filepicker'
 import { ClientDisplayableError } from '@standardnotes/responses'
 import { ContentType } from '@standardnotes/common'
 import { DownloadAndDecryptFileOperation } from '../Operations/DownloadAndDecrypt'
@@ -34,7 +34,6 @@ import { FileDownloadProgress } from '../Types/FileDownloadProgress'
 import { readAndDecryptBackupFile } from './ReadAndDecryptBackupFile'
 import { DecryptItemsKeyWithUserFallback, EncryptionProvider, SNItemsKey } from '@standardnotes/encryption'
 import { FileDecryptor } from '../UseCase/FileDecryptor'
-import { OrderedByteChunker } from '../Utils/OrderedByteChunker'
 
 const OneHundredMb = 100 * 1_000_000
 

@@ -36,6 +36,7 @@
   },
   "dependencies": {
     "@standardnotes/encryption": "^1.8.1",
+    "@standardnotes/filepicker": "^1.15.0",
     "@standardnotes/models": "^1.10.0",
     "@standardnotes/responses": "^1.6.25",
     "@standardnotes/services": "^1.13.1",
