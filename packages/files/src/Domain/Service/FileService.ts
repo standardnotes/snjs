@@ -154,9 +154,12 @@ export class FileService extends AbstractService implements FilesClientInterface
 
     let decryptedAggregate = new Uint8Array()
 
-    const orderedChunker = new OrderedByteChunker(file.encryptedChunkSizes, async (encryptedBytes, index, isLast) => {
+    const orderedChunker = new OrderedByteChunker(file.encryptedChunkSizes, async (encryptedBytes) => {
       const decryptedBytes = decryptOperation.decryptBytes(encryptedBytes)
-      decryptedAggregate = new Uint8Array([...decryptedAggregate, ...chunk])
+
+      if (decryptedBytes) {
+        decryptedAggregate = new Uint8Array([...decryptedAggregate, ...decryptedBytes.decryptedBytes])
+      }
     })
 
     await orderedChunker.addBytes(entry.encryptedBytes, false)
@@ -171,16 +174,15 @@ export class FileService extends AbstractService implements FilesClientInterface
     const cachedBytes = this.encryptedCache.get(file.uuid)
 
     if (cachedBytes) {
-      const decryptOperation = new FileDecryptor(file, this.crypto)
+      const decryptedBytes = await this.decryptCachedEntry(file, cachedBytes)
 
-      const orderedChunker = new OrderedByteChunker(file.encryptedChunkSizes, async (chunk, index, isLast) => {})
-
-      await onDecryptedBytes(cachedBytes, undefined)
+      await onDecryptedBytes(decryptedBytes.decryptedBytes, undefined)
 
       return undefined
     }
 
     const addToCache = file.encryptedSize < this.encryptedCache.maxSize
+
     let cacheEntryAggregate = new Uint8Array()
 
     const operation = new DownloadAndDecryptFileOperation(file, this.crypto, this.api)
