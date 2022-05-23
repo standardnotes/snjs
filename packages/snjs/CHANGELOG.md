@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.113.1](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.113.0...@standardnotes/snjs@2.113.1) (2022-05-23)
+
+
+### Bug Fixes
+
+* always push registration push ([#746](https://github.com/standardnotes/snjs/issues/746)) ([016df32](https://github.com/standardnotes/snjs/commit/016df32c16a1a8a035acf4ad48c59de3528932e7))
+
+
+
+
+
 # [2.113.0](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.112.0...@standardnotes/snjs@2.113.0) (2022-05-22)
 
 
