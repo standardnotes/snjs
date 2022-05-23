@@ -74,9 +74,9 @@ describe('download and decrypt', () => {
 
     operation = new DownloadAndDecryptFileOperation(file, crypto, apiService)
 
-    await operation.run(async (decryptedBytes) => {
-      if (decryptedBytes) {
-        receivedBytes = new Uint8Array([...receivedBytes, ...decryptedBytes])
+    await operation.run(async (result) => {
+      if (result) {
+        receivedBytes = new Uint8Array([...receivedBytes, ...result.decrypted.decryptedBytes])
       }
 
       await Promise.resolve()
@@ -99,9 +99,9 @@ describe('download and decrypt', () => {
 
     const progress: FileDownloadProgress = await new Promise((resolve) => {
       // eslint-disable-next-line @typescript-eslint/require-await
-      void operation.run(async (_decryptedBytes, chunkProgress) => {
+      void operation.run(async (result) => {
         operation.abort()
-        resolve(chunkProgress)
+        resolve(result.progress)
       })
     })
 

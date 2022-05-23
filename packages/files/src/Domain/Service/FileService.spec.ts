@@ -77,10 +77,12 @@ describe('fileService', () => {
     crypto.xchacha20StreamEncryptorPush = jest.fn().mockReturnValue(new Uint8Array())
   })
 
-  it('should cache file after download', async () => {
+  it.only('should cache file after download', async () => {
     const file = {
       uuid: '1',
       decryptedSize: 100_000,
+      encryptedSize: 101_000,
+      encryptedChunkSizes: [101_000],
     } as jest.Mocked<FileItem>
 
     let downloadMock = apiService.downloadFile as jest.Mock
@@ -99,7 +101,7 @@ describe('fileService', () => {
 
     expect(downloadMock).toHaveBeenCalledTimes(0)
 
-    expect(fileService['cache'].get(file.uuid)).toBeTruthy()
+    expect(fileService['encryptedCache'].get(file.uuid)).toBeTruthy()
   })
 
   it('deleting file should remove it from cache', async () => {
@@ -114,6 +116,6 @@ describe('fileService', () => {
 
     await fileService.deleteFile(file)
 
-    expect(fileService['cache'].get(file.uuid)).toBeFalsy()
+    expect(fileService['encryptedCache'].get(file.uuid)).toBeFalsy()
   })
 })

@@ -1,4 +1,4 @@
-import { FileMemoryCache } from '@standardnotes/filepicker'
+import { DecryptedBytes, EncryptedBytes, FileMemoryCache, OrderedByteChunker } from '@standardnotes/filepicker'
 import { ClientDisplayableError } from '@standardnotes/responses'
 import { ContentType } from '@standardnotes/common'
 import { DownloadAndDecryptFileOperation } from '../Operations/DownloadAndDecrypt'
@@ -33,11 +33,12 @@ import { FilesClientInterface } from './FilesClientInterface'
 import { FileDownloadProgress } from '../Types/FileDownloadProgress'
 import { readAndDecryptBackupFile } from './ReadAndDecryptBackupFile'
 import { DecryptItemsKeyWithUserFallback, EncryptionProvider, SNItemsKey } from '@standardnotes/encryption'
+import { FileDecryptor } from '../UseCase/FileDecryptor'
 
 const OneHundredMb = 100 * 1_000_000
 
 export class FileService extends AbstractService implements FilesClientInterface {
-  private cache: FileMemoryCache = new FileMemoryCache(OneHundredMb)
+  private encryptedCache: FileMemoryCache = new FileMemoryCache(OneHundredMb)
 
   constructor(
     private api: FilesApiInterface,
@@ -55,8 +56,8 @@ export class FileService extends AbstractService implements FilesClientInterface
   override deinit(): void {
     super.deinit()
 
-    this.cache.clear()
-    ;(this.cache as unknown) = undefined
+    this.encryptedCache.clear()
+    ;(this.encryptedCache as unknown) = undefined
     ;(this.api as unknown) = undefined
     ;(this.itemManager as unknown) = undefined
     ;(this.encryptor as unknown) = undefined
@@ -147,41 +148,60 @@ export class FileService extends AbstractService implements FilesClientInterface
     return file
   }
 
+  private async decryptCachedEntry(file: FileItem, entry: EncryptedBytes): Promise<DecryptedBytes> {
+    const decryptOperation = new FileDecryptor(file, this.crypto)
+
+    let decryptedAggregate = new Uint8Array()
+
+    const orderedChunker = new OrderedByteChunker(file.encryptedChunkSizes, async (encryptedBytes) => {
+      const decryptedBytes = decryptOperation.decryptBytes(encryptedBytes)
+
+      if (decryptedBytes) {
+        decryptedAggregate = new Uint8Array([...decryptedAggregate, ...decryptedBytes.decryptedBytes])
+      }
+    })
+
+    await orderedChunker.addBytes(entry.encryptedBytes, false)
+
+    return { decryptedBytes: decryptedAggregate }
+  }
+
   public async downloadFile(
     file: FileItem,
     onDecryptedBytes: (decryptedBytes: Uint8Array, progress?: FileDownloadProgress) => Promise<void>,
   ): Promise<ClientDisplayableError | undefined> {
-    const cachedFile = this.cache.get(file.uuid)
+    const cachedBytes = this.encryptedCache.get(file.uuid)
 
-    if (cachedFile) {
-      await onDecryptedBytes(cachedFile, undefined)
+    if (cachedBytes) {
+      const decryptedBytes = await this.decryptCachedEntry(file, cachedBytes)
+
+      await onDecryptedBytes(decryptedBytes.decryptedBytes, undefined)
 
       return undefined
     }
 
-    const addToCache = file.decryptedSize < this.cache.maxSize
-    let cacheEntryAggregate = new Uint8Array()
+    const addToCache = file.encryptedSize < this.encryptedCache.maxSize
 
-    const bytesWrapper = async (bytes: Uint8Array, progress: FileDownloadProgress): Promise<void> => {
-      if (addToCache) {
-        cacheEntryAggregate = new Uint8Array([...cacheEntryAggregate, ...bytes])
-      }
-      return onDecryptedBytes(bytes, progress)
-    }
+    let cacheEntryAggregate = new Uint8Array()
 
     const operation = new DownloadAndDecryptFileOperation(file, this.crypto, this.api)
 
-    const result = await operation.run(bytesWrapper)
+    const result = await operation.run(async ({ decrypted, encrypted, progress }): Promise<void> => {
+      if (addToCache) {
+        cacheEntryAggregate = new Uint8Array([...cacheEntryAggregate, ...encrypted.encryptedBytes])
+      }
+      return onDecryptedBytes(decrypted.decryptedBytes, progress)
+    })
 
     if (addToCache) {
-      this.cache.add(file.uuid, cacheEntryAggregate)
+      this.encryptedCache.add(file.uuid, { encryptedBytes: cacheEntryAggregate })
     }
 
     return result.error
   }
 
   public async deleteFile(file: FileItem): Promise<ClientDisplayableError | undefined> {
-    this.cache.remove(file.uuid)
+    this.encryptedCache.remove(file.uuid)
 
     const tokenResult = await this.api.createFileValetToken(file.remoteIdentifier, 'delete')
 

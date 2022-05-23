@@ -1,18 +1,19 @@
 import { removeFromArray } from '@standardnotes/utils'
 import { Uuid } from '@standardnotes/common'
+import { EncryptedBytes } from '../TypedBytes'
 
 export class FileMemoryCache {
-  private cache: Record<Uuid, Uint8Array> = {}
+  private cache: Record<Uuid, EncryptedBytes> = {}
   private orderedQueue: Uuid[] = []
 
   constructor(public readonly maxSize: number) {}
 
-  add(uuid: Uuid, data: Uint8Array): boolean {
-    if (data.length > this.maxSize) {
+  add(uuid: Uuid, data: EncryptedBytes): boolean {
+    if (data.encryptedBytes.length > this.maxSize) {
       return false
     }
 
-    while (this.size + data.length > this.maxSize) {
+    while (this.size + data.encryptedBytes.length > this.maxSize) {
       this.remove(this.orderedQueue[0])
     }
 
@@ -25,11 +26,11 @@ export class FileMemoryCache {
 
   get size(): number {
     return Object.values(this.cache)
-      .map((bytes) => bytes.length)
+      .map((bytes) => bytes.encryptedBytes.length)
       .reduce((total, fileLength) => total + fileLength, 0)
   }
 
-  get(uuid: Uuid): Uint8Array | undefined {
+  get(uuid: Uuid): EncryptedBytes | undefined {
     return this.cache[uuid]
   }
 
