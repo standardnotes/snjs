@@ -1,5 +1,5 @@
 import { ContentType } from '@standardnotes/common'
-import { SyncOptions } from '@standardnotes/services'
+import { ChallengeReason, SyncOptions } from '@standardnotes/services'
 import { TransactionalMutation } from '../Items'
 import * as Models from '@standardnotes/models'
 import { ClientDisplayableError } from '@standardnotes/responses'
@@ -69,6 +69,21 @@ export interface MutatorClientInterface {
     payloadSourceKey?: string,
   ): Promise<Models.DecryptedItemInterface | undefined>
 
+  protectItems<
+    _M extends Models.DecryptedItemMutator<Models.ItemContent>,
+    I extends Models.DecryptedItemInterface<Models.ItemContent>,
+  >(
+    items: I[],
+  ): Promise<I[]>
+
+  unprotectItems<
+    _M extends Models.DecryptedItemMutator<Models.ItemContent>,
+    I extends Models.DecryptedItemInterface<Models.ItemContent>,
+  >(
+    items: I[],
+    reason: ChallengeReason,
+  ): Promise<I[] | undefined>
+
   protectNote(note: Models.SNNote): Promise<Models.SNNote>
 
   unprotectNote(note: Models.SNNote): Promise<Models.SNNote | undefined>
@@ -80,10 +95,6 @@ export interface MutatorClientInterface {
   protectFile(file: Models.FileItem): Promise<Models.FileItem>
 
   unprotectFile(file: Models.FileItem): Promise<Models.FileItem | undefined>
-
-  protectFiles(notes: Models.FileItem[]): Promise<Models.FileItem[]>
-
-  unprotectFiles(notes: Models.FileItem[]): Promise<Models.FileItem[]>
 
   /**
    * Takes the values of the input item and emits it onto global state.
