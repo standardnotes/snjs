@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.114.0](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.113.4...@standardnotes/snjs@2.114.0) (2022-05-24)
+
+
+### Features
+
+* un/protect multiple files ([#749](https://github.com/standardnotes/snjs/issues/749)) ([025cff4](https://github.com/standardnotes/snjs/commit/025cff4e9467f4cfe35efa0074019def192fb946))
+
+
+
+
+
 ## [2.113.4](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.113.3...@standardnotes/snjs@2.113.4) (2022-05-24)
 
 **Note:** Version bump only for package @standardnotes/snjs
