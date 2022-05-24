@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.19.0](https://github.com/standardnotes/snjs/compare/@standardnotes/auth@3.18.17...@standardnotes/auth@3.19.0) (2022-05-24)
+
+
+### Features
+
+* add user analytics id to cross service token data ([046c951](https://github.com/standardnotes/snjs/commit/046c951cac4b1d9a80904da97d5fc279a629e965))
+
+
+
+
+
 ## [3.18.17](https://github.com/standardnotes/snjs/compare/@standardnotes/auth@3.18.16...@standardnotes/auth@3.18.17) (2022-05-22)
 
 **Note:** Version bump only for package @standardnotes/auth

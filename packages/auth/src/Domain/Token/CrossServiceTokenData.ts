@@ -7,6 +7,7 @@ export type CrossServiceTokenData = {
     uuid: Uuid
     email: string
   }
+  analyticsId: number
   roles: Array<Role>
   session?: {
     uuid: Uuid
