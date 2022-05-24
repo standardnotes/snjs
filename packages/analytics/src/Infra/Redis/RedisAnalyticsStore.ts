@@ -71,19 +71,19 @@ export class RedisAnalyticsStore implements AnalyticsStoreInterface {
     return statistics
   }
 
-  private getMonthlyKey() {
+  private getMonthlyKey(): string {
     const date = new Date()
 
     return `${this.getYear(date)}-${this.getMonth(date)}`
   }
 
-  private getDailyKey(date?: Date) {
+  private getDailyKey(date?: Date): string {
     date = date ?? new Date()
 
     return `${this.getYear(date)}-${this.getMonth(date)}-${this.getDayOfTheMonth(date)}`
   }
 
-  private getWeeklyKey() {
+  private getWeeklyKey(): string {
     const date = new Date()
 
     const firstJanuary = new Date(date.getFullYear(), 0, 1)
