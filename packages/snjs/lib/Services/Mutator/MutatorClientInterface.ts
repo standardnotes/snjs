@@ -81,6 +81,10 @@ export interface MutatorClientInterface {
 
   unprotectFile(file: Models.FileItem): Promise<Models.FileItem | undefined>
 
+  protectFiles(notes: Models.FileItem[]): Promise<Models.FileItem[]>
+
+  unprotectFiles(notes: Models.FileItem[]): Promise<Models.FileItem[]>
+
   /**
    * Takes the values of the input item and emits it onto global state.
    */

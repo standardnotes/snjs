@@ -202,6 +202,15 @@ export class MutatorService extends AbstractService implements MutatorClientInte
     return result ? result[0] : undefined
   }
 
+  public async protectFiles(files: Models.FileItem[]): Promise<Models.FileItem[]> {
+    return this.protectItems(files)
+  }
+
+  public async unprotectFiles(files: Models.FileItem[]): Promise<Models.FileItem[]> {
+    const results = await this.unprotectItems(files, ChallengeReason.UnprotectFile)
+    return results || []
+  }
+
   public async mergeItem(
     item: Models.DecryptedItemInterface,
     source: Models.PayloadEmitSource,
