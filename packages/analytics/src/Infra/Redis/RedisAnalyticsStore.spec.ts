@@ -1,4 +1,5 @@
 import * as IORedis from 'ioredis'
+import { AnalyticsActivity } from '../../Domain'
 
 import { RedisAnalyticsStore } from './RedisAnalyticsStore'
 
@@ -10,6 +11,19 @@ describe('RedisAnalyticsStore', () => {
   beforeEach(() => {
     redisClient = {} as jest.Mocked<IORedis.Redis>
     redisClient.incr = jest.fn()
+    redisClient.setbit = jest.fn()
+  })
+
+  it('should set analytics activity', async () => {
+    jest.useFakeTimers('modern')
+    jest.setSystemTime(1653395155000)
+    await createStore().markActivity(AnalyticsActivity.EditingItems, 123)
+    jest.useRealTimers()
+
+    expect(redisClient.setbit).toBeCalledTimes(3)
+    expect(redisClient.setbit).toHaveBeenNthCalledWith(1, 'bitmap:action:editing-items:timespan:2022-5', 123, 1)
+    expect(redisClient.setbit).toHaveBeenNthCalledWith(2, 'bitmap:action:editing-items:timespan:2022-week-21', 123, 1)
+    expect(redisClient.setbit).toHaveBeenNthCalledWith(3, 'bitmap:action:editing-items:timespan:2022-5-24', 123, 1)
   })
 
   it('should get yesterday out of sync incidents', async () => {
