@@ -1,5 +1,5 @@
 import { ContentType } from '@standardnotes/common'
-import { SyncOptions } from '@standardnotes/services'
+import { ChallengeReason, SyncOptions } from '@standardnotes/services'
 import { TransactionalMutation } from '../Items'
 import * as Models from '@standardnotes/models'
 import { ClientDisplayableError } from '@standardnotes/responses'
@@ -68,6 +68,21 @@ export interface MutatorClientInterface {
     emitSource?: Models.PayloadEmitSource,
     payloadSourceKey?: string,
   ): Promise<Models.DecryptedItemInterface | undefined>
+
+  protectItems<
+    _M extends Models.DecryptedItemMutator<Models.ItemContent>,
+    I extends Models.DecryptedItemInterface<Models.ItemContent>,
+  >(
+    items: I[],
+  ): Promise<I[]>
+
+  unprotectItems<
+    _M extends Models.DecryptedItemMutator<Models.ItemContent>,
+    I extends Models.DecryptedItemInterface<Models.ItemContent>,
+  >(
+    items: I[],
+    reason: ChallengeReason,
+  ): Promise<I[] | undefined>
 
   protectNote(note: Models.SNNote): Promise<Models.SNNote>
 

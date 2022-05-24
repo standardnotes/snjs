@@ -138,7 +138,7 @@ export class MutatorService extends AbstractService implements MutatorClientInte
     return this.itemManager.runTransactionalMutation(transaction, emitSource, payloadSourceKey)
   }
 
-  private async protectItems<M extends Models.DecryptedItemMutator, I extends Models.DecryptedItemInterface>(
+  async protectItems<M extends Models.DecryptedItemMutator, I extends Models.DecryptedItemInterface>(
     items: I[],
   ): Promise<I[]> {
     const protectedItems = await this.itemManager.changeItems<M, I>(
@@ -153,7 +153,7 @@ export class MutatorService extends AbstractService implements MutatorClientInte
     return protectedItems
   }
 
-  private async unprotectItems<M extends Models.DecryptedItemMutator, I extends Models.DecryptedItemInterface>(
+  async unprotectItems<M extends Models.DecryptedItemMutator, I extends Models.DecryptedItemInterface>(
     items: I[],
     reason: ChallengeReason,
   ): Promise<I[] | undefined> {
