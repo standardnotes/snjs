@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.28.11](https://github.com/standardnotes/snjs/compare/@standardnotes/domain-events@2.28.10...@standardnotes/domain-events@2.28.11) (2022-05-24)
+
+**Note:** Version bump only for package @standardnotes/domain-events
+
+
+
+
+
 ## [2.28.10](https://github.com/standardnotes/snjs/compare/@standardnotes/domain-events@2.28.9...@standardnotes/domain-events@2.28.10) (2022-05-24)
 
 **Note:** Version bump only for package @standardnotes/domain-events
