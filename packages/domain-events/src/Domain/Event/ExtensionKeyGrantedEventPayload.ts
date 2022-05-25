@@ -11,5 +11,4 @@ export interface ExtensionKeyGrantedEventPayload {
   payAmount: number | null
   billingEveryNMonths: number | null
   activeUntil: string | null
-  skipEmail: boolean
 }
