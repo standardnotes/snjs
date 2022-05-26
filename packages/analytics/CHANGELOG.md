@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.2.0](https://github.com/standardnotes/snjs/compare/@standardnotes/analytics@1.1.0...@standardnotes/analytics@1.2.0) (2022-05-26)
+
+
+### Features
+
+* add activity indicators in analytics ([e6f5b5a](https://github.com/standardnotes/snjs/commit/e6f5b5afbff1f5f96adfcba42f4708fa74ac7f80))
+
+
+
+
+
 # [1.1.0](https://github.com/standardnotes/snjs/compare/@standardnotes/analytics@1.0.7...@standardnotes/analytics@1.1.0) (2022-05-24)
 
 
