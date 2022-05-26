@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.3.0](https://github.com/standardnotes/snjs/compare/@standardnotes/analytics@1.2.0...@standardnotes/analytics@1.3.0) (2022-05-26)
+
+
+### Features
+
+* add calculating activity retention in analytics ([bc2f26d](https://github.com/standardnotes/snjs/commit/bc2f26d63a8ff0e2750b37bc1ee56297f6a8c98d))
+
+
+
+
+
 # [1.2.0](https://github.com/standardnotes/snjs/compare/@standardnotes/analytics@1.1.0...@standardnotes/analytics@1.2.0) (2022-05-26)
 
 

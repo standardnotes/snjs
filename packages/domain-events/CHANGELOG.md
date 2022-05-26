@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.28.13](https://github.com/standardnotes/snjs/compare/@standardnotes/domain-events@2.28.12...@standardnotes/domain-events@2.28.13) (2022-05-26)
+
+
+### Bug Fixes
+
+* add activity statistics to daily report ([2979b59](https://github.com/standardnotes/snjs/commit/2979b59e153ce698f2b98c3bac5dd516fe114f36))
+
+
+
+
+
 ## [2.28.12](https://github.com/standardnotes/snjs/compare/@standardnotes/domain-events@2.28.11...@standardnotes/domain-events@2.28.12) (2022-05-25)
 
 
