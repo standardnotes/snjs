@@ -6,6 +6,52 @@ import { AnalyticsStoreInterface } from '../../Domain/Service/AnalyticsStoreInte
 export class RedisAnalyticsStore implements AnalyticsStoreInterface {
   constructor(private redisClient: IORedis.Redis) {}
 
+  async calculateActivityRetentionForYesterday(activity: AnalyticsActivity): Promise<number> {
+    const dayBeforeYesterdayKey = this.getDailyKey(this.getDayBeforeYesterdayDate())
+    const yesterdayKey = this.getDailyKey(this.getYesterdayDate())
+
+    const diffKey = `bitmap:action:${activity}:timespan:${dayBeforeYesterdayKey}-${yesterdayKey}`
+
+    await this.redisClient.send_command(
+      'BITOP',
+      'AND',
+      diffKey,
+      `bitmap:action:${activity}:timespan:${dayBeforeYesterdayKey}`,
+      `bitmap:action:${activity}:timespan:${yesterdayKey}`,
+    )
+
+    const yesterdayAndDayBeforeYesterdayTotalInActivity = await this.redisClient.bitcount(diffKey)
+
+    const dayBeforeYesterdayTotalInActivity = await this.redisClient.bitcount(
+      `bitmap:action:${activity}:timespan:${dayBeforeYesterdayKey}`,
+    )
+
+    return Math.ceil((yesterdayAndDayBeforeYesterdayTotalInActivity * 100) / dayBeforeYesterdayTotalInActivity)
+  }
+
+  async calculateActivityRetentionForLastWeek(activity: AnalyticsActivity): Promise<number> {
+    const weekBeforeLastWeekKey = this.getWeeklyKey(this.getWeekBeforeLastWeekDate())
+    const lastWeekKey = this.getWeeklyKey(this.getLastWeekDate())
+
+    const diffKey = `bitmap:action:${activity}:timespan:${weekBeforeLastWeekKey}-${lastWeekKey}`
+
+    await this.redisClient.send_command(
+      'BITOP',
+      'AND',
+      diffKey,
+      `bitmap:action:${activity}:timespan:${weekBeforeLastWeekKey}`,
+      `bitmap:action:${activity}:timespan:${lastWeekKey}`,
+    )
+
+    const lastWeekAndWeekBeforeLastWeekTotalInActivity = await this.redisClient.bitcount(diffKey)
+
+    const weekBeforeLastWeekTotalInActivity = await this.redisClient.bitcount(
+      `bitmap:action:${activity}:timespan:${weekBeforeLastWeekKey}`,
+    )
+
+    return Math.ceil((lastWeekAndWeekBeforeLastWeekTotalInActivity * 100) / weekBeforeLastWeekTotalInActivity)
+  }
+
   async wasActivityDoneYesterday(activity: AnalyticsActivity, analyticsId: number): Promise<boolean> {
     const bitValue = await this.redisClient.getbit(
       `bitmap:action:${activity}:timespan:${this.getDailyKey(this.getYesterdayDate())}`,
@@ -43,9 +89,13 @@ export class RedisAnalyticsStore implements AnalyticsStoreInterface {
   }
 
   async markActivity(activity: AnalyticsActivity, analyticsId: number): Promise<void> {
-    await this.redisClient.setbit(`bitmap:action:${activity}:timespan:${this.getMonthlyKey()}`, analyticsId, 1)
-    await this.redisClient.setbit(`bitmap:action:${activity}:timespan:${this.getWeeklyKey()}`, analyticsId, 1)
-    await this.redisClient.setbit(`bitmap:action:${activity}:timespan:${this.getDailyKey()}`, analyticsId, 1)
+    const pipeline = this.redisClient.pipeline()
+
+    pipeline.setbit(`bitmap:action:${activity}:timespan:${this.getMonthlyKey()}`, analyticsId, 1)
+    pipeline.setbit(`bitmap:action:${activity}:timespan:${this.getWeeklyKey()}`, analyticsId, 1)
+    pipeline.setbit(`bitmap:action:${activity}:timespan:${this.getDailyKey()}`, analyticsId, 1)
+
+    await pipeline.exec()
   }
 
   async getYesterdayOutOfSyncIncidents(): Promise<number> {
@@ -61,8 +111,12 @@ export class RedisAnalyticsStore implements AnalyticsStoreInterface {
   }
 
   async incrementOutOfSyncIncidents(): Promise<void> {
-    await this.redisClient.incr(`count:action:out-of-sync:timespan:${this.getDailyKey()}`)
-    await this.redisClient.incr(`count:action:out-of-sync:timespan:${this.getMonthlyKey()}`)
+    const pipeline = this.redisClient.pipeline()
+
+    pipeline.incr(`count:action:out-of-sync:timespan:${this.getDailyKey()}`)
+    pipeline.incr(`count:action:out-of-sync:timespan:${this.getMonthlyKey()}`)
+
+    await pipeline.exec()
   }
 
   async getYesterdaySNJSUsage(): Promise<{ version: string; count: number }[]> {
@@ -82,15 +136,21 @@ export class RedisAnalyticsStore implements AnalyticsStoreInterface {
   }
 
   async incrementApplicationVersionUsage(applicationVersion: string): Promise<void> {
-    await this.redisClient.incr(`count:action:application-request:${applicationVersion}:timespan:${this.getDailyKey()}`)
-    await this.redisClient.incr(
-      `count:action:application-request:${applicationVersion}:timespan:${this.getMonthlyKey()}`,
-    )
+    const pipeline = this.redisClient.pipeline()
+
+    pipeline.incr(`count:action:application-request:${applicationVersion}:timespan:${this.getDailyKey()}`)
+    pipeline.incr(`count:action:application-request:${applicationVersion}:timespan:${this.getMonthlyKey()}`)
+
+    await pipeline.exec()
   }
 
   async incrementSNJSVersionUsage(snjsVersion: string): Promise<void> {
-    await this.redisClient.incr(`count:action:snjs-request:${snjsVersion}:timespan:${this.getDailyKey()}`)
-    await this.redisClient.incr(`count:action:snjs-request:${snjsVersion}:timespan:${this.getMonthlyKey()}`)
+    const pipeline = this.redisClient.pipeline()
+
+    pipeline.incr(`count:action:snjs-request:${snjsVersion}:timespan:${this.getDailyKey()}`)
+    pipeline.incr(`count:action:snjs-request:${snjsVersion}:timespan:${this.getMonthlyKey()}`)
+
+    await pipeline.exec()
   }
 
   private async getRequestCountPerVersion(keys: string[]): Promise<{ version: string; count: number }[]> {
@@ -150,9 +210,23 @@ export class RedisAnalyticsStore implements AnalyticsStoreInterface {
     return yesterday
   }
 
+  private getDayBeforeYesterdayDate(): Date {
+    const dayBeforeYesterday = new Date()
+    dayBeforeYesterday.setDate(new Date().getDate() - 2)
+
+    return dayBeforeYesterday
+  }
+
   private getLastWeekDate(): Date {
     const yesterday = new Date()
     yesterday.setDate(new Date().getDate() - 7)
+
+    return yesterday
+  }
+
+  private getWeekBeforeLastWeekDate(): Date {
+    const yesterday = new Date()
+    yesterday.setDate(new Date().getDate() - 14)
 
     return yesterday
   }

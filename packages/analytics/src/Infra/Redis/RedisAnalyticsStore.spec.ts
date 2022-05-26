@@ -5,14 +5,56 @@ import { RedisAnalyticsStore } from './RedisAnalyticsStore'
 
 describe('RedisAnalyticsStore', () => {
   let redisClient: IORedis.Redis
+  let pipeline: IORedis.Pipeline
 
   const createStore = () => new RedisAnalyticsStore(redisClient)
 
   beforeEach(() => {
+    pipeline = {} as jest.Mocked<IORedis.Pipeline>
+    pipeline.incr = jest.fn()
+    pipeline.setbit = jest.fn()
+    pipeline.exec = jest.fn()
+
     redisClient = {} as jest.Mocked<IORedis.Redis>
+    redisClient.pipeline = jest.fn().mockReturnValue(pipeline)
     redisClient.incr = jest.fn()
     redisClient.setbit = jest.fn()
     redisClient.getbit = jest.fn().mockReturnValue(1)
+    redisClient.send_command = jest.fn()
+  })
+
+  it('should calculate activity retention for yesterday', async () => {
+    redisClient.bitcount = jest.fn().mockReturnValueOnce(7).mockReturnValueOnce(10)
+
+    jest.useFakeTimers('modern')
+    jest.setSystemTime(1653395155000)
+    expect(await createStore().calculateActivityRetentionForYesterday(AnalyticsActivity.EditingItems)).toEqual(70)
+    jest.useRealTimers()
+
+    expect(redisClient.send_command).toHaveBeenCalledWith(
+      'BITOP',
+      'AND',
+      'bitmap:action:editing-items:timespan:2022-5-22-2022-5-23',
+      'bitmap:action:editing-items:timespan:2022-5-22',
+      'bitmap:action:editing-items:timespan:2022-5-23',
+    )
+  })
+
+  it('should calculate activity retention for last week', async () => {
+    redisClient.bitcount = jest.fn().mockReturnValueOnce(7).mockReturnValueOnce(10)
+
+    jest.useFakeTimers('modern')
+    jest.setSystemTime(1653395155000)
+    expect(await createStore().calculateActivityRetentionForLastWeek(AnalyticsActivity.EditingItems)).toEqual(70)
+    jest.useRealTimers()
+
+    expect(redisClient.send_command).toHaveBeenCalledWith(
+      'BITOP',
+      'AND',
+      'bitmap:action:editing-items:timespan:2022-week-19-2022-week-20',
+      'bitmap:action:editing-items:timespan:2022-week-19',
+      'bitmap:action:editing-items:timespan:2022-week-20',
+    )
   })
 
   it('shoud tell if activity was done yesterday', async () => {
@@ -57,10 +99,11 @@ describe('RedisAnalyticsStore', () => {
     await createStore().markActivity(AnalyticsActivity.EditingItems, 123)
     jest.useRealTimers()
 
-    expect(redisClient.setbit).toBeCalledTimes(3)
-    expect(redisClient.setbit).toHaveBeenNthCalledWith(1, 'bitmap:action:editing-items:timespan:2022-5', 123, 1)
-    expect(redisClient.setbit).toHaveBeenNthCalledWith(2, 'bitmap:action:editing-items:timespan:2022-week-21', 123, 1)
-    expect(redisClient.setbit).toHaveBeenNthCalledWith(3, 'bitmap:action:editing-items:timespan:2022-5-24', 123, 1)
+    expect(pipeline.setbit).toBeCalledTimes(3)
+    expect(pipeline.setbit).toHaveBeenNthCalledWith(1, 'bitmap:action:editing-items:timespan:2022-5', 123, 1)
+    expect(pipeline.setbit).toHaveBeenNthCalledWith(2, 'bitmap:action:editing-items:timespan:2022-week-21', 123, 1)
+    expect(pipeline.setbit).toHaveBeenNthCalledWith(3, 'bitmap:action:editing-items:timespan:2022-5-24', 123, 1)
+    expect(pipeline.exec).toHaveBeenCalled()
   })
 
   it('should get yesterday out of sync incidents', async () => {
@@ -108,18 +151,21 @@ describe('RedisAnalyticsStore', () => {
   it('should increment application version usage', async () => {
     await createStore().incrementApplicationVersionUsage('1.2.3')
 
-    expect(redisClient.incr).toHaveBeenCalled()
+    expect(pipeline.incr).toHaveBeenCalled()
+    expect(pipeline.exec).toHaveBeenCalled()
   })
 
   it('should increment snjs version usage', async () => {
     await createStore().incrementSNJSVersionUsage('1.2.3')
 
-    expect(redisClient.incr).toHaveBeenCalled()
+    expect(pipeline.incr).toHaveBeenCalled()
+    expect(pipeline.exec).toHaveBeenCalled()
   })
 
   it('should increment out of sync incedent count', async () => {
     await createStore().incrementOutOfSyncIncidents()
 
-    expect(redisClient.incr).toHaveBeenCalled()
+    expect(pipeline.incr).toHaveBeenCalled()
+    expect(pipeline.exec).toHaveBeenCalled()
   })
 })
