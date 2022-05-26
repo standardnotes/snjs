@@ -6,6 +6,42 @@ import { AnalyticsStoreInterface } from '../../Domain/Service/AnalyticsStoreInte
 export class RedisAnalyticsStore implements AnalyticsStoreInterface {
   constructor(private redisClient: IORedis.Redis) {}
 
+  async wasActivityDoneYesterday(activity: AnalyticsActivity, analyticsId: number): Promise<boolean> {
+    const bitValue = await this.redisClient.getbit(
+      `bitmap:action:${activity}:timespan:${this.getDailyKey(this.getYesterdayDate())}`,
+      analyticsId,
+    )
+
+    return bitValue === 1
+  }
+
+  async wasActivityDoneToday(activity: AnalyticsActivity, analyticsId: number): Promise<boolean> {
+    const bitValue = await this.redisClient.getbit(
+      `bitmap:action:${activity}:timespan:${this.getDailyKey()}`,
+      analyticsId,
+    )
+
+    return bitValue === 1
+  }
+
+  async wasActivityDoneLastWeek(activity: AnalyticsActivity, analyticsId: number): Promise<boolean> {
+    const bitValue = await this.redisClient.getbit(
+      `bitmap:action:${activity}:timespan:${this.getWeeklyKey(this.getLastWeekDate())}`,
+      analyticsId,
+    )
+
+    return bitValue === 1
+  }
+
+  async wasActivityDoneThisWeek(activity: AnalyticsActivity, analyticsId: number): Promise<boolean> {
+    const bitValue = await this.redisClient.getbit(
+      `bitmap:action:${activity}:timespan:${this.getWeeklyKey()}`,
+      analyticsId,
+    )
+
+    return bitValue === 1
+  }
+
   async markActivity(activity: AnalyticsActivity, analyticsId: number): Promise<void> {
     await this.redisClient.setbit(`bitmap:action:${activity}:timespan:${this.getMonthlyKey()}`, analyticsId, 1)
     await this.redisClient.setbit(`bitmap:action:${activity}:timespan:${this.getWeeklyKey()}`, analyticsId, 1)
@@ -83,8 +119,8 @@ export class RedisAnalyticsStore implements AnalyticsStoreInterface {
     return `${this.getYear(date)}-${this.getMonth(date)}-${this.getDayOfTheMonth(date)}`
   }
 
-  private getWeeklyKey(): string {
-    const date = new Date()
+  private getWeeklyKey(date?: Date): string {
+    date = date ?? new Date()
 
     const firstJanuary = new Date(date.getFullYear(), 0, 1)
 
@@ -110,6 +146,13 @@ export class RedisAnalyticsStore implements AnalyticsStoreInterface {
   private getYesterdayDate(): Date {
     const yesterday = new Date()
     yesterday.setDate(new Date().getDate() - 1)
+
+    return yesterday
+  }
+
+  private getLastWeekDate(): Date {
+    const yesterday = new Date()
+    yesterday.setDate(new Date().getDate() - 7)
 
     return yesterday
   }

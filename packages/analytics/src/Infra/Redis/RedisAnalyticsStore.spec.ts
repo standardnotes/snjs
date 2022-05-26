@@ -12,6 +12,43 @@ describe('RedisAnalyticsStore', () => {
     redisClient = {} as jest.Mocked<IORedis.Redis>
     redisClient.incr = jest.fn()
     redisClient.setbit = jest.fn()
+    redisClient.getbit = jest.fn().mockReturnValue(1)
+  })
+
+  it('shoud tell if activity was done yesterday', async () => {
+    jest.useFakeTimers('modern')
+    jest.setSystemTime(1653395155000)
+    await createStore().wasActivityDoneYesterday(AnalyticsActivity.EditingItems, 123)
+    jest.useRealTimers()
+
+    expect(redisClient.getbit).toHaveBeenCalledWith('bitmap:action:editing-items:timespan:2022-5-23', 123)
+  })
+
+  it('shoud tell if activity was done today', async () => {
+    jest.useFakeTimers('modern')
+    jest.setSystemTime(1653395155000)
+    await createStore().wasActivityDoneToday(AnalyticsActivity.EditingItems, 123)
+    jest.useRealTimers()
+
+    expect(redisClient.getbit).toHaveBeenCalledWith('bitmap:action:editing-items:timespan:2022-5-24', 123)
+  })
+
+  it('shoud tell if activity was done last week', async () => {
+    jest.useFakeTimers('modern')
+    jest.setSystemTime(1653395155000)
+    await createStore().wasActivityDoneLastWeek(AnalyticsActivity.EditingItems, 123)
+    jest.useRealTimers()
+
+    expect(redisClient.getbit).toHaveBeenCalledWith('bitmap:action:editing-items:timespan:2022-week-20', 123)
+  })
+
+  it('shoud tell if activity was done this week', async () => {
+    jest.useFakeTimers('modern')
+    jest.setSystemTime(1653395155000)
+    await createStore().wasActivityDoneThisWeek(AnalyticsActivity.EditingItems, 123)
+    jest.useRealTimers()
+
+    expect(redisClient.getbit).toHaveBeenCalledWith('bitmap:action:editing-items:timespan:2022-week-21', 123)
   })
 
   it('should set analytics activity', async () => {

@@ -5,6 +5,10 @@ export interface AnalyticsStoreInterface {
   incrementApplicationVersionUsage(applicationVersion: string): Promise<void>
   incrementOutOfSyncIncidents(): Promise<void>
   markActivity(activity: AnalyticsActivity, analyticsId: number): Promise<void>
+  wasActivityDoneYesterday(activity: AnalyticsActivity, analyticsId: number): Promise<boolean>
+  wasActivityDoneToday(activity: AnalyticsActivity, analyticsId: number): Promise<boolean>
+  wasActivityDoneLastWeek(activity: AnalyticsActivity, analyticsId: number): Promise<boolean>
+  wasActivityDoneThisWeek(activity: AnalyticsActivity, analyticsId: number): Promise<boolean>
   getYesterdaySNJSUsage(): Promise<Array<{ version: string; count: number }>>
   getYesterdayApplicationUsage(): Promise<Array<{ version: string; count: number }>>
   getYesterdayOutOfSyncIncidents(): Promise<number>
