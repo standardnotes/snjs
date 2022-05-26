@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.3.1](https://github.com/standardnotes/snjs/compare/@standardnotes/analytics@1.3.0...@standardnotes/analytics@1.3.1) (2022-05-26)
+
+
+### Bug Fixes
+
+* add backup analytics activity ([cf7ae68](https://github.com/standardnotes/snjs/commit/cf7ae68e13aa9403702340da8a3bca35e9273784))
+
+
+
+
+
 # [1.3.0](https://github.com/standardnotes/snjs/compare/@standardnotes/analytics@1.2.0...@standardnotes/analytics@1.3.0) (2022-05-26)
 
 
