@@ -7,7 +7,6 @@ export type CrossServiceTokenData = {
     uuid: Uuid
     email: string
   }
-  analyticsId: number
   roles: Array<Role>
   session?: {
     uuid: Uuid
@@ -18,4 +17,5 @@ export type CrossServiceTokenData = {
     readonly_access: boolean
   }
   extensionKey?: string
+  analyticsId?: number
 }
