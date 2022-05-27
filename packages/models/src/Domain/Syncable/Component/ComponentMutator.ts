@@ -42,6 +42,14 @@ export class ComponentMutator extends DecryptedItemMutator<ComponentContent> {
     this.mutableContent.permissions = permissions
   }
 
+  set name(name: string) {
+    this.mutableContent.name = name
+  }
+
+  set offlineOnly(offlineOnly: boolean) {
+    this.mutableContent.offlineOnly = offlineOnly
+  }
+
   public associateWithItem(uuid: Uuid): void {
     const associated = this.mutableContent.associatedItemIds || []
     addIfUnique(associated, uuid)
