@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.11.0](https://github.com/standardnotes/snjs/compare/@standardnotes/models@1.10.3...@standardnotes/models@1.11.0) (2022-05-27)
+
+
+### Features
+
+* add 'name' and 'offlineOnly' setters to ComponentMutator ([#751](https://github.com/standardnotes/snjs/issues/751)) ([55b1f68](https://github.com/standardnotes/snjs/commit/55b1f687fb25facf925b081871152e4ea7723886))
+
+
+
+
+
 ## [1.10.3](https://github.com/standardnotes/snjs/compare/@standardnotes/models@1.10.2...@standardnotes/models@1.10.3) (2022-05-27)
 
 **Note:** Version bump only for package @standardnotes/models
