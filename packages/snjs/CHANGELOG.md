@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.114.4](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.114.3...@standardnotes/snjs@2.114.4) (2022-05-27)
+
+
+### Bug Fixes
+
+* add dealloced flag to note controller ([22955cc](https://github.com/standardnotes/snjs/commit/22955cc49d4262ff7de6e192c78cbc24b7ea3a32))
+
+
+
+
+
 ## [2.114.3](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.114.2...@standardnotes/snjs@2.114.3) (2022-05-27)
 
 **Note:** Version bump only for package @standardnotes/snjs
