@@ -26,6 +26,7 @@ export type EditorValues = {
 
 export class NoteViewController {
   public note!: SNNote
+  public dealloced = false
   private application: SNApplication
   private innerValueChangeObservers: ((note: SNNote, source: PayloadEmitSource) => void)[] = []
   private removeStreamObserver?: () => void
@@ -46,6 +47,7 @@ export class NoteViewController {
   }
 
   deinit(): void {
+    this.dealloced = true
     this.removeStreamObserver?.()
     ;(this.removeStreamObserver as unknown) = undefined
     ;(this.application as unknown) = undefined

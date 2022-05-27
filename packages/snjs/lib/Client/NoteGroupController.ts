@@ -5,7 +5,7 @@ import { UuidString } from '@Lib/Types/UuidString'
 import { SNApplication } from '../Application/Application'
 import { NoteViewController } from './NoteViewController'
 
-type NoteControllerGroupChangeCallback = (activeController: NoteViewController) => void
+type NoteControllerGroupChangeCallback = (activeController: NoteViewController | undefined) => void
 
 export class NoteGroupController {
   public noteControllers: NoteViewController[] = []
@@ -86,7 +86,7 @@ export class NoteGroupController {
     this.notifyObservers()
   }
 
-  get activeNoteViewController(): NoteViewController {
+  get activeNoteViewController(): NoteViewController | undefined {
     return this.noteControllers[0]
   }
 
