@@ -1113,7 +1113,7 @@ export class SNSyncService
       })
     })
 
-    await this.payloadManager.emitPayloads(payloads, PayloadEmitSource.LocalChanged)
+    await this.payloadManager.emitPayloads(payloads, PayloadEmitSource.InternalChange)
     await this.persistPayloads(payloads)
   }
 

@@ -11,7 +11,7 @@ const MaximumSyncOptions = {
 }
 
 export class AppContext {
-  constructor({ identifier, crypto, email, password, passcode } = {}) {
+  constructor({ identifier, crypto, email, password, passcode, navigationHandler } = {}) {
     if (!identifier) {
       identifier = `${Math.random()}`
     }
@@ -28,11 +28,20 @@ export class AppContext {
       passcode = 'mypasscode'
     }
 
+    if (!crypto) {
+      crypto = new FakeWebCrypto()
+    }
+
+    if (!navigationHandler) {
+      navigationHandler = {}
+    }
+
     this.identifier = identifier
     this.crypto = crypto
     this.email = email
     this.password = password
     this.passcode = passcode
+    this.navigationHandler = navigationHandler
   }
 
   enableLogging() {
@@ -193,7 +202,8 @@ export class AppContext {
     await this.application.prepareForLaunch({
       receiveChallenge: receiveChallenge || this.handleChallenge,
     })
-    await this.application.launch(awaitDatabaseLoad)
+
+    await this.application.launch({ awaitDatabaseLoad, navigationEventHandler: this.navigationHandler })
   }
 
   async deinit() {
@@ -312,5 +322,9 @@ export class AppContext {
       original: note,
       conflict: this.findNoteByTitle('title-2'),
     }
+  }
+
+  sleep(seconds) {
+    return Utils.sleep(seconds)
   }
 }

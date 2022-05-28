@@ -57,12 +57,22 @@ export function BuildSmartViews(
       ...PayloadTimestampDefaults(),
       content: FillItemContent<SmartViewContent>({
         title: 'Trash',
-        predicate: trashedNotesPredicate(options).toJson(),
+        predicate: trashedNotesPredicate().toJson(),
       }),
     }),
   )
 
-  const untagged = new SmartView(
+  const untagged = untaggedNotesSmartView(options)
+
+  if (supportsFileNavigation) {
+    return [notes, files, archived, trash, untagged]
+  } else {
+    return [notes, archived, trash, untagged]
+  }
+}
+
+export function untaggedNotesSmartView(options: FilterDisplayOptions) {
+  return new SmartView(
     new DecryptedPayload({
       uuid: SystemViewId.UntaggedNotes,
       content_type: ContentType.SmartView,
@@ -73,12 +83,6 @@ export function BuildSmartViews(
       }),
     }),
   )
-
-  if (supportsFileNavigation) {
-    return [notes, files, archived, trash, untagged]
-  } else {
-    return [notes, archived, trash, untagged]
-  }
 }
 
 function allNotesPredicate(options: FilterDisplayOptions) {
@@ -140,20 +144,12 @@ function archivedNotesPredicate(options: FilterDisplayOptions) {
   return predicate
 }
 
-function trashedNotesPredicate(options: FilterDisplayOptions) {
+export function trashedNotesPredicate() {
   const subPredicates: Predicate<SNNote>[] = [
     new Predicate('trashed', '=', true),
     new Predicate('content_type', '=', ContentType.Note),
   ]
-  if (options.includeArchived === false) {
-    subPredicates.push(new Predicate('archived', '=', false))
-  }
-  if (options.includeProtected === false) {
-    subPredicates.push(new Predicate('protected', '=', false))
-  }
-  if (options.includePinned === false) {
-    subPredicates.push(new Predicate('pinned', '=', false))
-  }
+
   const predicate = new CompoundPredicate('and', subPredicates)
 
   return predicate

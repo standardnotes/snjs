@@ -1,4 +1,4 @@
-import { ContentType } from '@standardnotes/common'
+import { ContentType, Uuid } from '@standardnotes/common'
 import {
   MutationType,
   ItemsKeyInterface,
@@ -11,6 +11,18 @@ import {
   DeletedItemInterface,
   ItemContent,
   PredicateInterface,
+  FileItem,
+  SNNote,
+  SNTag,
+  DisplayOptions,
+  DecryptedTransferPayload,
+  TagNoteCountChangeObserver,
+  SNComponent,
+  SmartView,
+  SNTheme,
+  DisplayItem,
+  DisplayControllerOptions,
+  ItemDisplayController,
 } from '@standardnotes/models'
 import { AbstractService } from '../Service/AbstractService'
 
@@ -57,6 +69,13 @@ export interface ItemManagerInterface extends AbstractService {
   ): Promise<DecryptedItemInterface[]>
 
   get items(): DecryptedItemInterface[]
+
+  createDisplayController<I extends DisplayItem>(
+    contentTypes: ContentType[],
+    options: DisplayControllerOptions,
+  ): ItemDisplayController<I>
+
+  registerGlobalSmartViews(smartViews: SmartView[]): void
 
   /**
    * Inserts the item as-is by reading its payload value. This function will not
@@ -130,4 +149,101 @@ export interface ItemManagerInterface extends AbstractService {
   ): T[]
 
   subItemsMatchingPredicates<T extends DecryptedItemInterface>(items: T[], predicates: PredicateInterface<T>[]): T[]
+
+  get invalidItems(): EncryptedItemInterface[]
+
+  associateFileWithNote(file: FileItem, note: SNNote): Promise<FileItem>
+
+  disassociateFileWithNote(file: FileItem, note: SNNote): Promise<FileItem>
+
+  getFilesForNote(note: SNNote): FileItem[]
+
+  renameFile(file: FileItem, name: string): Promise<FileItem>
+
+  addTagToNote(note: SNNote, tag: SNTag, addHierarchy: boolean): Promise<SNTag[]>
+
+  /** Creates an unmanaged, un-inserted item from a payload. */
+  createItemFromPayload(payload: DecryptedPayloadInterface): DecryptedItemInterface
+
+  createPayloadFromObject(object: DecryptedTransferPayload): DecryptedPayloadInterface
+
+  get trashedItems(): SNNote[]
+
+  getDisplayableComponents(): (SNComponent | SNTheme)[]
+
+  notesMatchingSmartView(view: SmartView): SNNote[]
+
+  addNoteCountChangeObserver(observer: TagNoteCountChangeObserver): () => void
+
+  allCountableNotesCount(): number
+
+  countableNotesForTag(tag: SNTag | SmartView): number
+
+  findTagByTitle(title: string): SNTag | undefined
+
+  getTagPrefixTitle(tag: SNTag): string | undefined
+
+  getTagLongTitle(tag: SNTag): string
+
+  hasTagsNeedingFoldersMigration(): boolean
+
+  referencesForItem(itemToLookupUuidFor: DecryptedItemInterface, contentType?: ContentType): DecryptedItemInterface[]
+
+  itemsReferencingItem(itemToLookupUuidFor: DecryptedItemInterface, contentType?: ContentType): DecryptedItemInterface[]
+
+  /**
+   * Finds tags with title or component starting with a search query and (optionally) not associated with a note
+   * @param searchQuery - The query string to match
+   * @param note - The note whose tags should be omitted from results
+   * @returns Array containing tags matching search query and not associated with note
+   */
+  searchTags(searchQuery: string, note?: SNNote): SNTag[]
+
+  isValidTagParent(parentTagToLookUpUuidFor: SNTag, childToLookUpUuidFor: SNTag): boolean
+
+  /**
+   * Returns the parent for a tag
+   */
+  getTagParent(itemToLookupUuidFor: SNTag): SNTag | undefined
+
+  /**
+   * Returns the hierarchy of parents for a tag
+   * @returns Array containing all parent tags
+   */
+  getTagParentChain(itemToLookupUuidFor: SNTag): SNTag[]
+
+  /**
+   * Returns all descendants for a tag
+   * @returns Array containing all descendant tags
+   */
+  getTagChildren(itemToLookupUuidFor: SNTag): SNTag[]
+
+  /**
+   * Get tags for a note sorted in natural order
+   * @param note - The note whose tags will be returned
+   * @returns Array containing tags associated with a note
+   */
+  getSortedTagsForNote(note: SNNote): SNTag[]
+
+  isSmartViewTitle(title: string): boolean
+
+  getNoteCount(): number
+
+  /**
+   * Finds an item by UUID.
+   */
+  findItem<T extends DecryptedItemInterface = DecryptedItemInterface>(uuid: Uuid): T | undefined
+
+  /**
+   * Finds an item by predicate.
+   */
+  findItems<T extends DecryptedItemInterface>(uuids: Uuid[]): T[]
+
+  findSureItem<T extends DecryptedItemInterface = DecryptedItemInterface>(uuid: Uuid): T
+
+  /**
+   * @param item item to be checked
+   * @returns Whether the item is a template (unmanaged)
+   */
+  isTemplateItem(item: DecryptedItemInterface): boolean
 }

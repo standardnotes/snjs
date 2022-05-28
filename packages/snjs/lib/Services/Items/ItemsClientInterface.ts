@@ -13,7 +13,6 @@ import {
   DecryptedItemInterface,
   SNComponent,
   SNTheme,
-  DisplayOptions,
 } from '@standardnotes/models'
 import { UuidString } from '@Lib/Types'
 
@@ -37,17 +36,7 @@ export interface ItemsClientInterface {
 
   get trashedItems(): SNNote[]
 
-  setPrimaryItemDisplayOptions(options: DisplayOptions): void
-
-  getDisplayableNotes(): SNNote[]
-
-  getDisplayableTags(): SNTag[]
-
   getDisplayableItemsKeys(): SNItemsKey[]
-
-  getDisplayableFiles(): FileItem[]
-
-  getDisplayableNotesAndFiles(): (SNNote | FileItem)[]
 
   getDisplayableComponents(): (SNComponent | SNTheme)[]
 
@@ -108,8 +97,6 @@ export interface ItemsClientInterface {
   getSortedTagsForNote(note: SNNote): SNTag[]
 
   isSmartViewTitle(title: string): boolean
-
-  getSmartViews(): SmartView[]
 
   getNoteCount(): number
 

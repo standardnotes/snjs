@@ -37,12 +37,17 @@ import { FileDecryptor } from '../UseCase/FileDecryptor'
 
 const OneHundredMb = 100 * 1_000_000
 
+interface ItemsApiForFiles {
+  setItemToBeDeleted: ItemManagerInterface['setItemToBeDeleted']
+  createItem: ItemManagerInterface['createItem']
+}
+
 export class FileService extends AbstractService implements FilesClientInterface {
   private encryptedCache: FileMemoryCache = new FileMemoryCache(OneHundredMb)
 
   constructor(
     private api: FilesApiInterface,
-    private itemManager: ItemManagerInterface,
+    private itemManager: ItemsApiForFiles,
     private syncService: SyncServiceInterface,
     private encryptor: EncryptionProvider,
     private challengor: ChallengeServiceInterface,

@@ -1,0 +1,50 @@
+import { DisplayOptions, FileItem, SmartView, SNNote } from '@standardnotes/models';
+import { ItemManagerChangeData } from '@standardnotes/services';
+import { NavigationEventHandler } from '../Interface/EventHandler';
+import { ItemsApiForNavigationController } from '../Interface/ItemsApi';
+import { NavigationControllerInterface } from '../Interface/NavigationControllerInterface';
+import { Folder, SupportedItem, NavigationControllerConfig } from '../Interface/Types';
+export declare class NavigationController implements NavigationControllerInterface {
+    private items;
+    private readonly config;
+    private eventHandler;
+    private notes;
+    private folders;
+    private files;
+    private selectedItems;
+    private navigationDisplayController;
+    private folderDisplayController;
+    private fileDisplayController;
+    private systemSmartViews;
+    private disposers;
+    constructor(items: ItemsApiForNavigationController, config: NavigationControllerConfig, eventHandler: NavigationEventHandler);
+    deinit(): void;
+    handleNotesStream(_stream: ItemManagerChangeData<SNNote>): void;
+    private handleFilesStream;
+    private handleFoldersStream;
+    private handleSelectionUpdatesForStream;
+    selectItems(items: SupportedItem[], { multipleSelection }?: {
+        multipleSelection: boolean;
+    }): void;
+    deselectItems(items: {
+        uuid: SupportedItem['uuid'];
+        content_type: SupportedItem['content_type'];
+    }[]): void;
+    private notifyEventHandlerOfChangeInSelection;
+    getNotes(): SNNote[];
+    getFolders(): Folder[];
+    getFiles(): FileItem[];
+    getNotesAndFiles(): (SNNote | FileItem)[];
+    private allSelectedItems;
+    getSelectedNotes(): SNNote[];
+    getSelectedNotesAndFiles(): (SNNote | FileItem)[];
+    getSelectedFolders(): Folder[];
+    getSelectedFiles(): FileItem[];
+    getFilesForSelectedNotes(): FileItem[];
+    setDisplayOptions(options: DisplayOptions): void;
+    private rebuildSystemSmartViews;
+    get allNotesSmartView(): SmartView;
+    get archivedSmartView(): SmartView;
+    get trashSmartView(): SmartView;
+    get untaggedNotesSmartView(): SmartView;
+}

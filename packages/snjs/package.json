@@ -90,6 +90,7 @@
     "@standardnotes/services": "^1.13.5",
     "@standardnotes/settings": "^1.14.3",
     "@standardnotes/sncrypto-common": "^1.9.0",
-    "@standardnotes/utils": "^1.6.10"
+    "@standardnotes/utils": "^1.6.10",
+    "@standardnotes/navigation": "1.0.0"
   }
 }

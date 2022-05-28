@@ -11,6 +11,8 @@ import {
   FillItemContent,
   PayloadTimestampDefaults,
   NoteContent,
+  SmartView,
+  untaggedNotesSmartView,
 } from '@standardnotes/models'
 
 const setupRandomUuid = () => {
@@ -159,25 +161,6 @@ describe('itemManager', () => {
       await payloadManager.emitPayload(encrypted, Models.PayloadEmitSource.LocalInserted)
 
       expect(mockFn.mock.calls[0][2]).toHaveLength(1)
-    })
-  })
-
-  describe('note display criteria', () => {
-    it('viewing notes with tag', async () => {
-      itemManager = createService()
-      const tag = createTag('parent')
-      const note = createNote('note')
-      await itemManager.insertItems([tag, note])
-      await itemManager.addTagToNote(note, tag, false)
-
-      itemManager.setPrimaryItemDisplayOptions({
-        tags: [tag],
-        sortBy: 'title',
-        sortDirection: 'asc',
-      })
-
-      const notes = itemManager.getDisplayableNotes()
-      expect(notes).toHaveLength(1)
     })
   })
 
@@ -347,30 +330,6 @@ describe('itemManager', () => {
       expect(uuidChain).toEqual([greatGrandParent.uuid, grandParent.uuid, parent.uuid])
     })
 
-    it('viewing notes for parent tag should not display notes of children', async () => {
-      itemManager = createService()
-      const parentTag = createTag('parent')
-      const childTag = createTag('child')
-      await itemManager.insertItems([parentTag, childTag])
-      await itemManager.setTagParent(parentTag, childTag)
-
-      const parentNote = createNote('parentNote')
-      const childNote = createNote('childNote')
-      await itemManager.insertItems([parentNote, childNote])
-
-      await itemManager.addTagToNote(parentNote, parentTag, false)
-      await itemManager.addTagToNote(childNote, childTag, false)
-
-      itemManager.setPrimaryItemDisplayOptions({
-        tags: [parentTag],
-        sortBy: 'title',
-        sortDirection: 'asc',
-      })
-
-      const notes = itemManager.getDisplayableNotes()
-      expect(notes).toHaveLength(1)
-    })
-
     it('adding a note to a tag hierarchy should add the note to its parent too', async () => {
       itemManager = createService()
       const parentTag = createTag('parent')
@@ -420,7 +379,6 @@ describe('itemManager', () => {
       expect(!!item).toEqual(true)
       /* Template items should never be added to the record */
       expect(itemManager.items).toHaveLength(0)
-      expect(itemManager.getDisplayableNotes()).toHaveLength(0)
     })
 
     it('isTemplateItem return the correct value', async () => {
@@ -437,21 +395,6 @@ describe('itemManager', () => {
       await itemManager.insertItem(item)
 
       expect(itemManager.isTemplateItem(item)).toEqual(false)
-    })
-
-    it('isTemplateItem return the correct value for system smart views', () => {
-      itemManager = createService()
-      setupRandomUuid()
-
-      const [systemTag1, ...restOfSystemViews] = itemManager
-        .getSmartViews()
-        .filter((view) => Object.values(Models.SystemViewId).includes(view.uuid as Models.SystemViewId))
-
-      const isSystemTemplate = itemManager.isTemplateItem(systemTag1)
-      expect(isSystemTemplate).toEqual(false)
-
-      const areTemplates = restOfSystemViews.map((tag) => itemManager.isTemplateItem(tag)).every((value) => !!value)
-      expect(areTemplates).toEqual(false)
     })
   })
 
@@ -630,7 +573,7 @@ describe('itemManager', () => {
     })
 
     const view = itemManager.findItem(tag.uuid) as Models.SmartView
-    const views = itemManager.getSmartViews()
+    const views = itemManager.getItems<SmartView>(ContentType.SmartView)
 
     expect(view.title).toEqual('New Title')
     expect(views.some((tag: Models.SmartView) => tag.title === 'New Title')).toEqual(true)
@@ -651,7 +594,7 @@ describe('itemManager', () => {
     itemManager = createService()
     setupRandomUuid()
 
-    const view = itemManager.untaggedNotesSmartView
+    const view = untaggedNotesSmartView({})
 
     const tag = createTag('tag')
     const untaggedNote = createNote('note')

@@ -1,3 +1,6 @@
+import { NavigationController } from './../../../navigation/src/Domain/Controller/NavigationController'
+import { NavigationControllerInterface } from './../../../navigation/src/Domain/Interface/NavigationControllerInterface'
+import { NavigationEventHandler } from './../../../navigation/src/Domain/Interface/EventHandler'
 import * as Common from '@standardnotes/common'
 import * as ExternalServices from '@standardnotes/services'
 import * as Encryption from '@standardnotes/encryption'
@@ -96,6 +99,7 @@ export class SNApplication
   private integrityService!: ExternalServices.IntegrityService
   private statusService!: ExternalServices.StatusService
   private filesBackupService?: Files.FilesBackupService
+  private navigationController!: NavigationControllerInterface
 
   private internalEventBus!: ExternalServices.InternalEventBusInterface
 
@@ -260,7 +264,13 @@ export class SNApplication
    * @param awaitDatabaseLoad
    * Option to await database load before marking the app as ready.
    */
-  public async launch(awaitDatabaseLoad = false): Promise<void> {
+  public async launch({
+    navigationEventHandler,
+    awaitDatabaseLoad,
+  }: {
+    navigationEventHandler: NavigationEventHandler
+    awaitDatabaseLoad?: boolean
+  }): Promise<void> {
     this.launched = false
 
     const launchChallenge = this.getLaunchChallenge()
@@ -287,14 +297,14 @@ export class SNApplication
     this.apiService.loadHost()
     this.webSocketsService.loadWebSocketUrl()
     this.sessionManager.initializeFromDisk()
-
     this.settingsService.initializeFromDisk()
-
     this.featuresService.initializeFromDisk()
 
     this.launched = true
     await this.notifyEvent(ApplicationEvent.Launched)
     await this.handleStage(ExternalServices.ApplicationStage.Launched_10)
+
+    this.navigationController = new NavigationController(this.itemManager, this.options, navigationEventHandler)
 
     const databasePayloads = await this.syncService.getDatabasePayloads()
     await this.handleStage(ExternalServices.ApplicationStage.LoadingDatabase_11)
@@ -744,6 +754,9 @@ export class SNApplication
     for (const service of this.services) {
       service.deinit()
     }
+
+    this.navigationController.deinit()
+    ;(this.navigationController as unknown) = undefined
 
     this.options.crypto.deinit()
     ;(this.options as unknown) = undefined

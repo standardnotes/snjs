@@ -1,5 +1,5 @@
 import { ContentType, Uuid } from '@standardnotes/common'
-import { assert, naturalSort, removeFromArray, UuidGenerator, Uuids } from '@standardnotes/utils'
+import { naturalSort, removeFromArray, UuidGenerator, Uuids } from '@standardnotes/utils'
 import { ItemsKeyMutator, SNItemsKey } from '@standardnotes/encryption'
 import { PayloadManager } from '../Payloads/PayloadManager'
 import { TagsToFoldersMigrationApplicator } from '../../Migrations/Applicators/TagsToFolders'
@@ -11,6 +11,7 @@ import { ItemsClientInterface } from './ItemsClientInterface'
 import { PayloadManagerChangeData } from '../Payloads'
 import { DiagnosticInfo } from '@standardnotes/services'
 import { ApplicationDisplayOptions } from '@Lib/Application/Options/OptionalOptions'
+import { DisplayControllerOptions, DisplayItem } from '@standardnotes/models'
 
 type ItemsChangeObserver<I extends Models.DecryptedItemInterface = Models.DecryptedItemInterface> = {
   contentType: ContentType[]
@@ -32,16 +33,16 @@ export class ItemManager
   private unsubChangeObserver: () => void
   private observers: ItemsChangeObserver[] = []
   private collection!: Models.ItemCollection
-  private systemSmartViews: Models.SmartView[]
+
   private tagNotesIndex!: Models.TagNotesIndex
 
-  private navigationDisplayController!: Models.ItemDisplayController<Models.SNNote | Models.FileItem>
-  private tagDisplayController!: Models.ItemDisplayController<Models.SNTag>
   private itemsKeyDisplayController!: Models.ItemDisplayController<SNItemsKey>
   private componentDisplayController!: Models.ItemDisplayController<Models.SNComponent>
   private themeDisplayController!: Models.ItemDisplayController<Models.SNTheme>
-  private fileDisplayController!: Models.ItemDisplayController<Models.FileItem>
+
   private smartViewDisplayController!: Models.ItemDisplayController<Models.SmartView>
+  private externalDisplayControllers: Models.ItemDisplayController<DisplayItem>[] = []
+  private globalSmartViews?: Models.SmartView[]
 
   constructor(
     private payloadManager: PayloadManager,
@@ -50,32 +51,29 @@ export class ItemManager
   ) {
     super(internalEventBus)
     this.payloadManager = payloadManager
-    this.systemSmartViews = this.rebuildSystemSmartViews({})
+
     this.createCollection()
     this.unsubChangeObserver = this.payloadManager.addObserver(ContentType.Any, this.setPayloads.bind(this))
   }
 
-  private rebuildSystemSmartViews(criteria: Models.FilterDisplayOptions): Models.SmartView[] {
-    this.systemSmartViews = Models.BuildSmartViews(criteria, this.options)
-    return this.systemSmartViews
+  public createDisplayController<I extends DisplayItem>(
+    contentTypes: ContentType[],
+    options: DisplayControllerOptions,
+  ): Models.ItemDisplayController<I> {
+    const controller = new Models.ItemDisplayController<I>(this.collection, contentTypes, options)
+
+    this.externalDisplayControllers.push(controller)
+
+    return controller
+  }
+
+  public registerGlobalSmartViews(smartViews: Models.SmartView[]): void {
+    this.globalSmartViews = smartViews
   }
 
   private createCollection() {
     this.collection = new Models.ItemCollection()
 
-    this.navigationDisplayController = new Models.ItemDisplayController(
-      this.collection,
-      [ContentType.Note, ContentType.File],
-      {
-        sortBy: 'created_at',
-        sortDirection: 'dsc',
-        hiddenContentTypes: !this.options.supportsFileNavigation ? [ContentType.File] : [],
-      },
-    )
-    this.tagDisplayController = new Models.ItemDisplayController(this.collection, [ContentType.Tag], {
-      sortBy: 'title',
-      sortDirection: 'asc',
-    })
     this.itemsKeyDisplayController = new Models.ItemDisplayController(this.collection, [ContentType.ItemsKey], {
       sortBy: 'created_at',
       sortDirection: 'asc',
@@ -92,23 +90,17 @@ export class ItemManager
       sortBy: 'title',
       sortDirection: 'asc',
     })
-    this.fileDisplayController = new Models.ItemDisplayController(this.collection, [ContentType.File], {
-      sortBy: 'title',
-      sortDirection: 'asc',
-    })
 
     this.tagNotesIndex = new Models.TagNotesIndex(this.collection, this.tagNotesIndex?.observers)
   }
 
   private get allDisplayControllers(): Models.ItemDisplayController<Models.DisplayItem>[] {
     return [
-      this.navigationDisplayController,
-      this.tagDisplayController,
       this.itemsKeyDisplayController,
       this.componentDisplayController,
       this.themeDisplayController,
       this.smartViewDisplayController,
-      this.fileDisplayController,
+      ...this.externalDisplayControllers,
     ]
   }
 
@@ -122,84 +114,6 @@ export class ItemManager
 
   public createPayloadFromObject(object: Models.DecryptedTransferPayload): Models.DecryptedPayloadInterface {
     return new Models.DecryptedPayload(object)
-  }
-
-  public setPrimaryItemDisplayOptions(options: Models.DisplayOptions): void {
-    const override: Models.FilterDisplayOptions = {}
-
-    if (options.views && options.views.find((view) => view.uuid === Models.SystemViewId.AllNotes)) {
-      if (options.includeArchived == undefined) {
-        override.includeArchived = false
-      }
-      if (options.includeTrashed == undefined) {
-        override.includeTrashed = false
-      }
-    }
-    if (options.views && options.views.find((view) => view.uuid === Models.SystemViewId.ArchivedNotes)) {
-      if (options.includeTrashed == undefined) {
-        override.includeTrashed = false
-      }
-    }
-    if (options.views && options.views.find((view) => view.uuid === Models.SystemViewId.TrashedNotes)) {
-      if (options.includeArchived == undefined) {
-        override.includeArchived = true
-      }
-    }
-
-    this.rebuildSystemSmartViews({ ...options, ...override })
-
-    const mostRecentVersionOfTags = options.tags
-      ?.map((tag) => {
-        return this.collection.find(tag.uuid) as Models.SNTag
-      })
-      .filter((tag) => tag != undefined)
-
-    const mostRecentVersionOfViews = options.views
-      ?.map((view) => {
-        if (Models.isSystemView(view)) {
-          return this.systemSmartViews.find((systemView) => systemView.uuid === view.uuid) as Models.SmartView
-        }
-        return this.collection.find(view.uuid) as Models.SmartView
-      })
-      .filter((view) => view != undefined)
-
-    const updatedOptions: Models.DisplayOptions = {
-      ...options,
-      ...override,
-      ...{
-        tags: mostRecentVersionOfTags,
-        views: mostRecentVersionOfViews,
-      },
-    }
-
-    this.navigationDisplayController.setDisplayOptions({
-      customFilter: Models.computeUnifiedFilterForDisplayOptions(updatedOptions, this.collection),
-      ...updatedOptions,
-    })
-  }
-
-  public getDisplayableNotes(): Models.SNNote[] {
-    assert(this.navigationDisplayController.contentTypes.length === 2)
-
-    const fileContentTypeHidden = !this.options.supportsFileNavigation
-    if (fileContentTypeHidden) {
-      return this.navigationDisplayController.items() as Models.SNNote[]
-    } else {
-      return this.navigationDisplayController.items().filter(Models.isNote)
-    }
-  }
-
-  public getDisplayableFiles(): Models.FileItem[] {
-    return this.fileDisplayController.items()
-  }
-
-  public getDisplayableNotesAndFiles(): (Models.SNNote | Models.FileItem)[] {
-    assert(this.options.supportsFileNavigation)
-    return this.navigationDisplayController.items()
-  }
-
-  public getDisplayableTags(): Models.SNTag[] {
-    return this.tagDisplayController.items()
   }
 
   public getDisplayableItemsKeys(): SNItemsKey[] {
@@ -217,13 +131,11 @@ export class ItemManager
     ;(this.payloadManager as unknown) = undefined
     ;(this.collection as unknown) = undefined
     ;(this.tagNotesIndex as unknown) = undefined
-    ;(this.tagDisplayController as unknown) = undefined
-    ;(this.navigationDisplayController as unknown) = undefined
     ;(this.itemsKeyDisplayController as unknown) = undefined
     ;(this.componentDisplayController as unknown) = undefined
     ;(this.themeDisplayController as unknown) = undefined
-    ;(this.fileDisplayController as unknown) = undefined
     ;(this.smartViewDisplayController as unknown) = undefined
+    ;(this.externalDisplayControllers as unknown) = undefined
   }
 
   resetState(): void {
@@ -247,7 +159,7 @@ export class ItemManager
   }
 
   private findSystemSmartView(uuid: Uuid): Models.SmartView | undefined {
-    return this.systemSmartViews.find((view) => view.uuid === uuid)
+    return this.globalSmartViews?.find((view) => view.uuid === uuid)
   }
 
   findSureItem<T extends Models.DecryptedItemInterface = Models.DecryptedItemInterface>(uuid: UuidString): T {
@@ -929,12 +841,13 @@ export class ItemManager
   }
 
   public getRootTags(): Models.SNTag[] {
-    return this.getDisplayableTags().filter((tag) => tag.parentId === undefined)
+    return this.getItems<Models.SNTag>(ContentType.Tag).filter((tag) => tag.parentId === undefined)
   }
 
   public findTagByTitle(title: string): Models.SNTag | undefined {
     const lowerCaseTitle = title.toLowerCase()
-    return this.getDisplayableTags().find((tag) => tag.title?.toLowerCase() === lowerCaseTitle)
+
+    return this.getItems<Models.SNTag>(ContentType.Tag).find((tag) => tag.title?.toLowerCase() === lowerCaseTitle)
   }
 
   public findTagByTitleAndParent(title: string, parentItemToLookupUuidFor?: Models.SNTag): Models.SNTag | undefined {
@@ -953,7 +866,7 @@ export class ItemManager
    */
   public searchTags(searchQuery: string, note?: Models.SNNote): Models.SNTag[] {
     return naturalSort(
-      this.getDisplayableTags().filter((tag) => {
+      this.getItems<Models.SNTag>(ContentType.Tag).filter((tag) => {
         const expandedTitle = this.getTagLongTitle(tag)
         const matchesQuery = expandedTitle.toLowerCase().includes(searchQuery.toLowerCase())
         const tagInNote = note ? this.itemsReferencingItem(note).some((item) => item?.uuid === tag.uuid) : false
@@ -1229,24 +1142,8 @@ export class ItemManager
     ) as Models.SNNote[]
   }
 
-  public get allNotesSmartView(): Models.SmartView {
-    return this.systemSmartViews.find((tag) => tag.uuid === Models.SystemViewId.AllNotes) as Models.SmartView
-  }
-
-  public get archivedSmartView(): Models.SmartView {
-    return this.systemSmartViews.find((tag) => tag.uuid === Models.SystemViewId.ArchivedNotes) as Models.SmartView
-  }
-
-  public get trashSmartView(): Models.SmartView {
-    return this.systemSmartViews.find((tag) => tag.uuid === Models.SystemViewId.TrashedNotes) as Models.SmartView
-  }
-
-  public get untaggedNotesSmartView(): Models.SmartView {
-    return this.systemSmartViews.find((tag) => tag.uuid === Models.SystemViewId.UntaggedNotes) as Models.SmartView
-  }
-
   public get trashedItems(): Models.SNNote[] {
-    return this.notesMatchingSmartView(this.trashSmartView)
+    return this.itemsMatchingPredicate(ContentType.Note, Models.trashedNotesPredicate()).filter(Models.isNote)
   }
 
   /**
@@ -1255,14 +1152,6 @@ export class ItemManager
   public async emptyTrash(): Promise<void> {
     const notes = this.trashedItems
     await this.setItemsToBeDeleted(notes)
-  }
-
-  /**
-   * Returns all smart views, sorted by title.
-   */
-  public getSmartViews(): Models.SmartView[] {
-    const userTags = this.smartViewDisplayController.items()
-    return this.systemSmartViews.concat(userTags)
   }
 
   /**

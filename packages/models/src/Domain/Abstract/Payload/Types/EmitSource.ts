@@ -2,6 +2,8 @@ export enum PayloadEmitSource {
   /** When an observer registers to stream items, the items are pushed immediately to the observer */
   InitialObserverRegistrationPush = 1,
 
+  InternalChange,
+
   /**
    * Payload when a client modifies item property then maps it to update UI.
    * This also indicates that the item was dirtied
@@ -30,12 +32,13 @@ export enum PayloadEmitSource {
   RemoteSaved,
 }
 
-/**
- * Whether the changed payload represents only an internal change that shouldn't
- * require a UI refresh
- */
-export function isPayloadSourceInternalChange(source: PayloadEmitSource): boolean {
-  return [PayloadEmitSource.RemoteSaved, PayloadEmitSource.PreSyncSave].includes(source)
+export function isPayloadSourceNotInterestingToClients(source: PayloadEmitSource): boolean {
+  return [
+    PayloadEmitSource.InternalChange,
+    PayloadEmitSource.RemoteSaved,
+    PayloadEmitSource.PreSyncSave,
+    PayloadEmitSource.OfflineSyncSaved,
+  ].includes(source)
 }
 
 export function isPayloadSourceRetrieved(source: PayloadEmitSource): boolean {
