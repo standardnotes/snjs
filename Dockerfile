@@ -31,6 +31,7 @@ COPY --chown=$UID:$GID packages/features/package.json /var/www/packages/features
 COPY --chown=$UID:$GID packages/filepicker/package.json /var/www/packages/filepicker/package.json
 COPY --chown=$UID:$GID packages/files/package.json /var/www/packages/files/package.json
 COPY --chown=$UID:$GID packages/models/package.json /var/www/packages/models/package.json
+COPY --chown=$UID:$GID packages/navigation/package.json /var/www/packages/navigation/package.json
 COPY --chown=$UID:$GID packages/responses/package.json /var/www/packages/responses/package.json
 COPY --chown=$UID:$GID packages/services/package.json /var/www/packages/services/package.json
 COPY --chown=$UID:$GID packages/settings/package.json /var/www/packages/settings/package.json
