@@ -72,8 +72,8 @@ describe('items', () => {
     const params2 = Factory.createNotePayload()
     await this.application.itemManager.emitItemsFromPayloads([params1, params2], PayloadEmitSource.LocalChanged)
 
-    let item1 = this.application.itemManager.getDisplayableNotes()[0]
-    let item2 = this.application.itemManager.getDisplayableNotes()[1]
+    let item1 = this.application.navigation.getNotes()[0]
+    let item2 = this.application.navigation.getNotes()[1]
 
     expect(item1.isItemContentEqualWith(item2)).to.equal(true)
 
@@ -177,8 +177,8 @@ describe('items', () => {
     const params2 = Factory.createNotePayload()
     await this.application.itemManager.emitItemsFromPayloads([params1, params2], PayloadEmitSource.LocalChanged)
 
-    let item1 = this.application.itemManager.getDisplayableNotes()[0]
-    const item2 = this.application.itemManager.getDisplayableNotes()[1]
+    let item1 = this.application.navigation.getNotes()[0]
+    const item2 = this.application.navigation.getNotes()[1]
 
     item1 = await this.application.mutator.changeAndSaveItem(
       item1,

@@ -110,7 +110,7 @@ describe('2020-01-15 mobile migration', () => {
       await application.prepareForLaunch({
         receiveChallenge,
       })
-      await application.launch(true)
+      await application.launch({ awaitDatabaseLoad: true })
 
       expect(application.protocolService.rootKeyEncryption.keyMode).to.equal(KeyMode.RootKeyPlusWrapper)
 
@@ -135,8 +135,8 @@ describe('2020-01-15 mobile migration', () => {
       expect(keychainValue).to.not.be.ok
 
       /** Expect note is decrypted */
-      expect(application.itemManager.getDisplayableNotes().length).to.equal(1)
-      const retrievedNote = application.itemManager.getDisplayableNotes()[0]
+      expect(application.navigation.getNotes().length).to.equal(1)
+      const retrievedNote = application.navigation.getNotes()[0]
       expect(retrievedNote.uuid).to.equal(notePayload.uuid)
       expect(retrievedNote.content.text).to.equal(notePayload.content.text)
 
@@ -165,7 +165,7 @@ describe('2020-01-15 mobile migration', () => {
       await application.prepareForLaunch({
         receiveChallenge,
       })
-      await application.launch(true)
+      await application.launch({ awaitDatabaseLoad: true })
       expect(await application.getUser().email).to.equal(identifier)
       expect(await application.getHost()).to.equal(customServer)
       const preferences = await application.diskStorageService.getValue('preferences')
@@ -253,7 +253,7 @@ describe('2020-01-15 mobile migration', () => {
       receiveChallenge: receiveChallenge,
     })
     expect(application.protocolService.rootKeyEncryption.keyMode).to.equal(KeyMode.WrapperOnly)
-    await application.launch(true)
+    await application.launch({ awaitDatabaseLoad: true })
     /** Should be decrypted */
     const storageMode = application.diskStorageService.domainKeyForMode(StorageValueModes.Default)
     const valueStore = application.diskStorageService.values[storageMode]
@@ -271,8 +271,8 @@ describe('2020-01-15 mobile migration', () => {
     expect(keychainValue).to.not.be.ok
 
     /** Expect note is decrypted */
-    expect(application.itemManager.getDisplayableNotes().length).to.equal(1)
-    const retrievedNote = application.itemManager.getDisplayableNotes()[0]
+    expect(application.navigation.getNotes().length).to.equal(1)
+    const retrievedNote = application.navigation.getNotes()[0]
     expect(retrievedNote.uuid).to.equal(notePayload.uuid)
     expect(retrievedNote.content.text).to.equal(notePayload.content.text)
     expect(
@@ -364,9 +364,9 @@ describe('2020-01-15 mobile migration', () => {
       receiveChallenge: receiveChallenge,
     })
     expect(application.protocolService.rootKeyEncryption.keyMode).to.equal(KeyMode.WrapperOnly)
-    await application.launch(true)
+    await application.launch({ awaitDatabaseLoad: true })
 
-    const retrievedNote = application.itemManager.getDisplayableNotes()[0]
+    const retrievedNote = application.navigation.getNotes()[0]
     expect(retrievedNote.errorDecrypting).to.not.be.ok
 
     /** application should not crash */
@@ -445,7 +445,7 @@ describe('2020-01-15 mobile migration', () => {
     await application.prepareForLaunch({
       receiveChallenge: receiveChallenge,
     })
-    await application.launch(true)
+    await application.launch({ awaitDatabaseLoad: true })
 
     expect(application.protocolService.rootKeyEncryption.keyMode).to.equal(KeyMode.RootKeyOnly)
     /** Should be decrypted */
@@ -463,8 +463,8 @@ describe('2020-01-15 mobile migration', () => {
     expect(typeof keyParams).to.equal('object')
 
     /** Expect note is decrypted */
-    expect(application.itemManager.getDisplayableNotes().length).to.equal(1)
-    const retrievedNote = application.itemManager.getDisplayableNotes()[0]
+    expect(application.navigation.getNotes().length).to.equal(1)
+    const retrievedNote = application.navigation.getNotes()[0]
     expect(retrievedNote.uuid).to.equal(notePayload.uuid)
     expect(retrievedNote.content.text).to.equal(notePayload.content.text)
     expect(
@@ -558,7 +558,7 @@ describe('2020-01-15 mobile migration', () => {
     await application.prepareForLaunch({
       receiveChallenge: receiveChallenge,
     })
-    await application.launch(true)
+    await application.launch({ awaitDatabaseLoad: true })
 
     /** Recovery migration is non-blocking, so let's block for it */
     await Factory.sleep(1.0)
@@ -576,8 +576,8 @@ describe('2020-01-15 mobile migration', () => {
     expect(application.protocolService.rootKeyEncryption.keyMode).to.equal(KeyMode.RootKeyOnly)
 
     /** Expect note is decrypted */
-    expect(application.itemManager.getDisplayableNotes().length).to.equal(1)
-    const retrievedNote = application.itemManager.getDisplayableNotes()[0]
+    expect(application.navigation.getNotes().length).to.equal(1)
+    const retrievedNote = application.navigation.getNotes()[0]
     expect(retrievedNote.uuid).to.equal(notePayload.uuid)
     expect(retrievedNote.content.text).to.equal(notePayload.content.text)
     expect(await application.getUser().email).to.equal(email)
@@ -638,14 +638,14 @@ describe('2020-01-15 mobile migration', () => {
     await application.prepareForLaunch({
       receiveChallenge: receiveChallenge,
     })
-    await application.launch(true)
+    await application.launch({ awaitDatabaseLoad: true })
 
     const itemsKey = application.itemManager.getDisplayableItemsKeys()[0]
     expect(itemsKey.keyVersion).to.equal(ProtocolVersion.V002)
 
     /** Expect note is decrypted */
-    expect(application.itemManager.getDisplayableNotes().length).to.equal(1)
-    const retrievedNote = application.itemManager.getDisplayableNotes()[0]
+    expect(application.navigation.getNotes().length).to.equal(1)
+    const retrievedNote = application.navigation.getNotes()[0]
     expect(retrievedNote.uuid).to.equal(notePayload.uuid)
     expect(retrievedNote.content.text).to.equal(notePayload.content.text)
 
@@ -708,14 +708,14 @@ describe('2020-01-15 mobile migration', () => {
     await application.prepareForLaunch({
       receiveChallenge: receiveChallenge,
     })
-    await application.launch(true)
+    await application.launch({ awaitDatabaseLoad: true })
 
     const itemsKey = application.itemManager.getDisplayableItemsKeys()[0]
     expect(itemsKey.keyVersion).to.equal(ProtocolVersion.V001)
 
     /** Expect note is decrypted */
-    expect(application.itemManager.getDisplayableNotes().length).to.equal(1)
-    const retrievedNote = application.itemManager.getDisplayableNotes()[0]
+    expect(application.navigation.getNotes().length).to.equal(1)
+    const retrievedNote = application.navigation.getNotes()[0]
     expect(retrievedNote.uuid).to.equal(notePayload.uuid)
     expect(retrievedNote.content.text).to.equal(notePayload.content.text)
 
@@ -748,7 +748,7 @@ describe('2020-01-15 mobile migration', () => {
     })
 
     await application.prepareForLaunch({ receiveChallenge: () => {} })
-    await application.launch(true)
+    await application.launch({ awaitDatabaseLoad: true })
 
     expect(application.apiService.getSession()).to.be.ok
 
@@ -776,7 +776,7 @@ describe('2020-01-15 mobile migration', () => {
     })
 
     await application.prepareForLaunch({ receiveChallenge: () => {} })
-    await application.launch(true)
+    await application.launch({ awaitDatabaseLoad: true })
 
     expect(application.apiService.getSession()).to.be.ok
 
@@ -833,7 +833,7 @@ describe('2020-01-15 mobile migration', () => {
     await application.prepareForLaunch({
       receiveChallenge: receiveChallenge,
     })
-    await application.launch(true)
+    await application.launch({ awaitDatabaseLoad: true })
 
     expect(application.protocolService.rootKeyEncryption.keyMode).to.equal(KeyMode.RootKeyNone)
     /** Should be decrypted */
@@ -846,8 +846,8 @@ describe('2020-01-15 mobile migration', () => {
     expect(application.protocolService.rootKeyEncryption.keyMode).to.equal(KeyMode.RootKeyNone)
 
     /** Expect note is decrypted */
-    expect(application.itemManager.getDisplayableNotes().length).to.equal(1)
-    const retrievedNote = application.itemManager.getDisplayableNotes()[0]
+    expect(application.navigation.getNotes().length).to.equal(1)
+    const retrievedNote = application.navigation.getNotes()[0]
     expect(retrievedNote.uuid).to.equal(notePayload.uuid)
     expect(retrievedNote.content.text).to.equal(notePayload.content.text)
     expect(
@@ -969,7 +969,7 @@ describe('2020-01-15 mobile migration', () => {
       await application.prepareForLaunch({
         receiveChallenge,
       })
-      await application.launch(true)
+      await application.launch({ awaitDatabaseLoad: true })
 
       expect(application.protocolService.rootKeyEncryption.keyMode).to.equal(KeyMode.RootKeyPlusWrapper)
 
@@ -994,8 +994,8 @@ describe('2020-01-15 mobile migration', () => {
       expect(keychainValue).to.not.be.ok
 
       /** Expect note is decrypted */
-      expect(application.itemManager.getDisplayableNotes().length).to.equal(1)
-      const retrievedNote = application.itemManager.getDisplayableNotes()[0]
+      expect(application.navigation.getNotes().length).to.equal(1)
+      const retrievedNote = application.navigation.getNotes()[0]
       expect(retrievedNote.uuid).to.equal(notePayload.uuid)
       expect(retrievedNote.content.text).to.equal(notePayload.content.text)
 
@@ -1023,7 +1023,7 @@ describe('2020-01-15 mobile migration', () => {
       await application.prepareForLaunch({
         receiveChallenge,
       })
-      await application.launch(true)
+      await application.launch({ awaitDatabaseLoad: true })
       expect(await application.getUser().email).to.equal(identifier)
       expect(await application.getHost()).to.equal(customServer)
       const preferences = await application.diskStorageService.getValue('preferences')

@@ -50,7 +50,7 @@ describe('device authentication', function () {
     }
     await tmpApplication.prepareForLaunch({ receiveChallenge })
     expect(await tmpApplication.protocolService.getRootKey()).to.not.be.ok
-    await tmpApplication.launch(true)
+    await tmpApplication.launch({ awaitDatabaseLoad: true })
     expect(await tmpApplication.protocolService.getRootKey()).to.be.ok
     expect(tmpApplication.protocolService.rootKeyEncryption.keyMode).to.equal(KeyMode.WrapperOnly)
     await Factory.safeDeinit(tmpApplication)
@@ -100,7 +100,7 @@ describe('device authentication', function () {
     await tmpApplication.prepareForLaunch({ receiveChallenge })
     expect(await tmpApplication.protocolService.getRootKey()).to.not.be.ok
     expect((await tmpApplication.protectionService.createLaunchChallenge()).prompts.length).to.equal(2)
-    await tmpApplication.launch(true)
+    await tmpApplication.launch({ awaitDatabaseLoad: true })
     expect(await tmpApplication.protocolService.getRootKey()).to.be.ok
     expect(tmpApplication.protocolService.rootKeyEncryption.keyMode).to.equal(KeyMode.WrapperOnly)
     await Factory.safeDeinit(tmpApplication)
@@ -155,7 +155,7 @@ describe('device authentication', function () {
       receiveChallenge: receiveChallenge,
     })
     expect(await tmpApplication.protocolService.getRootKey()).to.not.be.ok
-    await tmpApplication.launch(true)
+    await tmpApplication.launch({ awaitDatabaseLoad: true })
     expect(await tmpApplication.diskStorageService.getValue(sampleStorageKey)).to.equal(sampleStorageValue)
     expect(await tmpApplication.protocolService.getRootKey()).to.be.ok
     expect(tmpApplication.protocolService.rootKeyEncryption.keyMode).to.equal(KeyMode.RootKeyPlusWrapper)

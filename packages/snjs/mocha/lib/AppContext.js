@@ -33,7 +33,14 @@ export class AppContext {
     }
 
     if (!navigationHandler) {
-      navigationHandler = {}
+      navigationHandler = {
+        onNotes() {},
+        onFolders() {},
+        onFiles() {},
+        onSelectedNotes() {},
+        onSelectedFolders() {},
+        onSelectedFiles() {},
+      }
     }
 
     this.identifier = identifier
@@ -300,11 +307,11 @@ export class AppContext {
   }
 
   findNoteByTitle(title) {
-    return this.application.items.getDisplayableNotes().find((note) => note.title === title)
+    return this.application.navigation.getNotes().find((note) => note.title === title)
   }
 
   get noteCount() {
-    return this.application.items.getDisplayableNotes().length
+    return this.application.navigation.getNotes().length
   }
 
   async createConflictedNotes(otherContext) {

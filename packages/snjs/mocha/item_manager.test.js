@@ -1,5 +1,3 @@
-/* eslint-disable no-unused-expressions */
-/* eslint-disable no-undef */
 import * as Factory from './lib/factory.js'
 chai.use(chaiAsPromised)
 const expect = chai.expect
@@ -8,6 +6,8 @@ describe('item manager', function () {
   beforeEach(async function () {
     this.payloadManager = new PayloadManager()
     this.itemManager = new ItemManager(this.payloadManager)
+    this.navigation = new NavigationController(this.itemManager, { supportsFileNavigation: false })
+
     this.createNote = async () => {
       return this.itemManager.createItem(ContentType.Note, {
         title: 'hello',
@@ -22,6 +22,7 @@ describe('item manager', function () {
           content_type: note.content_type,
         }
       })
+
       return this.itemManager.createItem(ContentType.Tag, {
         title: 'thoughts',
         references: references,
@@ -68,7 +69,7 @@ describe('item manager', function () {
     await this.createNote()
 
     expect(this.itemManager.items.length).to.equal(1)
-    expect(this.itemManager.getDisplayableNotes().length).to.equal(1)
+    expect(this.navigation.getNotes().length).to.equal(1)
   })
 
   it('find item', async function () {
@@ -254,11 +255,11 @@ describe('item manager', function () {
       await this.itemManager.duplicateItem(note)
       sinon.assert.calledTwice(this.emitPayloads)
 
-      const originalNote = this.itemManager.getDisplayableNotes()[0]
-      const duplicatedNote = this.itemManager.getDisplayableNotes()[1]
+      const originalNote = this.navigation.getNotes()[0]
+      const duplicatedNote = this.navigation.getNotes()[1]
 
       expect(this.itemManager.items.length).to.equal(2)
-      expect(this.itemManager.getDisplayableNotes().length).to.equal(2)
+      expect(this.navigation.getNotes().length).to.equal(2)
       expect(originalNote.uuid).to.not.equal(duplicatedNote.uuid)
       expect(originalNote.uuid).to.equal(duplicatedNote.duplicateOf)
       expect(originalNote.uuid).to.equal(duplicatedNote.payload.duplicate_of)
@@ -271,11 +272,11 @@ describe('item manager', function () {
       await this.itemManager.duplicateItem(note, true)
       sinon.assert.calledTwice(this.emitPayloads)
 
-      const originalNote = this.itemManager.getDisplayableNotes()[0]
-      const duplicatedNote = this.itemManager.getDisplayableNotes()[1]
+      const originalNote = this.navigation.getNotes()[0]
+      const duplicatedNote = this.navigation.getNotes()[1]
 
       expect(this.itemManager.items.length).to.equal(2)
-      expect(this.itemManager.getDisplayableNotes().length).to.equal(2)
+      expect(this.navigation.getNotes().length).to.equal(2)
       expect(originalNote.uuid).to.not.equal(duplicatedNote.uuid)
       expect(originalNote.uuid).to.equal(duplicatedNote.duplicateOf)
       expect(originalNote.uuid).to.equal(duplicatedNote.payload.duplicate_of)
@@ -290,7 +291,7 @@ describe('item manager', function () {
 
       expect(duplicate.content.references).to.have.length(1)
       expect(this.itemManager.items).to.have.length(3)
-      expect(this.itemManager.getDisplayableTags()).to.have.length(2)
+      expect(this.itemManager.getTags()).to.have.length(2)
     })
 
     it('adds duplicated item as a relationship to items referencing it', async function () {
@@ -333,11 +334,7 @@ describe('item manager', function () {
 
     /** Deleted items do not show up in item manager's public interface */
     expect(this.itemManager.items.length).to.equal(0)
-    expect(this.itemManager.getDisplayableNotes().length).to.equal(0)
-  })
-
-  it('system smart views', async function () {
-    expect(this.itemManager.systemSmartViews.length).to.be.above(0)
+    expect(this.navigation.getNotes().length).to.equal(0)
   })
 
   it('find tag by title', async function () {
@@ -369,7 +366,7 @@ describe('item manager', function () {
       mutator.trashed = true
     })
 
-    expect(this.itemManager.trashSmartView).to.be.ok
+    expect(this.navigation.trashSmartView).to.be.ok
     expect(versionTwo.trashed).to.equal(true)
     expect(versionTwo.dirty).to.equal(true)
     expect(versionTwo.content).to.be.ok
@@ -515,11 +512,11 @@ describe('item manager', function () {
         mutator.archived = true
       })
 
-      this.itemManager.setPrimaryItemDisplayOptions({
-        views: [this.itemManager.allNotesSmartView],
+      this.navigation.setDisplayOptions({
+        views: [this.navigation.allNotesSmartView],
       })
 
-      expect(this.itemManager.getDisplayableNotes().length).to.equal(0)
+      expect(this.navigation.getNotes().length).to.equal(0)
     })
 
     it('archived view should not include trashed notes by default', async function () {
@@ -530,11 +527,11 @@ describe('item manager', function () {
         mutator.trashed = true
       })
 
-      this.itemManager.setPrimaryItemDisplayOptions({
-        views: [this.itemManager.archivedSmartView],
+      this.navigation.setDisplayOptions({
+        views: [this.navigation.archivedSmartView],
       })
 
-      expect(this.itemManager.getDisplayableNotes().length).to.equal(0)
+      expect(this.navigation.getNotes().length).to.equal(0)
     })
 
     it('trashed view should include archived notes by default', async function () {
@@ -545,11 +542,11 @@ describe('item manager', function () {
         mutator.trashed = true
       })
 
-      this.itemManager.setPrimaryItemDisplayOptions({
-        views: [this.itemManager.trashSmartView],
+      this.navigation.setDisplayOptions({
+        views: [this.navigation.trashSmartView],
       })
 
-      expect(this.itemManager.getDisplayableNotes().length).to.equal(1)
+      expect(this.navigation.getNotes().length).to.equal(1)
     })
   })
 

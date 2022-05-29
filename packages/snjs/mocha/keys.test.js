@@ -336,7 +336,7 @@ describe('keys', function () {
     await this.application.signIn(this.email, this.password, undefined, undefined, undefined, true)
 
     expect(this.application.itemManager.getDisplayableItemsKeys().length).to.equal(1)
-    expect(this.application.itemManager.getDisplayableNotes().length).to.equal(10)
+    expect(this.application.navigation.getNotes().length).to.equal(10)
     expect(this.application.payloadManager.invalidPayloads.length).to.equal(0)
   })
 
@@ -598,7 +598,7 @@ describe('keys', function () {
       recreatedApp.submitValuesForChallenge(challenge, [CreateChallengeValue(challenge.prompts[0], this.password)])
     }
     await recreatedApp.prepareForLaunch({ receiveChallenge })
-    await recreatedApp.launch(true)
+    await recreatedApp.launch({ awaitDatabaseLoad: true })
 
     expect(recreatedApp.protocolService.getRootKey()).to.be.ok
     expect(totalChallenges).to.equal(expectedChallenges)

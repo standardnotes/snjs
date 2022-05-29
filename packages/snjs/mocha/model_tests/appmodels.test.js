@@ -99,7 +99,7 @@ describe('app models', () => {
     item = items[0]
 
     expect(item.content.foo).to.equal('bar')
-    expect(this.application.itemManager.getDisplayableNotes().length).to.equal(1)
+    expect(this.application.navigation.getNotes().length).to.equal(1)
   })
 
   it('mapping item twice should preserve references', async function () {
@@ -256,7 +256,7 @@ describe('app models', () => {
     const refreshedItem1_2 = this.application.itemManager.findItem(item1.uuid)
     expect(refreshedItem1_2).to.not.be.ok
 
-    expect(this.application.itemManager.getDisplayableNotes().length).to.equal(2)
+    expect(this.application.navigation.getNotes().length).to.equal(2)
 
     expect(alternatedItem.content.references.length).to.equal(1)
     expect(this.application.itemManager.itemsReferencingItem(alternatedItem.uuid).length).to.equal(0)
@@ -346,8 +346,8 @@ describe('app models', () => {
     const noteCopy = await this.application.itemManager.duplicateItem(note)
     expect(note.uuid).to.not.equal(noteCopy.uuid)
 
-    expect(this.application.itemManager.getDisplayableNotes().length).to.equal(2)
-    expect(this.application.itemManager.getDisplayableTags().length).to.equal(1)
+    expect(this.application.navigation.getNotes().length).to.equal(2)
+    expect(this.application.itemManager.getTags().length).to.equal(1)
 
     expect(note.content.references.length).to.equal(0)
     expect(noteCopy.content.references.length).to.equal(0)

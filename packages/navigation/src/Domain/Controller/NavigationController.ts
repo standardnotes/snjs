@@ -13,7 +13,6 @@ import {
   SNTag,
   SystemViewId,
   isFile,
-  PayloadEmitSource,
   isPayloadSourceNotInterestingToClients,
 } from '@standardnotes/models'
 import { ItemManagerChangeData } from '@standardnotes/services'
@@ -39,7 +38,7 @@ export class NavigationController implements NavigationControllerInterface {
   constructor(
     private items: ItemsApiForNavigationController,
     private readonly config: NavigationControllerConfig = { supportsFileNavigation: false },
-    private eventHandler: NavigationEventHandler,
+    private eventHandler?: NavigationEventHandler,
   ) {
     this.disposers.push(
       items.addObserver<SNNote>(ContentType.Note, (stream) => {
@@ -110,19 +109,19 @@ export class NavigationController implements NavigationControllerInterface {
       this.notes = this.navigationDisplayController.items().filter(isNote)
     }
 
-    this.eventHandler.onNotes(this.notes)
+    this.eventHandler?.onNotes(this.notes)
   }
 
   private handleFilesStream(_stream: ItemManagerChangeData<FileItem>): void {
     this.files = this.fileDisplayController.items()
 
-    this.eventHandler.onFiles(this.files)
+    this.eventHandler?.onFiles(this.files)
   }
 
   private handleFoldersStream(_stream: ItemManagerChangeData<Folder>): void {
     this.folders = [...this.systemSmartViews, ...this.folderDisplayController.items()]
 
-    this.eventHandler.onFolders(this.folders)
+    this.eventHandler?.onFolders(this.folders)
   }
 
   private handleSelectionUpdatesForStream(stream: ItemManagerChangeData<SupportedItem>): void {
@@ -158,15 +157,15 @@ export class NavigationController implements NavigationControllerInterface {
     concernedItems: { uuid: SupportedItem['uuid']; content_type: SupportedItem['content_type'] }[],
   ): void {
     if (concernedItems.some((item) => item.content_type === ContentType.Note)) {
-      this.eventHandler.onSelectedNotes(this.getSelectedNotes())
+      this.eventHandler?.onSelectedNotes(this.getSelectedNotes())
     }
 
     if (concernedItems.some((item) => FolderContentTypes.includes(item.content_type))) {
-      this.eventHandler.onSelectedFolders(this.getSelectedFolders())
+      this.eventHandler?.onSelectedFolders(this.getSelectedFolders())
     }
 
     if (concernedItems.some((item) => item.content_type === ContentType.File)) {
-      this.eventHandler.onSelectedFiles(this.getSelectedFiles())
+      this.eventHandler?.onSelectedFiles(this.getSelectedFiles())
     }
   }
 

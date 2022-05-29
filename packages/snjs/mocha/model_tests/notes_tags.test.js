@@ -89,8 +89,8 @@ describe('notes and tags', () => {
     expect(tagPayload.content.references.length).to.equal(1)
 
     await this.application.itemManager.emitItemsFromPayloads([notePayload, tagPayload], PayloadEmitSource.LocalChanged)
-    let note = this.application.itemManager.getDisplayableNotes()[0]
-    let tag = this.application.itemManager.getDisplayableTags()[0]
+    let note = this.application.navigation.getNotes()[0]
+    let tag = this.application.itemManager.getTags()[0]
 
     expect(note.dirty).to.not.be.ok
     expect(tag.dirty).to.not.be.ok
@@ -107,7 +107,7 @@ describe('notes and tags', () => {
 
     await this.application.itemManager.setItemToBeDeleted(note)
 
-    tag = this.application.itemManager.getDisplayableTags()[0]
+    tag = this.application.itemManager.getTags()[0]
 
     const deletedNotePayload = this.application.payloadManager.findOne(note.uuid)
     expect(deletedNotePayload.dirty).to.be.true
@@ -119,8 +119,8 @@ describe('notes and tags', () => {
     expect(this.application.itemManager.itemsReferencingItem(note).length).to.equal(0)
     expect(tag.noteCount).to.equal(0)
 
-    tag = this.application.itemManager.getDisplayableTags()[0]
-    expect(this.application.itemManager.getDisplayableNotes().length).to.equal(0)
+    tag = this.application.itemManager.getTags()[0]
+    expect(this.application.navigation.getNotes().length).to.equal(0)
     expect(tag.dirty).to.be.false
   })
 
@@ -200,8 +200,8 @@ describe('notes and tags', () => {
   it('properly handles tag duplication', async function () {
     const pair = createRelatedNoteTagPairPayload()
     await this.application.itemManager.emitItemsFromPayloads(pair, PayloadEmitSource.LocalChanged)
-    let note = this.application.itemManager.getDisplayableNotes()[0]
-    let tag = this.application.itemManager.getDisplayableTags()[0]
+    let note = this.application.navigation.getNotes()[0]
+    let tag = this.application.itemManager.getTags()[0]
 
     const duplicateTag = await this.application.itemManager.duplicateItem(tag, true)
     await this.application.syncService.sync(syncOptions)
@@ -305,11 +305,11 @@ describe('notes and tags', () => {
         )
       }),
     )
-    this.application.items.setPrimaryItemDisplayOptions({
+    this.application.navigation.setDisplayOptions({
       sortBy: 'title',
       sortDirection: 'dsc',
     })
-    const titles = this.application.items.getDisplayableNotes().map((note) => note.title)
+    const titles = this.application.navigation.getNotes().map((note) => note.title)
     expect(titles).to.deep.equal(['Z', 'Y', 'B', 'A'])
   })
 
@@ -341,12 +341,12 @@ describe('notes and tags', () => {
           title: 'A',
         }),
       )
-      this.application.items.setPrimaryItemDisplayOptions({
+      this.application.navigation.setDisplayOptions({
         sortBy: 'title',
         sortDirection: 'dsc',
         tags: [tag],
       })
-      const displayedNotes = this.application.items.getDisplayableNotes()
+      const displayedNotes = this.application.navigation.getNotes()
       expect(displayedNotes.length).to.equal(1)
       expect(displayedNotes[0].uuid).to.equal(taggedNote.uuid)
     })
@@ -362,13 +362,13 @@ describe('notes and tags', () => {
       await this.application.mutator.changeItem(trashedNote, (mutator) => {
         mutator.trashed = true
       })
-      this.application.items.setPrimaryItemDisplayOptions({
+      this.application.navigation.setDisplayOptions({
         sortBy: 'title',
         sortDirection: 'dsc',
         tags: [tag],
         includeTrashed: false,
       })
-      const displayedNotes = this.application.items.getDisplayableNotes()
+      const displayedNotes = this.application.navigation.getNotes()
       expect(displayedNotes.length).to.equal(1)
       expect(displayedNotes[0].uuid).to.equal(taggedNote.uuid)
     })
@@ -383,24 +383,24 @@ describe('notes and tags', () => {
           )
         }),
       )
-      const pinnedNote = this.application.itemManager.getDisplayableNotes().find((note) => note.title === 'B')
+      const pinnedNote = this.application.navigation.getNotes().find((note) => note.title === 'B')
       await this.application.mutator.changeItem(pinnedNote, (mutator) => {
         mutator.pinned = true
       })
       const tag = await this.application.mutator.findOrCreateTag('A')
       await this.application.mutator.changeItem(tag, (mutator) => {
-        for (const note of this.application.itemManager.getDisplayableNotes()) {
+        for (const note of this.application.navigation.getNotes()) {
           mutator.e2ePendingRefactor_addItemAsRelationship(note)
         }
       })
 
-      this.application.items.setPrimaryItemDisplayOptions({
+      this.application.navigation.setDisplayOptions({
         sortBy: 'title',
         sortDirection: 'dsc',
         tags: [tag],
       })
 
-      const displayedNotes = this.application.items.getDisplayableNotes()
+      const displayedNotes = this.application.navigation.getNotes()
       expect(displayedNotes).to.have.length(4)
       expect(displayedNotes[0].title).to.equal('B')
       expect(displayedNotes[1].title).to.equal('Z')
@@ -430,13 +430,13 @@ describe('notes and tags', () => {
         }),
       )
       const matches = this.application.items.notesMatchingSmartView(view)
-      this.application.items.setPrimaryItemDisplayOptions({
+      this.application.navigation.setDisplayOptions({
         sortBy: 'title',
         sortDirection: 'asc',
         views: [view],
       })
 
-      const displayedNotes = this.application.items.getDisplayableNotes()
+      const displayedNotes = this.application.navigation.getNotes()
       expect(displayedNotes).to.deep.equal(matches)
       expect(matches.length).to.equal(1)
       expect(matches[0].uuid).to.equal(note.uuid)
@@ -468,13 +468,13 @@ describe('notes and tags', () => {
         }),
       )
       const matches = this.application.items.notesMatchingSmartView(view)
-      this.application.items.setPrimaryItemDisplayOptions({
+      this.application.navigation.setDisplayOptions({
         sortBy: 'title',
         sortDirection: 'asc',
         views: [view],
       })
 
-      const displayedNotes = this.application.items.getDisplayableNotes()
+      const displayedNotes = this.application.navigation.getNotes()
       expect(displayedNotes).to.deep.equal(matches)
       expect(matches.length).to.equal(1)
       expect(matches[0].uuid).to.equal(note.uuid)
@@ -505,13 +505,13 @@ describe('notes and tags', () => {
         }),
       )
       const matches = this.application.items.notesMatchingSmartView(view)
-      this.application.items.setPrimaryItemDisplayOptions({
+      this.application.navigation.setDisplayOptions({
         sortBy: 'title',
         sortDirection: 'asc',
         views: [view],
       })
 
-      const displayedNotes = this.application.items.getDisplayableNotes()
+      const displayedNotes = this.application.navigation.getNotes()
       expect(displayedNotes).to.deep.equal(matches)
       expect(matches.length).to.equal(1)
       expect(matches[0].uuid).to.equal(unpinnedNote.uuid)
@@ -541,12 +541,12 @@ describe('notes and tags', () => {
         }),
       )
       const matches = this.application.items.notesMatchingSmartView(view)
-      this.application.items.setPrimaryItemDisplayOptions({
+      this.application.navigation.setDisplayOptions({
         sortBy: 'title',
         sortDirection: 'asc',
         views: [view],
       })
-      const displayedNotes = this.application.items.getDisplayableNotes()
+      const displayedNotes = this.application.navigation.getNotes()
       expect(displayedNotes).to.deep.equal(matches)
       expect(matches.length).to.equal(1)
       expect(matches[0].uuid).to.equal(longNote.uuid)
@@ -595,12 +595,12 @@ describe('notes and tags', () => {
         }),
       )
       const matches = this.application.items.notesMatchingSmartView(view)
-      this.application.items.setPrimaryItemDisplayOptions({
+      this.application.navigation.setDisplayOptions({
         sortBy: 'title',
         sortDirection: 'asc',
         views: [view],
       })
-      const displayedNotes = this.application.items.getDisplayableNotes()
+      const displayedNotes = this.application.navigation.getNotes()
       expect(displayedNotes).to.deep.equal(matches)
       expect(matches.length).to.equal(1)
       expect(matches[0].uuid).to.equal(recentNote.uuid)
@@ -629,12 +629,12 @@ describe('notes and tags', () => {
         }),
       )
       const matches = this.application.items.notesMatchingSmartView(view)
-      this.application.items.setPrimaryItemDisplayOptions({
+      this.application.navigation.setDisplayOptions({
         sortBy: 'title',
         sortDirection: 'asc',
         views: [view],
       })
-      const displayedNotes = this.application.items.getDisplayableNotes()
+      const displayedNotes = this.application.navigation.getNotes()
       expect(displayedNotes).to.deep.equal(matches)
       expect(matches.length).to.equal(1)
       expect(matches[0].uuid).to.equal(untaggedNote.uuid)
@@ -663,12 +663,12 @@ describe('notes and tags', () => {
         }),
       )
       const matches = this.application.items.notesMatchingSmartView(view)
-      this.application.items.setPrimaryItemDisplayOptions({
+      this.application.navigation.setDisplayOptions({
         sortBy: 'title',
         sortDirection: 'asc',
         views: [view],
       })
-      const displayedNotes = this.application.items.getDisplayableNotes()
+      const displayedNotes = this.application.navigation.getNotes()
       expect(displayedNotes).to.deep.equal(matches)
       expect(matches.length).to.equal(1)
       expect(matches[0].uuid).to.equal(taggedNote.uuid)
@@ -712,12 +712,12 @@ describe('notes and tags', () => {
         }),
       )
       const matches = this.application.items.notesMatchingSmartView(view)
-      this.application.items.setPrimaryItemDisplayOptions({
+      this.application.navigation.setDisplayOptions({
         sortBy: 'title',
         sortDirection: 'asc',
         views: [view],
       })
-      const displayedNotes = this.application.items.getDisplayableNotes()
+      const displayedNotes = this.application.navigation.getNotes()
       expect(displayedNotes).to.deep.equal(matches)
       expect(matches.length).to.equal(1)
       expect(matches[0].uuid).to.equal(pinnedAndLockedNote.uuid)
@@ -767,12 +767,12 @@ describe('notes and tags', () => {
         }),
       )
       const matches = this.application.items.notesMatchingSmartView(view)
-      this.application.items.setPrimaryItemDisplayOptions({
+      this.application.navigation.setDisplayOptions({
         sortBy: 'created_at',
         sortDirection: 'asc',
         views: [view],
       })
-      const displayedNotes = this.application.items.getDisplayableNotes()
+      const displayedNotes = this.application.navigation.getNotes()
       expect(displayedNotes.length).to.equal(matches.length)
       expect(matches.length).to.equal(3)
       expect(matches.find((note) => note.uuid === protectedNote.uuid)).to.exist
@@ -796,7 +796,7 @@ describe('notes and tags', () => {
       PayloadEmitSource.LocalChanged,
     )
 
-    this.application.items.setPrimaryItemDisplayOptions({
+    this.application.navigation.setDisplayOptions({
       sortBy: 'title',
       sortDirection: 'dsc',
       searchQuery: {
@@ -804,7 +804,7 @@ describe('notes and tags', () => {
       },
     })
 
-    const displayedNotes = this.application.items.getDisplayableNotes()
+    const displayedNotes = this.application.navigation.getNotes()
     expect(displayedNotes.length).to.equal(2)
     expect(displayedNotes[0].uuid).to.equal(notePayload4.uuid)
     expect(displayedNotes[1].uuid).to.equal(notePayload1.uuid)
@@ -825,7 +825,7 @@ describe('notes and tags', () => {
       PayloadEmitSource.LocalChanged,
     )
 
-    this.application.items.setPrimaryItemDisplayOptions({
+    this.application.navigation.setDisplayOptions({
       sortBy: 'title',
       sortDirection: 'dsc',
       searchQuery: {
@@ -833,7 +833,7 @@ describe('notes and tags', () => {
       },
     })
 
-    const displayedNotes = this.application.items.getDisplayableNotes()
+    const displayedNotes = this.application.navigation.getNotes()
     expect(displayedNotes.length).to.equal(3)
     expect(displayedNotes[0].uuid).to.equal(notePayload3.uuid)
     expect(displayedNotes[1].uuid).to.equal(notePayload2.uuid)

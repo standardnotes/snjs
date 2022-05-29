@@ -124,6 +124,10 @@ export class ItemManager
     return [...this.componentDisplayController.items(), ...this.themeDisplayController.items()]
   }
 
+  public getTags(): Models.SNTag[] {
+    return this.getItems(ContentType.Tag)
+  }
+
   public override deinit(): void {
     this.unsubChangeObserver()
     ;(this.options as unknown) = undefined

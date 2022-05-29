@@ -301,7 +301,7 @@ describe('basic auth', function () {
 
     expect(this.application.itemManager.items.length).to.equal(this.expectedItemCount)
 
-    const note = this.application.itemManager.getDisplayableNotes()[0]
+    const note = this.application.navigation.getNotes()[0]
 
     /**
      * Create conflict for a note. First modify the item without saving so that

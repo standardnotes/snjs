@@ -84,7 +84,7 @@ describe('model manager mapping', () => {
       },
     })
     await this.application.itemManager.emitItemsFromPayloads([mutated], PayloadEmitSource.LocalChanged)
-    const item = this.application.itemManager.getDisplayableNotes()[0]
+    const item = this.application.navigation.getNotes()[0]
 
     expect(item.content.title).to.equal(newTitle)
   })
@@ -92,7 +92,7 @@ describe('model manager mapping', () => {
   it('setting an item dirty should retrieve it in dirty items', async function () {
     const payload = Factory.createNotePayload()
     await this.application.itemManager.emitItemsFromPayloads([payload], PayloadEmitSource.LocalChanged)
-    const note = this.application.itemManager.getDisplayableNotes()[0]
+    const note = this.application.navigation.getNotes()[0]
     await this.application.itemManager.setItemDirty(note)
     const dirtyItems = this.application.itemManager.getDirtyItems()
     expect(dirtyItems.length).to.equal(1)

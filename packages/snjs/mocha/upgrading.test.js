@@ -116,7 +116,7 @@ describe('upgrading', () => {
      */
     this.application = await Factory.signOutApplicationAndReturnNew(this.application)
     await this.application.signIn(this.email, this.password, undefined, undefined, undefined, true)
-    expect(this.application.itemManager.getDisplayableNotes().length).to.equal(1)
+    expect(this.application.navigation.getNotes().length).to.equal(1)
     expect(this.application.payloadManager.invalidPayloads).to.be.empty
   }).timeout(15000)
 
@@ -148,7 +148,7 @@ describe('upgrading', () => {
         this.receiveChallengeWithApp(appFirst, challenge)
       },
     })
-    await appFirst.launch(true)
+    await appFirst.launch({ awaitDatabaseLoad: true })
     const result = await appFirst.upgradeProtocolVersion()
     expect(result).to.deep.equal({ success: true })
     expect(appFirst.payloadManager.invalidPayloads).to.be.empty
@@ -161,7 +161,7 @@ describe('upgrading', () => {
         this.receiveChallengeWithApp(appSecond, challenge)
       },
     })
-    await appSecond.launch(true)
+    await appSecond.launch({ awaitDatabaseLoad: true })
     expect(appSecond.payloadManager.invalidPayloads).to.be.empty
     await Factory.safeDeinit(appSecond)
   }).timeout(15000)
@@ -204,7 +204,7 @@ describe('upgrading', () => {
 
     /** After change, note should now be encrypted with latest protocol version */
 
-    const note = this.application.itemManager.getDisplayableNotes()[0]
+    const note = this.application.navigation.getNotes()[0]
     await Factory.markDirtyAndSyncItem(this.application, note)
 
     const refreshedNotePayloads = await Factory.getStoragePayloadsOfType(this.application, ContentType.Note)

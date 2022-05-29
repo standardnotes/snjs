@@ -6,6 +6,7 @@ describe('note display criteria', function () {
   beforeEach(async function () {
     this.payloadManager = new PayloadManager()
     this.itemManager = new ItemManager(this.payloadManager)
+    this.navigation = new NavigationController(this.itemManager, { supportsFileNavigation: false })
 
     this.createNote = async (title = 'hello', text = 'world') => {
       return this.itemManager.createItem(ContentType.Note, {
@@ -200,7 +201,7 @@ describe('note display criteria', function () {
       expect(
         itemsMatchingOptions(
           {
-            views: [this.itemManager.allNotesSmartView],
+            views: [this.navigation.allNotesSmartView],
           },
           this.itemManager.collection.all(ContentType.Note),
           this.itemManager.collection,
@@ -210,7 +211,7 @@ describe('note display criteria', function () {
       expect(
         itemsMatchingOptions(
           {
-            views: [this.itemManager.trashSmartView],
+            views: [this.navigation.trashSmartView],
           },
           this.itemManager.collection.all(ContentType.Note),
           this.itemManager.collection,
@@ -220,7 +221,7 @@ describe('note display criteria', function () {
       expect(
         itemsMatchingOptions(
           {
-            views: [this.itemManager.archivedSmartView],
+            views: [this.navigation.archivedSmartView],
           },
           this.itemManager.collection.all(ContentType.Note),
           this.itemManager.collection,
@@ -237,7 +238,7 @@ describe('note display criteria', function () {
       expect(
         itemsMatchingOptions(
           {
-            views: [this.itemManager.allNotesSmartView],
+            views: [this.navigation.allNotesSmartView],
             includeTrashed: false,
           },
           this.itemManager.collection.all(ContentType.Note),
@@ -248,7 +249,7 @@ describe('note display criteria', function () {
       expect(
         itemsMatchingOptions(
           {
-            views: [this.itemManager.trashSmartView],
+            views: [this.navigation.trashSmartView],
           },
           this.itemManager.collection.all(ContentType.Note),
           this.itemManager.collection,
@@ -258,7 +259,7 @@ describe('note display criteria', function () {
       expect(
         itemsMatchingOptions(
           {
-            views: [this.itemManager.archivedSmartView],
+            views: [this.navigation.archivedSmartView],
           },
           this.itemManager.collection.all(ContentType.Note),
           this.itemManager.collection,
@@ -275,7 +276,7 @@ describe('note display criteria', function () {
       expect(
         itemsMatchingOptions(
           {
-            views: [this.itemManager.allNotesSmartView],
+            views: [this.navigation.allNotesSmartView],
             includeArchived: false,
           },
           this.itemManager.collection.all(ContentType.Note),
@@ -286,7 +287,7 @@ describe('note display criteria', function () {
       expect(
         itemsMatchingOptions(
           {
-            views: [this.itemManager.trashSmartView],
+            views: [this.navigation.trashSmartView],
           },
           this.itemManager.collection.all(ContentType.Note),
           this.itemManager.collection,
@@ -296,7 +297,7 @@ describe('note display criteria', function () {
       expect(
         itemsMatchingOptions(
           {
-            views: [this.itemManager.archivedSmartView],
+            views: [this.navigation.archivedSmartView],
           },
           this.itemManager.collection.all(ContentType.Note),
           this.itemManager.collection,
@@ -314,7 +315,7 @@ describe('note display criteria', function () {
       expect(
         itemsMatchingOptions(
           {
-            views: [this.itemManager.allNotesSmartView],
+            views: [this.navigation.allNotesSmartView],
           },
           this.itemManager.collection.all(ContentType.Note),
           this.itemManager.collection,
@@ -324,7 +325,7 @@ describe('note display criteria', function () {
       expect(
         itemsMatchingOptions(
           {
-            views: [this.itemManager.trashSmartView],
+            views: [this.navigation.trashSmartView],
           },
           this.itemManager.collection.all(ContentType.Note),
           this.itemManager.collection,
@@ -334,7 +335,7 @@ describe('note display criteria', function () {
       expect(
         itemsMatchingOptions(
           {
-            views: [this.itemManager.archivedSmartView],
+            views: [this.navigation.archivedSmartView],
           },
           this.itemManager.collection.all(ContentType.Note),
           this.itemManager.collection,
@@ -350,7 +351,7 @@ describe('note display criteria', function () {
       expect(
         itemsMatchingOptions(
           {
-            views: [this.itemManager.allNotesSmartView],
+            views: [this.navigation.allNotesSmartView],
             includeTrashed: true,
           },
           this.itemManager.collection.all(ContentType.Note),
@@ -361,7 +362,7 @@ describe('note display criteria', function () {
       expect(
         itemsMatchingOptions(
           {
-            views: [this.itemManager.trashSmartView],
+            views: [this.navigation.trashSmartView],
             includeTrashed: true,
           },
           this.itemManager.collection.all(ContentType.Note),
@@ -380,7 +381,7 @@ describe('note display criteria', function () {
       expect(
         itemsMatchingOptions(
           {
-            views: [this.itemManager.allNotesSmartView],
+            views: [this.navigation.allNotesSmartView],
             includeTrashed: false,
           },
           this.itemManager.collection.all(ContentType.Note),
@@ -391,7 +392,7 @@ describe('note display criteria', function () {
       expect(
         itemsMatchingOptions(
           {
-            views: [this.itemManager.allNotesSmartView],
+            views: [this.navigation.allNotesSmartView],
             includeTrashed: true,
           },
           this.itemManager.collection.all(ContentType.Note),
@@ -402,7 +403,7 @@ describe('note display criteria', function () {
       expect(
         itemsMatchingOptions(
           {
-            views: [this.itemManager.trashSmartView],
+            views: [this.navigation.trashSmartView],
             includeTrashed: true,
           },
           this.itemManager.collection.all(ContentType.Note),
@@ -413,7 +414,7 @@ describe('note display criteria', function () {
       expect(
         itemsMatchingOptions(
           {
-            views: [this.itemManager.archivedSmartView],
+            views: [this.navigation.archivedSmartView],
             includeTrashed: true,
           },
           this.itemManager.collection.all(ContentType.Note),
@@ -433,7 +434,7 @@ describe('note display criteria', function () {
       expect(
         itemsMatchingOptions(
           {
-            views: [this.itemManager.allNotesSmartView],
+            views: [this.navigation.allNotesSmartView],
           },
           this.itemManager.collection.all(ContentType.Note),
           this.itemManager.collection,
@@ -443,7 +444,7 @@ describe('note display criteria', function () {
       expect(
         itemsMatchingOptions(
           {
-            views: [this.itemManager.trashSmartView],
+            views: [this.navigation.trashSmartView],
           },
           this.itemManager.collection.all(ContentType.Note),
           this.itemManager.collection,
@@ -453,7 +454,7 @@ describe('note display criteria', function () {
       expect(
         itemsMatchingOptions(
           {
-            views: [this.itemManager.archivedSmartView],
+            views: [this.navigation.archivedSmartView],
           },
           this.itemManager.collection.all(ContentType.Note),
           this.itemManager.collection,
@@ -469,7 +470,7 @@ describe('note display criteria', function () {
       expect(
         itemsMatchingOptions(
           {
-            views: [this.itemManager.allNotesSmartView],
+            views: [this.navigation.allNotesSmartView],
             includeArchived: true,
           },
           this.itemManager.collection.all(ContentType.Note),
@@ -480,7 +481,7 @@ describe('note display criteria', function () {
       expect(
         itemsMatchingOptions(
           {
-            views: [this.itemManager.trashSmartView],
+            views: [this.navigation.trashSmartView],
             includeArchived: true,
           },
           this.itemManager.collection.all(ContentType.Note),
@@ -498,7 +499,7 @@ describe('note display criteria', function () {
       expect(
         itemsMatchingOptions(
           {
-            views: [this.itemManager.allNotesSmartView],
+            views: [this.navigation.allNotesSmartView],
             includeArchived: false,
           },
           this.itemManager.collection.all(ContentType.Note),
@@ -509,7 +510,7 @@ describe('note display criteria', function () {
       expect(
         itemsMatchingOptions(
           {
-            views: [this.itemManager.allNotesSmartView],
+            views: [this.navigation.allNotesSmartView],
             includeArchived: true,
           },
           this.itemManager.collection.all(ContentType.Note),
@@ -520,7 +521,7 @@ describe('note display criteria', function () {
       expect(
         itemsMatchingOptions(
           {
-            views: [this.itemManager.trashSmartView],
+            views: [this.navigation.trashSmartView],
             includeArchived: true,
           },
           this.itemManager.collection.all(ContentType.Note),
@@ -531,7 +532,7 @@ describe('note display criteria', function () {
       expect(
         itemsMatchingOptions(
           {
-            views: [this.itemManager.archivedSmartView],
+            views: [this.navigation.archivedSmartView],
             includeArchived: false,
           },
           this.itemManager.collection.all(ContentType.Note),
@@ -550,7 +551,7 @@ describe('note display criteria', function () {
       expect(
         itemsMatchingOptions(
           {
-            views: [this.itemManager.allNotesSmartView],
+            views: [this.navigation.allNotesSmartView],
             includeArchived: true,
           },
           this.itemManager.collection.all(ContentType.Note),
@@ -561,7 +562,7 @@ describe('note display criteria', function () {
       expect(
         itemsMatchingOptions(
           {
-            views: [this.itemManager.trashSmartView],
+            views: [this.navigation.trashSmartView],
             includeArchived: true,
           },
           this.itemManager.collection.all(ContentType.Note),
@@ -572,7 +573,7 @@ describe('note display criteria', function () {
       expect(
         itemsMatchingOptions(
           {
-            views: [this.itemManager.archivedSmartView],
+            views: [this.navigation.archivedSmartView],
             includeArchived: true,
           },
           this.itemManager.collection.all(ContentType.Note),
@@ -590,9 +591,9 @@ describe('note display criteria', function () {
         itemsMatchingOptions(
           {
             views: [
-              this.itemManager.allNotesSmartView,
-              this.itemManager.archivedSmartView,
-              this.itemManager.trashSmartView,
+              this.navigation.allNotesSmartView,
+              this.navigation.archivedSmartView,
+              this.navigation.trashSmartView,
             ],
           },
           this.itemManager.collection.all(ContentType.Note),
@@ -603,7 +604,7 @@ describe('note display criteria', function () {
       expect(
         itemsMatchingOptions(
           {
-            views: [this.itemManager.trashSmartView],
+            views: [this.navigation.trashSmartView],
           },
           this.itemManager.collection.all(ContentType.Note),
           this.itemManager.collection,
@@ -620,7 +621,7 @@ describe('note display criteria', function () {
       expect(
         itemsMatchingOptions(
           {
-            views: [this.itemManager.allNotesSmartView],
+            views: [this.navigation.allNotesSmartView],
             includeArchived: false,
           },
           this.itemManager.collection.all(ContentType.Note),
@@ -631,7 +632,7 @@ describe('note display criteria', function () {
       expect(
         itemsMatchingOptions(
           {
-            views: [this.itemManager.allNotesSmartView],
+            views: [this.navigation.allNotesSmartView],
             includeArchived: true,
           },
           this.itemManager.collection.all(ContentType.Note),
@@ -642,7 +643,7 @@ describe('note display criteria', function () {
       expect(
         itemsMatchingOptions(
           {
-            views: [this.itemManager.trashSmartView],
+            views: [this.navigation.trashSmartView],
             includeArchived: true,
           },
           this.itemManager.collection.all(ContentType.Note),
@@ -653,7 +654,7 @@ describe('note display criteria', function () {
       expect(
         itemsMatchingOptions(
           {
-            views: [this.itemManager.archivedSmartView],
+            views: [this.navigation.archivedSmartView],
             includeArchived: false,
           },
           this.itemManager.collection.all(ContentType.Note),
@@ -672,7 +673,7 @@ describe('note display criteria', function () {
       expect(
         itemsMatchingOptions(
           {
-            views: [this.itemManager.allNotesSmartView],
+            views: [this.navigation.allNotesSmartView],
             includeArchived: true,
           },
           this.itemManager.collection.all(ContentType.Note),
@@ -683,7 +684,7 @@ describe('note display criteria', function () {
       expect(
         itemsMatchingOptions(
           {
-            views: [this.itemManager.trashSmartView],
+            views: [this.navigation.trashSmartView],
             includeArchived: true,
           },
           this.itemManager.collection.all(ContentType.Note),
@@ -694,7 +695,7 @@ describe('note display criteria', function () {
       expect(
         itemsMatchingOptions(
           {
-            views: [this.itemManager.archivedSmartView],
+            views: [this.navigation.archivedSmartView],
             includeArchived: true,
           },
           this.itemManager.collection.all(ContentType.Note),

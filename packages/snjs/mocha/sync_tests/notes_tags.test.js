@@ -39,7 +39,7 @@ describe('notes + tags syncing', function () {
     await this.application.itemManager.resetState()
     await this.application.syncService.clearSyncPositionTokens()
     await this.application.syncService.sync(syncOptions)
-    const downloadedNote = this.application.itemManager.getDisplayableNotes()[0]
+    const downloadedNote = this.application.navigation.getNotes()[0]
     expect(downloadedNote.items_key_id).to.not.be.ok
     // Allow time for waitingForKey
     await Factory.sleep(0.1)
@@ -55,8 +55,8 @@ describe('notes + tags syncing', function () {
     await this.application.itemManager.emitItemsFromPayloads([notePayload, tagPayload], PayloadEmitSource.LocalChanged)
     const note = this.application.itemManager.getItems([ContentType.Note])[0]
     const tag = this.application.itemManager.getItems([ContentType.Tag])[0]
-    expect(this.application.itemManager.getDisplayableNotes().length).to.equal(1)
-    expect(this.application.itemManager.getDisplayableTags().length).to.equal(1)
+    expect(this.application.navigation.getNotes().length).to.equal(1)
+    expect(this.application.itemManager.getTags().length).to.equal(1)
 
     for (let i = 0; i < 9; i++) {
       await this.application.itemManager.setItemsDirty([note, tag])
@@ -65,8 +65,8 @@ describe('notes + tags syncing', function () {
       expect(tag.content.references.length).to.equal(1)
       expect(this.application.itemManager.itemsReferencingItem(note).length).to.equal(1)
       expect(tag.noteCount).to.equal(1)
-      expect(this.application.itemManager.getDisplayableNotes().length).to.equal(1)
-      expect(this.application.itemManager.getDisplayableTags().length).to.equal(1)
+      expect(this.application.navigation.getNotes().length).to.equal(1)
+      expect(this.application.itemManager.getTags().length).to.equal(1)
       console.warn('Waiting 0.1s...')
       await Factory.sleep(0.1)
     }
@@ -77,8 +77,8 @@ describe('notes + tags syncing', function () {
     const notePayload = pair[0]
     const tagPayload = pair[1]
     await this.application.itemManager.emitItemsFromPayloads([notePayload, tagPayload], PayloadEmitSource.LocalChanged)
-    const originalNote = this.application.itemManager.getDisplayableNotes()[0]
-    const originalTag = this.application.itemManager.getDisplayableTags()[0]
+    const originalNote = this.application.navigation.getNotes()[0]
+    const originalTag = this.application.itemManager.getTags()[0]
     await this.application.itemManager.setItemsDirty([originalNote, originalTag])
 
     await this.application.syncService.sync(syncOptions)
@@ -92,11 +92,11 @@ describe('notes + tags syncing', function () {
     await this.application.diskStorageService.clearAllPayloads()
     await this.application.syncService.markAllItemsAsNeedingSyncAndPersist()
 
-    expect(this.application.itemManager.getDisplayableNotes().length).to.equal(1)
-    expect(this.application.itemManager.getDisplayableTags().length).to.equal(1)
+    expect(this.application.navigation.getNotes().length).to.equal(1)
+    expect(this.application.itemManager.getTags().length).to.equal(1)
 
-    const note = this.application.itemManager.getDisplayableNotes()[0]
-    const tag = this.application.itemManager.getDisplayableTags()[0]
+    const note = this.application.navigation.getNotes()[0]
+    const tag = this.application.itemManager.getTags()[0]
 
     expect(tag.content.references.length).to.equal(1)
     expect(note.content.references.length).to.equal(0)
@@ -110,8 +110,8 @@ describe('notes + tags syncing', function () {
     const notePayload = pair[0]
     const tagPayload = pair[1]
     await this.application.itemManager.emitItemsFromPayloads([notePayload, tagPayload], PayloadEmitSource.LocalChanged)
-    let note = this.application.itemManager.getDisplayableNotes()[0]
-    let tag = this.application.itemManager.getDisplayableTags()[0]
+    let note = this.application.navigation.getNotes()[0]
+    let tag = this.application.itemManager.getTags()[0]
     expect(this.application.itemManager.itemsReferencingItem(note).length).to.equal(1)
 
     await this.application.itemManager.setItemsDirty([note, tag])
@@ -124,8 +124,8 @@ describe('notes + tags syncing', function () {
     expect(note.dirty).to.equal(false)
     expect(tag.dirty).to.equal(false)
 
-    expect(this.application.itemManager.getDisplayableNotes().length).to.equal(1)
-    expect(this.application.itemManager.getDisplayableTags().length).to.equal(1)
+    expect(this.application.navigation.getNotes().length).to.equal(1)
+    expect(this.application.itemManager.getTags().length).to.equal(1)
 
     await Factory.changePayloadTimeStampAndSync(
       this.application,
@@ -140,10 +140,10 @@ describe('notes + tags syncing', function () {
     tag = this.application.itemManager.findItem(tag.uuid)
 
     // tag should now be conflicted and a copy created
-    expect(this.application.itemManager.getDisplayableNotes().length).to.equal(1)
-    expect(this.application.itemManager.getDisplayableTags().length).to.equal(2)
+    expect(this.application.navigation.getNotes().length).to.equal(1)
+    expect(this.application.itemManager.getTags().length).to.equal(2)
 
-    const tags = this.application.itemManager.getDisplayableTags()
+    const tags = this.application.itemManager.getTags()
     const conflictedTag = tags.find((tag) => {
       return !!tag.content.conflict_of
     })

@@ -67,5 +67,5 @@ export async function initializeApplication(application) {
       }
     },
   })
-  await application.launch(true)
+  await application.launch({ awaitDatabaseLoad: true })
 }

@@ -203,7 +203,7 @@ describe('key recovery service', function () {
       application.submitValuesForChallenge(challenge, [CreateChallengeValue(challenge.prompts[0], unassociatedPassword)])
     }
     await application.prepareForLaunch({ receiveChallenge })
-    await application.launch(true)
+    await application.launch({ awaitDatabaseLoad: true })
 
     await Factory.registerUserToApplication({
       application: application,
@@ -309,7 +309,7 @@ describe('key recovery service', function () {
     const contextA = await Factory.createAppContextWithFakeCrypto(namespace)
     const appA = contextA.application
     await appA.prepareForLaunch({ receiveChallenge: () => {} })
-    await appA.launch(true)
+    await appA.launch({ awaitDatabaseLoad: true })
 
     await Factory.registerUserToApplication({
       application: appA,
@@ -322,7 +322,7 @@ describe('key recovery service', function () {
     /** Create simultaneous appB signed into same account */
     const appB = await Factory.createApplicationWithFakeCrypto('another-namespace')
     await appB.prepareForLaunch({ receiveChallenge: () => {} })
-    await appB.launch(true)
+    await appB.launch({ awaitDatabaseLoad: true })
 
     await Factory.loginToApplication({
       application: appB,
@@ -345,7 +345,7 @@ describe('key recovery service', function () {
 
     const recreatedAppA = await Factory.createApplicationWithFakeCrypto(namespace)
     await recreatedAppA.prepareForLaunch({ receiveChallenge: () => {} })
-    await recreatedAppA.launch(true)
+    await recreatedAppA.launch({ awaitDatabaseLoad: true })
 
     expect(recreatedAppA.payloadManager.findOne(note.uuid).errorDecrypting).to.equal(true)
     expect(recreatedAppA.payloadManager.findOne(note.uuid).waitingForKey).to.equal(true)
@@ -372,7 +372,7 @@ describe('key recovery service', function () {
     }
 
     await application.prepareForLaunch({ receiveChallenge })
-    await application.launch(true)
+    await application.launch({ awaitDatabaseLoad: true })
     await context.register()
 
     const correctRootKey = await application.protocolService.getRootKey()
@@ -570,7 +570,7 @@ describe('key recovery service', function () {
       application.submitValuesForChallenge(challenge, [CreateChallengeValue(challenge.prompts[0], unassociatedPassword)])
     }
     await application.prepareForLaunch({ receiveChallenge })
-    await application.launch(true)
+    await application.launch({ awaitDatabaseLoad: true })
 
     await Factory.registerOldUser({
       application: application,

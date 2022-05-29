@@ -217,6 +217,10 @@ export class SNApplication
     return this.filesBackupService
   }
 
+  public get navigation(): NavigationControllerInterface {
+    return this.navigationController
+  }
+
   public computePrivateWorkspaceIdentifier(userphrase: string, name: string): Promise<string | undefined> {
     return Encryption.ComputePrivateWorkspaceIdentifier(this.options.crypto, userphrase, name)
   }

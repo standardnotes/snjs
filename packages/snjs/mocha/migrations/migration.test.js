@@ -67,7 +67,7 @@ describe('migrations', () => {
     await application.prepareForLaunch({
       receiveChallenge: () => {},
     })
-    await application.launch(true)
+    await application.launch({ awaitDatabaseLoad: true })
     expect(await application.migrationService.getStoredSnjsVersion()).to.equal(SnjsVersion)
     await Factory.safeDeinit(application)
   })
@@ -79,7 +79,7 @@ describe('migrations', () => {
     await application.prepareForLaunch({
       receiveChallenge: () => {},
     })
-    await application.launch(true)
+    await application.launch({ awaitDatabaseLoad: true })
     expect(await application.migrationService.getStoredSnjsVersion()).to.equal(SnjsVersion)
     await Factory.safeDeinit(application)
   })
@@ -97,7 +97,7 @@ describe('migrations', () => {
     await application.prepareForLaunch({
       receiveChallenge: () => {},
     })
-    await application.launch(true)
+    await application.launch({ awaitDatabaseLoad: true })
     expect(await application.migrationService.getStoredSnjsVersion()).to.equal(SnjsVersion)
     await Factory.safeDeinit(application)
   })
@@ -108,7 +108,7 @@ describe('migrations', () => {
     await application.prepareForLaunch({
       receiveChallenge: () => {},
     })
-    await application.launch(true)
+    await application.launch({ awaitDatabaseLoad: true })
 
     const mfaItem = CreateDecryptedItemFromPayload(
       new DecryptedPayload({
@@ -145,7 +145,7 @@ describe('migrations', () => {
     await application.prepareForLaunch({
       receiveChallenge: () => {},
     })
-    await application.launch(true)
+    await application.launch({ awaitDatabaseLoad: true })
 
     const noDistractionItem = CreateDecryptedItemFromPayload(
       new DecryptedPayload({

@@ -37,6 +37,10 @@ describe.only('navigation', function () {
     expect(controller).to.be.ok
   })
 
+  it('should have global smart views defined', async function () {
+    expect(controller.systemSmartViews.length).to.be.above(0)
+  })
+
   it('navigation handler should notify of new items', async function () {
     const deferred = Deferred()
 

@@ -465,7 +465,7 @@ describe('server session', function () {
 
     const appA = await Factory.createApplicationWithFakeCrypto(Factory.randomString())
     await appA.prepareForLaunch({})
-    await appA.launch(true)
+    await appA.launch({ awaitDatabaseLoad: true })
 
     const email = `${Math.random()}`
     const password = `${Math.random()}`
@@ -479,7 +479,7 @@ describe('server session', function () {
     /** Create simultaneous appB signed into same account */
     const appB = await Factory.createApplicationWithFakeCrypto('another-namespace')
     await appB.prepareForLaunch({})
-    await appB.launch(true)
+    await appB.launch({ awaitDatabaseLoad: true })
     await Factory.loginToApplication({
       application: appB,
       email: email,
@@ -520,7 +520,7 @@ describe('server session', function () {
     }
     const appA = await Factory.createApplicationWithFakeCrypto(Factory.randomString())
     await appA.prepareForLaunch({ receiveChallenge })
-    await appA.launch(true)
+    await appA.launch({ awaitDatabaseLoad: true })
 
     await Factory.registerUserToApplication({
       application: appA,

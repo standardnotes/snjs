@@ -40,7 +40,7 @@ describe('protections', function () {
         application.submitValuesForChallenge(challenge, values)
       },
     })
-    await application.launch(true)
+    await application.launch({ awaitDatabaseLoad: true })
     await Factory.registerUserToApplication({
       application: application,
       email: UuidGenerator.GenerateUuid(),
@@ -83,7 +83,7 @@ describe('protections', function () {
         application.submitValuesForChallenge(challenge, values)
       },
     })
-    await application.launch(true)
+    await application.launch({ awaitDatabaseLoad: true })
 
     await application.addPasscode(passcode)
     let note = await Factory.createMappedNote(application)
@@ -115,7 +115,7 @@ describe('protections', function () {
         application.submitValuesForChallenge(challenge, values)
       },
     })
-    await application.launch(true)
+    await application.launch({ awaitDatabaseLoad: true })
 
     await application.addPasscode(passcode)
     let note = await Factory.createMappedNote(application)
@@ -138,7 +138,7 @@ describe('protections', function () {
         application.cancelChallenge(challenge)
       },
     })
-    await application.launch(true)
+    await application.launch({ awaitDatabaseLoad: true })
 
     await application.addPasscode(passcode)
     let note = await Factory.createMappedNote(application)
@@ -170,7 +170,7 @@ describe('protections', function () {
         application.submitValuesForChallenge(challenge, values)
       },
     })
-    await application.launch(true)
+    await application.launch({ awaitDatabaseLoad: true })
 
     await application.addPasscode(passcode)
     let note = await Factory.createMappedNote(application)
@@ -211,7 +211,7 @@ describe('protections', function () {
       },
     })
 
-    await application.launch(true)
+    await application.launch({ awaitDatabaseLoad: true })
     await Factory.registerUserToApplication({
       application: application,
       email: UuidGenerator.GenerateUuid(),
@@ -251,7 +251,7 @@ describe('protections', function () {
         application.submitValuesForChallenge(challenge, values)
       },
     })
-    await application.launch(true)
+    await application.launch({ awaitDatabaseLoad: true })
 
     await application.addPasscode(passcode)
 
@@ -278,7 +278,7 @@ describe('protections', function () {
         application.submitValuesForChallenge(challenge, values)
       },
     })
-    await application.launch(true)
+    await application.launch({ awaitDatabaseLoad: true })
 
     await application.addPasscode(passcode)
 
@@ -421,7 +421,7 @@ describe('protections', function () {
           application.submitValuesForChallenge(challenge, values)
         },
       })
-      await application.launch(true)
+      await application.launch({ awaitDatabaseLoad: true })
       await Factory.registerUserToApplication({
         application: application,
         email: UuidGenerator.GenerateUuid(),
@@ -463,7 +463,7 @@ describe('protections', function () {
           application.submitValuesForChallenge(challenge, values)
         },
       })
-      await application.launch(true)
+      await application.launch({ awaitDatabaseLoad: true })
       await application.addPasscode(passcode)
 
       const NOTE_COUNT = 3
@@ -488,7 +488,7 @@ describe('protections', function () {
           application.cancelChallenge(challenge)
         },
       })
-      await application.launch(true)
+      await application.launch({ awaitDatabaseLoad: true })
       await application.addPasscode(passcode)
 
       const NOTE_COUNT = 3
@@ -509,7 +509,7 @@ describe('protections', function () {
           application.cancelChallenge(challenge)
         },
       })
-      await application.launch(true)
+      await application.launch({ awaitDatabaseLoad: true })
 
       const NOTE_COUNT = 3
       let notes = await Factory.createManyMappedNotes(application, NOTE_COUNT)
@@ -545,7 +545,7 @@ describe('protections', function () {
           application.submitValuesForChallenge(challenge, values)
         },
       })
-      await application.launch(true)
+      await application.launch({ awaitDatabaseLoad: true })
       await application.addPasscode(passcode)
 
       const NOTE_COUNT = 3
@@ -582,7 +582,7 @@ describe('protections', function () {
           application.submitValuesForChallenge(challenge, values)
         },
       })
-      await application.launch(true)
+      await application.launch({ awaitDatabaseLoad: true })
       await application.addPasscode(passcode)
 
       const NOTE_COUNT = 3
@@ -607,7 +607,7 @@ describe('protections', function () {
           application.cancelChallenge(challenge)
         },
       })
-      await application.launch(true)
+      await application.launch({ awaitDatabaseLoad: true })
       await application.addPasscode(passcode)
 
       const NOTE_COUNT = 3
