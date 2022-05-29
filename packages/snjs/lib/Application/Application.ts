@@ -1,6 +1,3 @@
-import { NavigationController } from './../../../navigation/src/Domain/Controller/NavigationController'
-import { NavigationControllerInterface } from './../../../navigation/src/Domain/Interface/NavigationControllerInterface'
-import { NavigationEventHandler } from './../../../navigation/src/Domain/Interface/EventHandler'
 import * as Common from '@standardnotes/common'
 import * as ExternalServices from '@standardnotes/services'
 import * as Encryption from '@standardnotes/encryption'
@@ -34,6 +31,7 @@ import { DeinitCallback } from '../ApplicationGroup/DeinitCallback'
 import { DeinitMode } from './DeinitMode'
 import { ApplicationConstructorOptions, FullyResolvedApplicationOptions } from './Options/ApplicationOptions'
 import { ApplicationOptionsDefaults } from './Options/Defaults'
+import { NavigationEventHandler, NavigationControllerInterface, NavigationController } from '@standardnotes/navigation'
 
 /** How often to automatically sync, in milliseconds */
 const DEFAULT_AUTO_SYNC_INTERVAL = 30_000

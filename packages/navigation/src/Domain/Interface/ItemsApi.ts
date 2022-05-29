@@ -6,4 +6,5 @@ export interface ItemsApiForNavigationController {
   getFilesForNote: ItemManagerInterface['getFilesForNote']
   itemsReferencingItem: ItemManagerInterface['itemsReferencingItem']
   findItem: ItemManagerInterface['findItem']
+  registerGlobalSmartViews: ItemManagerInterface['registerGlobalSmartViews']
 }

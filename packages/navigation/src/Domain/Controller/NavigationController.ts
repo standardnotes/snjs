@@ -287,6 +287,9 @@ export class NavigationController implements NavigationControllerInterface {
 
   private rebuildSystemSmartViews(criteria: FilterDisplayOptions): SmartView[] {
     this.systemSmartViews = BuildSmartViews(criteria, this.config)
+
+    this.items.registerGlobalSmartViews(this.systemSmartViews)
+
     return this.systemSmartViews
   }
 
