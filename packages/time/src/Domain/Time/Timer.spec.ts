@@ -10,6 +10,11 @@ describe('Timer', () => {
     expect(`${timestamp}`.length).toEqual(16)
   })
 
+  it('should return a timestamp in seconds', () => {
+    const timestamp = createTimer().getTimestampInSeconds()
+    expect(`${timestamp}`.length).toEqual(10)
+  })
+
   it('should return a utc date', () => {
     const date = createTimer().getUTCDate()
     expect(date).toBeInstanceOf(Date)

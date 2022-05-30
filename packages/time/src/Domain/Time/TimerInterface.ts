@@ -1,5 +1,6 @@
 export interface TimerInterface {
   getTimestampInMicroseconds(): number
+  getTimestampInSeconds(): number
   getUTCDate(): Date
   getUTCDateNDaysAgo(n: number): Date
   getUTCDateNDaysAhead(n: number): Date

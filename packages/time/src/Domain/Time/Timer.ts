@@ -29,6 +29,10 @@ export class Timer implements TimerInterface {
     return microtime.now()
   }
 
+  getTimestampInSeconds(): number {
+    return this.convertMicrosecondsToSeconds(this.getTimestampInMicroseconds())
+  }
+
   getUTCDate(): Date {
     return dayjs.utc().toDate()
   }
