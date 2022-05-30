@@ -69,6 +69,11 @@ describe('Timer', () => {
     expect(timestamp).toEqual(1617004805233000)
   })
 
+  it('should convert a string date to seconds', () => {
+    const timestamp = createTimer().convertStringDateToSeconds('2021-03-29 08:00:05.233Z')
+    expect(timestamp).toEqual(1617004805)
+  })
+
   it('should convert microseconds to string date', () => {
     expect(createTimer().convertMicrosecondsToStringDate(1617004805233123)).toEqual('2021-03-29T08:00:05.233123Z')
   })
