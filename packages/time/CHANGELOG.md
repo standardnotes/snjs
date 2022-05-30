@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.7.0](https://github.com/standardnotes/snjs/compare/@standardnotes/time@1.6.10...@standardnotes/time@1.7.0) (2022-05-30)
+
+
+### Features
+
+* getting timestamp in seconds ([24c3215](https://github.com/standardnotes/snjs/commit/24c3215fd0797b60eec10a88583c0ed8c7020387))
+
+
+
+
+
 ## [1.6.10](https://github.com/standardnotes/snjs/compare/@standardnotes/time@1.6.9...@standardnotes/time@1.6.10) (2022-05-30)
 
 
