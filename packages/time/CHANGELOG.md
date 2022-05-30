@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.6.10](https://github.com/standardnotes/snjs/compare/@standardnotes/time@1.6.9...@standardnotes/time@1.6.10) (2022-05-30)
+
+
+### Bug Fixes
+
+* add converting string dates to seconds ([f1ccbc9](https://github.com/standardnotes/snjs/commit/f1ccbc929fbd9a452ca87cbaf88bf4ce30855c91))
+
+
+
+
+
 ## [1.6.9](https://github.com/standardnotes/snjs/compare/@standardnotes/time@1.6.7...@standardnotes/time@1.6.9) (2022-05-04)
 
 **Note:** Version bump only for package @standardnotes/time
