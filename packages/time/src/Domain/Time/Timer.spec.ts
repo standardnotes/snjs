@@ -10,6 +10,11 @@ describe('Timer', () => {
     expect(`${timestamp}`.length).toEqual(16)
   })
 
+  it('should return a timestamp in seconds', () => {
+    const timestamp = createTimer().getTimestampInSeconds()
+    expect(`${timestamp}`.length).toEqual(10)
+  })
+
   it('should return a utc date', () => {
     const date = createTimer().getUTCDate()
     expect(date).toBeInstanceOf(Date)
@@ -67,6 +72,11 @@ describe('Timer', () => {
   it('should convert a string date to microseconds', () => {
     const timestamp = createTimer().convertStringDateToMicroseconds('2021-03-29 08:00:05.233Z')
     expect(timestamp).toEqual(1617004805233000)
+  })
+
+  it('should convert a string date to seconds', () => {
+    const timestamp = createTimer().convertStringDateToSeconds('2021-03-29 08:00:05.233Z')
+    expect(timestamp).toEqual(1617004805)
   })
 
   it('should convert microseconds to string date', () => {

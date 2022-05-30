@@ -29,6 +29,10 @@ export class Timer implements TimerInterface {
     return microtime.now()
   }
 
+  getTimestampInSeconds(): number {
+    return this.convertMicrosecondsToSeconds(this.getTimestampInMicroseconds())
+  }
+
   getUTCDate(): Date {
     return dayjs.utc().toDate()
   }
@@ -67,6 +71,10 @@ export class Timer implements TimerInterface {
 
   convertStringDateToMilliseconds(date: string): number {
     return dayjs.utc(date).valueOf()
+  }
+
+  convertStringDateToSeconds(date: string): number {
+    return this.convertMicrosecondsToSeconds(this.convertStringDateToMicroseconds(date))
   }
 
   convertMicrosecondsToMilliseconds(microseconds: number): number {

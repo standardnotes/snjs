@@ -15,6 +15,8 @@ export type CrossServiceTokenData = {
     updated_at: string
     device_info: string
     readonly_access: boolean
+    access_expiration: string
+    refresh_expiration: string
   }
   extensionKey?: string
   analyticsId?: number

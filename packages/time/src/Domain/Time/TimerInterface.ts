@@ -1,5 +1,6 @@
 export interface TimerInterface {
   getTimestampInMicroseconds(): number
+  getTimestampInSeconds(): number
   getUTCDate(): Date
   getUTCDateNDaysAgo(n: number): Date
   getUTCDateNDaysAhead(n: number): Date
@@ -11,6 +12,7 @@ export interface TimerInterface {
   convertStringDateToDate(date: string): Date
   convertStringDateToMicroseconds(date: string): number
   convertStringDateToMilliseconds(date: string): number
+  convertStringDateToSeconds(date: string): number
   convertMicrosecondsToMilliseconds(microseconds: number): number
   convertMicrosecondsToSeconds(microseconds: number): number
   convertMicrosecondsToStringDate(microseconds: number): string

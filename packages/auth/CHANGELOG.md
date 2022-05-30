@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.19.2](https://github.com/standardnotes/snjs/compare/@standardnotes/auth@3.19.1...@standardnotes/auth@3.19.2) (2022-05-30)
+
+
+### Bug Fixes
+
+* add session access and refresh expiration dates to cross service token data ([8ad0eee](https://github.com/standardnotes/snjs/commit/8ad0eee04acfbba03e62881e1c17e77baedbea04))
+
+
+
+
+
 ## [3.19.1](https://github.com/standardnotes/snjs/compare/@standardnotes/auth@3.19.0...@standardnotes/auth@3.19.1) (2022-05-27)
 
 
