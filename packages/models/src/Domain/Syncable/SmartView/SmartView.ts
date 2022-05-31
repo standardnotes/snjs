@@ -3,6 +3,8 @@ import { PredicateInterface, PredicateJsonForm } from '../../Runtime/Predicate/I
 import { predicateFromJson } from '../../Runtime/Predicate/Generators'
 import { ItemContent } from '../../Abstract/Content/ItemContent'
 import { DecryptedPayloadInterface } from '../../Abstract/Payload/Interfaces/DecryptedPayload'
+import { ItemInterface } from '../../Abstract/Item'
+import { ContentType } from '@standardnotes/common'
 
 export const SMART_TAG_DSL_PREFIX = '!['
 
@@ -21,6 +23,10 @@ export interface SmartViewContent extends ItemContent {
 
 export function isSystemView(view: SmartView): boolean {
   return Object.values(SystemViewId).includes(view.uuid as SystemViewId)
+}
+
+export function isSmartView(x: ItemInterface): x is SmartView {
+  return x.content_type === ContentType.SmartView
 }
 
 /**

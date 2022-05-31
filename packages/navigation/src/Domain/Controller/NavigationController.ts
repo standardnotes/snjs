@@ -6,17 +6,18 @@ import {
   FileItem,
   FilterDisplayOptions,
   isNote,
-  isSystemView,
   ItemDisplayController,
   SmartView,
   SNNote,
-  SNTag,
   SystemViewId,
   isFile,
   isPayloadSourceNotInterestingToClients,
+  isSmartView,
+  isTag,
 } from '@standardnotes/models'
 import { ItemManagerChangeData } from '@standardnotes/services'
-import { extendArray, assert } from '@standardnotes/utils'
+import { extendArray, assert, Uuids } from '@standardnotes/utils'
+import { NavigationDisplayOptions } from '../Interface/DisplayOptions'
 import { NavigationEventHandler } from '../Interface/EventHandler'
 import { ItemsApiForNavigationController } from '../Interface/ItemsApi'
 import { NavigationControllerInterface } from '../Interface/NavigationControllerInterface'
@@ -32,6 +33,7 @@ export class NavigationController implements NavigationControllerInterface {
   private folderDisplayController: ItemDisplayController<Folder>
   private fileDisplayController: ItemDisplayController<FileItem>
   private systemSmartViews: SmartView[]
+  private lastDisplayOptions?: DisplayOptions
 
   private disposers: (() => void)[] = []
 
@@ -43,10 +45,12 @@ export class NavigationController implements NavigationControllerInterface {
     this.disposers.push(
       items.addObserver<SNNote>(ContentType.Note, (stream) => {
         this.handleNotesStream(stream)
+
         if (!isPayloadSourceNotInterestingToClients(stream.source)) {
           this.handleSelectionUpdatesForStream(stream)
         }
       }),
+
       items.addObserver<Folder>(FolderContentTypes, (stream) => {
         this.handleFoldersStream(stream)
 
@@ -54,6 +58,7 @@ export class NavigationController implements NavigationControllerInterface {
           this.handleSelectionUpdatesForStream(stream)
         }
       }),
+
       items.addObserver<FileItem>(ContentType.File, (stream) => {
         this.handleFilesStream(stream)
 
@@ -99,7 +104,29 @@ export class NavigationController implements NavigationControllerInterface {
     ;(this.fileDisplayController as unknown) = undefined
   }
 
-  handleNotesStream(_stream: ItemManagerChangeData<SNNote>): void {
+  private handleNotesStream(_stream: ItemManagerChangeData<SNNote>): void {
+    this.reloadNotesAndNotify()
+  }
+
+  private handleFilesStream(_stream: ItemManagerChangeData<FileItem>): void {
+    this.files = this.fileDisplayController.items()
+
+    this.eventHandler?.onFiles(this.files)
+  }
+
+  private handleFoldersStream(stream: ItemManagerChangeData<Folder>): void {
+    this.reloadFoldersAndNotify()
+
+    const relevantChanged = [...stream.changed, ...stream.inserted]
+    const selectedFolderIds = Uuids(this.getSelectedFolders())
+
+    const changesInSelected = relevantChanged.some((f) => selectedFolderIds.includes(f.uuid))
+    if (changesInSelected) {
+      this.reloadDisplayOptions()
+    }
+  }
+
+  private reloadNotesAndNotify(): void {
     assert(this.navigationDisplayController.contentTypes.length === 2)
 
     const fileContentTypeHidden = !this.config.supportsFileNavigation
@@ -112,13 +139,7 @@ export class NavigationController implements NavigationControllerInterface {
     this.eventHandler?.onNotes(this.notes)
   }
 
-  private handleFilesStream(_stream: ItemManagerChangeData<FileItem>): void {
-    this.files = this.fileDisplayController.items()
-
-    this.eventHandler?.onFiles(this.files)
-  }
-
-  private handleFoldersStream(_stream: ItemManagerChangeData<Folder>): void {
+  private reloadFoldersAndNotify(): void {
     this.folders = [...this.systemSmartViews, ...this.folderDisplayController.items()]
 
     this.eventHandler?.onFolders(this.folders)
@@ -229,10 +250,22 @@ export class NavigationController implements NavigationControllerInterface {
     return files
   }
 
-  setDisplayOptions(options: DisplayOptions): void {
+  private reloadDisplayOptions(): void {
+    if (this.lastDisplayOptions) {
+      this.setDisplayOptions(this.lastDisplayOptions)
+
+      this.reloadNotesAndNotify()
+    }
+  }
+
+  setDisplayOptions(options: NavigationDisplayOptions): void {
     const override: FilterDisplayOptions = {}
 
-    if (options.views && options.views.find((view) => view.uuid === SystemViewId.AllNotes)) {
+    const selectedFolders = this.getSelectedFolders()
+    const tags = selectedFolders.filter(isTag)
+    const views = selectedFolders.filter(isSmartView)
+
+    if (views.find((view) => view.uuid === SystemViewId.AllNotes)) {
       if (options.includeArchived == undefined) {
         override.includeArchived = false
       }
@@ -240,12 +273,12 @@ export class NavigationController implements NavigationControllerInterface {
         override.includeTrashed = false
       }
     }
-    if (options.views && options.views.find((view) => view.uuid === SystemViewId.ArchivedNotes)) {
+    if (views.find((view) => view.uuid === SystemViewId.ArchivedNotes)) {
       if (options.includeTrashed == undefined) {
         override.includeTrashed = false
       }
     }
-    if (options.views && options.views.find((view) => view.uuid === SystemViewId.TrashedNotes)) {
+    if (views.find((view) => view.uuid === SystemViewId.TrashedNotes)) {
       if (options.includeArchived == undefined) {
         override.includeArchived = true
       }
@@ -253,29 +286,16 @@ export class NavigationController implements NavigationControllerInterface {
 
     this.rebuildSystemSmartViews({ ...options, ...override })
 
-    const mostRecentVersionOfTags = options.tags
-      ?.map((tag) => {
-        return this.items.findItem(tag.uuid) as SNTag
-      })
-      .filter((tag) => tag != undefined)
-
-    const mostRecentVersionOfViews = options.views
-      ?.map((view) => {
-        if (isSystemView(view)) {
-          return this.systemSmartViews.find((systemView) => systemView.uuid === view.uuid) as SmartView
-        }
-        return this.items.findItem(view.uuid) as SmartView
-      })
-      .filter((view) => view != undefined)
-
     const updatedOptions: DisplayOptions = {
       ...options,
       ...override,
       ...{
-        tags: mostRecentVersionOfTags,
-        views: mostRecentVersionOfViews,
+        tags: tags,
+        views: views,
       },
     }
+
+    this.lastDisplayOptions = updatedOptions
 
     this.navigationDisplayController.setDisplayOptions({
       customFilter: computeUnifiedFilterForDisplayOptions(updatedOptions, {

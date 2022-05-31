@@ -43,7 +43,6 @@ describe.only('navigation', function () {
 
   it('navigation handler should notify of new items', async function () {
     const deferred = Deferred()
-
     const context = await createContext({
       onNotes: (notes) => {
         deferred.resolve(notes)
@@ -51,7 +50,6 @@ describe.only('navigation', function () {
     })
 
     await context.createSyncedNote()
-
     const notes = await deferred.promise
 
     expect(notes.length).to.equal(1)
@@ -85,13 +83,11 @@ describe.only('navigation', function () {
         }
       },
     })
+
     const controller = context.application.navigationController
     const note = await context.createSyncedNote()
-
     controller.selectItems([note])
-
     await context.deleteItemAndSync(note)
-
     const selectedNotes = await deferred.promise
 
     expect(selectedNotes.length).to.equal(0)
