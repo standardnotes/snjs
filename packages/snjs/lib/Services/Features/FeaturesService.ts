@@ -1,6 +1,13 @@
 import { AccountEvent, UserService } from '../User/UserService'
 import { SNApiService } from '../Api/ApiService'
-import { arraysEqual, convertTimestampToMilliseconds, removeFromArray, Copy, lastElement } from '@standardnotes/utils'
+import {
+  arraysEqual,
+  convertTimestampToMilliseconds,
+  removeFromArray,
+  Copy,
+  lastElement,
+  isString,
+} from '@standardnotes/utils'
 import { ClientDisplayableError, UserFeaturesResponse } from '@standardnotes/responses'
 import { ContentType, RoleName } from '@standardnotes/common'
 import { FeaturesClientInterface } from './ClientInterface'
@@ -618,8 +625,28 @@ export class SNFeaturesService
       await this.alertService.alert(Messages.API_MESSAGE_FAILED_DOWNLOADING_EXTENSION)
       return undefined
     }
-    const rawFeature = response.data as FeaturesImports.ThirdPartyFeatureDescription
+
+    let rawFeature = response.data as FeaturesImports.ThirdPartyFeatureDescription
+
+    if (isString(rawFeature)) {
+      try {
+        rawFeature = JSON.parse(rawFeature)
+        // eslint-disable-next-line no-empty
+      } catch (error) {}
+    }
+
     if (!rawFeature.content_type) {
+      return
+    }
+
+    const isValidContentType = [
+      ContentType.Component,
+      ContentType.Theme,
+      ContentType.ActionsExtension,
+      ContentType.ExtensionRepo,
+    ].includes(rawFeature.content_type)
+
+    if (!isValidContentType) {
       return
     }
 
@@ -645,7 +672,9 @@ export class SNFeaturesService
       valid_until: new Date(rawFeature.expires_at || 0),
       hosted_url: rawFeature.url,
     } as Partial<Models.ComponentContent>)
+
     const component = this.itemManager.createTemplateItem(rawFeature.content_type, content) as Models.SNComponent
+
     return component
   }
 
