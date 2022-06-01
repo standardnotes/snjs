@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.4.1](https://github.com/standardnotes/snjs/compare/@standardnotes/analytics@1.4.0...@standardnotes/analytics@1.4.1) (2022-06-01)
+
+
+### Bug Fixes
+
+* rename analytics activity backup to email backup ([30d2db6](https://github.com/standardnotes/snjs/commit/30d2db63e5dec05b3f0976211c661d8aa0e04139))
+
+
+
+
+
 # [1.4.0](https://github.com/standardnotes/snjs/compare/@standardnotes/analytics@1.3.1...@standardnotes/analytics@1.4.0) (2022-06-01)
 
 
