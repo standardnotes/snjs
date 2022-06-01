@@ -1078,6 +1078,7 @@ export class SNApplication
   }
 
   private clearInternalEventBus(): void {
+    this.internalEventBus.deinit()
     ;(this.internalEventBus as unknown) = undefined
   }
 

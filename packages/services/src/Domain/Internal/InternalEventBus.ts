@@ -11,6 +11,10 @@ export class InternalEventBus implements InternalEventBusInterface {
     this.eventHandlers = new Map<InternalEventType, InternalEventHandlerInterface[]>()
   }
 
+  deinit(): void {
+    ;(this.eventHandlers as unknown) = undefined
+  }
+
   addEventHandler(handler: InternalEventHandlerInterface, eventType: string): void {
     let handlersForEventType = this.eventHandlers.get(eventType)
     if (handlersForEventType === undefined) {

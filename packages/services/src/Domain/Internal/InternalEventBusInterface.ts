@@ -23,4 +23,6 @@ export interface InternalEventBusInterface {
    * Either all handlers will start at once or they will do it sequentially.
    */
   publishSync(event: InternalEventInterface, strategy: InternalEventPublishStrategy): Promise<void>
+
+  deinit(): void
 }
