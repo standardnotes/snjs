@@ -6,6 +6,80 @@ import { AnalyticsStoreInterface } from '../../Domain/Service/AnalyticsStoreInte
 export class RedisAnalyticsStore implements AnalyticsStoreInterface {
   constructor(private redisClient: IORedis.Redis) {}
 
+  async unmarkActivityForToday(activity: AnalyticsActivity, analyticsId: number): Promise<void> {
+    const pipeline = this.redisClient.pipeline()
+
+    pipeline.setbit(`bitmap:action:${activity}:timespan:${this.getMonthlyKey()}`, analyticsId, 0)
+    pipeline.setbit(`bitmap:action:${activity}:timespan:${this.getWeeklyKey()}`, analyticsId, 0)
+    pipeline.setbit(`bitmap:action:${activity}:timespan:${this.getDailyKey()}`, analyticsId, 0)
+
+    await pipeline.exec()
+  }
+
+  async unmarkActivitiesForToday(activities: AnalyticsActivity[], analyticsId: number): Promise<void> {
+    const pipeline = this.redisClient.pipeline()
+
+    for (const activity of activities) {
+      pipeline.setbit(`bitmap:action:${activity}:timespan:${this.getMonthlyKey()}`, analyticsId, 0)
+      pipeline.setbit(`bitmap:action:${activity}:timespan:${this.getWeeklyKey()}`, analyticsId, 0)
+      pipeline.setbit(`bitmap:action:${activity}:timespan:${this.getDailyKey()}`, analyticsId, 0)
+    }
+
+    await pipeline.exec()
+  }
+
+  async unmarkActivityForYesterday(activity: AnalyticsActivity, analyticsId: number): Promise<void> {
+    const pipeline = this.redisClient.pipeline()
+
+    pipeline.setbit(`bitmap:action:${activity}:timespan:${this.getMonthlyKey(this.getYesterdayDate())}`, analyticsId, 0)
+    pipeline.setbit(`bitmap:action:${activity}:timespan:${this.getWeeklyKey(this.getYesterdayDate())}`, analyticsId, 0)
+    pipeline.setbit(`bitmap:action:${activity}:timespan:${this.getDailyKey(this.getYesterdayDate())}`, analyticsId, 0)
+
+    await pipeline.exec()
+  }
+
+  async unmarkActivitiesForYesterday(activities: AnalyticsActivity[], analyticsId: number): Promise<void> {
+    const pipeline = this.redisClient.pipeline()
+
+    for (const activity of activities) {
+      pipeline.setbit(
+        `bitmap:action:${activity}:timespan:${this.getMonthlyKey(this.getYesterdayDate())}`,
+        analyticsId,
+        0,
+      )
+      pipeline.setbit(
+        `bitmap:action:${activity}:timespan:${this.getWeeklyKey(this.getYesterdayDate())}`,
+        analyticsId,
+        0,
+      )
+      pipeline.setbit(`bitmap:action:${activity}:timespan:${this.getDailyKey(this.getYesterdayDate())}`, analyticsId, 0)
+    }
+
+    await pipeline.exec()
+  }
+
+  async markActivityForToday(activity: AnalyticsActivity, analyticsId: number): Promise<void> {
+    const pipeline = this.redisClient.pipeline()
+
+    pipeline.setbit(`bitmap:action:${activity}:timespan:${this.getMonthlyKey()}`, analyticsId, 1)
+    pipeline.setbit(`bitmap:action:${activity}:timespan:${this.getWeeklyKey()}`, analyticsId, 1)
+    pipeline.setbit(`bitmap:action:${activity}:timespan:${this.getDailyKey()}`, analyticsId, 1)
+
+    await pipeline.exec()
+  }
+
+  async markActivitiesForToday(activities: AnalyticsActivity[], analyticsId: number): Promise<void> {
+    const pipeline = this.redisClient.pipeline()
+
+    for (const activity of activities) {
+      pipeline.setbit(`bitmap:action:${activity}:timespan:${this.getMonthlyKey()}`, analyticsId, 1)
+      pipeline.setbit(`bitmap:action:${activity}:timespan:${this.getWeeklyKey()}`, analyticsId, 1)
+      pipeline.setbit(`bitmap:action:${activity}:timespan:${this.getDailyKey()}`, analyticsId, 1)
+    }
+
+    await pipeline.exec()
+  }
+
   async calculateActivityTotalCountForYesterday(activity: AnalyticsActivity): Promise<number> {
     return this.redisClient.bitcount(`bitmap:action:${activity}:timespan:${this.getDailyKey(this.getYesterdayDate())}`)
   }
@@ -96,16 +170,6 @@ export class RedisAnalyticsStore implements AnalyticsStoreInterface {
     return bitValue === 1
   }
 
-  async markActivity(activity: AnalyticsActivity, analyticsId: number): Promise<void> {
-    const pipeline = this.redisClient.pipeline()
-
-    pipeline.setbit(`bitmap:action:${activity}:timespan:${this.getMonthlyKey()}`, analyticsId, 1)
-    pipeline.setbit(`bitmap:action:${activity}:timespan:${this.getWeeklyKey()}`, analyticsId, 1)
-    pipeline.setbit(`bitmap:action:${activity}:timespan:${this.getDailyKey()}`, analyticsId, 1)
-
-    await pipeline.exec()
-  }
-
   async getYesterdayOutOfSyncIncidents(): Promise<number> {
     const count = await this.redisClient.get(
       `count:action:out-of-sync:timespan:${this.getDailyKey(this.getYesterdayDate())}`,
@@ -175,8 +239,8 @@ export class RedisAnalyticsStore implements AnalyticsStoreInterface {
     return statistics
   }
 
-  private getMonthlyKey(): string {
-    const date = new Date()
+  private getMonthlyKey(date?: Date): string {
+    date = date ?? new Date()
 
     return `${this.getYear(date)}-${this.getMonth(date)}`
   }

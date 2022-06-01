@@ -115,16 +115,129 @@ describe('RedisAnalyticsStore', () => {
     expect(redisClient.getbit).toHaveBeenCalledWith('bitmap:action:editing-items:timespan:2022-week-21', 123)
   })
 
-  it('should set analytics activity', async () => {
+  it('should mark analytics activity for today', async () => {
     jest.useFakeTimers('modern')
     jest.setSystemTime(1653395155000)
-    await createStore().markActivity(AnalyticsActivity.EditingItems, 123)
+    await createStore().markActivityForToday(AnalyticsActivity.EditingItems, 123)
     jest.useRealTimers()
 
     expect(pipeline.setbit).toBeCalledTimes(3)
     expect(pipeline.setbit).toHaveBeenNthCalledWith(1, 'bitmap:action:editing-items:timespan:2022-5', 123, 1)
     expect(pipeline.setbit).toHaveBeenNthCalledWith(2, 'bitmap:action:editing-items:timespan:2022-week-21', 123, 1)
     expect(pipeline.setbit).toHaveBeenNthCalledWith(3, 'bitmap:action:editing-items:timespan:2022-5-24', 123, 1)
+    expect(pipeline.exec).toHaveBeenCalled()
+  })
+
+  it('should mark analytics activities for today', async () => {
+    jest.useFakeTimers('modern')
+    jest.setSystemTime(1653395155000)
+    await createStore().markActivitiesForToday(
+      [AnalyticsActivity.EditingItems, AnalyticsActivity.EmailUnbackedUpData],
+      123,
+    )
+    jest.useRealTimers()
+
+    expect(pipeline.setbit).toBeCalledTimes(6)
+    expect(pipeline.setbit).toHaveBeenNthCalledWith(1, 'bitmap:action:editing-items:timespan:2022-5', 123, 1)
+    expect(pipeline.setbit).toHaveBeenNthCalledWith(2, 'bitmap:action:editing-items:timespan:2022-week-21', 123, 1)
+    expect(pipeline.setbit).toHaveBeenNthCalledWith(3, 'bitmap:action:editing-items:timespan:2022-5-24', 123, 1)
+    expect(pipeline.setbit).toHaveBeenNthCalledWith(4, 'bitmap:action:email-unbacked-up-data:timespan:2022-5', 123, 1)
+    expect(pipeline.setbit).toHaveBeenNthCalledWith(
+      5,
+      'bitmap:action:email-unbacked-up-data:timespan:2022-week-21',
+      123,
+      1,
+    )
+    expect(pipeline.setbit).toHaveBeenNthCalledWith(
+      6,
+      'bitmap:action:email-unbacked-up-data:timespan:2022-5-24',
+      123,
+      1,
+    )
+    expect(pipeline.exec).toHaveBeenCalled()
+  })
+
+  it('should unmark analytics activity for today', async () => {
+    jest.useFakeTimers('modern')
+    jest.setSystemTime(1653395155000)
+    await createStore().unmarkActivityForToday(AnalyticsActivity.EditingItems, 123)
+    jest.useRealTimers()
+
+    expect(pipeline.setbit).toBeCalledTimes(3)
+    expect(pipeline.setbit).toHaveBeenNthCalledWith(1, 'bitmap:action:editing-items:timespan:2022-5', 123, 0)
+    expect(pipeline.setbit).toHaveBeenNthCalledWith(2, 'bitmap:action:editing-items:timespan:2022-week-21', 123, 0)
+    expect(pipeline.setbit).toHaveBeenNthCalledWith(3, 'bitmap:action:editing-items:timespan:2022-5-24', 123, 0)
+    expect(pipeline.exec).toHaveBeenCalled()
+  })
+
+  it('should unmark analytics activities for today', async () => {
+    jest.useFakeTimers('modern')
+    jest.setSystemTime(1653395155000)
+    await createStore().unmarkActivitiesForToday(
+      [AnalyticsActivity.EditingItems, AnalyticsActivity.EmailUnbackedUpData],
+      123,
+    )
+    jest.useRealTimers()
+
+    expect(pipeline.setbit).toBeCalledTimes(6)
+    expect(pipeline.setbit).toHaveBeenNthCalledWith(1, 'bitmap:action:editing-items:timespan:2022-5', 123, 0)
+    expect(pipeline.setbit).toHaveBeenNthCalledWith(2, 'bitmap:action:editing-items:timespan:2022-week-21', 123, 0)
+    expect(pipeline.setbit).toHaveBeenNthCalledWith(3, 'bitmap:action:editing-items:timespan:2022-5-24', 123, 0)
+    expect(pipeline.setbit).toHaveBeenNthCalledWith(4, 'bitmap:action:email-unbacked-up-data:timespan:2022-5', 123, 0)
+    expect(pipeline.setbit).toHaveBeenNthCalledWith(
+      5,
+      'bitmap:action:email-unbacked-up-data:timespan:2022-week-21',
+      123,
+      0,
+    )
+    expect(pipeline.setbit).toHaveBeenNthCalledWith(
+      6,
+      'bitmap:action:email-unbacked-up-data:timespan:2022-5-24',
+      123,
+      0,
+    )
+    expect(pipeline.exec).toHaveBeenCalled()
+  })
+
+  it('should unmark analytics activity for yesterday', async () => {
+    jest.useFakeTimers('modern')
+    jest.setSystemTime(1653395155000)
+    await createStore().unmarkActivityForYesterday(AnalyticsActivity.EditingItems, 123)
+    jest.useRealTimers()
+
+    expect(pipeline.setbit).toBeCalledTimes(3)
+    expect(pipeline.setbit).toHaveBeenNthCalledWith(1, 'bitmap:action:editing-items:timespan:2022-5', 123, 0)
+    expect(pipeline.setbit).toHaveBeenNthCalledWith(2, 'bitmap:action:editing-items:timespan:2022-week-21', 123, 0)
+    expect(pipeline.setbit).toHaveBeenNthCalledWith(3, 'bitmap:action:editing-items:timespan:2022-5-23', 123, 0)
+    expect(pipeline.exec).toHaveBeenCalled()
+  })
+
+  it('should unmark analytics activities for yesterday', async () => {
+    jest.useFakeTimers('modern')
+    jest.setSystemTime(1653395155000)
+    await createStore().unmarkActivitiesForYesterday(
+      [AnalyticsActivity.EditingItems, AnalyticsActivity.EmailUnbackedUpData],
+      123,
+    )
+    jest.useRealTimers()
+
+    expect(pipeline.setbit).toBeCalledTimes(6)
+    expect(pipeline.setbit).toHaveBeenNthCalledWith(1, 'bitmap:action:editing-items:timespan:2022-5', 123, 0)
+    expect(pipeline.setbit).toHaveBeenNthCalledWith(2, 'bitmap:action:editing-items:timespan:2022-week-21', 123, 0)
+    expect(pipeline.setbit).toHaveBeenNthCalledWith(3, 'bitmap:action:editing-items:timespan:2022-5-23', 123, 0)
+    expect(pipeline.setbit).toHaveBeenNthCalledWith(4, 'bitmap:action:email-unbacked-up-data:timespan:2022-5', 123, 0)
+    expect(pipeline.setbit).toHaveBeenNthCalledWith(
+      5,
+      'bitmap:action:email-unbacked-up-data:timespan:2022-week-21',
+      123,
+      0,
+    )
+    expect(pipeline.setbit).toHaveBeenNthCalledWith(
+      6,
+      'bitmap:action:email-unbacked-up-data:timespan:2022-5-23',
+      123,
+      0,
+    )
     expect(pipeline.exec).toHaveBeenCalled()
   })
 
