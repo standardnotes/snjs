@@ -6,6 +6,14 @@ import { AnalyticsStoreInterface } from '../../Domain/Service/AnalyticsStoreInte
 export class RedisAnalyticsStore implements AnalyticsStoreInterface {
   constructor(private redisClient: IORedis.Redis) {}
 
+  async calculateActivityTotalCountForYesterday(activity: AnalyticsActivity): Promise<number> {
+    return this.redisClient.bitcount(`bitmap:action:${activity}:timespan:${this.getDailyKey(this.getYesterdayDate())}`)
+  }
+
+  async calculateActivityTotalCountForLastWeek(activity: AnalyticsActivity): Promise<number> {
+    return this.redisClient.bitcount(`bitmap:action:${activity}:timespan:${this.getWeeklyKey(this.getLastWeekDate())}`)
+  }
+
   async calculateActivityRetentionForYesterday(activity: AnalyticsActivity): Promise<number> {
     const dayBeforeYesterdayKey = this.getDailyKey(this.getDayBeforeYesterdayDate())
     const yesterdayKey = this.getDailyKey(this.getYesterdayDate())

@@ -14,4 +14,6 @@ export interface AnalyticsStoreInterface {
   wasActivityDoneThisWeek(activity: AnalyticsActivity, analyticsId: number): Promise<boolean>
   calculateActivityRetentionForYesterday(activity: AnalyticsActivity): Promise<number>
   calculateActivityRetentionForLastWeek(activity: AnalyticsActivity): Promise<number>
+  calculateActivityTotalCountForYesterday(activity: AnalyticsActivity): Promise<number>
+  calculateActivityTotalCountForLastWeek(activity: AnalyticsActivity): Promise<number>
 }

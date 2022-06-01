@@ -23,6 +23,28 @@ describe('RedisAnalyticsStore', () => {
     redisClient.send_command = jest.fn()
   })
 
+  it('should calculate total count of activities yesterday', async () => {
+    redisClient.bitcount = jest.fn().mockReturnValue(70)
+
+    jest.useFakeTimers('modern')
+    jest.setSystemTime(1653395155000)
+    expect(await createStore().calculateActivityTotalCountForYesterday(AnalyticsActivity.EditingItems)).toEqual(70)
+    jest.useRealTimers()
+
+    expect(redisClient.bitcount).toHaveBeenCalledWith('bitmap:action:editing-items:timespan:2022-5-23')
+  })
+
+  it('should calculate total count of activities last week', async () => {
+    redisClient.bitcount = jest.fn().mockReturnValue(70)
+
+    jest.useFakeTimers('modern')
+    jest.setSystemTime(1653395155000)
+    expect(await createStore().calculateActivityTotalCountForLastWeek(AnalyticsActivity.EditingItems)).toEqual(70)
+    jest.useRealTimers()
+
+    expect(redisClient.bitcount).toHaveBeenCalledWith('bitmap:action:editing-items:timespan:2022-week-20')
+  })
+
   it('should calculate activity retention for yesterday', async () => {
     redisClient.bitcount = jest.fn().mockReturnValueOnce(7).mockReturnValueOnce(10)
 
