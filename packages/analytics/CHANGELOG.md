@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.5.0](https://github.com/standardnotes/snjs/compare/@standardnotes/analytics@1.4.1...@standardnotes/analytics@1.5.0) (2022-06-01)
+
+
+### Features
+
+* add unmarking activities ([09cea1d](https://github.com/standardnotes/snjs/commit/09cea1d8e97dd83f2eaafaef5ff680aef8c5c3ff))
+
+
+
+
+
 ## [1.4.1](https://github.com/standardnotes/snjs/compare/@standardnotes/analytics@1.4.0...@standardnotes/analytics@1.4.1) (2022-06-01)
 
 
