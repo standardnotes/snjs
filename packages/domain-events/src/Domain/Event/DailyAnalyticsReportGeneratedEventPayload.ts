@@ -1,4 +1,4 @@
-export interface DailyVersionAdoptionReportGeneratedEventPayload {
+export interface DailyAnalyticsReportGeneratedEventPayload {
   snjsStatistics: Array<{
     version: string
     count: number
@@ -10,6 +10,7 @@ export interface DailyVersionAdoptionReportGeneratedEventPayload {
   activityStatistics: Array<{
     name: string
     retention: number
+    totalCount: number
   }>
   outOfSyncIncidents: number
 }
