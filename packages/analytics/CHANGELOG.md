@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.4.0](https://github.com/standardnotes/snjs/compare/@standardnotes/analytics@1.3.1...@standardnotes/analytics@1.4.0) (2022-06-01)
+
+
+### Features
+
+* add calculating total counts of activites in analytics ([6ed659a](https://github.com/standardnotes/snjs/commit/6ed659a7c4411ce2555e4af96dc5473c3d03fd41))
+
+
+
+
+
 ## [1.3.1](https://github.com/standardnotes/snjs/compare/@standardnotes/analytics@1.3.0...@standardnotes/analytics@1.3.1) (2022-05-26)
 
 

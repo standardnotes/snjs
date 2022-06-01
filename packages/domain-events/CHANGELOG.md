@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.29.0](https://github.com/standardnotes/snjs/compare/@standardnotes/domain-events@2.28.15...@standardnotes/domain-events@2.29.0) (2022-06-01)
+
+
+### Features
+
+* renamed daily version adoption report to daily analytics report ([b9f3b8d](https://github.com/standardnotes/snjs/commit/b9f3b8dc258770b214f369cea08358bb05a55179))
+
+
+
+
+
 ## [2.28.15](https://github.com/standardnotes/snjs/compare/@standardnotes/domain-events@2.28.14...@standardnotes/domain-events@2.28.15) (2022-05-30)
 
 **Note:** Version bump only for package @standardnotes/domain-events
