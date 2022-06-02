@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.4.128](https://github.com/standardnotes/snjs/compare/@standardnotes/domain-events-infra@1.4.127...@standardnotes/domain-events-infra@1.4.128) (2022-06-02)
+
+
+### Bug Fixes
+
+* parsing create at date on events from JSON string ([a914657](https://github.com/standardnotes/snjs/commit/a914657f949c522ffa6263ab2b92ddd34256e94e))
+
+
+
+
+
 ## [1.4.127](https://github.com/standardnotes/snjs/compare/@standardnotes/domain-events-infra@1.4.126...@standardnotes/domain-events-infra@1.4.127) (2022-06-01)
 
 **Note:** Version bump only for package @standardnotes/domain-events-infra

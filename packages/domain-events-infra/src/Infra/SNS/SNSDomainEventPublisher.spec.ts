@@ -23,13 +23,15 @@ describe('SNSDomainEventPublisher', () => {
     event = {} as jest.Mocked<DomainEventInterface>
     event.type = 'TEST'
     event.payload = { foo: 'bar' }
+    event.createdAt = new Date(1)
   })
 
   it('should publish a domain event', async () => {
     await createPublisher().publish(event)
 
     expect(sns.publish).toHaveBeenCalledWith({
-      Message: 'eJyrViqpLEhVslIKcQ0OUdJRKkiszMlPTFGyqlZKy88HiiclFinV1gIA9tQMhA==',
+      Message:
+        'eJyrViqpLEhVslIKcQ0OUdJRKkiszMlPTFGyqlZKy88HiiclFinV6iglF6UmlqSmOJYAhQwtzQ10DQyBKMTAwAqM9AwMDKOUagGlWhXt',
       MessageAttributes: {
         event: {
           DataType: 'String',

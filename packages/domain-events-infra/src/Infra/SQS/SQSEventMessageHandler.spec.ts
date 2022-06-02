@@ -26,7 +26,7 @@ describe('SQSEventMessageHandler', () => {
 
   it('should handle messages', async () => {
     const sqsMessage = `{
-      "Message" : "eJyrViqpLEhVslIKcQ0OUdJRKkiszMlPTFGyqlZKy88HiiclFinV1gIA9tQMhA=="
+      "Message" : "eJyrViqpLEhVslIKcQ0OUdJRKkiszMlPTFGyqlZKy88HiiclFinV6iglF6UmlqSmOJYAhQwtzQ10DQyBKMTAwAqM9AwMDKOUagGlWhXt"
     }`
 
     await createHandler().handleMessage(sqsMessage)
@@ -36,6 +36,7 @@ describe('SQSEventMessageHandler', () => {
         foo: 'bar',
       },
       type: 'TEST',
+      createdAt: new Date(1),
     })
   })
 

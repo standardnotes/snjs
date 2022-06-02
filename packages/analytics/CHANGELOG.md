@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.6.0](https://github.com/standardnotes/snjs/compare/@standardnotes/analytics@1.5.0...@standardnotes/analytics@1.6.0) (2022-06-02)
+
+
+### Features
+
+* refactor analytics store to handle different periods of time ([00d4f3f](https://github.com/standardnotes/snjs/commit/00d4f3f2f742b0deb5ef4cd415c672574cb3a911))
+
+
+
+
+
 # [1.5.0](https://github.com/standardnotes/snjs/compare/@standardnotes/analytics@1.4.1...@standardnotes/analytics@1.5.0) (2022-06-01)
 
 
