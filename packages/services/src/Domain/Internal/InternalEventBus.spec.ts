@@ -107,4 +107,11 @@ describe('InternalEventBus', () => {
     expect(eventHandler2.handleEvent).not.toHaveBeenCalled()
     expect(eventHandler3.handleEvent).not.toHaveBeenCalled()
   })
+
+  it('should clear event observers on deinit', async () => {
+    const eventBus = createEventBus()
+    eventBus.deinit()
+
+    expect(eventBus['eventHandlers']).toBeUndefined
+  })
 })
