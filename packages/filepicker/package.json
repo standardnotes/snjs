@@ -18,7 +18,7 @@
   "scripts": {
     "clean": "rm -fr dist",
     "prestart": "yarn clean",
-    "watch": "tsc -p tsconfig.json --watch",
+    "start": "tsc -p tsconfig.json --watch",
     "build": "tsc -p tsconfig.json",
     "lint": "eslint . --ext .ts",
     "test:unit": "jest"
