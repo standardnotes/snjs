@@ -1,5 +1,5 @@
 import { Uuid } from '@standardnotes/common'
-import { EncryptedTransferPayload } from '@standardnotes/models'
+import { BackupFileEncryptedContextualPayload } from '@standardnotes/models'
 
 /* istanbul ignore file */
 
@@ -11,8 +11,8 @@ export const FileBackupsConstantsV1 = {
 
 export interface FileBackupMetadataFile {
   info: Record<string, string>
-  file: EncryptedTransferPayload
-  itemsKey: EncryptedTransferPayload
+  file: BackupFileEncryptedContextualPayload
+  itemsKey: BackupFileEncryptedContextualPayload
   version: '1.0.0'
 }
 
