@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.8.3](https://github.com/standardnotes/snjs/compare/@standardnotes/components@1.8.2...@standardnotes/components@1.8.3) (2022-06-02)
+
+
+### Bug Fixes
+
+* empty the component's directory before copying files ([#754](https://github.com/standardnotes/snjs/issues/754)) ([be9b383](https://github.com/standardnotes/snjs/commit/be9b3830988e0e1e7f12fffd3bb0168b936f8c2e))
+
+
+
+
+
 ## [1.8.2](https://github.com/standardnotes/snjs/compare/@standardnotes/components@1.8.1...@standardnotes/components@1.8.2) (2022-05-24)
 
 **Note:** Version bump only for package @standardnotes/components
