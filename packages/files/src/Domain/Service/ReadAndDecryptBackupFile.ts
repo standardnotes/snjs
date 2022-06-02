@@ -28,8 +28,8 @@ export async function readAndDecryptBackupFile(
     await onDecryptedBytes(decryptResult.decryptedBytes)
   })
 
-  const readResult = await fileSystem.readFile(fileHandle, async (encryptedBytes: Uint8Array, isLast: boolean) => {
-    await byteChunker.addBytes(encryptedBytes, isLast)
+  const readResult = await fileSystem.readFile(fileHandle, async (encryptedBytes: Uint8Array) => {
+    await byteChunker.addBytes(encryptedBytes)
   })
 
   return readResult

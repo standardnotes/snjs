@@ -161,7 +161,7 @@ export class FileService extends AbstractService implements FilesClientInterface
       }
     })
 
-    await orderedChunker.addBytes(entry.encryptedBytes, false)
+    await orderedChunker.addBytes(entry.encryptedBytes)
 
     return { decryptedBytes: decryptedAggregate }
   }

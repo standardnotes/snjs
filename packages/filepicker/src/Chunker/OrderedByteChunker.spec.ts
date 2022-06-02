@@ -15,7 +15,7 @@ describe('ordered byte chunker', () => {
       receivedBytes = new Uint8Array([...receivedBytes, ...bytes])
     })
 
-    await chunker.addBytes(chunkOfSize(30), false)
+    await chunker.addBytes(chunkOfSize(30))
 
     expect(numCallbacks).toEqual(3)
     expect(receivedBytes.length).toEqual(30)

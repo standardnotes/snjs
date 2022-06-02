@@ -1,6 +1,6 @@
 {
   "name": "@standardnotes/filepicker",
-  "version": "1.16.6",
+  "version": "1.16.7",
   "engines": {
     "node": ">=14.0.0 <17.0.0"
   },
@@ -18,7 +18,7 @@
   "scripts": {
     "clean": "rm -fr dist",
     "prestart": "yarn clean",
-    "watch": "tsc -p tsconfig.json --watch",
+    "start": "tsc -p tsconfig.json --watch",
     "build": "tsc -p tsconfig.json",
     "lint": "eslint . --ext .ts",
     "test:unit": "jest"
