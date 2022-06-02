@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.16.9](https://github.com/standardnotes/snjs/compare/@standardnotes/filepicker@1.16.8...@standardnotes/filepicker@1.16.9) (2022-06-02)
+
+**Note:** Version bump only for package @standardnotes/filepicker
+
+
+
+
+
 ## [1.16.8](https://github.com/standardnotes/snjs/compare/@standardnotes/filepicker@1.16.7...@standardnotes/filepicker@1.16.8) (2022-06-02)
 
 **Note:** Version bump only for package @standardnotes/filepicker
