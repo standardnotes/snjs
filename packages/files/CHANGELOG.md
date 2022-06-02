@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.3.7](https://github.com/standardnotes/snjs/compare/@standardnotes/files@1.3.6...@standardnotes/files@1.3.7) (2022-06-02)
+
+
+### Bug Fixes
+
+* remove isLast dep from ordered byte chunker ([3385581](https://github.com/standardnotes/snjs/commit/33855817d8d96d100b7d4f423f59f00c55834b6f))
+
+
+
+
+
 ## [1.3.6](https://github.com/standardnotes/snjs/compare/@standardnotes/files@1.3.5...@standardnotes/files@1.3.6) (2022-06-01)
 
 **Note:** Version bump only for package @standardnotes/files
