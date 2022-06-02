@@ -1,6 +1,6 @@
 import { ContentType, Uuid } from '@standardnotes/common'
 import { EncryptionProvider } from '@standardnotes/encryption'
-import { PayloadEmitSource, FileItem } from '@standardnotes/models'
+import { PayloadEmitSource, FileItem, CreateEncryptedBackupFileContextPayload } from '@standardnotes/models'
 import { ClientDisplayableError } from '@standardnotes/responses'
 import {
   ItemManagerInterface,
@@ -146,8 +146,8 @@ export class FilesBackupService extends AbstractService {
         instructions:
           'Drag and drop this metadata file into the File Backups preferences pane in the Standard Notes desktop or web application interface.',
       },
-      file: encryptedFile.ejected(),
-      itemsKey: encryptedItemsKey.ejected(),
+      file: CreateEncryptedBackupFileContextPayload(encryptedFile.ejected()),
+      itemsKey: CreateEncryptedBackupFileContextPayload(encryptedItemsKey.ejected()),
       version: '1.0.0',
     }
 

@@ -232,7 +232,11 @@ export class FileService extends AbstractService implements FilesClientInterface
   }
 
   public async decryptBackupMetadataFile(metdataFile: FileBackupMetadataFile): Promise<FileItem | undefined> {
-    const encryptedItemsKey = new EncryptedPayload(metdataFile.itemsKey)
+    const encryptedItemsKey = new EncryptedPayload({
+      ...metdataFile.itemsKey,
+      waitingForKey: false,
+      errorDecrypting: false,
+    })
 
     const decryptedItemsKeyResult = await DecryptItemsKeyWithUserFallback(
       encryptedItemsKey,
@@ -244,7 +248,7 @@ export class FileService extends AbstractService implements FilesClientInterface
       return undefined
     }
 
-    const encryptedFile = new EncryptedPayload(metdataFile.file)
+    const encryptedFile = new EncryptedPayload({ ...metdataFile.file, waitingForKey: false, errorDecrypting: false })
 
     const itemsKey = new SNItemsKey(decryptedItemsKeyResult)
 
