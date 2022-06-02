@@ -57,11 +57,18 @@ const ensureDirExists = (dir) => {
   }
 }
 
+const emptyExistingDir = (dir) => {
+  if (fs.existsSync(dir)) {
+    fs.rmSync(dir, { recursive: true })
+  }
+}
+
 const copyToTmp = async (feature) => {
   const location = LocationMapping[feature.identifier]
   const srcComponentPath = path.join(SOURCE_FILES_PATH, location)
   const targetComponentPath = `${path.join(ComponentsDir, feature.identifier)}`
 
+  emptyExistingDir(targetComponentPath)
   ensureDirExists(targetComponentPath)
 
   for (const file of feature.static_files) {
