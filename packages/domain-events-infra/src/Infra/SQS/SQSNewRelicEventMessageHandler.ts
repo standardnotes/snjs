@@ -18,6 +18,8 @@ export class SQSNewRelicEventMessageHandler implements DomainEventMessageHandler
 
     const domainEvent: DomainEventInterface = JSON.parse(domainEventJson)
 
+    domainEvent.createdAt = new Date(domainEvent.createdAt)
+
     const handler = this.handlers.get(domainEvent.type)
     if (!handler) {
       this.logger.debug(`Event handler for event type ${domainEvent.type} does not exist`)
