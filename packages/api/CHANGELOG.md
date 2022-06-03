@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.1.2](https://github.com/standardnotes/snjs/compare/@standardnotes/api@1.1.1...@standardnotes/api@1.1.2) (2022-06-03)
+
+
+### Bug Fixes
+
+* add option to define additional params to the user registration request if needed ([78f169f](https://github.com/standardnotes/snjs/commit/78f169f993cb0d1950e553fe251f6bc903dd6da8))
+
+
+
+
+
 ## [1.1.1](https://github.com/standardnotes/snjs/compare/@standardnotes/api@1.1.0...@standardnotes/api@1.1.1) (2022-06-03)
 
 
