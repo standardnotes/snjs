@@ -37,6 +37,7 @@ export function computeFiltersForDisplayOptions(
       if (compoundPredicate.keypathIncludesString('tags')) {
         const noteWithTags = ItemWithTags.Create(
           item.payload,
+          item,
           collection.elementsReferencingElement(item, ContentType.Tag) as SNTag[],
         )
         return compoundPredicate.matchesItem(noteWithTags)

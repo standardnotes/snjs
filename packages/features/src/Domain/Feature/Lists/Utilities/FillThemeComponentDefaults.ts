@@ -26,8 +26,10 @@ export function FillThemeComponentDefaults(
   }
 
   theme.content_type = ContentType.Theme
+
   if (!theme.area) {
-    theme.area = ComponentArea.Editor
+    theme.area = ComponentArea.Themes
   }
+
   return theme as ThemeFeatureDescription
 }
