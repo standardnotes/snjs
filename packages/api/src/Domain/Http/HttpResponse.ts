@@ -8,5 +8,5 @@ export interface HttpResponse {
   status: HttpStatusCode
   data?: HttpResponseBody | HttpErrorResponseBody
   meta?: HttpResponseMeta
-  headers: HttpHeaders
+  headers?: HttpHeaders
 }
