@@ -43,7 +43,6 @@ describe('basic auth', function () {
       error = caughtError
     }
 
-    console.log(error.message)
     expect(error.message).to.equal('Your password must be at least 8 characters in length. '
     + 'For your security, please choose a longer password or, ideally, a passphrase, and try again.')
 
