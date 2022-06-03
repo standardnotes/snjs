@@ -4,7 +4,7 @@ import {
   HttpServiceInterface,
   UserApiService,
   UserApiServiceInterface,
-  UserRegistrationResponse,
+  UserRegistrationResponseBody,
   UserServer,
   UserServerInterface,
 } from '@standardnotes/api'
@@ -790,7 +790,7 @@ export class SNApplication
     password: string,
     ephemeral = false,
     mergeLocal = true,
-  ): Promise<UserRegistrationResponse> {
+  ): Promise<UserRegistrationResponseBody> {
     return this.userService.register(email, password, ephemeral, mergeLocal)
   }
 

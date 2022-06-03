@@ -23,7 +23,7 @@ import { UserClientInterface } from './UserClientInterface'
 import { UuidGenerator } from '@standardnotes/utils'
 import * as Messages from '../Api/Messages'
 import { DeinitSource } from '@Lib/Types'
-import { UserRegistrationResponse } from '@Lib/../../api/dist'
+import { UserRegistrationResponseBody } from '@standardnotes/api'
 
 const MINIMUM_PASSCODE_LENGTH = 1
 
@@ -80,30 +80,39 @@ export class UserService extends AbstractService<AccountEvent, AccountEventData>
     password: string,
     ephemeral = false,
     mergeLocal = true,
-  ): Promise<UserRegistrationResponse> {
+  ): Promise<UserRegistrationResponseBody> {
     if (this.protocolService.hasAccount()) {
       throw Error('Tried to register when an account already exists.')
     }
+
     if (this.registering) {
       throw Error('Already registering.')
     }
+
     this.registering = true
+
     try {
       this.lockSyncing()
       const response = await this.sessionManager.register(email, password, ephemeral)
 
       this.syncService.resetSyncState()
+
       await this.storageService.setPersistencePolicy(
         ephemeral ? StoragePersistencePolicies.Ephemeral : StoragePersistencePolicies.Default,
       )
+
       if (mergeLocal) {
         await this.syncService.markAllItemsAsNeedingSyncAndPersist()
       } else {
         await this.itemManager.removeAllItemsFromMemory()
         await this.clearDatabase()
       }
+
       await this.notifyEvent(AccountEvent.SignedInOrRegistered)
+
       this.unlockSyncing()
+      this.registering = false
+
       await this.syncService.downloadFirstSync(300)
       void this.protocolService.decryptErroredPayloads()
 

@@ -44,7 +44,6 @@ import {
   ErrorMessage,
   HttpErrorResponseBody,
   UserApiServiceInterface,
-  UserRegistrationResponse,
   UserRegistrationResponseBody,
 } from '@standardnotes/api'
 
@@ -270,19 +269,22 @@ export class SNSessionManager extends AbstractService<SessionEvent> implements S
     return undefined
   }
 
-  async register(email: string, password: string, ephemeral: boolean): Promise<UserRegistrationResponse> {
+  async register(email: string, password: string, ephemeral: boolean): Promise<UserRegistrationResponseBody> {
     if (password.length < MINIMUM_PASSWORD_LENGTH) {
       throw new ApiCallError(
         ErrorMessage.InsufficientPasswordMessage.replace('%LENGTH%', MINIMUM_PASSWORD_LENGTH.toString()),
       )
     }
+
     const { wrappingKey, canceled } = await this.challengeService.getWrappingKeyIfApplicable()
     if (canceled) {
       throw new ApiCallError(ErrorMessage.PasscodeRequired)
     }
+
     email = cleanedEmailString(email)
+
     const rootKey = await this.protocolService.createRootKey(email, password, Common.KeyParamsOrigination.Registration)
-    const serverPassword = rootKey.serverPassword!
+    const serverPassword = rootKey.serverPassword as string
     const keyParams = rootKey.keyParams
 
     const registerResponse = await this.userApiService.register(email, serverPassword, keyParams, ephemeral)
@@ -291,9 +293,9 @@ export class SNSessionManager extends AbstractService<SessionEvent> implements S
       throw new ApiCallError((registerResponse.data as HttpErrorResponseBody).error.message)
     }
 
-    await this.handleAuthResponse(registerResponse.data as UserRegistrationResponseBody, rootKey, wrappingKey)
+    await this.handleAuthResponse(registerResponse.data, rootKey, wrappingKey)
 
-    return registerResponse
+    return registerResponse.data
   }
 
   private async retrieveKeyParams(
