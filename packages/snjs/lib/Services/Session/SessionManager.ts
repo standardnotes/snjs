@@ -22,7 +22,7 @@ import {
   EncryptionService,
   CreateNewRootKey,
 } from '@standardnotes/encryption'
-import { RegisterStrings, SessionStrings, SignInStrings } from '../Api/Messages'
+import { SessionStrings, SignInStrings } from '../Api/Messages'
 import { RemoteSession, RawStorageValue } from './Sessions/Types'
 import { Session } from './Sessions/Session'
 import { SessionFromRawStorageValue } from './Sessions/Generator'
@@ -39,6 +39,14 @@ import * as Common from '@standardnotes/common'
 import * as Messages from '../Api/Messages'
 import * as Responses from '@standardnotes/responses'
 import { Challenge, ChallengeService } from '../Challenge'
+import {
+  ApiCallError,
+  ErrorMessage,
+  HttpErrorResponseBody,
+  UserApiServiceInterface,
+  UserRegistrationResponse,
+  UserRegistrationResponseBody,
+} from '@standardnotes/api'
 
 export const MINIMUM_PASSWORD_LENGTH = 8
 export const MissingAccountParams = 'missing-params'
@@ -70,6 +78,7 @@ export class SNSessionManager extends AbstractService<SessionEvent> implements S
   constructor(
     private diskStorageService: DiskStorageService,
     private apiService: SNApiService,
+    private userApiService: UserApiServiceInterface,
     private alertService: AlertService,
     private protocolService: EncryptionService,
     private challengeService: ChallengeService,
@@ -261,33 +270,30 @@ export class SNSessionManager extends AbstractService<SessionEvent> implements S
     return undefined
   }
 
-  async register(email: string, password: string, ephemeral: boolean): Promise<SessionManagerResponse> {
+  async register(email: string, password: string, ephemeral: boolean): Promise<UserRegistrationResponse> {
     if (password.length < MINIMUM_PASSWORD_LENGTH) {
-      return {
-        response: this.apiService.createErrorResponse(Messages.InsufficientPasswordMessage(MINIMUM_PASSWORD_LENGTH)),
-      }
+      throw new ApiCallError(
+        ErrorMessage.InsufficientPasswordMessage.replace('%LENGTH%', MINIMUM_PASSWORD_LENGTH.toString()),
+      )
     }
     const { wrappingKey, canceled } = await this.challengeService.getWrappingKeyIfApplicable()
     if (canceled) {
-      return {
-        response: this.apiService.createErrorResponse(
-          RegisterStrings.PasscodeRequired,
-          Responses.StatusCode.LocalValidationError,
-        ),
-      }
+      throw new ApiCallError(ErrorMessage.PasscodeRequired)
     }
     email = cleanedEmailString(email)
     const rootKey = await this.protocolService.createRootKey(email, password, Common.KeyParamsOrigination.Registration)
     const serverPassword = rootKey.serverPassword!
     const keyParams = rootKey.keyParams
-    const registerResponse = await this.apiService.register(email, serverPassword, keyParams, ephemeral)
-    if (!registerResponse.error && registerResponse.data) {
-      await this.handleSuccessAuthResponse(registerResponse as Responses.RegistrationResponse, rootKey, wrappingKey)
+
+    const registerResponse = await this.userApiService.register(email, serverPassword, keyParams, ephemeral)
+
+    if ('error' in registerResponse.data) {
+      throw new ApiCallError((registerResponse.data as HttpErrorResponseBody).error.message)
     }
-    return {
-      response: registerResponse,
-      rootKey: rootKey,
-    }
+
+    await this.handleAuthResponse(registerResponse.data as UserRegistrationResponseBody, rootKey, wrappingKey)
+
+    return registerResponse
   }
 
   private async retrieveKeyParams(
@@ -619,8 +625,22 @@ export class SNSessionManager extends AbstractService<SessionEvent> implements S
     this.webSocketsService.startWebSocketConnection(session.authorizationValue)
   }
 
+  private async handleAuthResponse(body: UserRegistrationResponseBody, rootKey: SNRootKey, wrappingKey?: SNRootKey) {
+    const session = new TokenSession(
+      body.session.access_token,
+      body.session.access_expiration,
+      body.session.refresh_token,
+      body.session.refresh_expiration,
+      body.session.readonly_access,
+    )
+    await this.populateSession(rootKey, body.user, session, this.apiService.getHost(), wrappingKey)
+  }
+
+  /**
+   * @deprecated use handleAuthResponse instead
+   */
   private async handleSuccessAuthResponse(
-    response: Responses.RegistrationResponse | Responses.SignInResponse | Responses.ChangeCredentialsResponse,
+    response: Responses.SignInResponse | Responses.ChangeCredentialsResponse,
     rootKey: SNRootKey,
     wrappingKey?: SNRootKey,
   ) {

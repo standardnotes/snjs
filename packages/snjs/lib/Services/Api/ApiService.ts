@@ -33,6 +33,7 @@ import { Strings } from '@Lib/Strings'
 import { SNRootKeyParams } from '@standardnotes/encryption'
 import { ApiEndpointParam, ClientDisplayableError, CreateValetTokenPayload } from '@standardnotes/responses'
 import { PureCryptoInterface } from '@standardnotes/sncrypto-common'
+import { HttpResponseMeta } from '@standardnotes/api'
 
 /** Legacy api version field to be specified in params when calling v0 APIs. */
 const V0_API_VERSION = '20200115'
@@ -163,7 +164,7 @@ export class SNApiService
     return response
   }
 
-  private processMetaObject(meta: Responses.ResponseMeta) {
+  public processMetaObject(meta: HttpResponseMeta) {
     if (meta.auth && meta.auth.userUuid && meta.auth.roles) {
       void this.notifyEvent(ApiServiceEvent.MetaReceived, {
         userUuid: meta.auth.userUuid,
@@ -235,33 +236,6 @@ export class SNApiService
       /** A session is optional here, if valid, endpoint bypasses 2FA and returns additional params */
       authentication: this.session?.authorizationValue,
     })
-  }
-
-  async register(
-    email: string,
-    serverPassword: string,
-    keyParams: SNRootKeyParams,
-    ephemeral: boolean,
-  ): Promise<Responses.RegistrationResponse | Responses.HttpResponse> {
-    if (this.registering) {
-      return this.createErrorResponse(messages.API_MESSAGE_REGISTRATION_IN_PROGRESS) as Responses.RegistrationResponse
-    }
-    this.registering = true
-    const url = joinPaths(this.host, Paths.v1.register)
-    const params = this.params({
-      password: serverPassword,
-      email,
-      ephemeral,
-      ...keyParams.getPortableValue(),
-    })
-    const response = await this.request({
-      verb: HttpVerb.Post,
-      url,
-      fallbackErrorMessage: messages.API_MESSAGE_GENERIC_REGISTRATION_FAIL,
-      params,
-    })
-    this.registering = false
-    return response
   }
 
   async signIn(dto: {

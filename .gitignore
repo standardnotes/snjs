@@ -28,6 +28,7 @@ packages/sncrypto-web/dist
 packages/snjs/dist
 packages/time/dist
 packages/utils/dist
+packages/api/dist
 
 yarn-error.log
 package-lock.json

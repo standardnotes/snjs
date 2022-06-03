@@ -23,6 +23,7 @@ import { UserClientInterface } from './UserClientInterface'
 import { UuidGenerator } from '@standardnotes/utils'
 import * as Messages from '../Api/Messages'
 import { DeinitSource } from '@Lib/Types'
+import { UserRegistrationResponse } from '@Lib/../../api/dist'
 
 const MINIMUM_PASSCODE_LENGTH = 1
 
@@ -79,7 +80,7 @@ export class UserService extends AbstractService<AccountEvent, AccountEventData>
     password: string,
     ephemeral = false,
     mergeLocal = true,
-  ): Promise<AccountServiceResponse> {
+  ): Promise<UserRegistrationResponse> {
     if (this.protocolService.hasAccount()) {
       throw Error('Tried to register when an account already exists.')
     }
@@ -89,28 +90,29 @@ export class UserService extends AbstractService<AccountEvent, AccountEventData>
     this.registering = true
     try {
       this.lockSyncing()
-      const result = await this.sessionManager.register(email, password, ephemeral)
-      if (!result.response.error) {
-        this.syncService.resetSyncState()
-        await this.storageService.setPersistencePolicy(
-          ephemeral ? StoragePersistencePolicies.Ephemeral : StoragePersistencePolicies.Default,
-        )
-        if (mergeLocal) {
-          await this.syncService.markAllItemsAsNeedingSyncAndPersist()
-        } else {
-          await this.itemManager.removeAllItemsFromMemory()
-          await this.clearDatabase()
-        }
-        await this.notifyEvent(AccountEvent.SignedInOrRegistered)
-        this.unlockSyncing()
-        await this.syncService.downloadFirstSync(300)
-        void this.protocolService.decryptErroredPayloads()
+      const response = await this.sessionManager.register(email, password, ephemeral)
+
+      this.syncService.resetSyncState()
+      await this.storageService.setPersistencePolicy(
+        ephemeral ? StoragePersistencePolicies.Ephemeral : StoragePersistencePolicies.Default,
+      )
+      if (mergeLocal) {
+        await this.syncService.markAllItemsAsNeedingSyncAndPersist()
       } else {
-        this.unlockSyncing()
+        await this.itemManager.removeAllItemsFromMemory()
+        await this.clearDatabase()
       }
-      return result.response
-    } finally {
+      await this.notifyEvent(AccountEvent.SignedInOrRegistered)
+      this.unlockSyncing()
+      await this.syncService.downloadFirstSync(300)
+      void this.protocolService.decryptErroredPayloads()
+
+      return response
+    } catch (error) {
+      this.unlockSyncing()
       this.registering = false
+
+      throw error
     }
   }
 
