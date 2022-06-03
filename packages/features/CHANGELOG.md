@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.44.7](https://github.com/standardnotes/snjs/compare/@standardnotes/features@1.44.6...@standardnotes/features@1.44.7) (2022-06-03)
+
+
+### Bug Fixes
+
+* define getters on items used in predicates so keypath lookups are not undefined ([#756](https://github.com/standardnotes/snjs/issues/756)) ([3297077](https://github.com/standardnotes/snjs/commit/32970774897a48fd9a12b329ca204ed6882a47ab))
+
+
+
+
+
 ## [1.44.6](https://github.com/standardnotes/snjs/compare/@standardnotes/features@1.44.5...@standardnotes/features@1.44.6) (2022-05-30)
 
 **Note:** Version bump only for package @standardnotes/features
