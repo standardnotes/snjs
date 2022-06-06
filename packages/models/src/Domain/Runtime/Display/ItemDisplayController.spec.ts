@@ -21,13 +21,13 @@ describe('item display controller', () => {
       sortDirection: 'asc',
     })
 
-    expect(controller.items()[0]).toEqual(noteB)
-    expect(controller.items()[1]).toEqual(noteA)
+    expect(controller.items()[0]).toEqual(noteA)
+    expect(controller.items()[1]).toEqual(noteB)
 
     controller.setDisplayOptions({ sortBy: 'title', sortDirection: 'dsc' })
 
-    expect(controller.items()[0]).toEqual(noteA)
-    expect(controller.items()[1]).toEqual(noteB)
+    expect(controller.items()[0]).toEqual(noteB)
+    expect(controller.items()[1]).toEqual(noteA)
   })
 
   it('should filter items', () => {
@@ -106,8 +106,8 @@ describe('item display controller', () => {
       sortDirection: 'asc',
     })
 
-    expect(controller.items()[0]).toEqual(noteB)
-    expect(controller.items()[1]).toEqual(noteA)
+    expect(controller.items()[0]).toEqual(noteA)
+    expect(controller.items()[1]).toEqual(noteB)
 
     expect(collection.all()).toHaveLength(2)
 
@@ -227,13 +227,13 @@ describe('item display controller', () => {
       sortDirection: 'asc',
     })
 
-    expect(controller.items()[0]).toEqual(note)
-    expect(controller.items()[1]).toEqual(file)
+    expect(controller.items()[0]).toEqual(file)
+    expect(controller.items()[1]).toEqual(note)
 
     controller.setDisplayOptions({ sortBy: 'title', sortDirection: 'dsc' })
 
-    expect(controller.items()[0]).toEqual(file)
-    expect(controller.items()[1]).toEqual(note)
+    expect(controller.items()[0]).toEqual(note)
+    expect(controller.items()[1]).toEqual(file)
   })
 
   it('should hide hidden types', () => {

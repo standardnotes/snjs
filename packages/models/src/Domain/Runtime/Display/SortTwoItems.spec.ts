@@ -11,12 +11,12 @@ describe('sort two items', () => {
     expect(sortTwoItems(noteA, noteB, 'created_at', 'dsc')).toEqual(SortRightFirst)
   })
 
-  it('title sort should be inverted', () => {
+  it('should sort by title', () => {
     const noteA = createNoteWithContent({ title: 'a' })
     const noteB = createNoteWithContent({ title: 'b' })
 
-    expect(sortTwoItems(noteA, noteB, 'title', 'asc')).toEqual(SortRightFirst)
-    expect(sortTwoItems(noteA, noteB, 'title', 'dsc')).toEqual(SortLeftFirst)
+    expect(sortTwoItems(noteA, noteB, 'title', 'asc')).toEqual(SortLeftFirst)
+    expect(sortTwoItems(noteA, noteB, 'title', 'dsc')).toEqual(SortRightFirst)
   })
 
   it('should sort correctly by title and pinned', () => {

@@ -1,10 +1,5 @@
 import { isString } from '@standardnotes/utils'
-import {
-  CollectionSort,
-  CollectionSortDirection,
-  CollectionSortHumanPerceptionPrefersInverseDirection,
-  CollectionSortProperty,
-} from '../Collection/CollectionSort'
+import { CollectionSort, CollectionSortDirection, CollectionSortProperty } from '../Collection/CollectionSort'
 import { DisplayItem } from './Types'
 
 export const SortLeftFirst = -1
@@ -42,9 +37,7 @@ export function sortTwoItems(
 
   const aValue = a[sortBy] || ''
   const bValue = b[sortBy] || ''
-  const smallerNaturallyComesFirst =
-    (sortDirection === 'asc' && !CollectionSortHumanPerceptionPrefersInverseDirection[sortBy]) ||
-    (sortDirection === 'dsc' && CollectionSortHumanPerceptionPrefersInverseDirection[sortBy])
+  const smallerNaturallyComesFirst = sortDirection === 'asc'
 
   let compareResult = KeepSameOrder
 
