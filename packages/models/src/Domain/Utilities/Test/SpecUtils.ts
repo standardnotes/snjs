@@ -26,7 +26,7 @@ export const createNote = (payload?: Partial<NoteContent>): SNNote => {
   )
 }
 
-export const createNoteWithContent = (content: Partial<NoteContent>): SNNote => {
+export const createNoteWithContent = (content: Partial<NoteContent>, createdAt?: Date): SNNote => {
   return new SNNote(
     new DecryptedPayload(
       {
@@ -34,6 +34,7 @@ export const createNoteWithContent = (content: Partial<NoteContent>): SNNote => 
         content_type: ContentType.Note,
         content: FillItemContent<NoteContent>(content),
         ...PayloadTimestampDefaults(),
+        created_at: createdAt || new Date(),
       },
       PayloadSource.Constructor,
     ),

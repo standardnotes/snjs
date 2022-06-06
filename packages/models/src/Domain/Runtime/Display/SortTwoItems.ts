@@ -1,6 +1,15 @@
 import { isString } from '@standardnotes/utils'
-import { CollectionSort, CollectionSortDirection, CollectionSortProperty } from '../Collection/CollectionSort'
+import {
+  CollectionSort,
+  CollectionSortDirection,
+  CollectionSortHumanPerceptionPrefersInverseDirection,
+  CollectionSortProperty,
+} from '../Collection/CollectionSort'
 import { DisplayItem } from './Types'
+
+export const SortLeftFirst = -1
+export const SortRightFirst = 1
+export const KeepSameOrder = 0
 
 /** @O(n * log(n)) */
 export function sortTwoItems(
@@ -12,11 +21,11 @@ export function sortTwoItems(
 ): number {
   /** If the elements are undefined, move to beginning */
   if (!a) {
-    return -1
+    return SortLeftFirst
   }
 
   if (!b) {
-    return 1
+    return SortRightFirst
   }
 
   if (!bypassPinCheck) {
@@ -24,17 +33,20 @@ export function sortTwoItems(
       return sortTwoItems(a, b, sortBy, sortDirection, true)
     }
     if (a.pinned) {
-      return -1
+      return SortLeftFirst
     }
     if (b.pinned) {
-      return 1
+      return SortRightFirst
     }
   }
 
   const aValue = a[sortBy] || ''
   const bValue = b[sortBy] || ''
-  const smallerNaturallyComesFirst = sortDirection === 'asc'
-  let compareResult = 0
+  const smallerNaturallyComesFirst =
+    (sortDirection === 'asc' && !CollectionSortHumanPerceptionPrefersInverseDirection[sortBy]) ||
+    (sortDirection === 'dsc' && CollectionSortHumanPerceptionPrefersInverseDirection[sortBy])
+
+  let compareResult = KeepSameOrder
 
   /**
    * Check for string length due to issue on React Native 0.65.1
@@ -50,29 +62,29 @@ export function sortTwoItems(
   ) {
     compareResult = aValue.localeCompare(bValue, 'en', { numeric: true })
   } else if (aValue > bValue) {
-    compareResult = 1
+    compareResult = SortRightFirst
   } else if (aValue < bValue) {
-    compareResult = -1
+    compareResult = SortLeftFirst
   } else {
-    compareResult = 0
+    compareResult = KeepSameOrder
   }
 
-  const isLeftSmaller = compareResult === -1
-  const isLeftBigger = compareResult === 1
+  const isLeftSmaller = compareResult === SortLeftFirst
+  const isLeftBigger = compareResult === SortRightFirst
 
   if (isLeftSmaller) {
     if (smallerNaturallyComesFirst) {
-      return -1
+      return SortLeftFirst
     } else {
-      return 1
+      return SortRightFirst
     }
   } else if (isLeftBigger) {
     if (smallerNaturallyComesFirst) {
-      return 1
+      return SortRightFirst
     } else {
-      return -1
+      return SortLeftFirst
     }
   } else {
-    return 0
+    return KeepSameOrder
   }
 }
