@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.115.5](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.115.4...@standardnotes/snjs@2.115.5) (2022-06-06)
+
+
+### Bug Fixes
+
+* reverse title sort ([#757](https://github.com/standardnotes/snjs/issues/757)) ([dacee77](https://github.com/standardnotes/snjs/commit/dacee77488593ec71c670c1bfa62cc7f526c8b56))
+
+
+
+
+
 ## [2.115.4](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.115.3...@standardnotes/snjs@2.115.4) (2022-06-03)
 
 **Note:** Version bump only for package @standardnotes/snjs

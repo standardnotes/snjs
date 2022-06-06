@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.11.4](https://github.com/standardnotes/snjs/compare/@standardnotes/models@1.11.3...@standardnotes/models@1.11.4) (2022-06-06)
+
+
+### Bug Fixes
+
+* reverse title sort ([#757](https://github.com/standardnotes/snjs/issues/757)) ([dacee77](https://github.com/standardnotes/snjs/commit/dacee77488593ec71c670c1bfa62cc7f526c8b56))
+
+
+
+
+
 ## [1.11.3](https://github.com/standardnotes/snjs/compare/@standardnotes/models@1.11.2...@standardnotes/models@1.11.3) (2022-06-03)
 
 
