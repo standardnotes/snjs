@@ -17,10 +17,4 @@ export const CollectionSort: Record<string, keyof SortableItem> = {
 
 export type CollectionSortDirection = 'asc' | 'dsc'
 
-export const CollectionSortHumanPerceptionPrefersInverseDirection = {
-  [CollectionSort.CreatedAt]: false,
-  [CollectionSort.UpdatedAt]: false,
-  [CollectionSort.Title]: true,
-}
-
 export type CollectionSortProperty = keyof SortableItem
