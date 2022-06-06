@@ -11,6 +11,7 @@ import { ItemsClientInterface } from './ItemsClientInterface'
 import { PayloadManagerChangeData } from '../Payloads'
 import { DiagnosticInfo } from '@standardnotes/services'
 import { ApplicationDisplayOptions } from '@Lib/Application/Options/OptionalOptions'
+import { CollectionSort } from '@standardnotes/models'
 
 type ItemsChangeObserver<I extends Models.DecryptedItemInterface = Models.DecryptedItemInterface> = {
   contentType: ContentType[]
@@ -170,6 +171,10 @@ export class ItemManager
         tags: mostRecentVersionOfTags,
         views: mostRecentVersionOfViews,
       },
+    }
+
+    if (updatedOptions.sortBy === CollectionSort.Title) {
+      updatedOptions.sortDirection = updatedOptions.sortDirection === 'asc' ? 'dsc' : 'asc'
     }
 
     this.navigationDisplayController.setDisplayOptions({

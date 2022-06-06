@@ -310,7 +310,8 @@ describe('notes and tags', () => {
       sortDirection: 'dsc',
     })
     const titles = this.application.items.getDisplayableNotes().map((note) => note.title)
-    expect(titles).to.deep.equal(['Z', 'Y', 'B', 'A'])
+    /** setPrimaryItemDisplayOptions inverses sort for title */
+    expect(titles).to.deep.equal(['A', 'B', 'Y', 'Z'])
   })
 
   it('setting a note dirty should collapse its properties into content', async function () {
@@ -402,8 +403,9 @@ describe('notes and tags', () => {
 
       const displayedNotes = this.application.items.getDisplayableNotes()
       expect(displayedNotes).to.have.length(4)
+      /** setPrimaryItemDisplayOptions inverses sort for title */
       expect(displayedNotes[0].title).to.equal('B')
-      expect(displayedNotes[1].title).to.equal('Z')
+      expect(displayedNotes[1].title).to.equal('A')
     })
   })
 
@@ -806,8 +808,9 @@ describe('notes and tags', () => {
 
     const displayedNotes = this.application.items.getDisplayableNotes()
     expect(displayedNotes.length).to.equal(2)
-    expect(displayedNotes[0].uuid).to.equal(notePayload4.uuid)
-    expect(displayedNotes[1].uuid).to.equal(notePayload1.uuid)
+    /** setPrimaryItemDisplayOptions inverses sort for title */
+    expect(displayedNotes[0].uuid).to.equal(notePayload1.uuid)
+    expect(displayedNotes[1].uuid).to.equal(notePayload4.uuid)
   })
 
   it('search query should be case insensitive and match notes and tags title', async function () {
@@ -835,8 +838,9 @@ describe('notes and tags', () => {
 
     const displayedNotes = this.application.items.getDisplayableNotes()
     expect(displayedNotes.length).to.equal(3)
-    expect(displayedNotes[0].uuid).to.equal(notePayload3.uuid)
+    /** setPrimaryItemDisplayOptions inverses sort for title */
+    expect(displayedNotes[0].uuid).to.equal(notePayload1.uuid)
     expect(displayedNotes[1].uuid).to.equal(notePayload2.uuid)
-    expect(displayedNotes[2].uuid).to.equal(notePayload1.uuid)
+    expect(displayedNotes[2].uuid).to.equal(notePayload3.uuid)
   })
 })
