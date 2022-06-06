@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.115.6](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.115.5...@standardnotes/snjs@2.115.6) (2022-06-06)
+
+
+### Bug Fixes
+
+* freeze observers before looping ([#758](https://github.com/standardnotes/snjs/issues/758)) ([6da827a](https://github.com/standardnotes/snjs/commit/6da827a39cdba1406c51e2663c59cf34ae270cdb))
+
+
+
+
+
 ## [2.115.5](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.115.4...@standardnotes/snjs@2.115.5) (2022-06-06)
 
 
