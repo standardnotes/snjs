@@ -1,6 +1,4 @@
 export * from './Application'
-export * from './ApplicationInterface'
-export * from './DeinitMode'
 export * from './Event'
 export * from './LiveItem'
 export * from './Platforms'

@@ -1,4 +1,4 @@
-import { DeinitSource } from './../../Types/DeinitSource'
+import { DeinitSource } from './DeinitSource'
 export interface UserClientInterface {
   deleteAccount(): Promise<{
     error: boolean
