@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.45.1](https://github.com/standardnotes/snjs/compare/@standardnotes/features@1.45.0...@standardnotes/features@1.45.1) (2022-06-09)
+
+
+### Bug Fixes
+
+* get ExperimentalFeatures identifiers from experimentalFeatures() ([#762](https://github.com/standardnotes/snjs/issues/762)) ([6b2af78](https://github.com/standardnotes/snjs/commit/6b2af783f25260b47211b1eefb8e0f6742bb3b07))
+
+
+
+
+
 # [1.45.0](https://github.com/standardnotes/snjs/compare/@standardnotes/features@1.44.7...@standardnotes/features@1.45.0) (2022-06-09)
 
 
