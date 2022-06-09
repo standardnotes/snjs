@@ -1,8 +1,9 @@
 import { ApplicationIdentifier } from '@standardnotes/common'
-import { UserClientInterface } from './../Services/User/UserClientInterface'
-import { DeinitSource } from './../Types/DeinitSource'
-import { DeinitCallback } from '../ApplicationGroup/DeinitCallback'
+
+import { DeinitCallback } from './DeinitCallback'
 import { DeinitMode } from './DeinitMode'
+import { DeinitSource } from './DeinitSource'
+import { UserClientInterface } from './UserClientInterface'
 
 export interface ApplicationInterface {
   deinit(mode: DeinitMode, source: DeinitSource): void
