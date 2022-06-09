@@ -1,5 +1,6 @@
 export enum FeatureIdentifier {
   AccountSwitcher = 'com.standardnotes.account-switcher',
+  AdvancedChecklist = 'org.standardnotes.advanced-checklist',
   AutobiographyTheme = 'org.standardnotes.theme-autobiography',
   BoldEditor = 'org.standardnotes.bold-editor',
   CloudLink = 'org.standardnotes.cloudlink',

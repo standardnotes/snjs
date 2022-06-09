@@ -16,6 +16,7 @@
     "package-components": "node package-components.mjs"
   },
   "devDependencies": {
+    "@standardnotes/advanced-checklist": "0.0.1",
     "@standardnotes/autobiography-theme": "1.0.4",
     "@standardnotes/deterministic-zip": "^1.2.0",
     "@standardnotes/dynamic-theme": "1.0.4",

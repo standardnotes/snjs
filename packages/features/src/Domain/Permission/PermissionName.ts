@@ -1,5 +1,6 @@
 export enum PermissionName {
   AccountSwitcher = 'app:account-switcher',
+  AdvancedChecklist = 'editor:advanced-checklist',
   AutobiographyTheme = 'theme:autobiography',
   BoldEditor = 'editor:bold',
   CloudLink = 'component:cloud-link',
