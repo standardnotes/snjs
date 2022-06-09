@@ -429,9 +429,7 @@ export class SNApplication
       this.onLaunch()
     }
     for (const observer of this.eventHandlers.slice()) {
-      if (observer.singleEvent && observer.singleEvent === event) {
-        await observer.callback(event, data || {})
-      } else if (!observer.singleEvent) {
+      if ((observer.singleEvent && observer.singleEvent === event) || !observer.singleEvent) {
         await observer.callback(event, data || {})
       }
     }
