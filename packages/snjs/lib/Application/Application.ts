@@ -18,7 +18,7 @@ import * as Utils from '@standardnotes/utils'
 import * as Settings from '@standardnotes/settings'
 import * as Files from '@standardnotes/files'
 import { Subscription } from '@standardnotes/auth'
-import { UuidString, DeinitSource, ApplicationEventPayload } from '../Types'
+import { UuidString, ApplicationEventPayload } from '../Types'
 import { ApplicationEvent, applicationEventForSyncEvent } from '@Lib/Application/Event'
 import {
   ChallengeValidation,
@@ -29,15 +29,16 @@ import {
   ChallengeValue,
   StorageKey,
   ChallengeReason,
+  DeinitMode,
+  DeinitSource,
+  AppGroupManagedApplication,
+  ApplicationInterface,
 } from '@standardnotes/services'
 import { SNLog } from '../Log'
 import { useBoolean } from '@standardnotes/utils'
 import { DecryptedItemInterface, EncryptedItemInterface } from '@standardnotes/models'
 import { ClientDisplayableError } from '@standardnotes/responses'
 import { Challenge, ChallengeResponse } from '../Services'
-import { AppGroupManagedApplication, ApplicationInterface } from './ApplicationInterface'
-import { DeinitCallback } from '../ApplicationGroup/DeinitCallback'
-import { DeinitMode } from './DeinitMode'
 import { ApplicationConstructorOptions, FullyResolvedApplicationOptions } from './Options/ApplicationOptions'
 import { ApplicationOptionsDefaults } from './Options/Defaults'
 
@@ -67,7 +68,7 @@ type ObserverRemover = () => void
 export class SNApplication
   implements ApplicationInterface, AppGroupManagedApplication, InternalServices.ListedClientInterface
 {
-  onDeinit!: DeinitCallback
+  onDeinit!: ExternalServices.DeinitCallback
 
   /**
    * A runtime based identifier for each dynamic instantiation of the application instance.
@@ -207,7 +208,7 @@ export class SNApplication
     return this.syncService
   }
 
-  public get user(): InternalServices.UserClientInterface {
+  public get user(): ExternalServices.UserClientInterface {
     return this.userService
   }
 
@@ -736,7 +737,7 @@ export class SNApplication
     this.challengeService.cancelChallenge(challenge)
   }
 
-  public setOnDeinit(onDeinit: DeinitCallback): void {
+  public setOnDeinit(onDeinit: ExternalServices.DeinitCallback): void {
     this.onDeinit = onDeinit
   }
 

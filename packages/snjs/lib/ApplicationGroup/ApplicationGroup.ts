@@ -1,15 +1,15 @@
-import { AppGroupManagedApplication } from './../Application/ApplicationInterface'
-import { DeinitSource } from '../Types'
 import {
   AbstractService,
+  AppGroupManagedApplication,
+  DeinitSource,
+  DeinitCallback,
   DeviceInterface,
+  DeinitMode,
   InternalEventBus,
   InternalEventBusInterface,
   RawStorageKey,
 } from '@standardnotes/services'
 import { UuidGenerator } from '@standardnotes/utils'
-import { DeinitCallback } from './DeinitCallback'
-import { DeinitMode } from '../Application/DeinitMode'
 import { AppGroupCallback } from './AppGroupCallback'
 import { ApplicationGroupEvent, ApplicationGroupEventData } from './ApplicationGroupEvent'
 import { DescriptorRecord } from './DescriptorRecord'

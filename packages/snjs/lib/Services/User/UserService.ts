@@ -10,7 +10,9 @@ import {
   ChallengePrompt,
   ChallengeReason,
   ChallengeValidation,
+  DeinitSource,
   InternalEventBusInterface,
+  UserClientInterface,
   StoragePersistencePolicies,
 } from '@standardnotes/services'
 import { SNApiService } from './../Api/ApiService'
@@ -19,10 +21,8 @@ import { SNSessionManager, MINIMUM_PASSWORD_LENGTH } from '../Session/SessionMan
 import { DiskStorageService } from '@Lib/Services/Storage/DiskStorageService'
 import { SNSyncService } from '../Sync/SyncService'
 import { Strings } from '../../Strings/index'
-import { UserClientInterface } from './UserClientInterface'
 import { UuidGenerator } from '@standardnotes/utils'
 import * as Messages from '../Api/Messages'
-import { DeinitSource } from '@Lib/Types'
 import { UserRegistrationResponseBody } from '@standardnotes/api'
 
 const MINIMUM_PASSCODE_LENGTH = 1
