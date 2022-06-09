@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.9.0](https://github.com/standardnotes/snjs/compare/@standardnotes/components@1.8.3...@standardnotes/components@1.9.0) (2022-06-09)
+
+
+### Features
+
+* advanced checklist ([#759](https://github.com/standardnotes/snjs/issues/759)) ([600c88a](https://github.com/standardnotes/snjs/commit/600c88a81e5871a91793c2e7ca2aea9f358d839e))
+
+
+
+
+
 ## [1.8.3](https://github.com/standardnotes/snjs/compare/@standardnotes/components@1.8.2...@standardnotes/components@1.8.3) (2022-06-02)
 
 

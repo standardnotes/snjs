@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.45.0](https://github.com/standardnotes/snjs/compare/@standardnotes/features@1.44.7...@standardnotes/features@1.45.0) (2022-06-09)
+
+
+### Features
+
+* advanced checklist ([#759](https://github.com/standardnotes/snjs/issues/759)) ([600c88a](https://github.com/standardnotes/snjs/commit/600c88a81e5871a91793c2e7ca2aea9f358d839e))
+
+
+
+
+
 ## [1.44.7](https://github.com/standardnotes/snjs/compare/@standardnotes/features@1.44.6...@standardnotes/features@1.44.7) (2022-06-03)
 
 
