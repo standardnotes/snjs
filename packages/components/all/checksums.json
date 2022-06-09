@@ -99,11 +99,6 @@
     "base64": "13497d3939fbec67cf0baa0f7c182112f0d13474a3e7f4750790823f78688a47",
     "binary": "fc6e37d7250d14b245facb760aece51d006fd321d9ac2f153c5a571565411311"
   },
-  "org.standardnotes.advanced-task-editor": {
-    "version": "1.0.0",
-    "base64": "fd6afa7cbab4dec6ef37c48b7094c27ac4ea50b50925e62787eb41f6d25f9b43",
-    "binary": "b9f845341dcfe9f7f715c3460d0aacd0bce2073c85cd92ff497ea2a6351b6893"
-  },
   "org.standardnotes.advanced-checklist": {
     "version": "0.0.1",
     "base64": "6fc4b14848e1692524448cfde7a06db543d5abbe3f7194fcd8c69c605ab08039",
