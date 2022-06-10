@@ -140,7 +140,7 @@ export function editors(): EditorFeatureDescription[] {
     availableInSubscriptions: [SubscriptionName.PlusPlan, SubscriptionName.ProPlan],
     name: 'Dynamic Markdown',
     identifier: FeatureIdentifier.MarkdownVisualEditor,
-    version: '1.0.6',
+    version: '1.0.7',
     note_type: NoteType.Markdown,
     file_type: 'md',
     permission_name: PermissionName.MarkdownVisualEditor,
