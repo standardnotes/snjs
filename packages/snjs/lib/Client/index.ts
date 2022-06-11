@@ -1,3 +1,4 @@
 export * from './IconsController'
-export * from './NoteGroupController'
 export * from './NoteViewController'
+export * from './FileViewController'
+export * from './ItemGroupController'
