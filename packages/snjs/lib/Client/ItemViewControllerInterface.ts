@@ -1,6 +1,6 @@
 import { SNNote, FileItem } from '@standardnotes/models'
 
-export interface ItemViewController {
+export interface ItemViewControllerInterface {
   item: SNNote | FileItem
 
   deinit: () => void
