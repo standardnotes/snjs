@@ -4,5 +4,5 @@ export interface ItemViewControllerInterface {
   item: SNNote | FileItem
 
   deinit: () => void
-  initialize(addTagHierarchy: boolean): Promise<void>
+  initialize(addTagHierarchy?: boolean): Promise<void>
 }

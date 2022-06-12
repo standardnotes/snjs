@@ -19,6 +19,7 @@ import {
   SAVE_TIMEOUT_DEBOUNCE,
 } from './Types'
 import { ItemViewControllerInterface } from './ItemViewControllerInterface'
+import { TemplateNoteViewControllerOptions } from './TemplateNoteViewControllerOptions'
 
 export type EditorValues = {
   title: string
@@ -28,22 +29,25 @@ export type EditorValues = {
 export class NoteViewController implements ItemViewControllerInterface {
   public item!: SNNote
   public dealloced = false
-  private application: SNApplication
   private innerValueChangeObservers: ((note: SNNote, source: PayloadEmitSource) => void)[] = []
   private removeStreamObserver?: () => void
   public isTemplateNote = false
   private saveTimeout?: ReturnType<typeof setTimeout>
+  private defaultTitle: string | undefined
+  private defaultTag: UuidString | undefined
 
   constructor(
-    application: SNApplication,
-    noteUuid: string | undefined,
-    private defaultTitle: string | undefined,
-    private defaultTag: UuidString | undefined,
+    private application: SNApplication,
+    item?: SNNote,
+    templateNoteOptions?: TemplateNoteViewControllerOptions,
   ) {
-    this.application = application
+    if (item) {
+      this.item = item
+    }
 
-    if (noteUuid) {
-      this.item = application.items.findItem(noteUuid) as SNNote
+    if (templateNoteOptions) {
+      this.defaultTitle = templateNoteOptions.title
+      this.defaultTag = templateNoteOptions.tag
     }
   }
 

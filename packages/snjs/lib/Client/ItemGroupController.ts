@@ -1,20 +1,14 @@
 import { ApplicationEvent } from '../Application/Event'
 import { FileItem, PrefKey, SNNote } from '@standardnotes/models'
 import { removeFromArray } from '@standardnotes/utils'
-import { UuidString } from '@Lib/Types/UuidString'
 import { SNApplication } from '../Application/Application'
 import { NoteViewController } from './NoteViewController'
 import { FileViewController } from './FileViewController'
+import { TemplateNoteViewControllerOptions } from './TemplateNoteViewControllerOptions'
 
 type ItemControllerGroupChangeCallback = (activeController: NoteViewController | FileViewController | undefined) => void
 
-type CreateItemControllerOptions =
-  | FileItem
-  | {
-      uuid?: SNNote['uuid']
-      title?: string
-      tag?: UuidString
-    }
+type CreateItemControllerOptions = FileItem | SNNote | TemplateNoteViewControllerOptions
 
 export class ItemGroupController {
   public itemControllers: (NoteViewController | FileViewController)[] = []
@@ -56,10 +50,13 @@ export class ItemGroupController {
     let controller!: NoteViewController | FileViewController
 
     if (options instanceof FileItem) {
-      controller = new FileViewController(this.application, options)
+      const file = options
+      controller = new FileViewController(this.application, file)
+    } else if (options instanceof SNNote) {
+      const note = options
+      controller = new NoteViewController(this.application, note)
     } else {
-      const { uuid, title, tag } = options
-      controller = new NoteViewController(this.application, uuid, title, tag)
+      controller = new NoteViewController(this.application, undefined, options)
     }
 
     this.itemControllers.push(controller)
