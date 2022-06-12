@@ -1,5 +1,5 @@
 import { ApplicationEvent } from '../Application/Event'
-import { FileItem, PrefKey } from '@standardnotes/models'
+import { FileItem, PrefKey, SNNote } from '@standardnotes/models'
 import { removeFromArray } from '@standardnotes/utils'
 import { UuidString } from '@Lib/Types/UuidString'
 import { SNApplication } from '../Application/Application'
@@ -7,6 +7,15 @@ import { NoteViewController } from './NoteViewController'
 import { FileViewController } from './FileViewController'
 
 type ItemControllerGroupChangeCallback = (activeController: NoteViewController | FileViewController | undefined) => void
+
+type CreateItemControllerOptions = {
+  file?: FileItem
+  note?: {
+    uuid?: SNNote['uuid']
+    title?: string
+    tag?: UuidString
+  }
+}
 
 export class ItemGroupController {
   public itemControllers: (NoteViewController | FileViewController)[] = []
@@ -42,32 +51,27 @@ export class ItemGroupController {
     this.itemControllers.length = 0
   }
 
-  async createNoteController(noteUuid?: string, noteTitle?: string, noteTag?: UuidString): Promise<NoteViewController> {
+  async createItemController({
+    file,
+    note,
+  }: CreateItemControllerOptions): Promise<NoteViewController | FileViewController> {
     if (this.activeItemViewController) {
       this.closeItemController(this.activeItemViewController, { notify: false })
     }
 
-    const controller = new NoteViewController(this.application, noteUuid, noteTitle, noteTag)
+    let controller!: NoteViewController | FileViewController
+
+    if (note) {
+      controller = new NoteViewController(this.application, note.uuid, note.title, note.tag)
+    }
+
+    if (file) {
+      controller = new FileViewController(this.application, file)
+    }
 
     this.itemControllers.push(controller)
 
     await controller.initialize(this.addTagHierarchy)
-
-    this.notifyObservers()
-
-    return controller
-  }
-
-  async createFileController(fileItem: FileItem): Promise<FileViewController> {
-    if (this.activeItemViewController) {
-      this.closeItemController(this.activeItemViewController, { notify: false })
-    }
-
-    const controller = new FileViewController(this.application, fileItem)
-
-    this.itemControllers.push(controller)
-
-    await controller.initialize()
 
     this.notifyObservers()
 
