@@ -8,14 +8,13 @@ import { FileViewController } from './FileViewController'
 
 type ItemControllerGroupChangeCallback = (activeController: NoteViewController | FileViewController | undefined) => void
 
-type CreateItemControllerOptions = {
-  file?: FileItem
-  note?: {
-    uuid?: SNNote['uuid']
-    title?: string
-    tag?: UuidString
-  }
-}
+type CreateItemControllerOptions =
+  | FileItem
+  | {
+      uuid?: SNNote['uuid']
+      title?: string
+      tag?: UuidString
+    }
 
 export class ItemGroupController {
   public itemControllers: (NoteViewController | FileViewController)[] = []
@@ -51,22 +50,18 @@ export class ItemGroupController {
     this.itemControllers.length = 0
   }
 
-  async createItemController({
-    file,
-    note,
-  }: CreateItemControllerOptions): Promise<NoteViewController | FileViewController> {
+  async createItemController(options: CreateItemControllerOptions): Promise<NoteViewController | FileViewController> {
     if (this.activeItemViewController) {
       this.closeItemController(this.activeItemViewController, { notify: false })
     }
 
     let controller!: NoteViewController | FileViewController
 
-    if (note) {
-      controller = new NoteViewController(this.application, note.uuid, note.title, note.tag)
-    }
-
-    if (file) {
-      controller = new FileViewController(this.application, file)
+    if (options instanceof FileItem) {
+      controller = new FileViewController(this.application, options)
+    } else {
+      const { uuid, title, tag } = options
+      controller = new NoteViewController(this.application, uuid, title, tag)
     }
 
     this.itemControllers.push(controller)
