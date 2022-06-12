@@ -1,5 +1,5 @@
 import { ApplicationEvent } from '../Application/Event'
-import { PrefKey } from '@standardnotes/models'
+import { FileItem, PrefKey } from '@standardnotes/models'
 import { removeFromArray } from '@standardnotes/utils'
 import { UuidString } from '@Lib/Types/UuidString'
 import { SNApplication } from '../Application/Application'
@@ -58,12 +58,12 @@ export class ItemGroupController {
     return controller
   }
 
-  async createFileController(fileUuid: string): Promise<FileViewController> {
+  async createFileController(fileItem: FileItem): Promise<FileViewController> {
     if (this.activeItemViewController) {
       this.closeItemController(this.activeItemViewController, { notify: false })
     }
 
-    const controller = new FileViewController(this.application, fileUuid)
+    const controller = new FileViewController(this.application, fileItem)
 
     this.itemControllers.push(controller)
 

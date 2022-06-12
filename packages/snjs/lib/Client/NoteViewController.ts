@@ -18,13 +18,14 @@ import {
   SAVE_TIMEOUT_NO_DEBOUNCE,
   SAVE_TIMEOUT_DEBOUNCE,
 } from './Types'
+import { ItemViewController } from './ItemViewControllerInterface'
 
 export type EditorValues = {
   title: string
   text: string
 }
 
-export class NoteViewController {
+export class NoteViewController implements ItemViewController {
   public item!: SNNote
   public dealloced = false
   private application: SNApplication

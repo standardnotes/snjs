@@ -1,16 +1,15 @@
 import { FileItem } from '@standardnotes/models'
 import { ContentType } from '@standardnotes/common'
 import { SNApplication } from '../Application/Application'
+import { ItemViewController } from './ItemViewControllerInterface'
 
-export class FileViewController {
-  public item!: FileItem
+export class FileViewController implements ItemViewController {
+  public item: FileItem
   public dealloced = false
   private removeStreamObserver?: () => void
 
-  constructor(private application: SNApplication, fileUuid: FileItem['uuid']) {
-    if (fileUuid) {
-      this.item = this.application.items.findItem(fileUuid) as FileItem
-    }
+  constructor(private application: SNApplication, fileItem: FileItem) {
+    this.item = fileItem
   }
 
   deinit() {
