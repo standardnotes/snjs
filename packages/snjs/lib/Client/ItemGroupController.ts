@@ -18,13 +18,11 @@ type CreateItemControllerOptions =
 
 export class ItemGroupController {
   public itemControllers: (NoteViewController | FileViewController)[] = []
-  private application: SNApplication
   private addTagHierarchy: boolean
   changeObservers: ItemControllerGroupChangeCallback[] = []
   eventObservers: (() => void)[] = []
 
-  constructor(application: SNApplication) {
-    this.application = application
+  constructor(private application: SNApplication) {
     this.addTagHierarchy = application.getPreference(PrefKey.NoteAddToParentFolders, true)
 
     this.eventObservers.push(
