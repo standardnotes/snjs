@@ -29,6 +29,7 @@ packages/snjs/dist
 packages/time/dist
 packages/utils/dist
 packages/api/dist
+packages/scheduler/dist
 
 yarn-error.log
 package-lock.json

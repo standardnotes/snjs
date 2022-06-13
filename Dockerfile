@@ -41,6 +41,7 @@ COPY --chown=$UID:$GID packages/snjs/package.json /var/www/packages/snjs/package
 COPY --chown=$UID:$GID packages/time/package.json /var/www/packages/time/package.json
 COPY --chown=$UID:$GID packages/utils/package.json /var/www/packages/utils/package.json
 COPY --chown=$UID:$GID packages/api/package.json /var/www/packages/api/package.json
+COPY --chown=$UID:$GID packages/scheduler/package.json /var/www/packages/scheduler/package.json
 
 RUN yarn install --pure-lockfile
 
