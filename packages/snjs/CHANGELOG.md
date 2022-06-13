@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.116.0](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.115.12...@standardnotes/snjs@2.116.0) (2022-06-13)
+
+
+### Features
+
+* ItemGroupController ([#765](https://github.com/standardnotes/snjs/issues/765)) ([13e8b90](https://github.com/standardnotes/snjs/commit/13e8b90344975c5ca3d097808c5c787debd43cf4))
+
+
+
+
+
 ## [2.115.12](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.115.11...@standardnotes/snjs@2.115.12) (2022-06-13)
 
 **Note:** Version bump only for package @standardnotes/snjs
