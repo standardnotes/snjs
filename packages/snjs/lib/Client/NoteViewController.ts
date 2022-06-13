@@ -18,31 +18,36 @@ import {
   SAVE_TIMEOUT_NO_DEBOUNCE,
   SAVE_TIMEOUT_DEBOUNCE,
 } from './Types'
+import { ItemViewControllerInterface } from './ItemViewControllerInterface'
+import { TemplateNoteViewControllerOptions } from './TemplateNoteViewControllerOptions'
 
 export type EditorValues = {
   title: string
   text: string
 }
 
-export class NoteViewController {
-  public note!: SNNote
+export class NoteViewController implements ItemViewControllerInterface {
+  public item!: SNNote
   public dealloced = false
-  private application: SNApplication
   private innerValueChangeObservers: ((note: SNNote, source: PayloadEmitSource) => void)[] = []
   private removeStreamObserver?: () => void
   public isTemplateNote = false
   private saveTimeout?: ReturnType<typeof setTimeout>
+  private defaultTitle: string | undefined
+  private defaultTag: UuidString | undefined
 
   constructor(
-    application: SNApplication,
-    noteUuid: string | undefined,
-    private defaultTitle: string | undefined,
-    private defaultTag: UuidString | undefined,
+    private application: SNApplication,
+    item?: SNNote,
+    templateNoteOptions?: TemplateNoteViewControllerOptions,
   ) {
-    this.application = application
+    if (item) {
+      this.item = item
+    }
 
-    if (noteUuid) {
-      this.note = application.items.findItem(noteUuid) as SNNote
+    if (templateNoteOptions) {
+      this.defaultTitle = templateNoteOptions.title
+      this.defaultTag = templateNoteOptions.tag
     }
   }
 
@@ -51,7 +56,7 @@ export class NoteViewController {
     this.removeStreamObserver?.()
     ;(this.removeStreamObserver as unknown) = undefined
     ;(this.application as unknown) = undefined
-    ;(this.note as unknown) = undefined
+    ;(this.item as unknown) = undefined
 
     this.innerValueChangeObservers.length = 0
 
@@ -59,7 +64,7 @@ export class NoteViewController {
   }
 
   async initialize(addTagHierarchy: boolean): Promise<void> {
-    if (!this.note) {
+    if (!this.item) {
       const note = this.application.mutator.createTemplateItem<NoteContent, SNNote>(ContentType.Note, {
         text: '',
         title: this.defaultTitle || '',
@@ -67,14 +72,14 @@ export class NoteViewController {
       })
 
       this.isTemplateNote = true
-      this.note = note
+      this.item = note
 
       if (this.defaultTag) {
         const tag = this.application.items.findItem(this.defaultTag) as SNTag
         await this.application.items.addTagToNote(note, tag, addTagHierarchy)
       }
 
-      this.notifyObservers(this.note, PayloadEmitSource.InitialObserverRegistrationPush)
+      this.notifyObservers(this.item, PayloadEmitSource.InitialObserverRegistrationPush)
     }
 
     this.streamItems()
@@ -93,12 +98,12 @@ export class NoteViewController {
         const notes = changed.concat(inserted)
 
         const matchingNote = notes.find((item) => {
-          return item.uuid === this.note.uuid
+          return item.uuid === this.item.uuid
         })
 
         if (matchingNote) {
           this.isTemplateNote = false
-          this.note = matchingNote
+          this.item = matchingNote
           this.notifyObservers(matchingNote, source)
         }
       },
@@ -107,7 +112,7 @@ export class NoteViewController {
 
   public insertTemplatedNote(): Promise<DecryptedItemInterface> {
     this.isTemplateNote = false
-    return this.application.mutator.insertItem(this.note)
+    return this.application.mutator.insertItem(this.item)
   }
 
   /**
@@ -117,8 +122,8 @@ export class NoteViewController {
   public addNoteInnerValueChangeObserver(callback: (note: SNNote, source: PayloadEmitSource) => void): () => void {
     this.innerValueChangeObservers.push(callback)
 
-    if (this.note) {
-      callback(this.note, PayloadEmitSource.InitialObserverRegistrationPush)
+    if (this.item) {
+      callback(this.item, PayloadEmitSource.InitialObserverRegistrationPush)
     }
 
     const thislessChangeObservers = this.innerValueChangeObservers
@@ -156,13 +161,13 @@ export class NoteViewController {
       await this.insertTemplatedNote()
     }
 
-    if (!this.application.items.findItem(this.note.uuid)) {
+    if (!this.application.items.findItem(this.item.uuid)) {
       void this.application.alertService.alert(STRING_INVALID_NOTE)
       return
     }
 
     await this.application.mutator.changeItem(
-      this.note,
+      this.item,
       (mutator) => {
         const noteMutator = mutator as NoteMutator
         if (dto.customMutate) {
