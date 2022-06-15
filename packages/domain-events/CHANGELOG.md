@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.31.1](https://github.com/standardnotes/snjs/compare/@standardnotes/domain-events@2.31.0...@standardnotes/domain-events@2.31.1) (2022-06-15)
+
+
+### Bug Fixes
+
+* change userUuid to userEmail as the identifier on message requested ([8f0a6dd](https://github.com/standardnotes/snjs/commit/8f0a6ddc428b23578aac75a1945e3958df56cd02))
+
+
+
+
+
 # [2.31.0](https://github.com/standardnotes/snjs/compare/@standardnotes/domain-events@2.30.0...@standardnotes/domain-events@2.31.0) (2022-06-15)
 
 
