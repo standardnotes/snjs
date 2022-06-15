@@ -5,7 +5,7 @@ node_modules
 
 coverage
 
-packages/*/dist/
+packages/**/dist/
 !packages/components/all/**/dist/
 
 yarn-error.log
