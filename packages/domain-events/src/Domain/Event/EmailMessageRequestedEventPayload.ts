@@ -1,4 +1,4 @@
 export interface EmailMessageRequestedEventPayload {
-  userUuid: string
+  userEmail: string
   messageIdentifier: string
 }
