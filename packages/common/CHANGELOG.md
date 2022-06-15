@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.23.0](https://github.com/standardnotes/snjs/compare/@standardnotes/common@1.22.0...@standardnotes/common@1.23.0) (2022-06-15)
+
+
+### Features
+
+* add email requested events ([4d501fa](https://github.com/standardnotes/snjs/commit/4d501faedad44ff23782db1704956a6c19365fb6))
+
+
+
+
+
 # [1.22.0](https://github.com/standardnotes/snjs/compare/@standardnotes/common@1.21.0...@standardnotes/common@1.22.0) (2022-05-22)
 
 
