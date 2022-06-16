@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.32.0](https://github.com/standardnotes/snjs/compare/@standardnotes/domain-events@2.31.1...@standardnotes/domain-events@2.32.0) (2022-06-16)
+
+
+### Features
+
+* add origin and optional target meta properties to events ([43c4e81](https://github.com/standardnotes/snjs/commit/43c4e819c8a40cd2d04088bf93e9e3a3af1f1b8f))
+
+
+
+
+
 ## [2.31.1](https://github.com/standardnotes/snjs/compare/@standardnotes/domain-events@2.31.0...@standardnotes/domain-events@2.31.1) (2022-06-15)
 
 

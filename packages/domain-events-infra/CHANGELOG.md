@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.5.0](https://github.com/standardnotes/snjs/compare/@standardnotes/domain-events-infra@1.4.135...@standardnotes/domain-events-infra@1.5.0) (2022-06-16)
+
+
+### Features
+
+* add origin and optional target meta properties to events ([43c4e81](https://github.com/standardnotes/snjs/commit/43c4e819c8a40cd2d04088bf93e9e3a3af1f1b8f))
+
+
+
+
+
 ## [1.4.135](https://github.com/standardnotes/snjs/compare/@standardnotes/domain-events-infra@1.4.134...@standardnotes/domain-events-infra@1.4.135) (2022-06-15)
 
 **Note:** Version bump only for package @standardnotes/domain-events-infra
