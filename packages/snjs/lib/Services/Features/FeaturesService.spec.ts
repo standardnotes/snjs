@@ -401,7 +401,6 @@ describe('featuresService', () => {
         identifier: FeatureIdentifier.BoldEditor,
         content_type: ContentType.Component,
         expires_at: tomorrow_server,
-        version: '1.0.0',
       } as FeatureDescription
 
       const newRoles = [...roles, RoleName.PlusUser]

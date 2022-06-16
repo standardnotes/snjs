@@ -48,11 +48,8 @@ export type ClientFeatureDescription = RoleFields & {
 export type ComponentFeatureDescription = BaseFeatureDescription & {
   /** The relative path of the index.html file or the main css file if theme, within the component folder itself */
   index_path: string
-  download_url: string
   content_type: ContentType
-  git_repo_url: string
   static_files?: string[]
-  version: string
   area: ComponentArea
 }
 

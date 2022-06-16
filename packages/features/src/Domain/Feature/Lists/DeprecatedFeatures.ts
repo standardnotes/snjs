@@ -11,7 +11,6 @@ export function GetDeprecatedFeatures(): FeatureDescription[] {
     availableInSubscriptions: [SubscriptionName.PlusPlan, SubscriptionName.ProPlan],
     name: 'FileSafe',
     identifier: FeatureIdentifier.DeprecatedFileSafe,
-    version: '2.0.10',
     component_permissions: [
       {
         name: ComponentAction.StreamContextItem,
@@ -31,8 +30,6 @@ export function GetDeprecatedFeatures(): FeatureDescription[] {
     deprecated: true,
     description:
       'Encrypted attachments for your notes using your Dropbox, Google Drive, or WebDAV server. Limited to 50MB per file.',
-    git_repo_url: 'https://github.com/standardnotes/filesafe-client',
-    marketing_url: 'https://standardnotes.com/extensions/filesafe',
     thumbnail_url: 'https://s3.amazonaws.com/standard-notes/screenshots/models/FileSafe-banner.png',
   })
 
