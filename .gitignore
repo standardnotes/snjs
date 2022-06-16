@@ -5,8 +5,8 @@ node_modules
 
 coverage
 
-packages/**/dist/
-!packages/components/all/**/dist/
+packages/**/dist/**
+!packages/components/all/**/dist/**
 
 yarn-error.log
 package-lock.json
