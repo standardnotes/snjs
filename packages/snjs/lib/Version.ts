@@ -1,3 +1,5 @@
+import { eq, gt } from 'semver'
+
 /** Declared in webpack config */
 declare const __VERSION__: string
 export const SnjsVersion = __VERSION__
@@ -26,22 +28,17 @@ export function isRightVersionGreaterThanLeft(left: string, right: string): bool
  *  1 if a > b
  */
 export function compareSemVersions(left: string, right: string): 1 | -1 | 0 {
-  const leftParts = left.split('.')
-  const rightParts = right.split('.')
-  for (let i = 0; i < rightParts.length; i++) {
-    /**
-     * ~~ parses int
-     * Convert to number so that 001 becomes 1
-     */
-    const rightComp = Number(~~rightParts[i])
-    const leftComp = Number(~~leftParts[i])
-    if (rightComp > leftComp) {
-      return -1
-    }
-    if (rightComp < leftComp) {
-      return 1
-    }
+  if (left === right) {
+    return 0
   }
 
-  return 0
+  if (eq(left, right)) {
+    return 0
+  }
+
+  if (gt(left, right)) {
+    return 1
+  }
+
+  return -1
 }
