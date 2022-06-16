@@ -28,10 +28,6 @@ export function isRightVersionGreaterThanLeft(left: string, right: string): bool
  *  1 if a > b
  */
 export function compareSemVersions(left: string, right: string): 1 | -1 | 0 {
-  if (left === right) {
-    return 0
-  }
-
   if (eq(left, right)) {
     return 0
   }
