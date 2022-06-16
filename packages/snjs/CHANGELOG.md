@@ -3,6 +3,33 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.117.0](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.116.2...@standardnotes/snjs@2.117.0) (2022-06-15)
+
+
+### Features
+
+* new hosted components assets path ([32f477d](https://github.com/standardnotes/snjs/commit/32f477dbf403ec35374f53b27a7d661088f12568))
+
+
+
+
+
+## [2.116.2](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.116.1...@standardnotes/snjs@2.116.2) (2022-06-15)
+
+**Note:** Version bump only for package @standardnotes/snjs
+
+
+
+
+
+## [2.116.1](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.116.0...@standardnotes/snjs@2.116.1) (2022-06-15)
+
+**Note:** Version bump only for package @standardnotes/snjs
+
+
+
+
+
 # [2.116.0](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.115.12...@standardnotes/snjs@2.116.0) (2022-06-13)
 
 

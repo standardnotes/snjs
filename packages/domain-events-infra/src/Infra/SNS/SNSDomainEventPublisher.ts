@@ -18,8 +18,19 @@ export class SNSDomainEventPublisher implements DomainEventPublisherInterface {
           DataType: 'String',
           StringValue: 'true',
         },
+        origin: {
+          DataType: 'String',
+          StringValue: event.meta.origin,
+        },
       },
       Message: zlib.deflateSync(JSON.stringify(event)).toString('base64'),
+    }
+
+    if (event.meta.target !== undefined) {
+      ;(message.MessageAttributes as AWS.SNS.MessageAttributeMap).target = {
+        DataType: 'String',
+        StringValue: event.meta.target,
+      }
     }
 
     await this.snsClient.publish(message).promise()
