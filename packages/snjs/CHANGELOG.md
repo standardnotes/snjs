@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.117.4](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.117.3...@standardnotes/snjs@2.117.4) (2022-06-16)
+
+
+### Bug Fixes
+
+* version comparison including beta/alpha using semver package ([#768](https://github.com/standardnotes/snjs/issues/768)) ([0cf2650](https://github.com/standardnotes/snjs/commit/0cf2650c0d54bb31c6c52f0d9834ddd6f259dba7))
+
+
+
+
+
 ## [2.117.3](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.117.2...@standardnotes/snjs@2.117.3) (2022-06-16)
 
 **Note:** Version bump only for package @standardnotes/snjs
