@@ -1,3 +1,5 @@
+import { DomainEventService } from './DomainEventService'
+
 export interface DomainEventInterface {
   type: string
   createdAt: Date
@@ -7,5 +9,7 @@ export interface DomainEventInterface {
       userIdentifier: string
       userIdentifierType: 'uuid' | 'email'
     }
+    origin: DomainEventService
+    target?: DomainEventService
   }
 }
