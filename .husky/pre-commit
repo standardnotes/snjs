@@ -1,5 +1,5 @@
 #!/bin/sh
 . "$(dirname "$0")/_/husky.sh"
 
-# yarn build
-# yarn lint
+yarn build
+yarn lint

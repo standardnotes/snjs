@@ -1,6 +1,7 @@
-import { FeatureDescription, ComponentArea, ComponentPermission } from '@standardnotes/features'
+import { ComponentArea, ComponentPermission } from '@standardnotes/features'
 import { Uuid } from '@standardnotes/common'
 import { ItemContent } from '../../Abstract/Content/ItemContent'
+import { ComponentPackageInfo } from './PackageInfo'
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 export interface ComponentInterface {
@@ -21,7 +22,7 @@ export interface ComponentInterface {
   offlineOnly: boolean
   name: string
   autoupdateDisabled: boolean
-  package_info: FeatureDescription
+  package_info: ComponentPackageInfo
   area: ComponentArea
   permissions: ComponentPermission[]
   valid_until: Date | number
