@@ -5,7 +5,6 @@ import {
   ThirdPartyFeatureDescription,
   ComponentArea,
   ComponentFlag,
-  FeatureDescription,
   ComponentPermission,
   FindNativeFeature,
 } from '@standardnotes/features'
@@ -19,6 +18,7 @@ import { ItemContent } from '../../Abstract/Content/ItemContent'
 import { Predicate } from '../../Runtime/Predicate/Predicate'
 import { ItemInterface } from '../../Abstract/Item/Interfaces/ItemInterface'
 import { DecryptedItemInterface } from './../../Abstract/Item/Interfaces/DecryptedItem'
+import { ComponentPackageInfo } from './PackageInfo'
 
 export const isComponent = (x: ItemInterface): x is SNComponent => x.content_type === ContentType.Component
 
@@ -41,7 +41,7 @@ export class SNComponent extends DecryptedItem<ComponentContent> implements Comp
   public readonly offlineOnly: boolean
   public readonly name: string
   public readonly autoupdateDisabled: boolean
-  public readonly package_info: FeatureDescription
+  public readonly package_info: ComponentPackageInfo
   public readonly area: ComponentArea
   public readonly permissions: ComponentPermission[] = []
   public readonly valid_until: Date

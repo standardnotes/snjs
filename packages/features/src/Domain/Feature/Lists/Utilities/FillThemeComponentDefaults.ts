@@ -1,8 +1,6 @@
 import { ContentType } from '@standardnotes/common'
 import { ThemeFeatureDescription } from '../../FeatureDescription'
 import { ComponentArea } from '../../../Component/ComponentArea'
-import { FeatureIdentifier } from '../../FeatureIdentifier'
-import { getGithubDownloadUrl } from './GithubDownloadUrl'
 
 type RequiredThemeFields = Pick<ThemeFeatureDescription, 'availableInSubscriptions'>
 
@@ -11,14 +9,6 @@ export function FillThemeComponentDefaults(
 ): ThemeFeatureDescription {
   if (!theme.static_files) {
     theme.static_files = ['dist', 'package.json']
-  }
-
-  if (theme.git_repo_url && !theme.download_url) {
-    theme.download_url = getGithubDownloadUrl(
-      theme.git_repo_url,
-      theme.version as string,
-      theme.identifier as FeatureIdentifier,
-    )
   }
 
   if (!theme.index_path) {

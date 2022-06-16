@@ -5,15 +5,13 @@ node_modules
 
 coverage
 
-packages/**/dist/**
-!packages/components/all/**/dist/**
+dist
 
 yarn-error.log
 package-lock.json
 lerna-debug.log
 newrelic_agent.log
 
-# Ignore ENV variables config
 .env
 auth.env
 api-gateway.env
@@ -22,5 +20,3 @@ syncing-server.env
 mock-event-publisher.env
 files.env
 codeqldb
-
-packages/components/tmp

@@ -558,7 +558,7 @@ export class SNFeaturesService
     if (existingItem) {
       const featureExpiresAt = new Date(feature.expires_at || 0)
       const hasChange =
-        feature.version !== existingItem.package_info.version ||
+        JSON.stringify(feature) !== JSON.stringify(existingItem.package_info) ||
         featureExpiresAt.getTime() !== existingItem.valid_until.getTime()
       if (hasChange) {
         resultingItem = await this.itemManager.changeComponent(existingItem, (mutator) => {

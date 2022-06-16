@@ -22,7 +22,6 @@ COPY --chown=$UID:$GID package.json yarn.lock /var/www/
 COPY --chown=$UID:$GID packages/analytics/package.json /var/www/packages/analytics/package.json
 COPY --chown=$UID:$GID packages/auth/package.json /var/www/packages/auth/package.json
 COPY --chown=$UID:$GID packages/common/package.json /var/www/packages/common/package.json
-COPY --chown=$UID:$GID packages/components/package.json /var/www/packages/components/package.json
 COPY --chown=$UID:$GID packages/config/package.json /var/www/packages/config/package.json
 COPY --chown=$UID:$GID packages/domain-events-infra/package.json /var/www/packages/domain-events-infra/package.json
 COPY --chown=$UID:$GID packages/domain-events/package.json /var/www/packages/domain-events/package.json

@@ -2294,69 +2294,6 @@
   resolved "https://registry.yarnpkg.com/@sinonjs/text-encoding/-/text-encoding-0.7.1.tgz#8da5c6530915653f3a1f38fd5f101d8c3f8079c5"
   integrity sha512-+iTbntw2IZPb/anVDbypzfQa+ay64MW0Zo8aJ8gZPWMMK6/OubMVb6lUPMagqjOPnmtauXnFCACVl3O7ogjeqQ==
 
-"@standardnotes/advanced-checklist@0.0.1":
-  version "0.0.1"
-  resolved "https://registry.yarnpkg.com/@standardnotes/advanced-checklist/-/advanced-checklist-0.0.1.tgz#a0a6aab2664e6b96ba2be5ba360013c7c92337b5"
-  integrity sha512-LGW9Nlht/wE5c045j0uPUBJZ3OpPll9z62nMXsmz37S/i8Ksh6WnFaQUQDBrDNOzbZ/uJMJdMoW1ixykAap9CA==
-
-"@standardnotes/autobiography-theme@1.0.4":
-  version "1.0.4"
-  resolved "https://registry.yarnpkg.com/@standardnotes/autobiography-theme/-/autobiography-theme-1.0.4.tgz#578fbca7c5eae6cead8d6a229b8d39ae5f6c09ab"
-  integrity sha512-ssk1kCQersmvLxAXUExCSqhdjr4cRXIV9dGDDOjdeT+dUyemfO6ti5u/nOTDJVhw+dBGL15Hu/kzDU+1i75pQg==
-
-"@standardnotes/deterministic-zip@^1.2.0":
-  version "1.2.0"
-  resolved "https://registry.yarnpkg.com/@standardnotes/deterministic-zip/-/deterministic-zip-1.2.0.tgz#b5fc2380fcb048a843988768c7e0f44459ef2d2c"
-  integrity sha512-xAFC0zXKiizR0V7OwF+YXBEhQTaz5tZav1R+oyKVhIppiVwDub9iRrZkw/0eMMf3RdvM4ZnFjrjud/fm9KUgbA==
-  dependencies:
-    async "^3.1.0"
-    crc32-stream "^3.0.0"
-    minimatch "^3.0.3"
-
-"@standardnotes/dynamic-theme@1.0.4":
-  version "1.0.4"
-  resolved "https://registry.yarnpkg.com/@standardnotes/dynamic-theme/-/dynamic-theme-1.0.4.tgz#13bc6db9a5383333b9005f924c2e49a68b2a5e58"
-  integrity sha512-JUAFgO+IOoTpuUYTxgT/s9wMRPWJdVAuv16PmWBEPKeL2NH2rZ/Ndi3rHstwyqhketCJKJ3RIfKG/QOfAUjg1Q==
-
-"@standardnotes/filesafe-bar@standardnotes/filesafe-client":
-  version "2.0.15"
-  resolved "https://codeload.github.com/standardnotes/filesafe-client/tar.gz/fc111cc0a81de01d63ba27dea2998100c6f0011f"
-
-"@standardnotes/focus-theme@1.2.9":
-  version "1.2.9"
-  resolved "https://registry.yarnpkg.com/@standardnotes/focus-theme/-/focus-theme-1.2.9.tgz#cfe012d555368da0df5c1ef0a0f4e404f2ac2de7"
-  integrity sha512-P3DpouZxow1Td8JDWQmMeROHzrgKYKAxAJmOcmxIj+lHRCLP+IDWhAXbjhtpVyH5+suJ/48abVCrk1QkwTAubQ==
-
-"@standardnotes/futura-theme@1.2.9":
-  version "1.2.9"
-  resolved "https://registry.yarnpkg.com/@standardnotes/futura-theme/-/futura-theme-1.2.9.tgz#9c10769ac4e28eb7ed31b2593cec2be1ba24012f"
-  integrity sha512-GczRd5RNs8A2/NFQrr8who7jakoGrkazfNa2CMLK0wyXH/HH/06w+SwDuJAuUZvT4Z/rQ0BSl59x16Ynl5Fy+w==
-
-"@standardnotes/markdown-visual@1.0.7":
-  version "1.0.7"
-  resolved "https://registry.yarnpkg.com/@standardnotes/markdown-visual/-/markdown-visual-1.0.7.tgz#b0c9ff37344507d9e5cf4d0c51107458ef6cb90f"
-  integrity sha512-x1Sdd+Eb6B/Ld2uJi32eoMqvkr5xVOuVlPCvK6/NwY3PG/L0eh1wX9+v8uveAZAl7gOjSVYMnqtVy129asd/jg==
-
-"@standardnotes/midnight-theme@1.2.8":
-  version "1.2.8"
-  resolved "https://registry.yarnpkg.com/@standardnotes/midnight-theme/-/midnight-theme-1.2.8.tgz#ddf2ee8c8169acc13385fd42c032d51d74d7f119"
-  integrity sha512-4xi3GvmfhVjGQRLAxHqPX/522ly8V7rhD8Ncr56K9g3I3l5Bnhw9Mt0Dex5/UHaxQ3o+dF/lkyxSQ4hU6/YMjQ==
-
-"@standardnotes/simple-task-editor@1.3.10":
-  version "1.3.10"
-  resolved "https://registry.yarnpkg.com/@standardnotes/simple-task-editor/-/simple-task-editor-1.3.10.tgz#60e90b27f63a11aa1646efd7d34e72598408f37d"
-  integrity sha512-fgiCQLXT2S2vUwvtqhCOdqw9c1hUp8/YdjPqLF967t3l5PKywNteTn2Nz8Mg7B1+CUzrEFcZTJOFkDDsT5kjhA==
-
-"@standardnotes/solarized-dark-theme@1.2.7":
-  version "1.2.7"
-  resolved "https://registry.yarnpkg.com/@standardnotes/solarized-dark-theme/-/solarized-dark-theme-1.2.7.tgz#a0fdfbcdd35f333e2047b55a15dd37bae22d400c"
-  integrity sha512-AgqKTrDq3cuqvK+q/H7BZyXy/AJmNUIxgFRuQumzfubqjIiu2tf3WnFzcqwd3VPnLNR/1EyxTdMVVtH7i2YTDw==
-
-"@standardnotes/titanium-theme@1.2.8":
-  version "1.2.8"
-  resolved "https://registry.yarnpkg.com/@standardnotes/titanium-theme/-/titanium-theme-1.2.8.tgz#713128911aa9b7319520a3fdd36957f5803cdd23"
-  integrity sha512-XREZ/viwOi2E1W8KPP0jvfevQBRbZSDuDl6h3RyVRAt1+M+D4SzNBblYocWLVCVtTT/B817BFQ3DzNhBdMCxSg==
-
 "@tootallnate/once@1":
   version "1.1.2"
   resolved "https://registry.yarnpkg.com/@tootallnate/once/-/once-1.1.2.tgz#ccb91445360179a04e7fe6aff78c00ffc1eeaf82"
@@ -3203,7 +3140,7 @@ assign-symbols@^1.0.0:
   resolved "https://registry.yarnpkg.com/assign-symbols/-/assign-symbols-1.0.0.tgz#59667f41fadd4f20ccbc2bb96b8d4f7f78ec0367"
   integrity sha512-Q+JC7Whu8HhmTdBph/Tq59IoRtoy6KAm5zzPv00WdujX82lbAL8K7WVjne7vdCsAmbF4AYaDOPyO3k0kl8qIrw==
 
-async@^3.1.0, async@^3.2.3:
+async@^3.2.3:
   version "3.2.4"
   resolved "https://registry.yarnpkg.com/async/-/async-3.2.4.tgz#2d22e00f8cddeb5fde5dd33522b56d1cf569a81c"
   integrity sha512-iAB+JbDEGXhyIUavoDl9WP/Jj106Kz9DEn1DPgYw5ruDn0e3Wgi3sKFm55sASdGBNOQB8F59d9qQ7deqrHA8wQ==
@@ -3516,7 +3453,7 @@ buffer@4.9.2:
     ieee754 "^1.1.4"
     isarray "^1.0.0"
 
-buffer@^5.1.0, buffer@^5.2.1, buffer@^5.5.0:
+buffer@^5.2.1, buffer@^5.5.0:
   version "5.7.1"
   resolved "https://registry.yarnpkg.com/buffer/-/buffer-5.7.1.tgz#ba62e7c13133053582197160851a8f648e99eed0"
   integrity sha512-EHcyIPBQ4BSGlvjB16k5KgAJ27CIsHY/2JBmCRReo48y9rQ3MaUzWX3KVlBa4U7MyX02HdVj0K7C3WaB3ju7FQ==
@@ -4142,21 +4079,6 @@ cosmiconfig@^5.1.0:
     is-directory "^0.3.1"
     js-yaml "^3.13.1"
     parse-json "^4.0.0"
-
-crc32-stream@^3.0.0:
-  version "3.0.1"
-  resolved "https://registry.yarnpkg.com/crc32-stream/-/crc32-stream-3.0.1.tgz#cae6eeed003b0e44d739d279de5ae63b171b4e85"
-  integrity sha512-mctvpXlbzsvK+6z8kJwSJ5crm7yBwrQMTybJzMw1O4lLGJqjlDCXY2Zw7KheiA6XBEcBmfLx1D88mjRGVJtY9w==
-  dependencies:
-    crc "^3.4.4"
-    readable-stream "^3.4.0"
-
-crc@^3.4.4:
-  version "3.8.0"
-  resolved "https://registry.yarnpkg.com/crc/-/crc-3.8.0.tgz#ad60269c2c856f8c299e2c4cc0de4556914056c6"
-  integrity sha512-iX3mfgcTMIq3ZKLIsVFAbv7+Mc10kxabAGQb8HvjA1o3T1PIYprbakQ65d3I+2HGHt6nSKkM9PYjgoJO2KcFBQ==
-  dependencies:
-    buffer "^5.1.0"
 
 create-require@^1.1.0:
   version "1.1.1"
@@ -7702,7 +7624,7 @@ minimatch@4.2.1:
   dependencies:
     brace-expansion "^1.1.7"
 
-minimatch@^3.0.3, minimatch@^3.0.4, minimatch@^3.1.1, minimatch@^3.1.2:
+minimatch@^3.0.4, minimatch@^3.1.1, minimatch@^3.1.2:
   version "3.1.2"
   resolved "https://registry.yarnpkg.com/minimatch/-/minimatch-3.1.2.tgz#19cd194bfd3e428f049a70817c038d89ab4be35b"
   integrity sha512-J7p63hRiAjw1NDEww1W7i37+ByIrOWO5XQQAzZ3VOcL0PNybwpfmV/N05zFAzwQ9USyEcX6t3UO+K5aqBQOIHw==
@@ -9556,63 +9478,6 @@ smart-buffer@^4.1.0:
   version "4.2.0"
   resolved "https://registry.yarnpkg.com/smart-buffer/-/smart-buffer-4.2.0.tgz#6e1d71fa4f18c05f7d0ff216dd16a481d0e8d9ae"
   integrity sha512-94hK0Hh8rPqQl2xXc3HsaBoOXKV20MToPkcXvwbISWLEs+64sBq5kFgn2kJDHb1Pry9yrP0dxrCI9RRci7RXKg==
-
-sn-advanced-markdown-editor@1.5.0:
-  version "1.5.0"
-  resolved "https://registry.yarnpkg.com/sn-advanced-markdown-editor/-/sn-advanced-markdown-editor-1.5.0.tgz#006e8bbb0c91614b94e35192f65c9af382a679a1"
-  integrity sha512-K0KA5anng3m8M+NB1H8ecnLRS6Sfr9cE7cr72zG8qNDiRz6AIlb1qlaNshRJ1kNMTJ3evFibIbJfWXvfv5PFAA==
-
-sn-bold-editor@1.3.5:
-  version "1.3.5"
-  resolved "https://registry.yarnpkg.com/sn-bold-editor/-/sn-bold-editor-1.3.5.tgz#db3ea8f6b7b807a4b759773bf21211c269453484"
-  integrity sha512-MHS99C7wvS4wtnfInjD65iPrCcrmXFF7JrgxRQycrDmv1oRbU4mVEOpQtUTX4rBz6Sq2yOXKLcaxgStb/9XNTg==
-
-sn-code-editor@1.3.12:
-  version "1.3.12"
-  resolved "https://registry.yarnpkg.com/sn-code-editor/-/sn-code-editor-1.3.12.tgz#5f19421bab01097e37a4f11b0dbce37dd330b3e7"
-  integrity sha512-i5RgNhEpTxjg3FyjKkG2sWMzKyswqg5V9J2sHZvHmCsqQRQxPd6nPxWrkrWTjANSxqtriZ8sp5P1YmANM7uR7A==
-
-sn-codemirror-search@1.0.0, sn-codemirror-search@^1.0.0:
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/sn-codemirror-search/-/sn-codemirror-search-1.0.0.tgz#13c06b2cead6a3670eabdbffadd69d839ea53c3f"
-  integrity sha512-T8WAFgdhChF91ZHX2ELGy48kzulMgzwTWA5p1QqMHOZDbgi23i3XWflNzcwPdKw8Px0DIRwpJ6ffQfcft0LMbQ==
-
-sn-fancy-markdown-editor@1.3.6:
-  version "1.3.6"
-  resolved "https://registry.yarnpkg.com/sn-fancy-markdown-editor/-/sn-fancy-markdown-editor-1.3.6.tgz#9e563fb3bf66a1a2e338f38faf392ce34bfab3d8"
-  integrity sha512-ZgwEyCo2njVpSRLGmsrisPF7ZNnzKJMnZCCm59+Z1IdlKRzz2vc79Oe5PsHpDuzE4UqWOgcI3Kxh5pUnWtWzog==
-
-sn-folders@1.3.8:
-  version "1.3.8"
-  resolved "https://registry.yarnpkg.com/sn-folders/-/sn-folders-1.3.8.tgz#ae3caec472ce8d201495f1aa501e01ed198a45bc"
-  integrity sha512-OE190Jny3SkbdPjD6wqkrv0R3Ze5j9OFNIg6qGLdortXs9POg8eOzYPRls5DL7imJZtptHYn5ku0EfqXVfxxiw==
-
-sn-minimal-markdown-editor@1.3.9:
-  version "1.3.9"
-  resolved "https://registry.yarnpkg.com/sn-minimal-markdown-editor/-/sn-minimal-markdown-editor-1.3.9.tgz#977012f744f8f7f926926ccc262703dbad5ce176"
-  integrity sha512-lUMpZYcsjK1kGeljR6oAQolDOQkY+W5a3jo2fZZ1ROye/fRfvpfqZf7+tHArBNHxMG5TAnlJpAZsBP4kFUe6gQ==
-  dependencies:
-    sn-codemirror-search "1.0.0"
-
-sn-plus-editor@1.6.1:
-  version "1.6.1"
-  resolved "https://registry.yarnpkg.com/sn-plus-editor/-/sn-plus-editor-1.6.1.tgz#11ad67b0eb5a5f5e3f18a1805c12b29c15bea164"
-  integrity sha512-Ys2XTrUnelCFpD/StqwB4Q7rooPeox4xDegbXHV7MnTuYIcU41TkQBHrnsmcf6zL3Mkv5hzYHtrP3JzFfHk5NA==
-
-sn-simple-markdown-editor@1.4.2:
-  version "1.4.2"
-  resolved "https://registry.yarnpkg.com/sn-simple-markdown-editor/-/sn-simple-markdown-editor-1.4.2.tgz#32cbb6300a1b251c285c97bf89b9c6442213698a"
-  integrity sha512-HASXYu/zs2PGYtIZm+1zb9IorQvqe8ovDVA0K2nQ2ZzHMgw5/w7SVNVPH0FZeStv9JEqOYCccLUK0UZGdKdMWA==
-
-sn-spreadsheets@1.4.4:
-  version "1.4.4"
-  resolved "https://registry.yarnpkg.com/sn-spreadsheets/-/sn-spreadsheets-1.4.4.tgz#95e2947bb227f5cbb8ba8b88270eaf51ff300d79"
-  integrity sha512-nYHT6NjspBZmYrG70ESY6KoGA5UPTvp/Y9OaOIB5PhH/X6K5posiDIfPo5IBqNT4oOZ03QHPkNAW1Q6X4KgdUA==
-
-sn-token-vault@2.0.10:
-  version "2.0.10"
-  resolved "https://registry.yarnpkg.com/sn-token-vault/-/sn-token-vault-2.0.10.tgz#43f7ffd96f62d6014318a98e990eb0d584c486d1"
-  integrity sha512-arj8YvFpPBRsJ20BPtglOMWlvXlafC3M3XZo/eSSx1uJUBfwWwDNFcgdJSkBsuXweVWc1UBqsfGm4JuUtHIaUQ==
 
 snapdragon-node@^2.0.1:
   version "2.1.1"

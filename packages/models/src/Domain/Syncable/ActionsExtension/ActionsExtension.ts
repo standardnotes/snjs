@@ -1,11 +1,12 @@
 import { DecryptedItemInterface } from './../../Abstract/Item/Interfaces/DecryptedItem'
-import { FeatureDescription, ThirdPartyFeatureDescription } from '@standardnotes/features'
+import { ThirdPartyFeatureDescription } from '@standardnotes/features'
 import { DecryptedItem } from '../../Abstract/Item/Implementations/DecryptedItem'
 import { ItemContent } from '../../Abstract/Content/ItemContent'
 import { ConflictStrategy } from '../../Abstract/Item/Types/ConflictStrategy'
 import { DecryptedPayloadInterface } from '../../Abstract/Payload/Interfaces/DecryptedPayload'
 import { HistoryEntryInterface } from '../../Runtime/History/HistoryEntryInterface'
 import { Action } from './Types'
+import { ComponentPackageInfo } from '../Component/PackageInfo'
 
 export interface ActionExtensionInterface {
   actions: Action[]
@@ -13,7 +14,7 @@ export interface ActionExtensionInterface {
   description: string
   hosted_url?: string
   name: string
-  package_info: FeatureDescription
+  package_info: ComponentPackageInfo
   supported_types: string[]
   url: string
 }
@@ -30,7 +31,7 @@ export class SNActionsExtension extends DecryptedItem<ActionExtensionContent> {
   public readonly supported_types: string[]
   public readonly deprecation?: string
   public readonly name: string
-  public readonly package_info: FeatureDescription
+  public readonly package_info: ComponentPackageInfo
 
   constructor(payload: DecryptedPayloadInterface<ActionExtensionContent>) {
     super(payload)
