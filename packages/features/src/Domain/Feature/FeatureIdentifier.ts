@@ -1,5 +1,3 @@
-import { experimentalFeatures } from './Lists/ExperimentalFeatures'
-
 export enum FeatureIdentifier {
   AccountSwitcher = 'com.standardnotes.account-switcher',
   AdvancedChecklist = 'org.standardnotes.advanced-checklist',
@@ -50,4 +48,4 @@ export const LegacyFileSafeIdentifier = 'org.standardnotes.legacy.file-safe'
 
 export const DeprecatedFeatures = [FeatureIdentifier.DeprecatedFileSafe, FeatureIdentifier.DeprecatedFoldersComponent]
 
-export const ExperimentalFeatures = experimentalFeatures().map((feature) => feature.identifier)
+export const ExperimentalFeatures = [FeatureIdentifier.AdvancedChecklist]
