@@ -44,7 +44,10 @@ export interface DeviceInterface {
   getDatabaseKeys(): Promise<string[]>
 
   /**
-   * Return true for killsApplication if the clear data operation kills the application process completely.
+   * Remove all keychain and database data from device.
+   * @param workspaceIdentifiers An array of identifiers present during time of function call. Used in case
+   * caller needs to reference the identifiers. This param should not be used to selectively clear workspaces.
+   * @returns true for killsApplication if the clear data operation kills the application process completely.
    * This tends to be the case for the desktop application.
    */
   clearAllDataFromDevice(workspaceIdentifiers: ApplicationIdentifier[]): Promise<{ killsApplication: boolean }>

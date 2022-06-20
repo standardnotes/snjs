@@ -127,6 +127,7 @@ export class BaseMigration extends Migration {
     if (!this.didPreRun) {
       throw Error('Attempting to access specialized function before prerun')
     }
+
     if (!this.reader) {
       await this.loadReader()
     }
