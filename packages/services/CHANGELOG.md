@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.13.20](https://github.com/standardnotes/snjs/compare/@standardnotes/services@1.13.19...@standardnotes/services@1.13.20) (2022-06-22)
+
+
+### Bug Fixes
+
+* mobile keychain types ([#769](https://github.com/standardnotes/snjs/issues/769)) ([1fa6fb5](https://github.com/standardnotes/snjs/commit/1fa6fb57e398e60c27041b826540b6a1a6de5e91))
+
+
+
+
+
 ## [1.13.19](https://github.com/standardnotes/snjs/compare/@standardnotes/services@1.13.18...@standardnotes/services@1.13.19) (2022-06-20)
 
 **Note:** Version bump only for package @standardnotes/services

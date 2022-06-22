@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.117.7](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.117.6...@standardnotes/snjs@2.117.7) (2022-06-22)
+
+
+### Bug Fixes
+
+* mobile keychain types ([#769](https://github.com/standardnotes/snjs/issues/769)) ([1fa6fb5](https://github.com/standardnotes/snjs/commit/1fa6fb57e398e60c27041b826540b6a1a6de5e91))
+
+
+
+
+
 ## [2.117.6](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.117.5...@standardnotes/snjs@2.117.6) (2022-06-22)
 
 **Note:** Version bump only for package @standardnotes/snjs

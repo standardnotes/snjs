@@ -1,6 +1,6 @@
 {
   "name": "@standardnotes/api",
-  "version": "1.1.13",
+  "version": "1.1.14",
   "engines": {
     "node": ">=14.0.0 <17.0.0"
   },
@@ -46,9 +46,9 @@
   "dependencies": {
     "@standardnotes/auth": "^3.19.3",
     "@standardnotes/common": "^1.23.0",
-    "@standardnotes/encryption": "^1.8.19",
+    "@standardnotes/encryption": "^1.8.20",
     "@standardnotes/responses": "^1.6.36",
-    "@standardnotes/services": "^1.13.19",
+    "@standardnotes/services": "^1.13.20",
     "@standardnotes/utils": "^1.6.11"
   }
 }
