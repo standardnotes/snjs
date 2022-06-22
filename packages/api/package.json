@@ -48,6 +48,7 @@
     "@standardnotes/common": "^1.23.0",
     "@standardnotes/encryption": "^1.8.19",
     "@standardnotes/responses": "^1.6.36",
+    "@standardnotes/services": "^1.13.19",
     "@standardnotes/utils": "^1.6.11"
   }
 }
