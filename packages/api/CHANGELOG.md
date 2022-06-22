@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.1.13](https://github.com/standardnotes/snjs/compare/@standardnotes/api@1.1.12...@standardnotes/api@1.1.13) (2022-06-22)
+
+
+### Bug Fixes
+
+* missing dependency ([b748571](https://github.com/standardnotes/snjs/commit/b748571c3288ecec3a2c0aed333ceaaf718832cd))
+
+
+
+
+
 ## [1.1.12](https://github.com/standardnotes/snjs/compare/@standardnotes/api@1.1.11...@standardnotes/api@1.1.12) (2022-06-20)
 
 **Note:** Version bump only for package @standardnotes/api
