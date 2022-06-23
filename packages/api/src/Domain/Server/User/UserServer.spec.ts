@@ -17,6 +17,13 @@ describe('UserServer', () => {
     } as jest.Mocked<UserRegistrationResponse>)
   })
 
+  it('should set host', () => {
+    const server = createServer()
+    server.setHost('http://foo')
+
+    expect(server['host']).toEqual('http://foo')
+  })
+
   it('should register a user', async () => {
     const response = await createServer().register({
       password: 'test',

@@ -1,3 +1,4 @@
+/* istanbul ignore file */
 import { isString } from '@standardnotes/utils'
 import { Environment } from '@standardnotes/services'
 import { HttpRequestParams } from './HttpRequestParams'

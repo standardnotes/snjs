@@ -519,6 +519,7 @@ export class SNApplication
    * Set the server's URL
    */
   public async setHost(host: string): Promise<void> {
+    this.userServer.setHost(host)
     return this.apiService.setHost(host)
   }
 
@@ -527,7 +528,7 @@ export class SNApplication
   }
 
   public async setCustomHost(host: string): Promise<void> {
-    await this.apiService.setHost(host)
+    await this.setHost(host)
     this.webSocketsService.setWebSocketUrl(undefined)
   }
 
