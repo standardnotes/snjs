@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.7.1](https://github.com/standardnotes/snjs/compare/@standardnotes/time@1.7.0...@standardnotes/time@1.7.1) (2022-06-23)
+
+
+### Bug Fixes
+
+* upgrade microtime package version ([65ec0e6](https://github.com/standardnotes/snjs/commit/65ec0e6f3a72718aa490f30a168fbdd13b5a4c76))
+
+
+
+
+
 # [1.7.0](https://github.com/standardnotes/snjs/compare/@standardnotes/time@1.6.10...@standardnotes/time@1.7.0) (2022-05-30)
 
 
