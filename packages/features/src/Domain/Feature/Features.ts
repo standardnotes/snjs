@@ -4,7 +4,6 @@ import { editors } from './Lists/Editors'
 import { themes } from './Lists/Themes'
 import { serverFeatures } from './Lists/ServerFeatures'
 import { clientFeatures } from './Lists/ClientFeatures'
-import { GetDeprecatedFeatures } from './Lists/DeprecatedFeatures'
 import { experimentalFeatures } from './Lists/ExperimentalFeatures'
 import { SubscriptionName } from '@standardnotes/common'
 
@@ -17,7 +16,5 @@ export function GetFeaturesForSubscription(subscription: SubscriptionName): Feat
 }
 
 export function FindNativeFeature(identifier: FeatureIdentifier): FeatureDescription | undefined {
-  return GetFeatures()
-    .concat(GetDeprecatedFeatures())
-    .find((f) => f.identifier === identifier)
+  return GetFeatures().find((f) => f.identifier === identifier)
 }
