@@ -8,6 +8,10 @@ import { UserServerInterface } from './UserServerInterface'
 export class UserServer implements UserServerInterface {
   constructor(private httpService: HttpServiceInterface, private host: string) {}
 
+  setHost(host: string): void {
+    this.host = host
+  }
+
   async register(params: UserRegistrationRequestParams): Promise<UserRegistrationResponse> {
     const url = joinPaths(this.host, Paths.v1.register)
 
