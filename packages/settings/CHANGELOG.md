@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.15.0](https://github.com/standardnotes/snjs/compare/@standardnotes/settings@1.14.3...@standardnotes/settings@1.15.0) (2022-06-24)
+
+
+### Features
+
+* add muting marketing emails setting ([4d811e3](https://github.com/standardnotes/snjs/commit/4d811e3adab30fa2f1abde2ed3ebcc399e933d9c))
+
+
+
+
+
 ## [1.14.3](https://github.com/standardnotes/snjs/compare/@standardnotes/settings@1.14.1...@standardnotes/settings@1.14.3) (2022-05-04)
 
 **Note:** Version bump only for package @standardnotes/settings
