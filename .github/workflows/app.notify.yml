@@ -1,0 +1,15 @@
+name: Notify App
+
+on:
+  workflow_dispatch:
+
+jobs:
+  Notify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Notify App Repo
+        uses: peter-evans/repository-dispatch@v2
+        with:
+          token: ${{ secrets.CI_PAT_TOKEN }}
+          repository: standardnotes/app
+          event-type: snjs-updated-event

@@ -36,11 +36,16 @@ jobs:
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
+      - name: Notify App Repo
+        uses: peter-evans/repository-dispatch@v2
+        with:
+          token: ${{ secrets.CI_PAT_TOKEN }}
+          repository: standardnotes/app
+          event-type: snjs-updated-event
+
   git-sync:
     needs: publish
-
     runs-on: ubuntu-latest
-
     steps:
       - name: git-sync
         uses: wei/git-sync@v3
