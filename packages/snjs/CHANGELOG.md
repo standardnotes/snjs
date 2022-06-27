@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.118.0](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.117.11...@standardnotes/snjs@2.118.0) (2022-06-27)
+
+
+### Features
+
+* deprecate non-primary editors ([#772](https://github.com/standardnotes/snjs/issues/772)) ([60c8f2a](https://github.com/standardnotes/snjs/commit/60c8f2a6a057ac1a097b077143ed85a7607eba20))
+
+
+
+
+
 ## [2.117.11](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.117.10...@standardnotes/snjs@2.117.11) (2022-06-27)
 
 **Note:** Version bump only for package @standardnotes/snjs
