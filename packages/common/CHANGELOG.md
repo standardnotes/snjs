@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.23.1](https://github.com/standardnotes/snjs/compare/@standardnotes/common@1.23.0...@standardnotes/common@1.23.1) (2022-06-27)
+
+
+### Bug Fixes
+
+* add email message identifier for files email campaign ([affa300](https://github.com/standardnotes/snjs/commit/affa3005b6933165e262227282198310f0a65cb3))
+
+
+
+
+
 # [1.23.0](https://github.com/standardnotes/snjs/compare/@standardnotes/common@1.22.0...@standardnotes/common@1.23.0) (2022-06-15)
 
 

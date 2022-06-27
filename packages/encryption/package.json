@@ -1,6 +1,6 @@
 {
   "name": "@standardnotes/encryption",
-  "version": "1.8.20",
+  "version": "1.8.21",
   "engines": {
     "node": ">=14.0.0 <17.0.0"
   },
@@ -35,8 +35,8 @@
     "preset": "../../node_modules/@standardnotes/config/src/jest.json"
   },
   "dependencies": {
-    "@standardnotes/models": "^1.11.10",
-    "@standardnotes/responses": "^1.6.36",
-    "@standardnotes/services": "^1.13.20"
+    "@standardnotes/models": "^1.11.11",
+    "@standardnotes/responses": "^1.6.37",
+    "@standardnotes/services": "^1.13.21"
   }
 }
