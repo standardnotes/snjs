@@ -43,6 +43,13 @@ jobs:
           repository: standardnotes/app
           event-type: snjs-updated-event
 
+      - name: Notify Server Repo
+        uses: peter-evans/repository-dispatch@v2
+        with:
+          token: ${{ secrets.CI_PAT_TOKEN }}
+          repository: standardnotes/server
+          event-type: snjs-updated-event
+
   git-sync:
     needs: publish
     runs-on: ubuntu-latest
