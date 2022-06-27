@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.32.3](https://github.com/standardnotes/snjs/compare/@standardnotes/domain-events@2.32.2...@standardnotes/domain-events@2.32.3) (2022-06-27)
+
+
+### Bug Fixes
+
+* add email message context to event payload ([82f539e](https://github.com/standardnotes/snjs/commit/82f539ec8dc9bbe27614feee1ebd8bdc8d493432))
+
+
+
+
+
 ## [2.32.2](https://github.com/standardnotes/snjs/compare/@standardnotes/domain-events@2.32.1...@standardnotes/domain-events@2.32.2) (2022-06-16)
 
 **Note:** Version bump only for package @standardnotes/domain-events
