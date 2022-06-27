@@ -23,7 +23,7 @@ describe('features', () => {
       expires_at: tomorrow,
     }
     boldEditorFeature = {
-      ...GetFeatures().find((feature) => feature.identifier === FeatureIdentifier.BoldEditor),
+      ...GetFeatures().find((feature) => feature.identifier === FeatureIdentifier.DeprecatedBoldEditor),
       expires_at: tomorrow,
     }
     tagNestingFeature = {
@@ -177,7 +177,7 @@ describe('features', () => {
   })
 
   it('should provide feature', async () => {
-    const feature = application.features.getUserFeature(FeatureIdentifier.BoldEditor)
+    const feature = application.features.getUserFeature(FeatureIdentifier.DeprecatedBoldEditor)
     expect(feature).to.containSubset(boldEditorFeature)
   })
 
