@@ -7,10 +7,6 @@ type RequiredThemeFields = Pick<ThemeFeatureDescription, 'availableInSubscriptio
 export function FillThemeComponentDefaults(
   theme: Partial<ThemeFeatureDescription> & RequiredThemeFields,
 ): ThemeFeatureDescription {
-  if (!theme.static_files) {
-    theme.static_files = ['dist', 'package.json']
-  }
-
   if (!theme.index_path) {
     theme.index_path = 'dist/dist.css'
   }

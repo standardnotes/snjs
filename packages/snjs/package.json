@@ -16,7 +16,7 @@
   },
   "scripts": {
     "start": "webpack -w --config webpack.dev.js",
-    "build": "webpack --config webpack.prod.js && yarn tsc",
+    "build": "yarn tsc && webpack --config webpack.prod.js",
     "docs": "jsdoc -c jsdoc.json",
     "tsc": "tsc --project lib/tsconfig.json && tscpaths -p lib/tsconfig.json -s lib -o dist/@types",
     "lint": "yarn lint:tsc && yarn lint:eslint",

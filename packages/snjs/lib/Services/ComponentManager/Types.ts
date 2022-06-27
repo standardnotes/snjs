@@ -42,7 +42,7 @@ export type OutgoingItemMessagePayload = {
 export const AllowedBatchStreaming = Object.freeze([
   LegacyFileSafeIdentifier,
   FeatureIdentifier.DeprecatedFileSafe,
-  FeatureIdentifier.BoldEditor,
+  FeatureIdentifier.DeprecatedBoldEditor,
 ])
 
 /**

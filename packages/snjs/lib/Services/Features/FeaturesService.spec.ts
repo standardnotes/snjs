@@ -68,7 +68,7 @@ describe('featuresService', () => {
         expires_at: tomorrow_server,
       },
       {
-        ...GetFeatures().find((f) => f.identifier === FeatureIdentifier.BoldEditor),
+        ...GetFeatures().find((f) => f.identifier === FeatureIdentifier.PlusEditor),
         expires_at: tomorrow_server,
       },
     ] as jest.Mocked<FeatureDescription[]>
@@ -133,22 +133,22 @@ describe('featuresService', () => {
       storageService.getValue = jest.fn().mockReturnValue(GetFeatures())
 
       const featuresService = createService()
-      featuresService.getExperimentalFeatures = jest.fn().mockReturnValue([FeatureIdentifier.BoldEditor])
-      await featuresService.initializeFromDisk()
+      featuresService.getExperimentalFeatures = jest.fn().mockReturnValue([FeatureIdentifier.PlusEditor])
+      featuresService.initializeFromDisk()
 
-      featuresService.enableExperimentalFeature(FeatureIdentifier.BoldEditor)
+      featuresService.enableExperimentalFeature(FeatureIdentifier.PlusEditor)
 
-      expect(featuresService.isExperimentalFeatureEnabled(FeatureIdentifier.BoldEditor)).toEqual(true)
+      expect(featuresService.isExperimentalFeatureEnabled(FeatureIdentifier.PlusEditor)).toEqual(true)
 
-      featuresService.disableExperimentalFeature(FeatureIdentifier.BoldEditor)
+      featuresService.disableExperimentalFeature(FeatureIdentifier.PlusEditor)
 
-      expect(featuresService.isExperimentalFeatureEnabled(FeatureIdentifier.BoldEditor)).toEqual(false)
+      expect(featuresService.isExperimentalFeatureEnabled(FeatureIdentifier.PlusEditor)).toEqual(false)
     })
 
     it('does not create a component for not enabled experimental feature', async () => {
       const features = [
         {
-          identifier: FeatureIdentifier.BoldEditor,
+          identifier: FeatureIdentifier.PlusEditor,
           expires_at: tomorrow_server,
           content_type: ContentType.Component,
         },
@@ -165,9 +165,9 @@ describe('featuresService', () => {
       storageService.getValue = jest.fn().mockReturnValue(roles)
 
       const featuresService = createService()
-      featuresService.getExperimentalFeatures = jest.fn().mockReturnValue([FeatureIdentifier.BoldEditor])
+      featuresService.getExperimentalFeatures = jest.fn().mockReturnValue([FeatureIdentifier.PlusEditor])
 
-      await featuresService.initializeFromDisk()
+      featuresService.initializeFromDisk()
       await featuresService.updateRolesAndFetchFeatures('123', newRoles)
       expect(itemManager.createItem).not.toHaveBeenCalled()
     })
@@ -184,11 +184,11 @@ describe('featuresService', () => {
       storageService.getValue = jest.fn().mockReturnValue(roles)
 
       const featuresService = createService()
-      featuresService.getExperimentalFeatures = jest.fn().mockReturnValue([FeatureIdentifier.BoldEditor])
+      featuresService.getExperimentalFeatures = jest.fn().mockReturnValue([FeatureIdentifier.PlusEditor])
 
-      featuresService.getEnabledExperimentalFeatures = jest.fn().mockReturnValue([FeatureIdentifier.BoldEditor])
+      featuresService.getEnabledExperimentalFeatures = jest.fn().mockReturnValue([FeatureIdentifier.PlusEditor])
 
-      await featuresService.initializeFromDisk()
+      featuresService.initializeFromDisk()
       await featuresService.updateRolesAndFetchFeatures('123', newRoles)
       expect(itemManager.createItem).toHaveBeenCalled()
     })
@@ -208,7 +208,7 @@ describe('featuresService', () => {
 
       storageService.getValue = jest.fn().mockReturnValue(roles)
       const featuresService = createService()
-      await featuresService.initializeFromDisk()
+      featuresService.initializeFromDisk()
       await featuresService.updateRolesAndFetchFeatures('123', newRoles)
       expect(storageService.setValue).toHaveBeenCalledWith(StorageKey.UserRoles, newRoles)
       expect(apiService.getUserFeatures).toHaveBeenCalledWith('123')
@@ -219,7 +219,7 @@ describe('featuresService', () => {
 
       storageService.getValue = jest.fn().mockReturnValue(roles)
       const featuresService = createService()
-      await featuresService.initializeFromDisk()
+      featuresService.initializeFromDisk()
       await featuresService.updateRolesAndFetchFeatures('123', newRoles)
       expect(storageService.setValue).toHaveBeenCalledWith(StorageKey.UserRoles, newRoles)
       expect(apiService.getUserFeatures).toHaveBeenCalledWith('123')
@@ -230,7 +230,7 @@ describe('featuresService', () => {
 
       storageService.getValue = jest.fn().mockReturnValue(roles)
       const featuresService = createService()
-      await featuresService.initializeFromDisk()
+      featuresService.initializeFromDisk()
       await featuresService.updateRolesAndFetchFeatures('123', newRoles)
       expect(storageService.setValue).toHaveBeenCalledWith(StorageKey.UserFeatures, features)
     })
@@ -240,7 +240,7 @@ describe('featuresService', () => {
 
       storageService.getValue = jest.fn().mockReturnValue(roles)
       const featuresService = createService()
-      await featuresService.initializeFromDisk()
+      featuresService.initializeFromDisk()
       await featuresService.updateRolesAndFetchFeatures('123', newRoles)
       expect(itemManager.createItem).toHaveBeenCalledTimes(2)
       expect(itemManager.createItem).toHaveBeenCalledWith(
@@ -260,7 +260,7 @@ describe('featuresService', () => {
           package_info: expect.objectContaining({
             content_type: ContentType.Component,
             expires_at: tomorrow_client,
-            identifier: FeatureIdentifier.BoldEditor,
+            identifier: FeatureIdentifier.PlusEditor,
           }),
         }),
         true,
@@ -273,7 +273,7 @@ describe('featuresService', () => {
         content_type: ContentType.Component,
         content: {
           package_info: {
-            identifier: FeatureIdentifier.BoldEditor,
+            identifier: FeatureIdentifier.PlusEditor,
             valid_until: new Date(),
           },
         },
@@ -310,7 +310,7 @@ describe('featuresService', () => {
       })
 
       const featuresService = createService()
-      await featuresService.initializeFromDisk()
+      featuresService.initializeFromDisk()
       await featuresService.updateRolesAndFetchFeatures('123', newRoles)
       expect(itemManager.createItem).toHaveBeenCalledWith(
         ContentType.Component,
@@ -318,7 +318,7 @@ describe('featuresService', () => {
           package_info: expect.objectContaining({
             content_type: ContentType.Component,
             expires_at: yesterday_client,
-            identifier: FeatureIdentifier.BoldEditor,
+            identifier: FeatureIdentifier.PlusEditor,
           }),
         }),
         true,
@@ -357,7 +357,7 @@ describe('featuresService', () => {
       })
 
       const featuresService = createService()
-      await featuresService.initializeFromDisk()
+      featuresService.initializeFromDisk()
       await featuresService.updateRolesAndFetchFeatures('123', newRoles)
       expect(itemManager.setItemsToBeDeleted).toHaveBeenCalledWith([existingItem])
     })
@@ -380,7 +380,30 @@ describe('featuresService', () => {
 
       storageService.getValue = jest.fn().mockReturnValue(roles)
       const featuresService = createService()
-      await featuresService.initializeFromDisk()
+      featuresService.initializeFromDisk()
+      await featuresService.updateRolesAndFetchFeatures('123', newRoles)
+      expect(itemManager.createItem).not.toHaveBeenCalled()
+    })
+
+    it('does not create an item for deprecated features', async () => {
+      const features = [
+        {
+          identifier: FeatureIdentifier.DeprecatedBoldEditor,
+          expires_at: tomorrow_server,
+        },
+      ]
+
+      apiService.getUserFeatures = jest.fn().mockReturnValue({
+        data: {
+          features,
+        },
+      })
+
+      const newRoles = [...roles, RoleName.PlusUser]
+
+      storageService.getValue = jest.fn().mockReturnValue(roles)
+      const featuresService = createService()
+      featuresService.initializeFromDisk()
       await featuresService.updateRolesAndFetchFeatures('123', newRoles)
       expect(itemManager.createItem).not.toHaveBeenCalled()
     })
@@ -388,7 +411,7 @@ describe('featuresService', () => {
     it('does nothing after initial update if roles have not changed', async () => {
       storageService.getValue = jest.fn().mockReturnValue(roles)
       const featuresService = createService()
-      await featuresService.initializeFromDisk()
+      featuresService.initializeFromDisk()
       await featuresService.updateRolesAndFetchFeatures('123', roles)
       await featuresService.updateRolesAndFetchFeatures('123', roles)
       await featuresService.updateRolesAndFetchFeatures('123', roles)
@@ -398,7 +421,7 @@ describe('featuresService', () => {
 
     it('remote native features should be swapped with compiled version', async () => {
       const remoteFeature = {
-        identifier: FeatureIdentifier.BoldEditor,
+        identifier: FeatureIdentifier.PlusEditor,
         content_type: ContentType.Component,
         expires_at: tomorrow_server,
       } as FeatureDescription
@@ -435,7 +458,7 @@ describe('featuresService', () => {
           role_name: RoleName.PlusUser,
         },
         {
-          identifier: FeatureIdentifier.BoldEditor,
+          identifier: FeatureIdentifier.PlusEditor,
           content_type: ContentType.Component,
           expires_at: expiredDate,
           role_name: RoleName.ProUser,
@@ -453,13 +476,13 @@ describe('featuresService', () => {
       await featuresService.updateRolesAndFetchFeatures('123', [RoleName.CoreUser, RoleName.PlusUser])
 
       expect(featuresService.getFeatureStatus(FeatureIdentifier.MidnightTheme)).toBe(FeatureStatus.Entitled)
-      expect(featuresService.getFeatureStatus(FeatureIdentifier.BoldEditor)).toBe(FeatureStatus.NotInCurrentPlan)
+      expect(featuresService.getFeatureStatus(FeatureIdentifier.PlusEditor)).toBe(FeatureStatus.NotInCurrentPlan)
       expect(featuresService.getFeatureStatus(FeatureIdentifier.SheetsEditor)).toBe(FeatureStatus.NotInCurrentPlan)
 
       await featuresService.updateRolesAndFetchFeatures('123', [RoleName.CoreUser])
 
       expect(featuresService.getFeatureStatus(FeatureIdentifier.MidnightTheme)).toBe(FeatureStatus.NoUserSubscription)
-      expect(featuresService.getFeatureStatus(FeatureIdentifier.BoldEditor)).toBe(FeatureStatus.NoUserSubscription)
+      expect(featuresService.getFeatureStatus(FeatureIdentifier.PlusEditor)).toBe(FeatureStatus.NoUserSubscription)
       expect(featuresService.getFeatureStatus(FeatureIdentifier.SheetsEditor)).toBe(FeatureStatus.NoUserSubscription)
 
       features = [
@@ -470,7 +493,7 @@ describe('featuresService', () => {
           role_name: RoleName.PlusUser,
         },
         {
-          identifier: FeatureIdentifier.BoldEditor,
+          identifier: FeatureIdentifier.PlusEditor,
           content_type: ContentType.Component,
           expires_at: expiredDate,
           role_name: RoleName.ProUser,
@@ -488,7 +511,7 @@ describe('featuresService', () => {
       expect(featuresService.getFeatureStatus(FeatureIdentifier.MidnightTheme)).toBe(
         FeatureStatus.InCurrentPlanButExpired,
       )
-      expect(featuresService.getFeatureStatus(FeatureIdentifier.BoldEditor)).toBe(FeatureStatus.NotInCurrentPlan)
+      expect(featuresService.getFeatureStatus(FeatureIdentifier.PlusEditor)).toBe(FeatureStatus.NotInCurrentPlan)
       expect(featuresService.getFeatureStatus(FeatureIdentifier.SheetsEditor)).toBe(FeatureStatus.NotInCurrentPlan)
     })
 
@@ -627,13 +650,15 @@ describe('featuresService', () => {
 
       sessionManager.isSignedIntoFirstPartyServer = jest.fn().mockReturnValue(true)
 
-      expect(featuresService.getFeatureStatus(FeatureIdentifier.DeprecatedFileSafe)).toBe(
+      expect(featuresService.getFeatureStatus(FeatureIdentifier.DeprecatedFileSafe as FeatureIdentifier)).toBe(
         FeatureStatus.NoUserSubscription,
       )
 
       await featuresService.updateRolesAndFetchFeatures('123', [RoleName.CoreUser, RoleName.PlusUser])
 
-      expect(featuresService.getFeatureStatus(FeatureIdentifier.DeprecatedFileSafe)).toBe(FeatureStatus.Entitled)
+      expect(featuresService.getFeatureStatus(FeatureIdentifier.DeprecatedFileSafe as FeatureIdentifier)).toBe(
+        FeatureStatus.Entitled,
+      )
     })
 
     it('has paid subscription', async () => {

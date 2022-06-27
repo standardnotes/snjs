@@ -8,7 +8,7 @@ describe('features', () => {
   let email
   let password
   let midnightThemeFeature
-  let boldEditorFeature
+  let plusEditorFeature
   let tagNestingFeature
   let getUserFeatures
 
@@ -22,8 +22,8 @@ describe('features', () => {
       ...GetFeatures().find((feature) => feature.identifier === FeatureIdentifier.MidnightTheme),
       expires_at: tomorrow,
     }
-    boldEditorFeature = {
-      ...GetFeatures().find((feature) => feature.identifier === FeatureIdentifier.BoldEditor),
+    plusEditorFeature = {
+      ...GetFeatures().find((feature) => feature.identifier === FeatureIdentifier.PlusEditor),
       expires_at: tomorrow,
     }
     tagNestingFeature = {
@@ -38,7 +38,7 @@ describe('features', () => {
     getUserFeatures = sinon.stub(application.apiService, 'getUserFeatures').callsFake(() => {
       return Promise.resolve({
         data: {
-          features: [midnightThemeFeature, boldEditorFeature, tagNestingFeature],
+          features: [midnightThemeFeature, plusEditorFeature, tagNestingFeature],
         },
       })
     })
@@ -65,7 +65,7 @@ describe('features', () => {
 
       expect(application.featuresService.features).to.have.lengthOf(3)
       expect(application.featuresService.features[0]).to.containSubset(midnightThemeFeature)
-      expect(application.featuresService.features[1]).to.containSubset(boldEditorFeature)
+      expect(application.featuresService.features[1]).to.containSubset(plusEditorFeature)
 
       const storedRoles = await application.getValue(StorageKey.UserRoles)
 
@@ -76,7 +76,7 @@ describe('features', () => {
 
       expect(storedFeatures).to.have.lengthOf(3)
       expect(storedFeatures[0]).to.containSubset(midnightThemeFeature)
-      expect(storedFeatures[1]).to.containSubset(boldEditorFeature)
+      expect(storedFeatures[1]).to.containSubset(plusEditorFeature)
       expect(storedFeatures[2]).to.containSubset(tagNestingFeature)
     })
 
@@ -99,9 +99,9 @@ describe('features', () => {
       expect(editorItems[0].content).to.containSubset(
         JSON.parse(
           JSON.stringify({
-            name: boldEditorFeature.name,
-            area: boldEditorFeature.area,
-            package_info: boldEditorFeature,
+            name: plusEditorFeature.name,
+            area: plusEditorFeature.area,
+            package_info: plusEditorFeature,
             valid_until: new Date(midnightThemeFeature.expires_at),
           }),
         ),
@@ -177,8 +177,8 @@ describe('features', () => {
   })
 
   it('should provide feature', async () => {
-    const feature = application.features.getUserFeature(FeatureIdentifier.BoldEditor)
-    expect(feature).to.containSubset(boldEditorFeature)
+    const feature = application.features.getUserFeature(FeatureIdentifier.PlusEditor)
+    expect(feature).to.containSubset(plusEditorFeature)
   })
 
   describe('extension repo items observer', () => {
