@@ -440,7 +440,7 @@ export class SNFeaturesService
   }
 
   public isFeatureDeprecated(featureId: FeaturesImports.FeatureIdentifier): boolean {
-    return FeaturesImports.DeprecatedFeatures.includes(featureId)
+    return FeaturesImports.FindNativeFeature(featureId)?.deprecated === true
   }
 
   public getFeatureStatus(featureId: FeaturesImports.FeatureIdentifier): FeatureStatus {
@@ -552,6 +552,10 @@ export class SNFeaturesService
       }
       return false
     })
+
+    if (feature.deprecated && !existingItem) {
+      return false
+    }
 
     let resultingItem: Models.SNComponent | undefined = existingItem
 

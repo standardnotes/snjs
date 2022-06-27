@@ -8,8 +8,6 @@ export type RequiredEditorFields = Pick<EditorFeatureDescription, 'availableInSu
 export function FillEditorComponentDefaults(
   component: Partial<EditorFeatureDescription> & RequiredEditorFields,
 ): EditorFeatureDescription {
-  component.static_files = ['index.html', 'dist', 'package.json'].concat(component.static_files || [])
-
   if (!component.index_path) {
     component.index_path = 'dist/index.html'
   }

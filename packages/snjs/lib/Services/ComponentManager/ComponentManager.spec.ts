@@ -86,7 +86,7 @@ describe('featuresService', () => {
       content: {
         package_info: {
           hosted_url: 'https://example.com/component',
-          identifier: identifier || FeatureIdentifier.BoldEditor,
+          identifier: identifier || FeatureIdentifier.PlusEditor,
           file_type: file_type ?? 'html',
           valid_until: new Date(),
         },
@@ -134,7 +134,7 @@ describe('featuresService', () => {
 
       const manager = createManager(Environment.Desktop, Platform.MacDesktop)
       expect(
-        manager.areRequestedPermissionsValid(nativeComponent(FeatureIdentifier.MarkdownBasicEditor), permissions),
+        manager.areRequestedPermissionsValid(nativeComponent(FeatureIdentifier.MarkdownVisualEditor), permissions),
       ).toEqual(true)
     })
 
@@ -219,9 +219,9 @@ describe('featuresService', () => {
       ]
 
       const manager = createManager(Environment.Desktop, Platform.MacDesktop)
-      expect(manager.areRequestedPermissionsValid(nativeComponent(FeatureIdentifier.BoldEditor), permissions)).toEqual(
-        true,
-      )
+      expect(
+        manager.areRequestedPermissionsValid(nativeComponent(FeatureIdentifier.DeprecatedBoldEditor), permissions),
+      ).toEqual(true)
     })
 
     it('non bold editor should not able to stream filesafe files', () => {

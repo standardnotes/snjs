@@ -9,7 +9,14 @@ import { experimentalFeatures } from './Lists/ExperimentalFeatures'
 import { SubscriptionName } from '@standardnotes/common'
 
 export function GetFeatures(): FeatureDescription[] {
-  return [...themes(), ...editors(), ...serverFeatures(), ...clientFeatures(), ...experimentalFeatures()]
+  return [
+    ...themes(),
+    ...editors(),
+    ...serverFeatures(),
+    ...clientFeatures(),
+    ...experimentalFeatures(),
+    ...GetDeprecatedFeatures(),
+  ]
 }
 
 export function GetFeaturesForSubscription(subscription: SubscriptionName): FeatureDescription[] {
@@ -17,7 +24,5 @@ export function GetFeaturesForSubscription(subscription: SubscriptionName): Feat
 }
 
 export function FindNativeFeature(identifier: FeatureIdentifier): FeatureDescription | undefined {
-  return GetFeatures()
-    .concat(GetDeprecatedFeatures())
-    .find((f) => f.identifier === identifier)
+  return GetFeatures().find((f) => f.identifier === identifier)
 }

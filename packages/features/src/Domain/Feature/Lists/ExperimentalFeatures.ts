@@ -16,7 +16,6 @@ export function experimentalFeatures(): FeatureDescription[] {
     interchangeable: false,
     permission_name: PermissionName.AdvancedChecklist,
     description: 'A task editor with grouping functionality.',
-    static_files: ['build'],
     index_path: 'build/index.html',
   })
 
