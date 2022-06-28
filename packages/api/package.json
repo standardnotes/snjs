@@ -36,10 +36,10 @@
     "preset": "../../node_modules/@standardnotes/config/src/jest.json",
     "coverageThreshold": {
       "global": {
-        "branches": 9,
-        "functions": 27,
-        "lines": 27,
-        "statements": 28
+        "branches": 17,
+        "functions": 43,
+        "lines": 46,
+        "statements": 46
       }
     }
   },

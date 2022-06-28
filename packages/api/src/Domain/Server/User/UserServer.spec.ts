@@ -6,22 +6,14 @@ import { UserServer } from './UserServer'
 
 describe('UserServer', () => {
   let httpService: HttpServiceInterface
-  const host = 'http://test.te'
 
-  const createServer = () => new UserServer(httpService, host)
+  const createServer = () => new UserServer(httpService)
 
   beforeEach(() => {
     httpService = {} as jest.Mocked<HttpServiceInterface>
-    httpService.postAbsolute = jest.fn().mockReturnValue({
+    httpService.post = jest.fn().mockReturnValue({
       data: { user: { email: 'test@test.te', uuid: '1-2-3' } },
     } as jest.Mocked<UserRegistrationResponse>)
-  })
-
-  it('should set host', () => {
-    const server = createServer()
-    server.setHost('http://foo')
-
-    expect(server['host']).toEqual('http://foo')
   })
 
   it('should register a user', async () => {

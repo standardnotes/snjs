@@ -1,4 +1,3 @@
-/* istanbul ignore file */
 export enum ErrorTag {
   MfaInvalid = 'mfa-invalid',
   MfaRequired = 'mfa-required',
