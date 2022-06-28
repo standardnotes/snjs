@@ -1,4 +1,3 @@
-/* istanbul ignore file */
 export enum HttpVerb {
   Get = 'GET',
   Post = 'POST',

@@ -1,4 +1,3 @@
-/* istanbul ignore file */
 export enum ApiEndpointParam {
   LastSyncToken = 'sync_token',
   PaginationToken = 'cursor_token',

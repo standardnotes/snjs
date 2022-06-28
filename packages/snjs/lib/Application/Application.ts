@@ -519,8 +519,9 @@ export class SNApplication
    * Set the server's URL
    */
   public async setHost(host: string): Promise<void> {
-    this.userServer.setHost(host)
-    return this.apiService.setHost(host)
+    this.httpService.setHost(host)
+
+    await this.apiService.setHost(host)
   }
 
   public getHost(): string | undefined {
@@ -1255,7 +1256,7 @@ export class SNApplication
   }
 
   private createUserServer() {
-    this.userServer = new UserServer(this.httpService, this.options.defaultHost)
+    this.userServer = new UserServer(this.httpService)
   }
 
   private createItemManager() {
@@ -1294,6 +1295,7 @@ export class SNApplication
       this.environment,
       this.options.appVersion,
       SnjsVersion,
+      this.options.defaultHost,
       this.apiService.processMetaObject.bind(this.apiService),
     )
   }

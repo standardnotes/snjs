@@ -1,5 +1,3 @@
-/* istanbul ignore file */
-
 import { AnyKeyParamsContent } from '@standardnotes/common'
 import { ApiEndpointParam } from '../ApiEndpointParam'
 import { ApiVersion } from '../../Api/ApiVersion'

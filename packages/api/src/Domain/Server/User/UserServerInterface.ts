@@ -3,6 +3,4 @@ import { UserRegistrationResponse } from '../../Response/User/UserRegistrationRe
 
 export interface UserServerInterface {
   register(params: UserRegistrationRequestParams): Promise<UserRegistrationResponse>
-
-  setHost(host: string): void
 }

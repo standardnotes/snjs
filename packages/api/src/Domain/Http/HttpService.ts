@@ -1,5 +1,4 @@
-/* istanbul ignore file */
-import { isString } from '@standardnotes/utils'
+import { isString, joinPaths } from '@standardnotes/utils'
 import { Environment } from '@standardnotes/services'
 import { HttpRequestParams } from './HttpRequestParams'
 import { HttpVerb } from './HttpVerb'
@@ -17,27 +16,32 @@ export class HttpService implements HttpServiceInterface {
     private environment: Environment,
     private appVersion: string,
     private snjsVersion: string,
+    private host: string,
     private updateMetaCallback: (meta: HttpResponseMeta) => void,
   ) {}
 
-  async getAbsolute(url: string, params?: HttpRequestParams, authentication?: string): Promise<HttpResponse> {
-    return this.runHttp({ url, params, verb: HttpVerb.Get, authentication })
+  setHost(host: string): void {
+    this.host = host
   }
 
-  async postAbsolute(url: string, params?: HttpRequestParams, authentication?: string): Promise<HttpResponse> {
-    return this.runHttp({ url, params, verb: HttpVerb.Post, authentication })
+  async get(path: string, params?: HttpRequestParams, authentication?: string): Promise<HttpResponse> {
+    return this.runHttp({ url: joinPaths(this.host, path), params, verb: HttpVerb.Get, authentication })
   }
 
-  async putAbsolute(url: string, params?: HttpRequestParams, authentication?: string): Promise<HttpResponse> {
-    return this.runHttp({ url, params, verb: HttpVerb.Put, authentication })
+  async post(path: string, params?: HttpRequestParams, authentication?: string): Promise<HttpResponse> {
+    return this.runHttp({ url: joinPaths(this.host, path), params, verb: HttpVerb.Post, authentication })
   }
 
-  async patchAbsolute(url: string, params: HttpRequestParams, authentication?: string): Promise<HttpResponse> {
-    return this.runHttp({ url, params, verb: HttpVerb.Patch, authentication })
+  async put(path: string, params?: HttpRequestParams, authentication?: string): Promise<HttpResponse> {
+    return this.runHttp({ url: joinPaths(this.host, path), params, verb: HttpVerb.Put, authentication })
   }
 
-  async deleteAbsolute(url: string, params?: HttpRequestParams, authentication?: string): Promise<HttpResponse> {
-    return this.runHttp({ url, params, verb: HttpVerb.Delete, authentication })
+  async patch(path: string, params: HttpRequestParams, authentication?: string): Promise<HttpResponse> {
+    return this.runHttp({ url: joinPaths(this.host, path), params, verb: HttpVerb.Patch, authentication })
+  }
+
+  async delete(path: string, params?: HttpRequestParams, authentication?: string): Promise<HttpResponse> {
+    return this.runHttp({ url: joinPaths(this.host, path), params, verb: HttpVerb.Delete, authentication })
   }
 
   private async runHttp(httpRequest: HttpRequest): Promise<HttpResponse> {

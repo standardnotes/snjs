@@ -1,4 +1,3 @@
-/* istanbul ignore file */
 export enum HttpStatusCode {
   Success = 200,
   NoContent = 204,
