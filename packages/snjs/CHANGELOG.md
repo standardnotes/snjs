@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.118.2](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.118.1...@standardnotes/snjs@2.118.2) (2022-06-28)
+
+
+### Bug Fixes
+
+* dealloc handler in item controller ([ed42621](https://github.com/standardnotes/snjs/commit/ed42621844fb17fb06515fba54024ca3ba5f9fd4))
+
+
+
+
+
 ## [2.118.1](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.118.0...@standardnotes/snjs@2.118.1) (2022-06-28)
 
 
