@@ -23,6 +23,10 @@ export class FileViewController implements ItemViewControllerInterface {
 
   private streamItems() {
     this.removeStreamObserver = this.application.streamItems<FileItem>(ContentType.File, ({ changed, inserted }) => {
+      if (this.dealloced) {
+        return
+      }
+
       const files = changed.concat(inserted)
 
       const matchingFile = files.find((item) => {

@@ -95,6 +95,10 @@ export class NoteViewController implements ItemViewControllerInterface {
     this.removeStreamObserver = this.application.streamItems<SNNote>(
       ContentType.Note,
       ({ changed, inserted, source }) => {
+        if (this.dealloced) {
+          return
+        }
+
         const notes = changed.concat(inserted)
 
         const matchingNote = notes.find((item) => {
