@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.118.1](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.118.0...@standardnotes/snjs@2.118.1) (2022-06-28)
+
+
+### Bug Fixes
+
+* setting custom host ([#773](https://github.com/standardnotes/snjs/issues/773)) ([2fe27b0](https://github.com/standardnotes/snjs/commit/2fe27b0324486fad915a91096142579e649995b8))
+
+
+
+
+
 # [2.118.0](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.117.11...@standardnotes/snjs@2.118.0) (2022-06-27)
 
 

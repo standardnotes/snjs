@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.1.18](https://github.com/standardnotes/snjs/compare/@standardnotes/api@1.1.17...@standardnotes/api@1.1.18) (2022-06-28)
+
+
+### Bug Fixes
+
+* setting custom host ([#773](https://github.com/standardnotes/snjs/issues/773)) ([2fe27b0](https://github.com/standardnotes/snjs/commit/2fe27b0324486fad915a91096142579e649995b8))
+
+
+
+
+
 ## [1.1.17](https://github.com/standardnotes/snjs/compare/@standardnotes/api@1.1.16...@standardnotes/api@1.1.17) (2022-06-27)
 
 **Note:** Version bump only for package @standardnotes/api
