@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.47.0](https://github.com/standardnotes/snjs/compare/@standardnotes/features@1.46.0...@standardnotes/features@1.47.0) (2022-06-29)
+
+
+### Features
+
+* undeprecate markdown pro editor ([#774](https://github.com/standardnotes/snjs/issues/774)) ([5b0d582](https://github.com/standardnotes/snjs/commit/5b0d5826a7a1e1432c0026fa04dc26b4bfff44d7))
+
+
+
+
+
 # [1.46.0](https://github.com/standardnotes/snjs/compare/@standardnotes/features@1.45.6...@standardnotes/features@1.46.0) (2022-06-27)
 
 
