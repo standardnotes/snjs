@@ -1,6 +1,6 @@
-import { ClientFeatureDescription } from '../FeatureDescription'
-import { PermissionName } from '../../Permission/PermissionName'
-import { FeatureIdentifier } from '../FeatureIdentifier'
+import { ClientFeatureDescription } from '../Feature/FeatureDescription'
+import { PermissionName } from '../Permission/PermissionName'
+import { FeatureIdentifier } from '../Feature/FeatureIdentifier'
 import { SubscriptionName } from '@standardnotes/common'
 
 export function clientFeatures(): ClientFeatureDescription[] {

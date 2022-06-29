@@ -1,7 +1,7 @@
-import { ComponentAction } from '../../../Component/ComponentAction'
+import { ComponentAction } from '../../Component/ComponentAction'
 import { ContentType } from '@standardnotes/common'
-import { EditorFeatureDescription } from '../../FeatureDescription'
-import { ComponentArea } from '../../../Component/ComponentArea'
+import { EditorFeatureDescription } from '../../Feature/FeatureDescription'
+import { ComponentArea } from '../../Component/ComponentArea'
 
 export type RequiredEditorFields = Pick<EditorFeatureDescription, 'availableInSubscriptions'>
 

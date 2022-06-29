@@ -1,12 +1,15 @@
-import { FeatureDescription } from './../FeatureDescription'
 import { ContentType, SubscriptionName } from '@standardnotes/common'
-import { EditorFeatureDescription, IframeComponentFeatureDescription } from '../FeatureDescription'
-import { PermissionName } from '../../Permission/PermissionName'
-import { FeatureIdentifier } from '../FeatureIdentifier'
-import { NoteType } from '../../Component/NoteType'
+import {
+  EditorFeatureDescription,
+  IframeComponentFeatureDescription,
+  FeatureDescription,
+} from '../Feature/FeatureDescription'
+import { PermissionName } from '../Permission/PermissionName'
+import { FeatureIdentifier } from '../Feature/FeatureIdentifier'
+import { NoteType } from '../Component/NoteType'
 import { FillEditorComponentDefaults } from './Utilities/FillEditorComponentDefaults'
-import { ComponentAction } from '../../Component/ComponentAction'
-import { ComponentArea } from '../../Component/ComponentArea'
+import { ComponentAction } from '../Component/ComponentAction'
+import { ComponentArea } from '../Component/ComponentArea'
 
 export function GetDeprecatedFeatures(): FeatureDescription[] {
   const bold: EditorFeatureDescription = FillEditorComponentDefaults({
@@ -47,20 +50,6 @@ export function GetDeprecatedFeatures(): FeatureDescription[] {
     permission_name: PermissionName.MarkdownBasicEditor,
     description: 'A Markdown editor with dynamic split-pane preview.',
     thumbnail_url: 'https://s3.amazonaws.com/standard-notes/screenshots/models/editors/simple-markdown.jpg',
-  })
-
-  const markdownPro: EditorFeatureDescription = FillEditorComponentDefaults({
-    availableInSubscriptions: [SubscriptionName.PlusPlan, SubscriptionName.ProPlan],
-    name: 'Hybrid Markdown',
-    identifier: FeatureIdentifier.DeprecatedMarkdownProEditor,
-    note_type: NoteType.Markdown,
-    file_type: 'md',
-    permission_name: PermissionName.MarkdownProEditor,
-    spellcheckControl: true,
-    deprecated: true,
-    description:
-      'A fully featured Markdown editor that supports live preview, a styling toolbar, and split pane support.',
-    thumbnail_url: 'https://s3.amazonaws.com/standard-notes/screenshots/models/editors/adv-markdown.jpg',
   })
 
   const markdownMinimist: EditorFeatureDescription = FillEditorComponentDefaults({
@@ -117,5 +106,5 @@ export function GetDeprecatedFeatures(): FeatureDescription[] {
     thumbnail_url: 'https://s3.amazonaws.com/standard-notes/screenshots/models/FileSafe-banner.png',
   })
 
-  return [bold, markdownBasic, markdownPro, markdownMinimist, markdownMath, filesafe]
+  return [bold, markdownBasic, markdownMinimist, markdownMath, filesafe]
 }

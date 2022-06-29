@@ -1,8 +1,8 @@
 import { SubscriptionName } from '@standardnotes/common'
-import { NoteType } from '../../Component/NoteType'
-import { PermissionName } from '../../Permission/PermissionName'
-import { EditorFeatureDescription, FeatureDescription } from '../FeatureDescription'
-import { FeatureIdentifier } from '../FeatureIdentifier'
+import { NoteType } from '../Component/NoteType'
+import { PermissionName } from '../Permission/PermissionName'
+import { EditorFeatureDescription, FeatureDescription } from '../Feature/FeatureDescription'
+import { FeatureIdentifier } from '../Feature/FeatureIdentifier'
 import { FillEditorComponentDefaults } from './Utilities/FillEditorComponentDefaults'
 
 export function experimentalFeatures(): FeatureDescription[] {

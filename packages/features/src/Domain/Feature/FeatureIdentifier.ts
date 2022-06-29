@@ -29,6 +29,7 @@ export enum FeatureIdentifier {
 
   AdvancedChecklist = 'org.standardnotes.advanced-checklist',
   CodeEditor = 'org.standardnotes.code-editor',
+  MarkdownProEditor = 'org.standardnotes.advanced-markdown-editor',
   MarkdownVisualEditor = 'org.standardnotes.markdown-visual-editor',
   PlainTextEditor = 'org.standardnotes.plain-text-editor',
   PlusEditor = 'org.standardnotes.plus-editor',
@@ -40,7 +41,6 @@ export enum FeatureIdentifier {
   DeprecatedMarkdownBasicEditor = 'org.standardnotes.simple-markdown-editor',
   DeprecatedMarkdownMathEditor = 'org.standardnotes.fancy-markdown-editor',
   DeprecatedMarkdownMinimistEditor = 'org.standardnotes.minimal-markdown-editor',
-  DeprecatedMarkdownProEditor = 'org.standardnotes.advanced-markdown-editor',
   DeprecatedFoldersComponent = 'org.standardnotes.folders',
   DeprecatedFileSafe = 'org.standardnotes.file-safe',
 }
