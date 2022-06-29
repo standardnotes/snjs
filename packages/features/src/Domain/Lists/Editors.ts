@@ -1,8 +1,8 @@
 import { SubscriptionName } from '@standardnotes/common'
-import { EditorFeatureDescription } from '../FeatureDescription'
-import { PermissionName } from '../../Permission/PermissionName'
-import { FeatureIdentifier } from '../FeatureIdentifier'
-import { NoteType } from '../../Component/NoteType'
+import { EditorFeatureDescription } from '../Feature/FeatureDescription'
+import { PermissionName } from '../Permission/PermissionName'
+import { FeatureIdentifier } from '../Feature/FeatureIdentifier'
+import { NoteType } from '../Component/NoteType'
 import { FillEditorComponentDefaults } from './Utilities/FillEditorComponentDefaults'
 
 export function editors(): EditorFeatureDescription[] {
@@ -35,9 +35,22 @@ export function editors(): EditorFeatureDescription[] {
     thumbnail_url: 'https://s3.amazonaws.com/standard-notes/screenshots/models/editors/plus-editor.jpg',
   })
 
-  const markdownVisual: EditorFeatureDescription = FillEditorComponentDefaults({
+  const markdown: EditorFeatureDescription = FillEditorComponentDefaults({
     availableInSubscriptions: [SubscriptionName.PlusPlan, SubscriptionName.ProPlan],
     name: 'Markdown',
+    identifier: FeatureIdentifier.MarkdownProEditor,
+    note_type: NoteType.Markdown,
+    file_type: 'md',
+    permission_name: PermissionName.MarkdownProEditor,
+    spellcheckControl: true,
+    description:
+      'A fully featured Markdown editor that supports live preview, a styling toolbar, and split pane support.',
+    thumbnail_url: 'https://s3.amazonaws.com/standard-notes/screenshots/models/editors/adv-markdown.jpg',
+  })
+
+  const markdownAlt: EditorFeatureDescription = FillEditorComponentDefaults({
+    availableInSubscriptions: [SubscriptionName.PlusPlan, SubscriptionName.ProPlan],
+    name: 'Markdown Alternative',
     identifier: FeatureIdentifier.MarkdownVisualEditor,
     note_type: NoteType.Markdown,
     file_type: 'md',
@@ -88,5 +101,5 @@ export function editors(): EditorFeatureDescription[] {
     thumbnail_url: 'https://s3.amazonaws.com/standard-notes/screenshots/models/editors/spreadsheets.png',
   })
 
-  return [code, plus, markdownVisual, task, tokenvault, spreadsheets]
+  return [code, plus, markdown, markdownAlt, task, tokenvault, spreadsheets]
 }

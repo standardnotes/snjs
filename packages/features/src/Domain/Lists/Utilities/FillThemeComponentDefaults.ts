@@ -1,6 +1,6 @@
 import { ContentType } from '@standardnotes/common'
-import { ThemeFeatureDescription } from '../../FeatureDescription'
-import { ComponentArea } from '../../../Component/ComponentArea'
+import { ThemeFeatureDescription } from '../../Feature/FeatureDescription'
+import { ComponentArea } from '../../Component/ComponentArea'
 
 type RequiredThemeFields = Pick<ThemeFeatureDescription, 'availableInSubscriptions'>
 

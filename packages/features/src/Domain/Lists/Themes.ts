@@ -1,6 +1,6 @@
-import { ThemeFeatureDescription } from '../FeatureDescription'
-import { PermissionName } from '../../Permission/PermissionName'
-import { FeatureIdentifier } from '../FeatureIdentifier'
+import { ThemeFeatureDescription } from '../Feature/FeatureDescription'
+import { PermissionName } from '../Permission/PermissionName'
+import { FeatureIdentifier } from '../Feature/FeatureIdentifier'
 import { FillThemeComponentDefaults } from './Utilities/FillThemeComponentDefaults'
 import { SubscriptionName } from '@standardnotes/common'
 
