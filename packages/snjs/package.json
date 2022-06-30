@@ -16,6 +16,8 @@
   },
   "scripts": {
     "start": "webpack -w --config webpack.dev.js",
+    "clean": "rm -fr dist",
+    "prebuild": "yarn clean",
     "build": "yarn tsc && webpack --config webpack.prod.js",
     "docs": "jsdoc -c jsdoc.json",
     "tsc": "tsc --project lib/tsconfig.json && tscpaths -p lib/tsconfig.json -s lib -o dist/@types",

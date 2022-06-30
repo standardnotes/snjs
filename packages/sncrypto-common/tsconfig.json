@@ -1,30 +1,11 @@
 {
+  "extends": "../../tsconfig.json",
   "compilerOptions": {
-    "target": "esnext",
-    "module": "commonjs",
-    "moduleResolution": "node",
-    "allowJs": true,
-    "strict": true,
-    "isolatedModules": true,
-    "esModuleInterop": true,
-    "declaration": true,
     "composite": true,
     "outDir": "./dist",
-    "inlineSourceMap": true,
-    "types": [
-      "node"
-    ],
-    "typeRoots": [
-      "node_modules/@types",
-      "typings"
-    ]
   },
   "include": [
-    "src/**/*",
-    "typings/**/*"
+    "src/**/*"
   ],
-  "exclude": [
-    "node_modules",
-    "test/**/*"
-  ]
+  "references": []
 }

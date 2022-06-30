@@ -5,11 +5,11 @@
     "node": ">=16.0.0 <17.0.0"
   },
   "description": "Utils and models required for scheduling jobs",
-  "main": "dist/index.js",
+  "main": "dist/src/index.js",
   "author": "Standard Notes",
-  "types": "dist/index.d.ts",
+  "types": "dist/src/index.d.ts",
   "files": [
-    "dist"
+    "dist/src"
   ],
   "publishConfig": {
     "access": "public"

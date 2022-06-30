@@ -18,10 +18,9 @@
   },
   "include": [
     "src/**/*",
-    "typings/**/*"
   ],
   "exclude": [
-    "node_modules",
-    "test/**/*"
+    "dist",
+    "**/*.spec.ts"
   ]
 }

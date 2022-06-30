@@ -5,11 +5,11 @@
     "node": ">=16.0.0 <17.0.0"
   },
   "description": "Payload encryption used in SNJS library",
-  "main": "dist/index.js",
+  "main": "dist/src/index.js",
   "author": "Standard Notes",
-  "types": "dist/index.d.ts",
+  "types": "dist/src/index.d.ts",
   "files": [
-    "dist"
+    "dist/src"
   ],
   "publishConfig": {
     "access": "public"
@@ -31,8 +31,11 @@
     "typescript": "^4.6.2"
   },
   "dependencies": {
+    "@standardnotes/common": "workspace:*",
     "@standardnotes/models": "workspace:*",
     "@standardnotes/responses": "workspace:*",
-    "@standardnotes/services": "workspace:*"
+    "@standardnotes/services": "workspace:*",
+    "@standardnotes/sncrypto-common": "workspace:*",
+    "@standardnotes/utils": "workspace:*"
   }
 }
