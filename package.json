@@ -2,11 +2,13 @@
   "name": "@standardnotes/snjs-monorepo",
   "private": true,
   "author": "Standard Notes",
-  "workspaces": [
-    "packages/*"
-  ],
+  "workspaces": {
+    "packages": [
+      "packages/*"
+    ]
+  },
   "engines": {
-    "node": ">=12.19.0 <17.0.0"
+    "node": ">=16.0.0 <17.0.0"
   },
   "scripts": {
     "bootstrap": "lerna bootstrap",
@@ -21,8 +23,8 @@
     "test:e2e:dev-server": "docker-compose up -d",
     "test:e2e:dev-setup": "docker-compose up",
     "test:e2e:dev": "mocha-headless-chrome --timeout 1200000 -f http://localhost:9002/packages/snjs/mocha/test.html?sync_server_host_name=localhost",
-    "build": "lerna run build",
-    "lint": "lerna run lint",
+    "build": "yarn workspaces foreach -pt -j 10 --verbose run build",
+    "lint": "yarn workspaces foreach -pt -j 10 --verbose run lint",
     "version-bump": "lerna version --conventional-commits --yes -m \"chore(release): publish\"",
     "version-bump-beta": "lerna version --conventional-commits --conventional-prerelease --yes -m \"chore(release): publish beta\"",
     "publish-packages": "lerna publish from-git --yes",
@@ -37,10 +39,14 @@
     "build:snjscore": "yarn build:models && yarn build:services && yarn build:encryption && yarn build:files && yarn build:snjs"
   },
   "devDependencies": {
-    "@types/node": "^17.0.21",
-    "eslint": "^8.10.0",
-    "husky": "^7.0.4",
-    "lerna": "^3.22.1"
+    "@commitlint/cli": "^17.0.2",
+    "@commitlint/config-conventional": "^17.0.2",
+    "@lerna-lite/cli": "^1.5.1",
+    "@lerna-lite/list": "^1.5.1",
+    "@lerna-lite/run": "^1.5.1",
+    "@types/node": "^18.0.0",
+    "eslint": "^8.17.0",
+    "husky": "^7.0.4"
   },
-  "dependencies": {}
+  "packageManager": "yarn@3.2.1"
 }

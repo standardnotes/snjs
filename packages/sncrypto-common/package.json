@@ -1,6 +1,9 @@
 {
   "name": "@standardnotes/sncrypto-common",
   "version": "1.9.0",
+  "engines": {
+    "node": ">=16.0.0 <17.0.0"
+  },
   "description": "SNCrypto common",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -18,8 +21,8 @@
     "test:unit": "yarn lint"
   },
   "devDependencies": {
-    "@standardnotes/config": "^2.4.3",
     "@typescript-eslint/eslint-plugin": "^5.12.1",
-    "@typescript-eslint/parser": "^5.12.1"
+    "@typescript-eslint/parser": "^5.12.1",
+    "typescript": "^4.7.4"
   }
 }

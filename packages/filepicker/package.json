@@ -2,7 +2,7 @@
   "name": "@standardnotes/filepicker",
   "version": "1.16.23",
   "engines": {
-    "node": ">=14.0.0 <17.0.0"
+    "node": ">=16.0.0 <17.0.0"
   },
   "description": "Web filepicker for Standard Notes projects",
   "main": "dist/index.js",
@@ -24,7 +24,6 @@
     "test:unit": "jest"
   },
   "devDependencies": {
-    "@standardnotes/config": "^2.4.3",
     "@types/jest": "^27.4.1",
     "@types/wicg-file-system-access": "^2020.9.5",
     "jest": "^27.5.1",
@@ -32,16 +31,9 @@
     "ts-node": "^10.5.0",
     "typescript": "^4.5.5"
   },
-  "jest": {
-    "preset": "../../node_modules/@standardnotes/config/src/jest.json",
-    "coveragePathIgnorePatterns": [
-      "/node_modules/",
-      "/example/"
-    ]
-  },
   "dependencies": {
-    "@standardnotes/common": "^1.23.1",
-    "@standardnotes/services": "^1.13.23",
-    "@standardnotes/utils": "^1.6.12"
+    "@standardnotes/common": "workspace:*",
+    "@standardnotes/services": "workspace:*",
+    "@standardnotes/utils": "workspace:*"
   }
 }

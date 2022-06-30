@@ -1,4 +1,4 @@
 {
-  "exclude": ["node_modules"],
-  "extends": "./packages/config/src/linter.tsconfig.json"
+  "extends": "./tsconfig.json",
+  "exclude": ["dist", "test-setup.ts"]
 }

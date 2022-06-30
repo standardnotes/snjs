@@ -1,3 +1,6 @@
 {
-  "extends": ["../../node_modules/@standardnotes/config/src/.eslintrc"]
+  "extends": "../../.eslintrc",
+  "parserOptions": {
+    "project": "./linter.tsconfig.json"
+  }
 }

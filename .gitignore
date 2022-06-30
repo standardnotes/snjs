@@ -1,6 +1,5 @@
 node_modules
 .DS_Store
-.vscode
 .idea
 
 coverage
@@ -20,3 +19,12 @@ syncing-server.env
 mock-event-publisher.env
 files.env
 codeqldb
+
+.yarn/*
+!.yarn/cache
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/unplugged
+!.yarn/sdks
+!.yarn/versions
