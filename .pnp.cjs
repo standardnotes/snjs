@@ -6368,6 +6368,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@standardnotes/common", "workspace:packages/common"],\
             ["@types/dompurify", "npm:2.3.3"],\
             ["@types/jest", "npm:27.5.2"],\
+            ["@types/jsdom", "npm:16.2.14"],\
             ["@types/lodash", "npm:4.14.182"],\
             ["@types/node", "npm:18.0.0"],\
             ["@typescript-eslint/eslint-plugin", "virtual:c66bf20e88479ada0172094776519a9f51acc4731d22079b60a295bcec7ea42d5545cbce58a77a50d932bf953298799135e99707486e343da6d99ba1d167bdbd#npm:5.30.0"],\
