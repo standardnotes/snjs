@@ -12,7 +12,7 @@ The entry point of SNJS is the [`SNApplication`](packages/snjs/lib/application.t
 
 An application must be supplied a custom subclass of [DeviceInterface](packages/snjs/lib/device_interface.ts). This allows the library to generalize all behavior a client will need to perform throughout normal client operation, such as saving data to a local database store, saving key/values, and accessing the keychain.
 
-On Web platforms SNJS interacts with [`sncrypto`](https://github.com/standardnotes/snjs/tree/packages/sncrypto-common) to perform operations as mentioned in the [specification](https://github.com/standardnotes/snjs/blob/master/packages/snjs/specification.md) document. This includes operations like key generation and data encryption.
+On Web platforms SNJS interacts with [`sncrypto`](https://github.com/standardnotes/snjs/tree/packages/sncrypto-common) to perform operations as mentioned in the [specification](https://github.com/standardnotes/snjs/blob/main/packages/snjs/specification.md) document. This includes operations like key generation and data encryption.
 
 SNJS also interacts with a Standard Notes [syncing server](https://github.com/standardnotes/syncing-server-js), which is a zero-knowledge data and sync store that deals with encrypted data, and never learns of client secrets or sensitive information.
 
