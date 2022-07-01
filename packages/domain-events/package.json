@@ -29,6 +29,7 @@
     "@standardnotes/scheduler": "workspace:*"
   },
   "devDependencies": {
-    "typescript": "^4.5.5"
+    "@typescript-eslint/eslint-plugin": "^5.30.0",
+    "eslint-plugin-prettier": "^4.2.1"
   }
 }

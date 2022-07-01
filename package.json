@@ -26,6 +26,7 @@
     "clean": "yarn workspaces foreach -pt -j 10 --verbose run clean",
     "build": "yarn clean && yarn workspaces foreach -pt -j 10 --verbose run build",
     "lint": "yarn workspaces foreach -pt -j 10 --verbose run lint",
+    "lint:snjs": "yarn workspace @standardnotes/snjs lint",
     "version-bump": "lerna version --conventional-commits --yes -m \"chore(release): publish\"",
     "version-bump-beta": "lerna version --conventional-commits --conventional-prerelease --yes -m \"chore(release): publish beta\"",
     "publish-packages": "lerna publish from-git --yes",
@@ -46,8 +47,13 @@
     "@lerna-lite/list": "^1.5.1",
     "@lerna-lite/run": "^1.5.1",
     "@types/node": "^18.0.0",
+    "@typescript-eslint/parser": "^5.30.0",
     "eslint": "^8.17.0",
-    "husky": "^7.0.4"
+    "eslint-config-prettier": "^8.5.0",
+    "eslint-plugin-prettier": "^4.2.1",
+    "husky": "^7.0.4",
+    "prettier": "^2.7.1",
+    "typescript": "^4.7.4"
   },
   "packageManager": "yarn@3.2.1"
 }
