@@ -10,13 +10,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
         with:
-          token: ${{ secrets.PAT_TOKEN }}
-          fetch-depth: 0
-      - uses: actions/setup-node@v1
-        with:
-          node-version: '16.x'
-          registry-url: 'https://registry.npmjs.org's
+          node-version: 16
       - run: yarn build
 
   lint:
@@ -24,13 +20,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
         with:
-          token: ${{ secrets.PAT_TOKEN }}
-          fetch-depth: 0
-      - uses: actions/setup-node@v1
-        with:
-          node-version: '16.x'
-          registry-url: 'https://registry.npmjs.org's
+          node-version: 16
       - run: yarn lint
 
   unit-tests:
@@ -38,13 +30,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
         with:
-          token: ${{ secrets.PAT_TOKEN }}
-          fetch-depth: 0
-      - uses: actions/setup-node@v1
-        with:
-          node-version: '16.x'
-          registry-url: 'https://registry.npmjs.org'
+          node-version: 16
       - run: yarn test:unit
 
   e2e-tests:
@@ -52,13 +40,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
         with:
-          token: ${{ secrets.PAT_TOKEN }}
-          fetch-depth: 0
-      - uses: actions/setup-node@v1
-        with:
-          node-version: '16.x'
-          registry-url: 'https://registry.npmjs.org'
+          node-version: 16
       - run: yarn test:e2e
 
   publish:
@@ -70,10 +54,9 @@ jobs:
         with:
           token: ${{ secrets.PAT_TOKEN }}
           fetch-depth: 0
-      - uses: actions/setup-node@v1
+      - uses: actions/setup-node@v3
         with:
-          node-version: '16.x'
-          registry-url: 'https://registry.npmjs.org'
+          node-version: 16
       - run: yarn build
       - name: Setup git config
         run: |
