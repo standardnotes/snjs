@@ -43,7 +43,7 @@ jobs:
 
   publish:
     if: contains(github.event.head_commit.message, 'chore(release)') == false
-    needs: [ build, lint, unit-tests, e2e-tests ]
+    needs: [ lint, unit-tests, e2e-tests ]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
