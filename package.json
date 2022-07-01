@@ -25,8 +25,7 @@
     "build": "yarn clean && yarn workspaces foreach -pt -j 10 --verbose run build",
     "lint": "yarn workspaces foreach -pt -j 10 --verbose --exclude @standardnotes/snjs run lint",
     "version-bump": "lerna version --conventional-commits --yes -m \"chore(release): publish\"",
-    "publish-packages": "lerna publish from-git --yes",
-    "prepare": "husky install"
+    "publish-packages": "lerna publish from-git --yes"
   },
   "devDependencies": {
     "@commitlint/cli": "^17.0.2",
@@ -39,7 +38,6 @@
     "eslint": "^8.17.0",
     "eslint-config-prettier": "^8.5.0",
     "eslint-plugin-prettier": "^4.2.1",
-    "husky": "^7.0.4",
     "prettier": "^2.7.1",
     "typescript": "^4.7.4"
   },
