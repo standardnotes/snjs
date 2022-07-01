@@ -40,7 +40,7 @@ services:
       - snjs
 
   mock-event-publisher:
-    image: standardnotes/mock-event-publisher:1.0.5
+    image: standardnotes/mock-event-publisher
     entrypoint: [
       "./wait-for.sh", "localstack", "4566",
       "./docker/entrypoint.sh", "start-web"
@@ -59,7 +59,7 @@ services:
       - snjs
 
   syncing-server-js:
-    image: standardnotes/syncing-server-js:1.54.1
+    image: standardnotes/syncing-server-js
     entrypoint: [
       "./wait-for.sh", "db", "3306",
       "./wait-for.sh", "cache", "6379",
@@ -70,7 +70,7 @@ services:
       - snjs
 
   syncing-server-js-worker:
-    image: standardnotes/syncing-server-js:1.54.1
+    image: standardnotes/syncing-server-js
     depends_on:
       - syncing-server-js
     entrypoint: [
@@ -82,7 +82,7 @@ services:
       - snjs
 
   api-gateway:
-    image: standardnotes/api-gateway:1.40.1
+    image: standardnotes/api-gateway
     depends_on:
       - syncing-server-js
       - auth
@@ -101,7 +101,7 @@ services:
       - snjs
 
   auth:
-    image: standardnotes/auth:1.46.2
+    image: standardnotes/auth
     depends_on:
       - syncing-server-js
     entrypoint: [
@@ -113,7 +113,7 @@ services:
       - snjs
 
   auth-worker:
-    image: standardnotes/auth:1.46.2
+    image: standardnotes/auth
     depends_on:
       - auth
     entrypoint: [
@@ -126,7 +126,7 @@ services:
       - snjs
 
   files:
-    image: standardnotes/files:1.8.0
+    image: standardnotes/files
     entrypoint: [
       "./wait-for.sh", "db", "3306",
       "./wait-for.sh", "cache", "6379",
