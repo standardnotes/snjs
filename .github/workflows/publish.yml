@@ -5,9 +5,53 @@ on:
     branches: [ main ]
 
 jobs:
+  build:
+    if: contains(github.event.head_commit.message, 'chore(release)') == false
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v1
+        with:
+          node-version: '16.x'
+          registry-url: 'https://registry.npmjs.org's
+      - run: yarn build
+
+  lint:
+    if: contains(github.event.head_commit.message, 'chore(release)') == false
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v1
+        with:
+          node-version: '16.x'
+          registry-url: 'https://registry.npmjs.org's
+      - run: yarn lint
+
+  unit-tests:
+    if: contains(github.event.head_commit.message, 'chore(release)') == false
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v1
+        with:
+          node-version: '16.x'
+          registry-url: 'https://registry.npmjs.org'
+      - run: yarn test:unit
+
+  e2e-tests:
+    if: contains(github.event.head_commit.message, 'chore(release)') == false
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v1
+        with:
+          node-version: '16.x'
+          registry-url: 'https://registry.npmjs.org'
+      - run: yarn test:e2e
+
   publish:
     if: contains(github.event.head_commit.message, 'chore(release)') == false
-
+    needs: [ build, lint, unit-tests, e2e-tests ]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -19,7 +63,6 @@ jobs:
           node-version: '16.x'
           registry-url: 'https://registry.npmjs.org'
       - run: yarn build
-      - run: yarn lint
       - name: Setup git config
         run: |
           git config --global user.name "standardci"
@@ -36,6 +79,10 @@ jobs:
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
+  update-app-repo:
+    needs: publish
+    runs-on: ubuntu-latest
+    steps:
       - name: Notify App Repo
         uses: peter-evans/repository-dispatch@v2
         with:
@@ -43,7 +90,11 @@ jobs:
           repository: standardnotes/app
           event-type: snjs-updated-event
 
-      - name: Notify Server Repo
+  update-server-repo:
+    needs: publish
+    runs-on: ubuntu-latest
+    steps:
+      - name: Notify App Repo
         uses: peter-evans/repository-dispatch@v2
         with:
           token: ${{ secrets.CI_PAT_TOKEN }}
@@ -51,7 +102,7 @@ jobs:
           event-type: snjs-updated-event
 
   git-sync:
-    needs: publish
+    needs: [ publish, update-app-repo, update-server-repo ]
     runs-on: ubuntu-latest
     steps:
       - name: git-sync
@@ -64,7 +115,7 @@ jobs:
           ssh_private_key: ${{ secrets.SSH_PRIVATE_KEY }}
 
   notify_discord:
-    needs: publish
+    needs: [ publish, update-app-repo, update-server-repo ]
     if: contains(github.event.head_commit.message, 'chore(release)') == false
 
     runs-on: ubuntu-latest
