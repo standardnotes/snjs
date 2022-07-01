@@ -149,6 +149,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["eslint", "npm:8.18.0"],\
             ["eslint-config-prettier", "virtual:40f7dfe1897785b648deeb1f1a7908eff8315ad85b2c2b9cdf114062305c4c9bc9c02070ae8e4c405c6a424aa29c32eac3fb92cba9ecc2f6d34beb666f77aaeb#npm:8.5.0"],\
             ["eslint-plugin-prettier", "virtual:40f7dfe1897785b648deeb1f1a7908eff8315ad85b2c2b9cdf114062305c4c9bc9c02070ae8e4c405c6a424aa29c32eac3fb92cba9ecc2f6d34beb666f77aaeb#npm:4.2.1"],\
+            ["mocha-headless-chrome", "npm:4.0.0"],\
             ["prettier", "npm:2.7.1"],\
             ["typescript", "patch:typescript@npm%3A4.7.4#~builtin<compat/typescript>::version=4.7.4&hash=7ad353"]\
           ],\
@@ -6794,6 +6795,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["eslint", "npm:8.18.0"],\
             ["eslint-config-prettier", "virtual:40f7dfe1897785b648deeb1f1a7908eff8315ad85b2c2b9cdf114062305c4c9bc9c02070ae8e4c405c6a424aa29c32eac3fb92cba9ecc2f6d34beb666f77aaeb#npm:8.5.0"],\
             ["eslint-plugin-prettier", "virtual:40f7dfe1897785b648deeb1f1a7908eff8315ad85b2c2b9cdf114062305c4c9bc9c02070ae8e4c405c6a424aa29c32eac3fb92cba9ecc2f6d34beb666f77aaeb#npm:4.2.1"],\
+            ["mocha-headless-chrome", "npm:4.0.0"],\
             ["prettier", "npm:2.7.1"],\
             ["typescript", "patch:typescript@npm%3A4.7.4#~builtin<compat/typescript>::version=4.7.4&hash=7ad353"]\
           ],\
