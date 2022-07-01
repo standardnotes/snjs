@@ -30,7 +30,7 @@ function setup {
   cp docker/files.env.sample docker/files.env
 
   echo "# Installing project dependecies (Host Machine)"
-  yarn install --pure-lockfile
+  yarn install --immutable
   yarn build
 }
 

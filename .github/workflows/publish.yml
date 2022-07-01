@@ -9,16 +9,6 @@ on:
     branches: [ main ]
 
 jobs:
-  build:
-    if: contains(github.event.head_commit.message, 'chore(release)') == false
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
-        with:
-          node-version: 16
-      - run: yarn build
-
   lint:
     if: contains(github.event.head_commit.message, 'chore(release)') == false
     runs-on: ubuntu-latest
@@ -38,6 +28,7 @@ jobs:
         with:
           node-version: 16
       - run: yarn install --immutable # required for microtime package in @standardnotes/time
+      - run: yarn build
       - run: yarn test:unit
 
   e2e-tests:

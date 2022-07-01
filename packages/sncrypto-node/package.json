@@ -36,7 +36,9 @@
     "@typescript-eslint/eslint-plugin": "^5.30.0",
     "babel-loader": "^8.2.5",
     "eslint-plugin-prettier": "^4.2.1",
+    "jest": "^28.1.2",
     "regenerator-runtime": "^0.13.9",
+    "ts-jest": "^28.0.5",
     "ts-loader": "^9.2.6",
     "webpack": "^5.69.1",
     "webpack-cli": "^4.9.2"
