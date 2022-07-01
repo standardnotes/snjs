@@ -2,45 +2,47 @@
   "name": "@standardnotes/snjs-monorepo",
   "private": true,
   "author": "Standard Notes",
-  "workspaces": [
-    "packages/*"
-  ],
+  "workspaces": {
+    "packages": [
+      "packages/*"
+    ]
+  },
   "engines": {
-    "node": ">=12.19.0 <17.0.0"
+    "node": ">=16.0.0 <17.0.0"
   },
   "scripts": {
-    "bootstrap": "lerna bootstrap",
-    "start": "lerna run start --parallel",
-    "test:unit": "lerna run test:unit --parallel",
+    "start": "yarn workspaces foreach -pt -j 10 --verbose run start",
+    "test:unit": "yarn workspaces foreach -pt -j 10 --verbose run test:unit",
     "start:e2e:mocha": "yarn run start:test-server:dev",
     "start:e2e:docker": "yarn run test:e2e:dev-setup",
-    "start:test-server": "node e2e-server.js",
-    "start:test-server:dev": "node e2e-server.js --dev",
+    "start:test-server": "yarn node e2e-server.js",
+    "start:test-server:dev": "yarn node e2e-server.js --dev",
     "test:e2e": "bash test.sh stable",
-    "test:e2e:canary": "bash test.sh canary",
     "test:e2e:dev-server": "docker-compose up -d",
     "test:e2e:dev-setup": "docker-compose up",
     "test:e2e:dev": "mocha-headless-chrome --timeout 1200000 -f http://localhost:9002/packages/snjs/mocha/test.html?sync_server_host_name=localhost",
-    "build": "lerna run build",
-    "lint": "lerna run lint",
+    "clean": "yarn workspaces foreach -pt -j 10 --verbose run clean",
+    "build": "yarn clean && yarn workspaces foreach -pt -j 10 --verbose run build",
+    "lint": "yarn workspaces foreach -pt -j 10 --verbose run lint",
+    "lint:snjs": "yarn workspace @standardnotes/snjs lint",
     "version-bump": "lerna version --conventional-commits --yes -m \"chore(release): publish\"",
-    "version-bump-beta": "lerna version --conventional-commits --conventional-prerelease --yes -m \"chore(release): publish beta\"",
     "publish-packages": "lerna publish from-git --yes",
-    "publish-packages-beta": "lerna publish from-git --yes --dist-tag beta",
-    "prepare": "husky install",
-    "build:services": "yarn --cwd packages/services build",
-    "build:models": "yarn --cwd packages/models build",
-    "build:snjs": "yarn --cwd packages/snjs build",
-    "build:files": "yarn --cwd packages/files build",
-    "build:filepicker": "yarn --cwd packages/filepicker build",
-    "build:encryption": "yarn --cwd packages/encryption build",
-    "build:snjscore": "yarn build:models && yarn build:services && yarn build:encryption && yarn build:files && yarn build:snjs"
+    "prepare": "husky install"
   },
   "devDependencies": {
-    "@types/node": "^17.0.21",
-    "eslint": "^8.10.0",
+    "@commitlint/cli": "^17.0.2",
+    "@commitlint/config-conventional": "^17.0.2",
+    "@lerna-lite/cli": "^1.5.1",
+    "@lerna-lite/list": "^1.5.1",
+    "@lerna-lite/run": "^1.5.1",
+    "@types/node": "^18.0.0",
+    "@typescript-eslint/parser": "^5.30.0",
+    "eslint": "^8.17.0",
+    "eslint-config-prettier": "^8.5.0",
+    "eslint-plugin-prettier": "^4.2.1",
     "husky": "^7.0.4",
-    "lerna": "^3.22.1"
+    "prettier": "^2.7.1",
+    "typescript": "^4.7.4"
   },
-  "dependencies": {}
+  "packageManager": "yarn@3.2.1"
 }

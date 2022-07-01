@@ -17,7 +17,7 @@ import {
   ChallengeValidation,
 } from '@standardnotes/services'
 import { ProtectionsClientInterface } from './ClientInterface'
-import { ContentType } from '@Lib/../../common/dist'
+import { ContentType } from '@standardnotes/common'
 
 export enum ProtectionEvent {
   UnprotectedSessionBegan = 'UnprotectedSessionBegan',

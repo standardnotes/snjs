@@ -1,6 +1,10 @@
 {
-  "extends": ["../../node_modules/@standardnotes/config/src/.eslintrc"],
+  "extends": "../../.eslintrc",
+  "parserOptions": {
+    "project": "./linter.tsconfig.json"
+  },
   "rules": {
-    "@typescript-eslint/no-explicit-any": ["warn", { "ignoreRestArgs": true }]
+    "@typescript-eslint/no-explicit-any": ["warn", { "ignoreRestArgs": true }],
+    "@typescript-eslint/no-non-null-assertion": "warn"
   }
 }

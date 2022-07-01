@@ -1,25 +1,31 @@
 {
   "name": "@standardnotes/sncrypto-common",
   "version": "1.9.0",
+  "engines": {
+    "node": ">=16.0.0 <17.0.0"
+  },
   "description": "SNCrypto common",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "main": "dist/src/index.js",
+  "author": "Standard Notes",
+  "types": "dist/src/index.d.ts",
   "files": [
-    "dist"
+    "dist/src"
   ],
   "license": "AGPL-3.0-or-later",
   "publishConfig": {
     "access": "public"
   },
   "scripts": {
+    "clean": "rm -fr dist",
+    "prebuild": "yarn clean",
     "build": "tsc -p tsconfig.json",
     "watch": "tsc -p tsconfig.json --watch",
     "lint": "eslint . --ext .ts",
     "test:unit": "yarn lint"
   },
   "devDependencies": {
-    "@standardnotes/config": "^2.4.3",
-    "@typescript-eslint/eslint-plugin": "^5.12.1",
-    "@typescript-eslint/parser": "^5.12.1"
+    "@typescript-eslint/eslint-plugin": "^5.30.0",
+    "@typescript-eslint/parser": "^5.12.1",
+    "eslint-plugin-prettier": "^4.2.1"
   }
 }

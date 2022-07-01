@@ -7,7 +7,7 @@ import {
 } from '@standardnotes/models'
 import { PayloadManager } from './PayloadManager'
 import { InternalEventBusInterface } from '@standardnotes/services'
-import { ContentType } from '@Lib/../../common/dist'
+import { ContentType } from '@standardnotes/common'
 
 describe('payload manager', () => {
   let payloadManager: PayloadManager

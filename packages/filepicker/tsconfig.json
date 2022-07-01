@@ -1,13 +1,12 @@
 {
-  "extends": "../../node_modules/@standardnotes/config/src/tsconfig.json",
+  "extends": "../../tsconfig.json",
   "compilerOptions": {
-    "rootDir": "src",
-    "outDir": "dist",
-    "resolveJsonModule": true,
-    "esModuleInterop": true
+    "composite": true,
+    "outDir": "./dist",
   },
-  "exclude": [
-    "dist",
-    "example"
-  ]
+  "include": [
+    "src/**/*"
+  ],
+  "exclude": ["**/*.spec.ts", "dist", "example"],
+  "references": []
 }
