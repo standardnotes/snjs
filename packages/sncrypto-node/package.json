@@ -24,7 +24,8 @@
     "test:unit": "jest spec"
   },
   "dependencies": {
-    "@standardnotes/sncrypto-common": "workspace:*"
+    "@standardnotes/sncrypto-common": "workspace:*",
+    "reflect-metadata": "^0.1.13"
   },
   "devDependencies": {
     "@babel/core": "^7.18.6",

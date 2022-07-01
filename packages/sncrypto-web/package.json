@@ -27,7 +27,8 @@
   "dependencies": {
     "@standardnotes/sncrypto-common": "workspace:*",
     "buffer": "^6.0.3",
-    "libsodium-wrappers": "^0.7.10"
+    "libsodium-wrappers": "^0.7.10",
+    "reflect-metadata": "^0.1.13"
   },
   "devDependencies": {
     "@babel/core": "^7.18.6",

@@ -36,6 +36,7 @@
   "dependencies": {
     "@standardnotes/common": "workspace:*",
     "@standardnotes/services": "workspace:*",
-    "@standardnotes/utils": "workspace:*"
+    "@standardnotes/utils": "workspace:*",
+    "reflect-metadata": "^0.1.13"
   }
 }

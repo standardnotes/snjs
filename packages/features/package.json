@@ -26,7 +26,8 @@
   },
   "dependencies": {
     "@standardnotes/auth": "workspace:*",
-    "@standardnotes/common": "workspace:*"
+    "@standardnotes/common": "workspace:*",
+    "reflect-metadata": "^0.1.13"
   },
   "devDependencies": {
     "@types/jest": "^27.4.1",

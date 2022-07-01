@@ -29,7 +29,8 @@
     "@standardnotes/common": "workspace:*",
     "@standardnotes/models": "workspace:*",
     "@standardnotes/responses": "workspace:*",
-    "@standardnotes/utils": "workspace:*"
+    "@standardnotes/utils": "workspace:*",
+    "reflect-metadata": "^0.1.13"
   },
   "devDependencies": {
     "@types/jest": "^27.4.1",

@@ -26,7 +26,8 @@
   },
   "dependencies": {
     "@standardnotes/common": "workspace:*",
-    "jsonwebtoken": "^8.5.1"
+    "jsonwebtoken": "^8.5.1",
+    "reflect-metadata": "^0.1.13"
   },
   "devDependencies": {
     "@types/jest": "^27.4.1",

@@ -32,6 +32,7 @@
     "ts-jest": "^27.1.3"
   },
   "dependencies": {
-    "@standardnotes/common": "workspace:*"
+    "@standardnotes/common": "workspace:*",
+    "reflect-metadata": "^0.1.13"
   }
 }

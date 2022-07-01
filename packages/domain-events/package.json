@@ -26,7 +26,8 @@
     "@standardnotes/auth": "workspace:*",
     "@standardnotes/common": "workspace:*",
     "@standardnotes/features": "workspace:*",
-    "@standardnotes/scheduler": "workspace:*"
+    "@standardnotes/scheduler": "workspace:*",
+    "reflect-metadata": "^0.1.13"
   },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^5.30.0",

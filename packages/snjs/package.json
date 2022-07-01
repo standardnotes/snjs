@@ -84,6 +84,7 @@
     "@standardnotes/settings": "workspace:*",
     "@standardnotes/sncrypto-common": "workspace:*",
     "@standardnotes/utils": "workspace:*",
+    "reflect-metadata": "^0.1.13",
     "semver": "^7.3.7"
   }
 }
