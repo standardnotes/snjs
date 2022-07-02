@@ -1,4 +1,4 @@
-import { ApplicationIdentifier } from '@standardnotes/common'
+import { ApplicationIdentifier, KeyParamsOrigination } from '@standardnotes/common'
 
 import { DeinitCallback } from './DeinitCallback'
 import { DeinitMode } from './DeinitMode'
@@ -19,4 +19,14 @@ export interface AppGroupManagedApplication extends ApplicationInterface {
   onDeinit: DeinitCallback
 
   setOnDeinit(onDeinit: DeinitCallback): void
+}
+
+export interface SessionManagerApplication extends ApplicationInterface {
+  changePassword(
+    currentPassword: string,
+    newPassword: string,
+    passcode?: string,
+    origination?: KeyParamsOrigination,
+    validateNewPasswordStrength?: boolean,
+  ): Promise<unknown>
 }
