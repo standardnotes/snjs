@@ -53,6 +53,7 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: 16
+      - run: yarn install --immutable
       - run: yarn build
       - name: Setup git config
         run: |
@@ -65,7 +66,6 @@ jobs:
           passphrase: ${{ secrets.PASSPHRASE }}
           git_user_signingkey: true
           git_commit_gpgsign: true
-      - run: yarn install --immutable
       - run: yarn version-bump
       - run: yarn publish-packages
         env:
