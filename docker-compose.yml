@@ -61,9 +61,9 @@ services:
   syncing-server-js:
     image: standardnotes/syncing-server-js
     entrypoint: [
-      "./wait-for.sh", "db", "3306",
-      "./wait-for.sh", "cache", "6379",
-      "./docker/entrypoint.sh", "start-web"
+      "./packages/syncing-server/wait-for.sh", "db", "3306",
+      "./packages/syncing-server/wait-for.sh", "cache", "6379",
+      "./packages/syncing-server/docker/entrypoint.sh", "start-web"
     ]
     env_file: docker/syncing-server-js.env
     networks:
@@ -74,8 +74,8 @@ services:
     depends_on:
       - syncing-server-js
     entrypoint: [
-      "./wait-for.sh", "syncing-server-js", "3000",
-      "./docker/entrypoint.sh", "start-worker"
+      "./packages/syncing-server/wait-for.sh", "syncing-server-js", "3000",
+      "./packages/syncing-server/docker/entrypoint.sh", "start-worker"
     ]
     env_file: docker/syncing-server-js.env
     networks:
@@ -87,10 +87,10 @@ services:
       - syncing-server-js
       - auth
     entrypoint: [
-      "./wait-for.sh", "syncing-server-js", "3000",
-      "./wait-for.sh", "auth", "3000",
-      "./wait-for.sh", "files", "3000",
-      "./docker/entrypoint.sh", "start-web"
+      "./packages/api-gateway/wait-for.sh", "syncing-server-js", "3000",
+      "./packages/api-gateway/wait-for.sh", "auth", "3000",
+      "./packages/api-gateway/wait-for.sh", "files", "3000",
+      "./packages/api-gateway/docker/entrypoint.sh", "start-web"
     ]
     env_file: docker/api-gateway.env
     environment:
@@ -105,8 +105,8 @@ services:
     depends_on:
       - syncing-server-js
     entrypoint: [
-      "./wait-for.sh", "syncing-server-js", "3000",
-      "./docker/entrypoint.sh", "start-web"
+      "./packages/auth/wait-for.sh", "syncing-server-js", "3000",
+      "./packages/auth/docker/entrypoint.sh", "start-web"
     ]
     env_file: docker/auth.env
     networks:
@@ -117,9 +117,9 @@ services:
     depends_on:
       - auth
     entrypoint: [
-      "./wait-for.sh", "auth", "3000",
-      "./wait-for.sh", "localstack", "4566",
-      "./docker/entrypoint.sh", "start-worker"
+      "./packages/auth/wait-for.sh", "auth", "3000",
+      "./packages/auth/wait-for.sh", "localstack", "4566",
+      "./packages/auth/docker/entrypoint.sh", "start-worker"
     ]
     env_file: docker/auth.env
     networks:
@@ -128,9 +128,9 @@ services:
   files:
     image: standardnotes/files
     entrypoint: [
-      "./wait-for.sh", "db", "3306",
-      "./wait-for.sh", "cache", "6379",
-      "./docker/entrypoint.sh", "start-web"
+      "./packages/files/wait-for.sh", "db", "3306",
+      "./packages/files/wait-for.sh", "cache", "6379",
+      "./packages/files/docker/entrypoint.sh", "start-web"
     ]
     ports:
       - 3125:3000
