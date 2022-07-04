@@ -44,7 +44,6 @@
     "chai-as-promised": "^7.1.1",
     "chai-subset": "^1.6.0",
     "circular-dependency-plugin": "^5.2.2",
-    "connect": "^3.7.0",
     "crypto-js": "^4.1.1",
     "docdash": "^1.2.0",
     "dom-storage": "^2.1.0",
