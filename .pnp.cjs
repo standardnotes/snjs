@@ -152,6 +152,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["eslint-plugin-prettier", "virtual:40f7dfe1897785b648deeb1f1a7908eff8315ad85b2c2b9cdf114062305c4c9bc9c02070ae8e4c405c6a424aa29c32eac3fb92cba9ecc2f6d34beb666f77aaeb#npm:4.2.1"],\
             ["mocha-headless-chrome", "npm:4.0.0"],\
             ["prettier", "npm:2.7.1"],\
+            ["serve-static", "npm:1.15.0"],\
             ["typescript", "patch:typescript@npm%3A4.7.4#~builtin<compat/typescript>::version=4.7.4&hash=7ad353"]\
           ],\
           "linkType": "SOFT"\
@@ -6765,7 +6766,6 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["regenerator-runtime", "npm:0.13.9"],\
             ["script-loader", "npm:0.7.2"],\
             ["semver", "npm:7.3.7"],\
-            ["serve-static", "npm:1.15.0"],\
             ["sinon", "npm:13.0.2"],\
             ["ts-jest", "virtual:b3946080b62092fd53e1141839da112b684b0f36a333349b3357e42bb5dbf3bb7fe1a3ef99e20e2018ee575e5dce71d44ded2685679efd7f29b1e7d9014dfc01#npm:28.0.5"],\
             ["ts-loader", "virtual:b3946080b62092fd53e1141839da112b684b0f36a333349b3357e42bb5dbf3bb7fe1a3ef99e20e2018ee575e5dce71d44ded2685679efd7f29b1e7d9014dfc01#npm:9.3.0"],\
@@ -6798,6 +6798,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["eslint-plugin-prettier", "virtual:40f7dfe1897785b648deeb1f1a7908eff8315ad85b2c2b9cdf114062305c4c9bc9c02070ae8e4c405c6a424aa29c32eac3fb92cba9ecc2f6d34beb666f77aaeb#npm:4.2.1"],\
             ["mocha-headless-chrome", "npm:4.0.0"],\
             ["prettier", "npm:2.7.1"],\
+            ["serve-static", "npm:1.15.0"],\
             ["typescript", "patch:typescript@npm%3A4.7.4#~builtin<compat/typescript>::version=4.7.4&hash=7ad353"]\
           ],\
           "linkType": "SOFT"\
