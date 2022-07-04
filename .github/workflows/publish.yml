@@ -48,7 +48,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
         with:
-          token: ${{ secrets.PAT_TOKEN }}
+          token: ${{ secrets.CI_PAT_TOKEN }}
           fetch-depth: 0
       - uses: actions/setup-node@v3
         with:
@@ -62,14 +62,14 @@ jobs:
       - name: Import GPG key
         uses: crazy-max/ghaction-import-gpg@v4
         with:
-          gpg_private_key: ${{ secrets.GPG_PRIVATE_KEY }}
-          passphrase: ${{ secrets.PASSPHRASE }}
+          gpg_private_key: ${{ secrets.CI_GPG_PRIVATE_KEY }}
+          passphrase: ${{ secrets.CI_GPG_PASSPHRASE }}
           git_user_signingkey: true
           git_commit_gpgsign: true
       - run: yarn version-bump
       - run: yarn publish-packages
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NODE_AUTH_TOKEN: ${{ secrets.CI_NPM_TOKEN }}
 
   update-app-repo:
     needs: publish
