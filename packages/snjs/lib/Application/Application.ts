@@ -33,6 +33,7 @@ import {
   DeinitSource,
   AppGroupManagedApplication,
   ApplicationInterface,
+  SessionManagerApplication,
 } from '@standardnotes/services'
 import { SNLog } from '../Log'
 import { useBoolean } from '@standardnotes/utils'
@@ -66,7 +67,11 @@ type ItemStream<I extends DecryptedItemInterface> = (data: {
 type ObserverRemover = () => void
 
 export class SNApplication
-  implements ApplicationInterface, AppGroupManagedApplication, InternalServices.ListedClientInterface
+  implements
+    ApplicationInterface,
+    AppGroupManagedApplication,
+    InternalServices.ListedClientInterface,
+    SessionManagerApplication
 {
   onDeinit!: ExternalServices.DeinitCallback
 
