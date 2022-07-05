@@ -45,10 +45,6 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
         "reference": "workspace:packages/domain-events-infra"\
       },\
       {\
-        "name": "@standardnotes/encryption",\
-        "reference": "workspace:packages/encryption"\
-      },\
-      {\
         "name": "@standardnotes/features",\
         "reference": "workspace:packages/features"\
       },\
@@ -114,7 +110,6 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
       ["@standardnotes/common", ["workspace:packages/common"]],\
       ["@standardnotes/domain-events", ["workspace:packages/domain-events"]],\
       ["@standardnotes/domain-events-infra", ["workspace:packages/domain-events-infra"]],\
-      ["@standardnotes/encryption", ["workspace:packages/encryption"]],\
       ["@standardnotes/features", ["workspace:packages/features"]],\
       ["@standardnotes/filepicker", ["workspace:packages/filepicker"]],\
       ["@standardnotes/files", ["workspace:packages/files"]],\
@@ -6383,7 +6378,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@standardnotes/api", "workspace:packages/api"],\
             ["@standardnotes/auth", "workspace:packages/auth"],\
             ["@standardnotes/common", "workspace:packages/common"],\
-            ["@standardnotes/encryption", "workspace:packages/encryption"],\
+            ["@standardnotes/encryption", "npm:1.10.2"],\
             ["@standardnotes/models", "workspace:packages/models"],\
             ["@standardnotes/responses", "workspace:packages/responses"],\
             ["@standardnotes/services", "workspace:packages/services"],\
@@ -6476,25 +6471,19 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
         }]\
       ]],\
       ["@standardnotes/encryption", [\
-        ["workspace:packages/encryption", {\
-          "packageLocation": "./packages/encryption/",\
+        ["npm:1.10.2", {\
+          "packageLocation": "./.yarn/cache/@standardnotes-encryption-npm-1.10.2-f42a56fbcc-c7cb096c12.zip/node_modules/@standardnotes/encryption/",\
           "packageDependencies": [\
-            ["@standardnotes/encryption", "workspace:packages/encryption"],\
+            ["@standardnotes/encryption", "npm:1.10.2"],\
             ["@standardnotes/common", "workspace:packages/common"],\
             ["@standardnotes/models", "workspace:packages/models"],\
             ["@standardnotes/responses", "workspace:packages/responses"],\
             ["@standardnotes/services", "workspace:packages/services"],\
             ["@standardnotes/sncrypto-common", "workspace:packages/sncrypto-common"],\
             ["@standardnotes/utils", "workspace:packages/utils"],\
-            ["@types/jest", "npm:27.5.2"],\
-            ["@types/node", "npm:18.0.0"],\
-            ["@typescript-eslint/eslint-plugin", "virtual:c66bf20e88479ada0172094776519a9f51acc4731d22079b60a295bcec7ea42d5545cbce58a77a50d932bf953298799135e99707486e343da6d99ba1d167bdbd#npm:5.30.0"],\
-            ["eslint-plugin-prettier", "virtual:c66bf20e88479ada0172094776519a9f51acc4731d22079b60a295bcec7ea42d5545cbce58a77a50d932bf953298799135e99707486e343da6d99ba1d167bdbd#npm:4.2.1"],\
-            ["jest", "virtual:c66bf20e88479ada0172094776519a9f51acc4731d22079b60a295bcec7ea42d5545cbce58a77a50d932bf953298799135e99707486e343da6d99ba1d167bdbd#npm:27.5.1"],\
-            ["reflect-metadata", "npm:0.1.13"],\
-            ["ts-jest", "virtual:c66bf20e88479ada0172094776519a9f51acc4731d22079b60a295bcec7ea42d5545cbce58a77a50d932bf953298799135e99707486e343da6d99ba1d167bdbd#npm:27.1.5"]\
+            ["reflect-metadata", "npm:0.1.13"]\
           ],\
-          "linkType": "SOFT"\
+          "linkType": "HARD"\
         }]\
       ]],\
       ["@standardnotes/features", [\
@@ -6540,7 +6529,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageDependencies": [\
             ["@standardnotes/files", "workspace:packages/files"],\
             ["@standardnotes/common", "workspace:packages/common"],\
-            ["@standardnotes/encryption", "workspace:packages/encryption"],\
+            ["@standardnotes/encryption", "npm:1.10.2"],\
             ["@standardnotes/filepicker", "workspace:packages/filepicker"],\
             ["@standardnotes/models", "workspace:packages/models"],\
             ["@standardnotes/responses", "workspace:packages/responses"],\
@@ -6725,7 +6714,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@standardnotes/auth", "workspace:packages/auth"],\
             ["@standardnotes/common", "workspace:packages/common"],\
             ["@standardnotes/domain-events", "workspace:packages/domain-events"],\
-            ["@standardnotes/encryption", "workspace:packages/encryption"],\
+            ["@standardnotes/encryption", "npm:1.10.2"],\
             ["@standardnotes/features", "workspace:packages/features"],\
             ["@standardnotes/files", "workspace:packages/files"],\
             ["@standardnotes/models", "workspace:packages/models"],\

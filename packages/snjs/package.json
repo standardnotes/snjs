@@ -75,7 +75,7 @@
     "@standardnotes/auth": "workspace:*",
     "@standardnotes/common": "workspace:*",
     "@standardnotes/domain-events": "workspace:*",
-    "@standardnotes/encryption": "workspace:*",
+    "@standardnotes/encryption": "^1.10.2",
     "@standardnotes/features": "workspace:*",
     "@standardnotes/files": "workspace:*",
     "@standardnotes/models": "workspace:*",

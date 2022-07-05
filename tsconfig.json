@@ -41,9 +41,6 @@
       "path": "./packages/domain-events-infra"
     },
     {
-      "path": "./packages/encryption"
-    },
-    {
       "path": "./packages/features"
     },
     {

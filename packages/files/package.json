@@ -33,7 +33,7 @@
   },
   "dependencies": {
     "@standardnotes/common": "workspace:*",
-    "@standardnotes/encryption": "workspace:*",
+    "@standardnotes/encryption": "^1.10.2",
     "@standardnotes/filepicker": "workspace:*",
     "@standardnotes/models": "workspace:*",
     "@standardnotes/responses": "workspace:*",

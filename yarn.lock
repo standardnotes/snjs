@@ -3899,7 +3899,7 @@ __metadata:
   dependencies:
     "@standardnotes/auth": "workspace:*"
     "@standardnotes/common": "workspace:*"
-    "@standardnotes/encryption": "workspace:*"
+    "@standardnotes/encryption": ^1.10.2
     "@standardnotes/models": "workspace:*"
     "@standardnotes/responses": "workspace:*"
     "@standardnotes/services": "workspace:*"
@@ -3930,7 +3930,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@standardnotes/common@workspace:*, @standardnotes/common@workspace:packages/common":
+"@standardnotes/common@^1.23.1, @standardnotes/common@workspace:*, @standardnotes/common@workspace:packages/common":
   version: 0.0.0-use.local
   resolution: "@standardnotes/common@workspace:packages/common"
   dependencies:
@@ -3982,25 +3982,20 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@standardnotes/encryption@workspace:*, @standardnotes/encryption@workspace:packages/encryption":
-  version: 0.0.0-use.local
-  resolution: "@standardnotes/encryption@workspace:packages/encryption"
+"@standardnotes/encryption@npm:^1.10.2":
+  version: 1.10.2
+  resolution: "@standardnotes/encryption@npm:1.10.2"
   dependencies:
-    "@standardnotes/common": "workspace:*"
-    "@standardnotes/models": "workspace:*"
-    "@standardnotes/responses": "workspace:*"
-    "@standardnotes/services": "workspace:*"
-    "@standardnotes/sncrypto-common": "workspace:*"
-    "@standardnotes/utils": "workspace:*"
-    "@types/jest": ^27.4.1
-    "@types/node": ^18.0.0
-    "@typescript-eslint/eslint-plugin": ^5.30.0
-    eslint-plugin-prettier: ^4.2.1
-    jest: ^27.5.1
+    "@standardnotes/common": ^1.23.1
+    "@standardnotes/models": ^1.11.13
+    "@standardnotes/responses": ^1.6.39
+    "@standardnotes/services": ^1.13.23
+    "@standardnotes/sncrypto-common": ^1.9.0
+    "@standardnotes/utils": ^1.6.12
     reflect-metadata: ^0.1.13
-    ts-jest: ^27.1.3
-  languageName: unknown
-  linkType: soft
+  checksum: c7cb096c1288578c6ad35b1117b8a41a9c221b5dcc7be0874236d98b449c78f1364d6317938ea3ecd4f6cfbd35bb443482e20f5ad6beb26022b68c82bdc7ffe4
+  languageName: node
+  linkType: hard
 
 "@standardnotes/features@workspace:*, @standardnotes/features@workspace:packages/features":
   version: 0.0.0-use.local
@@ -4040,7 +4035,7 @@ __metadata:
   resolution: "@standardnotes/files@workspace:packages/files"
   dependencies:
     "@standardnotes/common": "workspace:*"
-    "@standardnotes/encryption": "workspace:*"
+    "@standardnotes/encryption": ^1.10.2
     "@standardnotes/filepicker": "workspace:*"
     "@standardnotes/models": "workspace:*"
     "@standardnotes/responses": "workspace:*"
@@ -4056,7 +4051,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@standardnotes/models@workspace:*, @standardnotes/models@workspace:packages/models":
+"@standardnotes/models@^1.11.13, @standardnotes/models@workspace:*, @standardnotes/models@workspace:packages/models":
   version: 0.0.0-use.local
   resolution: "@standardnotes/models@workspace:packages/models"
   dependencies:
@@ -4075,7 +4070,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@standardnotes/responses@workspace:*, @standardnotes/responses@workspace:packages/responses":
+"@standardnotes/responses@^1.6.39, @standardnotes/responses@workspace:*, @standardnotes/responses@workspace:packages/responses":
   version: 0.0.0-use.local
   resolution: "@standardnotes/responses@workspace:packages/responses"
   dependencies:
@@ -4105,7 +4100,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@standardnotes/services@workspace:*, @standardnotes/services@workspace:packages/services":
+"@standardnotes/services@^1.13.23, @standardnotes/services@workspace:*, @standardnotes/services@workspace:packages/services":
   version: 0.0.0-use.local
   resolution: "@standardnotes/services@workspace:packages/services"
   dependencies:
@@ -4134,7 +4129,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@standardnotes/sncrypto-common@workspace:*, @standardnotes/sncrypto-common@workspace:packages/sncrypto-common":
+"@standardnotes/sncrypto-common@^1.9.0, @standardnotes/sncrypto-common@workspace:*, @standardnotes/sncrypto-common@workspace:packages/sncrypto-common":
   version: 0.0.0-use.local
   resolution: "@standardnotes/sncrypto-common@workspace:packages/sncrypto-common"
   dependencies:
@@ -4241,7 +4236,7 @@ __metadata:
     "@standardnotes/auth": "workspace:*"
     "@standardnotes/common": "workspace:*"
     "@standardnotes/domain-events": "workspace:*"
-    "@standardnotes/encryption": "workspace:*"
+    "@standardnotes/encryption": ^1.10.2
     "@standardnotes/features": "workspace:*"
     "@standardnotes/files": "workspace:*"
     "@standardnotes/models": "workspace:*"
@@ -4310,7 +4305,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@standardnotes/utils@workspace:*, @standardnotes/utils@workspace:packages/utils":
+"@standardnotes/utils@^1.6.12, @standardnotes/utils@workspace:*, @standardnotes/utils@workspace:packages/utils":
   version: 0.0.0-use.local
   resolution: "@standardnotes/utils@workspace:packages/utils"
   dependencies:
