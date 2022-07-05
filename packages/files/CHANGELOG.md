@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.4.0](https://github.com/standardnotes/snjs/compare/@standardnotes/files@1.3.24...@standardnotes/files@1.4.0) (2022-07-05)
+
+### Features
+
+* remove encryption package in favor of standardnotes/app repository ([f6d1c9e](https://github.com/standardnotes/snjs/commit/f6d1c9ee538bb59ee7ac28c0d49ca682d4eb4d38))
+
 ## [1.3.24](https://github.com/standardnotes/snjs/compare/@standardnotes/files@1.3.23...@standardnotes/files@1.3.24) (2022-07-04)
 
 ### Bug Fixes

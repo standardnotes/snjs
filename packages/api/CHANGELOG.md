@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.2.0](https://github.com/standardnotes/snjs/compare/@standardnotes/api@1.1.20...@standardnotes/api@1.2.0) (2022-07-05)
+
+### Features
+
+* remove encryption package in favor of standardnotes/app repository ([f6d1c9e](https://github.com/standardnotes/snjs/commit/f6d1c9ee538bb59ee7ac28c0d49ca682d4eb4d38))
+
 ## [1.1.20](https://github.com/standardnotes/snjs/compare/@standardnotes/api@1.1.19...@standardnotes/api@1.1.20) (2022-07-04)
 
 ### Bug Fixes
