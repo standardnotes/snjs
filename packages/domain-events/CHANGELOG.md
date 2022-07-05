@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.33.0](https://github.com/standardnotes/snjs/compare/@standardnotes/domain-events@2.32.7...@standardnotes/domain-events@2.33.0) (2022-07-05)
+
+### Features
+
+* remove features package in favor of standardnotes/app repository ([bb8226b](https://github.com/standardnotes/snjs/commit/bb8226b77550707c2a981778a78fe3dccf1aaa03))
+
 ## [2.32.7](https://github.com/standardnotes/snjs/compare/@standardnotes/domain-events@2.32.6...@standardnotes/domain-events@2.32.7) (2022-07-04)
 
 ### Bug Fixes

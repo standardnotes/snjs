@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.12.0](https://github.com/standardnotes/snjs/compare/@standardnotes/models@1.11.14...@standardnotes/models@1.12.0) (2022-07-05)
+
+### Features
+
+* remove features package in favor of standardnotes/app repository ([bb8226b](https://github.com/standardnotes/snjs/commit/bb8226b77550707c2a981778a78fe3dccf1aaa03))
+
 ## [1.11.14](https://github.com/standardnotes/snjs/compare/@standardnotes/models@1.11.13...@standardnotes/models@1.11.14) (2022-07-04)
 
 ### Bug Fixes
