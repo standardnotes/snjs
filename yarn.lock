@@ -3168,7 +3168,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@lerna-lite/cli@npm:^1.5.1":
+"@lerna-lite/cli@npm:^1.6.0":
   version: 1.6.0
   resolution: "@lerna-lite/cli@npm:1.6.0"
   dependencies:
@@ -3274,7 +3274,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@lerna-lite/list@npm:^1.5.1":
+"@lerna-lite/list@npm:^1.6.0":
   version: 1.6.0
   resolution: "@lerna-lite/list@npm:1.6.0"
   dependencies:
@@ -3349,7 +3349,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@lerna-lite/run@npm:^1.5.1":
+"@lerna-lite/run@npm:^1.6.0":
   version: 1.6.0
   resolution: "@lerna-lite/run@npm:1.6.0"
   dependencies:
@@ -4198,9 +4198,9 @@ __metadata:
   dependencies:
     "@commitlint/cli": ^17.0.2
     "@commitlint/config-conventional": ^17.0.2
-    "@lerna-lite/cli": ^1.5.1
-    "@lerna-lite/list": ^1.5.1
-    "@lerna-lite/run": ^1.5.1
+    "@lerna-lite/cli": ^1.6.0
+    "@lerna-lite/list": ^1.6.0
+    "@lerna-lite/run": ^1.6.0
     "@types/jest": ^28.1.4
     "@types/node": ^18.0.0
     "@typescript-eslint/parser": ^5.30.0
