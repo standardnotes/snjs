@@ -34,7 +34,7 @@
   },
   "dependencies": {
     "@standardnotes/common": "workspace:*",
-    "@standardnotes/features": "workspace:*",
+    "@standardnotes/features": "^1.47.0",
     "@standardnotes/responses": "workspace:*",
     "@standardnotes/utils": "workspace:*",
     "lodash": "^4.17.21",

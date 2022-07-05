@@ -3914,7 +3914,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@standardnotes/auth@workspace:*, @standardnotes/auth@workspace:packages/auth":
+"@standardnotes/auth@^3.19.4, @standardnotes/auth@workspace:*, @standardnotes/auth@workspace:packages/auth":
   version: 0.0.0-use.local
   resolution: "@standardnotes/auth@workspace:packages/auth"
   dependencies:
@@ -3971,7 +3971,7 @@ __metadata:
   dependencies:
     "@standardnotes/auth": "workspace:*"
     "@standardnotes/common": "workspace:*"
-    "@standardnotes/features": "workspace:*"
+    "@standardnotes/features": ^1.47.0
     "@standardnotes/scheduler": "workspace:*"
     "@types/jest": ^28.1.4
     "@typescript-eslint/eslint-plugin": ^5.30.0
@@ -3997,20 +3997,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@standardnotes/features@workspace:*, @standardnotes/features@workspace:packages/features":
-  version: 0.0.0-use.local
-  resolution: "@standardnotes/features@workspace:packages/features"
+"@standardnotes/features@npm:^1.47.0":
+  version: 1.47.0
+  resolution: "@standardnotes/features@npm:1.47.0"
   dependencies:
-    "@standardnotes/auth": "workspace:*"
-    "@standardnotes/common": "workspace:*"
-    "@types/jest": ^28.1.4
-    "@typescript-eslint/eslint-plugin": ^5.30.0
-    eslint-plugin-prettier: ^4.2.1
-    jest: ^28.1.2
-    reflect-metadata: ^0.1.13
-    ts-jest: ^28.0.5
-  languageName: unknown
-  linkType: soft
+    "@standardnotes/auth": ^3.19.4
+    "@standardnotes/common": ^1.23.1
+  checksum: bd0ddd6017867e7c905dfdbac4875889713b3f10e79a2e702cc76c3f5db4c9a5ac1a2418e54358aaee4f4404e4d62b208faa755c61bc2eb3e5a2a17777dfbdd0
+  languageName: node
+  linkType: hard
 
 "@standardnotes/filepicker@workspace:*, @standardnotes/filepicker@workspace:packages/filepicker":
   version: 0.0.0-use.local
@@ -4056,7 +4051,7 @@ __metadata:
   resolution: "@standardnotes/models@workspace:packages/models"
   dependencies:
     "@standardnotes/common": "workspace:*"
-    "@standardnotes/features": "workspace:*"
+    "@standardnotes/features": ^1.47.0
     "@standardnotes/responses": "workspace:*"
     "@standardnotes/utils": "workspace:*"
     "@types/jest": ^27.4.1
@@ -4076,7 +4071,7 @@ __metadata:
   dependencies:
     "@standardnotes/auth": "workspace:*"
     "@standardnotes/common": "workspace:*"
-    "@standardnotes/features": "workspace:*"
+    "@standardnotes/features": ^1.47.0
     "@types/jest": ^27.4.1
     "@typescript-eslint/eslint-plugin": ^5.30.0
     eslint-plugin-prettier: ^4.2.1
@@ -4237,7 +4232,7 @@ __metadata:
     "@standardnotes/common": "workspace:*"
     "@standardnotes/domain-events": "workspace:*"
     "@standardnotes/encryption": ^1.10.2
-    "@standardnotes/features": "workspace:*"
+    "@standardnotes/features": ^1.47.0
     "@standardnotes/files": "workspace:*"
     "@standardnotes/models": "workspace:*"
     "@standardnotes/responses": "workspace:*"

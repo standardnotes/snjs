@@ -25,7 +25,7 @@
   "dependencies": {
     "@standardnotes/auth": "workspace:*",
     "@standardnotes/common": "workspace:*",
-    "@standardnotes/features": "workspace:*",
+    "@standardnotes/features": "^1.47.0",
     "@standardnotes/scheduler": "workspace:*",
     "reflect-metadata": "^0.1.13"
   },

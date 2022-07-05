@@ -33,7 +33,7 @@
   "dependencies": {
     "@standardnotes/auth": "workspace:*",
     "@standardnotes/common": "workspace:*",
-    "@standardnotes/features": "workspace:*",
+    "@standardnotes/features": "^1.47.0",
     "reflect-metadata": "^0.1.13"
   }
 }
