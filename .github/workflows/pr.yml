@@ -9,25 +9,31 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
+      - name: Set up Node
+        uses: actions/setup-node@v3
         with:
-          node-version: 16
+          registry-url: 'https://registry.npmjs.org'
+          node-version-file: '.nvmrc'
       - run: yarn build
   lint:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
+      - name: Set up Node
+        uses: actions/setup-node@v3
         with:
-          node-version: 16
+          registry-url: 'https://registry.npmjs.org'
+          node-version-file: '.nvmrc'
       - run: yarn lint
   unit-tests:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
+      - name: Set up Node
+        uses: actions/setup-node@v3
         with:
-          node-version: 16
+          registry-url: 'https://registry.npmjs.org'
+          node-version-file: '.nvmrc'
       - run: yarn install --immutable # required for microtime package in @standardnotes/time
       - run: yarn build
       - run: yarn test:unit
@@ -35,7 +41,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
+      - name: Set up Node
+        uses: actions/setup-node@v3
         with:
-          node-version: 16
+          registry-url: 'https://registry.npmjs.org'
+          node-version-file: '.nvmrc'
       - run: yarn test:e2e
