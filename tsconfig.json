@@ -23,9 +23,6 @@
   "exclude": ["**/*.spec.ts", "dist", "test-setup.ts"],
   "references": [
     {
-      "path": "./packages/analytics"
-    },
-    {
       "path": "./packages/api"
     },
     {
