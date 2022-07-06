@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.3.0](https://github.com/standardnotes/snjs/compare/@standardnotes/api@1.2.1...@standardnotes/api@1.3.0) (2022-07-06)
+
+### Features
+
+* remove filepicker, features, services and models packages in favor of standardnotes/app repository ([27f474e](https://github.com/standardnotes/snjs/commit/27f474e859701c5713c8b6ed27cd1a4d5e4392bb))
+
 ## [1.2.1](https://github.com/standardnotes/snjs/compare/@standardnotes/api@1.2.0...@standardnotes/api@1.2.1) (2022-07-05)
 
 **Note:** Version bump only for package @standardnotes/api

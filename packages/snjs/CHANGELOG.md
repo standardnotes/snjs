@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.121.0](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.120.0...@standardnotes/snjs@2.121.0) (2022-07-06)
+
+### Bug Fixes
+
+* application interface import ([3727df8](https://github.com/standardnotes/snjs/commit/3727df8185dbc60dced14b28fc722da8b42c7c08))
+* update files package to latest version ([7097de1](https://github.com/standardnotes/snjs/commit/7097de1e470533de54cc8119052c99eee73f9d4b))
+
+### Features
+
+* remove filepicker, features, services and models packages in favor of standardnotes/app repository ([27f474e](https://github.com/standardnotes/snjs/commit/27f474e859701c5713c8b6ed27cd1a4d5e4392bb))
+
 # [2.120.0](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.119.0...@standardnotes/snjs@2.120.0) (2022-07-05)
 
 ### Features
