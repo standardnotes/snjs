@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.122.0](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.121.0...@standardnotes/snjs@2.122.0) (2022-07-06)
+
+### Bug Fixes
+
+* update api to the latest fixed version ([fcc11ef](https://github.com/standardnotes/snjs/commit/fcc11ef7005ecd72620bcf8c85420ebbf4998ee7))
+
+### Features
+
+* remove domain-events and domain-events-infra package in favour of standardnotes/server repository ([2ba8240](https://github.com/standardnotes/snjs/commit/2ba8240d70c24e9c022d721cdb5472d84a54af88))
+* remove remaining packages to other standardnotes repos - except snjs itself ([30a1071](https://github.com/standardnotes/snjs/commit/30a1071eb11c71858ceaecac463df7299fbe3e92))
+
 # [2.121.0](https://github.com/standardnotes/snjs/compare/@standardnotes/snjs@2.120.0...@standardnotes/snjs@2.121.0) (2022-07-06)
 
 ### Bug Fixes
