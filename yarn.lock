@@ -4033,32 +4033,33 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@standardnotes/filepicker@npm:1.19.0":
-  version: 1.19.0
-  resolution: "@standardnotes/filepicker@npm:1.19.0"
+"@standardnotes/filepicker@npm:1.19.1":
+  version: 1.19.1
+  resolution: "@standardnotes/filepicker@npm:1.19.1"
   dependencies:
     "@standardnotes/common": ^1.23.1
     "@standardnotes/services": 1.15.0
     "@standardnotes/utils": ^1.6.12
+    "@types/wicg-file-system-access": ^2020.9.5
     reflect-metadata: ^0.1.13
-  checksum: 413dba3dd334f7c54006c18bd9c45a29aa00118dbf03bbff3b8f608ef39eb8985e2204d18bb3f9d1a60c7aff4c5d93995a4f6068305c527cdf042a964bd86efe
+  checksum: 4ecd06b98d0c154f1d0f2d85e4ba7780888f48b731184a1c8e939956db0a6e4f849db8aecc070fe844352abf2e682cd3f40b55b54c8a8e13aa5c1fbf2e3c69c3
   languageName: node
   linkType: hard
 
-"@standardnotes/files@npm:^1.7.0":
-  version: 1.7.0
-  resolution: "@standardnotes/files@npm:1.7.0"
+"@standardnotes/files@npm:^1.7.1":
+  version: 1.7.1
+  resolution: "@standardnotes/files@npm:1.7.1"
   dependencies:
     "@standardnotes/common": ^1.23.1
     "@standardnotes/encryption": 1.12.0
-    "@standardnotes/filepicker": 1.19.0
+    "@standardnotes/filepicker": 1.19.1
     "@standardnotes/models": 1.14.0
     "@standardnotes/responses": ^1.6.39
     "@standardnotes/services": 1.15.0
     "@standardnotes/sncrypto-common": ^1.9.0
     "@standardnotes/utils": ^1.6.12
     reflect-metadata: ^0.1.13
-  checksum: ef8221577622020b2bca04a1ca84adaef9d3861a892945dea2920e9d2ec5b2f11118e5e4d15fd0c2142c39158768706bd9167ae5cd8329f4767116873fc2e588
+  checksum: ab975212992dd97fb53960c7861c31b97884804fa367ce729745e6b9a936c7d43b6cf84704a774e97b0e02fc9e16f106042746535dd07d24ad891ed4407cddb1
   languageName: node
   linkType: hard
 
@@ -4239,7 +4240,7 @@ __metadata:
     "@standardnotes/domain-events": "workspace:*"
     "@standardnotes/encryption": ^1.10.2
     "@standardnotes/features": ^1.47.0
-    "@standardnotes/files": ^1.7.0
+    "@standardnotes/files": ^1.7.1
     "@standardnotes/models": ^1.14.0
     "@standardnotes/responses": "workspace:*"
     "@standardnotes/services": ^1.15.0
@@ -4686,6 +4687,13 @@ __metadata:
   version: 8.3.4
   resolution: "@types/uuid@npm:8.3.4"
   checksum: 6f11f3ff70f30210edaa8071422d405e9c1d4e53abbe50fdce365150d3c698fe7bbff65c1e71ae080cbfb8fded860dbb5e174da96fdbbdfcaa3fb3daa474d20f
+  languageName: node
+  linkType: hard
+
+"@types/wicg-file-system-access@npm:^2020.9.5":
+  version: 2020.9.5
+  resolution: "@types/wicg-file-system-access@npm:2020.9.5"
+  checksum: 56243705df43fd3b18049adcf5cb639dfbec5a033a33991f4050d0f6e09ebc94a70f426fde1926b7b0fb493d75ea7064eba95e06852eccd8d9cff4b1fde47e35
   languageName: node
   linkType: hard
 

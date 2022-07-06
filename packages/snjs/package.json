@@ -77,7 +77,7 @@
     "@standardnotes/domain-events": "workspace:*",
     "@standardnotes/encryption": "^1.10.2",
     "@standardnotes/features": "^1.47.0",
-    "@standardnotes/files": "^1.7.0",
+    "@standardnotes/files": "^1.7.1",
     "@standardnotes/models": "^1.14.0",
     "@standardnotes/responses": "workspace:*",
     "@standardnotes/services": "^1.15.0",

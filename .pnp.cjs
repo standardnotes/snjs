@@ -6497,26 +6497,27 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
         }]\
       ]],\
       ["@standardnotes/filepicker", [\
-        ["npm:1.19.0", {\
-          "packageLocation": "./.yarn/cache/@standardnotes-filepicker-npm-1.19.0-2029bd78c4-413dba3dd3.zip/node_modules/@standardnotes/filepicker/",\
+        ["npm:1.19.1", {\
+          "packageLocation": "./.yarn/cache/@standardnotes-filepicker-npm-1.19.1-c31ccfd754-4ecd06b98d.zip/node_modules/@standardnotes/filepicker/",\
           "packageDependencies": [\
-            ["@standardnotes/filepicker", "npm:1.19.0"],\
+            ["@standardnotes/filepicker", "npm:1.19.1"],\
             ["@standardnotes/common", "workspace:packages/common"],\
             ["@standardnotes/services", "npm:1.15.0"],\
             ["@standardnotes/utils", "workspace:packages/utils"],\
+            ["@types/wicg-file-system-access", "npm:2020.9.5"],\
             ["reflect-metadata", "npm:0.1.13"]\
           ],\
           "linkType": "HARD"\
         }]\
       ]],\
       ["@standardnotes/files", [\
-        ["npm:1.7.0", {\
-          "packageLocation": "./.yarn/cache/@standardnotes-files-npm-1.7.0-0ca44cb72e-ef82215776.zip/node_modules/@standardnotes/files/",\
+        ["npm:1.7.1", {\
+          "packageLocation": "./.yarn/cache/@standardnotes-files-npm-1.7.1-5ef7d4ef2b-ab97521299.zip/node_modules/@standardnotes/files/",\
           "packageDependencies": [\
-            ["@standardnotes/files", "npm:1.7.0"],\
+            ["@standardnotes/files", "npm:1.7.1"],\
             ["@standardnotes/common", "workspace:packages/common"],\
             ["@standardnotes/encryption", "npm:1.12.0"],\
-            ["@standardnotes/filepicker", "npm:1.19.0"],\
+            ["@standardnotes/filepicker", "npm:1.19.1"],\
             ["@standardnotes/models", "npm:1.14.0"],\
             ["@standardnotes/responses", "workspace:packages/responses"],\
             ["@standardnotes/services", "npm:1.15.0"],\
@@ -6685,7 +6686,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@standardnotes/domain-events", "workspace:packages/domain-events"],\
             ["@standardnotes/encryption", "npm:1.10.2"],\
             ["@standardnotes/features", "npm:1.47.0"],\
-            ["@standardnotes/files", "npm:1.7.0"],\
+            ["@standardnotes/files", "npm:1.7.1"],\
             ["@standardnotes/models", "npm:1.14.0"],\
             ["@standardnotes/responses", "workspace:packages/responses"],\
             ["@standardnotes/services", "npm:1.15.0"],\
@@ -7226,6 +7227,15 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageLocation": "./.yarn/cache/@types-uuid-npm-8.3.4-7547f4402c-6f11f3ff70.zip/node_modules/@types/uuid/",\
           "packageDependencies": [\
             ["@types/uuid", "npm:8.3.4"]\
+          ],\
+          "linkType": "HARD"\
+        }]\
+      ]],\
+      ["@types/wicg-file-system-access", [\
+        ["npm:2020.9.5", {\
+          "packageLocation": "./.yarn/cache/@types-wicg-file-system-access-npm-2020.9.5-384d8d4b25-56243705df.zip/node_modules/@types/wicg-file-system-access/",\
+          "packageDependencies": [\
+            ["@types/wicg-file-system-access", "npm:2020.9.5"]\
           ],\
           "linkType": "HARD"\
         }]\
