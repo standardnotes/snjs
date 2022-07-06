@@ -41,22 +41,10 @@
       "path": "./packages/domain-events-infra"
     },
     {
-      "path": "./packages/filepicker"
-    },
-    {
-      "path": "./packages/files"
-    },
-    {
-      "path": "./packages/models"
-    },
-    {
       "path": "./packages/responses"
     },
     {
       "path": "./packages/scheduler"
-    },
-    {
-      "path": "./packages/services"
     },
     {
       "path": "./packages/settings"

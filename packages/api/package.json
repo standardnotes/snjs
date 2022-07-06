@@ -36,9 +36,9 @@
     "@standardnotes/auth": "workspace:*",
     "@standardnotes/common": "workspace:*",
     "@standardnotes/encryption": "^1.10.2",
-    "@standardnotes/models": "workspace:*",
+    "@standardnotes/models": "^1.14.0",
     "@standardnotes/responses": "workspace:*",
-    "@standardnotes/services": "workspace:*",
+    "@standardnotes/services": "^1.15.0",
     "@standardnotes/utils": "workspace:*",
     "reflect-metadata": "^0.1.13"
   }

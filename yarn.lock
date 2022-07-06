@@ -3900,9 +3900,9 @@ __metadata:
     "@standardnotes/auth": "workspace:*"
     "@standardnotes/common": "workspace:*"
     "@standardnotes/encryption": ^1.10.2
-    "@standardnotes/models": "workspace:*"
+    "@standardnotes/models": ^1.14.0
     "@standardnotes/responses": "workspace:*"
-    "@standardnotes/services": "workspace:*"
+    "@standardnotes/services": ^1.15.0
     "@standardnotes/utils": "workspace:*"
     "@types/jest": ^27.4.1
     "@types/lodash": ^4.14.182
@@ -3982,6 +3982,21 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@standardnotes/encryption@npm:1.12.0":
+  version: 1.12.0
+  resolution: "@standardnotes/encryption@npm:1.12.0"
+  dependencies:
+    "@standardnotes/common": ^1.23.1
+    "@standardnotes/models": 1.14.0
+    "@standardnotes/responses": ^1.6.39
+    "@standardnotes/services": 1.15.0
+    "@standardnotes/sncrypto-common": ^1.9.0
+    "@standardnotes/utils": ^1.6.12
+    reflect-metadata: ^0.1.13
+  checksum: 1a28653b1e75c8c728fc7e68a64950eea2a291b339c7cd9f8672061ab9768ae7895fb75184b98e9046c296a96bb40d835dda7706ace973a948232f0f0655fcf7
+  languageName: node
+  linkType: hard
+
 "@standardnotes/encryption@npm:^1.10.2":
   version: 1.10.2
   resolution: "@standardnotes/encryption@npm:1.10.2"
@@ -3997,6 +4012,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@standardnotes/features@npm:1.50.0":
+  version: 1.50.0
+  resolution: "@standardnotes/features@npm:1.50.0"
+  dependencies:
+    "@standardnotes/auth": ^3.19.4
+    "@standardnotes/common": ^1.23.1
+    reflect-metadata: ^0.1.13
+  checksum: b61b50695bd0f7cbd62d491ea754022f01de96e7f2cfe5ae44cf8d985295f298bb0e7acd3bc3ab551d74bafa5f8eeb82c1164f46b46fd737bac3e5cea45d2441
+  languageName: node
+  linkType: hard
+
 "@standardnotes/features@npm:^1.47.0":
   version: 1.47.0
   resolution: "@standardnotes/features@npm:1.47.0"
@@ -4007,63 +4033,48 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@standardnotes/filepicker@workspace:*, @standardnotes/filepicker@workspace:packages/filepicker":
-  version: 0.0.0-use.local
-  resolution: "@standardnotes/filepicker@workspace:packages/filepicker"
+"@standardnotes/filepicker@npm:1.19.0":
+  version: 1.19.0
+  resolution: "@standardnotes/filepicker@npm:1.19.0"
   dependencies:
-    "@standardnotes/common": "workspace:*"
-    "@standardnotes/services": "workspace:*"
-    "@standardnotes/utils": "workspace:*"
-    "@types/jest": ^27.4.1
-    "@types/wicg-file-system-access": ^2020.9.5
-    "@typescript-eslint/eslint-plugin": ^5.30.0
-    eslint-plugin-prettier: ^4.2.1
-    jest: ^27.5.1
+    "@standardnotes/common": ^1.23.1
+    "@standardnotes/services": 1.15.0
+    "@standardnotes/utils": ^1.6.12
     reflect-metadata: ^0.1.13
-    ts-jest: ^27.1.3
-    ts-node: ^10.5.0
-  languageName: unknown
-  linkType: soft
+  checksum: 413dba3dd334f7c54006c18bd9c45a29aa00118dbf03bbff3b8f608ef39eb8985e2204d18bb3f9d1a60c7aff4c5d93995a4f6068305c527cdf042a964bd86efe
+  languageName: node
+  linkType: hard
 
-"@standardnotes/files@workspace:*, @standardnotes/files@workspace:packages/files":
-  version: 0.0.0-use.local
-  resolution: "@standardnotes/files@workspace:packages/files"
+"@standardnotes/files@npm:^1.7.0":
+  version: 1.7.0
+  resolution: "@standardnotes/files@npm:1.7.0"
   dependencies:
-    "@standardnotes/common": "workspace:*"
-    "@standardnotes/encryption": ^1.10.2
-    "@standardnotes/filepicker": "workspace:*"
-    "@standardnotes/models": "workspace:*"
-    "@standardnotes/responses": "workspace:*"
-    "@standardnotes/services": "workspace:*"
-    "@standardnotes/sncrypto-common": "workspace:*"
-    "@standardnotes/utils": "workspace:*"
-    "@types/jest": ^27.4.1
-    "@typescript-eslint/eslint-plugin": ^5.30.0
-    eslint-plugin-prettier: ^4.2.1
-    jest: ^27.5.1
+    "@standardnotes/common": ^1.23.1
+    "@standardnotes/encryption": 1.12.0
+    "@standardnotes/filepicker": 1.19.0
+    "@standardnotes/models": 1.14.0
+    "@standardnotes/responses": ^1.6.39
+    "@standardnotes/services": 1.15.0
+    "@standardnotes/sncrypto-common": ^1.9.0
+    "@standardnotes/utils": ^1.6.12
     reflect-metadata: ^0.1.13
-    ts-jest: ^27.1.3
-  languageName: unknown
-  linkType: soft
+  checksum: ef8221577622020b2bca04a1ca84adaef9d3861a892945dea2920e9d2ec5b2f11118e5e4d15fd0c2142c39158768706bd9167ae5cd8329f4767116873fc2e588
+  languageName: node
+  linkType: hard
 
-"@standardnotes/models@^1.11.13, @standardnotes/models@workspace:*, @standardnotes/models@workspace:packages/models":
-  version: 0.0.0-use.local
-  resolution: "@standardnotes/models@workspace:packages/models"
+"@standardnotes/models@npm:1.14.0, @standardnotes/models@npm:^1.11.13, @standardnotes/models@npm:^1.14.0":
+  version: 1.14.0
+  resolution: "@standardnotes/models@npm:1.14.0"
   dependencies:
-    "@standardnotes/common": "workspace:*"
-    "@standardnotes/features": ^1.47.0
-    "@standardnotes/responses": "workspace:*"
-    "@standardnotes/utils": "workspace:*"
-    "@types/jest": ^27.4.1
-    "@types/lodash": ^4.14.182
-    "@typescript-eslint/eslint-plugin": ^5.30.0
-    eslint-plugin-prettier: ^4.2.1
-    jest: ^27.5.1
+    "@standardnotes/common": ^1.23.1
+    "@standardnotes/features": 1.50.0
+    "@standardnotes/responses": ^1.6.39
+    "@standardnotes/utils": ^1.6.12
     lodash: ^4.17.21
     reflect-metadata: ^0.1.13
-    ts-jest: ^27.1.3
-  languageName: unknown
-  linkType: soft
+  checksum: bfb9d517b6569d39e3f7bb700a644e430c7c88a2ce84c24d649efd8aac1fa94f222258fe08e1afa2614ffd73ac414911bbe39a597c1f6e9bfce6852a2c7ac776
+  languageName: node
+  linkType: hard
 
 "@standardnotes/responses@^1.6.39, @standardnotes/responses@workspace:*, @standardnotes/responses@workspace:packages/responses":
   version: 0.0.0-use.local
@@ -4095,24 +4106,19 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@standardnotes/services@^1.13.23, @standardnotes/services@workspace:*, @standardnotes/services@workspace:packages/services":
-  version: 0.0.0-use.local
-  resolution: "@standardnotes/services@workspace:packages/services"
+"@standardnotes/services@npm:1.15.0, @standardnotes/services@npm:^1.13.23, @standardnotes/services@npm:^1.15.0":
+  version: 1.15.0
+  resolution: "@standardnotes/services@npm:1.15.0"
   dependencies:
-    "@standardnotes/auth": "workspace:*"
-    "@standardnotes/common": "workspace:*"
-    "@standardnotes/models": "workspace:*"
-    "@standardnotes/responses": "workspace:*"
-    "@standardnotes/utils": "workspace:*"
-    "@types/jest": ^27.4.1
-    "@typescript-eslint/eslint-plugin": ^5.30.0
-    "@typescript-eslint/parser": ^5.12.1
-    eslint-plugin-prettier: ^4.2.1
-    jest: ^27.5.1
+    "@standardnotes/auth": ^3.19.4
+    "@standardnotes/common": ^1.23.1
+    "@standardnotes/models": 1.14.0
+    "@standardnotes/responses": ^1.6.39
+    "@standardnotes/utils": ^1.6.12
     reflect-metadata: ^0.1.13
-    ts-jest: ^27.1.3
-  languageName: unknown
-  linkType: soft
+  checksum: 1028a5b4c1372f13044115b3dea510a7e32479567161007472116f8a6168570735beeb32a5e795259f461bc983e75c4a4be72b8a927c60225c4057594ce139b2
+  languageName: node
+  linkType: hard
 
 "@standardnotes/settings@workspace:*, @standardnotes/settings@workspace:packages/settings":
   version: 0.0.0-use.local
@@ -4233,10 +4239,10 @@ __metadata:
     "@standardnotes/domain-events": "workspace:*"
     "@standardnotes/encryption": ^1.10.2
     "@standardnotes/features": ^1.47.0
-    "@standardnotes/files": "workspace:*"
-    "@standardnotes/models": "workspace:*"
+    "@standardnotes/files": ^1.7.0
+    "@standardnotes/models": ^1.14.0
     "@standardnotes/responses": "workspace:*"
-    "@standardnotes/services": "workspace:*"
+    "@standardnotes/services": ^1.15.0
     "@standardnotes/settings": "workspace:*"
     "@standardnotes/sncrypto-common": "workspace:*"
     "@standardnotes/sncrypto-web": "workspace:*"
@@ -4680,13 +4686,6 @@ __metadata:
   version: 8.3.4
   resolution: "@types/uuid@npm:8.3.4"
   checksum: 6f11f3ff70f30210edaa8071422d405e9c1d4e53abbe50fdce365150d3c698fe7bbff65c1e71ae080cbfb8fded860dbb5e174da96fdbbdfcaa3fb3daa474d20f
-  languageName: node
-  linkType: hard
-
-"@types/wicg-file-system-access@npm:^2020.9.5":
-  version: 2020.9.5
-  resolution: "@types/wicg-file-system-access@npm:2020.9.5"
-  checksum: 56243705df43fd3b18049adcf5cb639dfbec5a033a33991f4050d0f6e09ebc94a70f426fde1926b7b0fb493d75ea7064eba95e06852eccd8d9cff4b1fde47e35
   languageName: node
   linkType: hard
 
@@ -13830,7 +13829,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"ts-node@npm:^10.5.0, ts-node@npm:^10.8.1":
+"ts-node@npm:^10.8.1":
   version: 10.8.1
   resolution: "ts-node@npm:10.8.1"
   dependencies:
