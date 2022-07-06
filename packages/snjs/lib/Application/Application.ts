@@ -17,7 +17,7 @@ import * as InternalServices from '../Services'
 import * as Utils from '@standardnotes/utils'
 import * as Settings from '@standardnotes/settings'
 import * as Files from '@standardnotes/files'
-import { Subscription } from '@standardnotes/auth'
+import { Subscription } from '@standardnotes/security'
 import { UuidString, ApplicationEventPayload } from '../Types'
 import { ApplicationEvent, applicationEventForSyncEvent } from '@Lib/Application/Event'
 import {

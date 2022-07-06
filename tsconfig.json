@@ -21,39 +21,5 @@
     "target": "es2022",
   },
   "exclude": ["**/*.spec.ts", "dist", "test-setup.ts"],
-  "references": [
-    {
-      "path": "./packages/api"
-    },
-    {
-      "path": "./packages/auth"
-    },
-    {
-      "path": "./packages/common"
-    },
-    {
-      "path": "./packages/responses"
-    },
-    {
-      "path": "./packages/scheduler"
-    },
-    {
-      "path": "./packages/settings"
-    },
-    {
-      "path": "./packages/sncrypto-common"
-    },
-    {
-      "path": "./packages/sncrypto-node"
-    },
-    {
-      "path": "./packages/sncrypto-web"
-    },
-    {
-      "path": "./packages/time"
-    },
-    {
-      "path": "./packages/utils"
-    }
-  ]
+  "references": []
 }
