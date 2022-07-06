@@ -70,7 +70,7 @@
     "webpack-merge": "^5.8.0"
   },
   "dependencies": {
-    "@standardnotes/api": "^1.4.0",
+    "@standardnotes/api": "^1.4.1",
     "@standardnotes/common": "^1.25.0",
     "@standardnotes/domain-events": "^2.39.0",
     "@standardnotes/encryption": "^1.13.0",
@@ -83,6 +83,7 @@
     "@standardnotes/settings": "^1.17.0",
     "@standardnotes/sncrypto-common": "^1.11.0",
     "@standardnotes/sncrypto-web": "^1.12.0",
+    "@standardnotes/utils": "^1.8.0",
     "reflect-metadata": "^0.1.13",
     "semver": "^7.3.7"
   }

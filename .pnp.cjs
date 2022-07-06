@@ -3732,16 +3732,17 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
         }]\
       ]],\
       ["@standardnotes/api", [\
-        ["npm:1.4.0", {\
-          "packageLocation": "./.yarn/cache/@standardnotes-api-npm-1.4.0-e9d04d9fc8-59088fd8c6.zip/node_modules/@standardnotes/api/",\
+        ["npm:1.4.1", {\
+          "packageLocation": "./.yarn/cache/@standardnotes-api-npm-1.4.1-8a5e6a980c-0d789f701a.zip/node_modules/@standardnotes/api/",\
           "packageDependencies": [\
-            ["@standardnotes/api", "npm:1.4.0"],\
+            ["@standardnotes/api", "npm:1.4.1"],\
             ["@standardnotes/common", "npm:1.25.0"],\
             ["@standardnotes/encryption", "npm:1.13.0"],\
             ["@standardnotes/models", "npm:1.15.0"],\
             ["@standardnotes/responses", "npm:1.9.0"],\
             ["@standardnotes/security", "npm:1.2.0"],\
             ["@standardnotes/services", "npm:1.16.0"],\
+            ["@standardnotes/utils", "npm:1.8.0"],\
             ["reflect-metadata", "npm:0.1.13"]\
           ],\
           "linkType": "HARD"\
@@ -3950,7 +3951,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@standardnotes/snjs", "workspace:packages/snjs"],\
             ["@babel/core", "npm:7.18.6"],\
             ["@babel/preset-env", "virtual:b3946080b62092fd53e1141839da112b684b0f36a333349b3357e42bb5dbf3bb7fe1a3ef99e20e2018ee575e5dce71d44ded2685679efd7f29b1e7d9014dfc01#npm:7.18.6"],\
-            ["@standardnotes/api", "npm:1.4.0"],\
+            ["@standardnotes/api", "npm:1.4.1"],\
             ["@standardnotes/common", "npm:1.25.0"],\
             ["@standardnotes/domain-events", "npm:2.39.0"],\
             ["@standardnotes/encryption", "npm:1.13.0"],\
@@ -3963,6 +3964,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@standardnotes/settings", "npm:1.17.0"],\
             ["@standardnotes/sncrypto-common", "npm:1.11.0"],\
             ["@standardnotes/sncrypto-web", "npm:1.12.0"],\
+            ["@standardnotes/utils", "npm:1.8.0"],\
             ["@types/crypto-js", "npm:4.1.1"],\
             ["@types/jest", "npm:28.1.4"],\
             ["@types/jsdom", "npm:16.2.14"],\
