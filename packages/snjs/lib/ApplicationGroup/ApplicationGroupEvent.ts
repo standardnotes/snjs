@@ -1,5 +1,4 @@
-import { DeinitMode, DeinitSource } from '@standardnotes/services'
-import { ApplicationInterface } from '@standardnotes/services/src/Domain/Application/ApplicationInterface'
+import { ApplicationInterface, DeinitMode, DeinitSource } from '@standardnotes/services'
 import { DescriptorRecord } from './DescriptorRecord'
 
 export enum ApplicationGroupEvent {
