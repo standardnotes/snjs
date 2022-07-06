@@ -74,7 +74,7 @@
     "@standardnotes/api": "workspace:*",
     "@standardnotes/auth": "workspace:*",
     "@standardnotes/common": "workspace:*",
-    "@standardnotes/domain-events": "workspace:*",
+    "@standardnotes/domain-events": "^2.35.0",
     "@standardnotes/encryption": "^1.10.2",
     "@standardnotes/features": "^1.47.0",
     "@standardnotes/files": "^1.7.1",
